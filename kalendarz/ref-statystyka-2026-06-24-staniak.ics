@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Modeling Hydrogen-Deuterium Exchange Mass Spectrometry data vi
+ a convolutions of exchange probabilities
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-24-staniak@im-uwr.github.io
+DTSTAMP:20261029T220510Z
+DTSTART;TZID=Europe/Warsaw:20260624T113000
+DTEND;TZID=Europe/Warsaw:20260624T130000
+SUMMARY:Modeling Hydrogen-Deuterium Exchange Mass Spectrometry data via con
+ volutions of exchange probabilities
+LOCATION:sala 605
+DESCRIPTION:Mateusz Staniak (IM UWr)\nSeminarium: Statystyka\nhttps://im-uw
+ r.github.io/Web-Core/seminaria/statystyka#2026-06-24-staniak
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-stani
+ ak
+END:VEVENT
+END:VCALENDAR
