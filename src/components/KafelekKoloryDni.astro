@@ -67,4 +67,10 @@ const brakDanych = !t0.kolor && !t0.nastepny;
   [data-kolor='brak'][data-nastepny='niebieski'] > .kd-pod::before { background: var(--kd-n-mocny); }
   [data-kolor='brak'][data-nastepny='pomaranczowy'] > .kd-pod::before { background: var(--kd-p-mocny); }
   [data-kolor='brak'][data-nastepny=''] > .kd-pod::before { display: none; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: kafelek to siatka (ikona | napis, komputer.css) — kropka zajmuje dwa wiersze, opis pod tytułem */
+  @media (min-width: 761px) {
+    .kd-kropka { grid-row: span 2; }
+    [data-kd-tytul] { grid-column: 2; }
+    .kd-pod { grid-column: 2; margin-top: 0; }
+  }
 </style>

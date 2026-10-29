@@ -120,9 +120,10 @@ const ikona = (a: string) =>
   : /zajecia|plan/.test(a) ? 'zegar'
   : 'strzalka';
 
-// ④ Aktualności dla studentów (komputer: trzy karty; telefon — wygląd „Portal”: zwarta lista sześciu).
+// ④ Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;
+//    telefon — wygląd „Portal”: zwarta lista sześciu).
 const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
-const aktualnosci = dlaStudentow.slice(0, 3);
+const aktualnosci = dlaStudentow.slice(0, 4);
 const aktualnosciTel = dlaStudentow.slice(0, 6);
 
 // ⑤ Kontakt: sekretariat dydaktyczny i zastępca dyrektora ds. dydaktycznych — z pól „Kontakt” kierunków (bez dubli).
@@ -331,6 +332,25 @@ const wstep = w(tekst, 'wstep');
   .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
   .people + .link-arrow { margin-top: 8px; }
   @media (prefers-reduced-motion: reduce) { .dz-prog .go :global(svg) { transition: none; transform: none !important; } }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” — niższe karty kierunków i ścieżek, linki ścieżki w dwóch kolumnach ---------- */
+  @media (min-width: 761px) {
+    .dz-wrap { padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); }
+    .dz-prog { min-height: 0; }
+    .dz-prog .go { padding-top: 2px; }
+    .dz-paths { gap: 12px; }
+    .dz-path { gap: 8px; padding: 14px 16px; }
+    .dz-path-h { gap: 12px; }
+    .dz-path h2 { font-size: 19px; }
+    .dz-path p { margin: 0; line-height: 1.4; }
+    /* linki ścieżki w dwóch kolumnach, gdy się mieszczą (dłuższa lista „Już studiuję” o połowę niższa) */
+    .dz-path ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); column-gap: 16px; }
+    .dz-path li a { min-height: 40px; padding: 4px 8px; }
+    .dz-head { margin-bottom: 8px; }
+    .dz-head h2 { font-size: 22px; }
+    .dz-zakres { margin: 0 0 2px; }
+    .people + .link-arrow { margin-top: 4px; }
+  }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {

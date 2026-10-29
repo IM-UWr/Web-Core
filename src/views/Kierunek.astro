@@ -330,6 +330,12 @@ const sekcje = [
   /* liczby kierunku mniejsze niż w statystykach działów (34 px) — „6 semestrów”, „licencjat” mieszczą się w kafelku */
   .kh-fakty .stat { padding: 16px 18px; }
   .kh-fakty .stat .n { font-size: 24px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: przyciski bliżej opisu; fakty jak liczby działów w tym wariancie (komputer.css: .stat) */
+  @media (min-width: 761px) {
+    .kh-btns { margin-top: 4px; }
+    .kh-fakty { margin: 0 0 14px; }
+    .kh-fakty .stat { padding: 9px 14px; }
+  }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {

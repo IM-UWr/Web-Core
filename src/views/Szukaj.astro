@@ -16,7 +16,7 @@ const teksty = lang === 'en'
 <Baza tytul={t(lang, 'szukaj')} szukaj={false}>
   <link slot="head" rel="stylesheet" href={u('/pagefind/pagefind-ui.css')} />
   <NaglowekStrony tytul={t(lang, 'szukajNaStronie')} lang={lang} okruszki={[{ etykieta: t(lang, 'szukaj') }]} />
-  <div class="wrap" style="padding-top:28px;padding-bottom:72px">
+  <div class="wrap sz-wrap">
     <div id="szukajka" style="max-width:900px"></div>
     <noscript><p>{lang === 'en' ? 'Search requires JavaScript.' : 'Wyszukiwarka wymaga włączonej obsługi JavaScript.'}</p></noscript>
   </div>
@@ -40,3 +40,9 @@ const teksty = lang === 'en'
     document.head.appendChild(s);
   })();
 </script>
+
+<style>
+  .sz-wrap { padding-top: 28px; padding-bottom: 72px; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp treści od nagłówka i stopki jak na innych podstronach (komputer.css) */
+  @media (min-width: 761px) { .sz-wrap { padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); } }
+</style>

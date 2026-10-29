@@ -22,10 +22,16 @@ const lead = T(
 ---
 <Baza tytul={tytul} opis={lead}>
   <NaglowekStrony tytul={tytul} lead={lead} lang={lang} />
-  <div class="wrap" style="padding-top:32px;padding-bottom:64px">
+  <div class="wrap lw-wrap">
     {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="muted">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
     <p style="margin:24px 0 0">
       <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
     </p>
   </div>
 </Baza>
+
+<style>
+  .lw-wrap { padding-top: 32px; padding-bottom: 64px; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp treści od nagłówka i stopki jak na innych podstronach (komputer.css) */
+  @media (min-width: 761px) { .lw-wrap { padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); } }
+</style>

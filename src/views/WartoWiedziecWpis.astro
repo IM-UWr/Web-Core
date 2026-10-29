@@ -59,7 +59,7 @@ const wszystkie = T('Warto wiedzieć', 'Highlights');
     </div>
     <div class="side" aria-hidden="true"></div>
   </div>
-  <div class="wrap" style="padding-bottom:64px" data-pagefind-ignore>
+  <div class="wrap ww-wiecej" data-pagefind-ignore>
     <WartoWiedziec lang={lang} pomin={slugOf(wpis.id)} naglowek={T('Zobacz też', 'See also')} />
   </div>
 </Baza>
@@ -67,4 +67,7 @@ const wszystkie = T('Warto wiedzieć', 'Highlights');
 <style>
   .ww-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; font-size: 15px; font-weight: 700; }
   .ww-meta a { color: var(--muted); }
+  .ww-wiecej { padding-bottom: 64px; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (komputer.css) */
+  @media (min-width: 761px) { .ww-wiecej { padding-bottom: var(--tresc-dol); } }
 </style>

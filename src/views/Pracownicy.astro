@@ -55,4 +55,6 @@ const lead = lang === 'en'
   .pr-wrap { padding-top: 28px; padding-bottom: 64px; }
   /* telefon (≤ 760 px): wygląd „Portal” — mniej miejsca nad i pod spisem */
   @media (max-width: 760px) { .pr-wrap { padding-top: 16px; padding-bottom: 40px; } }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp treści od nagłówka i stopki jak na innych podstronach (komputer.css) */
+  @media (min-width: 761px) { .pr-wrap { padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); } }
 </style>

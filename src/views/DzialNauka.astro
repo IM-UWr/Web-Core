@@ -347,6 +347,21 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
   .dz-obrony { border-bottom: 1px solid var(--line); }
   .dz-obrony .t { font-size: 19px; }
 
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (wspólny ze stroną „Instytut”) ---------- */
+  @media (min-width: 761px) {
+    .dz-wrap { padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); }
+    .dz-intro { margin: -4px 0 10px; max-width: 820px; font-size: 15px; line-height: 1.5; }
+    .dz-more { margin: 4px 0 0; }
+    .dz-groups { gap: 12px 16px; }
+    .dz-g h3 { margin: 0 0 6px; }
+    .dz-tiles { gap: 6px; }
+    .dz-tile { display: flex; min-height: 42px; padding-block: 6px; }
+    .dz-ile { font-size: 15px; }
+    .dz-granty { gap: 10px; }
+    .dz-granty h3 { font-size: 16px; }
+    .dz-obrony .t { font-size: 17px; }
+  }
+
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */
   @media (max-width: 760px) {
     .dz-wrap { padding-top: 4px; padding-bottom: 36px; }

@@ -167,4 +167,20 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
   @media (prefers-reduced-motion: reduce) {
     .ww-link, .ww-go :global(svg), .ww-foto img { transition: none; transform: none !important; }
   }
+  /* komputer (≥ 761 px), wariant „Zwarta”: niższe karty (pas z rokiem / zdjęciem), mniejsze czcionki i odstępy */
+  @media (min-width: 761px) {
+    .ww-head { margin-bottom: 10px; }
+    .ww-head h2 { font-size: 22px; }
+    .ww-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+    .ww-jedna { max-width: 480px; }
+    .ww-media { min-height: 64px; padding: 10px 16px; }
+    .ww-media:not(.ww-foto)::after { width: 36px; height: 3px; }
+    .ww-media:not(.ww-foto) .ww-rok { font-size: clamp(28px, 2.6vw, 36px); }
+    .ww-foto { height: 76px; padding: 0; }
+    .ww-foto .ww-rok { left: 12px; bottom: 10px; padding: 2px 10px; font-size: 14px; }
+    .ww-body { gap: 5px; padding: 12px 16px 12px; }
+    .ww-t { font-size: 17px; }
+    .ww-x { line-height: 1.5; }
+    .ww-go { padding-top: 2px; }
+  }
 </style>

@@ -39,7 +39,7 @@ const lead = lang === 'en'
 ---
 <Baza tytul={t(lang, 'seminaria')} opis={lead}>
   <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }} />
-  <div class="wrap" style="padding-top:32px;padding-bottom:64px;display:flex;flex-direction:column;gap:40px">
+  <div class="wrap ls-wrap">
     <section aria-labelledby="h-tydzien">
       <div class="section-head" style="margin-bottom:14px">
         <h2 id="h-tydzien" style="font-size:24px">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
@@ -84,3 +84,9 @@ const lead = lang === 'en'
     )}
   </div>
 </Baza>
+
+<style>
+  .ls-wrap { padding-top: 32px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 40px; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp treści od nagłówka i stopki jak na innych podstronach (komputer.css) */
+  @media (min-width: 761px) { .ls-wrap { padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); gap: 24px; } }
+</style>

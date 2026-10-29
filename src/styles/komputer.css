@@ -1,0 +1,291 @@
+/* ==========================================================================
+   Komputer (≥ 761 px): wygląd wariantu „Zwarta”
+   Ten sam układ co zwykła strona, ciaśniejszy rytm pionowy: niższy baner i nagłówki podstron, mniejsze
+   odstępy, czcionki i zaokrąglenia, karty i kafelki w zwartszej formie.
+   Na telefonie (≤ 760 px) strona wygląda dokładnie tak jak bez tego pliku — każda reguła poniżej siedzi
+   w @media (min-width: 761px); telefon ma swój wygląd („Portal”) w telefon.css i portal.css.
+   Wartości są przeniesione z wariantu „Zwarta” (gałąź wariant-zwarta repozytorium Avean/IM-Website-test, global.css i tlo.css;
+   tam obowiązywały na każdej szerokości). Każda reguła podaje tylko to, co wariant zmienia w regule o tym samym
+   selektorze w global.css / tlo.css. Plik ładuje się po global.css i tlo.css, więc reguły z szerszych progów
+   tamtych plików (900, 1600 px) i reguły, które tam wygrywały kolejnością, są tu powtórzone niżej.
+   Stopka w wersji „zwartej” jest już w global.css (wspólna dla komputera we wszystkich wariantach).
+   Odstępy własne widoków (strony działów, listy) — w ich stylach, też w @media (min-width: 761px).
+   ========================================================================== */
+
+@media (min-width: 761px) {
+  /* ---------- podstawy ----------
+     --section — pasy sekcji strony głównej; --tresc-gora / --tresc-dol — odstęp treści podstrony od nagłówka
+     i od stopki (używają ich .layout poniżej i widoki: strony działów, listy, wyszukiwarka). */
+  :root {
+    --radius-s: 8px;
+    --radius: 12px;
+    --radius-l: 14px;
+    --section: clamp(20px, 2.4vw, 30px);
+    --tresc-gora: clamp(14px, 2vw, 22px);
+    --tresc-dol: clamp(28px, 3.5vw, 44px);
+    --hdr-h: 59px;
+  }
+  body { font-size: 16px; line-height: 1.5; }
+
+  /* ---------- przyciski i etykiety ---------- */
+  .btn { min-height: 42px; padding: 0 18px; }
+  .btn-small { min-height: 32px; padding: 0 12px; }
+  .link-arrow { min-height: 40px; }
+  .badge { padding: 2px 8px; font-size: 12.5px; }
+
+  /* ---------- nagłówek ---------- */
+  .hdr-row { min-height: 58px; }
+  .brand-logo { height: 34px; }
+  .brand-name { font-size: 16px; }
+  .brand-sub { font-size: 12px; }
+  .nav > a, .nav-pill { min-height: 40px; }
+  .nav-top, .nav-arrow { min-height: 40px; }
+  .dropdown { gap: 24px; padding: 16px 20px; }
+  .dropdown-group a { padding: 5px 0; }
+  .icon-btn { width: 40px; height: 40px; }
+  .mnav summary, .mnav > a { min-height: 46px; font-size: 17px; }
+
+  /* ---------- baner (strona główna): niższy, mniejszy tytuł ---------- */
+  .hero { --hero-tekst: 640px; }
+  .js .hdr-foto ~ main .hero-fig::after { height: calc(var(--hdr-h) + 70px); }
+  .hero-fig figcaption { bottom: 10px; padding: 3px 8px; }
+  .hero-in { min-height: clamp(270px, 21.5vw, 320px); padding-top: 28px; padding-bottom: clamp(20px, 2vw, 28px); }
+  .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 20px); }
+  .hero-txt { gap: 10px; }
+  .hero-logo { height: clamp(30px, 2.6vw, 38px); margin-bottom: 0; }
+  .hero h1 { font-size: clamp(34px, 3.4vw, 50px); line-height: 1; }
+  .hero-lead { max-width: 36em; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.5; }
+  .hero-btns { margin-top: 4px; }
+  .hero-flag { min-height: 32px; }
+
+  /* ---------- kafelki na skróty: ikona obok napisu ---------- */
+  .tiles { gap: 10px; padding-top: 16px; }
+  .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 2px 12px; min-height: 52px; padding: 10px 14px; line-height: 1.3; flex-direction: row; }
+  .tile svg { width: 22px; height: 22px; }
+
+  /* ---------- sekcje ---------- */
+  .section-head { gap: 0 24px; margin-bottom: 10px; }
+  .section-head h2 { font-size: clamp(22px, 2.4vw, 28px); }
+  .section-head h3 { font-size: 19px; }
+
+  /* ---------- karty aktualności (cztery w rzędzie) ---------- */
+  .news-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
+  .news-card { gap: 5px; padding: 14px 16px; }
+  .news-card .t { font-size: 17px; line-height: 1.3; }
+  .news-card .x { line-height: 1.45; }
+  .news-meta { gap: 4px 10px; font-size: 13px; }
+  .news-card.featured .img { flex: 1 1 220px; min-height: 160px; }
+  .news-card.featured .body { flex: 1 1 220px; gap: 5px; padding: 14px 16px; }
+  .news-card.featured .t { font-size: 20px; }
+
+  /* ---------- wydarzenia i seminaria ---------- */
+  .event-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; }
+  .event { gap: 12px; padding: 12px; }
+  .datebox { flex: 0 0 56px; height: 60px; border-radius: 10px; }
+  .datebox .d { font-size: 23px; }
+  .datebox .m { font-size: 12px; }
+  .datebox.small { flex-basis: 46px; height: 50px; border-radius: 9px; }
+  .datebox.small .d { font-size: 19px; }
+  .event .t { font-size: 16px; line-height: 1.25; }
+  .event-body { gap: 2px; }
+  .sem-week { margin-top: 20px; padding-top: 16px; }
+  .sem-week-sam { margin-top: 0; padding-top: 0; }
+  .sem-row { padding: 7px 14px; }
+  .sem-empty { padding: 10px 14px; }
+
+  /* ---------- studia ---------- */
+  .studia-head { gap: 8px 24px; margin-bottom: 12px; }
+  .studia-head h2 { margin: 0 0 2px; font-size: clamp(22px, 2.4vw, 28px); }
+  .studia-head p { font-size: 15px; }
+  .prog-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 10px; }
+  .prog { gap: 3px; padding: 12px 16px; }
+  .prog .l { font-size: 12px; }
+  .prog .n { font-size: 17px; }
+  .prog .o { line-height: 1.4; }
+
+  /* ---------- podstrony ---------- */
+  .page-head .wrap { padding-top: clamp(12px, 1.8vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); gap: 6px; }
+  .page-head h1 { font-size: clamp(26px, 3.2vw, 38px); }
+  .page-head .lead { max-width: 820px; font-size: 16px; line-height: 1.5; }
+  .wstecz { margin-bottom: 0; }
+  .sem-koord { margin: 8px 0 0; }
+  .sem-koord-n { font-size: 17px; }
+  .sem-meta { gap: 4px 20px; margin: 8px 0 0; font-size: 15px; }
+  .wstecz a { min-height: 32px; font-size: 14px; }
+  .layout { gap: 24px 32px; padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); }
+  .layout > .side { flex: 1 1 260px; max-width: 300px; gap: 14px; }
+  .side-box { gap: 8px; padding: 14px 16px; }
+  .side-box h2 { font-size: 18px; }
+  .side-box .event { padding: 10px; border-radius: 10px; }
+  .notice { padding: 10px 14px; }
+
+  /* treść artykułów i stron */
+  .prose { max-width: 800px; font-size: 16px; line-height: 1.55; }
+  .prose h2 { margin: 1.3em 0 .45em; font-size: 22px; }
+  .prose h3 { margin: 1.2em 0 .35em; font-size: 18px; }
+  .prose p, .prose ul, .prose ol { margin: 0 0 .75em; }
+  .prose li { margin: .15em 0; }
+  .prose table { margin: .75em 0 1.1em; font-size: 15px; }
+  .prose th, .prose td { padding: 6px 10px; }
+  .prose blockquote { margin: 1em 0; padding: 10px 14px; font-size: 16px; }
+
+  /* listy wpisów */
+  .month { margin: 14px 0 2px; }
+  .row-item { gap: 14px; padding: 10px 0; }
+  .row-item .body { gap: 2px; }
+  .row-item .t { font-size: 17px; line-height: 1.3; }
+  .row-item .x { font-size: 15px; line-height: 1.5; }
+  .row-item .thumb { flex: 0 0 108px; height: 72px; border-radius: 8px; }
+  .filters { gap: 8px; padding-top: 4px; }
+  .filters .chips { gap: 6px; }
+  .filters.filters-lewo { margin-bottom: 4px; }
+
+  /* blok wydarzenia we wpisie */
+  .event-box { gap: 10px 24px; padding: 12px 16px; }
+
+  /* załączniki i dokumenty: w kolumnach, gdy się mieszczą */
+  .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 6px 10px; flex-direction: row; }
+  .files li { min-width: 0; }
+  .files a { gap: 10px; height: 100%; min-height: 40px; padding: 7px 12px; border-radius: 10px; }
+
+  /* nawigacja nowszy / starszy */
+  .pn a { gap: 2px; padding: 10px 14px; border-radius: 10px; }
+
+  /* tabela pracowników */
+  .staff-tools { gap: 8px; margin-bottom: 8px; }
+  .staff-tools .chips { gap: 6px; }
+  .staff-count { margin-bottom: 4px; }
+  .search { height: 40px; }
+  .staff th { padding: 6px 10px; }
+  .staff td { padding: 7px 10px; }
+
+  /* seminaria */
+  .sem-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+  .sem-card { gap: 5px; padding: 14px 16px; }
+  .sem-card .t { font-size: 18px; }
+  article.talk { padding: 10px 0; }
+  .talk h3 { margin: 3px 0 2px; font-size: 17px; }
+  .info-list { gap: 4px 14px; font-size: 15px; }
+
+  /* ---------- dodatki do nagłówka ---------- */
+  .hdr-search { height: 40px; }
+  .article-head { gap: 8px; margin-bottom: 16px; }
+  .article-head h1 { font-size: clamp(26px, 3.2vw, 36px); }
+  .article-head .lead { font-size: 17px; }
+  .article-figure { margin: 0 0 16px; max-width: 800px; }
+  .article-figure img { max-height: 420px; }
+  .article-block { margin-top: 20px; max-width: 800px; gap: 10px; }
+  .article-block h2 { font-size: 19px; }
+  .share { gap: 8px; margin-top: 20px; padding-top: 14px; }
+  .crumbs-inline { padding-top: 12px; }
+
+  /* spis sekcji strony */
+  .toc a { padding: 4px 0 4px 12px; }
+  .toc-top { margin-bottom: 14px; padding: 4px 14px; }
+  .toc-top summary { min-height: 40px; }
+  .toc-top ol { margin: 2px 0 8px; }
+  .toc-top a { display: flex; align-items: center; min-height: 40px; padding-block: 0; }
+  .side-nav a { min-height: 34px; }
+
+  /* granty */
+  .grant { padding: 10px 0; }
+  .grant h3 { margin: 3px 0 2px; font-size: 17px; }
+
+  /* zakłady; liczby działów jako wiersz „liczba + opis” */
+  .stats { gap: 10px; margin-bottom: 14px; }
+  .stat { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 9px 14px; }
+  .stat .n { flex: none; font-size: 26px; }
+  .stat .l { flex: 1 1 90px; min-width: 0; line-height: 1.3; }
+  .dept-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+  .dept { gap: 5px; padding: 14px 16px; }
+  .dept .t { font-size: 17px; }
+  .dept .f { padding-top: 6px; }
+  .zsec { margin-bottom: 24px; }
+  .zsec > h2 { margin: 0 0 10px; font-size: 22px; }
+  .subhead { margin: 14px 0 6px; }
+  .people { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
+  .person { gap: 1px; padding: 8px 12px; border-radius: 10px; }
+  .lead-person .os-n { font-size: 17px; }
+  .plain-list { gap: 3px; }
+  .more { margin-top: 6px; }
+  .more summary { min-height: 40px; }
+
+  /* kierunek studiów */
+  .eyebrow { font-size: 12.5px; }
+  .entry-cards { gap: 10px; margin-bottom: 14px; }
+  .entry { gap: 12px; padding: 10px 14px; }
+  .entry strong { font-size: 16px; }
+  .why-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+  .why { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; align-content: start; gap: 3px 10px; padding: 11px 14px; flex-direction: row; }
+  .why strong { line-height: 1.3; }
+  .why > span { grid-column: 1 / -1; line-height: 1.45; }
+  .tracks { gap: 18px; margin-bottom: 8px; }
+  .track h3 { margin: 0 0 8px; font-size: 17px; }
+  .step { gap: 2px; padding: 0 0 11px 24px; }
+  .step strong { font-size: 16px; }
+  .step .desc { line-height: 1.45; }
+  .step .deadline { display: block; margin-top: 2px; padding: 3px 9px; flex-wrap: nowrap; align-items: normal; gap: normal; }
+  .step .deadline a { margin-left: 6px; }
+  .step .deadline svg { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+  .spec-grid { gap: 10px; }
+  .spec { gap: 5px; padding: 12px 16px; line-height: 1.45; }
+  .spec h3 { font-size: 17px; line-height: 1.3; }
+  .spec .lbl { display: inline; margin-right: 6px; }
+  .spec .foot { padding-top: 6px; }
+  .year-pick { gap: 6px 12px; margin-bottom: 10px; }
+  .tabs { gap: 6px; margin-bottom: 10px; }
+  .faq summary { min-height: 44px; }
+  .faq .prose { padding-bottom: 8px; }
+
+  /* specjalność */
+  .callout { margin-top: 12px; padding: 10px 14px; }
+  .course-groups { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+  .course-group { padding: 12px 16px; }
+  .course-group h3 { margin: 0 0 6px; }
+  .course-group ul { gap: 5px; }
+  .course-group li { line-height: 1.4; }
+  .checks { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 4px 20px; }
+  .checks li { padding-left: 26px; font-size: 15px; line-height: 1.45; }
+
+  /* spis pracowników: niższe wiersze, zakład / funkcja w tej samej linii co nazwisko (gdy się mieści) */
+  .staff-dir { margin-bottom: 22px; }
+  .staff-dir > .staff-h { font-size: 20px; margin: 12px 0 4px; }
+  .staff-head, .staff-row { gap: 2px 16px; padding: 6px 12px; }
+  .staff-head { padding-top: 5px; padding-bottom: 5px; }
+  .staff-sub { margin: 14px 0 2px 12px; }
+  .staff-row { border-radius: 10px; line-height: 1.4; }
+  .staff-row::before { left: 12px; right: 12px; }
+  .staff-row .n small { display: inline-block; margin-left: 10px; }
+  .person.os-link .os-a .ico { top: 10px; right: 10px; }
+
+  /* ---------- tło i nagłówki podstron (tlo.css): niższy pas nagłówka ---------- */
+  .ph { --ph-gora: clamp(12px, 1.8vw, 24px); --ph-min: clamp(0px, 12vw, 172px); }
+  .ph .wrap { padding-top: var(--ph-gora); padding-bottom: clamp(16px, 2.2vw, 28px); min-height: var(--ph-min); }
+  .ph .wrap > h1, .ph .wrap > .lead { max-width: min(820px, 62%); }
+  .ph h1 { font-size: clamp(28px, 3.2vw, 40px); }
+  .ph-zdjecie.ph-z-foto .ph-foto { top: clamp(12px, 1.6vw, 18px); bottom: clamp(12px, 1.6vw, 18px); }
+  .js .hdr-foto ~ main > .ph:first-child > .wrap { padding-top: calc(var(--ph-gora) + var(--hdr-h)); min-height: calc(var(--ph-min) + var(--hdr-h)); }
+  .js .hdr-foto ~ main > .ph-granat:first-child::before { height: calc(var(--hdr-h) + 32px); }
+
+  /* sekcje stron (tlo.css: body[data-sekcje]) */
+  body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .dz-head h2, body[data-sekcje] .zsec .ww-head h2 { font-size: clamp(21px, 2.2vw, 24px); }
+  body[data-sekcje='pasy'] .wrap > .zsec { padding: clamp(16px, 2.2vw, 26px) 0; }
+  body[data-sekcje='pasy'] .main .zsec { padding: 16px 0; }
+  body[data-sekcje='pasy'] .main .zsec:nth-child(even of .zsec) { margin-inline: calc(-1 * min(18px, var(--gutter))); padding-inline: min(18px, var(--gutter)); }
+  body[data-sekcje='pasy'] :is(.zsec > h2, .zsec .dz-head h2, .zsec .ww-head h2, .section-head h2, .studia-head h2)::before { width: 5px; margin-right: 10px; }
+  body[data-sekcje='pasy'] .prose h2 { margin: 1.3em 0 .5em; padding: .3em .6em .3em .8em; border-radius: 10px; }
+  body[data-sekcje='linia'] .zsec { margin-bottom: 20px; padding-top: 14px; }
+  body[data-sekcje='linia'] :is(.section-head h2, .studia-head h2)::before { margin-bottom: 8px; }
+  body[data-sekcje='linia'] .prose h2 { margin-top: 1.5em; padding-top: 14px; }
+  body[data-sekcje='linia'] main > .section { padding-top: 6px; padding-bottom: clamp(14px, 1.8vw, 22px); }
+  body[data-sekcje='linia'] main > .section > .wrap:first-child { padding-top: 16px; }
+  body[data-sekcje='karty'] .zsec:not(.dz-paths) { margin-bottom: 14px; padding: clamp(14px, 2vw, 22px); }
+  body[data-sekcje='karty'] .zsec.dz-paths { margin-bottom: 14px; }
+  body[data-sekcje='karty'] .section { padding-top: clamp(8px, 1.2vw, 14px); padding-bottom: clamp(8px, 1.2vw, 14px); }
+  body[data-sekcje='karty'] .section > .wrap { padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); }
+  body[data-sekcje='karty'] .prose h2 { margin-top: 1.4em; padding-bottom: 8px; }
+}
+
+/* reguły z szerszych progów global.css, które nadpisują te same właściwości (muszą zostać po regułach powyżej) */
+@media (min-width: 761px) and (max-width: 900px) { .layout > .side { max-width: none; } }
+@media (min-width: 1600px) { .brand-name { font-size: 18px; } }
