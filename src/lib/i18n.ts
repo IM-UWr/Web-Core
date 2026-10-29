@@ -4,6 +4,7 @@ const T = {
   pl: {
     instytut: 'Instytut Matematyczny',
     uwr: 'Uniwersytet Wrocławski',
+    uwrStronaGlowna: 'Uniwersytet Wrocławski — strona główna UWr',
     wydzial: 'Wydział Matematyki i Informatyki',
     szukaj: 'Szukaj',
     menu: 'Menu',
@@ -111,6 +112,7 @@ const T = {
   en: {
     instytut: 'Mathematical Institute',
     uwr: 'University of Wrocław',
+    uwrStronaGlowna: 'University of Wrocław — main website',
     wydzial: 'Faculty of Mathematics and Computer Science',
     szukaj: 'Search',
     menu: 'Menu',
