@@ -1,0 +1,816 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:IM UWr — wydarzenia
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:konf-2013-workshop-on-set-theoretic-methods-in-compact-spaces-and-banac
+ h-spaces@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20130417
+DTEND;VALUE=DATE:20130422
+SUMMARY:Workshop on set theoretic methods in compact spaces and Banach spac
+ es
+LOCATION:Warszawa
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2013-worksh
+ op-on-set-theoretic-methods-in-compact-spaces-and-banach-spaces
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2013-workshop-on-se
+ t-theoretic-methods-in-compact-spaces-and-banach-spaces
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2013-7th-international-conference-on-levy-processes-theory-and-app
+ lications@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20130715
+DTEND;VALUE=DATE:20130720
+SUMMARY:7th International Conference on Lévy Processes: Theory and Applica
+ tions
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2013-7th-in
+ ternational-conference-on-levy-processes-theory-and-applications
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2013-7th-internatio
+ nal-conference-on-levy-processes-theory-and-applications
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-probabilistic-aspect-of-harmonic-analysis@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140426
+DTEND;VALUE=DATE:20140504
+SUMMARY:Probabilistic Aspect of Harmonic Analysis
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-probab
+ ilistic-aspect-of-harmonic-analysis
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-probabilistic-
+ aspect-of-harmonic-analysis
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-7th-young-set-theory-workshop@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140511
+DTEND;VALUE=DATE:20140518
+SUMMARY:7th Young Set Theory Workshop
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-7th-yo
+ ung-set-theory-workshop
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-7th-young-set-
+ theory-workshop
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-stochastic-networks-and-risk-analysis-iv@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140527
+DTEND;VALUE=DATE:20140602
+SUMMARY:Stochastic Networks and Risk Analysis IV
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-stocha
+ stic-networks-and-risk-analysis-iv
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-stochastic-net
+ works-and-risk-analysis-iv
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-sesja-poswiecona-100-leciu-urodzin-profesora-stanislawa-hartm
+ ana@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140606
+DTEND;VALUE=DATE:20140608
+SUMMARY:Sesja poświęcona 100-leciu urodzin profesora Stanisława Hartmana
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-sesja-
+ poswiecona-100-leciu-urodzin-profesora-stanislawa-hartmana
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-sesja-poswieco
+ na-100-leciu-urodzin-profesora-stanislawa-hartmana
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-integration-vector-measures-and-related-topics@im-uwr.github.
+ io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140615
+DTEND;VALUE=DATE:20140622
+SUMMARY:Integration\, Vector Measures and Related Topics
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-integr
+ ation-vector-measures-and-related-topics
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-integration-ve
+ ctor-measures-and-related-topics
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-16th-workshop-non-commutative-harmonic-analysis@im-uwr.github
+ .io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140706
+DTEND;VALUE=DATE:20140713
+SUMMARY:16th Workshop: Non-commutative Harmonic Analysis
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-16th-w
+ orkshop-non-commutative-harmonic-analysis
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-16th-workshop-
+ non-commutative-harmonic-analysis
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2014-workshop-in-set-theory@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20140914
+DTEND;VALUE=DATE:20140918
+SUMMARY:Workshop in set theory
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-worksh
+ op-in-set-theory
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2014-workshop-in-se
+ t-theory
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2015-winter-school-in-abstract-analysis-2015@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20150131
+DTEND;VALUE=DATE:20150208
+SUMMARY:Winter School in Abstract Analysis 2015
+LOCATION:Hejnice
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2015-winter
+ -school-in-abstract-analysis-2015
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2015-winter-school-
+ in-abstract-analysis-2015
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2015-kazimierz-urbanik-1930-2005@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20150522
+DTEND;VALUE=DATE:20150524
+SUMMARY:Kazimierz Urbanik (1930-2005)
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2015-kazimi
+ erz-urbanik-1930-2005
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2015-kazimierz-urba
+ nik-1930-2005
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2015-conference-on-geometric-group-theory@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20150629
+DTEND;VALUE=DATE:20150704
+SUMMARY:Conference on Geometric Group Theory
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2015-confer
+ ence-on-geometric-group-theory
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2015-conference-on-
+ geometric-group-theory
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-winter-school-in-abstract-analysis-2016@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160130
+DTEND;VALUE=DATE:20160207
+SUMMARY:Winter School in Abstract Analysis 2016
+LOCATION:Hejnice
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-winter
+ -school-in-abstract-analysis-2016
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-winter-school-
+ in-abstract-analysis-2016
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-combinatorics-and-groups@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160411
+DTEND;VALUE=DATE:20160415
+SUMMARY:Combinatorics and Groups
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-combin
+ atorics-and-groups
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-combinatorics-
+ and-groups
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-xxx-konferencja-z-historii-matematyki@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160505
+DTEND;VALUE=DATE:20160509
+SUMMARY:XXX Konferencja z Historii Matematyki
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-xxx-ko
+ nferencja-z-historii-matematyki
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-xxx-konferencj
+ a-z-historii-matematyki
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-probabilistic-aspect-of-harmonic-analysis@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160514
+DTEND;VALUE=DATE:20160522
+SUMMARY:Probabilistic Aspect of Harmonic Analysis
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-probab
+ ilistic-aspect-of-harmonic-analysis
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-probabilistic-
+ aspect-of-harmonic-analysis
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-17th-workshop-non-commutative-probability-levy-processes-and-
+ operator-algebras-w@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160724
+DTEND;VALUE=DATE:20160731
+SUMMARY:17th Workshop: Non-commutative probability. Lévy processes and ope
+ rator algebras\, with applications
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-17th-w
+ orkshop-non-commutative-probability-levy-processes-and-operator-algebras-w
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-17th-workshop-
+ non-commutative-probability-levy-processes-and-operator-algebras-w
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-7th-euro-japanese-workshop-on-blow-up@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160904
+DTEND;VALUE=DATE:20160910
+SUMMARY:7th Euro-Japanese Workshop on Blow-up
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-7th-eu
+ ro-japanese-workshop-on-blow-up
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-7th-euro-japan
+ ese-workshop-on-blow-up
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-mathematics-of-pattern-formation@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160911
+DTEND;VALUE=DATE:20160917
+SUMMARY:Mathematics of pattern formation
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-mathem
+ atics-of-pattern-formation
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-mathematics-of
+ -pattern-formation
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2016-stochastic-models-v@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20160911
+DTEND;VALUE=DATE:20160918
+SUMMARY:Stochastic models V
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-stocha
+ stic-models-v
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2016-stochastic-mod
+ els-v
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2017-winter-school-in-abstract-analysis-2017@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20170128
+DTEND;VALUE=DATE:20170205
+SUMMARY:Winter School in Abstract Analysis 2017
+LOCATION:Hejnice
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-winter
+ -school-in-abstract-analysis-2017
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-winter-school-
+ in-abstract-analysis-2017
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2017-xxxi-konferencja-z-historii-matematyki@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20170522
+DTEND;VALUE=DATE:20170527
+SUMMARY:XXXI Konferencja z Historii Matematyki
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-xxxi-k
+ onferencja-z-historii-matematyki
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-xxxi-konferenc
+ ja-z-historii-matematyki
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2017-model-theory-in-wroclaw-2017@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20170630
+DTEND;VALUE=DATE:20170703
+SUMMARY:Model Theory in Wrocław 2017
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-model-
+ theory-in-wroclaw-2017
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-model-theory-i
+ n-wroclaw-2017
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2017-model-theory-conference@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20170702
+DTEND;VALUE=DATE:20170709
+SUMMARY:Model Theory Conference
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-model-
+ theory-conference
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-model-theory-c
+ onference
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2017-analysis-and-applications-in-honor-of-professor-elias-m-stein
+ @im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20170904
+DTEND;VALUE=DATE:20170909
+SUMMARY:Analysis and Applications: in honor of Professor Elias M. Stein
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-analys
+ is-and-applications-in-honor-of-professor-elias-m-stein
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-analysis-and-a
+ pplications-in-honor-of-professor-elias-m-stein
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-winter-school-in-abstract-analysis-2018@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180127
+DTEND;VALUE=DATE:20180204
+SUMMARY:Winter School in Abstract Analysis 2018
+LOCATION:Hejnice
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-winter
+ -school-in-abstract-analysis-2018
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-winter-school-
+ in-abstract-analysis-2018
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-xxxii-konferencja-z-historii-matematyki@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180423
+DTEND;VALUE=DATE:20180428
+SUMMARY:XXXII Konferencja z Historii Matematyki
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-xxxii-
+ konferencja-z-historii-matematyki
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-xxxii-konferen
+ cja-z-historii-matematyki
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-probabilistic-aspects-of-harmonic-analysis@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180506
+DTEND;VALUE=DATE:20180513
+SUMMARY:Probabilistic Aspects of Harmonic Analysis
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-probab
+ ilistic-aspects-of-harmonic-analysis
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-probabilistic-
+ aspects-of-harmonic-analysis
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-stochastic-models-vi@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180603
+DTEND;VALUE=DATE:20180609
+SUMMARY:Stochastic Models VI
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-stocha
+ stic-models-vi
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-stochastic-mod
+ els-vi
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-international-quantitative-linguistics-conference-qualico-201
+ 8@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180705
+DTEND;VALUE=DATE:20180709
+SUMMARY:International Quantitative Linguistics Conference QUALICO 2018
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-intern
+ ational-quantitative-linguistics-conference-qualico-2018
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-international-
+ quantitative-linguistics-conference-qualico-2018
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-18th-workshop-noncommutative-probability-operators-algebras-r
+ andom-matrices-and@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180715
+DTEND;VALUE=DATE:20180722
+SUMMARY:18th Workshop: Noncommutative Probability\, Operators Algebras\, Ra
+ ndom Matrices and Related Topics\, with Applications
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-18th-w
+ orkshop-noncommutative-probability-operators-algebras-random-matrices-and
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-18th-workshop-
+ noncommutative-probability-operators-algebras-random-matrices-and
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2018-umi-simai-ptm-joint-meeting@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20180917
+DTEND;VALUE=DATE:20180921
+SUMMARY:UMI-SIMAI-PTM Joint Meeting
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-umi-si
+ mai-ptm-joint-meeting
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2018-umi-simai-ptm-
+ joint-meeting
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2019-winter-school-in-abstract-analysis-2019@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20190126
+DTEND;VALUE=DATE:20190203
+SUMMARY:Winter School in Abstract Analysis 2019
+LOCATION:Hejnice
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2019-winter
+ -school-in-abstract-analysis-2019
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2019-winter-school-
+ in-abstract-analysis-2019
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2019-xxxiii-konferencja-z-historii-matematyki@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20190527
+DTEND;VALUE=DATE:20190601
+SUMMARY:XXXIII Konferencja z Historii Matematyki
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2019-xxxiii
+ -konferencja-z-historii-matematyki
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2019-xxxiii-konfere
+ ncja-z-historii-matematyki
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2019-forum-on-partial-differential-equations-xi@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20190623
+DTEND;VALUE=DATE:20190630
+SUMMARY:Forum on Partial Differential Equations XI
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2019-forum-
+ on-partial-differential-equations-xi
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2019-forum-on-parti
+ al-differential-equations-xi
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2022-19th-workshop-noncommutative-probability-noncommucative-harmo
+ nic-analysis-and-re@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20220731
+DTEND;VALUE=DATE:20220807
+SUMMARY:19th Workshop: Noncommutative Probability\, Noncommucative Harmonic
+  Analysis and Related Topics\, with Applications
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-19th-w
+ orkshop-noncommutative-probability-noncommucative-harmonic-analysis-and-re
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-19th-workshop-
+ noncommutative-probability-noncommucative-harmonic-analysis-and-re
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2022-probability-and-analysis-2022@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20220919
+DTEND;VALUE=DATE:20220924
+SUMMARY:Probability and Analysis 2022
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-probab
+ ility-and-analysis-2022
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-probability-an
+ d-analysis-2022
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2022-model-theory-conference-in-celebration-of-ludomir-newelski-s-
+ 60th-birthday@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20221217
+DTEND;VALUE=DATE:20221222
+SUMMARY:Model Theory Conference in celebration of Ludomir Newelski's 60th b
+ irthday
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-model-
+ theory-conference-in-celebration-of-ludomir-newelski-s-60th-birthday
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-model-theory-c
+ onference-in-celebration-of-ludomir-newelski-s-60th-birthday
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2023-stochastic-models-vii@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20230529
+DTEND;VALUE=DATE:20230603
+SUMMARY:Stochastic Models VII
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-stocha
+ stic-models-vii
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-stochastic-mod
+ els-vii
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2023-model-theory-workshop@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20230915
+DTEND;VALUE=DATE:20230919
+SUMMARY:Model Theory Workshop
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-model-
+ theory-workshop
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-model-theory-w
+ orkshop
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2023-model-theory-conference@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20230919
+DTEND;VALUE=DATE:20230924
+SUMMARY:Model Theory Conference
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-model-
+ theory-conference
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-model-theory-c
+ onference
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2023-discrete-random-structures@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20231016
+DTEND;VALUE=DATE:20231021
+SUMMARY:Discrete random structures
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-discre
+ te-random-structures
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2023-discrete-rando
+ m-structures
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2024-probability-and-analysis-2024@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20240422
+DTEND;VALUE=DATE:20240427
+SUMMARY:Probability and Analysis 2024
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-probab
+ ility-and-analysis-2024
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-probability-an
+ d-analysis-2024
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2024-second-wroclaw-logic-conference@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20240531
+DTEND;VALUE=DATE:20240603
+SUMMARY:Second Wroclaw Logic Conference
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-second
+ -wroclaw-logic-conference
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-second-wroclaw
+ -logic-conference
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2024-xiii-forum-of-partial-differential-equations@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20240623
+DTEND;VALUE=DATE:20240630
+SUMMARY:XIII Forum of Partial Differential Equations
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-xiii-f
+ orum-of-partial-differential-equations
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-xiii-forum-of-
+ partial-differential-equations
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2024-contemporary-harmonic-analysis-and-its-synergies@im-uwr.githu
+ b.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20240801
+DTEND;VALUE=DATE:20241001
+SUMMARY:Contemporary Harmonic Analysis and its Synergies
+LOCATION:Wrocław/Będlewo/Warszawa
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-contem
+ porary-harmonic-analysis-and-its-synergies
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2024-contemporary-h
+ armonic-analysis-and-its-synergies
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2025-structures-in-banach-spaces@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20250317
+DTEND;VALUE=DATE:20250322
+SUMMARY:Structures in Banach spaces
+LOCATION:Wiedeń
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-struct
+ ures-in-banach-spaces
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-structures-in-
+ banach-spaces
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2025-perspectives-on-ergodic-theory-and-its-interactions@im-uwr.gi
+ thub.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20250623
+DTEND;VALUE=DATE:20250628
+SUMMARY:Perspectives on Ergodic Theory and its Interactions
+LOCATION:Warszawa
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-perspe
+ ctives-on-ergodic-theory-and-its-interactions
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-perspectives-o
+ n-ergodic-theory-and-its-interactions
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2025-20th-workshop-noncommutative-probability-operator-algebras-an
+ d-related-topics-wi@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20250706
+DTEND;VALUE=DATE:20250713
+SUMMARY:20th Workshop: Noncommutative Probability\, Operator Algebras and R
+ elated Topics\, with Applications
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-20th-w
+ orkshop-noncommutative-probability-operator-algebras-and-related-topics-wi
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-20th-workshop-
+ noncommutative-probability-operator-algebras-and-related-topics-wi
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2025-stochastic-processes-and-their-applications@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20250714
+DTEND;VALUE=DATE:20250719
+SUMMARY:Stochastic Processes and their Applications
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-stocha
+ stic-processes-and-their-applications
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2025-stochastic-pro
+ cesses-and-their-applications
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2026-discrete-random-structures-ii@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20260517
+DTEND;VALUE=DATE:20260523
+SUMMARY:Discrete Random Structures II
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2026-discre
+ te-random-structures-ii
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2026-discrete-rando
+ m-structures-ii
+END:VEVENT
+BEGIN:VEVENT
+UID:obr-2026-06-18-maciej-korpalski@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260618T163000
+DTEND;TZID=Europe/Warsaw:20260618T183000
+SUMMARY:Maciej Korpalski
+LOCATION:sala WS\, Instytut Matematyczny UWr
+DESCRIPTION:On isomorphic and geometric properties of Banach spaces of cont
+ inuous functions\nhttps://im-uwr.github.io/Web-Core/obrony-doktorskie/2026
+ -06-18-maciej-korpalski
+URL:https://im-uwr.github.io/Web-Core/obrony-doktorskie/2026-06-18-maciej-k
+ orpalski
+END:VEVENT
+BEGIN:VEVENT
+UID:obr-2026-06-19-aleksander-antasik@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260619T153000
+DTEND;TZID=Europe/Warsaw:20260619T173000
+SUMMARY:Aleksander Antasik
+LOCATION:sala WS\, Instytut Matematyczny UWr
+DESCRIPTION:Rational approximation of surface group representations\nhttps:
+ //im-uwr.github.io/Web-Core/obrony-doktorskie/2026-06-19-aleksander-antasi
+ k
+URL:https://im-uwr.github.io/Web-Core/obrony-doktorskie/2026-06-19-aleksand
+ er-antasik
+END:VEVENT
+BEGIN:VEVENT
+UID:akt-2026-06-19-seminarium-ze-statystyki@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260622T110000
+DTEND;TZID=Europe/Warsaw:20260624T130000
+SUMMARY:Seminarium ze statystyki
+LOCATION:sale 602 i 605\, Instytut Matematyczny UWr
+DESCRIPTION:Dwa spotkania poświęcone metodom statystycznym dla danych wys
+ okowymiarowych i modelowaniu w biologii molekularnej — 22 i 24 czerwca.\
+ nhttps://im-uwr.github.io/Web-Core/aktualnosci/2026-06-19-seminarium-ze-st
+ atystyki
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-06-19-seminarium-ze-
+ statystyki
+END:VEVENT
+BEGIN:VEVENT
+UID:akt-2026-06-16-seminarium-wydzialowe@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260623T123000
+DTEND;TZID=Europe/Warsaw:20260623T140000
+SUMMARY:Seminarium wydziałowe: prof. Olga Vitek
+LOCATION:sala 119\, Instytut Informatyki UWr
+DESCRIPTION:„Statistical methods increase the accuracy and the interpreta
+ bility of quantitative proteomic investigations” — 23 czerwca\, sala 1
+ 19 w Instytucie Informatyki.\nhttps://im-uwr.github.io/Web-Core/aktualnosc
+ i/2026-06-16-seminarium-wydzialowe
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-06-16-seminarium-wyd
+ zialowe
+END:VEVENT
+BEGIN:VEVENT
+UID:akt-2026-07-14-szkola-baby-steps-beyond-the-horizon@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20260830
+DTEND;VALUE=DATE:20260906
+SUMMARY:Szkoła dla studentów Baby Steps Beyond the Horizon
+LOCATION:Będlewo
+DESCRIPTION:Szkoła w Będlewie (30 sierpnia – 5 września 2026) pokazuj
+ ąca studentom żywo rozwijającą się matematykę. Rejestracja on-site d
+ o 31 lipca.\nhttps://im-uwr.github.io/Web-Core/aktualnosci/2026-07-14-szko
+ la-baby-steps-beyond-the-horizon
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-07-14-szkola-baby-st
+ eps-beyond-the-horizon
+END:VEVENT
+BEGIN:VEVENT
+UID:konf-2026-chilijsko-polski-kongres-matematyczny@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20260907
+DTEND;VALUE=DATE:20260912
+SUMMARY:Chilijsko-polski Kongres Matematyczny
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2026-chilij
+ sko-polski-kongres-matematyczny
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2026-chilijsko-pols
+ ki-kongres-matematyczny
+END:VEVENT
+BEGIN:VEVENT
+UID:akt-2026-09-10-wyklad-prof-uwe-franza@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260915T130000
+DTEND;TZID=Europe/Warsaw:20260915T143000
+SUMMARY:Wykład prof. Uwe Franza
+LOCATION:sala WS\, Instytut Matematyczny UWr
+DESCRIPTION:Wykład otwarty „Who was Seki Takakazu?” w ramach programu 
+ IDUB.\nhttps://im-uwr.github.io/Web-Core/aktualnosci/2026-09-10-wyklad-pro
+ f-uwe-franza
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-09-10-wyklad-prof-uw
+ e-franza
+END:VEVENT
+BEGIN:VEVENT
+UID:akt-2026-09-23-2-kongres-mlodych-odkrywcow@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20260921
+DTEND;VALUE=DATE:20260923
+SUMMARY:2. Kongres Młodych Odkrywców
+LOCATION:Wydział Matematyki i Informatyki UWr
+DESCRIPTION:Prawie 170 uczniów z niemal 20 szkół średnich wzięło udzi
+ ał w wykładach\, warsztatach i grze terenowej.\nhttps://im-uwr.github.io
+ /Web-Core/aktualnosci/2026-09-23-2-kongres-mlodych-odkrywcow
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-09-23-2-kongres-mlod
+ ych-odkrywcow
+END:VEVENT
+BEGIN:VEVENT
+UID:obr-2026-09-21-tomasz-zuchowski@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260921T170000
+DTEND;TZID=Europe/Warsaw:20260921T190000
+SUMMARY:Tomasz Żuchowski
+LOCATION:sala WS\, Instytut Matematyczny UWr
+DESCRIPTION:On sequences of measures and ideals in Boolean algebras\nhttps:
+ //im-uwr.github.io/Web-Core/obrony-doktorskie/2026-09-21-tomasz-zuchowski
+URL:https://im-uwr.github.io/Web-Core/obrony-doktorskie/2026-09-21-tomasz-z
+ uchowski
+END:VEVENT
+BEGIN:VEVENT
+UID:akt-2026-09-20-kurs-dla-studentow-pierwszego-roku@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;VALUE=DATE:20260925
+DTEND;VALUE=DATE:20260926
+SUMMARY:Kurs dla studentów pierwszego roku
+LOCATION:Wydział Matematyki i Informatyki UWr
+DESCRIPTION:Kurs przygotowawczy dla osób przyjętych na pierwszy rok studi
+ ów na WMI UWr — od 25 września.\nhttps://im-uwr.github.io/Web-Core/akt
+ ualnosci/2026-09-20-kurs-dla-studentow-pierwszego-roku
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-09-20-kurs-dla-stude
+ ntow-pierwszego-roku
+END:VEVENT
+BEGIN:VEVENT
+UID:obr-2026-10-20-maciej-tadej@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20261020T140000
+DTEND;TZID=Europe/Warsaw:20261020T160000
+SUMMARY:Maciej Tadej
+LOCATION:sala WS\, Instytut Matematyczny UWr
+DESCRIPTION:Analysis and simulations of the non-linear models with non-loca
+ l dispersal of species considered in finite\, flat habitats\nhttps://im-uw
+ r.github.io/Web-Core/obrony-doktorskie/2026-10-20-maciej-tadej
+URL:https://im-uwr.github.io/Web-Core/obrony-doktorskie/2026-10-20-maciej-t
+ adej
+END:VEVENT
+BEGIN:VEVENT
+UID:obr-2026-10-27-malwina-mrowinska@im-uwr.github.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20261027T131500
+DTEND;TZID=Europe/Warsaw:20261027T151500
+SUMMARY:Malwina Mrowińska
+LOCATION:sala WS\, Instytut Matematyczny UWr
+DESCRIPTION:Estimation of a block-structured covariance matrix\nhttps://im-
+ uwr.github.io/Web-Core/obrony-doktorskie/2026-10-27-malwina-mrowinska
+URL:https://im-uwr.github.io/Web-Core/obrony-doktorskie/2026-10-27-malwina-
+ mrowinska
+END:VEVENT
+END:VCALENDAR

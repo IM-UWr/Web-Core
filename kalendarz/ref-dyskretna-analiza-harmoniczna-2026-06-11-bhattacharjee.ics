@@ -1,0 +1,44 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Crystallization and K-theoretical aspects of the quantum twist
+ or bundle
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:ref-dyskretna-analiza-harmoniczna-2026-06-11-bhattacharjee@im-uwr.githu
+ b.io
+DTSTAMP:20261029T222615Z
+DTSTART;TZID=Europe/Warsaw:20260611T101500
+DTEND;TZID=Europe/Warsaw:20260611T114500
+SUMMARY:Crystallization and K-theoretical aspects of the quantum twistor bu
+ ndle
+LOCATION:sala 604
+DESCRIPTION:Suvrajit Bhattacharjee (Uniwersytet w Białymstoku)\nSeminarium
+ : Dyskretna analiza harmoniczna i niekomutatywna probabilistyka\nhttps://i
+ m-uwr.github.io/Web-Core/seminaria/dyskretna-analiza-harmoniczna#2026-06-1
+ 1-bhattacharjee
+URL:https://im-uwr.github.io/Web-Core/seminaria/dyskretna-analiza-harmonicz
+ na#2026-06-11-bhattacharjee
+END:VEVENT
+END:VCALENDAR
