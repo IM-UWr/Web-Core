@@ -1,0 +1,9 @@
+---
+import PublikacjeRok from '../../../../views/PublikacjeRok.astro';
+import { wykazy } from '../../../../views/publikacjeDane';
+export function getStaticPaths() {
+  return Object.keys(wykazy).map((rok) => ({ params: { rok }, props: { rok: Number(rok) } }));
+}
+const { rok } = Astro.props;
+---
+<PublikacjeRok rok={rok} lang="en" />

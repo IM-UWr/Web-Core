@@ -1,0 +1,7 @@
+---
+import Specjalnosc from '../../../views/Specjalnosc.astro';
+import { sciezkiSpecjalnosci } from '../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiSpecjalnosci(); }
+const { specjalnosc } = Astro.props;
+---
+<Specjalnosc specjalnosc={specjalnosc} lang="pl" />

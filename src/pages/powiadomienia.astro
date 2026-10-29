@@ -1,0 +1,76 @@
+---
+// Potwierdzenie zapisu i wypisanie z listy powiadomień o referatach (linki z wiadomości e-mail).
+// /powiadomienia/?a=potwierdz&t=<token>  — potwierdza automatycznie po otwarciu,
+// /powiadomienia/?a=wypisz&t=<token>     — wypisuje po kliknięciu przycisku (skanery poczty, które
+//                                            „otwierają” linki, nie wypiszą nikogo przez przypadek).
+// Strona dwujęzyczna, bo wiadomości są po angielsku. Automat: skrypty/powiadomienia/Code.gs.
+import Baza from '../layouts/Baza.astro';
+import Ikona from '../components/Ikona.astro';
+import ustawienia from '../data/ustawienia.json';
+import { u } from '../lib/url';
+
+const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
+---
+<Baza tytul="Email notifications · Powiadomienia e-mail" szukaj={false} alternatywa={null}>
+  <meta slot="head" name="robots" content="noindex" />
+  <div class="wrap" style="max-width:640px;padding-top:56px;padding-bottom:72px">
+    <div class="side-box" id="powiadomienia-stan" data-adres={adresListy} style="gap:14px">
+      <p class="eyebrow">Seminar notifications · Powiadomienia o seminariach</p>
+      <h1 style="margin:0;font-size:clamp(26px,4vw,34px);line-height:1.2" data-tytul>Email notifications</h1>
+      <p style="margin:0;font-size:17px" data-tekst>Opening your link… · Otwieram link…</p>
+      <p class="muted" style="margin:0;font-size:15px" data-tekst-pl></p>
+      <button type="button" class="btn btn-primary" data-wypisz hidden><Ikona nazwa="zamknij" rozmiar={16} />Unsubscribe · Wypisz mnie</button>
+      <a class="link-arrow" href={u('/en/seminaria')} data-seminarium>All seminars · Wszystkie seminaria<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      <noscript><p class="notice" style="margin:0">Please enable JavaScript to use this link. · Włącz JavaScript, aby skorzystać z linku.</p></noscript>
+    </div>
+  </div>
+</Baza>
+
+<script>
+  const box = document.getElementById('powiadomienia-stan') as HTMLElement;
+  const adres = box.dataset.adres || '';
+  const q = new URLSearchParams(location.search);
+  const akcja = q.get('a');
+  const token = q.get('t') || '';
+  const $ = (s: string) => box.querySelector<HTMLElement>(s)!;
+  const pokaz = (tytul: string, en: string, pl: string) => {
+    $('[data-tytul]').textContent = tytul;
+    $('[data-tekst]').textContent = en;
+    $('[data-tekst-pl]').textContent = pl;
+  };
+  const wyslij = async (a: string) => {
+    const body = new URLSearchParams({ akcja: a, t: token });
+    try {
+      const odp = await fetch(adres, { method: 'POST', body });
+      return await odp.json();
+    } catch (e) {
+      // przeglądarka mogła zablokować odczyt odpowiedzi, choć prośba dotarła
+      return navigator.onLine ? { ok: true } : { ok: false, blad: 'siec' };
+    }
+  };
+  const seminarium = (o: any) => {
+    if (o?.adres) $('[data-seminarium]').setAttribute('href', o.adres);
+    return o?.seminarium ? ` (${o.seminarium})` : '';
+  };
+
+  if (!adres || !/^[0-9a-f-]{36}$/i.test(token) || (akcja !== 'potwierdz' && akcja !== 'wypisz')) {
+    pokaz('Link not valid', 'This link is incomplete or has expired.', 'Link jest niepełny albo wygasł.');
+  } else if (akcja === 'potwierdz') {
+    wyslij('potwierdz').then((o) => {
+      if (o.ok) pokaz('Subscription confirmed', `You will receive an email about every new talk${seminarium(o)}. Each message has an unsubscribe link.`, 'Zapis potwierdzony — każda wiadomość zawiera link do wypisania się.');
+      else if (o.blad === 'wypisany') pokaz('You have unsubscribed', 'This address was removed from the list. To subscribe again, use the form on the seminar page.', 'Ten adres został wypisany. Aby zapisać się ponownie, użyj formularza na stronie seminarium.');
+      else pokaz('Link not valid', 'We could not find this subscription. Please sign up again on the seminar page.', 'Nie znaleźliśmy tego zapisu — zapisz się ponownie na stronie seminarium.');
+    });
+  } else {
+    pokaz('Unsubscribe', 'Click the button to stop receiving emails about new talks in this seminar.', 'Kliknij przycisk, aby nie dostawać już powiadomień o tym seminarium.');
+    const btn = $('[data-wypisz]') as HTMLButtonElement;
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      const o = await wyslij('wypisz');
+      btn.hidden = true;
+      if (o.ok) pokaz('You have been unsubscribed', `You will no longer receive these emails${seminarium(o)}. Changed your mind? Subscribe again on the seminar page.`, 'Wypisano z listy. Zmiana zdania? Zapisz się ponownie na stronie seminarium.');
+      else pokaz('Link not valid', 'We could not find this subscription — perhaps you have already unsubscribed.', 'Nie znaleźliśmy tego zapisu — być może już się wypisałeś.');
+    });
+  }
+</script>

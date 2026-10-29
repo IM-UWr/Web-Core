@@ -1,0 +1,95 @@
+---
+// Wspólny szkielet każdej strony: <head>, nagłówek, stopka.
+import '@fontsource-variable/manrope';
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+import '../styles/tlo.css';
+// Telefon (≤ 760 px): wygląd wariantu „Portal” — klocki (portal.css) i nadpisania odstępów i skali (telefon.css).
+import '../styles/portal.css';
+import '../styles/telefon.css';
+import Naglowek from '../components/Naglowek.astro';
+import Stopka from '../components/Stopka.astro';
+import { u, absolute, stripBase } from '../lib/url';
+import { t, jezykZeSciezki, drugiJezyk } from '../lib/i18n';
+import ustawienia from '../data/ustawienia.json';
+
+interface Props {
+  tytul: string;
+  opis?: string;
+  obraz?: string;
+  // false = strona w trybie podglądu (pole „Opublikowany” odznaczone)
+  opublikowany?: boolean;
+  // adres strony w drugim języku, jeśli inny niż domyślny /en/...
+  alternatywa?: string | null;
+  typ?: 'website' | 'article';
+  stronaGlowna?: boolean;
+  // czy indeksować treść w wyszukiwarce (Pagefind)
+  szukaj?: boolean;
+}
+
+const { tytul, opis, obraz, opublikowany = true, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true } = Astro.props;
+const sciezka = stripBase(Astro.url.pathname);
+const lang = jezykZeSciezki(sciezka);
+const pelnyTytul = stronaGlowna ? `${t(lang, 'instytut')} · ${t(lang, 'uwr')}` : `${tytul} · ${t(lang, 'instytut')} UWr`;
+const opisMeta = opis || (lang === 'en' ? ustawienia.wstep_en : ustawienia.wstep);
+const kanoniczny = absolute(sciezka, Astro.site);
+const inny = alternatywa === null ? null : alternatywa ?? drugiJezyk(sciezka);
+const plAdres = lang === 'pl' ? sciezka : inny;
+const enAdres = lang === 'en' ? sciezka : inny;
+const ogObraz = absolute(obraz || ustawienia.baner.zdjecie, Astro.site);
+// Wersja testowa na github.io nie powinna trafiać do Google (docelowo strona będzie pod domeną UWr).
+const testowa = (Astro.site?.hostname ?? '').endsWith('github.io');
+// Tło strony i oprawa sekcji (Ustawienia → „Tło strony”, „Sekcje”; style w src/styles/tlo.css).
+// tlo_strony: pole | kratka | penrose | zmierzch | fale | brak (stare true/false z pola-przełącznika = pole / brak).
+const tloUst = (ustawienia as any).tlo_strony;
+const tlo = tloUst === true ? 'pole' : ['pole', 'kratka', 'penrose', 'zmierzch', 'fale'].includes(tloUst) ? tloUst : undefined;
+// sekcje: pasy | linia | karty | brak (bez pola w ustawieniach — pasy).
+const sekcjeUst = (ustawienia as any).sekcje ?? 'pasy';
+const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : undefined;
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pelnyTytul}</title>
+    <meta name="description" content={opisMeta} />
+    {opublikowany && <link rel="canonical" href={kanoniczny} />}
+    {(!opublikowany || testowa) && <meta name="robots" content="noindex, nofollow" />}
+    {opublikowany && plAdres && <link rel="alternate" hreflang="pl" href={absolute(plAdres, Astro.site)} />}
+    {opublikowany && enAdres && <link rel="alternate" hreflang="en" href={absolute(enAdres, Astro.site)} />}
+    <meta property="og:type" content={typ} />
+    <meta property="og:title" content={stronaGlowna ? t(lang, 'instytut') : tytul} />
+    <meta property="og:description" content={opisMeta} />
+    <meta property="og:url" content={kanoniczny} />
+    <meta property="og:image" content={ogObraz} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_GB' : 'pl_PL'} />
+    <meta property="og:site_name" content={`${t(lang, 'instytut')} UWr`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'aktualnosci')} — ${t(lang, 'instytut')}`} href={u('/rss.xml')} />
+    <meta name="theme-color" content="#1b2d52" />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement, m;
+        d.classList.add('js');
+        try { m = localStorage.getItem('motyw'); } catch (e) {}
+        // Domyślnie tryb jasny (także na telefonach z ciemnym motywem systemu); ciemny tylko po wybraniu przyciskiem.
+        if (m !== 'dark' && m !== 'light') m = 'light';
+        d.setAttribute('data-theme', m);
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body data-tlo={tlo} data-sekcje={sekcje}>
+    <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
+    <Naglowek lang={lang} sciezka={sciezka} inny={inny} naZdjeciu={stronaGlowna && !!ustawienia.baner?.zdjecie} />
+    {!opublikowany && (
+      <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>
+    )}
+    <main id="tresc" {...(opublikowany && szukaj ? { 'data-pagefind-body': '' } : {})}>
+      <slot />
+    </main>
+    <Stopka lang={lang} />
+  </body>
+</html>

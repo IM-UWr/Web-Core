@@ -1,0 +1,42 @@
+---
+// Wyszukiwarka (Pagefind — indeks budowany po `astro build`).
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import { u } from '../lib/url';
+import { t } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const bundle = u('/pagefind/');
+const teksty = lang === 'en'
+  ? { placeholder: 'Search the website', zero_results: 'No results for [SEARCH_TERM]', load_more: 'More results', clear_search: 'Clear' }
+  : { placeholder: 'Szukaj na stronie', zero_results: 'Brak wyników dla [SEARCH_TERM]', load_more: 'Więcej wyników', clear_search: 'Wyczyść', many_results: '[COUNT] wyników dla [SEARCH_TERM]', one_result: '1 wynik dla [SEARCH_TERM]' };
+---
+<Baza tytul={t(lang, 'szukaj')} szukaj={false}>
+  <link slot="head" rel="stylesheet" href={u('/pagefind/pagefind-ui.css')} />
+  <NaglowekStrony tytul={t(lang, 'szukajNaStronie')} lang={lang} okruszki={[{ etykieta: t(lang, 'szukaj') }]} />
+  <div class="wrap" style="padding-top:28px;padding-bottom:72px">
+    <div id="szukajka" style="max-width:900px"></div>
+    <noscript><p>{lang === 'en' ? 'Search requires JavaScript.' : 'Wyszukiwarka wymaga włączonej obsługi JavaScript.'}</p></noscript>
+  </div>
+</Baza>
+
+<script is:inline define:vars={{ bundle, teksty }}>
+  (function () {
+    var s = document.createElement('script');
+    s.src = bundle + 'pagefind-ui.js';
+    s.onload = function () {
+      var ui = new PagefindUI({ element: '#szukajka', bundlePath: bundle, showSubResults: true, showImages: false, translations: teksty, autofocus: true });
+      var q = new URLSearchParams(location.search).get('q');
+      if (q) ui.triggerSearch(q);
+      // etykieta pola wyszukiwania dla czytników ekranu (Pagefind daje tylko placeholder)
+      var pole = document.querySelector('#szukajka .pagefind-ui__search-input');
+      if (pole) pole.setAttribute('aria-label', teksty.placeholder || 'Szukaj');
+    };
+    s.onerror = function () {
+      document.getElementById('szukajka').textContent = teksty.zero_results.replace('[SEARCH_TERM]', '');
+    };
+    document.head.appendChild(s);
+  })();
+</script>

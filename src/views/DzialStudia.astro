@@ -1,0 +1,379 @@
+---
+// Strona działu „Studia” (/studia, /en/studia): kierunki, dwie ścieżki (kandydat / student), pozostałe linki z menu
+// „Studia”, aktualności dla studentów i kontakt. Teksty: src/data/dzialy/studia.json; reszta z kolekcji, menu i Ustawień,
+// więc nowy kierunek, specjalność czy link w menu sam pojawia się na tej stronie.
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import KartaAktualnosci from '../components/KartaAktualnosci.astro';
+import WartoWiedziec from '../components/WartoWiedziec.astro';
+import ustawienia from '../data/ustawienia.json';
+import tekst from '../data/dzialy/studia.json';
+import { u, isExternal } from '../lib/url';
+import { wJezyku, wybierz, RODZAJE } from '../lib/i18n';
+import { short, type Lang } from '../lib/daty';
+import { listaKierunkow, menuGlowne, type Link } from '../lib/menu';
+import { listaAktualnosci, pracownicy } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const en = lang === 'en';
+const T = (pl: string, angielski: string) => (en ? angielski : pl);
+const w = (o: any, pole: string) => wybierz(o, pole, lang);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+// polska odmiana: 1 kierunek, 2–4 kierunki, 5+ kierunków
+const odm = (n: number, jeden: string, kilka: string, wiele: string) =>
+  n === 1 ? jeden : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? kilka : wiele;
+
+type Kierunek = CollectionEntry<'kierunki'>;
+type Poz = { etykieta: string; adres: string };
+const kierunki = await listaKierunkow();
+const st = ustawienia.studia;
+const stopnie = (k: Kierunek) => new Set(k.data.etapy.map((e) => e.stopien.trim()));
+// szkoła doktorska = same etapy III stopnia
+const doktorat = (k: Kierunek) => { const s = stopnie(k); return s.has('III') && !s.has('I') && !s.has('II'); };
+
+// ① Duże karty kierunków — jak kafelki „Studia” na stronie głównej, plus dodatkowe kafelki z Ustawień (np. studia podyplomowe).
+const kartyKierunkow = kierunki.map((k) => {
+  const d = k.data;
+  const nazwa = en ? d.menu_etykieta_en || d.nazwa_en || d.menu_etykieta || d.nazwa : d.menu_etykieta || d.nazwa;
+  const pelna = en ? d.nazwa_en || d.nazwa : d.nazwa;
+  return {
+    poziom: en ? d.kafelek_poziom_en || 'Programme' : d.kafelek_poziom || 'Kierunek',
+    nazwa,
+    pelna: pelna !== nazwa ? pelna : '',
+    opis: (en ? d.kafelek_opis_en || d.opis_en : '') || d.kafelek_opis || d.opis || '',
+    adres: `/studia/${k.id}`,
+  };
+});
+const karty = [
+  ...kartyKierunkow,
+  ...((st.kierunki ?? []) as any[])
+    .filter((x) => x.adres && !kartyKierunkow.some((k) => k.adres === x.adres))
+    .map((x) => ({ poziom: w(x, 'poziom'), nazwa: w(x, 'nazwa'), pelna: '', opis: w(x, 'opis'), adres: x.adres as string })),
+];
+
+// Pasek liczb (liczone z kolekcji).
+const idKierunkow = new Set(kierunki.map((k) => k.id));
+const specjalnosci = (await getCollection('specjalnosci')).filter(
+  (s) => s.data.opublikowany !== false && s.data.na_stronie_kierunku && !s.data.wygaszana && idKierunkow.has(s.data.kierunek),
+);
+const wszystkieStopnie = [...new Set(kierunki.flatMap((k) => [...stopnie(k)]))].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
+const nKierunkow = kierunki.filter((k) => !doktorat(k)).length;
+const nNauczycieli = (await pracownicy()).filter((o) => o.data.grupa === 'nauczyciel').length;
+const liczby = [
+  { n: nKierunkow, l: T(odm(nKierunkow, 'kierunek studiów', 'kierunki studiów', 'kierunków studiów'), nKierunkow === 1 ? 'degree programme' : 'degree programmes') },
+  { n: specjalnosci.length, l: T(odm(specjalnosci.length, 'specjalność do wyboru', 'specjalności do wyboru', 'specjalności do wyboru'), specjalnosci.length === 1 ? 'specialisation' : 'specialisations') },
+  { n: wszystkieStopnie.length, l: `${T(odm(wszystkieStopnie.length, 'stopień studiów', 'stopnie studiów', 'stopni studiów'), wszystkieStopnie.length === 1 ? 'level of study' : 'levels of study')} (${wszystkieStopnie.join(', ')})` },
+  { n: nNauczycieli, l: T(odm(nNauczycieli, 'nauczyciel akademicki', 'nauczycieli akademickich', 'nauczycieli akademickich'), nNauczycieli === 1 ? 'academic teacher' : 'academic teachers') },
+].filter((x) => x.n > 0);
+
+// ② Ścieżki — linki brane z menu „Studia” (etykiety i adresy z menu), uzupełnione o kotwice na stronach kierunków.
+const menuStudia = (await menuGlowne()).find((m) => m.etykieta === 'Studia');
+const linkiMenu: Link[] = (menuStudia?.grupy ?? []).flatMap((g) => g.linki);
+const norm = (a: string) => a.trim().replace(/\/$/, '');
+const zMenu = (warunek: (l: Link) => boolean): Poz | undefined => {
+  const l = linkiMenu.find(warunek);
+  return l ? { etykieta: w(l, 'etykieta'), adres: l.adres } : undefined;
+};
+const poAdresie = (a: string) => zMenu((l) => norm(l.adres) === a);
+const kierunekSpec = kierunki.find((k) => specjalnosci.some((s) => s.data.kierunek === k.id));
+const kierunekTerminy = kierunki.find((k) => !doktorat(k) && k.data.terminy.length > 0);
+const tylko = (lista: (Poz | undefined | false)[]) => lista.filter((x): x is Poz => !!x);
+
+const chce = tylko([
+  !!st.rekrutacja && { etykieta: T('Rekrutacja na studia', 'Admissions'), adres: st.rekrutacja },
+  karty.length > 0 && { etykieta: T('Kierunki studiów', 'Programmes'), adres: '#kierunki' },
+  !!kierunekSpec && { etykieta: T('Specjalności', 'Specialisations'), adres: `/studia/${kierunekSpec.id}#specjalnosci` },
+  poAdresie('/studia/pierwszy-rok'),
+]);
+const juz = tylko([
+  zMenu((l) => /plan/i.test(l.adres) || /^plan/i.test(l.etykieta)),
+  zMenu((l) => /usos/i.test(`${l.adres} ${l.etykieta}`)),
+  !!kierunekTerminy && { etykieta: T('Terminy i formularze', 'Deadlines and forms'), adres: `/studia/${kierunekTerminy.id}#terminy` },
+  poAdresie('/studia/egzaminy-i-dyplom'),
+  poAdresie('/studia/sprawy-studenckie'),
+  poAdresie('/studia/skrypty'),
+  poAdresie('/studia/rok-akademicki'),
+  poAdresie('/studia/zajecia'),
+]);
+const sciezki = [
+  { id: 'chce-studiowac', ikona: 'czapka', tytul: T('Chcę studiować', 'I want to study here'), opis: w(tekst, 'chce_studiowac'), linki: chce },
+  { id: 'juz-studiuje', ikona: 'kalendarz', tytul: T('Już studiuję', 'I am a student'), opis: w(tekst, 'juz_studiuje'), linki: juz },
+].filter((s) => s.linki.length > 0);
+
+// ③ Pozostałe linki z menu „Studia” (bez kierunków i bez tego, co już jest w ścieżkach).
+const uzyte = new Set([...karty, ...chce, ...juz].map((x) => norm(x.adres)));
+const pozostale: Poz[] = [];
+for (const l of linkiMenu) {
+  if (uzyte.has(norm(l.adres))) continue;
+  uzyte.add(norm(l.adres));
+  pozostale.push({ etykieta: w(l, 'etykieta'), adres: l.adres });
+}
+const ikona = (a: string) =>
+  isExternal(a) ? 'zewnetrzny'
+  : /dyplom|egzamin/.test(a) ? 'czapka'
+  : /most|wymian|sprawy/.test(a) ? 'ludzie'
+  : /skrypt|materia|program/.test(a) ? 'plik'
+  : /rok-akademicki|kalendarz/.test(a) ? 'kalendarz'
+  : /zajecia|plan/.test(a) ? 'zegar'
+  : 'strzalka';
+
+// ④ Aktualności dla studentów (komputer: trzy karty; telefon — wygląd „Portal”: zwarta lista sześciu).
+const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
+const aktualnosci = dlaStudentow.slice(0, 3);
+const aktualnosciTel = dlaStudentow.slice(0, 6);
+
+// ⑤ Kontakt: sekretariat dydaktyczny i zastępca dyrektora ds. dydaktycznych — z pól „Kontakt” kierunków (bez dubli).
+// Telefon podajemy tylko przy sekretariacie (administracja).
+type Kontakt = Kierunek['data']['kontakt'][number];
+const kontakty = kierunki.flatMap((k) => k.data.kontakt);
+const klucz = (k: Kontakt) => (k.email || k.osoba).trim().toLowerCase();
+const unikalne = (lista: Kontakt[]) => lista.filter((k, i) => lista.findIndex((x) => klucz(x) === klucz(k)) === i);
+const osobyKontakt = [
+  ...unikalne(kontakty.filter((k) => /^sekretariat dydaktyczny/i.test(k.rola.trim()))).map((k) => ({ ...k, zakres: w(tekst, 'sekretariat_zakres'), tel: k.telefon })),
+  ...unikalne(kontakty.filter((k) => /^zastępca dyrektora (im )?ds\. dydaktycznych/i.test(k.rola.trim()))).map((k) => ({ ...k, zakres: '', tel: undefined })),
+];
+
+const tytul = T('Studia', 'Study');
+const wstep = w(tekst, 'wstep');
+---
+<Baza tytul={tytul} opis={wstep}>
+  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w jednym wierszu w nagłówku, zwarte karty kierunków, ramki:
+       Chcę studiować, Kontakt, Już studiuję, Więcej dla studentów, Aktualności (sześć), Warto wiedzieć.
+       Kontakt, aktualności, „Warto wiedzieć” i liczby mają osobne bloki .tylko-telefon (inna kolejność lub liczba pozycji). */}
+  <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
+  <div class="wrap dz-wrap">
+    {liczby.length > 0 && (
+      <div class="stats tylko-komputer">
+        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
+      </div>
+    )}
+
+    {karty.length > 0 && (
+      <section class="zsec dz-kierunki" aria-labelledby="kierunki">
+        <h2 id="kierunki">{T('Kierunki studiów', 'Programmes')}</h2>
+        <div class="prog-grid">
+          {karty.map((k) => (
+            <a class="prog dz-prog" href={href(k.adres)}>
+              <span class="l">{k.poziom}</span>
+              <span class="n">{k.nazwa}<Ikona class="tylko-telefon" nazwa="strzalka" rozmiar={14} /></span>
+              {k.pelna && <span class="p">{k.pelna}</span>}
+              {k.opis && <span class="o">{k.opis}</span>}
+              <span class="go" aria-hidden="true">{T('Więcej', 'More')}<Ikona nazwa="strzalka" rozmiar={15} /></span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {sciezki.length > 0 && (
+      <div class="zsec dz-paths">
+        {sciezki.map((s, i) => (
+          <>
+          <section class="dz-path" aria-labelledby={s.id}>
+            <div class="dz-path-h">
+              <Ikona nazwa={s.ikona} rozmiar={26} />
+              <div>
+                <h2 id={s.id}>{s.tytul}</h2>
+                {s.opis && <p>{s.opis}</p>}
+              </div>
+            </div>
+            <ul>
+              {s.linki.map((l) => (
+                <li>
+                  <a href={href(l.adres)}>
+                    <span>{l.etykieta}</span>
+                    <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />
+                    {isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+          {i === 0 && osobyKontakt.length > 0 && (
+            <section class="pt-box tylko-telefon" aria-labelledby="kontakt-tel" data-pagefind-ignore>
+              <div class="pt-h"><h2 id="kontakt-tel">{T('Kontakt', 'Contact')}</h2></div>
+              <ul class="pt-list dz-osoby">
+                {osobyKontakt.map((k) => (
+                  <li>
+                    <span class="dz-rola">{w(k, 'rola')}</span>
+                    <span class="pt-t">{k.osoba}</span>
+                    {k.zakres && <span class="pt-s">{k.zakres}</span>}
+                    <span class="dz-c">
+                      {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
+                      {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
+                      {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p class="pt-stopka"><a class="pt-all" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
+            </section>
+          )}
+          </>
+        ))}
+      </div>
+    )}
+
+    {pozostale.length > 0 && (
+      <section class="zsec dz-wiecej" aria-labelledby="wiecej">
+        <h2 id="wiecej">{T('Więcej dla studentów', 'More for students')}</h2>
+        <div class="tiles dz-tiles">
+          {pozostale.map((l) => (
+            <a class="tile" href={href(l.adres)}>
+              <Ikona nazwa={ikona(l.adres)} />
+              <span>{l.etykieta}</span>
+              <span class="tylko-telefon dz-wiecej-ico" data-pagefind-ignore><Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />{isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <WartoWiedziec lang={lang} dzial="studia" klasa="tylko-komputer" />
+
+    <section class="zsec tylko-komputer" aria-labelledby="aktualnosci">
+      <div class="dz-head">
+        <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
+        <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </div>
+      {aktualnosci.length > 0 ? (
+        <div class="news-grid">
+          {aktualnosci.map((p) => <KartaAktualnosci p={p} lang={lang} />)}
+        </div>
+      ) : (
+        <p class="muted" style="margin:0">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
+      )}
+    </section>
+
+    <div class="dz-tel tylko-telefon" data-pagefind-ignore>
+      <section class="pt-box" aria-labelledby="aktualnosci-tel">
+        <div class="pt-h">
+          <h2 id="aktualnosci-tel">{T('Aktualności dla studentów', 'News for students')}</h2>
+          <a class="pt-all" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        </div>
+        {aktualnosciTel.length > 0 ? (
+          <ul class="pt-list">
+            {aktualnosciTel.map((p) => (
+              <li>
+                <a class="pt-item" href={href(p.href)}>
+                  <time class="pt-d" datetime={p.data}>{short(p.data).slice(0, 5)}</time>
+                  <span class="pt-b">
+                    <span class="pt-k">{RODZAJE[p.rodzaj]?.[lang]}</span>
+                    <span class="pt-t">{p.tytul}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="pt-pusto">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
+        )}
+      </section>
+      <WartoWiedziec lang={lang} dzial="studia" uklad="portal" />
+    </div>
+
+    <section class="zsec tylko-komputer" aria-labelledby="kontakt" style="margin-bottom:0">
+      <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
+      {osobyKontakt.length > 0 && (
+        <ul class="people">
+          {osobyKontakt.map((k) => (
+            <li class="person">
+              <span class="dz-rola">{w(k, 'rola')}</span>
+              <span class="os-n">{k.osoba}</span>
+              {k.zakres && <span class="dz-zakres">{k.zakres}</span>}
+              <span class="os-c">
+                {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
+                {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
+                {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+    </section>
+  </div>
+</Baza>
+
+<style>
+  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  .dz-prog { min-height: 180px; }
+  .dz-prog .p { margin-top: -4px; font-size: 14px; color: var(--muted); }
+  .dz-prog .go { margin-top: auto; padding-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
+  :global(:root[data-theme='dark']) .dz-prog .go { color: var(--accent); }
+  .dz-prog .go :global(svg) { transition: transform .15s; }
+  .dz-prog:hover .go :global(svg) { transform: translateX(3px); }
+  .dz-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+  .dz-path { display: flex; flex-direction: column; gap: 14px; padding: 22px; border-radius: var(--radius-l); border: 1.5px solid var(--line); }
+  .dz-path-h { display: flex; gap: 14px; align-items: flex-start; }
+  .dz-path-h :global(svg) { flex: none; margin-top: 2px; color: var(--primary); }
+  :global(:root[data-theme='dark']) .dz-path-h :global(svg) { color: var(--accent); }
+  .dz-path h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--ink); scroll-margin-top: 16px; }
+  .dz-path p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+  .dz-path ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .dz-path li { border-bottom: 1px solid var(--line); }
+  .dz-path li a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 10px 8px; font-weight: 700; color: var(--ink); text-decoration: none; }
+  .dz-path li a:hover { background: var(--tint); }
+  .dz-path li a :global(svg) { flex: none; color: var(--muted); }
+  .dz-tiles { padding-top: 0; }
+  .dz-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 10px; }
+  .dz-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
+  .dz-rola { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
+  .people + .link-arrow { margin-top: 8px; }
+  @media (prefers-reduced-motion: reduce) { .dz-prog .go :global(svg) { transition: none; transform: none !important; } }
+
+  /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
+  @media (max-width: 760px) {
+    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
+    /* kierunki: zwarte karty (dwie w rzędzie, na wąskim telefonie jedna), strzałka przy nazwie */
+    .dz-kierunki .prog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .dz-prog { min-height: 0; gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); background: var(--bg); color: var(--text); transition: border-color .15s, background-color .15s; }
+    .dz-prog:hover { border-color: var(--ink); background: var(--tint); color: var(--text); }
+    .dz-prog .l { font-size: 12px; font-weight: 800; letter-spacing: .05em; }
+    .dz-prog .n { display: flex; align-items: baseline; gap: 6px; font-size: 16px; font-weight: 800; line-height: 1.3; color: var(--ink); }
+    .dz-prog .n :global(.ico) { align-self: center; color: var(--muted); }
+    .dz-prog .p { margin-top: 0; font-size: 13.5px; line-height: 1.35; }
+    .dz-prog .o { font-size: 14px; line-height: 1.45; color: var(--text); }
+    .dz-prog .go { display: none; }
+    /* ścieżki i kontakt: ramki jedna pod drugą */
+    .zsec.dz-paths { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+    .dz-path { gap: 0; padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); }
+    .dz-path-h { display: block; }
+    .dz-path-h :global(svg) { display: none; }
+    .dz-path h2, .dz-wiecej > h2 { margin: 0 0 4px; padding-bottom: 7px; border-bottom: 2px solid var(--ink); font-size: 18px; line-height: 1.3; letter-spacing: -0.01em; }
+    .dz-path h2::before, .dz-wiecej > h2::before { content: ''; display: inline-block; width: 4px; height: .85em; margin-right: 9px; border-radius: 2px; background: var(--accent); vertical-align: -.05em; }
+    :global(:root[data-theme='dark']) .dz-path h2, :global(:root[data-theme='dark']) .dz-wiecej > h2 { border-bottom-color: var(--line); }
+    .dz-path p { margin: 10px 0 4px; font-size: 14px; line-height: 1.45; }
+    .dz-path ul { border-top: 0; }
+    .dz-path li:last-child { border-bottom: 0; }
+    .dz-path li a { gap: 10px; min-height: 40px; padding: 6px 4px; font-size: 15px; line-height: 1.3; }
+    .dz-osoby > li { display: flex; flex-direction: column; gap: 1px; padding: 8px 2px; }
+    .dz-osoby .dz-rola { letter-spacing: .05em; }
+    .dz-c { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+    .dz-c a { color: var(--ink); }
+    /* Więcej dla studentów: ramka z listą linków (napis z lewej, strzałka z prawej) */
+    .zsec.dz-wiecej { margin: 0 0 12px; padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+    .zsec.dz-wiecej::before { content: none; }
+    .dz-wiecej .tiles { display: block; padding: 0; }
+    .dz-wiecej :global(.tile) { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.3; }
+    .dz-wiecej :global(.tile + .tile) { min-height: 41px; border-top: 1px solid var(--line); }
+    .dz-wiecej :global(.tile:hover) { background: var(--tint); }
+    .dz-wiecej :global(.tile > svg) { display: none; }
+    .dz-wiecej-ico { display: inline-flex; flex: none; color: var(--muted); }
+    /* aktualności i „Warto wiedzieć” (bloki tylko na telefon) */
+    .dz-tel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  }
+  @media (max-width: 560px) {
+    .dz-kierunki .prog-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+// Pojedyncza konferencja.
+import { render } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { t, wJezyku } from '../lib/i18n';
+import { dayNum, monthShort, range, type Lang } from '../lib/daty';
+import { slugOf, trwaLubBedzie, type Konferencja, type Wydarzenie } from '../lib/tresci';
+import { adresIcs } from '../lib/kalendarz';
+
+interface Props { konferencja: Konferencja; lang: Lang }
+const { konferencja, lang } = Astro.props;
+const d = konferencja.data;
+const slug = slugOf(konferencja.id);
+const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
+const { Content } = await render(konferencja);
+const w: Wydarzenie = { rodzaj: 'konferencja', tytul, poczatek: d.poczatek, koniec: d.koniec, miejsce: d.miejsce, href: `/nauka/konferencje/${slug}`, uid: `konf-${slug}` };
+const przyszla = !d.odwolana && trwaLubBedzie(w);
+const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
+---
+<Baza tytul={tytul} opis={`${range(d.poczatek, d.koniec, lang)}${d.miejsce ? ', ' + d.miejsce : ''}`} opublikowany={d.opublikowany} obraz={d.zdjecie}>
+  <NaglowekStrony tytul={tytul} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All conferences' : 'Wszystkie konferencje', adres: '/nauka/konferencje' }} />
+  <div class="wrap layout">
+    <div class="main">
+      <section class="event-box" aria-label={lang === 'en' ? 'Conference details' : 'Szczegóły konferencji'} style="margin-bottom:24px">
+        <span class="datebox" aria-hidden="true"><span class="d">{dayNum(d.poczatek)}</span><span class="m">{monthShort(d.poczatek, lang)}</span></span>
+        <dl>
+          <dt>{t(lang, 'kiedy')}</dt><dd>{range(d.poczatek, d.koniec, lang)}</dd>
+          {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{d.miejsce}</dd></>}
+          {d.organizatorzy && <><dt>{lang === 'en' ? 'Organisers' : 'Organizatorzy'}</dt><dd>{d.organizatorzy}</dd></>}
+        </dl>
+        <div class="actions">
+          {d.odwolana ? <span class="status">{lang === 'en' ? 'Cancelled' : 'Odwołana'}</span> : przyszla ? (
+            <>
+              <a class="btn btn-small" href={u(adresIcs(w.uid))} download><Ikona nazwa="kalendarz" rozmiar={16} />{t(lang, 'dodajDoKalendarza')}</a>
+            </>
+          ) : <span class="status">{t(lang, 'odbylo')}</span>}
+        </div>
+      </section>
+      {d.strona && <p><a class="btn btn-primary" href={d.strona}>{lang === 'en' ? 'Conference website' : 'Strona konferencji'}<Ikona nazwa="zewnetrzny" rozmiar={16} /></a></p>}
+      {d.zdjecie && <figure class="article-figure"><img src={u(d.zdjecie)} alt="" /></figure>}
+      <div class="prose"><Content /></div>
+    </div>
+    <div class="side" aria-hidden="true"></div>
+  </div>
+</Baza>

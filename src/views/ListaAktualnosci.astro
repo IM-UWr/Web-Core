@@ -1,0 +1,141 @@
+---
+// Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import WierszAktualnosci from '../components/WierszAktualnosci.astro';
+import KartaWydarzenia from '../components/KartaWydarzenia.astro';
+import Ikona from '../components/Ikona.astro';
+import ustawienia from '../data/ustawienia.json';
+import { u } from '../lib/url';
+import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { monthYear, type Lang } from '../lib/daty';
+import { listaAktualnosci, wydarzeniaNaGlowna } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const lista = await listaAktualnosci(lang);
+// Najbliższe wydarzenia jak na stronie głównej: tylko gdy są blisko (Ustawienia → dni robocze); gdy brak — bez prawego paska, lista szersza.
+const wydarzenia = await wydarzeniaNaGlowna(3, lang, Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5);
+
+// Grupowanie po miesiącach
+const grupy: { miesiac: string; pozycje: typeof lista }[] = [];
+for (const p of lista) {
+  const m = monthYear(p.data, lang);
+  const ost = grupy[grupy.length - 1];
+  if (ost && ost.miesiac === m) ost.pozycje.push(p);
+  else grupy.push({ miesiac: m, pozycje: [p] });
+}
+const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
+const lead = lang === 'en' ? 'Announcements, events and achievements of the Mathematical Institute.' : 'Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.';
+---
+<Baza tytul={t(lang, 'aktualnosci')} opis={lead}>
+  <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]} />
+
+  <div class="wrap layout">
+    <div class="main" data-lista>
+      {/* Rodzaje wpisów i wyszukiwarka w lewej kolumnie, nad listą (wyszukiwarka zaraz za przyciskami; bez wydarzeń kolumna jest szersza). */}
+      <div class="filters filters-lewo">
+        <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter by type' : 'Filtruj według rodzaju'}>
+          <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
+          {rodzaje.map((r) => <button type="button" class="chip" aria-pressed="false" data-rodzaj={r}>{RODZAJE[r][lang]}</button>)}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <label class="search">
+            <Ikona nazwa="szukaj" rozmiar={18} />
+            <span class="sr-only">{lang === 'en' ? 'Search news' : 'Szukaj w aktualnościach'}</span>
+            <input type="search" data-szukaj placeholder={lang === 'en' ? 'Search news' : 'Szukaj w aktualnościach'} />
+          </label>
+        </div>
+      </div>
+      <p class="dla-info" data-dla-info hidden>
+        <span>{lang === 'en' ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
+        <button type="button" class="chip" data-dla-wyczysc>{lang === 'en' ? 'Show all' : 'Pokaż wszystkie'}</button>
+      </p>
+      {grupy.map((g) => (
+        <section data-grupa>
+          <h2 class="month">{g.miesiac}</h2>
+          {g.pozycje.map((p) => <WierszAktualnosci p={p} lang={lang} />)}
+        </section>
+      ))}
+      <p class="muted" data-pusto hidden>{lang === 'en' ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
+      <p class="muted" style="margin-top:28px">
+        {lang === 'en' ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
+        <a href={ustawienia.archiwum}>{lang === 'en' ? 'archive of the old website' : 'archiwum starej strony'}</a>.
+      </p>
+    </div>
+
+    {wydarzenia.length > 0 && (
+      <aside class="side" data-pagefind-ignore data-wydarzenia>
+        <div class="side-box side-plywajacy">
+          <h2>{t(lang, 'najblizsze')}</h2>
+          {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} maly />)}
+        </div>
+      </aside>
+    )}
+  </div>
+</Baza>
+
+<script>
+  const lista = document.querySelector('[data-lista]');
+  const pozycje = Array.from(document.querySelectorAll<HTMLElement>('[data-lista] .row-item'));
+  const grupy = Array.from(document.querySelectorAll<HTMLElement>('[data-grupa]'));
+  const pusto = document.querySelector<HTMLElement>('[data-pusto]');
+  const szukaj = document.querySelector<HTMLInputElement>('[data-szukaj]');
+  const rodzajBtn = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
+  const dlaInfo = document.querySelector<HTMLElement>('[data-dla-info]');
+  let rodzaj = '';
+  let dla = '';
+  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
+
+  function filtruj() {
+    const q = norm(szukaj?.value.trim() ?? '');
+    let ile = 0;
+    for (const p of pozycje) {
+      const ok = (!rodzaj || p.dataset.rodzaj === rodzaj) && (!dla || (p.dataset.dla ?? '').split(' ').includes(dla)) && (!q || norm(p.textContent ?? '').includes(q));
+      p.hidden = !ok;
+      if (ok) ile++;
+    }
+    for (const g of grupy) g.hidden = !g.querySelector('.row-item:not([hidden])');
+    if (pusto) pusto.hidden = ile > 0;
+  }
+  rodzajBtn.forEach((b) => b.addEventListener('click', () => {
+    rodzaj = b.dataset.rodzaj ?? '';
+    rodzajBtn.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    filtruj();
+  }));
+  // ?dla=… z linku (np. „Aktualności dla studentów”): zawężenie z informacją i przyciskiem „Pokaż wszystkie”
+  const ustawDla = (d: string) => {
+    const znane = !!d && !!dlaInfo?.querySelector(`[data-dla-etykieta="${CSS.escape(d)}"]`);
+    dla = znane ? d : '';
+    if (dlaInfo) {
+      dlaInfo.hidden = !dla;
+      dlaInfo.querySelectorAll<HTMLElement>('[data-dla-etykieta]').forEach((e) => (e.hidden = e.dataset.dlaEtykieta !== dla));
+    }
+    filtruj();
+  };
+  dlaInfo?.querySelector('[data-dla-wyczysc]')?.addEventListener('click', () => {
+    ustawDla('');
+    const url = new URL(location.href);
+    url.searchParams.delete('dla');
+    history.replaceState(history.state, '', url);
+  });
+  szukaj?.addEventListener('input', filtruj);
+  if (lista) {
+    const p = new URLSearchParams(location.search);
+    const d = p.get('dla');
+    if (d) ustawDla(d);
+    const r = p.get('rodzaj');
+    if (r) rodzajBtn.find((b) => b.dataset.rodzaj === r)?.click();
+  }
+
+  // Zakończone wydarzenia chowamy od razu (strona przebudowuje się 2× dziennie); bez wydarzeń — bez paska.
+  import { now as teraz, today as dzis, hasTime as zGodzina } from '../lib/daty';
+  const pasek = document.querySelector<HTMLElement>('[data-wydarzenia]');
+  if (pasek) {
+    pasek.querySelectorAll<HTMLElement>('[data-koniec]').forEach((k) => {
+      const kon = k.dataset.koniec || '';
+      if (kon && (zGodzina(kon) ? kon < teraz() : kon < dzis())) k.remove();
+    });
+    if (!pasek.querySelector('[data-koniec]')) pasek.remove();
+  }
+</script>

@@ -1,0 +1,157 @@
+---
+// Publikacje: wykazy prac według lat (karty lat → podstrony z listą w HTML, PDF-y) i czasopisma redagowane w Instytucie.
+// Treść: src/data/publikacje.json (CMS) i src/data/publikacje/RRRR.json (wykazy). Liczby liczą się z wykazów.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku, wybierz } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import { dane, lata, odmiana } from './publikacjeDane';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const en = lang === 'en';
+const T = (pl: string, en_: string) => (en ? en_ : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+
+const tytul = T('Publikacje', 'Publications');
+const lead = wybierz(dane as any, 'wstep', lang) || undefined;
+const wszystkie = lata();
+const zWykazem = wszystkie.filter((r) => r.wykaz);
+const suma = zWykazem.reduce((s, r) => s + r.liczba, 0);
+const najnowszy = wszystkie[0]?.rok;
+const najstarszy = wszystkie[wszystkie.length - 1]?.rok;
+const czasopisma = dane.czasopisma ?? [];
+const nPozycji = (n: number) => (en ? (n === 1 ? 'entry' : 'entries') : odmiana(n, 'pozycja', 'pozycje', 'pozycji'));
+const liczby = [
+  ...(suma ? [{ n: suma.toLocaleString(en ? 'en-GB' : 'pl-PL'), l: T(`${odmiana(suma, 'pozycja', 'pozycje', 'pozycji')} w wykazach prac`, 'entries in the lists of publications') }] : []),
+  ...(najnowszy ? [{ n: najnowszy === najstarszy ? String(najnowszy) : `${najstarszy}–${najnowszy}`, l: T('lata objęte wykazami', 'years covered') }] : []),
+  ...(czasopisma.length ? [{ n: String(czasopisma.length), l: T(`${odmiana(czasopisma.length, 'czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych')} w Instytucie`, czasopisma.length === 1 ? 'journal edited at the Institute' : 'journals edited at the Institute') }] : []),
+];
+const nagCzasopisma = wybierz(dane as any, 'czasopisma_naglowek', lang) || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
+const archiwum = wybierz(dane as any, 'archiwum', lang);
+---
+<Baza tytul={tytul} opis={lead}>
+  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} />
+  <div class="wrap pub-strona">
+    {liczby.length > 0 && (
+      <div class="stats">
+        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
+      </div>
+    )}
+
+    <section class="pub-sekcja" aria-labelledby="wykazy">
+      <div class="pub-sekcja-g">
+        <h2 id="wykazy">{T('Wykazy prac według lat', 'Lists of publications by year')}</h2>
+        <p class="muted">{T(
+          'Wybierz rok, aby zobaczyć listę prac. Pliki PDF to wykazy w oryginalnej postaci.',
+          'Choose a year to see the list of works. The PDF files are the lists in their original form.',
+        )}</p>
+      </div>
+      <ol class="lata" role="list">
+        {wszystkie.map((r) => {
+          const cel = r.wykaz ? href(`/nauka/publikacje/${r.rok}`) : r.pdf ? href(r.pdf) : undefined;
+          const uwaga = wybierz(r as any, 'uwagi', lang);
+          return (
+            <li class={`rok${r.rok === najnowszy ? ' rok-nowy' : ''}${cel ? ' rok-link' : ''}`}>
+              <h3 class="rok-n">{cel ? <a href={cel}>{r.rok}</a> : r.rok}</h3>
+              {r.wykaz ? <p class="rok-ile">{r.liczba} {nPozycji(r.liczba)}</p> : r.pdf ? <p class="rok-ile">{T('wykaz w PDF', 'PDF list')}</p> : null}
+              {uwaga && <p class="rok-uw">{uwaga}</p>}
+              {r.rok === najnowszy && <span class="badge rok-badge">{T('najnowszy', 'latest')}</span>}
+              {r.wykaz && r.pdf && (
+                <p class="rok-f">
+                  <a class="rok-pdf" href={href(r.pdf)} aria-label={T(`Wykaz ${r.rok} — PDF`, `List ${r.rok} — PDF`)}><Ikona nazwa="plik" rozmiar={15} />PDF</a>
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+
+    {czasopisma.length > 0 && (
+      <section class="pub-sekcja" aria-labelledby="czasopisma">
+        <div class="pub-sekcja-g">
+          <h2 id="czasopisma">{nagCzasopisma}</h2>
+        </div>
+        <div class="czasopisma">
+          {czasopisma.map((c) => {
+            const opis = wybierz(c as any, 'opis', lang);
+            const wydawca = wybierz(c as any, 'wydawca', lang);
+            const redakcja = wybierz(c as any, 'redakcja', lang);
+            const wsparcie = wybierz(c as any, 'wsparcie', lang);
+            const issn = [c.issn && `${c.issn}${c.eissn ? T(' (druk)', ' (print)') : ''}`, c.eissn && `${c.eissn} (online)`].filter(Boolean).join(' · ');
+            return (
+              <article class="cz">
+                <h3>{c.nazwa}</h3>
+                {opis && <p class="cz-o">{opis}</p>}
+                {(wydawca || wsparcie || redakcja || issn || c.kontakt) && (
+                  <dl class="cz-meta">
+                    {wydawca && <><dt>{T('Wydawca', 'Publisher')}</dt><dd>{wydawca}</dd></>}
+                    {wsparcie && <><dt>{T('Wsparcie', 'Sponsored by')}</dt><dd>{wsparcie}</dd></>}
+                    {redakcja && <><dt>{T('Redakcja', 'Editorial office')}</dt><dd>{redakcja}</dd></>}
+                    {c.kontakt && <><dt>{T('Kontakt', 'Contact')}</dt><dd><a href={`mailto:${c.kontakt}`}>{c.kontakt}</a></dd></>}
+                    {issn && <><dt>ISSN</dt><dd>{issn}</dd></>}
+                  </dl>
+                )}
+                {c.adres && <a class="link-arrow cz-link" href={href(c.adres)}>{T('Strona czasopisma', 'Journal website')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a>}
+              </article>
+            );
+          })}
+        </div>
+        {archiwum && <p class="muted pub-arch">{archiwum}</p>}
+      </section>
+    )}
+  </div>
+</Baza>
+
+<style>
+  .pub-strona { padding-top: clamp(24px, 4vw, 40px); padding-bottom: clamp(40px, 6vw, 72px); }
+  .pub-sekcja { margin-top: clamp(28px, 4vw, 44px); }
+  .pub-sekcja-g { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; margin-bottom: 16px; }
+  .pub-sekcja-g h2 { margin: 0; font-size: clamp(24px, 3vw, 30px); font-weight: 800; letter-spacing: -0.02em; scroll-margin-top: 16px; }
+  .pub-sekcja-g p { margin: 0; font-size: 15px; max-width: 560px; }
+
+  /* Siatka lat: klikalne karty (cała karta jest odnośnikiem; PDF osobno). */
+  .lata { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 164px), 1fr)); gap: 12px; }
+  .rok { position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 112px; padding: 16px 18px 14px; border-radius: var(--radius-l); border: 1px solid var(--line); background: var(--bg); transition: border-color .15s, box-shadow .15s, background-color .15s, transform .15s; }
+  .rok-n { margin: 0; font-size: 30px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .rok-n a { color: inherit; text-decoration: none; }
+  .rok-link .rok-n a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .rok-link:hover, .rok-link:focus-within { border-color: var(--ink); background: var(--tint); box-shadow: 0 6px 20px rgb(0 0 0 / .08); transform: translateY(-2px); }
+  .rok-link .rok-n a:focus-visible { outline: none; }
+  .rok-link:has(.rok-n a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .rok-ile { margin: 0; font-size: 14px; color: var(--muted); }
+  .rok-uw { margin: 0; font-size: 13px; color: var(--muted); }
+  .rok-f { margin: auto 0 0; padding-top: 8px; display: flex; justify-content: flex-end; }
+  .rok-badge { align-self: flex-start; margin-top: 4px; font-size: 12px; padding: 2px 9px; }
+  .rok-pdf { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; margin-left: auto; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); font-size: 13px; font-weight: 800; color: var(--ink); text-decoration: none; }
+  .rok-pdf:hover { border-color: var(--ink); color: var(--ink); }
+  .rok-nowy { border-color: var(--primary); box-shadow: inset 0 3px 0 var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .rok { transition: none; } .rok-link:hover, .rok-link:focus-within { transform: none; } }
+
+  /* Czasopisma */
+  .czasopisma { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+  .cz { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: var(--radius-l); background: var(--surface); min-width: 0; overflow-wrap: anywhere; }
+  .cz h3 { margin: 0; font-size: 21px; font-weight: 800; line-height: 1.25; color: var(--ink); }
+  .cz-o { margin: 0; font-size: 15px; line-height: 1.6; }
+  .cz-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; }
+  .cz-meta dt { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+  .cz-meta dd { margin: 0; }
+  .cz-link { margin-top: auto; }
+  .pub-arch { margin: 20px 0 0; font-size: 15px; }
+  @media (max-width: 520px) {
+    .cz-meta { grid-template-columns: 1fr; gap: 2px; } .cz-meta dd { margin-bottom: 6px; }
+    .lata { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .rok { min-height: 92px; padding: 12px 10px 10px; border-radius: var(--radius); }
+    .rok-n { font-size: 23px; } .rok-ile { font-size: 13px; }
+    .rok-badge { font-size: 11px; padding: 1px 7px; }
+    .rok-pdf { min-height: 28px; padding: 0 8px; font-size: 12px; }
+    .pub-strona .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pub-strona .stat { padding: 14px 16px; }
+    .pub-strona .stat .n { font-size: 26px; }
+    .pub-strona .stat:nth-child(2) { grid-column: 1 / -1; order: 3; }
+  }
+  @media (max-width: 340px) { .lata { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

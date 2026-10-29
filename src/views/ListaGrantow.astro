@@ -1,0 +1,227 @@
+---
+// Projekty i granty (/nauka/granty): liczby wyliczone z kolekcji, realizowane projekty jako karty,
+// zakończone jako zwarta lista pogrupowana wg roku zakończenia (najnowsze u góry), na końcu projekty bez podanych lat.
+// Bez wyszukiwarki i filtrów (decyzja właściciela strony). Prawy pasek: tylko spis „Na tej stronie” (sekcje i lata).
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import WierszGrantu from '../components/WierszGrantu.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
+import { today, type Lang } from '../lib/daty';
+import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, slugOf, type Grant } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+// liczebniki: 1 projekt, 2–4 (22–24…) projekty, 5+ projektów
+const odm = (n: number, jeden: string, kilka: string, wiele: string) => {
+  if (n === 1) return jeden;
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? kilka : wiele;
+};
+const ileProjektow = (n: number) => (lang === 'en' ? `${n} project${n === 1 ? '' : 's'}` : `${n} ${odm(n, 'projekt', 'projekty', 'projektów')}`);
+
+const wszystkie = await granty();
+const osoby = await pracownicy();
+const listaZakladow = await zaklady();
+const rok = Number(today().slice(0, 4));
+// Realizowane — tak samo jak na /nauka i na stronach zakładów: rok zakończenia ≥ bieżący rok.
+const realizowane = wszystkie.filter((g) => g.data.rok_do !== undefined && g.data.rok_do >= rok);
+const zakonczone = wszystkie.filter((g) => g.data.rok_do !== undefined && g.data.rok_do < rok);
+const bezLat = wszystkie.filter((g) => g.data.rok_do === undefined);
+const grupy = [...new Set(zakonczone.map((g) => g.data.rok_do!))]
+  .sort((a, b) => b - a)
+  .map((r) => ({ rok: r, lista: zakonczone.filter((g) => g.data.rok_do === r) }));
+
+const kier = (g: Grant) => kierownicyGrantu(g.data.kierownik, osoby);
+const tytul = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
+const adresGrantu = (g: Grant) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
+const zakladProjektu = (g: Grant) => listaZakladow.find((z) => z.id === zakladGrantu(g, osoby));
+const klasaRodzaju = (g: Grant) => `badge${g.data.rodzaj === 'ncn' ? ' badge-wydarzenie' : g.data.rodzaj === 'ue' ? ' badge-sukces' : ''}`;
+
+// Pasek liczb — wszystko liczone z kolekcji (kwot nie sumujemy: różne waluty i zapisy).
+const lataOd = wszystkie.map((g) => g.data.rok_od).filter((r): r is number => r !== undefined);
+const odRoku = lataOd.length ? Math.min(...lataOd) : undefined;
+const ileRodzaju = (r: string) => wszystkie.filter((g) => g.data.rodzaj === r).length;
+const liczby = [
+  { n: wszystkie.length, l: lang === 'en' ? `research projects${odRoku ? ` since ${odRoku}` : ''}` : `${odm(wszystkie.length, 'projekt badawczy', 'projekty badawcze', 'projektów badawczych')}${odRoku ? ` od ${odRoku} r.` : ''}` },
+  { n: realizowane.length, l: T(odm(realizowane.length, 'realizowany obecnie', 'realizowane obecnie', 'realizowanych obecnie'), 'ongoing') },
+  ...(['ncn', 'ue'] as const)
+    .filter((r) => ileRodzaju(r) > 0)
+    .map((r) => ({ n: ileRodzaju(r), l: r === 'ncn' ? T('z Narodowego Centrum Nauki', 'funded by the National Science Centre') : T('z programów UE i międzynarodowych', 'EU and international') })),
+];
+
+const naglowek = T('Projekty i granty', 'Research projects and grants');
+const lead = T(
+  'Projekty badawcze realizowane w Instytucie Matematycznym, finansowane przez Narodowe Centrum Nauki, programy unijne i inne źródła.',
+  'Research projects carried out at the Mathematical Institute, funded by the National Science Centre (NCN), EU programmes and other sources.',
+);
+const naTejStronie = T('Na tej stronie', 'On this page');
+const sekcje = [
+  { id: 'realizowane', tekst: T('Realizowane', 'Ongoing'), ile: realizowane.length, pokaz: true },
+  { id: 'zakonczone', tekst: T('Zakończone', 'Completed'), ile: zakonczone.length, pokaz: zakonczone.length > 0 },
+  { id: 'pozostale', tekst: T('Pozostałe', 'Other'), ile: bezLat.length, pokaz: bezLat.length > 0 },
+].filter((s) => s.pokaz);
+---
+<Baza tytul={naglowek} opis={lead}>
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} />
+
+  <div class="wrap layout">
+    <div class="main">
+      <div class="stats gl-stats">
+        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
+      </div>
+
+      {sekcje.length > 1 && (
+        <details class="toc toc-top gl-spis" data-pagefind-ignore>
+          <summary>{naTejStronie}<Ikona nazwa="dol" class="chev" rozmiar={18} /></summary>
+          <ol>
+            {sekcje.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>{s.tekst} <span class="gl-spis-ile">({s.ile})</span></a>
+                {s.id === 'zakonczone' && <ol class="gl-lata" aria-label={T('Rok zakończenia', 'Year completed')}>{grupy.map((gr) => <li><a href={`#rok-${gr.rok}`}>{gr.rok}</a></li>)}</ol>}
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
+
+      <section class="gl-sekcja" id="realizowane" aria-labelledby="h-realizowane">
+        <h2 id="h-realizowane">{T('Realizowane', 'Ongoing')} <span class="muted gl-ile">({realizowane.length})</span></h2>
+        {realizowane.length === 0 && <p class="muted">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
+        {realizowane.length > 0 && (
+          <div class="spec-grid">
+            {realizowane.map((g) => {
+              const k = kier(g);
+              const z = zakladProjektu(g);
+              const lata = lataGrantu(g);
+              return (
+                <article class="spec spec-link gl-karta">
+                  <div class="news-meta">
+                    <span class={klasaRodzaju(g)}>{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span>
+                    {g.data.program && <span class="badge">{g.data.program}</span>}
+                    {lata && <span class="gl-lata-txt">{lata}</span>}
+                  </div>
+                  <h3><a href={adresGrantu(g)}>{tytul(g)}</a></h3>
+                  {k.length > 0 && <p><span class="lbl">{k.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}</span>{k.map((x) => x.nazwa).join(', ')}</p>}
+                  {(z || g.data.kod) && (
+                    <p class="foot">
+                      {z && <a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a>}
+                      {g.data.kod && <span class="muted gl-kod">{g.data.kod}</span>}
+                    </p>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {zakonczone.length > 0 && (
+        <section class="gl-sekcja" id="zakonczone" aria-labelledby="h-zakonczone">
+          <h2 id="h-zakonczone">{T('Zakończone', 'Completed')} <span class="muted gl-ile">({zakonczone.length})</span></h2>
+          {grupy.map((gr) => (
+            <section class="gl-rok" id={`rok-${gr.rok}`} aria-labelledby={`h-rok-${gr.rok}`}>
+              <h3 class="gl-rok-h" id={`h-rok-${gr.rok}`}>
+                <span class="r">{gr.rok}</span><span class="sr-only">, </span><span class="n">{ileProjektow(gr.lista.length)}</span>
+              </h3>
+              <ul class="gw-lista">
+                {gr.lista.map((g) => <WierszGrantu grant={g} kierownicy={kier(g)} lang={lang} />)}
+              </ul>
+            </section>
+          ))}
+        </section>
+      )}
+
+      {bezLat.length > 0 && (
+        <section class="gl-sekcja" id="pozostale" aria-labelledby="h-pozostale">
+          <h2 id="h-pozostale">{T('Pozostałe', 'Other')} <span class="muted gl-ile">({bezLat.length})</span></h2>
+          <p class="muted gl-uwaga">{T('Projekty bez podanych lat realizacji.', 'Projects without recorded dates.')}</p>
+          <ul class="gw-lista">
+            {bezLat.map((g) => <WierszGrantu grant={g} kierownicy={kier(g)} lang={lang} />)}
+          </ul>
+        </section>
+      )}
+    </div>
+
+    <aside class="side" data-pagefind-ignore>
+      {sekcje.length > 1 && (
+        <nav class="side-box toc toc-side gl-spis" aria-label={naTejStronie}>
+          <h2>{naTejStronie}</h2>
+          <ol>
+            {sekcje.map((s) => (
+              <li>
+                <a href={`#${s.id}`} data-gl-sekcja>{s.tekst} <span class="gl-spis-ile">({s.ile})</span></a>
+                {s.id === 'zakonczone' && <ol class="gl-lata" aria-label={T('Rok zakończenia', 'Year completed')}>{grupy.map((gr) => <li><a href={`#rok-${gr.rok}`} data-gl-rok>{gr.rok}</a></li>)}</ol>}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+    </aside>
+  </div>
+</Baza>
+
+<script>
+  // Spis po prawej: podświetla czytaną sekcję i rok — ostatni, którego początek minął górne 30% okna.
+  const sekcje = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-gl-sekcja]'));
+  const lata = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-gl-rok]'));
+  const pary = (linki: HTMLAnchorElement[]) =>
+    linki.map((a) => ({ a, el: document.getElementById(a.hash.slice(1)) })).filter((x): x is { a: HTMLAnchorElement; el: HTMLElement } => !!x.el);
+  const grupy = [pary(sekcje), pary(lata)];
+  if (grupy.some((g) => g.length)) {
+    const ustaw = () => {
+      // na samym dole strony krótka ostatnia sekcja nie dojdzie do linii — wtedy ostatnia widoczna
+      const dol = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      const linia = dol ? window.innerHeight : window.innerHeight * 0.3;
+      for (const g of grupy) {
+        let biezacy: HTMLAnchorElement | undefined;
+        for (const { a, el } of g) {
+          const r = el.getBoundingClientRect();
+          if (r.top <= linia && r.bottom > 0) biezacy = a;
+        }
+        g.forEach(({ a }) => a.toggleAttribute('aria-current', a === biezacy));
+      }
+    };
+    let ramka = 0;
+    const zaplanuj = () => {
+      cancelAnimationFrame(ramka);
+      ramka = requestAnimationFrame(ustaw);
+    };
+    window.addEventListener('scroll', zaplanuj, { passive: true });
+    window.addEventListener('resize', zaplanuj);
+    ustaw();
+  }
+</script>
+
+<style>
+  .gl-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); margin-bottom: 36px; }
+  .gl-sekcja { margin-bottom: 44px; }
+  .gl-sekcja > h2 { margin: 0 0 16px; font-size: clamp(24px, 3vw, 28px); font-weight: 800; }
+  .gl-ile { font-size: .65em; font-weight: 600; }
+  .gl-uwaga { margin: -8px 0 10px; font-size: 15px; }
+  .gl-karta h3 { line-height: 1.3; overflow-wrap: anywhere; }
+  .gl-lata-txt, .gl-kod { font-variant-numeric: tabular-nums; }
+  .gl-kod { overflow-wrap: anywhere; }
+
+  /* zakończone: rok po lewej (przyklejony podczas przewijania grupy), lista po prawej */
+  .gl-rok { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .gl-rok-h { position: sticky; top: calc(var(--hdr-h) + 16px); align-self: start; display: flex; flex-direction: column; gap: 2px; margin: 0; padding-top: 10px; }
+  .gl-rok-h .r { font-size: 28px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .gl-rok-h .n { font-size: 13px; font-weight: 600; color: var(--muted); }
+  @media (max-width: 640px) {
+    .gl-rok { grid-template-columns: minmax(0, 1fr); padding: 18px 0 8px; }
+    .gl-rok-h { position: static; flex-direction: row; align-items: baseline; gap: 10px; padding: 0 0 4px; }
+    .gl-rok-h .r { font-size: 24px; }
+    .gw-lista { margin: 0 -14px; }
+  }
+
+  /* spis: sekcje jak w „Na tej stronie”, lata jako pigułki */
+  .gl-spis-ile { font-weight: 600; color: var(--muted); }
+  .gl-spis .gl-lata { flex-direction: row; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px 14px; }
+  .gl-spis .gl-lata a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 11px; border: 1.5px solid var(--line); border-radius: 999px; font-size: 14px; font-weight: 700; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .gl-spis .gl-lata a:hover { border-color: var(--ink); }
+  .gl-spis .gl-lata a[aria-current] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+  .toc-side.gl-spis { max-height: calc(100vh - var(--hdr-h) - 32px); overflow-y: auto; }
+</style>

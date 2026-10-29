@@ -1,0 +1,170 @@
+---
+// „Warto wiedzieć” — karty z kolekcji src/content/warto_wiedziec (jedno miejsce edycji w CMS).
+// uklad: 'glowna' = pasek na stronie głównej (tylko pozycje „Pokaż na stronie głównej”),
+//        'dzial'  = sekcja na stronie działu (/nauka, /studia) albo „Zobacz też” na podstronie pozycji,
+//        'lista'  = sama siatka kart (strona /warto-wiedziec),
+//        'portal' = wariant „Portal” na telefonie: ramka .pt-box ze zwartą listą (rok lub miniatura, tytuł, zajawka);
+//                   stoi w bloku .tylko-telefon, więc id ma przyrostek „-tel” i nie trafia do wyszukiwarki;
+//                   glowna = tylko pozycje „Pokaż na stronie głównej”.
+// klasa: dodatkowe klasy sekcji (np. tylko-komputer, gdy na telefonie stoi obok wersja 'portal').
+// Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
+import { getCollection } from 'astro:content';
+import Ikona from './Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku, wybierz } from '../lib/i18n';
+import { slugOf } from '../lib/tresci';
+import type { Lang } from '../lib/daty';
+
+interface Props {
+  lang: Lang;
+  dzial?: 'nauka' | 'studia' | 'instytut';
+  limit?: number;
+  naglowek?: string;
+  uklad?: 'glowna' | 'dzial' | 'lista' | 'portal';
+  // tylko dla układu 'portal'
+  glowna?: boolean;
+  klasa?: string;
+  // identyfikator pozycji do pominięcia (np. bieżąca podstrona)
+  pomin?: string;
+}
+const { lang, dzial, limit, naglowek, uklad = 'dzial', pomin, glowna = false, klasa } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+
+const wszystkie = (await getCollection('warto_wiedziec'))
+  .filter((w) => w.data.opublikowany !== false)
+  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'));
+const wybrane = wszystkie
+  .filter((w) => (uklad !== 'glowna' && !glowna) || w.data.na_glownej)
+  .filter((w) => !dzial || w.data.dzial === dzial)
+  .filter((w) => slugOf(w.id) !== pomin);
+const pokaz = limit ? wybrane.slice(0, limit) : wybrane;
+// Link do pełnej listy tylko wtedy, gdy są pozycje, których tu nie widać.
+const wiecej = uklad !== 'lista' && pokaz.length < wszystkie.filter((w) => slugOf(w.id) !== pomin).length;
+
+const karty = pokaz.map((w) => {
+  const d = w.data;
+  const maStrone = !!w.body?.trim();
+  const cel = maStrone ? `/warto-wiedziec/${slugOf(w.id)}` : d.link;
+  const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
+  return {
+    id: slugOf(w.id),
+    tytul: wybierz(d, 'tytul', lang),
+    zajawka: wybierz(d, 'zajawka', lang),
+    rok: d.rok,
+    obraz: d.obraz,
+    cel,
+    zewnetrzny,
+    dalej: maStrone ? T('Czytaj więcej', 'Read more') : wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More')),
+  };
+});
+
+const tytulSekcji = naglowek ?? T('Warto wiedzieć', 'Highlights');
+const idSekcji = (uklad === 'glowna' || glowna ? 'h2-warto' : `warto-wiedziec${pomin ? '-inne' : dzial ? `-${dzial}` : ''}`) + (uklad === 'portal' ? '-tel' : '');
+const H = uklad === 'lista' ? 'h2' : 'h3';
+// Opakowanie: pasek strony głównej (.section-alt), sekcja działu (.zsec) albo sama siatka.
+const Zewn = uklad === 'lista' ? 'div' : 'section';
+const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial' ? 'zsec' : '', klasa].filter(Boolean).join(' ') || undefined;
+---
+{karty.length > 0 && uklad === 'portal' && (
+  <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore>
+    <div class="pt-h">
+      <h2 id={idSekcji}>{tytulSekcji}</h2>
+      {wiecej && <a class="pt-all" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={14} /></a>}
+    </div>
+    <ul class="pt-list">
+      {karty.map((k) => {
+        const Tag = k.cel ? 'a' : 'div';
+        return (
+          <li>
+            <Tag class="pt-item" href={k.cel ? href(k.cel) : undefined}>
+              {k.obraz ? <span class="pt-min"><img src={u(k.obraz)} alt="" loading="lazy" decoding="async" /></span> : k.rok && <span class="pt-d">{k.rok}</span>}
+              <span class="pt-b">
+                {k.obraz && k.rok && <span class="pt-k">{k.rok}</span>}
+                <span class="pt-t">{k.tytul}{k.zewnetrzny && <span class="sr-only"> {T('(strona zewnętrzna)', '(external site)')}</span>}</span>
+                {k.zajawka && <span class="pt-s">{k.zajawka}</span>}
+              </span>
+            </Tag>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+)}
+{karty.length > 0 && uklad !== 'portal' && (
+  <Zewn class={klasaZewn} aria-labelledby={uklad === 'lista' ? undefined : idSekcji}>
+    <div class={uklad === 'glowna' ? 'wrap' : undefined}>
+      {uklad !== 'lista' && (
+        <div class={uklad === 'glowna' ? 'section-head' : 'ww-head'}>
+          <h2 id={idSekcji}>{tytulSekcji}</h2>
+          {wiecej && <a class="link-arrow" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+        </div>
+      )}
+      <div class={`ww-grid${karty.length === 1 ? ' ww-jedna' : ''}`}>
+        {karty.map((k) => (
+          <article class={`ww-card${k.cel ? ' ww-link' : ''}`}>
+            {(k.obraz || k.rok) && (
+              <div class={`ww-media${k.obraz ? ' ww-foto' : ''}`}>
+                {k.obraz && <img src={u(k.obraz)} alt="" loading="lazy" decoding="async" />}
+                {k.rok && <span class="ww-rok">{k.rok}</span>}
+              </div>
+            )}
+            <div class="ww-body">
+              <H class="ww-t">
+                {k.cel ? (
+                  <a href={href(k.cel)}>{k.tytul}{k.zewnetrzny && <span class="sr-only"> {T('(strona zewnętrzna)', '(external site)')}</span>}</a>
+                ) : k.tytul}
+              </H>
+              {k.zajawka && <p class="ww-x">{k.zajawka}</p>}
+              {k.cel && (
+                <span class="ww-go" aria-hidden="true">{k.dalej}<Ikona nazwa={k.zewnetrzny ? 'zewnetrzny' : 'strzalka'} rozmiar={15} /></span>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </Zewn>
+)}
+
+<style>
+  .ww-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 14px; }
+  .ww-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
+  .ww-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px; }
+  .ww-jedna { max-width: 560px; }
+  .ww-card {
+    position: relative; display: flex; flex-direction: column; overflow: hidden;
+    border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); color: var(--text);
+  }
+  /* Górne pole: zdjęcie z rokiem na plakietce albo duży rok na jasnym tle */
+  .ww-media {
+    position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
+    min-height: 140px; padding: 18px 20px; background: var(--tint); color: var(--tint-ink);
+  }
+  .ww-media:not(.ww-foto)::after { content: ''; display: block; width: 44px; height: 4px; border-radius: 2px; background: var(--accent); }
+  .ww-media:not(.ww-foto) .ww-rok { font-size: clamp(36px, 4.4vw, 50px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .ww-foto { height: 160px; padding: 0; background: var(--photo); }
+  .ww-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
+  .ww-foto .ww-rok {
+    position: absolute; left: 14px; bottom: 14px; padding: 4px 12px; border-radius: 999px;
+    background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
+  }
+  .ww-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; }
+  .ww-t { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; color: var(--ink); }
+  .ww-t a { color: inherit; text-decoration: none; }
+  .ww-x { margin: 0; font-size: 15px; line-height: 1.55; }
+  .ww-go { margin-top: auto; padding-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
+  .ww-go :global(svg) { transition: transform .15s; }
+  /* Karta klikalna w całości (link w tytule rozciągnięty na kartę), podświetlenie po najechaniu — jak .spec-link */
+  .ww-link { transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .ww-link .ww-t a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .ww-link:hover, .ww-link:focus-within { border-color: var(--ink); box-shadow: 0 6px 20px rgb(0 0 0 / .1); transform: translateY(-2px); }
+  .ww-link:hover .ww-t a { text-decoration: underline; text-underline-offset: 4px; }
+  .ww-link:hover .ww-go :global(svg) { transform: translateX(3px); }
+  .ww-link:hover .ww-foto img { transform: scale(1.03); }
+  .ww-link .ww-t a:focus-visible { outline: none; }
+  .ww-link:has(.ww-t a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .ww-link, .ww-go :global(svg), .ww-foto img { transition: none; transform: none !important; }
+  }
+</style>

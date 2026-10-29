@@ -1,0 +1,101 @@
+---
+// Sukcesy: aktualności z rodzajem „sukces”, pogrupowane według lat (najnowsze na górze).
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku } from '../lib/i18n';
+import { short, type Lang } from '../lib/daty';
+import { aktualnosci, slugOf, type Aktualnosc } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+
+const sukcesy = (await aktualnosci()).filter((a) => a.data.rodzaj === 'sukces');
+const lata: { rok: string; lista: Aktualnosc[] }[] = [];
+for (const a of sukcesy) {
+  const r = a.data.data.slice(0, 4);
+  const ost = lata[lata.length - 1];
+  if (ost && ost.rok === r) ost.lista.push(a);
+  else lata.push({ rok: r, lista: [a] });
+}
+const tytul = (a: Aktualnosc) => (lang === 'en' && a.data.tytul_en) || a.data.tytul;
+const zajawka = (a: Aktualnosc) => (lang === 'en' && a.data.zajawka_en) || a.data.zajawka;
+const href = (a: Aktualnosc) => u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang));
+const zdjecie = (a: Aktualnosc) => (a.data.zdjecie ? (isExternal(a.data.zdjecie) ? a.data.zdjecie : u(a.data.zdjecie)) : undefined);
+
+const naglowek = T('Sukcesy', 'Achievements');
+const lead = T(
+  'Nagrody, wyróżnienia, granty i stypendia pracowników, doktorantów, studentów i absolwentów Instytutu Matematycznego.',
+  'Prizes, distinctions, grants and scholarships awarded to staff, PhD students, students and graduates of the Mathematical Institute.',
+);
+const najstarszy = lata.length ? lata[lata.length - 1].rok : '';
+const najnowszy = lata.length ? lata[0].rok : '';
+const archiwumStarejStrony = 'https://www.math.uni.wroc.pl/sukcesy';
+---
+<Baza tytul={naglowek} opis={lead}>
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} />
+  <div class="wrap layout">
+    <div class="main">
+      {sukcesy.length > 0 && (
+        <div class="stats">
+          <div class="stat"><span class="n">{sukcesy.length}</span><span class="l">{T('wpisów o sukcesach', 'achievement posts')}</span></div>
+          <div class="stat"><span class="n">{najstarszy === najnowszy ? najnowszy : `${najstarszy}–${najnowszy}`}</span><span class="l">{T('lata', 'years')}</span></div>
+        </div>
+      )}
+      {sukcesy.length === 0 && <p class="muted">{T('Brak wpisów o sukcesach.', 'No achievement posts yet.')}</p>}
+
+      {lata.map((g) => (
+        <section aria-labelledby={`rok-${g.rok}`} class="sukcesy-rok">
+          <h2 id={`rok-${g.rok}`} class="month sukcesy-rok-h">{g.rok}<span class="sukcesy-ile">{g.lista.length}</span></h2>
+          {g.lista.map((a) => (
+            <a class="row-item" href={href(a)}>
+              <span class="body">
+                <span class="news-meta"><time datetime={a.data.data}>{short(a.data.data)}</time></span>
+                <span class="t">{tytul(a)}</span>
+                {zajawka(a) && <span class="x">{zajawka(a)}</span>}
+              </span>
+              {zdjecie(a) && <span class="thumb sukcesy-thumb"><img src={zdjecie(a)} alt="" loading="lazy" /></span>}
+            </a>
+          ))}
+        </section>
+      ))}
+    </div>
+
+    <aside class="side" data-pagefind-ignore>
+      {lata.length > 1 && (
+        <nav class="side-box toc toc-side" aria-label={T('Lata', 'Years')}>
+          <h2>{T('Lata', 'Years')}</h2>
+          <ol style="flex-direction:row;flex-wrap:wrap;gap:6px">
+            {lata.map((g) => <li><a href={`#rok-${g.rok}`} class="chip" style="display:inline-flex;align-items:center;border-left:1.5px solid var(--line);padding:0 12px;min-height:36px">{g.rok}</a></li>)}
+          </ol>
+        </nav>
+      )}
+      <div class="side-box">
+        <h2>{T('Wcześniejsze sukcesy', 'Earlier achievements')}</h2>
+        <p style="margin:0;font-size:15px">{T(
+          'Wybrane wyróżnienia pracowników i absolwentów Instytutu do 2014 roku zebraliśmy w zestawieniu historycznym.',
+          'Selected distinctions of the Institute’s staff and graduates up to 2014 are listed in a historical overview.',
+        )}</p>
+        <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy/historia', lang))}>{T('Zestawienie historyczne', 'Historical overview')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+        <a class="link-arrow" href={archiwumStarejStrony}>{T('Archiwum starej strony', 'Archive of the old website')}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>
+      </div>
+      <div class="side-box">
+        <h2>{t(lang, 'aktualnosci')}</h2>
+        <p style="margin:0;font-size:15px">{T(
+          'Każdy sukces to wpis w aktualnościach — tam znajdziesz też ogłoszenia i wydarzenia.',
+          'Each achievement is a news post — the news page also lists announcements and events.',
+        )}</p>
+        <a class="link-arrow" href={u(wJezyku('/aktualnosci', lang))}>{t(lang, 'wszystkieAktualnosci')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </div>
+    </aside>
+  </div>
+</Baza>
+
+<style>
+  .sukcesy-rok-h { display: flex; align-items: center; gap: 10px; font-size: 15px; margin-top: 28px; scroll-margin-top: 16px; }
+  .sukcesy-ile { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 12px; letter-spacing: 0; }
+  .sukcesy-thumb { flex-basis: 112px; height: 112px; }
+  .sukcesy-thumb img { object-position: center top; }
+</style>

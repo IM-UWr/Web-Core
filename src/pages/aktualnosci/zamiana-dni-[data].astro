@@ -1,0 +1,8 @@
+---
+// Automatyczne ogłoszenia o zamianach dni (dane i szablon: src/data/kolory-dni.json) — po jednym na każdą zamianę.
+import AktualnoscZamianaDni from '../../views/AktualnoscZamianaDni.astro';
+import { datyZamian } from '../../lib/kolory-dni';
+export function getStaticPaths() { return datyZamian().map((data) => ({ params: { data } })); }
+const { data } = Astro.params;
+---
+<AktualnoscZamianaDni data={data!} lang="pl" />

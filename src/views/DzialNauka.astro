@@ -1,0 +1,406 @@
+---
+// Strona działu „Nauka” (/nauka, /en/nauka): wstęp, liczby, kafelki z menu „Nauka”, obszary badań zakładów,
+// seminaria w tym tygodniu, konferencje, realizowane projekty i obrony doktorskie.
+// Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import TabelaReferatow from '../components/TabelaReferatow.astro';
+import ListaReferatow from '../components/ListaReferatow.astro';
+import WartoWiedziec from '../components/WartoWiedziec.astro';
+import dzial from '../data/dzialy/nauka.json';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
+import { today, addDays, range, dayNum, monthShort, longWithDay, type Lang } from '../lib/daty';
+import { menuGlowne } from '../lib/menu';
+import {
+  zaklady, seminaria, konferencje, granty, obrony, referatyWTygodniu, tydzienSeminariow, trwaLubBedzie, slugOf,
+  type Grant, type Konferencja, type Obrona, type Zaklad,
+} from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+
+// Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta.
+const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
+  if (lang === 'en') return n === 1 ? en[0] : en[1];
+  if (n === 1) return pl[0];
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
+};
+
+const [listaZakladow, listaSeminariow, listaKonferencji, listaGrantow, listaObron] = await Promise.all([
+  zaklady(), seminaria(), konferencje(), granty(), obrony(),
+]);
+const dzis = today();
+const rok = Number(dzis.slice(0, 4));
+
+// Projekty realizowane — tak samo jak na /nauka/granty: rok zakończenia ≥ bieżący rok.
+const realizowane = listaGrantow.filter((g) => (g.data.rok_do ?? 0) >= rok);
+const maOpis = (g: Grant) => !!g.body?.trim();
+// Przykłady: najpierw projekty z opisem, potem najnowsze (każdy ma własną podstronę).
+const przyklady = [...realizowane.filter(maOpis), ...realizowane.filter((g) => !maOpis(g))].slice(0, 4);
+const lata = (g: Grant) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
+const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
+
+const aktywneSeminaria = listaSeminariow.filter((s) => s.data.aktywne !== false);
+const referaty = await referatyWTygodniu(lang);
+const tydzien = tydzienSeminariow();
+const naglowekSeminariow = t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien');
+
+// Konferencje: nadchodzące i trwające (najbliższe najpierw); gdy brak — trzy ostatnie.
+const konfTrwa = (k: Konferencja) => trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec });
+const nadchodzaceKonf = listaKonferencji.filter(konfTrwa).reverse().slice(0, 3);
+const pokazKonf = nadchodzaceKonf.length ? nadchodzaceKonf : listaKonferencji.filter((k) => !konfTrwa(k)).slice(0, 3);
+const konfWRoku = listaKonferencji.filter((k) => k.data.poczatek.slice(0, 4) === String(rok) && !k.data.odwolana);
+
+// Obrony: najbliższe, a po nich ostatnio odbyte — razem trzy.
+const obronaBedzie = (o: Obrona) => trwaLubBedzie({ poczatek: o.data.termin });
+const odbyteObrony = listaObron.filter((o) => !obronaBedzie(o));
+const pokazObrony = [...listaObron.filter(obronaBedzie).reverse(), ...odbyteObrony].slice(0, 3);
+const rokTemu = addDays(dzis, -365);
+const obronyRok = odbyteObrony.filter((o) => o.data.termin.slice(0, 10) >= rokTemu);
+
+// Pasek liczb (pozycje z zerem pomijamy).
+const liczby = [
+  { n: realizowane.length, l: odm(realizowane.length, ['realizowany projekt badawczy', 'realizowane projekty badawcze', 'realizowanych projektów badawczych'], ['ongoing research project', 'ongoing research projects']) },
+  { n: aktywneSeminaria.length, l: odm(aktywneSeminaria.length, ['aktywne seminarium', 'aktywne seminaria', 'aktywnych seminariów'], ['active seminar', 'active seminars']) },
+  { n: konfWRoku.length, l: `${odm(konfWRoku.length, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'])} ${T(`w ${rok} roku`, `in ${rok}`)}` },
+  { n: obronyRok.length, l: `${odm(obronyRok.length, ['obrona doktorska', 'obrony doktorskie', 'obron doktorskich'], ['PhD defence', 'PhD defences'])} ${T('w ostatnich 12 miesiącach', 'in the last 12 months')}` },
+].filter((x) => x.n > 0);
+
+// Kafelki: grupy i linki z menu „Nauka” (nowy link w menu sam pojawi się tutaj).
+const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Nauka' || m.etykieta_en === 'Research');
+const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
+
+const nazwaKrotka = (z: Zaklad) =>
+  lang === 'en' ? z.data.nazwa_krotka_en || z.data.nazwa_en || z.data.nazwa_krotka || z.data.nazwa : z.data.nazwa_krotka || z.data.nazwa;
+const obszaryZakladu = (z: Zaklad) => (lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary);
+
+const naglowek = T('Nauka', 'Research');
+const lead = wybierz(dzial, 'wstep', lang);
+const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
+---
+<Baza tytul={naglowek} opis={lead || undefined}>
+  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w nagłówku, „W tym dziale” w ramkach, zaraz pod nimi seminaria,
+       konferencje i obrony (osobny blok .tylko-telefon — na komputerze te sekcje stoją niżej), obszary badań w zwartych
+       kartach, projekty w ramce i na końcu „Warto wiedzieć” (osobny blok). */}
+  <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
+  <div class="wrap dz-wrap">
+    {liczby.length > 0 && (
+      <div class="stats tylko-komputer">
+        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
+      </div>
+    )}
+
+    {grupy.length > 0 && (
+      <section class="zsec" aria-labelledby="w-dziale">
+        <h2 id="w-dziale">{T('W tym dziale', 'In this section')}</h2>
+        <div class="dz-groups">
+          {grupy.map((g) => (
+            <div class="dz-g">
+              <h3>{wybierz(g, 'nazwa', lang)}</h3>
+              <div class="tiles dz-tiles">
+                {g.linki.map((l) => (
+                  <a class="tile dz-tile" href={href(l.adres)}>
+                    <span>{wybierz(l, 'etykieta', lang)}</span>
+                    <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={20} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <div class="zsec dz-tel tylko-telefon" data-pagefind-ignore>
+      <section class="pt-box" aria-labelledby="seminaria-tel">
+        <div class="pt-h">
+          <span class="pt-h-l">
+            <h2 id="seminaria-tel">{naglowekSeminariow}</h2>
+            <span class="pt-zakres">{range(tydzien.od, tydzien.do, lang)}</span>
+          </span>
+        </div>
+        <ListaReferatow
+          wiersze={referaty}
+          lang={lang}
+          etykieta={naglowekSeminariow}
+          pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
+        />
+        <p class="pt-stopka"><a class="pt-all" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
+      </section>
+
+      <section class="pt-box" aria-labelledby="konferencje-tel">
+        <div class="pt-h"><h2 id="konferencje-tel">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2></div>
+        {nadchodzaceKonf.length === 0 && (
+          <p class="pt-opis">
+            {T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}
+            {pokazKonf.length > 0 && ` ${T('Ostatnio odbyły się:', 'Most recent:')}`}
+          </p>
+        )}
+        {pokazKonf.length > 0 && (
+          <ul class="pt-list">
+            {pokazKonf.map((k) => (
+              <li>
+                <a class="pt-item" href={href(`/nauka/konferencje/${slugOf(k.id)}`)}>
+                  <span class={`pt-dbox${nadchodzaceKonf.length ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+                  <span class="pt-b">
+                    <span class="pt-k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
+                    <span class="pt-t">{wybierz(k.data, 'tytul', lang)}</span>
+                    {k.data.miejsce && <span class="pt-s">{k.data.miejsce}</span>}
+                    {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p class="pt-stopka"><a class="pt-all" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
+      </section>
+
+      <section class="pt-box" aria-labelledby="obrony-tel">
+        <div class="pt-h"><h2 id="obrony-tel">{t(lang, 'obrony')}</h2></div>
+        {pokazObrony.length === 0 && <p class="pt-pusto">{T('Brak zapowiedzianych obron.', 'No PhD defences announced.')}</p>}
+        {pokazObrony.length > 0 && (
+          <ul class="pt-list">
+            {pokazObrony.map((o) => {
+              const bedzie = obronaBedzie(o);
+              return (
+                <li>
+                  <a class="pt-item" href={href(`/obrony-doktorskie/${slugOf(o.id)}`)}>
+                    <span class={`pt-dbox${bedzie ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
+                    <span class="pt-b">
+                      <span class="pt-k">{bedzie && <>{T('nadchodząca', 'upcoming')} · </>}<span class="pt-k-m">{longWithDay(o.data.termin, lang)}</span></span>
+                      <span class="pt-t">{o.data.kandydat}</span>
+                      <span class="pt-s" lang="en">{o.data.tytul_rozprawy}</span>
+                      {o.data.miejsce && <span class="pt-s">{o.data.miejsce}</span>}
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <p class="pt-stopka"><a class="pt-all" href={href('/obrony-doktorskie')}>{T('Wszystkie obrony', 'All PhD defences')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
+      </section>
+    </div>
+
+    {listaZakladow.length > 0 && (
+      <section class="zsec dz-karty" aria-labelledby="obszary">
+        <h2 id="obszary">{T('Obszary badań', 'Research areas')}</h2>
+        <a class="pt-all dz-head-link tylko-telefon" data-pagefind-ignore href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        {obszaryOpis && <p class="dz-intro">{obszaryOpis}</p>}
+        <div class="spec-grid">
+          {listaZakladow.map((z) => (
+            <article class="spec spec-link">
+              <h3><a href={href(`/instytut/zaklady/${z.id}`)}>{nazwaKrotka(z)}</a></h3>
+              {obszaryZakladu(z).length > 0 && <p class="dz-tags">{obszaryZakladu(z).map((o) => <span class="badge">{o}</span>)}</p>}
+              <p class="foot"><span class="muted">{wybierz(z.data, 'nazwa', lang)}</span></p>
+            </article>
+          ))}
+        </div>
+        <p class="dz-more tylko-komputer">
+          <a class="link-arrow" href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+        </p>
+      </section>
+    )}
+
+    <WartoWiedziec lang={lang} dzial="nauka" klasa="tylko-komputer" />
+
+    <section class="zsec tylko-komputer" aria-labelledby="seminaria">
+      <h2 id="seminaria">{naglowekSeminariow}</h2>
+      <p class="dz-intro">{range(tydzien.od, tydzien.do, lang)}</p>
+      <div class="dz-ramka">
+        <TabelaReferatow
+          wiersze={referaty}
+          lang={lang}
+          etykieta={naglowekSeminariow}
+          pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
+        />
+      </div>
+      <p class="dz-more">
+        <a class="link-arrow" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </p>
+    </section>
+
+    <section class="zsec tylko-komputer" aria-labelledby="konferencje">
+      <h2 id="konferencje">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2>
+      {nadchodzaceKonf.length === 0 && (
+        <p class="dz-intro">
+          {T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}
+          {pokazKonf.length > 0 && ` ${T('Ostatnio odbyły się:', 'Most recent:')}`}
+        </p>
+      )}
+      {pokazKonf.length > 0 && (
+        <div class="event-grid">
+          {pokazKonf.map((k) => (
+            <a class="event dz-event" href={href(`/nauka/konferencje/${slugOf(k.id)}`)}>
+              <span class={`datebox${nadchodzaceKonf.length ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+              <span class="event-body">
+                <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
+                <span class="t">{wybierz(k.data, 'tytul', lang)}</span>
+                {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
+                {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
+              </span>
+            </a>
+          ))}
+        </div>
+      )}
+      <p class="dz-more">
+        <a class="link-arrow" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </p>
+    </section>
+
+    <section class="zsec dz-ramka-sek" aria-labelledby="granty">
+      <h2 id="granty">{T('Realizowane projekty', 'Ongoing projects')} <span class="muted dz-ile">({realizowane.length})</span></h2>
+      <a class="pt-all dz-head-link tylko-telefon" data-pagefind-ignore href={href('/nauka/granty')}>{T('Wszystkie projekty i granty', 'All projects and grants')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+      <span class="dz-kreska tylko-telefon" aria-hidden="true"></span>
+      {realizowane.length === 0 && <p class="dz-intro">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
+      {realizowane.length > przyklady.length && <p class="dz-intro">{T(`Wybrane spośród ${realizowane.length} realizowanych projektów.`, `A selection of ${realizowane.length} ongoing projects.`)}</p>}
+      {przyklady.length > 0 && (
+        <div class="dz-granty">
+          {przyklady.map((g) => (
+            <article class="spec spec-link">
+              <div class="news-meta">
+                <span class={`badge${g.data.rodzaj === 'ncn' ? ' badge-wydarzenie' : g.data.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span>
+                {g.data.program && <span class="badge">{g.data.program}</span>}
+                {lata(g) && <span>{lata(g)}</span>}
+              </div>
+              <h3><a href={href(`/nauka/granty/${slugOf(g.id)}`)}>{tytulGrantu(g)}</a></h3>
+              {g.data.kierownik && <p><span class="lbl">{T('Kierownik', 'Principal investigator')}</span>{g.data.kierownik}</p>}
+              {(g.data.kod || g.data.strona) && (
+                <p class="foot">
+                  {g.data.kod && <span class="dz-kod">{g.data.kod}</span>}
+                  {g.data.strona && <a href={g.data.strona}>{T('Strona projektu', 'Project website')} <Ikona nazwa="zewnetrzny" rozmiar={13} /></a>}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
+      <p class="dz-more tylko-komputer">
+        <a class="link-arrow" href={href('/nauka/granty')}>{T('Wszystkie projekty i granty', 'All projects and grants')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </p>
+    </section>
+
+    <section class="zsec tylko-komputer" aria-labelledby="obrony">
+      <h2 id="obrony">{t(lang, 'obrony')}</h2>
+      {pokazObrony.length === 0 && <p class="dz-intro">{T('Brak zapowiedzianych obron.', 'No PhD defences announced.')}</p>}
+      {pokazObrony.length > 0 && (
+        <div class="dz-obrony">
+          {pokazObrony.map((o) => {
+            const bedzie = obronaBedzie(o);
+            return (
+              <a class="row-item" href={href(`/obrony-doktorskie/${slugOf(o.id)}`)}>
+                <span class={`datebox small${bedzie ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
+                <span class="body">
+                  <span class="news-meta">
+                    {bedzie && <span class="badge badge-obrona">{T('nadchodząca', 'upcoming')}</span>}
+                    <span>{longWithDay(o.data.termin, lang)}</span>
+                    {o.data.miejsce && <span>· {o.data.miejsce}</span>}
+                  </span>
+                  <span class="t">{o.data.kandydat}</span>
+                  <span class="x" lang="en">{o.data.tytul_rozprawy}</span>
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+      <p class="dz-more">
+        <a class="link-arrow" href={href('/obrony-doktorskie')}>{T('Wszystkie obrony', 'All PhD defences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </p>
+    </section>
+
+    <div class="tylko-telefon" data-pagefind-ignore>
+      <WartoWiedziec lang={lang} dzial="nauka" uklad="portal" />
+    </div>
+  </div>
+</Baza>
+
+<style>
+  /* Układ wspólny ze stroną działu „Instytut” (DzialInstytut.astro). */
+  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  .dz-intro { margin: -4px 0 16px; max-width: 760px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+  .dz-more { display: flex; flex-wrap: wrap; gap: 0 24px; margin: 10px 0 0; }
+  .dz-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px 16px; }
+  .dz-g h3 { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
+  .dz-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
+  .dz-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* Tylko na stronie „Nauka”. */
+  .dz-ile { font-size: 16px; font-weight: 600; }
+  .dz-ramka { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .dz-event { background: var(--surface); }
+  .dz-granty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+  .dz-granty h3 { font-size: 17px; line-height: 1.3; }
+  .dz-kod { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .dz-obrony { border-bottom: 1px solid var(--line); }
+  .dz-obrony .t { font-size: 19px; }
+
+  /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */
+  @media (max-width: 760px) {
+    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
+    /* „W tym dziale”: każda grupa w ramce, linki jako wiersze (napis z lewej, strzałka z prawej) */
+    .dz-groups { display: flex; flex-direction: column; gap: 12px; }
+    .dz-g { padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+    .dz-g h3, .dz-ramka-sek > h2 { margin: 0 0 4px; padding-bottom: 7px; border-bottom: 2px solid var(--ink); font-size: 18px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; text-transform: none; color: var(--ink); }
+    .dz-g h3::before, .dz-ramka-sek > h2::before { content: ''; display: inline-block; width: 4px; height: .85em; margin-right: 9px; border-radius: 2px; background: var(--accent); vertical-align: -.05em; }
+    :global(:root[data-theme='dark']) .dz-g h3 { border-bottom-color: var(--line); }
+    .dz-tiles { display: block; }
+    .dz-tile { gap: 10px; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.3; }
+    .dz-tile + .dz-tile { min-height: 41px; border-top: 1px solid var(--line); }
+    .dz-tile:hover { background: var(--tint); }
+    .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
+    :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
+    /* seminaria, konferencje, obrony (blok tylko na telefon): ramki jedna pod drugą */
+    .dz-tel { display: flex; flex-direction: column; gap: 12px; }
+    /* obszary badań: tytuł i link w jednym wierszu, zwarte karty (hasła jako tekst) */
+    .dz-karty { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 20px; }
+    .dz-karty > * { flex: 1 1 100%; min-width: 0; }
+    .dz-karty > h2 { flex: 0 1 auto; margin: 0 0 8px; }
+    .dz-karty > .dz-head-link, .dz-ramka-sek > .dz-head-link { flex: 0 0 auto; }
+    .dz-karty > .dz-head-link { margin-bottom: 8px; }
+    .dz-intro { margin: -2px 0 10px; max-width: 860px; font-size: 15px; line-height: 1.5; }
+    .dz-karty .spec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .dz-karty .spec { gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); line-height: 1.45; }
+    .dz-karty .spec-link:hover, .dz-karty .spec-link:focus-within, .dz-ramka-sek .spec-link:hover, .dz-ramka-sek .spec-link:focus-within { box-shadow: none; transform: none; }
+    .dz-karty .spec h3 { font-size: 16px; line-height: 1.3; }
+    .dz-tags { display: block; margin: 2px 0 0; font-size: 14px; line-height: 1.45; color: var(--text); }
+    .dz-tags .badge { display: inline; padding: 0; border-radius: 0; background: none; color: inherit; font-size: inherit; font-weight: 400; line-height: inherit; }
+    .dz-tags .badge + .badge::before { content: ' · '; color: var(--muted); }
+    /* (jak w wariancie: akapit stopki karty zachowuje zwykły odstęp akapitu pod spodem) */
+    .dz-karty .spec .foot { margin-bottom: 1em; }
+    .dz-karty .spec .foot, .dz-ramka-sek .spec .foot { margin-top: auto; padding-top: 6px; border-top: 0; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+    /* projekty: sekcja w ramce (kreska sekcji nad nią zostaje); ramka narysowana pod treścią (::after) */
+    .zsec.dz-ramka-sek { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 14px; margin-bottom: 12px; padding: 27px 15px 9px; }
+    .zsec.dz-ramka-sek::after { content: ''; position: absolute; inset: 16px 0 0; z-index: -1; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); pointer-events: none; }
+    .dz-ramka-sek > * { flex: 1 1 100%; min-width: 0; }
+    .dz-ramka-sek > h2 { flex: 0 1 auto; margin: 0; padding-bottom: 0; border-bottom: 0; }
+    /* kreska pod tytułem i linkiem (osobny element, bo tytuł musi zostać bezpośrednio w sekcji) */
+    .dz-kreska { display: block; height: 2px; margin: 7px 0 4px; background: var(--ink); }
+    :global(:root[data-theme='dark']) .dz-kreska { background: var(--line); }
+    .dz-ramka-sek .dz-ile { margin-left: 4px; font-size: 13px; font-weight: 700; }
+    .dz-ramka-sek .dz-intro { margin: 6px 0 4px; font-size: 14px; line-height: 1.45; }
+    .dz-granty { margin-top: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .dz-granty .spec { gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); line-height: 1.45; }
+    .dz-granty h3 { font-size: 16px; }
+    .dz-granty .news-meta { font-size: 13px; gap: 4px 8px; }
+    .dz-granty .lbl { display: inline; margin-right: .3em; font-size: inherit; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+    .dz-granty .lbl::after { content: ':'; }
+    .dz-granty .spec > p:not(.foot) { margin: 1em 0; font-size: 14px; }
+    .dz-granty .foot { flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; margin-bottom: 1em; }
+  }
+  @media (max-width: 560px) {
+    .dz-karty .spec-grid, .dz-granty { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

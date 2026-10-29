@@ -1,0 +1,70 @@
+---
+// Podstrona pozycji „Warto wiedzieć” (powstaje tylko, gdy pozycja ma treść).
+import { render, type CollectionEntry } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import WartoWiedziec from '../components/WartoWiedziec.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import { renderMarkdown } from '../lib/markdown';
+import { slugOf } from '../lib/tresci';
+import type { Lang } from '../lib/daty';
+
+interface Props { wpis: CollectionEntry<'warto_wiedziec'>; lang: Lang }
+const { wpis, lang } = Astro.props;
+const d = wpis.data;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const tytul = wybierz(d, 'tytul', lang);
+const zajawka = wybierz(d, 'zajawka', lang);
+const { Content } = await render(wpis);
+const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+const tylkoPolski = lang === 'en' && !d.tresc_en;
+const DZIALY = {
+  nauka: { pl: 'Nauka', en: 'Research', adres: '/nauka' },
+  studia: { pl: 'Studia', en: 'Study', adres: '/studia' },
+  instytut: { pl: 'Instytut', en: 'Institute', adres: '/instytut' },
+} as const;
+const dzial = DZIALY[d.dzial];
+const zewnetrzny = !!d.link && isExternal(d.link);
+const etykietaLinku = wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More'));
+const opisObrazu = wybierz(d, 'obraz_opis', lang);
+const wszystkie = T('Warto wiedzieć', 'Highlights');
+---
+<Baza tytul={tytul} opis={zajawka || undefined} obraz={d.obraz} opublikowany={d.opublikowany} typ="article">
+  <NaglowekStrony tytul={tytul} lead={zajawka || undefined} lang={lang} wstecz={{ etykieta: wszystkie, adres: '/warto-wiedziec' }}>
+    <p class="ww-meta">
+      {d.rok && <span class="badge badge-sukces">{d.rok}</span>}
+      <a href={href(dzial.adres)}>{dzial[lang]}</a>
+    </p>
+  </NaglowekStrony>
+  <div class="wrap layout">
+    <div class="main">
+      {d.obraz && (
+        <figure class="article-figure">
+          <img src={u(d.obraz)} alt={opisObrazu} />
+          {opisObrazu && <figcaption>{opisObrazu}</figcaption>}
+        </figure>
+      )}
+      {tylkoPolski && <p class="notice" lang="en">{t('en', 'wersjaPolska')}</p>}
+      <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
+        {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
+      </div>
+      {d.link && (
+        <p style="margin-top:24px">
+          <a class="btn btn-primary" href={href(d.link)}>{etykietaLinku}<Ikona nazwa={zewnetrzny ? 'zewnetrzny' : 'strzalka'} rozmiar={16} /></a>
+        </p>
+      )}
+    </div>
+    <div class="side" aria-hidden="true"></div>
+  </div>
+  <div class="wrap" style="padding-bottom:64px" data-pagefind-ignore>
+    <WartoWiedziec lang={lang} pomin={slugOf(wpis.id)} naglowek={T('Zobacz też', 'See also')} />
+  </div>
+</Baza>
+
+<style>
+  .ww-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; font-size: 15px; font-weight: 700; }
+  .ww-meta a { color: var(--muted); }
+</style>

@@ -1,0 +1,31 @@
+---
+// Referaty tygodnia jako zwarta lista (wygląd „Portal” na telefonie): dzień i godzina z lewej, obok seminarium
+// (i sala), tytuł i prelegent. Ten sam zestaw danych co TabelaReferatow (tabela na komputerze); stoi w blokach
+// .tylko-telefon. Style: .pt-list w src/styles/portal.css.
+import { u } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import { dayShort, short, time, type Lang } from '../lib/daty';
+import { sala } from '../lib/tresci';
+
+interface Wiersz { termin: string; sala?: string; seminarium: string; tytul: string; prelegent: string; href: string }
+interface Props { wiersze: Wiersz[]; lang: Lang; pusty: string; etykieta: string }
+const { wiersze, lang, pusty, etykieta } = Astro.props;
+---
+{wiersze.length === 0 ? (
+  <p class="pt-pusto">{pusty}</p>
+) : (
+  <ul class="pt-list" aria-label={etykieta}>
+    {wiersze.map((w) => (
+      <li>
+        <a class="pt-item" href={u(wJezyku(w.href, lang))}>
+          <span class="pt-d pt-d-szer">{`${dayShort(w.termin, lang)} ${short(w.termin).slice(0, 5)}`}<br />{time(w.termin)}</span>
+          <span class="pt-b">
+            <span class="pt-k">{w.seminarium}{sala(w.sala, lang) && <span class="pt-k-m"> · {sala(w.sala, lang)}</span>}</span>
+            <span class="pt-t">{w.tytul}</span>
+            <span class="pt-s">{w.prelegent}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+)}

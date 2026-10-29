@@ -1,0 +1,23 @@
+---
+// Wydarzenie z kafelkiem daty (strona główna, kalendarz, panel boczny).
+import { u } from '../lib/url';
+import { wJezyku, RODZAJE } from '../lib/i18n';
+import { dayNum, monthShort, range, time, hasTime, type Lang } from '../lib/daty';
+import type { Wydarzenie } from '../lib/tresci';
+
+interface Props { w: Wydarzenie; lang: Lang; maly?: boolean; jasny?: boolean }
+const { w, lang, maly = false, jasny = false } = Astro.props;
+const meta = [(w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang), w.miejsce].filter(Boolean).join(' · ');
+---
+<a class="event" href={u(wJezyku(w.href, lang))} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
+  <span class={`datebox${maly ? ' small' : ''}${jasny ? ' light' : ''}`} aria-hidden="true">
+    <span class="d">{dayNum(w.poczatek)}</span>
+    <span class="m">{monthShort(w.poczatek, lang)}</span>
+  </span>
+  <span class="event-body">
+    <span class="k">{RODZAJE[w.rodzaj]?.[lang]}{hasTime(w.poczatek) ? ` · ${time(w.poczatek)}` : ''}</span>
+    <span class="t">{w.tytul}</span>
+    {w.podtytul && <span class="s" lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</span>}
+    <span class="s">{meta}</span>
+  </span>
+</a>

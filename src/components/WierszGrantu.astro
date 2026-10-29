@@ -1,0 +1,45 @@
+---
+// Wiersz zwartej listy projektów (/nauka/granty — zakończone; strona projektu — inne projekty zakładu).
+// Wstawiać w <ul class="gw-lista">. Cały wiersz jest linkiem do strony projektu (link w tytule rozciągnięty
+// na wiersz), po najechaniu podświetlenie jak przy kartach (.spec-link). Pod tytułem: rodzaj, kierownik, lata, numer.
+import { u } from '../lib/url';
+import { wJezyku, RODZAJE_GRANTOW } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import { slugOf, lataGrantu, type Grant, type KierownikGrantu } from '../lib/tresci';
+
+interface Props { grant: Grant; kierownicy: KierownikGrantu[]; lang: Lang }
+const { grant, kierownicy, lang } = Astro.props;
+const d = grant.data;
+const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
+const lata = lataGrantu(grant);
+---
+<li class="gw">
+  <a class="gw-t" href={u(wJezyku(`/nauka/granty/${slugOf(grant.id)}`, lang))}>{tytul}</a>
+  <span class="gw-m">
+    <span class="badge">{RODZAJE_GRANTOW[d.rodzaj][lang]}</span>
+    {kierownicy.length > 0 && <span class="s">{kierownicy.map((k) => k.nazwa).join(', ')}</span>}
+    {lata && <span class="s">{lata}</span>}
+    {d.kod && <span class="s gw-kod">{d.kod}</span>}
+  </span>
+</li>
+
+<style is:global>
+  .gw-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .gw { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid transparent; border-radius: 14px; transition: border-color .15s, background-color .15s; }
+  .gw + .gw::before { content: ''; position: absolute; left: 14px; right: 14px; top: -1px; height: 1px; background: var(--line); }
+  .gw-t { font-size: 16px; font-weight: 700; line-height: 1.4; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  .gw-t::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .gw-m { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  .gw-m .badge { padding: 1px 8px; font-size: 12px; }
+  /* kropka po elemencie (nie przed), żeby przy zawijaniu nie zaczynała nowego wiersza */
+  .gw-m .s:not(:last-child)::after { content: '·'; content: '·' / ''; margin-left: 8px; }
+  .gw-kod { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .gw:hover, .gw:focus-within { border-color: var(--ink); background: var(--tint); }
+  .gw:hover::before, .gw:focus-within::before, .gw:hover + .gw::before, .gw:focus-within + .gw::before { opacity: 0; }
+  .gw:hover .gw-t { text-decoration: underline; text-underline-offset: 4px; }
+  @supports selector(:has(a)) {
+    .gw-t:focus-visible { outline: none; }
+    .gw:has(.gw-t:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gw { transition: none; } }
+</style>

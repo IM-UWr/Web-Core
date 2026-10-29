@@ -1,0 +1,225 @@
+---
+// Nagłówek: logo, menu z rozwijanymi grupami (dane w src/data/nawigacja.json),
+// wyszukiwarka, przełącznik języka i trybu ciemnego, menu na telefon.
+import Ikona from './Ikona.astro';
+import { menuGlowne, type Pozycja } from '../lib/menu';
+import ustawienia from '../data/ustawienia.json';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+// naZdjeciu: strona główna z banerem — nagłówek leży na przyciemnionym zdjęciu, po przewinięciu robi się zwykły (biały)
+interface Props { lang: Lang; sciezka: string; inny: string | null; naZdjeciu?: boolean }
+const { lang, sciezka, inny, naZdjeciu = false } = Astro.props;
+
+const menu: Pozycja[] = await menuGlowne();
+
+const bezJezyka = sciezka.replace(/^\/en(?=\/|$)/, '') || '/';
+const pasuje = (adres: string) => !isExternal(adres) && adres !== '/' && (bezJezyka === adres || bezJezyka.startsWith(adres.replace(/#.*$/, '') + '/'));
+const aktywna = (p: Pozycja) => (p.adres ? pasuje(p.adres) : false) || (p.grupy ?? []).some((g) => g.linki.some((l) => pasuje(l.adres)));
+const tuJestem = (adres?: string) => !!adres && !isExternal(adres) && bezJezyka.replace(/\/$/, '') === adres.replace(/\/$/, '');
+const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
+const logo = (ustawienia as any).logo as string | undefined;
+---
+<header class:list={['hdr', { 'hdr-foto': naZdjeciu }]}>
+  <div class="wrap hdr-row">
+    <a class="brand" href={u(wJezyku('/', lang))}>
+      {logo
+        ? <img src={u(logo)} alt="" width="44" height="44" />
+        : <span class="brand-logo" aria-hidden="true" style={`--logo-pelne:url(${u('/pliki/uwr-logo.png')});--logo-godlo:url(${u('/pliki/uwr-godlo.png')})`}></span>}
+      <span class="sr-only">{t(lang, 'uwr')}: </span>
+      <span class="brand-txt">
+        <span class="brand-name">{t(lang, 'instytut')}</span>
+        <span class="brand-sub">{t(lang, 'wydzial')}</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
+      {menu.map((p, i) =>
+        p.grupy ? (
+          <div class:list={['nav-item', { 'is-current': aktywna(p) }]}>
+            <span class="nav-pill">
+              {p.adres
+                ? <a class="nav-top" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
+                : <button type="button" class="nav-top" data-rozwin aria-expanded="false" aria-controls={`menu-${i}`}>{wybierz(p, 'etykieta', lang)}</button>}
+              <button type="button" class="nav-arrow" data-rozwin aria-expanded="false" aria-controls={`menu-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={14} /></button>
+            </span>
+            <div class="dropdown" id={`menu-${i}`}>
+              {p.grupy.map((g) => (
+                <div class="dropdown-group">
+                  <h3>{wybierz(g, 'nazwa', lang)}</h3>
+                  {g.linki.map((l) => (
+                    <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
+                      {wybierz(l, 'etykieta', lang)}
+                      {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
+                    </a>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <a href={href(p.adres!)} aria-current={aktywna(p) ? 'page' : undefined}>
+            {wybierz(p, 'etykieta', lang)}
+            {isExternal(p.adres!) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
+          </a>
+        )
+      )}
+    </nav>
+
+    <div class="hdr-tools">
+      <form class="hdr-search" role="search" action={u(wJezyku('/szukaj', lang))} method="get">
+        <Ikona nazwa="szukaj" rozmiar={18} />
+        <label class="sr-only" for="szukaj-naglowek">{t(lang, 'szukaj')}</label>
+        <input id="szukaj-naglowek" type="search" name="q" placeholder={t(lang, 'szukaj')} />
+        <button type="submit" class="sr-only">{t(lang, 'szukaj')}</button>
+      </form>
+      <a class="icon-btn search-narrow" href={u(wJezyku('/szukaj', lang))} aria-label={t(lang, 'szukaj')}><Ikona nazwa="szukaj" /></a>
+      {inny && (
+        <a class="icon-btn hide-narrow" href={u(inny)} hreflang={lang === 'pl' ? 'en' : 'pl'} lang={lang === 'pl' ? 'en' : 'pl'} aria-label={t(lang, 'innyJezyk')}>{t(lang, 'innyJezykKrotko')}</a>
+      )}
+      <button type="button" class="icon-btn" data-motyw aria-label={t(lang, 'motyw')}>
+        <Ikona nazwa="ksiezyc" class="when-light" />
+        <Ikona nazwa="slonce" class="when-dark" />
+      </button>
+      <button type="button" class="icon-btn burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls="menu-telefon" data-burger data-otworz={t(lang, 'otworzMenu')} data-zamknij={t(lang, 'zamknijMenu')}>
+        <Ikona nazwa="menu" class="when-closed" />
+        <Ikona nazwa="zamknij" class="when-open" />
+      </button>
+    </div>
+  </div>
+
+  <nav class="mnav" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
+    {menu.map((p) =>
+      p.grupy ? (
+        <details open={aktywna(p) || undefined}>
+          <summary>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="dol" class="chev" rozmiar={18} /></summary>
+          <div class="mgroup">
+            {p.adres && <a class="mgroup-top" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{lang === 'en' ? 'Overview' : 'Przegląd działu'}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+            {p.grupy.map((g) => (
+              <>
+                <h3>{wybierz(g, 'nazwa', lang)}</h3>
+                {g.linki.map((l) => (
+                  <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
+                    {wybierz(l, 'etykieta', lang)}
+                    {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
+                  </a>
+                ))}
+              </>
+            ))}
+          </div>
+        </details>
+      ) : (
+        <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
+      )
+    )}
+    {inny && <a href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}>{t(lang, 'innyJezyk')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
+  </nav>
+</header>
+
+<script>
+  // Tryb ciemny
+  document.querySelectorAll<HTMLButtonElement>('[data-motyw]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const d = document.documentElement;
+      const nowy = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      d.setAttribute('data-theme', nowy);
+      try { localStorage.setItem('motyw', nowy); } catch (e) {}
+    })
+  );
+
+  // Pływający nagłówek: cień po przewinięciu; na stronie głównej przezroczysty na zdjęciu tylko u góry strony
+  // a na samym dole każdej strony przyjmuje kolor stopki
+  const hdr = document.querySelector<HTMLElement>('.hdr');
+  const stopka = document.querySelector<HTMLElement>('.ftr');
+  const odswiezNaglowek = () => {
+    if (!hdr) return;
+    // na stronie ze zdjęciem nagłówek zostaje przezroczysty, dopóki nie zbliżymy się do końca zdjęcia
+    // (strona główna: zdjęcie .hero-fig; podstrony: granatowy pas .ph na samej górze — wtedy biały dopiero przy jego końcu)
+    const foto = hdr.classList.contains('hdr-foto') ? document.querySelector<HTMLElement>('.hero-fig, #tresc > .ph') : null;
+    const zapas = foto?.classList.contains('ph') ? 16 : 72;
+    const przewiniety = foto ? foto.getBoundingClientRect().bottom <= hdr.offsetHeight + zapas : window.scrollY > 40;
+    hdr.classList.toggle('przewiniety', przewiniety);
+    if (stopka) {
+      const naDole = przewiniety && (stopka.getBoundingClientRect().top < window.innerHeight - 80
+        || window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4);
+      hdr.classList.toggle('hdr-stopka', naDole);
+    }
+  };
+  window.addEventListener('scroll', odswiezNaglowek, { passive: true });
+  window.addEventListener('resize', odswiezNaglowek, { passive: true });
+  odswiezNaglowek();
+
+  // Menu na telefon
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const mnav = document.getElementById('menu-telefon');
+  burger?.addEventListener('click', () => {
+    const otwarte = mnav?.classList.toggle('open') ?? false;
+    hdr?.classList.toggle('menu-otwarte', otwarte);
+    burger.setAttribute('aria-expanded', String(otwarte));
+    burger.setAttribute('aria-label', (otwarte ? burger.dataset.zamknij : burger.dataset.otworz) || '');
+  });
+
+  // Menu działów: klik w napis otwiera stronę działu, lista rozwija się po najechaniu myszką
+  // albo strzałką (klawiatura, ekrany dotykowe). Tylko jedna otwarta; Esc i klik obok zamykają.
+  const pozycje = Array.from(document.querySelectorAll<HTMLElement>('.nav-item'));
+  const ustaw = (p: HTMLElement, otwarta: boolean) => {
+    p.classList.toggle('open', otwarta);
+    p.querySelectorAll('[data-rozwin]').forEach((b) => b.setAttribute('aria-expanded', String(otwarta)));
+  };
+  const zamknijMenu = (poza?: HTMLElement) => pozycje.forEach((p) => p !== poza && ustaw(p, false));
+  pozycje.forEach((p) =>
+    p.querySelectorAll<HTMLButtonElement>('[data-rozwin]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const otworz = !p.classList.contains('open');
+        zamknijMenu(p);
+        ustaw(p, otworz);
+      })
+    )
+  );
+  document.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('.nav-item')) zamknijMenu();
+  });
+  // Lista pod pozycją menu: wyśrodkowana pod nią, ale nie wychodzi poza ekran (margines 16 px)
+  const dopasuj = (p: HTMLElement) => {
+    const lista = p.querySelector<HTMLElement>('.dropdown');
+    if (!lista) return;
+    lista.style.setProperty('--dx', '0px');
+    const r = lista.getBoundingClientRect();
+    if (!r.width) return;
+    const m = 16;
+    const dx = r.left < m ? m - r.left : r.right > window.innerWidth - m ? window.innerWidth - m - r.right : 0;
+    lista.style.setProperty('--dx', `${Math.round(dx)}px`);
+  };
+  const dopasujListy = () => pozycje.forEach(dopasuj);
+  pozycje.forEach((p) => {
+    p.addEventListener('pointerenter', () => dopasuj(p));
+    p.addEventListener('focusin', () => dopasuj(p));
+  });
+  dopasujListy();
+  window.addEventListener('resize', dopasujListy, { passive: true });
+  document.fonts?.ready.then(dopasujListy);
+  // Przyciski „Kopiuj adres” (data-kopiuj="adres")
+  document.querySelectorAll<HTMLButtonElement>('[data-kopiuj]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.kopiuj || location.href);
+        const s = b.querySelector('span') ?? b;
+        const stary = s.textContent;
+        s.textContent = b.dataset.ok ?? 'OK';
+        setTimeout(() => (s.textContent = stary), 2000);
+      } catch (e) {}
+    })
+  );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const otwarta = pozycje.find((p) => p.classList.contains('open') || p.contains(document.activeElement));
+    if (otwarta) {
+      ustaw(otwarta, false);
+      otwarta.querySelector<HTMLElement>('.nav-arrow')?.focus();
+      otwarta.classList.add('bez-hover');
+      otwarta.addEventListener('mouseleave', () => otwarta.classList.remove('bez-hover'), { once: true });
+    }
+  });
+</script>

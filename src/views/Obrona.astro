@@ -1,0 +1,68 @@
+---
+// Pojedyncza obrona doktorska z dokumentami.
+import { render } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku } from '../lib/i18n';
+import { longWithDay, short, dayNum, monthShort, plusMinutes, type Lang } from '../lib/daty';
+import { slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../lib/tresci';
+import { adresIcs } from '../lib/kalendarz';
+
+interface Props { obrona: Obrona; lang: Lang }
+const { obrona, lang } = Astro.props;
+const d = obrona.data;
+const slug = slugOf(obrona.id);
+const { Content } = await render(obrona);
+const href = (a: string) => (isExternal(a) ? a : u(a));
+const tytul = `${lang === 'en' ? 'PhD defence' : 'Obrona doktoratu'}: ${d.kandydat}`;
+const w: Wydarzenie = {
+  rodzaj: 'obrona', tytul, podtytul: d.tytul_rozprawy, poczatek: d.termin, koniecIcs: plusMinutes(d.termin, 120), miejsce: d.miejsce,
+  href: `/obrony-doktorskie/${slug}`, uid: `obr-${slug}`,
+};
+const przyszla = trwaLubBedzie(w);
+const dokumenty = [
+  d.zawiadomienie && { nazwa: t(lang, 'zawiadomienie'), plik: d.zawiadomienie },
+  d.rozprawa && { nazwa: t(lang, 'rozprawa'), plik: d.rozprawa },
+  d.streszczenie_pl && { nazwa: t(lang, 'streszczeniePl'), plik: d.streszczenie_pl },
+  d.streszczenie_en && { nazwa: t(lang, 'streszczenieEn'), plik: d.streszczenie_en },
+  ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${r.recenzent}`, plik: r.plik })),
+].filter(Boolean) as { nazwa: string; plik: string }[];
+---
+<Baza tytul={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article">
+  <NaglowekStrony tytul={d.kandydat} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All PhD defences' : 'Wszystkie obrony doktorskie', adres: '/obrony-doktorskie' }}>
+    <p class="lead" lang="en" style="font-weight:600;color:var(--ink)">{d.tytul_rozprawy}</p>
+  </NaglowekStrony>
+  <div class="wrap layout">
+    <div class="main">
+      <section class="event-box" aria-label={lang === 'en' ? 'Defence details' : 'Szczegóły obrony'}>
+        <span class="datebox" aria-hidden="true"><span class="d">{dayNum(d.termin)}</span><span class="m">{monthShort(d.termin, lang)}</span></span>
+        <dl>
+          <dt>{t(lang, 'kiedy')}</dt><dd>{longWithDay(d.termin, lang)}</dd>
+          {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{d.miejsce}</dd></>}
+          {d.promotorzy.length > 0 && <><dt>{t(lang, 'promotorzy')}</dt><dd>{d.promotorzy.join(', ')}</dd></>}
+        </dl>
+        <div class="actions">
+          {przyszla ? (
+            <>
+              <a class="btn btn-small" href={u(adresIcs(w.uid))} download><Ikona nazwa="kalendarz" rozmiar={16} />{t(lang, 'dodajDoKalendarza')}</a>
+            </>
+          ) : <span class="status">{t(lang, 'odbylo')}</span>}
+        </div>
+      </section>
+
+      <div class="prose" style="margin-top:24px"><Content /></div>
+
+      {dokumenty.length > 0 && (
+        <section class="article-block" aria-labelledby="h-dok">
+          <h2 id="h-dok">{t(lang, 'dokumenty')}</h2>
+          <ul class="files">{dokumenty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" />{x.nazwa}</a></li>)}</ul>
+        </section>
+      )}
+      {d.bip && <p class="article-block"><a class="link-arrow" href={d.bip}>{t(lang, 'bip')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
+      {d.data_ogloszenia && <p class="muted" style="font-size:14px;margin-top:24px">{t(lang, 'opublikowano')} {short(d.data_ogloszenia)}</p>}
+    </div>
+    <div class="side" aria-hidden="true"></div>
+  </div>
+</Baza>

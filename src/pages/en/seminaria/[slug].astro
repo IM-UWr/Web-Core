@@ -1,0 +1,7 @@
+---
+import Seminarium from '../../../views/Seminarium.astro';
+import { sciezkiSeminariow } from '../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiSeminariow(); }
+const { seminarium } = Astro.props;
+---
+<Seminarium seminarium={seminarium} lang="en" />

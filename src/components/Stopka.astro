@@ -1,0 +1,58 @@
+---
+// Stopka (wariant 1: pełna, ciemny granat). Kolumny w src/data/stopka.json.
+import Ikona from './Ikona.astro';
+import stopka from '../data/stopka.json';
+import ustawienia from '../data/ustawienia.json';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
+const k = ustawienia.kontakt;
+const partnerzy = (ustawienia.partnerzy ?? []) as { nazwa: string; logo: string; adres?: string }[];
+const rok = new Date().getFullYear();
+---
+<footer class="ftr">
+  <div class="wrap ftr-in">
+    <div class="ftr-cols">
+      <div class="ftr-main">
+        <span class="n">{t(lang, 'instytut')}</span>
+        <span class="a">{t(lang, 'uwr')}<br />{k.adres}</span>
+        <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a>
+        <a href={`mailto:${k.email}`}>{k.email}</a>
+        <span style="display:flex;gap:4px;margin-top:6px">
+          {ustawienia.facebook && <a class="icon-btn" style="color:inherit" href={ustawienia.facebook} aria-label="Facebook"><Ikona nazwa="facebook" /></a>}
+          {ustawienia.youtube && <a class="icon-btn" style="color:inherit" href={ustawienia.youtube} aria-label="YouTube"><Ikona nazwa="youtube" /></a>}
+        </span>
+      </div>
+      {stopka.kolumny.map((kol) => (
+        <nav class="ftr-col" aria-label={wybierz(kol, 'tytul', lang)}>
+          <h3>{wybierz(kol, 'tytul', lang)}</h3>
+          {kol.linki.map((l) => <a href={href(l.adres)}>{wybierz(l, 'etykieta', lang)}</a>)}
+        </nav>
+      ))}
+    </div>
+
+    {partnerzy.length > 0 && (
+      <div class="ftr-partners">
+        <span class="ftr-label">{t(lang, 'partnerzy')}</span>
+        <div class="logos">
+          {partnerzy.map((p) => (
+            p.adres ? <a href={p.adres}><img src={u(p.logo)} alt={p.nazwa} loading="lazy" /></a> : <img src={u(p.logo)} alt={p.nazwa} loading="lazy" />
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="ftr-bottom">
+      <span>© {rok} {t(lang, 'uwr')} · <span lang="en">Created by</span> Szymon Cygan</span>
+      <nav aria-label={lang === 'en' ? 'Legal' : 'Informacje prawne'}>
+        <a href={u(wJezyku('/deklaracja-dostepnosci', lang))}>{t(lang, 'deklaracja')}</a>
+        <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{t(lang, 'prywatnosc')}</a>
+        <a href={ustawienia.archiwum}>{t(lang, 'archiwum')}</a>
+      </nav>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,7 @@
+---
+import Aktualnosc from '../../../views/Aktualnosc.astro';
+import { sciezkiAktualnosci } from '../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiAktualnosci(); }
+const { wpis, nowszy, starszy } = Astro.props;
+---
+<Aktualnosc wpis={wpis} nowszy={nowszy} starszy={starszy} lang="en" />

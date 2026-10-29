@@ -1,0 +1,7 @@
+---
+import Grant from '../../../views/Grant.astro';
+import { sciezkiGrantow } from '../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiGrantow(); }
+const { grant } = Astro.props;
+---
+<Grant grant={grant} lang="pl" />

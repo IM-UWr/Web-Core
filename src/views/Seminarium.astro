@@ -1,0 +1,150 @@
+---
+// Strona seminarium: informacje, nadchodzące i minione referaty ze streszczeniami.
+import { render } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
+import { longWithDay, short, time, now, today, hasTime, type Lang } from '../lib/daty';
+import { referaty, seminariumReferatu, slugOf, sala, zaklady, pracownicy, type Seminarium } from '../lib/tresci';
+import { zTytulem } from '../lib/osoby';
+import ustawienia from '../data/ustawienia.json';
+
+interface Props { seminarium: Seminarium; lang: Lang }
+const { seminarium, lang } = Astro.props;
+const d = seminarium.data;
+const nazwa = (lang === 'en' && d.nazwa_en) || d.nazwa;
+const { Content } = await render(seminarium);
+const wszystkie = (await referaty()).filter((r) => seminariumReferatu(r) === seminarium.id);
+const n = now();
+const przyszle = (r: (typeof wszystkie)[number]) => (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today());
+const nadchodzace = await Promise.all(wszystkie.filter(przyszle).map(async (r) => ({ r, C: (await render(r)).Content })));
+const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(async (r) => ({ r, C: (await render(r)).Content })));
+const href = (a: string) => (isExternal(a) ? a : u(a));
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+// zakład(y), do których należy seminarium — link zamiast listy uczestników (skład jest na stronie zakładu)
+const zakladySem = (await zaklady()).filter((z) => d.zaklad.includes(z.id));
+// Koordynator(zy) = pole „prowadzący”: nazwisko z tytułem ze spisu pracowników, link do strony domowej, jeśli jest.
+// Termin i sala nie są stałe — każdy referat ma własne.
+const osoby = await pracownicy();
+const koordynatorzy = d.prowadzacy.map((imie) => {
+  const kand = osoby.filter((p) => p.data.imie_nazwisko === imie.trim());
+  const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
+  return { nazwa: zTytulem(o?.data.stopien, imie), strona: o?.data.strona as string | undefined };
+});
+// Adres automatu listy mailingowej (Google Apps Script, patrz README → „Powiadomienia e-mail”); pusty = zapisy wyłączone.
+const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
+---
+<Baza tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany}>
+  <NaglowekStrony tytul={nazwa} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), adres: '/seminaria' }}>
+    {(koordynatorzy.length > 0 || zakladySem.length > 0 || d.kontakt) && (
+      <div class="sem-koord">
+        {koordynatorzy.length > 0 && (
+          <p class="sem-koord-osoby">
+            <span class="sem-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
+            <span class="sem-koord-n">{koordynatorzy.map((k, i) => <>{i > 0 && ', '}{k.strona ? <a href={k.strona}>{k.nazwa}</a> : k.nazwa}</>)}</span>
+          </p>
+        )}
+        {(d.kontakt || zakladySem.length > 0) && (
+          <ul class="sem-meta">
+            {d.kontakt && <li><Ikona nazwa="mail" rozmiar={18} /><a href={`mailto:${d.kontakt}`}>{d.kontakt}</a></li>}
+            {zakladySem.map((z) => <li><Ikona nazwa="ludzie" rozmiar={18} /><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a></li>)}
+          </ul>
+        )}
+      </div>
+    )}
+  </NaglowekStrony>
+  <div class="wrap layout">
+    <div class="main">
+      <div class="prose"><Content /></div>
+
+      <section aria-labelledby="h-nad" style="margin-top:24px">
+        <h2 id="h-nad" style="font-size:26px;margin:0 0 4px">{t(lang, 'nadchodzace')}</h2>
+        {nadchodzace.length === 0 && <p class="muted">{t(lang, 'brakNadchodzacych')}</p>}
+        {nadchodzace.map(({ r, C }) => (
+          <article class="talk" id={slugOf(r.id)}>
+            <div class="talk-meta">
+              <strong style="color:var(--ink)">{longWithDay(r.data.termin, lang)}</strong>
+              {r.data.sala && <span>· {sala(r.data.sala, lang)}</span>}
+            </div>
+            <h3>{r.data.tytul}</h3>
+            <div class="who">{r.data.prelegent}{r.data.afiliacja && <span class="muted"> ({r.data.afiliacja})</span>}</div>
+            {r.body?.trim() && <div class="prose" style="font-size:16px;margin-top:10px"><C /></div>}
+            {r.data.pliki.length > 0 && (
+              <ul class="files" style="margin-top:10px">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
+            )}
+          </article>
+        ))}
+      </section>
+
+      {minione.length > 0 && (
+        <section aria-labelledby="h-min" style="margin-top:36px">
+          <h2 id="h-min" style="font-size:22px;margin:0 0 4px">{t(lang, 'minione')}</h2>
+          {minione.map(({ r, C }) => (
+            <article class="talk" id={slugOf(r.id)}>
+              <div class="talk-meta"><span>{short(r.data.termin)}{hasTime(r.data.termin) ? `, ${time(r.data.termin)}` : ''}</span>{r.data.sala && <span>· {sala(r.data.sala, lang)}</span>}</div>
+              <h3 style="font-size:17px">{r.data.tytul}</h3>
+              <div class="who">{r.data.prelegent}{r.data.afiliacja && <span class="muted"> ({r.data.afiliacja})</span>}</div>
+              {r.body?.trim() && (
+                <details>
+                  <summary>{t(lang, 'streszczenie')}</summary>
+                  <div class="prose" style="font-size:16px;margin-top:8px"><C /></div>
+                </details>
+              )}
+              {r.data.pliki.length > 0 && (
+                <ul class="files" style="margin-top:10px">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
+              )}
+            </article>
+          ))}
+        </section>
+      )}
+      {d.archiwum && <p style="margin-top:28px"><a class="link-arrow" href={d.archiwum}>{t(lang, 'archiwumSem')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
+    </div>
+
+    <aside class="side" data-pagefind-ignore>
+      <div class="side-box" id="powiadomienia">
+        <h2>{T('Powiadomienia e-mail', 'Email notifications')}</h2>
+        <p style="margin:0;font-size:15px">{T('Zostaw adres, a o każdym nowym referacie tego seminarium dostaniesz wiadomość (po angielsku). Z listy wypiszesz się jednym kliknięciem w każdej wiadomości.', 'Leave your address to get an email about every new talk in this seminar. Every message has a one-click unsubscribe link.')}</p>
+        {adresListy ? (
+          <form class="zapis" data-zapis action={adresListy} method="post" data-ok={T('Sprawdź skrzynkę — wysłaliśmy link potwierdzający zapis (jeśli nie widzisz wiadomości, zajrzyj do spamu).', 'Check your inbox — we have sent a confirmation link (look in the spam folder if you cannot see it).')} data-blad={T('Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.', 'Something went wrong. Please try again in a moment.')}>
+            <input type="hidden" name="akcja" value="zapisz" />
+            <input type="hidden" name="seminarium" value={seminarium.id} />
+            <input type="hidden" name="jezyk" value={lang} />
+            <label class="sr-only" for="zapis-email">{T('Adres e-mail', 'Email address')}</label>
+            <input id="zapis-email" type="email" name="email" required autocomplete="email" inputmode="email" placeholder={T('twój@adres.pl', 'you@example.com')} />
+            <div class="hp" aria-hidden="true"><label>Nie wypełniaj / leave empty <input type="text" name="www" tabindex="-1" autocomplete="off" /></label></div>
+            <button type="submit" class="btn btn-primary btn-small"><Ikona nazwa="mail" rozmiar={16} />{T('Zapisz mnie', 'Subscribe')}</button>
+            <p class="zapis-stan" role="status" aria-live="polite"></p>
+          </form>
+        ) : (
+          <p class="notice" style="font-size:14px;margin:0">{T('Zapisy na listę ruszą wkrótce.', 'Sign-up will open soon.')}</p>
+        )}
+        <p class="muted" style="font-size:13px;margin:0">{T('Adres służy wyłącznie do tych powiadomień —', 'Your address is used only for these notifications —')} <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{T('polityka prywatności', 'privacy policy')}</a>.</p>
+      </div>
+    </aside>
+  </div>
+</Baza>
+
+<script>
+  // Zapis na listę: wysyłka w tle (bez przeładowania strony). Automat zawsze odpowiada tak samo,
+  // żeby nie zdradzać, czy adres już jest na liście.
+  document.querySelectorAll<HTMLFormElement>('form[data-zapis]').forEach((f) =>
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const stan = f.querySelector<HTMLElement>('.zapis-stan');
+      const btn = f.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      let ok = true;
+      try {
+        await fetch(f.action, { method: 'POST', body: new URLSearchParams(new FormData(f) as any) });
+      } catch (err) {
+        // Odpowiedź automatu bywa blokowana przez przeglądarkę (CORS), choć zgłoszenie dotarło — błąd tylko bez sieci.
+        ok = navigator.onLine;
+      }
+      if (stan) stan.textContent = (ok ? f.dataset.ok : f.dataset.blad) || '';
+      if (ok) f.reset();
+      if (btn) btn.disabled = false;
+    })
+  );
+</script>

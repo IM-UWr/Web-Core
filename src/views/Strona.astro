@@ -1,0 +1,66 @@
+---
+// Strona stała (Markdown z src/content/strony). Adres = ścieżka pliku, np. studia/matematyka.md → /studia/matematyka
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import SpisTresci from '../components/SpisTresci.astro';
+import { menuGlowne } from '../lib/menu';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import { renderMarkdownZNaglowkami } from '../lib/markdown';
+import type { Lang } from '../lib/daty';
+
+interface Props { strona: CollectionEntry<'strony'>; lang: Lang }
+const { strona, lang } = Astro.props;
+const d = strona.data;
+const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
+const opis = (lang === 'en' && d.opis_en) || d.opis;
+const { Content, headings } = await render(strona);
+const en = lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en) : undefined;
+const htmlEn = en?.html ?? '';
+const naglowki = en ? en.naglowki : headings;
+const tylkoPolski = lang === 'en' && !d.tresc_en;
+
+// Dział menu, do którego należy strona — do okruszków i bocznej nawigacji.
+const adres = '/' + strona.id;
+type Link = { etykieta: string; etykieta_en?: string; adres: string };
+// Podstrona (np. /instytut/infrastruktura-informatyczna/regulamin-sieci) należy do działu swojej strony nadrzędnej.
+const wDziale = (l: Link) => l.adres === adres || adres.startsWith(l.adres + '/');
+const dzial = ((await menuGlowne()) as any[]).find((m) => (m.grupy ?? []).some((g: any) => g.linki.some(wDziale)));
+const linkiDzialu: Link[] = dzial ? dzial.grupy.flatMap((g: any) => g.linki) : [];
+const rodzic = linkiDzialu.filter((l) => !isExternal(l.adres) && adres.startsWith(l.adres + '/')).sort((x, y) => y.adres.length - x.adres.length)[0];
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+// Prawy pasek: domyślnie tylko spis „Na tej stronie”, bez menu działu (decyzja właściciela); pole „Prawy pasek” w CMS może to zmienić dla strony.
+const pasek = d.pasek_boczny ?? 'spis';
+---
+<Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany}>
+  <NaglowekStrony tytul={tytul} lead={opis} lang={lang} okruszki={[...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang), adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang), adres: rodzic.adres }] : []), { etykieta: tytul }]} />
+  <div class="wrap layout">
+    <div class="main">
+      {(pasek === 'spis' || pasek === 'oba') && <SpisTresci naglowki={naglowki} lang={lang} wariant="gora" />}
+      {tylkoPolski && <p class="notice">{t('en', 'wersjaPolska')}</p>}
+      <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
+        {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
+      </div>
+    </div>
+    {pasek !== 'brak' && (
+    <aside class="side" data-pagefind-ignore>
+      {(pasek === 'spis' || pasek === 'oba') && <SpisTresci naglowki={naglowki} lang={lang} wariant="bok" />}
+      {(pasek === 'menu' || pasek === 'oba') && linkiDzialu.length > 0 && (
+        <nav class="side-box side-nav" aria-label={wybierz(dzial, 'etykieta', lang)}>
+          <h2>{wybierz(dzial, 'etykieta', lang)}</h2>
+          <div style="display:flex;flex-direction:column">
+            {linkiDzialu.map((l) => (
+              <a href={href(l.adres)} aria-current={l.adres === adres ? 'page' : l === rodzic ? 'true' : undefined}>
+                {wybierz(l, 'etykieta', lang)}{isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
+              </a>
+            ))}
+          </div>
+        </nav>
+      )}
+    </aside>
+    )}
+  </div>
+</Baza>

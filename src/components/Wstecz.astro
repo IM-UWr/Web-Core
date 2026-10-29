@@ -1,0 +1,14 @@
+---
+// Powrót o poziom wyżej („← Wszystkie seminaria”) — zamiast okruszków.
+import Ikona from './Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { etykieta: string; adres: string; lang: Lang }
+const { etykieta, adres, lang } = Astro.props;
+const href = isExternal(adres) ? adres : u(wJezyku(adres, lang));
+---
+<nav class="wstecz" aria-label={lang === 'en' ? 'Back' : 'Powrót'}>
+  <a href={href}><Ikona nazwa="wstecz" rozmiar={18} /><span>{etykieta}</span></a>
+</nav>

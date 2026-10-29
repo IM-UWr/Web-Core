@@ -1,0 +1,172 @@
+---
+// Przełącznik semestrów — podłużne przyciski-pigułki jak zakładki w Kierunek.astro (.tabs + .chip, role="tablist").
+// Wspólny dla stron Rok akademicki (/studia/rok-akademicki) i Plan zajęć (/studia/plan-zajec).
+//
+// Panele renderuje strona, zaraz pod przełącznikiem: element z id = `id` semestru i atrybutem data-ps-panel;
+// panel semestru wybranego podczas budowania dostaje też data-ps-aktywny. Elementy towarzyszące panelowi
+// (np. spis sekcji w prawym pasku, terminy i listy semestru niżej na stronie) mają data-ps-dla="<id>"
+// i przełączają się razem z nim. lustro = drugi zestaw takich samych przycisków niżej na stronie (np. nad „Rokiem
+// w skrócie”), zsynchronizowany z głównym — pokazuje, który semestr jest wybrany, i pozwala go zmienić bez przewijania.
+// Bez JavaScriptu przełącznik jest ukryty, a wszystkie semestry są widoczne jeden pod drugim.
+// W przeglądarce semestr wybiera się wg dzisiejszej daty (Europe/Warsaw) albo wg adresu (#zimowy, #letni, kotwica w panelu);
+// przełączenie zmienia adres (history.replaceState), więc link do wybranego semestru można skopiować.
+import type { Lang } from '../lib/daty';
+
+interface Props {
+  semestry: { id: string; etykieta: string; od?: string | null; do?: string | null }[];
+  aktywny: string; // id semestru wybranego podczas budowania (wybierzSemestr z ./wyborSemestru)
+  lang: Lang;
+  etykieta?: string;
+  lustro?: boolean; // kopia przycisków sterująca głównym przełącznikiem strony (role="group", aria-pressed)
+}
+const { semestry, aktywny, lang, lustro = false } = Astro.props;
+const etykieta = Astro.props.etykieta ?? (lustro ? (lang === 'en' ? 'Semester shown' : 'Pokazany semestr') : lang === 'en' ? 'Semesters' : 'Semestry');
+// Na wąskim ekranie krótsza etykieta, żeby dwa przyciski zmieściły się obok siebie: „Zimowy 2026/27”, „Winter 2026/27”.
+const krotka = (e: string) => {
+  const k = e.replace(/^semestr\s+/i, '').replace(/\s+semester\b/i, '');
+  return k.charAt(0).toUpperCase() + k.slice(1);
+};
+---
+{semestry.length > 1 && lustro && (
+  <div class="tabs ps-tabs ps-lustro" role="group" aria-label={etykieta} data-ps-lustro>
+    {semestry.map((s) => (
+      <button type="button" class="chip" aria-pressed={s.id === aktywny ? 'true' : 'false'} data-ps-cel={s.id}>
+        {krotka(s.etykieta) === s.etykieta ? s.etykieta : <><span class="ps-pelna">{s.etykieta}</span><span class="ps-krotka">{krotka(s.etykieta)}</span></>}
+      </button>
+    ))}
+  </div>
+)}
+{semestry.length > 1 && !lustro && (
+  <div class="tabs ps-tabs" role="tablist" aria-label={etykieta} data-ps>
+    {semestry.map((s) => (
+      <button
+        type="button"
+        role="tab"
+        class="chip"
+        id={`ps-tab-${s.id}`}
+        aria-controls={s.id}
+        aria-selected={s.id === aktywny ? 'true' : 'false'}
+        tabindex={s.id === aktywny ? 0 : -1}
+        data-od={s.od ?? ''}
+        data-do={s.do ?? ''}
+      >{krotka(s.etykieta) === s.etykieta ? s.etykieta : <><span class="ps-pelna">{s.etykieta}</span><span class="ps-krotka">{krotka(s.etykieta)}</span></>}</button>
+    ))}
+  </div>
+)}
+
+<script>
+  import { today } from '../lib/daty';
+  import { wybierzSemestr } from './wyborSemestru';
+
+  document.querySelectorAll<HTMLElement>('[data-ps]').forEach((lista) => {
+    const tabs = Array.from(lista.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panele = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls') || ''));
+    if (tabs.length < 2 || panele.some((p) => !p)) return;
+    const P = panele as HTMLElement[];
+    P.forEach((p, i) => {
+      p.setAttribute('role', 'tabpanel');
+      p.setAttribute('aria-labelledby', tabs[i].id);
+      // bez tabindex: link z #kotwicą (np. /studia/plan-zajec#letni) nie ustawia fokusu na całym panelu (żółta ramka)
+    });
+
+    // Przewinięcie do panelu ma pokazać też przełącznik nad nim: scroll-margin-top panelu = odległość od góry przełącznika.
+    const wysokosc = () => {
+      const widoczny = P.find((p) => p.getClientRects().length > 0);
+      if (!widoczny) return;
+      const h = Math.round(widoczny.getBoundingClientRect().top - lista.getBoundingClientRect().top);
+      if (h > 0) P.forEach((p) => p.style.setProperty('--ps-h', `${h}px`));
+    };
+    let ramka = 0;
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(ramka);
+      ramka = requestAnimationFrame(wysokosc);
+    });
+
+    const pokaz = (i: number) => {
+      tabs.forEach((t, j) => {
+        t.setAttribute('aria-selected', String(i === j));
+        t.tabIndex = i === j ? 0 : -1;
+      });
+      P.forEach((p, j) => {
+        p.toggleAttribute('data-ps-aktywny', i === j);
+        p.hidden = i !== j;
+        document.querySelectorAll(`[data-ps-dla="${CSS.escape(p.id)}"]`).forEach((el) => el.toggleAttribute('data-ps-aktywny', i === j));
+        document.querySelectorAll(`[data-ps-lustro] [data-ps-cel="${CSS.escape(p.id)}"]`).forEach((b) => b.setAttribute('aria-pressed', String(i === j)));
+      });
+      wysokosc();
+    };
+    const celZAdresu = (): HTMLElement | null => {
+      let h = '';
+      try { h = decodeURIComponent(location.hash.slice(1)); } catch { /* zły adres */ }
+      return h ? document.getElementById(h) : null;
+    };
+    // semestr, do którego należy element: panel albo element towarzyszący (data-ps-dla)
+    const indeks = (el: HTMLElement | null) => {
+      if (!el) return -1;
+      const dla = el.closest<HTMLElement>('[data-ps-dla]')?.dataset.psDla;
+      return P.findIndex((p) => p === el || p.contains(el) || p.id === dla);
+    };
+    const doCelu = (el: HTMLElement) => requestAnimationFrame(() => el.scrollIntoView());
+
+    const cel = celZAdresu();
+    let i = indeks(cel);
+    if (i >= 0) {
+      pokaz(i);
+      doCelu(cel!);
+    } else {
+      const zBudowania = Math.max(0, tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'));
+      i = wybierzSemestr(tabs.map((t) => ({ od: t.dataset.od, do: t.dataset.do })), today(), zBudowania);
+      pokaz(i);
+    }
+
+    // Link w obrębie strony do innego semestru (np. #letni albo kotwica sekcji w ukrytym panelu).
+    window.addEventListener('hashchange', () => {
+      const el = celZAdresu();
+      const j = indeks(el);
+      if (j < 0) return;
+      if (P[j].hidden || !el!.getClientRects().length) pokaz(j);
+      doCelu(el!);
+    });
+
+    const wybierz = (j: number, fokus: boolean) => {
+      pokaz(j);
+      if (fokus) tabs[j].focus();
+      history.replaceState(history.state, '', `#${P[j].id}`);
+    };
+    document.querySelectorAll<HTMLButtonElement>('[data-ps-lustro] [data-ps-cel]').forEach((b) => {
+      const k = P.findIndex((p) => p.id === b.dataset.psCel);
+      if (k >= 0) b.addEventListener('click', () => wybierz(k, false));
+    });
+    tabs.forEach((t, k) => {
+      t.addEventListener('click', () => wybierz(k, false));
+      t.addEventListener('keydown', (e) => {
+        let j = -1;
+        if (e.key === 'ArrowRight') j = (k + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') j = (k - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') j = 0;
+        else if (e.key === 'End') j = tabs.length - 1;
+        if (j < 0) return;
+        e.preventDefault();
+        wybierz(j, true);
+      });
+    });
+  });
+</script>
+
+<style is:global>
+  /* Bez JS: bez przełącznika, wszystkie semestry. Z JS: widać tylko panel z data-ps-aktywny
+     (w HTML — semestr wybrany podczas budowania; skrypt poprawia wybór wg daty w przeglądarce). */
+  html:not(.js) .ps-tabs { display: none; }
+  html.js [data-ps-panel]:not([data-ps-aktywny]),
+  html.js [data-ps-dla]:not([data-ps-aktywny]) { display: none; }
+  [data-ps-dla] { display: contents; }
+  /* html ma scroll-padding-top = wysokość nagłówka; margines panelu = wysokość przełącznika nad nim */
+  html.js [data-ps-panel] { scroll-margin-top: var(--ps-h, 56px); }
+  .ps-tabs { margin: 0 0 18px; }
+  .ps-krotka { display: none; }
+  @media (max-width: 479px) {
+    .ps-pelna { display: none; }
+    .ps-krotka { display: inline; }
+  }
+  @media print { .ps-tabs { display: none !important; } }
+</style>

@@ -1,0 +1,154 @@
+---
+import Wstecz from '../components/Wstecz.astro';
+// Pojedyncza aktualność: blok wydarzenia, zdjęcie, treść, galeria, załączniki, nowszy/starszy wpis.
+import { render } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import Ikona from '../components/Ikona.astro';
+import KartaWydarzenia from '../components/KartaWydarzenia.astro';
+import Galeria from '../components/Galeria.tsx';
+import { u, isExternal, absolute } from '../lib/url';
+import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { short, longWithDay, range, dayNum, monthShort, now, today, hasTime, plusMinutes, type Lang } from '../lib/daty';
+import { slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
+import ustawienia from '../data/ustawienia.json';
+import { renderMarkdown } from '../lib/markdown';
+import { adresIcs } from '../lib/kalendarz';
+
+interface Props {
+  wpis: Aktualnosc;
+  lang: Lang;
+  nowszy?: Aktualnosc;
+  starszy?: Aktualnosc;
+}
+const { wpis, lang, nowszy, starszy } = Astro.props;
+const d = wpis.data;
+const slug = slugOf(wpis.id);
+const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
+const zajawka = (lang === 'en' && d.zajawka_en) || d.zajawka;
+const tytulInny = (w?: Aktualnosc) => (w ? (lang === 'en' && w.data.tytul_en) || w.data.tytul : '');
+
+const { Content } = await render(wpis);
+const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+const tylkoPolski = lang === 'en' && !d.tresc_en;
+
+const wydarzenie: Wydarzenie | undefined = d.wydarzenie_poczatek
+  ? {
+      rodzaj: 'wydarzenie', tytul, poczatek: d.wydarzenie_poczatek, koniec: d.wydarzenie_koniec,
+      koniecIcs: d.wydarzenie_koniec || (hasTime(d.wydarzenie_poczatek) ? plusMinutes(d.wydarzenie_poczatek, 120) : undefined), miejsce: d.wydarzenie_miejsce,
+      href: `/aktualnosci/${slug}`, uid: `akt-${slug}`, opis: zajawka,
+    }
+  : undefined;
+const minelo = wydarzenie ? !trwaLubBedzie(wydarzenie) : false;
+const trwa = wydarzenie && !minelo && (hasTime(wydarzenie.poczatek) ? wydarzenie.poczatek <= now() : wydarzenie.poczatek <= today());
+// Najbliższe wydarzenia jak na stronie głównej (tylko gdy są blisko); gdy brak — bez prawego paska, treść szersza.
+const najblizsze = (await wydarzeniaNaGlowna(4, lang, Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5)).filter((w) => w.href !== `/aktualnosci/${slug}`).slice(0, 3);
+const href = (a: string) => (isExternal(a) ? a : u(a));
+const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
+---
+<Baza tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article">
+  <div class="wrap crumbs-inline">
+    <Wstecz etykieta={t(lang, 'wszystkieAktualnosci')} adres="/aktualnosci" lang={lang} />
+  </div>
+
+  <div class="wrap layout" style="padding-top:16px">
+    <article class="main">
+      <header class="article-head">
+        <div class="news-meta">
+          <span class={`badge badge-${d.rodzaj}`}>{RODZAJE[d.rodzaj][lang]}</span>
+          <span>{t(lang, 'opublikowano')} <time datetime={d.data}>{short(d.data)}</time></span>
+          {d.dla.length > 0 && <span>· {t(lang, 'dla')}: {d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>}
+        </div>
+        <h1>{tytul}</h1>
+        {zajawka && <p class="lead">{zajawka}</p>}
+      </header>
+
+      {wydarzenie && (
+        <section class="event-box" aria-label={lang === 'en' ? 'Event details' : 'Szczegóły wydarzenia'} style="margin-bottom:28px">
+          <span class="datebox" aria-hidden="true"><span class="d">{dayNum(wydarzenie.poczatek)}</span><span class="m">{monthShort(wydarzenie.poczatek, lang)}</span></span>
+          <dl>
+            <dt>{t(lang, 'kiedy')}</dt>
+            <dd>{wydarzenie.koniec && wydarzenie.koniec.slice(0, 10) !== wydarzenie.poczatek.slice(0, 10) ? range(wydarzenie.poczatek, wydarzenie.koniec, lang) : longWithDay(wydarzenie.poczatek, lang) + (wydarzenie.koniec && hasTime(wydarzenie.koniec) ? `–${wydarzenie.koniec.slice(11, 16)}` : '')}</dd>
+            {wydarzenie.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{wydarzenie.miejsce}</dd></>}
+          </dl>
+          <div class="actions">
+            {minelo ? (
+              <span class="status">{t(lang, 'odbylo')}</span>
+            ) : (
+              <>
+                {trwa && <span class="status">{t(lang, 'trwa')}</span>}
+                <a class="btn btn-small" href={u(adresIcs(wydarzenie.uid))} download><Ikona nazwa="kalendarz" rozmiar={16} />{t(lang, 'dodajDoKalendarza')}</a>
+              </>
+            )}
+          </div>
+        </section>
+      )}
+
+      {d.zdjecie && (
+        <figure class="article-figure">
+          <img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />
+          {d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}
+        </figure>
+      )}
+
+      {tylkoPolski && <p class="notice" lang="en">{t('en', 'wersjaPolska')}</p>}
+      <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
+        {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
+      </div>
+
+      {d.galeria.length > 0 && (
+        <section class="article-block" aria-labelledby="h-galeria">
+          <h2 id="h-galeria">{t(lang, 'galeria')}</h2>
+          <Galeria
+            client:visible
+            zdjecia={d.galeria.map((g) => ({ src: u(g.plik), podpis: g.podpis }))}
+            etykieta={t(lang, 'galeria')}
+            zamknij={lang === 'en' ? 'Close' : 'Zamknij'}
+            poprzednie={lang === 'en' ? 'Previous photo' : 'Poprzednie zdjęcie'}
+            nastepne={lang === 'en' ? 'Next photo' : 'Następne zdjęcie'}
+          />
+        </section>
+      )}
+
+      {d.album && (
+        <p class="article-block"><a class="btn" href={d.album}><Ikona nazwa="zdjecia" rozmiar={18} />{t(lang, 'album')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>
+      )}
+
+      {d.zalaczniki.length > 0 && (
+        <section class="article-block" aria-labelledby="h-zal">
+          <h2 id="h-zal">{t(lang, 'zalaczniki')}</h2>
+          <ul class="files">
+            {d.zalaczniki.map((z) => (
+              <li><a href={href(z.plik)}><Ikona nazwa="plik" />{z.nazwa || z.plik.split('/').pop()}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div class="share">
+        <span>{t(lang, 'udostepnij')}:</span>
+        <button type="button" class="btn btn-small" data-kopiuj={adres} data-ok={t(lang, 'skopiowano')}><Ikona nazwa="link" rozmiar={16} /><span>{t(lang, 'kopiuj')}</span></button>
+      </div>
+
+      {(nowszy || starszy) && (
+        <nav class="pn" aria-label={lang === 'en' ? 'Other posts' : 'Inne wpisy'} style="margin-top:28px">
+          {nowszy ? (
+            <a href={u(wJezyku(`/aktualnosci/${slugOf(nowszy.id)}`, lang))}><span class="l">← {t(lang, 'nowszy')}</span><span class="t">{tytulInny(nowszy)}</span></a>
+          ) : <span />}
+          {starszy && (
+            <a href={u(wJezyku(`/aktualnosci/${slugOf(starszy.id)}`, lang))} style="text-align:right"><span class="l">{t(lang, 'starszy')} →</span><span class="t">{tytulInny(starszy)}</span></a>
+          )}
+        </nav>
+      )}
+    </article>
+
+    {najblizsze.length > 0 && (
+      <aside class="side" data-pagefind-ignore>
+        <div class="side-box side-plywajacy">
+          <h2>{t(lang, 'najblizsze')}</h2>
+          {najblizsze.map((w) => <KartaWydarzenia w={w} lang={lang} maly />)}
+        </div>
+      </aside>
+    )}
+  </div>
+</Baza>
+

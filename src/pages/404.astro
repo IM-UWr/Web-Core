@@ -1,0 +1,19 @@
+---
+import Baza from '../layouts/Baza.astro';
+import ustawienia from '../data/ustawienia.json';
+import { u } from '../lib/url';
+import { t } from '../lib/i18n';
+---
+<Baza tytul={t('pl', 'nieZnaleziono')} opublikowany={false} alternatywa={null} szukaj={false}>
+  <div class="wrap" style="padding-top:64px;padding-bottom:96px">
+    <p class="badge" style="margin:0 0 12px">404</p>
+    <h1 style="font-size:clamp(32px,5vw,48px);margin:0 0 12px">{t('pl', 'nieZnaleziono')}</h1>
+    <p style="font-size:18px;max-width:760px">{t('pl', 'nieZnalezionoOpis')}</p>
+    <p lang="en" class="muted">{t('en', 'nieZnalezionoOpis')}</p>
+    <div class="btn-row" style="margin-top:24px">
+      <a class="btn btn-primary" href={u('/')}>{t('pl', 'powrot')}</a>
+      <a class="btn" href={u('/szukaj')}>{t('pl', 'szukajNaStronie')}</a>
+      <a class="btn" href={ustawienia.archiwum}>{t('pl', 'archiwum')}</a>
+    </div>
+  </div>
+</Baza>

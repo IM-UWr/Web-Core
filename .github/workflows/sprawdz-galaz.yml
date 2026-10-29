@@ -1,0 +1,68 @@
+name: Sprawdzenie gałęzi (bez publikacji)
+
+# Budowanie gałęzi roboczych (agent-*, qa-*) — tylko kontrola, że strona się buduje.
+# Nic nie jest publikowane na GitHub Pages; wynik i błędy widać w adnotacjach przebiegu.
+# Gałąź z „podglad” w nazwie (np. agent-38-podglad-gesta): zbudowana strona (bez public/pliki) trafia dodatkowo
+# na gałąź podglad-<nazwa gałęzi>, skąd można ją pobrać gitem i obejrzeć lokalnie (zrzuty ekranu wariantów).
+# Push tokenem GITHUB_TOKEN nie uruchamia innych workflowów.
+on:
+  push:
+    branches: ['agent-*', 'qa-*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sprawdz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Treści z repozytoriów IM-UWr/Web-*
+        run: python3 skrypty/pobierz_tresci.py
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Instalacja zależności
+        run: npm install --no-audit --no-fund
+
+      - name: Kontrola plików treści
+        run: |
+          if ! python3 skrypty/sprawdz_tresci.py > tresci.log 2>&1; then
+            msg=$(sed -e 's/%/%25/g' tresci.log | head -60 | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Błędy w plikach treści::${msg}"
+            exit 1
+          fi
+
+      - name: Budowanie strony
+        run: |
+          set -o pipefail
+          if ! npm run build 2>&1 | tee build.log; then
+            msg=$(tail -c 6000 build.log | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/%/%25/g' -e 's/\r/%0D/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Błąd budowania::${msg}"
+            exit 1
+          fi
+          warn=$(sed -e 's/\x1b\[[0-9;]*m//g' build.log | grep -iE 'warn|error|failed|not found' | head -40 | sed -e 's/%/%25/g' | awk '{printf "%s%%0A", $0}' || true)
+          if [ -n "$warn" ]; then echo "::warning title=Ostrzeżenia budowania::${warn}"; fi
+          echo "::notice title=Wynik budowania::$(find dist -name '*.html' | wc -l) stron HTML, $(du -sh dist | cut -f1)"
+
+      - name: Podgląd zbudowanej strony (tylko gałęzie z „podglad” w nazwie)
+        if: contains(github.ref_name, 'podglad')
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          cd dist
+          rm -rf pliki
+          git init -q
+          git add -A
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -qm "Podgląd ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/podglad-${GITHUB_REF_NAME}"
+          echo "::notice title=Podgląd::gałąź podglad-${GITHUB_REF_NAME} ($(du -sh . | cut -f1))"

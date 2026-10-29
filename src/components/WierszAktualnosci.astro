@@ -1,0 +1,50 @@
+---
+// Pozycja na liście aktualności.
+// Telefon (≤ 760 px) — wygląd „Portal”: zwarty wiersz — data (przed plakietkami) i plakietki w lewej kolumnie albo
+// (≤ 640 px) w jednym wierszu nad tytułem, z prawej mała miniatura; znaczniki te same co na komputerze.
+import { u, isExternal } from '../lib/url';
+import { wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { short, range, type Lang } from '../lib/daty';
+import type { PozycjaListy } from '../lib/tresci';
+
+interface Props { p: PozycjaListy; lang: Lang }
+const { p, lang } = Astro.props;
+const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
+---
+<a class="row-item wa-row" href={href} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
+  <span class="body">
+    <span class="news-meta wa-meta">
+      <span class={`badge badge-${p.rodzaj}`}>{RODZAJE[p.rodzaj]?.[lang]}</span>
+      {p.dla.map((d) => <span class="badge">{ODBIORCY[d]?.[lang]}</span>)}
+      <time datetime={p.data}>{short(p.data)}</time>
+    </span>
+    <span class="t">{p.tytul}</span>
+    {p.wydarzenie && <span class="news-meta wa-kiedy"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</span>}
+    {p.zajawka && <span class="x">{p.zajawka}</span>}
+  </span>
+  {p.zdjecie && <span class="thumb"><img src={u(p.zdjecie)} alt="" loading="lazy" /></span>}
+</a>
+
+<style>
+  /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
+  @media (max-width: 760px) {
+    .wa-row { display: grid; grid-template-columns: 136px minmax(0, 1fr) auto; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 18px; row-gap: 0; align-items: start; }
+    .wa-row > .body { display: contents; }
+    .wa-meta { grid-column: 1; grid-row: 1 / 4; flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 2px; }
+    .wa-meta time { order: -1; font-size: 14px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .wa-meta .badge { padding: 1px 8px; font-size: 12.5px; white-space: nowrap; }
+    .wa-row .t { grid-column: 2; grid-row: 1; }
+    .wa-kiedy { grid-column: 2; grid-row: 2; margin-top: 3px; }
+    .wa-row .x { grid-column: 2; grid-row: 3; margin-top: 3px; }
+    .wa-row .thumb { grid-column: 3; grid-row: 1 / 4; display: block; width: 104px; height: 70px; }
+  }
+  @media (max-width: 640px) {
+    .wa-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto minmax(0, 1fr); }
+    .wa-meta { grid-column: 1 / -1; grid-row: 1; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 4px; padding-top: 0; }
+    .wa-meta time { margin-right: 6px; }
+    .wa-row .t { grid-column: 1; grid-row: 2; }
+    .wa-kiedy { grid-column: 1; grid-row: 3; }
+    .wa-row .x { grid-column: 1; grid-row: 4; }
+    .wa-row .thumb { grid-column: 2; grid-row: 2 / 5; width: 72px; height: 54px; }
+  }
+</style>

@@ -1,0 +1,182 @@
+---
+// Jeden semestr na stronie /studia/rok-akademicki: kalendarze miesięcy (kolory dni), opcjonalnie listy dni wolnych i zamian, PDF.
+// Kolory (--kd-*) dziedziczy z RokAkademicki.astro. W komórkach nie ma liter N/P — kolor, a dla czytników ekranu opis dnia.
+// Zamiana dni: duży skrót dnia, według którego planu są zajęcia („ŚR”), na środku komórki.
+// panel = element przełącznika semestrów (PrzelacznikSemestrow.astro): id + data-ps-panel (+ data-ps-aktywny).
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import { addDays, dayNum, longWithDay, monthYear, range, type Lang } from '../lib/daty';
+import {
+  nazwaSemestru, dniSemestru, statystykiSemestru, wolneSemestru, zamianySemestru, dzienTygodnia,
+  NAZWA_KOLORU, DNI_SKROT, SKROT_PLANU, nazwaDnia, opisZamiany, type Dzien, type Semestr,
+} from '../lib/kolory-dni';
+
+interface Props {
+  s: Semestr;
+  lang: Lang;
+  dzis: string;
+  id?: string; // id sekcji (kotwica, panel przełącznika)
+  panel?: boolean;
+  aktywny?: boolean;
+  listy?: boolean; // listy dni wolnych i zamian pod kalendarzem (semestry w archiwum)
+}
+const { s, lang, dzis, id = `sem-${s.poczatek}`, panel = false, aktywny = false, listy = false } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const wielka = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+
+const NAGLOWKI = lang === 'en' ? ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] : ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
+
+type Komorka = { data: string; d: Dzien | null };
+// Miesiące od początku do końca zajęć; tygodnie od poniedziałku.
+const dni = new Map(dniSemestru(s).map((d) => [d.data, d]));
+const miesiace: { nazwa: string; tygodnie: (Komorka | null)[][] }[] = [];
+for (let m = s.poczatek.slice(0, 7); m <= s.koniec.slice(0, 7); ) {
+  const pierwszy = `${m}-01`;
+  let d = addDays(pierwszy, 1 - dzienTygodnia(pierwszy));
+  const tygodnie: (Komorka | null)[][] = [];
+  do {
+    const tydz: (Komorka | null)[] = [];
+    for (let i = 0; i < 7; i++, d = addDays(d, 1)) tydz.push(d.slice(0, 7) === m ? { data: d, d: dni.get(d) ?? null } : null);
+    tygodnie.push(tydz);
+  } while (d.slice(0, 7) === m);
+  miesiace.push({ nazwa: monthYear(pierwszy, lang), tygodnie });
+  const [y, mm] = m.split('-').map(Number);
+  m = mm === 12 ? `${y + 1}-01` : `${y}-${String(mm + 1).padStart(2, '0')}`;
+}
+
+function klasa(k: Komorka): string {
+  if (!k.d) return 'poza';
+  if (k.d.kolor) return k.d.kolor;
+  return k.d.wolne ? 'wolne' : 'weekend';
+}
+
+// Pełny opis dnia (czytniki ekranu i podpowiedź po najechaniu).
+function opis(k: Komorka): string {
+  const d = k.d;
+  if (!d) return T('poza okresem zajęć', 'outside the teaching period');
+  if (d.kolor) {
+    const z = d.zamiana && d.plan ? `, ${T('zamiana dni', 'day swap')}: ${opisZamiany(d.plan, lang)}` : '';
+    return T(`dzień ${NAZWA_KOLORU.pl[d.kolor]}`, `${NAZWA_KOLORU.en[d.kolor]} day`) + z;
+  }
+  if (d.wolne) return `${T('bez zajęć', 'no classes')}: ${T(d.wolne.opis, d.wolne.opis_en)}`;
+  return T('bez zajęć', 'no classes');
+}
+
+const st = statystykiSemestru(s);
+const plan = st.plan.slice(1);
+const rowne = plan.every((n) => n === plan[0]);
+const liczby = rowne
+  ? T(`każdy dzień tygodnia ${plan[0]} razy`, `each weekday ${plan[0]} times`)
+  : plan.map((n, i) => `${DNI_SKROT[lang][i + 1]} ${n}`).join(', ');
+const wolne = listy ? wolneSemestru(s) : [];
+const zamiany = listy ? zamianySemestru(s) : [];
+const uwagi = (lang === 'en' && s.uwagi_en) || s.uwagi || '';
+const hId = `semestr-${s.poczatek}`;
+const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, lang);
+---
+<section
+  class="kd-sem"
+  id={id}
+  aria-labelledby={hId}
+  data-ps-panel={panel ? '' : undefined}
+  data-ps-aktywny={panel && aktywny ? '' : undefined}
+>
+  <h3 id={hId}>{nazwaSemestru(s, lang)}</h3>
+  <p class="kd-meta">
+    {T('Zajęcia', 'Classes')}: {range(s.poczatek, s.koniec, lang)} · {st.razem} {T('dni zajęć', 'class days')}
+    ({st.niebieskie} {T('niebieskich', 'blue')}, {st.pomaranczowe} {T('pomarańczowych', 'orange')}) · {liczby}
+  </p>
+  {uwagi && <p class="notice kd-uwagi">{uwagi}</p>}
+
+  <div class="kd-miesiace" data-pagefind-ignore>
+    {miesiace.map((m) => (
+      <table class="kd-mies">
+        <caption>{m.nazwa}</caption>
+        <thead>
+          <tr>{NAGLOWKI.map((n, j) => <th scope="col"><abbr title={nazwaDnia(j + 1, lang)}>{n}</abbr></th>)}</tr>
+        </thead>
+        <tbody>
+          {m.tygodnie.map((tydz) => (
+            <tr>
+              {tydz.map((k) => k ? (
+                <td
+                  class:list={[klasa(k), { zam: !!(k.d?.zamiana && k.d.plan), dzis: k.data === dzis }]}
+                  data-data={k.data}
+                  title={`${wielka(longWithDay(k.data, lang))} — ${opis(k)}`}
+                  aria-current={k.data === dzis ? 'date' : undefined}
+                >
+                  <span class="n">{dayNum(k.data)}</span><span class="sr-only">, {opis(k)}</span>
+                  {k.d?.zamiana && k.d.plan && <span class="z" aria-hidden="true">{SKROT_PLANU[lang][k.d.plan]}</span>}
+                </td>
+              ) : <td class="pusty"></td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ))}
+  </div>
+
+  {(wolne.length > 0 || zamiany.length > 0) && (
+    <div class="kd-listy">
+      {wolne.length > 0 && (
+        <div>
+          <h4>{T('Dni wolne od zajęć', 'Days without classes')}</h4>
+          <ul>
+            {wolne.map((w) => <li><strong>{zakres(w.od, w.do)}</strong> — {T(w.opis, w.opis_en)}</li>)}
+          </ul>
+        </div>
+      )}
+      {zamiany.length > 0 && (
+        <div>
+          <h4>{T('Zamiany dni', 'Day swaps')}</h4>
+          <ul>
+            {zamiany.map((d) => (
+              <li>
+                <strong>{wielka(longWithDay(d.data, lang))}</strong> — {opisZamiany(d.plan ?? 1, lang)}
+                {d.kolor ? ` (${T(`dzień ${NAZWA_KOLORU.pl[d.kolor]}`, `${NAZWA_KOLORU.en[d.kolor]} day`)})` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )}
+
+  {s.pdf && (
+    <a class="link-arrow" href={href(s.pdf)}><Ikona nazwa="plik" rozmiar={16} />{T('Kalendarz Instytutu w PDF', 'Institute calendar (PDF)')}</a>
+  )}
+</section>
+
+<style>
+  .kd-sem { margin-top: 8px; }
+  .kd-sem + .kd-sem { margin-top: 34px; }
+  .kd-sem h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.01em; scroll-margin-top: 16px; }
+  .kd-meta { margin: 6px 0 0; font-size: 15px; color: var(--muted); }
+  .kd-uwagi { margin: 14px 0 0; font-size: 15px; }
+  .kd-miesiace { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 22px 30px; margin: 20px 0 6px; }
+  .kd-mies { width: 100%; border-collapse: separate; border-spacing: 3px; table-layout: fixed; }
+  .kd-mies caption { padding: 0 3px 6px; text-align: left; font-size: 16px; font-weight: 800; color: var(--ink); }
+  .kd-mies th { padding: 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
+  .kd-mies abbr { text-decoration: none; }
+  .kd-mies td { position: relative; height: 46px; padding: 3px 5px; border-radius: 8px; vertical-align: top; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .kd-mies td.niebieski { background: var(--kd-n); color: var(--kd-n-ink); }
+  .kd-mies td.pomaranczowy { background: var(--kd-p); color: var(--kd-p-ink); }
+  .kd-mies td.wolne { background: repeating-linear-gradient(135deg, var(--surface) 0 5px, var(--kd-kreski) 5px 7px); background-color: var(--surface); }
+  .kd-mies td.weekend { background: var(--surface); }
+  .kd-mies td.wolne, .kd-mies td.weekend, .kd-mies td.poza { color: var(--muted); font-weight: 600; }
+  .kd-mies td.poza { font-weight: 500; }
+  /* zamiana dni: obwódka w mocnym kolorze dnia i duży skrót dnia planu na środku */
+  .kd-mies td.zam.niebieski { box-shadow: inset 0 0 0 2.5px var(--kd-n-mocny); }
+  .kd-mies td.zam.pomaranczowy { box-shadow: inset 0 0 0 2.5px var(--kd-p-mocny); }
+  .kd-mies td.zam .n { font-size: 11px; font-weight: 800; }
+  .kd-mies td .z { position: absolute; inset: 0; display: grid; place-items: center; padding-top: 9px; font-size: 19px; font-weight: 900; letter-spacing: .02em; line-height: 1; }
+  .kd-mies td .z:lang(en) { font-size: 15px; letter-spacing: 0; }
+  .kd-mies td.dzis { outline: 2.5px solid var(--ink); outline-offset: 1px; }
+  .kd-listy { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 4px 30px; }
+  .kd-listy h4 { margin: 16px 0 6px; font-size: 17px; font-weight: 800; }
+  .kd-listy ul { margin: 0; padding-left: 20px; font-size: 15px; }
+  .kd-listy li { margin: 3px 0; }
+  .kd-sem .link-arrow { margin-top: 10px; }
+</style>

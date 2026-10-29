@@ -1,0 +1,29 @@
+---
+// Statyczne przekierowanie ze starego adresu (np. /studia/kalendarz-zajec → /studia/rok-akademicki).
+// GitHub Pages nie obsługuje przekierowań serwera: <meta http-equiv="refresh"> + skrypt (zachowuje #kotwicę) + zwykły link.
+// noindex — wyszukiwarki mają indeksować tylko adres docelowy (canonical).
+import { u, absolute } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { cel: string; tytul: string; lang: Lang }
+const { cel, tytul, lang } = Astro.props;
+const adres = u(wJezyku(cel, lang));
+const en = lang === 'en';
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tytul} · {en ? 'Mathematical Institute' : 'Instytut Matematyczny'} UWr</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={absolute(wJezyku(cel, lang), Astro.site)} />
+    <meta http-equiv="refresh" content={`0; url=${adres}`} />
+    <script is:inline define:vars={{ adres }}>location.replace(adres + location.hash);</script>
+    <style>body { margin: 0; padding: 40px 16px; font: 18px/1.6 system-ui, sans-serif; text-align: center; background: #fff; color: #111a2e; } a { color: #1b2d52; font-weight: 700; }</style>
+  </head>
+  <body>
+    <p>{en ? 'This page has moved to ' : 'Ta strona jest teraz tutaj: '}<a href={adres}>{tytul}</a>.</p>
+  </body>
+</html>

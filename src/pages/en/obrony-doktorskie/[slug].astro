@@ -1,0 +1,7 @@
+---
+import Obrona from '../../../views/Obrona.astro';
+import { sciezkiObron } from '../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiObron(); }
+const { obrona } = Astro.props;
+---
+<Obrona obrona={obrona} lang="en" />

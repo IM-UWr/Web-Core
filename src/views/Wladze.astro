@@ -1,0 +1,347 @@
+---
+// Władze Instytutu: wyróżniona karta dyrektora, karty zastępców, sekretariat, kadencja i Rada Instytutu.
+// Dane: src/data/wladze.json (Pages CMS: Ustawienia strony → Władze Instytutu). Pierwsza osoba na liście = dyrektor (duża karta).
+// Tytuł, e-mail, pokój, stronę i zakład bierzemy z kolekcji pracowników po polu „imie_nazwisko” (dokładnie jak w Pracownikach).
+// Telefony podajemy tylko przy sekretariacie (administracja) — przy pracownikach naukowych nie.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku, wybierz } from '../lib/i18n';
+import { zTytulem } from '../lib/osoby';
+import { renderMarkdown } from '../lib/markdown';
+import { pracownicy, zaklady, type Pracownik } from '../lib/tresci';
+import type { Lang } from '../lib/daty';
+import wladze from '../data/wladze.json';
+
+type Tekst = string | null | undefined;
+type Osoba = {
+  rola?: Tekst; rola_en?: Tekst; imie_nazwisko: string; zakres?: Tekst; zakres_en?: Tekst;
+  dyzur?: Tekst; dyzur_en?: Tekst; zdjecie?: Tekst;
+  // tylko gdy osoby nie ma w Pracownikach:
+  stopien?: Tekst; email?: Tekst; pokoj?: Tekst; strona?: Tekst;
+};
+type Link = { etykieta: string; etykieta_en?: Tekst; adres: string };
+type Dane = {
+  tytul?: Tekst; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst;
+  osoby?: Osoba[] | null;
+  sekretariat?: {
+    nazwa?: Tekst; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; email?: Tekst; telefony?: string[] | null;
+    adres?: Tekst; adres_en?: Tekst; pokoj?: Tekst; godziny?: Tekst; godziny_en?: Tekst; osoby?: string[] | null;
+  } | null;
+  wydzial?: { tytul?: Tekst; tytul_en?: Tekst; opis?: Tekst; opis_en?: Tekst; osoby?: Osoba[] | null; link?: Link | null } | null;
+  kadencja?: Tekst; kadencja_en?: Tekst;
+  rada?: { tytul?: Tekst; tytul_en?: Tekst; opis?: Tekst; opis_en?: Tekst } | null;
+  linki?: Link[] | null;
+};
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const w = (o: any, pole: string) => (o ? wybierz(o, pole, lang) : '');
+const d = wladze as Dane;
+const tytul = w(d, 'tytul') || T('Władze Instytutu', 'Institute management');
+const lead = w(d, 'wstep');
+
+// Dane osób z kolekcji pracowników
+const kadra = await pracownicy();
+const listaZakladow = await zaklady();
+const znajdz = (imie: string): Pracownik | undefined => kadra.find((p) => p.data.imie_nazwisko.trim() === imie.trim());
+const inicjaly = (imie: string) => {
+  const s = imie.trim().split(/\s+/);
+  return ((s[0]?.[0] ?? '') + (s.length > 1 ? s[s.length - 1][0] : '')).toUpperCase();
+};
+const tel = (n: string) => {
+  const cyfry = n.replace(/[^\d+]/g, '');
+  return `tel:${cyfry.startsWith('+') ? cyfry : `+48${cyfry}`}`;
+};
+const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
+// Długi adres e-mail łamiemy najpierw po „@” (<wbr>), a dopiero w ostateczności w środku.
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const mail = (e: string) => esc(e).replace('@', '@<wbr>');
+
+// Dane wpisane przy osobie (e-mail, pokój, strona) mają pierwszeństwo przed spisem pracowników.
+// zeSpisuPokoj = false: pokój tylko z wpisu (np. dziekan — pokój w IM to nie biuro dziekana).
+const osobaZ = (o: Osoba, zeSpisuPokoj = true) => {
+  const p = znajdz(o.imie_nazwisko);
+  const z = p?.data.zaklad ? listaZakladow.find((x) => x.id === p.data.zaklad) : undefined;
+  return {
+    rola: w(o, 'rola'),
+    nazwa: zTytulem(o.stopien || p?.data.stopien, o.imie_nazwisko),
+    inicjaly: inicjaly(o.imie_nazwisko),
+    email: o.email || p?.data.email || '',
+    pokoj: o.pokoj || (zeSpisuPokoj ? p?.data.pokoj : '') || '',
+    strona: o.strona || p?.data.strona || '',
+    zakres: w(o, 'zakres'),
+    dyzur: w(o, 'dyzur'),
+    zdjecie: o.zdjecie || '',
+    zaklad: z ? { nazwa: w(z.data, 'nazwa'), adres: `/instytut/zaklady/${z.id}` } : undefined,
+  };
+};
+const osoby = (d.osoby ?? []).filter((o) => o && o.imie_nazwisko?.trim()).map((o) => osobaZ(o));
+// Władze Wydziału Matematyki i Informatyki (dziekan i prodziekan ds. matematyki)
+const wyd = d.wydzial ?? undefined;
+const osobyWydzialu = (wyd?.osoby ?? []).filter((o) => o && o.imie_nazwisko?.trim()).map((o) => osobaZ(o, false));
+const linkWydzialu = wyd?.link?.adres && wyd.link.etykieta ? wyd.link : undefined;
+const [dyrektor, ...zastepcy] = osoby;
+
+// Sekretariat
+const sek = d.sekretariat ?? undefined;
+const sekOsoby = (sek?.osoby ?? []).filter(Boolean).map((imie) => {
+  const p = znajdz(imie);
+  return { nazwa: imie, email: p?.data.email ?? '', telefon: p?.data.grupa === 'administracja' ? p.data.telefon ?? '' : '' };
+});
+const sekTelefony = (sek?.telefony ?? []).filter(Boolean);
+const sekJest = !!sek && !!(sek.email || sekTelefony.length || sekOsoby.length);
+
+// Teksty w Markdownie
+const kadencjaHtml = await renderMarkdown(w(d, 'kadencja') || undefined);
+const radaHtml = await renderMarkdown(w(d.rada, 'opis') || undefined);
+const linki = (d.linki ?? []).filter((l) => l && l.adres && l.etykieta);
+
+---
+<Baza tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined}>
+  <NaglowekStrony tytul={tytul} lead={lead || undefined} lang={lang} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }} />
+
+  <div class="wrap layout">
+    <div class="main">
+
+      {dyrektor && (
+        <section class={dyrektor.strona ? 'wl-dyr os-link' : 'wl-dyr'} aria-labelledby="dyrektor">
+          <div class="wl-foto">
+            {dyrektor.zdjecie
+              ? <img src={u(dyrektor.zdjecie)} alt="" decoding="async" />
+              : <span class="wl-ini" aria-hidden="true">{dyrektor.inicjaly}</span>}
+          </div>
+          <div class="wl-dyr-tresc">
+            {dyrektor.rola && <p class="wl-rola">{dyrektor.rola}</p>}
+            <h2 id="dyrektor" class="wl-n">
+              {dyrektor.strona
+                ? <a class="os-a" href={dyrektor.strona}>{dyrektor.nazwa}<span class="sr-only"> — {T('strona domowa', 'personal website')}</span></a>
+                : dyrektor.nazwa}
+            </h2>
+            {dyrektor.zaklad && <p class="wl-zaklad"><a href={href(dyrektor.zaklad.adres)}>{dyrektor.zaklad.nazwa}</a></p>}
+            {dyrektor.zakres && <p class="wl-zakres">{dyrektor.zakres}</p>}
+            <ul class="wl-kontakt">
+              {dyrektor.email && <li><Ikona nazwa="mail" rozmiar={16} /><a href={`mailto:${dyrektor.email}`} set:html={mail(dyrektor.email)} /></li>}
+              {dyrektor.pokoj && <li><Ikona nazwa="pinezka" rozmiar={16} /><span>{T('pok.', 'room')} {dyrektor.pokoj}</span></li>}
+              {dyrektor.dyzur && <li><Ikona nazwa="zegar" rozmiar={16} /><span>{T('Dyżur:', 'Office hours:')} {dyrektor.dyzur}</span></li>}
+            </ul>
+            {dyrektor.strona && (
+              <p class="wl-cta" aria-hidden="true"><span class="link-arrow">{T('Strona domowa', 'Personal website')}<Ikona nazwa="zewnetrzny" rozmiar={15} /></span></p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {zastepcy.length > 0 && (
+        <section class="zsec wl-sec" aria-labelledby="zastepcy">
+          <h2 id="zastepcy">{T('Zastępcy dyrektora', 'Deputy Directors')}</h2>
+          <ul class="wl-grid">
+            {zastepcy.map((o) => (
+              <li class={o.strona ? 'wl-karta os-link' : 'wl-karta'}>
+                <div class="wl-foto">
+                  {o.zdjecie
+                    ? <img src={u(o.zdjecie)} alt="" loading="lazy" decoding="async" />
+                    : <span class="wl-ini" aria-hidden="true">{o.inicjaly}</span>}
+                </div>
+                <div class="wl-karta-tresc">
+                  {o.rola && <p class="wl-rola">{o.rola}</p>}
+                  <h3 class="wl-n">
+                    {o.strona
+                      ? <a class="os-a" href={o.strona}>{o.nazwa}<span class="sr-only"> — {T('strona domowa', 'personal website')}</span><Ikona nazwa="zewnetrzny" rozmiar={14} /></a>
+                      : o.nazwa}
+                  </h3>
+                  {o.zaklad && <p class="wl-zaklad"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></p>}
+                  {o.zakres && <p class="wl-zakres">{o.zakres}</p>}
+                  <ul class="wl-kontakt">
+                    {o.email && <li><Ikona nazwa="mail" rozmiar={14} /><a href={`mailto:${o.email}`} set:html={mail(o.email)} /></li>}
+                    {o.pokoj && <li><Ikona nazwa="pinezka" rozmiar={14} /><span>{T('pok.', 'room')} {o.pokoj}</span></li>}
+                    {o.dyzur && <li><Ikona nazwa="zegar" rozmiar={14} /><span>{T('Dyżur:', 'Office hours:')} {o.dyzur}</span></li>}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {osobyWydzialu.length > 0 && (
+        <section class="zsec wl-sec" aria-labelledby="wydzial">
+          <h2 id="wydzial">{w(wyd, 'tytul') || T('Władze Wydziału', 'Faculty authorities')}</h2>
+          {w(wyd, 'opis') && <p class="wl-opis">{w(wyd, 'opis')}</p>}
+          <ul class="wl-grid">
+            {osobyWydzialu.map((o) => (
+              <li class={o.strona ? 'wl-karta os-link' : 'wl-karta'}>
+                <div class="wl-foto">
+                  {o.zdjecie
+                    ? <img src={u(o.zdjecie)} alt="" loading="lazy" decoding="async" />
+                    : <span class="wl-ini" aria-hidden="true">{o.inicjaly}</span>}
+                </div>
+                <div class="wl-karta-tresc">
+                  {o.rola && <p class="wl-rola">{o.rola}</p>}
+                  <h3 class="wl-n">
+                    {o.strona
+                      ? <a class="os-a" href={o.strona}>{o.nazwa}<span class="sr-only"> — {T('strona domowa', 'personal website')}</span><Ikona nazwa="zewnetrzny" rozmiar={14} /></a>
+                      : o.nazwa}
+                  </h3>
+                  {o.zaklad && <p class="wl-zaklad"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></p>}
+                  {o.zakres && <p class="wl-zakres">{o.zakres}</p>}
+                  <ul class="wl-kontakt">
+                    {o.email && <li><Ikona nazwa="mail" rozmiar={14} /><a href={`mailto:${o.email}`} set:html={mail(o.email)} /></li>}
+                    {o.pokoj && <li><Ikona nazwa="pinezka" rozmiar={14} /><span>{T('pok.', 'room')} {o.pokoj}</span></li>}
+                    {o.dyzur && <li><Ikona nazwa="zegar" rozmiar={14} /><span>{T('Dyżur:', 'Office hours:')} {o.dyzur}</span></li>}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {linkWydzialu && <p style="margin:16px 0 0"><a class="link-arrow" href={href(linkWydzialu.adres)}>{w(linkWydzialu, 'etykieta')}<Ikona nazwa={isExternal(linkWydzialu.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={15} /></a></p>}
+        </section>
+      )}
+
+      {sekJest && (
+        <section class="zsec wl-sec" aria-labelledby="sekretariat">
+          <h2 id="sekretariat">{w(sek, 'nazwa') || T('Sekretariat', 'Office')}</h2>
+          {w(sek, 'opis') && <p class="wl-opis">{w(sek, 'opis')}</p>}
+          <div class="wl-sek">
+            <div class="wl-sek-glowny">
+              {sek!.email && (
+                <p class="wl-sek-mail"><span class="wl-lbl">{T('E-mail', 'E-mail')}</span><a href={`mailto:${sek!.email}`} set:html={mail(sek!.email)} /></p>
+              )}
+              {sekTelefony.length > 0 && (
+                <p><span class="wl-lbl">{T('Telefon', 'Phone')}</span><span>{sekTelefony.map((n, i) => <>{i > 0 && ', '}<a href={tel(n)}>{n}</a></>)}</span></p>
+              )}
+              {w(sek, 'adres') && <p><span class="wl-lbl">{T('Adres', 'Address')}</span>{w(sek, 'adres')}{sek!.pokoj && `, ${T('pok.', 'room')} ${sek!.pokoj}`}</p>}
+              {!w(sek, 'adres') && sek!.pokoj && <p><span class="wl-lbl">{T('Pokój', 'Room')}</span>{sek!.pokoj}</p>}
+              {w(sek, 'godziny') && <p><span class="wl-lbl">{T('Godziny pracy', 'Opening hours')}</span>{w(sek, 'godziny')}</p>}
+            </div>
+            {sekOsoby.length > 0 && (
+              <ul class="wl-sek-osoby">
+                {sekOsoby.map((o) => (
+                  <li>
+                    <span class="wl-sek-n">{o.nazwa}</span>
+                    {o.email && <a href={`mailto:${o.email}`}><Ikona nazwa="mail" rozmiar={14} /><span set:html={mail(o.email)} /></a>}
+                    {o.telefon && <a href={tel(o.telefon)}><Ikona nazwa="telefon" rozmiar={14} />{o.telefon}</a>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
+
+      {kadencjaHtml && (
+        <section class="zsec wl-sec" aria-labelledby="kadencja">
+          <h2 id="kadencja">{T('Kadencja', 'Term of office')}</h2>
+          <div class="prose wl-prose"><Fragment set:html={kadencjaHtml} /></div>
+        </section>
+      )}
+
+      {radaHtml && (
+        <section class="zsec wl-sec" aria-labelledby="rada">
+          <h2 id="rada">{w(d.rada, 'tytul') || T('Rada Instytutu', 'Institute Council')}</h2>
+          <div class="prose wl-prose"><Fragment set:html={radaHtml} /></div>
+        </section>
+      )}
+
+      {linki.length > 0 && (
+        <section class="zsec wl-sec" aria-labelledby="zobacz">
+          <h2 id="zobacz">{T('Zobacz też', 'See also')}</h2>
+          <ul class="wl-linki">
+            {linki.map((l) => (
+              <li><a class="link-arrow" href={href(l.adres)}>{w(l, 'etykieta')}<Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={15} /></a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+
+  </div>
+</Baza>
+
+<style>
+  /* ---------- wspólne ---------- */
+  .wl-rola { margin: 0; display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.4; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--tint-ink); }
+  /* kreska na wysokości pierwszego wiersza (dłuższe funkcje łamią się na dwa wiersze) */
+  .wl-rola::before { content: ''; flex: 0 0 auto; width: 22px; height: 3px; margin-top: calc(.7em - 1.5px); border-radius: 2px; background: var(--accent); }
+  .wl-n { margin: 0; color: var(--ink); font-weight: 800; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+  .wl-n a { color: var(--ink); }
+  .wl-zaklad { margin: 0; font-size: 14px; }
+  .wl-zaklad a { color: var(--muted); text-decoration: none; }
+  .wl-zaklad a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+  .wl-zakres { margin: 0; color: var(--text); line-height: 1.55; }
+  .wl-kontakt { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; color: var(--muted); overflow-wrap: anywhere; }
+  .wl-kontakt li { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+  .wl-kontakt li :global(svg) { flex: 0 0 auto; margin-top: 3px; color: var(--primary); }
+  :global(:root[data-theme='dark']) .wl-kontakt li :global(svg) { color: var(--accent); }
+  .wl-kontakt a { color: var(--text); text-underline-offset: 3px; }
+
+  /* zdjęcie (portret 4:5) albo inicjały */
+  .wl-foto { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--radius); background: var(--photo); }
+  .wl-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
+  .wl-ini { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; letter-spacing: .02em; color: var(--tint-ink);
+    background: radial-gradient(120% 90% at 20% 10%, var(--bg) 0%, transparent 60%), var(--tint); }
+
+  /* ---------- dyrektor: duża karta ---------- */
+  .wl-dyr { display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); align-items: center;
+    margin-bottom: 44px; padding: clamp(16px, 2.4vw, 24px); border: 1px solid var(--line); border-radius: var(--radius-l);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%); }
+  .wl-dyr .wl-ini { font-size: 64px; }
+  .wl-dyr-tresc { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .wl-dyr .wl-n { font-size: clamp(26px, 3.2vw, 34px); line-height: 1.12; }
+  .wl-dyr .wl-zaklad { font-size: 15px; margin-top: -4px; }
+  .wl-dyr .wl-zakres { font-size: 17px; max-width: 56ch; }
+  .wl-dyr .wl-kontakt { font-size: 16px; margin-top: 4px; }
+  .wl-cta { margin: 0; }
+  .wl-cta .link-arrow { min-height: 0; }
+
+  /* ---------- zastępcy: siatka kart ---------- */
+  .wl-sec > h2 { margin-bottom: 16px; }
+  .wl-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+  .wl-karta { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 16px; align-items: start; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); min-width: 0; }
+  .wl-karta .wl-foto { border-radius: 12px; }
+  .wl-karta .wl-ini { font-size: 30px; }
+  .wl-karta-tresc { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .wl-karta .wl-rola { font-size: 11px; gap: 8px; }
+  .wl-karta .wl-rola::before { width: 16px; }
+  .wl-karta .wl-n { font-size: 18px; line-height: 1.25; }
+  .wl-karta .wl-zakres { font-size: 14px; }
+  .wl-karta .wl-kontakt { font-size: 13px; margin-top: 2px; }
+  /* ikona „strona zewnętrzna” w rogu — znak, że cała karta jest linkiem */
+  .wl-karta.os-link { padding-right: 40px; }
+  .wl-karta.os-link .os-a :global(.ico) { position: absolute; top: 16px; right: 14px; color: var(--muted); }
+  /* podświetlenie jak w global.css (.os-link), powtórzone, bo własne tło i ramka kart mają tę samą wagę selektora */
+  .wl-dyr.os-link:hover, .wl-dyr.os-link:focus-within, .wl-karta.os-link:hover, .wl-karta.os-link:focus-within {
+    border-color: var(--ink); background: var(--tint); box-shadow: 0 6px 20px rgb(0 0 0 / .08); }
+
+  /* ---------- sekretariat ---------- */
+  .wl-opis { margin: -4px 0 16px; max-width: 70ch; color: var(--muted); }
+  .wl-sek { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+  .wl-sek-glowny { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: var(--radius-l); background: var(--tint); color: var(--text); overflow-wrap: anywhere; }
+  .wl-sek-glowny p { margin: 0; display: flex; flex-direction: column; gap: 2px; font-size: 16px; }
+  .wl-sek-glowny a { color: var(--ink); text-underline-offset: 3px; }
+  .wl-sek-mail a { font-size: 19px; font-weight: 800; }
+  .wl-lbl { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--tint-ink); }
+  .wl-sek-osoby { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .wl-sek-osoby li { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); font-size: 14px; overflow-wrap: anywhere; }
+  .wl-sek-n { font-weight: 800; font-size: 16px; color: var(--ink); }
+  .wl-sek-osoby a { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-underline-offset: 3px; }
+  .wl-sek-osoby a :global(svg) { flex: 0 0 auto; color: var(--primary); }
+  :global(:root[data-theme='dark']) .wl-sek-osoby a :global(svg) { color: var(--accent); }
+
+  /* ---------- kadencja, rada, linki ---------- */
+  .wl-prose { font-size: 17px; }
+  .wl-linki { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .wl-linki li { border-top: 1px solid var(--line); }
+  .wl-linki li:last-child { border-bottom: 1px solid var(--line); }
+  .wl-linki .link-arrow { width: 100%; justify-content: space-between; }
+
+  @media (max-width: 640px) {
+    .wl-dyr { grid-template-columns: minmax(0, 1fr); align-items: start; }
+    .wl-dyr .wl-foto { width: min(200px, 60%); }
+  }
+  @media (max-width: 380px) {
+    .wl-karta { grid-template-columns: 80px minmax(0, 1fr); gap: 12px; }
+  }
+</style>

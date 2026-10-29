@@ -1,0 +1,49 @@
+---
+import Ikona from './Ikona.astro';
+// „Na tej stronie” — odnośniki do sekcji (nagłówków ##) bieżącej strony.
+// Wariant "bok" to przyklejony panel po prawej, "gora" to rozwijana lista nad treścią na telefonie.
+interface Props { naglowki: { depth: number; slug: string; text: string }[]; lang: 'pl' | 'en'; wariant: 'bok' | 'gora' }
+const { naglowki, lang, wariant } = Astro.props;
+const sekcje = naglowki.filter((h) => h.depth === 2);
+const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
+---
+{sekcje.length >= 2 && (
+  wariant === 'bok' ? (
+    <nav class="side-box toc toc-side" aria-label={tytul}>
+      <h2>{tytul}</h2>
+      <ol>
+        {sekcje.map((h) => <li><a href={`#${h.slug}`} data-toc={h.slug}>{h.text}</a></li>)}
+      </ol>
+    </nav>
+  ) : (
+    <details class="toc toc-top">
+      <summary>{tytul}<Ikona nazwa="dol" class="chev" rozmiar={18} /></summary>
+      <ol>
+        {sekcje.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+      </ol>
+    </details>
+  )
+)}
+
+<script>
+  // Podświetlanie sekcji, którą właśnie czytamy.
+  const linki = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-toc]'));
+  if (linki.length && 'IntersectionObserver' in window) {
+    const widoczne = new Set<string>();
+    const ustaw = () => {
+      const pierwszy = linki.find((a) => widoczne.has(a.dataset.toc!));
+      if (pierwszy) linki.forEach((a) => a.toggleAttribute('aria-current', a === pierwszy));
+    };
+    const obs = new IntersectionObserver(
+      (wpisy) => {
+        for (const w of wpisy) (w.isIntersecting ? widoczne.add(w.target.id) : widoczne.delete(w.target.id));
+        ustaw();
+      },
+      { rootMargin: '0px 0px -60% 0px' }
+    );
+    linki.forEach((a) => {
+      const el = document.getElementById(a.dataset.toc!);
+      if (el) obs.observe(el);
+    });
+  }
+</script>

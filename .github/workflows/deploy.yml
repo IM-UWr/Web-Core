@@ -1,0 +1,84 @@
+name: Budowanie i publikacja strony
+
+on:
+  push:
+    branches: [main]
+  # Zmiana w repozytorium treści IM-UWr/Web-* (workflow powiadom.yml) albo plan zajęć z USOS (przebuduj).
+  repository_dispatch:
+    types: [tresc-zmieniona, przebuduj, seminaria]
+  # Codzienna przebudowa: „Najbliższe wydarzenia”, „Seminaria w tym tygodniu”
+  # i wyróżnienia na stronie głównej zmieniają się z upływem czasu.
+  schedule:
+    - cron: '7 3 * * *'
+    - cron: '7 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Kilka zapisów w CMS pod rząd: trwające budowanie kończy się, czeka tylko najnowsze kolejne.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Treści z repozytoriów IM-UWr/Web-*
+        run: |
+          echo "::notice title=Zdarzenie::${{ github.event_name }} ${{ github.event.client_payload.repo }}"
+          python3 skrypty/pobierz_tresci.py
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Instalacja zależności
+        run: npm install --no-audit --no-fund
+
+      - name: Kontrola plików treści
+        run: |
+          if ! python3 skrypty/sprawdz_tresci.py > tresci.log 2>&1; then
+            msg=$(sed -e 's/%/%25/g' tresci.log | head -60 | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Błędy w plikach treści::${msg}"
+            exit 1
+          fi
+
+      - name: Konfiguracja GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      # Adres i ścieżkę bazową podaje configure-pages (działa też z domeną UWr).
+      - name: Budowanie strony
+        run: |
+          export SITE_URL="${{ steps.pages.outputs.origin }}"
+          export BASE_PATH="${{ steps.pages.outputs.base_path }}"
+          set -o pipefail
+          if ! npm run build 2>&1 | tee build.log; then
+            msg=$(tail -c 6000 build.log | sed -e 's/\x1b\[[0-9;]*m//g' -e 's/%/%25/g' -e 's/\r/%0D/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Błąd budowania::${msg}"
+            exit 1
+          fi
+          warn=$(sed -e 's/\x1b\[[0-9;]*m//g' build.log | grep -iE 'warn|error|failed|not found' | head -40 | sed -e 's/%/%25/g' | awk '{printf "%s%%0A", $0}' || true)
+          if [ -n "$warn" ]; then echo "::warning title=Ostrzeżenia budowania::${warn}"; fi
+          echo "::notice title=Wynik budowania::$(find dist -name '*.html' | wc -l) stron HTML, $(du -sh dist | cut -f1)"
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publikacja
+        id: deployment
+        uses: actions/deploy-pages@v4

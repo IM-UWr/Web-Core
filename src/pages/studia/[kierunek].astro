@@ -1,0 +1,7 @@
+---
+import Kierunek from '../../views/Kierunek.astro';
+import { sciezkiKierunkow } from '../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiKierunkow(); }
+const { kierunek } = Astro.props;
+---
+<Kierunek kierunek={kierunek} lang="pl" />

@@ -1,0 +1,7 @@
+---
+import Strona from '../../views/Strona.astro';
+import { sciezkiStron } from '../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiStron(); }
+const { strona } = Astro.props;
+---
+<Strona strona={strona} lang="en" />

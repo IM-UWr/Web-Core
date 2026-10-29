@@ -1,0 +1,82 @@
+---
+// Konferencje: nadchodzące u góry, minione według lat.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { t, wJezyku } from '../lib/i18n';
+import { dayNum, monthShort, range, type Lang } from '../lib/daty';
+import { konferencje, slugOf, trwaLubBedzie, type Konferencja } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const wszystkie = await konferencje();
+const przyszle = wszystkie.filter((k) => trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec })).reverse();
+const minione = wszystkie.filter((k) => !przyszle.includes(k));
+const lata: { rok: string; lista: Konferencja[] }[] = [];
+for (const k of minione) {
+  const r = k.data.poczatek.slice(0, 4);
+  const ost = lata[lata.length - 1];
+  if (ost && ost.rok === r) ost.lista.push(k);
+  else lata.push({ rok: r, lista: [k] });
+}
+const tytul = (k: Konferencja) => (lang === 'en' && k.data.tytul_en) || k.data.tytul;
+const href = (k: Konferencja) => u(wJezyku(`/nauka/konferencje/${slugOf(k.id)}`, lang));
+const odwolana = lang === 'en' ? 'cancelled' : 'odwołana';
+const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
+const lead = lang === 'en'
+  ? 'Conferences and workshops organised or co-organised by members of the Mathematical Institute.'
+  : 'Konferencje i warsztaty organizowane lub współorganizowane przez pracowników Instytutu Matematycznego.';
+---
+<Baza tytul={naglowek} opis={lead}>
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: naglowek }]} />
+  <div class="wrap layout">
+    <div class="main">
+      <section aria-labelledby="h-nadch" style="margin-bottom:32px">
+        <h2 id="h-nadch" style="font-size:24px;margin:0 0 14px">{lang === 'en' ? 'Upcoming' : 'Nadchodzące'}</h2>
+        {przyszle.length === 0 && <p class="muted" style="margin:0">{lang === 'en' ? 'No upcoming conferences announced.' : 'Nie zapowiedziano jeszcze kolejnych konferencji.'}</p>}
+        <div class="event-grid">
+          {przyszle.map((k) => (
+            <a class="event" href={href(k)} style="background:var(--surface)">
+              <span class="datebox" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+              <span class="event-body">
+                <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
+                <span class="t">{tytul(k)}</span>
+                {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {lata.map((g) => (
+        <section aria-labelledby={`rok-${g.rok}`}>
+          <h2 id={`rok-${g.rok}`} class="month" style="font-size:15px;margin-top:28px">{g.rok}</h2>
+          {g.lista.map((k) => (
+            <div class="row-item conf-row">
+              <span class="datebox small light" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+              <span class="body">
+                <a class="t" href={href(k)} style="font-size:18px;text-decoration:none">{tytul(k)}</a>
+                <span class="news-meta">
+                  <span>{range(k.data.poczatek, k.data.koniec, lang)}</span>
+                  {k.data.miejsce && <span>· {k.data.miejsce}</span>}
+                  {k.data.odwolana && <span class="badge">{odwolana}</span>}
+                  {k.data.strona && <a href={k.data.strona} class="link-arrow" style="min-height:0;font-size:14px">{lang === 'en' ? 'Website' : 'Strona konferencji'}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>}
+                </span>
+              </span>
+            </div>
+          ))}
+        </section>
+      ))}
+    </div>
+
+    <aside class="side" data-pagefind-ignore>
+      <nav class="side-box toc toc-side" aria-label={lang === 'en' ? 'Years' : 'Lata'}>
+        <h2>{lang === 'en' ? 'Years' : 'Lata'}</h2>
+        <ol style="flex-direction:row;flex-wrap:wrap;gap:6px">
+          {lata.map((g) => <li><a href={`#rok-${g.rok}`} class="chip" style="display:inline-flex;align-items:center;border-left:1.5px solid var(--line);padding:0 12px;min-height:36px">{g.rok}</a></li>)}
+        </ol>
+      </nav>
+    </aside>
+  </div>
+</Baza>

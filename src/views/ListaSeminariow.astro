@@ -1,0 +1,86 @@
+---
+// Lista seminariów z najbliższym referatem.
+// Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium bez zakładu (pole puste albo zakład,
+// którego nie ma na stronie) to seminarium niezależne — pokazuje się w osobnej grupie.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import TabelaReferatow from '../components/TabelaReferatow.astro';
+import { u } from '../lib/url';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import { long, now, today, hasTime, type Lang } from '../lib/daty';
+import { seminaria, referaty, zaklady, seminariumReferatu, referatyWTygodniu, tydzienSeminariow, sala } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const sem = await seminaria();
+const ref = await referaty();
+const zak = await zaklady();
+const n = now();
+const nastepny = (id: string) =>
+  ref.find((r) => seminariumReferatu(r) === id && (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today()));
+// zakłady seminarium (tylko te, które są na stronie), w kolejności zakładów
+const zakladySem = (s: (typeof sem)[number]) => zak.filter((z) => s.data.zaklad.includes(z.id));
+const kolejnosc = (s: (typeof sem)[number]) => zakladySem(s)[0]?.data.kolejnosc ?? Infinity;
+const aktywne = sem.filter((s) => s.data.aktywne);
+const nieaktywne = sem.filter((s) => !s.data.aktywne);
+const zakladowe = aktywne.filter((s) => zakladySem(s).length > 0).sort((a, b) => kolejnosc(a) - kolejnosc(b));
+const niezalezne = aktywne.filter((s) => zakladySem(s).length === 0);
+const grupy = [
+  { id: 'h-zakladow', tytul: T('Seminaria zakładów', 'Department seminars'), lista: zakladowe },
+  { id: 'h-niezalezne', tytul: T('Seminaria niezależne', 'Independent seminars'), lista: niezalezne },
+].filter((g) => g.lista.length > 0);
+const tydzien = tydzienSeminariow();
+const wTygodniu = await referatyWTygodniu(lang);
+const nazwa = (s: (typeof sem)[number]) => (lang === 'en' && s.data.nazwa_en) || s.data.nazwa;
+const lead = lang === 'en'
+  ? 'Research seminars of the Mathematical Institute. Everyone is welcome.'
+  : 'Seminaria naukowe Instytutu Matematycznego. Zapraszamy wszystkich zainteresowanych.';
+---
+<Baza tytul={t(lang, 'seminaria')} opis={lead}>
+  <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }} />
+  <div class="wrap" style="padding-top:32px;padding-bottom:64px;display:flex;flex-direction:column;gap:40px">
+    <section aria-labelledby="h-tydzien">
+      <div class="section-head" style="margin-bottom:14px">
+        <h2 id="h-tydzien" style="font-size:24px">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden">
+        <TabelaReferatow wiersze={wTygodniu} lang={lang} etykieta={t(lang, 'seminariaTydzien')} pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')} />
+      </div>
+    </section>
+
+    {grupy.map((g) => (
+      <section aria-labelledby={g.id}>
+        <h2 id={g.id} style="font-size:24px;margin:0 0 14px">{g.tytul}</h2>
+        <div class="sem-cards">
+          {g.lista.map((s) => {
+            const r = nastepny(s.id);
+            const zs = zakladySem(s);
+            return (
+              <a class="sem-card" href={u(wJezyku(`/seminaria/${s.id}`, lang))}>
+                {zs.length > 0 && <span class="muted" style="font-size:14px;font-weight:600">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</span>}
+                <span class="t">{nazwa(s)}</span>
+                {r ? (
+                  <span style="font-size:15px;padding-top:10px;border-top:1px solid var(--line)">
+                    <strong style="color:var(--ink)">{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — {r.data.tytul} <span class="muted">({r.data.prelegent})</span>
+                  </span>
+                ) : (
+                  <span class="muted" style="font-size:14px;padding-top:10px;border-top:1px solid var(--line)">{t(lang, 'brakNadchodzacych')}</span>
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+
+    {nieaktywne.length > 0 && (
+      <section aria-labelledby="h-nieaktywne">
+        <h2 id="h-nieaktywne" style="font-size:20px">{T('Pozostałe seminaria', 'Other seminars')}</h2>
+        <ul>
+          {nieaktywne.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
+        </ul>
+      </section>
+    )}
+  </div>
+</Baza>

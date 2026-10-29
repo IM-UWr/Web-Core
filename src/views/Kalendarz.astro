@@ -1,0 +1,86 @@
+---
+// Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u, absolute } from '../lib/url';
+import { t, wJezyku, RODZAJE } from '../lib/i18n';
+import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
+import { wszystkieWydarzenia, trwaLubBedzie, seminaria } from '../lib/tresci';
+import { adresIcs } from '../lib/kalendarz';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const wszystkie = (await wszystkieWydarzenia(lang)).filter(trwaLubBedzie);
+const grupy: { miesiac: string; pozycje: typeof wszystkie }[] = [];
+for (const w of wszystkie) {
+  const m = monthYear(w.poczatek, lang);
+  const ost = grupy[grupy.length - 1];
+  if (ost && ost.miesiac === m) ost.pozycje.push(w);
+  else grupy.push({ miesiac: m, pozycje: [w] });
+}
+const sem = (await seminaria()).filter((s) => s.data.aktywne);
+const kanaly = [
+  { nazwa: t(lang, 'wszystkieWydarzeniaKal'), plik: 'wszystko' },
+  { nazwa: t(lang, 'tylkoWydarzenia'), plik: 'wydarzenia' },
+  ...sem.map((s) => ({ nazwa: `${RODZAJE.referat[lang]}: ${(lang === 'en' && s.data.nazwa_en) || s.data.nazwa}`, plik: `seminarium-${s.id}` })),
+];
+const webcal = (plik: string) => absolute(adresIcs(plik), Astro.site).replace(/^https?:/, 'webcal:');
+const lead = lang === 'en'
+  ? 'Upcoming events, PhD defences and seminar talks at the Mathematical Institute.'
+  : 'Nadchodzące wydarzenia, obrony doktorskie i referaty seminaryjne w Instytucie Matematycznym.';
+---
+<Baza tytul={t(lang, 'kalendarz')} opis={lead}>
+  <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
+    <div class="filters">
+      <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
+        <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
+        <button type="button" class="chip" aria-pressed="false" data-rodzaj="wydarzenie">{RODZAJE.wydarzenie[lang]}</button>
+        <button type="button" class="chip" aria-pressed="false" data-rodzaj="obrona">{RODZAJE.obrona[lang]}</button>
+        <button type="button" class="chip" aria-pressed="false" data-rodzaj="konferencja">{RODZAJE.konferencja[lang]}</button>
+        <button type="button" class="chip" aria-pressed="false" data-rodzaj="referat">{t(lang, 'seminaria')}</button>
+      </div>
+    </div>
+  </NaglowekStrony>
+
+  <div class="wrap layout">
+    <div class="main">
+      {grupy.length === 0 && <p class="muted">{t(lang, 'brakWydarzen')}</p>}
+      {grupy.map((g) => (
+        <section data-grupa>
+          <h2 class="month">{g.miesiac}</h2>
+          {g.pozycje.map((w) => (
+            <a class="row-item" href={u(wJezyku(w.href, lang))} data-rodzaj={w.rodzaj}>
+              <span class={`datebox small${w.rodzaj === 'referat' ? ' light' : ''}`} aria-hidden="true">
+                <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
+              </span>
+              <span class="body">
+                <span class="news-meta">
+                  <span class={`badge badge-${w.rodzaj}`}>{RODZAJE[w.rodzaj][lang]}</span>
+                  <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
+                  {w.miejsce && <span>· {w.miejsce}</span>}
+                </span>
+                <span class="t" style="font-size:18px">{w.tytul}</span>
+                {w.podtytul && <span class="x">{w.podtytul}</span>}
+                {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
+              </span>
+            </a>
+          ))}
+        </section>
+      ))}
+    </div>
+
+  </div>
+</Baza>
+
+<script>
+  const btn = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
+  const poz = Array.from(document.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]'));
+  const grupy = Array.from(document.querySelectorAll<HTMLElement>('[data-grupa]'));
+  btn.forEach((b) => b.addEventListener('click', () => {
+    const r = b.dataset.rodzaj ?? '';
+    btn.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    poz.forEach((p) => (p.hidden = !!r && p.dataset.rodzaj !== r));
+    grupy.forEach((g) => (g.hidden = !g.querySelector('.row-item:not([hidden])')));
+  }));
+</script>

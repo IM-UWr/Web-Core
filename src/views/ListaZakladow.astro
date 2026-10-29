@@ -1,0 +1,57 @@
+---
+// Struktura Instytutu: liczby (liczone z tabeli pracowników) i karty zakładów.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import { zaklady, pracownicy, rangaStopnia } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const lista = await zaklady();
+const osoby = await pracownicy();
+const kadra = osoby.filter((o) => o.data.grupa === 'nauczyciel');
+const ile = (r: number) => kadra.filter((o) => rangaStopnia(o.data.stopien) === r).length;
+const liczby = [
+  { n: ile(0), l: T('profesorów', 'full professors') },
+  { n: ile(1), l: T('doktorów habilitowanych', 'associate professors (dr hab.)') },
+  { n: ile(2), l: T('doktorów', 'assistant professors (PhD)') },
+  { n: osoby.filter((o) => o.data.grupa === 'doktorant').length, l: T('doktorantów', 'PhD students') },
+];
+const naglowek = T('Struktura i zakłady', 'Structure and departments');
+const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracownia Dydaktyki i Popularyzacji Matematyki.', 'The Institute consists of eight research departments and the Mathematics Education and Outreach Unit.');
+---
+<Baza tytul={naglowek} opis={lead}>
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: naglowek }]} />
+  <div class="wrap" style="padding-top:32px;padding-bottom:64px">
+    <div class="stats">
+      {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
+    </div>
+
+    <div class="dept-grid">
+      {lista.map((z) => {
+        const n = osoby.filter((o) => o.data.zaklad === z.id).length;
+        const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
+        return (
+          <a class="dept" href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>
+            <span class="t">{wybierz(z.data, 'nazwa', lang)}</span>
+            {z.data.opis && <span class="o">{wybierz(z.data, 'opis', lang)}</span>}
+            <span class="tags">{obszary.slice(0, 4).map((o) => <span class="badge">{o}</span>)}</span>
+            <span class="f">
+              {z.data.kierownik && <span><span class="muted">{T('Kierownik', 'Head')}:</span> {z.data.kierownik}</span>}
+              <span class="muted">{n} {T('osób', 'people')}</span>
+            </span>
+          </a>
+        );
+      })}
+    </div>
+
+    <p class="muted" style="margin-top:28px;font-size:15px">
+      {T('Obszary badań Instytutu: podstawy matematyki, teoria modeli, algebra, kombinatoryka, teoria liczb, geometria i topologia różniczkowa, geometryczna teoria grup, równania różniczkowe, analiza harmoniczna, teoria miary, analiza funkcjonalna, teoria prawdopodobieństwa, procesy stochastyczne, statystyka matematyczna.',
+         'Research areas of the Institute: foundations of mathematics, model theory, algebra, combinatorics, number theory, differential geometry and topology, geometric group theory, differential equations, harmonic analysis, measure theory, functional analysis, probability theory, stochastic processes, mathematical statistics.')}
+    </p>
+  </div>
+</Baza>

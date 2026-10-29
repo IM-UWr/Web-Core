@@ -1,0 +1,95 @@
+---
+// Automatyczne ogłoszenie o zamianie dni: /aktualnosci/zamiana-dni-RRRR-MM-DD (EN /en/aktualnosci/…).
+// Tekst z szablonu w src/data/kolory-dni.json (pole „aktualnosci”, Pages CMS → Kalendarz zajęć), dane z tej samej zamiany.
+// Na listach aktualności pozycja jest tylko w oknie widoczności (od N dni roboczych przed zamianą do dnia zamiany);
+// sama strona istnieje zawsze (stare linki działają), poza oknem bez indeksowania i bez wyszukiwarki strony.
+import Baza from '../layouts/Baza.astro';
+import Wstecz from '../components/Wstecz.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { short, longWithDay, today, type Lang } from '../lib/daty';
+import { renderMarkdown } from '../lib/markdown';
+import { aktualnoscZamiany, nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
+
+interface Props { data: string; lang: Lang }
+const { data, lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const dzis = today();
+const a = aktualnoscZamiany(data, lang, dzis)!;
+const d = a.dzien;
+const html = await renderMarkdown(a.tresc);
+const minela = dzis > a.data;
+const dla = ['studenci', 'pracownicy'];
+const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dni', 'day-swaps')}`;
+---
+<Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie}>
+  {!a.wOknie && <meta slot="head" name="robots" content="noindex" />}
+  <div class="wrap crumbs-inline">
+    <Wstecz etykieta={t(lang, 'wszystkieAktualnosci')} adres="/aktualnosci" lang={lang} />
+  </div>
+
+  <div class="wrap layout zd" style="padding-top:16px">
+    <article class="main">
+      <header class="article-head">
+        <div class="news-meta">
+          <span class="badge badge-ogloszenie">{RODZAJE.ogloszenie[lang]}</span>
+          <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od)}</time></span>
+          <span>· {t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>
+        </div>
+        <h1>{a.tytul}</h1>
+      </header>
+
+      {minela && <p class="notice">{T('Ta zamiana dni już się odbyła.', 'This day swap has already taken place.')}</p>}
+
+      <section class="zd-dzien" data-kolor={d.kolor ?? 'brak'} aria-label={T('Zamiana dni', 'Day swap')}>
+        <span class="zd-skrot" aria-hidden="true">{SKROT_PLANU[lang][d.plan ?? d.dzienTygodnia]}</span>
+        <div>
+          <p class="zd-data">{wielka(longWithDay(a.data, lang))}</p>
+          <p class="zd-plan">{wielka(opisZamiany(d.plan ?? d.dzienTygodnia, lang))}</p>
+          {d.kolor && <p class="zd-kolor">{T(`Dzień ${NAZWA_KOLORU.pl[d.kolor]}`, `${wielka(NAZWA_KOLORU.en[d.kolor])} day`)} · {nazwaSemestru(a.semestr, lang)}</p>}
+        </div>
+      </section>
+
+      <div class="prose">
+        <Fragment set:html={html} />
+      </div>
+
+      <p><a class="btn" href={kalendarz}><Ikona nazwa="kalendarz" rozmiar={18} />{T('Kalendarz zajęć — rok akademicki', 'Class calendar — academic year')}</a></p>
+    </article>
+
+    <aside class="side" data-pagefind-ignore>
+      <div class="side-box">
+        <h2>{T('Zobacz też', 'See also')}</h2>
+        <a class="link-arrow" href={u(wJezyku('/studia/rok-akademicki', lang))}><Ikona nazwa="kalendarz" rozmiar={16} />{T('Rok akademicki i kolory dni', 'Academic year and day colours')}</a>
+        <a class="link-arrow" href={u(wJezyku('/studia/plan-zajec', lang))}><Ikona nazwa="zegar" rozmiar={16} />{T('Plan zajęć', 'Timetable')}</a>
+      </div>
+      <a class="link-arrow" href={u(wJezyku('/aktualnosci', lang))}><Ikona nazwa="wstecz" rozmiar={16} />{t(lang, 'wszystkieAktualnosci')}</a>
+    </aside>
+  </div>
+</Baza>
+
+<style>
+  .zd {
+    --kd-n: #a3ebf8; --kd-n-ink: #053947; --kd-n-mocny: #0e9cbc;
+    --kd-p: #ffd699; --kd-p-ink: #4a2900; --kd-p-mocny: #e0841b;
+  }
+  :global(:root[data-theme='dark']) .zd {
+    --kd-n: #0d4a58; --kd-n-ink: #cdf5fe; --kd-n-mocny: #3cc8e6;
+    --kd-p: #5c3708; --kd-p-ink: #ffe1b3; --kd-p-mocny: #f2a33a;
+  }
+  .zd-dzien { display: flex; align-items: center; gap: 20px; margin: 0 0 24px; padding: 20px 22px; border-radius: var(--radius-l); border: 2px solid var(--line); background: var(--surface); color: var(--ink); max-width: 760px; }
+  .zd-dzien[data-kolor='niebieski'] { background: var(--kd-n); border-color: var(--kd-n-mocny); color: var(--kd-n-ink); }
+  .zd-dzien[data-kolor='pomaranczowy'] { background: var(--kd-p); border-color: var(--kd-p-mocny); color: var(--kd-p-ink); }
+  .zd-skrot { flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--bg); font-size: 24px; font-weight: 900; letter-spacing: .02em; line-height: 1; }
+  [data-kolor='niebieski'] > .zd-skrot { background: var(--kd-n-mocny); color: #04222b; }
+  [data-kolor='pomaranczowy'] > .zd-skrot { background: var(--kd-p-mocny); color: #2b1700; }
+  .zd-data { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .zd-plan { margin: 2px 0 0; font-size: clamp(22px, 3.4vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .zd-kolor { margin: 4px 0 0; font-size: 15px; font-weight: 600; }
+  @media (max-width: 520px) {
+    .zd-dzien { align-items: flex-start; gap: 14px; padding: 16px; }
+    .zd-skrot { width: 56px; height: 56px; font-size: 19px; }
+  }
+</style>

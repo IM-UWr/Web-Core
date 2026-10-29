@@ -1,0 +1,12 @@
+---
+// Podstrona pozycji „Warto wiedzieć” (EN) — tylko dla pozycji z treścią.
+import { getCollection } from 'astro:content';
+import WartoWiedziecWpis from '../../../views/WartoWiedziecWpis.astro';
+import { slugOf } from '../../../lib/tresci';
+export async function getStaticPaths() {
+  const wpisy = (await getCollection('warto_wiedziec')).filter((w) => w.body?.trim());
+  return wpisy.map((wpis) => ({ params: { slug: slugOf(wpis.id) }, props: { wpis } }));
+}
+const { wpis } = Astro.props;
+---
+<WartoWiedziecWpis wpis={wpis} lang="en" />

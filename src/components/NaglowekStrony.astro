@@ -1,0 +1,66 @@
+---
+// Pasek tytułu podstrony: link „← poziom wyżej”, tytuł, opis i motyw graficzny działu.
+// Wygląd: Ustawienia → „Nagłówki podstron” (ustawienia.naglowki_podstron) — style w src/styles/tlo.css.
+import Wstecz from './Wstecz.astro';
+import { t } from '../lib/i18n';
+import { u, stripBase } from '../lib/url';
+import type { Lang } from '../lib/daty';
+import ustawienia from '../data/ustawienia.json';
+
+// Nad tytułem: link „← poziom wyżej”. Cel: `wstecz` albo ostatni z `okruszki`, który ma adres, albo strona główna.
+// nadtytul: mała etykieta nad tytułem (np. „Studia I i II stopnia” na stronie kierunku).
+interface Props { tytul: string; lead?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string }; nadtytul?: string }
+const { tytul, lead, lang, okruszki = [], wstecz, nadtytul } = Astro.props;
+const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
+const cel = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
+
+// Dział strony (po pierwszym członie adresu, bez /en) — od niego zależy motyw graficzny i zdjęcie.
+const DZIALY: Record<string, string> = {
+  instytut: 'instytut', pracownicy: 'instytut', 'warto-wiedziec': 'instytut',
+  nauka: 'nauka', seminaria: 'nauka', 'obrony-doktorskie': 'nauka', kalendarz: 'nauka',
+  studia: 'studia', aktualnosci: 'aktualnosci', popularyzacja: 'popularyzacja',
+};
+const czlon = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';
+const dzial = DZIALY[czlon] ?? 'inne';
+
+// Wariant: motyw (rysunek działu) | zdjecie (zdjęcie działu, bez zdjęcia — rysunek) | granat (ciemny pas) | prosty (jak dawniej).
+// Zdjęcia działów: naglowki_podstron.zdjecia.<dział> = { zdjecie, kadr }. Bez pola w ustawieniach — wartości domyślne poniżej.
+type Zdjecie = { zdjecie?: string; kadr?: string };
+const DOMYSLNE: { wariant: string; zdjecia: Record<string, Zdjecie> } = {
+  wariant: 'granat',
+  zdjecia: {
+    instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: 'center 45%' },
+    nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: 'center 40%' },
+    studia: { zdjecie: '/pliki/naglowki/studia.jpg', kadr: 'center 35%' },
+    aktualnosci: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: 'center 40%' },
+    popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: 'center 50%' },
+  },
+};
+const ust = ((ustawienia as any).naglowki_podstron ?? {}) as Partial<typeof DOMYSLNE>;
+const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : DOMYSLNE.wariant;
+const foto = wariant === 'zdjecie' || wariant === 'granat' ? (ust.zdjecia ?? DOMYSLNE.zdjecia)[dzial] : undefined;
+const zdjecie = foto?.zdjecie ? u(foto.zdjecie) : undefined;
+const ozdobny = wariant !== 'prosty';
+// Granatowy pas na samej górze strony: nagłówek strony (menu) jest u góry przezroczysty i leży na pasie,
+// jak na stronie głównej na zdjęciu (klasa .hdr-foto, style w global.css). Skrypt działa od razu przy wczytywaniu,
+// zanim pas się narysuje, żeby nic nie przeskakiwało; bez JS — zwykły biały nagłówek nad pasem.
+const naPasie = wariant === 'granat'
+  ? "(function(s){var p=s.parentElement,h=document.querySelector('.hdr');if(h&&p&&!p.previousElementSibling&&p.parentElement&&p.parentElement.id==='tresc'&&(function(n){while(n&&/^(SCRIPT|TEMPLATE|STYLE|LINK)$/.test(n.tagName))n=n.nextElementSibling;return n===p.parentElement;})(h.nextElementSibling))h.classList.add('hdr-foto');})(document.currentScript)"
+  : '';
+---
+<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto']} data-dzial={ozdobny ? dzial : undefined}>
+  {naPasie && <script is:inline set:html={naPasie} />}
+  <div class="wrap">
+    {ozdobny && <span class="ph-m" aria-hidden="true"></span>}
+    {zdjecie && (
+      <figure class="ph-foto" aria-hidden="true">
+        <img src={zdjecie} alt="" decoding="async" style={foto?.kadr ? `object-position:${foto.kadr}` : undefined} />
+      </figure>
+    )}
+    <Wstecz etykieta={cel.etykieta} adres={cel.adres} lang={lang} />
+    {nadtytul && <p class="eyebrow">{nadtytul}</p>}
+    <h1>{tytul}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+</div>

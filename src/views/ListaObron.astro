@@ -1,0 +1,43 @@
+---
+// Obrony doktorskie: nadchodzące i odbyte.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import ustawienia from '../data/ustawienia.json';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { t, wJezyku } from '../lib/i18n';
+import { dayNum, monthShort, longWithDay, short, type Lang } from '../lib/daty';
+import { obrony, slugOf, trwaLubBedzie, type Obrona } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const wszystkie = await obrony();
+const przyszle = wszystkie.filter((o) => trwaLubBedzie({ poczatek: o.data.termin })).reverse();
+const odbyte = wszystkie.filter((o) => !trwaLubBedzie({ poczatek: o.data.termin }));
+const lead = lang === 'en'
+  ? 'Public defences of doctoral theses in mathematics: notices, theses, abstracts and reviews.'
+  : 'Publiczne obrony rozpraw doktorskich z matematyki: zawiadomienia, rozprawy, streszczenia i recenzje.';
+---
+<Baza tytul={t(lang, 'obrony')} opis={lead}>
+  <NaglowekStrony tytul={t(lang, 'obrony')} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} />
+  <div class="wrap layout">
+    <div class="main">
+    {[{ h: t(lang, 'nadchodzaceObrony'), lista: przyszle }, { h: t(lang, 'odbyteObrony'), lista: odbyte }].map(({ h, lista }) => lista.length > 0 && (
+      <section style="margin-bottom:36px">
+        <h2 style="font-size:24px;margin:0 0 6px">{h}</h2>
+        {lista.map((o: Obrona) => (
+          <a class="row-item" href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>
+            <span class="datebox small" aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
+            <span class="body">
+              <span class="news-meta"><span>{longWithDay(o.data.termin, lang)}</span>{o.data.miejsce && <span>· {o.data.miejsce}</span>}</span>
+              <span class="t" style="font-size:19px">{o.data.kandydat}</span>
+              <span class="x" lang="en">{o.data.tytul_rozprawy}</span>
+            </span>
+          </a>
+        ))}
+      </section>
+    ))}
+    <p class="muted">{t(lang, 'archiwumObron')} <a href={`${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`}>{t(lang, 'archiwum')}</a>.</p>
+    </div>
+  </div>
+</Baza>

@@ -1,0 +1,311 @@
+---
+// Strona działu „Instytut” (/instytut, /en/instytut): wstęp, liczby, kafelki z menu „Instytut”,
+// zakłady w skrócie, ostatnie sukcesy, kontakt. Teksty edytowalne w src/data/dzialy/instytut.json.
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import dzial from '../data/dzialy/instytut.json';
+import ustawienia from '../data/ustawienia.json';
+import { u, isExternal } from '../lib/url';
+import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
+import { long, type Lang } from '../lib/daty';
+import { menuGlowne } from '../lib/menu';
+import { zTytulem } from '../lib/osoby';
+import { zaklady, pracownicy, seminaria, aktualnosci, slugOf } from '../lib/tresci';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+
+// Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta.
+const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
+  if (lang === 'en') return n === 1 ? en[0] : en[1];
+  if (n === 1) return pl[0];
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
+};
+
+const listaZakladow = await zaklady();
+const osoby = await pracownicy();
+const ileNauczycieli = osoby.filter((o) => o.data.grupa === 'nauczyciel').length;
+const ileDoktorantow = osoby.filter((o) => o.data.grupa === 'doktorant').length;
+const liczby = [
+  { n: ileNauczycieli, l: odm(ileNauczycieli, ['nauczyciel akademicki', 'nauczycieli akademickich', 'nauczycieli akademickich'], ['academic staff member', 'academic staff']) },
+  { n: ileDoktorantow, l: odm(ileDoktorantow, ['doktorant', 'doktorantów', 'doktorantów'], ['PhD student', 'PhD students']) },
+  { n: listaZakladow.length, l: odm(listaZakladow.length, ['zakład lub pracownia', 'zakłady i pracownie', 'zakładów i pracowni'], ['department or unit', 'departments and units']) },
+].filter((x) => x.n > 0);
+
+// Kafelki: grupy i linki z menu „Instytut” (nowy link w menu sam pojawi się tutaj).
+const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Instytut' || m.etykieta_en === 'Institute');
+const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
+
+// Kierownik zakładu z tytułem ze spisu pracowników (gdy jest), inaczej tak jak wpisano.
+const kierownik = (imie?: string) => {
+  if (!imie) return undefined;
+  const o = osoby.find((p) => p.data.imie_nazwisko === imie);
+  return o ? zTytulem(o.data.stopien, o.data.imie_nazwisko) : imie;
+};
+
+const sukcesy = (await aktualnosci()).filter((a) => a.data.rodzaj === 'sukces').slice(0, 3);
+
+const k = ustawienia.kontakt;
+const godziny = wybierz(dzial, 'kontakt_godziny', lang);
+const mapa = k.adres ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Instytut Matematyczny Uniwersytetu Wrocławskiego, ${k.adres}`)}` : undefined;
+// Mapa Google osadzana dopiero po kliknięciu (bez cookies Google do czasu zgody — patrz Polityka prywatności)
+const mapaEmbed = k.adres ? `https://www.google.com/maps?q=${encodeURIComponent(`Instytut Matematyczny Uniwersytetu Wrocławskiego, ${k.adres}`)}&output=embed&hl=${lang}` : undefined;
+
+const naglowek = T('Instytut', 'Institute');
+const lead = wybierz(dzial, 'wstep', lang);
+const zakladyOpis = wybierz(dzial, 'zaklady_opis', lang);
+const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
+---
+<Baza tytul={naglowek} opis={lead || undefined}>
+  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w nagłówku, „W tym dziale” w ramkach, zakłady w zwartych kartach,
+       sukcesy w ramce, kontakt w ramce (osobny blok .tylko-telefon, linki pod adresem) i pod nim mapa. */}
+  <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
+  <div class="wrap dz-wrap">
+    {liczby.length > 0 && (
+      <div class="stats tylko-komputer">
+        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
+      </div>
+    )}
+
+    {grupy.length > 0 && (
+      <section class="zsec" aria-labelledby="w-dziale">
+        <h2 id="w-dziale">{T('W tym dziale', 'In this section')}</h2>
+        <div class="dz-groups">
+          {grupy.map((g) => (
+            <div class="dz-g">
+              <h3>{wybierz(g, 'nazwa', lang)}</h3>
+              <div class="tiles dz-tiles">
+                {g.linki.map((l) => (
+                  <a class="tile dz-tile" href={href(l.adres)}>
+                    <span>{wybierz(l, 'etykieta', lang)}</span>
+                    <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={20} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {listaZakladow.length > 0 && (
+      <section class="zsec dz-karty" aria-labelledby="zaklady">
+        <h2 id="zaklady">{T('Zakłady', 'Departments')}</h2>
+        <a class="pt-all dz-head-link tylko-telefon" data-pagefind-ignore href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        {zakladyOpis && <p class="dz-intro">{zakladyOpis}</p>}
+        <div class="spec-grid">
+          {listaZakladow.map((z) => {
+            const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
+            const kier = kierownik(z.data.kierownik);
+            return (
+              <article class="spec spec-link">
+                <h3><a href={href(`/instytut/zaklady/${z.id}`)}>{wybierz(z.data, 'nazwa', lang)}</a></h3>
+                {obszary.length > 0 && <p class="dz-tags">{obszary.slice(0, 4).map((o) => <span class="badge">{o}</span>)}</p>}
+                {kier && <p class="foot"><span><span class="muted">{T('Kierownik', 'Head')}:</span> {kier}</span></p>}
+              </article>
+            );
+          })}
+        </div>
+        <p class="dz-more tylko-komputer">
+          <a class="link-arrow" href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+        </p>
+      </section>
+    )}
+
+    {sukcesy.length > 0 && (
+      <section class="zsec dz-ramka-sek dz-sukcesy" aria-labelledby="sukcesy">
+        <h2 id="sukcesy">{T('Ostatnie sukcesy', 'Recent achievements')}</h2>
+        <a class="pt-all dz-head-link tylko-telefon" data-pagefind-ignore href={href('/nauka/sukcesy')}>{T('Wszystkie sukcesy', 'All achievements')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        <span class="dz-kreska tylko-telefon" aria-hidden="true"></span>
+        {sukcesyOpis && <p class="dz-intro">{sukcesyOpis}</p>}
+        <div class="spec-grid">
+          {sukcesy.map((a) => {
+            const zajawka = (lang === 'en' && a.data.zajawka_en) || a.data.zajawka;
+            return (
+              <article class="spec spec-link">
+                <div class="news-meta">
+                  <span class="badge badge-sukces">{RODZAJE.sukces[lang]}</span>
+                  <time datetime={a.data.data.slice(0, 10)}>{long(a.data.data, lang, false)}</time>
+                </div>
+                <h3><a href={href(`/aktualnosci/${slugOf(a.id)}`)}>{(lang === 'en' && a.data.tytul_en) || a.data.tytul}</a></h3>
+                {zajawka && <p>{zajawka}</p>}
+              </article>
+            );
+          })}
+        </div>
+        <p class="dz-more tylko-komputer">
+          <a class="link-arrow" href={href('/nauka/sukcesy')}>{T('Wszystkie sukcesy', 'All achievements')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+        </p>
+      </section>
+    )}
+
+    <section class="zsec dz-kontakt-sek" aria-labelledby="kontakt">
+      <h2 id="kontakt" class="tylko-komputer">{T('Kontakt i dojazd', 'Contact and getting here')}</h2>
+      <div class="pt-box tylko-telefon" data-pagefind-ignore>
+        <div class="pt-h"><h2 id="kontakt-tel">{T('Kontakt i dojazd', 'Contact and getting here')}</h2></div>
+        <p class="dz-name">{t(lang, 'instytut')}, {t(lang, 'uwr')}</p>
+        <ul class="dz-kontakt">
+          {k.adres && <li><Ikona nazwa="pinezka" rozmiar={18} /><span>{k.adres}</span></li>}
+          {k.telefon && <li><Ikona nazwa="telefon" rozmiar={18} /><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></li>}
+          {k.email && <li><Ikona nazwa="mail" rozmiar={18} /><a href={`mailto:${k.email}`}>{k.email}</a></li>}
+          {godziny && <li><Ikona nazwa="zegar" rozmiar={18} /><span>{godziny}</span></li>}
+        </ul>
+        <p class="pt-stopka">
+          <a class="pt-all" href={href('/instytut/kontakt')}>{T('Wszystkie dane kontaktowe', 'Full contact details')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+          {mapa && <a class="pt-all" href={mapa}>{T('Pokaż na mapie', 'Show on map')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a>}
+        </p>
+      </div>
+      <div class="dz-kontakt-uklad">
+      <div class="dz-card tylko-komputer">
+        <p class="dz-name">{t(lang, 'instytut')}, {t(lang, 'uwr')}</p>
+        <ul class="dz-kontakt">
+          {k.adres && <li><Ikona nazwa="pinezka" rozmiar={20} /><span>{k.adres}</span></li>}
+          {k.telefon && <li><Ikona nazwa="telefon" rozmiar={20} /><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></li>}
+          {k.email && <li><Ikona nazwa="mail" rozmiar={20} /><a href={`mailto:${k.email}`}>{k.email}</a></li>}
+          {godziny && <li><Ikona nazwa="zegar" rozmiar={20} /><span>{godziny}</span></li>}
+        </ul>
+      </div>
+      {mapaEmbed && (
+        <div class="dz-mapa" data-mapa={mapaEmbed} data-tytul={T('Mapa: Instytut Matematyczny, pl. Grunwaldzki 2, Wrocław', 'Map: Mathematical Institute, pl. Grunwaldzki 2, Wrocław')}>
+          <button type="button" class="dz-mapa-btn" data-mapa-pokaz>
+            <Ikona nazwa="pinezka" rozmiar={30} />
+            <span class="t">{T('Pokaż mapę Google', 'Show Google map')}</span>
+            <span class="s">{T('Mapa załaduje się z serwisu Google Maps — Google może zapisać pliki cookies.', 'The map loads from Google Maps — Google may set cookies.')}</span>
+          </button>
+        </div>
+      )}
+      </div>
+      <p class="dz-more tylko-komputer">
+        <a class="link-arrow" href={href('/instytut/kontakt')}>{T('Wszystkie dane kontaktowe', 'Full contact details')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+        {mapa && <a class="link-arrow" href={mapa}>{T('Pokaż na mapie', 'Show on map')}<Ikona nazwa="zewnetrzny" rozmiar={16} /></a>}
+      </p>
+    </section>
+  </div>
+</Baza>
+
+<style>
+  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  .dz-intro { margin: -4px 0 16px; max-width: 760px; color: var(--muted); font-size: 16px; line-height: 1.6; }
+  .dz-more { display: flex; flex-wrap: wrap; gap: 0 24px; margin: 10px 0 0; }
+  .dz-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px 16px; }
+  .dz-g h3 { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
+  .dz-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
+  .dz-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .dz-kontakt-uklad { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; align-items: stretch; }
+  .dz-card { padding: 20px 22px; border-radius: var(--radius-l); background: var(--surface); }
+  .dz-mapa { position: relative; min-height: 300px; border-radius: var(--radius-l); overflow: hidden; background: var(--surface); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; }
+  .dz-mapa :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .dz-mapa-btn { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: center; cursor: pointer; }
+  .dz-mapa-btn :global(svg) { color: var(--primary); }
+  :global(:root[data-theme='dark']) .dz-mapa-btn :global(svg) { color: var(--accent); }
+  .dz-mapa-btn .t { padding: 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 700; box-shadow: var(--shadow); }
+  .dz-mapa-btn:hover .t { background: var(--primary); color: var(--primary-ink); }
+  .dz-mapa-btn .s { max-width: 320px; font-size: 13px; color: var(--muted); }
+  .dz-name { margin: 0 0 12px; font-weight: 800; color: var(--ink); }
+  .dz-kontakt { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; font-size: 17px; }
+  .dz-kontakt li { display: flex; align-items: flex-start; gap: 12px; }
+  .dz-kontakt li :global(svg) { flex: 0 0 auto; margin-top: 2px; color: var(--primary); }
+  :global(:root[data-theme='dark']) .dz-kontakt li :global(svg) { color: var(--accent); }
+
+  /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Nauka”) ---------- */
+  @media (max-width: 760px) {
+    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
+    /* „W tym dziale”: każda grupa w ramce, linki jako wiersze (napis z lewej, strzałka z prawej) */
+    .dz-groups { display: flex; flex-direction: column; gap: 12px; }
+    .dz-g { padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+    .dz-g h3, .dz-ramka-sek > h2 { margin: 0 0 4px; padding-bottom: 7px; border-bottom: 2px solid var(--ink); font-size: 18px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; text-transform: none; color: var(--ink); }
+    .dz-g h3::before, .dz-ramka-sek > h2::before { content: ''; display: inline-block; width: 4px; height: .85em; margin-right: 9px; border-radius: 2px; background: var(--accent); vertical-align: -.05em; }
+    :global(:root[data-theme='dark']) .dz-g h3 { border-bottom-color: var(--line); }
+    .dz-tiles { display: block; }
+    .dz-tile { gap: 10px; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.3; }
+    .dz-tile + .dz-tile { min-height: 41px; border-top: 1px solid var(--line); }
+    .dz-tile:hover { background: var(--tint); }
+    .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
+    :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
+    /* zakłady: tytuł i link w jednym wierszu, zwarte karty (hasła jako tekst, kierownik pod spodem) */
+    .dz-karty { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 20px; }
+    .dz-karty > * { flex: 1 1 100%; min-width: 0; }
+    .dz-karty > h2 { flex: 0 1 auto; margin: 0 0 8px; }
+    .dz-karty > .dz-head-link, .dz-ramka-sek > .dz-head-link { flex: 0 0 auto; }
+    .dz-karty > .dz-head-link { margin-bottom: 8px; }
+    .dz-intro { margin: -2px 0 10px; max-width: 860px; font-size: 15px; line-height: 1.5; }
+    .dz-karty .spec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .dz-karty .spec { gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); line-height: 1.45; }
+    .dz-karty .spec-link:hover, .dz-karty .spec-link:focus-within { box-shadow: none; transform: none; }
+    .dz-karty .spec h3 { font-size: 16px; line-height: 1.3; }
+    .dz-tags { display: block; margin: 2px 0 0; font-size: 14px; line-height: 1.45; color: var(--text); }
+    .dz-tags .badge { display: inline; padding: 0; border-radius: 0; background: none; color: inherit; font-size: inherit; font-weight: 400; line-height: inherit; }
+    .dz-tags .badge + .badge::before { content: ' · '; color: var(--muted); }
+    /* (jak w wariancie: akapit stopki karty zachowuje zwykły odstęp akapitu pod spodem) */
+    .dz-karty .spec .foot { margin-bottom: 1em; }
+    .dz-karty .spec .foot { margin-top: auto; padding-top: 6px; border-top: 0; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+    .dz-karty .spec .foot > span { color: var(--text); font-weight: 600; }
+    .dz-karty .spec .foot .muted { font-weight: 400; }
+    /* sukcesy: sekcja w ramce (kreska sekcji nad nią zostaje); ramka narysowana pod treścią (::after), wpisy jako wiersze */
+    .zsec.dz-ramka-sek { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 14px; margin-bottom: 12px; padding: 27px 15px 9px; }
+    .zsec.dz-ramka-sek::after { content: ''; position: absolute; inset: 16px 0 0; z-index: -1; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); pointer-events: none; }
+    .dz-ramka-sek > * { flex: 1 1 100%; min-width: 0; }
+    .dz-ramka-sek > h2 { flex: 0 1 auto; margin: 0; padding-bottom: 0; border-bottom: 0; }
+    /* kreska pod tytułem i linkiem (osobny element, bo tytuł musi zostać bezpośrednio w sekcji) */
+    .dz-kreska { display: block; height: 2px; margin: 7px 0 4px; background: var(--ink); }
+    :global(:root[data-theme='dark']) .dz-kreska { background: var(--line); }
+    .dz-ramka-sek .dz-intro { margin: 6px 0 4px; font-size: 14px; line-height: 1.45; }
+    .dz-sukcesy .spec-grid { display: block; }
+    .dz-sukcesy .spec { gap: 1px; min-height: 40px; padding: 8px 2px; border: 0; border-radius: 0; background: transparent; line-height: 1.45; }
+    .dz-sukcesy .spec + .spec { border-top: 1px solid var(--line); }
+    .dz-sukcesy .spec-link:hover, .dz-sukcesy .spec-link:focus-within { background: var(--surface); box-shadow: none; transform: none; }
+    .dz-sukcesy .news-meta { font-size: 12.5px; font-weight: 800; letter-spacing: .02em; line-height: 1.35; color: var(--primary); }
+    :global(:root[data-theme='dark']) .dz-sukcesy .news-meta { color: var(--accent); }
+    .dz-sukcesy .news-meta .badge { display: none; }
+    .dz-sukcesy .spec h3 { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.35; }
+    .dz-sukcesy .spec p { font-size: 14px; line-height: 1.45; color: var(--muted); }
+    /* kontakt: ramka (blok tylko na telefon) i pod nią mapa; kreska sekcji tylko nad sukcesami */
+    .zsec.dz-kontakt-sek { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; padding-top: 0; border-top: 0; }
+    .zsec.dz-kontakt-sek::before { content: none; }
+    .dz-kontakt-uklad { display: block; }
+    .dz-mapa { min-height: 230px; border: 1px solid var(--line); border-radius: var(--radius); }
+    .dz-mapa-btn { padding: 18px; }
+    .dz-mapa-btn .t { padding: 9px 16px; }
+    .dz-mapa-btn .s { max-width: 300px; }
+    .dz-name { margin: 8px 0 6px; }
+    .dz-kontakt { gap: 6px; font-size: 15px; }
+    .dz-kontakt li { align-items: center; gap: 10px; }
+    .dz-kontakt a { display: inline-flex; align-items: center; min-height: 40px; }
+  }
+  @media (max-width: 560px) {
+    .dz-karty .spec-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script>
+  // Mapa Google: ładowana dopiero po kliknięciu; wybór zapamiętany w tej przeglądarce
+  const pokaz = (box: HTMLElement) => {
+    const f = document.createElement('iframe');
+    f.src = box.dataset.mapa || '';
+    f.title = box.dataset.tytul || 'Mapa';
+    f.loading = 'lazy';
+    f.referrerPolicy = 'no-referrer-when-downgrade';
+    f.allowFullscreen = true;
+    box.replaceChildren(f);
+  };
+  document.querySelectorAll<HTMLElement>('[data-mapa]').forEach((box) => {
+    let zgoda = false;
+    try { zgoda = localStorage.getItem('mapa-google') === '1'; } catch (e) {}
+    if (zgoda) pokaz(box);
+    box.querySelector('[data-mapa-pokaz]')?.addEventListener('click', () => {
+      try { localStorage.setItem('mapa-google', '1'); } catch (e) {}
+      pokaz(box);
+    });
+  });
+</script>

@@ -1,0 +1,7 @@
+---
+import Zaklad from '../../../../views/Zaklad.astro';
+import { sciezkiZakladow } from '../../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiZakladow(); }
+const { zaklad } = Astro.props;
+---
+<Zaklad zaklad={zaklad} lang="en" />

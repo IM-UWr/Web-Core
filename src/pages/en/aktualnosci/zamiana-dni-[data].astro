@@ -1,0 +1,7 @@
+---
+import AktualnoscZamianaDni from '../../../views/AktualnoscZamianaDni.astro';
+import { datyZamian } from '../../../lib/kolory-dni';
+export function getStaticPaths() { return datyZamian().map((data) => ({ params: { data } })); }
+const { data } = Astro.params;
+---
+<AktualnoscZamianaDni data={data!} lang="en" />

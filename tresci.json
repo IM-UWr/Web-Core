@@ -1,0 +1,27 @@
+{
+  "_opis": "Repozytoria z treściami strony (organizacja IM-UWr). Przed budowaniem skrypty/pobierz_tresci.py nakłada ich katalogi src/ i public/ na Web-Core. Nowe repozytorium (np. nowe seminarium) dopisz tutaj.",
+  "organizacja": "IM-UWr",
+  "repozytoria": [
+    "Web-Aktualnosci",
+    "Web-Pracownicy",
+    "Web-Studia",
+    "Web-Instytut",
+    "Web-Nauka",
+    "Web-Popularyzacja",
+    "Web-Ustawienia",
+    "Web-Spec-Analiza-Danych",
+    "Web-Spec-Aktuarialno-Finansowa",
+    "Web-Spec-Nauczycielska",
+    "Web-Spec-Stosowana",
+    "Web-Spec-Teoretyczna",
+    "Web-Sem-Analiza-Harmoniczna",
+    "Web-Sem-Dydaktyka",
+    "Web-Sem-Dyskretna-Analiza-Harmoniczna",
+    "Web-Sem-Geometria",
+    "Web-Sem-Prawdopodobienstwo",
+    "Web-Sem-Rownania-Rozniczkowe",
+    "Web-Sem-Statystyka",
+    "Web-Sem-Teoria-Modeli",
+    "Web-Sem-Topologia"
+  ]
+}

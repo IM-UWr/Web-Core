@@ -1,0 +1,7 @@
+---
+import Konferencja from '../../../views/Konferencja.astro';
+import { sciezkiKonferencji } from '../../../lib/sciezki';
+export async function getStaticPaths() { return sciezkiKonferencji(); }
+const { konferencja } = Astro.props;
+---
+<Konferencja konferencja={konferencja} lang="pl" />

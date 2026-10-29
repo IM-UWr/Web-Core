@@ -1,0 +1,99 @@
+/* ==========================================================================
+   Plan zajęć (/studia/plan-zajec) — style tylko tej strony (import w src/views/PlanZajec.astro).
+   Układ jak dawny planZ.php: sekcje, a w nich przedmioty z tabelą grup. Kolumny wszystkich tabel
+   mają te same szerokości (table-layout: fixed + <colgroup>), więc tworzą jedną wspólną siatkę
+   z nagłówkiem kolumn na górze semestru. Na telefonie wiersz tabeli zamienia się w kartę.
+   Semestry przełącza PrzelacznikSemestrow.astro; prawy pasek (.pz-bok) to spis sekcji aktywnego semestru.
+   ========================================================================== */
+
+/* ---------- układ: plan + prawy pasek ze spisem sekcji ---------- */
+.plan-strona > .side { flex: 1 1 250px; max-width: 280px; }
+.pz-spis { display: contents; } /* spis przyklejony (sticky) względem całego paska */
+.plan-strona .toc-side { max-height: calc(100vh - var(--hdr-h, 71px) - 32px); overflow-y: auto; overscroll-behavior: contain; }
+.js .pz-semestr[data-ps-panel] { margin-top: 0; padding-top: 0; border-top: 0; }
+/* tabela potrzebuje szerokości: pasek tylko na szerokich ekranach, niżej spis zwinięty nad planem */
+@media (max-width: 1239px) {
+  .plan-strona > .side { display: none; }
+  .plan-strona .toc-top { display: block; }
+}
+/* bez JavaScriptu (wszystkie semestry naraz): spis zwinięty w każdym semestrze zamiast paska */
+html:not(.js) .plan-strona > .side { display: none; }
+html:not(.js) .plan-strona .toc-top { display: block; }
+.plan-strona .toc-top { margin: 0 0 4px; }
+.pz-sekcja h3 { scroll-margin-top: 44px; } /* pod przyklejonym nagłówkiem kolumn (html ma już scroll-padding na nagłówek strony) */
+
+.pz-stan { padding: 16px 18px; border-radius: var(--radius); background: var(--surface); color: var(--muted); font-weight: 600; }
+.pz-semestr { scroll-margin-top: calc(var(--hdr-h, 71px) + 12px); }
+.pz-semestr + .pz-semestr { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); }
+.pz-semestr > h2 { margin: 8px 0 6px; font-size: clamp(22px, 3vw, 28px); font-weight: 800; }
+.pz-data { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.pz-uwagi-ogolne { margin: 0 0 18px; padding-left: 20px; font-size: 15px; color: var(--text); }
+.pz-zrodlo { margin-top: 40px; font-size: 14px; color: var(--muted); }
+
+.pz-sekcja h3 { margin: 30px 0 4px; padding: 10px 14px; border-radius: var(--radius-s); background: var(--tint); color: var(--tint-ink); font-size: 17px; font-weight: 800; }
+.pz-przedmiot { break-inside: avoid; }
+.pz-przedmiot h4 { margin: 16px 0 2px; font-size: 17px; font-weight: 800; }
+.pz-przedmiot h4 a { color: var(--ink); text-decoration: none; }
+.pz-przedmiot h4 a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+:root[data-theme='dark'] .pz-przedmiot h4 a:hover { color: var(--accent); }
+
+/* ---------- tabele (wspólna siatka kolumn) ---------- */
+.pz-tabela { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 15px; line-height: 1.45; }
+.pz-tabela .k-gr { width: 3.2rem; }
+.pz-tabela .k-typ { width: 6.4rem; }
+.pz-tabela .k-prow { width: 24%; }
+.pz-tabela .k-dzien { width: 7.8rem; }
+.pz-tabela .k-godz { width: 8.4rem; }
+.pz-tabela .k-sala { width: 4.6rem; }
+.pz-tabela td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+.pz-tabela tbody tr:hover td { background: var(--surface); }
+.pz-tabela .c-gr, .pz-tabela .c-godz, .pz-tabela .c-sala { font-variant-numeric: tabular-nums; }
+.pz-tabela .c-godz { white-space: nowrap; }
+.pz-tabela .c-godz small { display: block; font-size: 13px; color: var(--muted); white-space: normal; }
+.pz-tabela .c-uwagi { font-size: 14px; color: var(--muted); white-space: pre-line; }
+.pz-tabela .c-uwagi a { color: inherit; font-weight: 700; }
+.pz-tabela abbr { text-decoration: none; }
+.pz-naglowek { position: sticky; top: var(--hdr-h, 71px); z-index: 2; background: var(--bg); }
+.pz-naglowek th { padding: 8px; border-bottom: 1.5px solid var(--line); text-align: left; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* nagłówki kolumn w tabelach przedmiotów — tylko dla czytników ekranu (widoczny jest nagłówek na górze semestru) */
+.pz-ukryty th { padding: 0; height: 0; border: 0; }
+.pz-ukryty th span { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pz-m { display: none; }
+
+/* ---------- telefon: wiersz = karta ---------- */
+@media (max-width: 760px) {
+  .pz-tabela, .pz-tabela tbody { display: block; }
+  .pz-tabela.pz-naglowek { display: none; }
+  .pz-tabela colgroup { display: none; }
+  .pz-tabela thead.pz-ukryty { display: block; height: 0; overflow: hidden; }
+  .pz-tabela tbody tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; padding: 8px 2px; border-bottom: 1px solid var(--line); }
+  .pz-tabela td { display: block; padding: 0; border: 0; }
+  .pz-tabela td:empty { display: none; }
+  .pz-tabela .c-typ { order: 1; font-weight: 800; color: var(--ink); }
+  .pz-tabela .c-gr { order: 2; font-weight: 700; }
+  .pz-tabela .c-dzien { order: 3; }
+  .pz-tabela .c-godz { order: 4; font-weight: 700; }
+  .pz-tabela .c-sala { order: 5; }
+  .pz-tabela .c-prow { order: 6; flex-basis: 100%; }
+  .pz-tabela .c-uwagi { order: 7; flex-basis: 100%; }
+  .pz-tabela .c-godz small { display: inline; margin-left: 6px; }
+  .pz-m { display: inline; }
+  .pz-tabela tbody tr:hover td { background: none; }
+}
+
+/* ---------- wydruk ---------- */
+@media print {
+  @page { margin: 12mm; }
+  .hdr, .ftr, .skip, .crumbs, .pz-bok, .toc-top { display: none !important; }
+  .page-head { background: none; border: 0; }
+  .page-head .wrap { padding: 0 0 6px; }
+  .page-head h1 { font-size: 18pt; }
+  .page-head .lead { display: none; }
+  .plan-strona { padding: 0 !important; max-width: none; }
+  .pz-naglowek { position: static; }
+  .pz-semestr + .pz-semestr { break-before: page; border: 0; margin-top: 0; }
+  .pz-tabela { font-size: 9pt; }
+  .pz-sekcja h3 { background: none; padding: 0; border-bottom: 1.5px solid #000; color: #000; }
+  .pz-tabela tr { break-inside: avoid; }
+  a { color: inherit !important; text-decoration: none !important; }
+}

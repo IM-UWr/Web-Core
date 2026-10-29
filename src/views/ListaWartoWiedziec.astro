@@ -1,0 +1,31 @@
+---
+// Lista „Warto wiedzieć” (/warto-wiedziec, /en/warto-wiedziec): wszystkie opublikowane pozycje kolekcji warto_wiedziec.
+import { getCollection } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import WartoWiedziec from '../components/WartoWiedziec.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const ile = (await getCollection('warto_wiedziec')).filter((w) => w.data.opublikowany !== false).length;
+
+const tytul = T('Warto wiedzieć', 'Highlights');
+const lead = T(
+  'Wyjątkowe wydarzenia i osiągnięcia, którymi Instytut Matematyczny chwali się od lat.',
+  'Exceptional events and achievements the Mathematical Institute has been proud of for years.',
+);
+---
+<Baza tytul={tytul} opis={lead}>
+  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} />
+  <div class="wrap" style="padding-top:32px;padding-bottom:64px">
+    {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="muted">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
+    <p style="margin:24px 0 0">
+      <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+    </p>
+  </div>
+</Baza>

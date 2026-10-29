@@ -1,0 +1,214 @@
+---
+// Podstrona zakładu: opis, skład (z tabeli pracowników), seminaria, granty, konferencje, obrony, aktualności.
+import { zTytulem } from '../lib/osoby';
+import { render } from 'astro:content';
+import Baza from '../layouts/Baza.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Ikona from '../components/Ikona.astro';
+import { u } from '../lib/url';
+import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
+import { range, long, short, now, today, hasTime, type Lang } from '../lib/daty';
+import { renderMarkdown } from '../lib/markdown';
+import {
+  zaklady, pracownicy, seminaria, referaty, granty, konferencje, obrony, aktualnosci,
+  seminariumReferatu, slugOf, sala, zakladGrantu, rangaStopnia, trwaLubBedzie, type Zaklad, type Pracownik,
+} from '../lib/tresci';
+
+interface Props { zaklad: Zaklad; lang: Lang }
+const { zaklad, lang } = Astro.props;
+const d = zaklad.data;
+const id = zaklad.id;
+const nazwa = wybierz(d, 'nazwa', lang);
+const opis = wybierz(d, 'opis', lang);
+const obszary = lang === 'en' && d.obszary_en.length ? d.obszary_en : d.obszary;
+const { Content } = await render(zaklad);
+const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+
+// Skład. Osoba ze stroną domową to jedno klikalne pole (klasy .os-link / .os-a w global.css).
+// Telefonów pracowników naukowych nie podajemy (pole „telefon” zakładu — tylko numer ogólny, jeśli jest).
+const osoby = await pracownicy();
+const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
+const sortuj = (a: Pracownik, b: Pracownik) =>
+  rangaStopnia(a.data.stopien) - rangaStopnia(b.data.stopien) || nazwisko(a.data.imie_nazwisko).localeCompare(nazwisko(b.data.imie_nazwisko), 'pl');
+const czlonkowie = osoby.filter((o) => o.data.zaklad === id);
+const kierownik = czlonkowie.find((o) => o.data.imie_nazwisko === d.kierownik);
+const grupySkladu = [
+  { tytul: lang === 'en' ? 'Staff' : 'Pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'nauczyciel' && o !== kierownik).sort(sortuj) },
+  { tytul: lang === 'en' ? 'PhD students' : 'Doktoranci', osoby: czlonkowie.filter((o) => o.data.grupa === 'doktorant').sort(sortuj) },
+  { tytul: lang === 'en' ? 'Retired staff' : 'Emerytowani pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'emeryt').sort(sortuj) },
+].filter((g) => g.osoby.length);
+
+// Seminaria z najbliższym referatem
+const sem = (await seminaria()).filter((s) => s.data.zaklad.includes(id));
+const ref = await referaty();
+const n = now();
+const nastepny = (sid: string) => ref.find((r) => seminariumReferatu(r) === sid && (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today()));
+
+// Granty (pole „zakład” albo zakład kierownika)
+const rok = Number(today().slice(0, 4));
+const gr = (await granty()).filter((g) => zakladGrantu(g, osoby) === id);
+const grTrwa = gr.filter((g) => (g.data.rok_do ?? 0) >= rok);
+const grKon = gr.filter((g) => (g.data.rok_do ?? 0) < rok);
+const lata = (g: (typeof gr)[number]) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
+const tytulGrantu = (g: (typeof gr)[number]) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
+const adresGrantu = (g: (typeof gr)[number]) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
+
+const konf = (await konferencje()).filter((k) => k.data.zaklad === id);
+const obr = (await obrony()).filter((o) => o.data.zaklad === id);
+const akt = (await aktualnosci()).filter((a) => a.data.zaklad === id).slice(0, 5);
+
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const naglowki = [
+  { depth: 2, slug: 'o-zakladzie', text: T('O zakładzie', 'About') },
+  { depth: 2, slug: 'sklad', text: T('Skład', 'People') },
+  ...(sem.length ? [{ depth: 2, slug: 'seminaria', text: sem.length > 1 ? T('Seminaria', 'Seminars') : T('Seminarium', 'Seminar') }] : []),
+  ...(gr.length ? [{ depth: 2, slug: 'granty', text: T('Projekty i granty', 'Grants') }] : []),
+  ...(konf.length ? [{ depth: 2, slug: 'konferencje', text: T('Konferencje', 'Conferences') }] : []),
+  ...(obr.length ? [{ depth: 2, slug: 'obrony', text: T('Obrony doktorskie', 'PhD defences') }] : []),
+  ...(akt.length ? [{ depth: 2, slug: 'aktualnosci', text: T('Aktualności', 'News') }] : []),
+];
+const wszystkieZaklady = await zaklady();
+---
+<Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie}>
+  <NaglowekStrony tytul={nazwa} lead={opis} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
+    {obszary.length > 0 && <div class="tags">{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
+  </NaglowekStrony>
+
+  <div class="wrap layout">
+    <div class="main">
+
+      <section class="zsec" aria-labelledby="o-zakladzie">
+        <h2 id="o-zakladzie">{T('O zakładzie', 'About')}</h2>
+        {d.zdjecie && <figure class="article-figure"><img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />{d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}</figure>}
+        <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+        {d.strona && <p><a class="link-arrow" href={d.strona}>{T('Strona zespołu', 'Group website')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
+      </section>
+
+      <section class="zsec" aria-labelledby="sklad">
+        <h2 id="sklad">{T('Skład', 'People')} <span class="muted" style="font-size:16px;font-weight:600">({czlonkowie.length})</span></h2>
+        {(kierownik || d.kierownik) && (
+          <div class={kierownik?.data.strona ? 'person lead-person os-link' : 'person lead-person'}>
+            <span class="role">{T('Kierownik', 'Head')}</span>
+            <span class="os-n">{kierownik?.data.strona
+              ? <a class="os-a" href={kierownik.data.strona}>{zTytulem(kierownik.data.stopien, kierownik.data.imie_nazwisko)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>
+              : kierownik ? zTytulem(kierownik.data.stopien, kierownik.data.imie_nazwisko) : d.kierownik}</span>
+            <span class="os-c">
+              {kierownik?.data.email && <a href={`mailto:${kierownik.data.email}`}><Ikona nazwa="mail" rozmiar={14} />{kierownik.data.email}</a>}
+              {(kierownik?.data.telefon || d.telefon) && <span><Ikona nazwa="telefon" rozmiar={14} />{kierownik?.data.telefon || d.telefon}</span>}
+              {kierownik?.data.pokoj && <span>{T('pok.', 'room')} {kierownik.data.pokoj}</span>}
+            </span>
+          </div>
+        )}
+        {grupySkladu.map((g) => (
+          <>
+            <h3 class="subhead">{g.tytul}</h3>
+            <ul class="people">
+              {g.osoby.map((o) => (
+                <li class={o.data.strona ? 'person os-link' : 'person'}>
+                  <span class="os-n">{o.data.strona ? <a class="os-a" href={o.data.strona}>{zTytulem(o.data.stopien, o.data.imie_nazwisko)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a> : zTytulem(o.data.stopien, o.data.imie_nazwisko)}</span>
+                  <span class="os-c">
+                    {o.data.email && <a href={`mailto:${o.data.email}`}>{o.data.email}</a>}
+                    {o.data.pokoj && <span>{T('pok.', 'room')} {o.data.pokoj}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))}
+        <p class="muted" style="font-size:14px">{T('Pełne dane kontaktowe:', 'Full contact details:')} <a href={u(wJezyku('/pracownicy', lang))}>{t(lang, 'pracownicy')}</a>.</p>
+      </section>
+
+      {sem.length > 0 && (
+        <section class="zsec" aria-labelledby="seminaria">
+          <h2 id="seminaria">{sem.length > 1 ? T('Seminaria', 'Seminars') : T('Seminarium', 'Seminar')}</h2>
+          <div class="sem-cards">
+            {sem.map((s) => {
+              const r = nastepny(s.id);
+              return (
+                <a class="sem-card" href={u(wJezyku(`/seminaria/${s.id}`, lang))}>
+                  <span class="t">{wybierz(s.data, 'nazwa', lang)}</span>
+                  {r ? (
+                    <span style="font-size:15px;padding-top:10px;border-top:1px solid var(--line)"><strong style="color:var(--ink)">{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — {r.data.tytul} <span class="muted">({r.data.prelegent})</span></span>
+                  ) : (
+                    <span class="muted" style="font-size:14px;padding-top:10px;border-top:1px solid var(--line)">{t(lang, 'brakNadchodzacych')}</span>
+                  )}
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {gr.length > 0 && (
+        <section class="zsec" aria-labelledby="granty">
+          <h2 id="granty">{T('Projekty i granty', 'Grants')}</h2>
+          {grTrwa.length === 0 && <p class="muted">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
+          {grTrwa.map((g) => (
+            <article class="grant">
+              <div class="news-meta"><span class="badge badge-wydarzenie">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span>· {g.data.kod}</span>}</div>
+              <h3><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></h3>
+              {g.data.kierownik && <p class="who"><span class="muted">{T('Kierownik', 'PI')}:</span> {g.data.kierownik}</p>}
+            </article>
+          ))}
+          {grKon.length > 0 && (
+            <details class="more">
+              <summary>{T('Zakończone projekty', 'Completed projects')} ({grKon.length})</summary>
+              {grKon.map((g) => (
+                <article class="grant">
+                  <div class="news-meta"><span class="badge">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span>· {g.data.kod}</span>}</div>
+                  <h3 style="font-size:16px"><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></h3>
+                  {g.data.kierownik && <p class="who muted" style="font-size:14px">{g.data.kierownik}</p>}
+                </article>
+              ))}
+            </details>
+          )}
+        </section>
+      )}
+
+      {konf.length > 0 && (
+        <section class="zsec" aria-labelledby="konferencje">
+          <h2 id="konferencje">{T('Konferencje', 'Conferences')}</h2>
+          <ul class="plain-list">
+            {konf.slice(0, 8).map((k) => (
+              <li>
+                <a href={u(wJezyku(`/nauka/konferencje/${slugOf(k.id)}`, lang))}>{wybierz(k.data, 'tytul', lang)}</a>
+                <span class="muted"> — {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? `, ${k.data.miejsce}` : ''}</span>
+                {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="badge badge-konferencja" style="margin-left:6px">{T('nadchodząca', 'upcoming')}</span>}
+              </li>
+            ))}
+          </ul>
+          {konf.length > 8 && <a class="link-arrow" href={u(wJezyku('/nauka/konferencje', lang))}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+        </section>
+      )}
+
+      {obr.length > 0 && (
+        <section class="zsec" aria-labelledby="obrony">
+          <h2 id="obrony">{T('Obrony doktorskie', 'PhD defences')}</h2>
+          <ul class="plain-list">
+            {obr.map((o) => <li><a href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>{o.data.kandydat}</a> <span class="muted">— {short(o.data.termin)}</span></li>)}
+          </ul>
+        </section>
+      )}
+
+      {akt.length > 0 && (
+        <section class="zsec" aria-labelledby="aktualnosci">
+          <h2 id="aktualnosci">{T('Aktualności', 'News')}</h2>
+          <ul class="plain-list">
+            {akt.map((a) => <li><a href={u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang))}>{wybierz(a.data, 'tytul', lang)}</a> <span class="muted">— {short(a.data.data)}</span></li>)}
+          </ul>
+        </section>
+      )}
+    </div>
+
+    <aside class="side" data-pagefind-ignore>
+      <nav class="side-box side-nav" aria-label={T('Zakłady', 'Departments')}>
+        <h2>{T('Zakłady', 'Departments')}</h2>
+        <div style="display:flex;flex-direction:column">
+          {wszystkieZaklady.map((z) => (
+            <a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))} aria-current={z.id === id ? 'page' : undefined}>{wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang)}</a>
+          ))}
+        </div>
+      </nav>
+    </aside>
+  </div>
+</Baza>
