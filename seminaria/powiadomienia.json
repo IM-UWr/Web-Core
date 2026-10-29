@@ -1,0 +1,138 @@
+{
+ "wygenerowano": "2026-10-29T22:17:17.038Z",
+ "seminaria": [
+  {
+   "id": "analiza-harmoniczna",
+   "nazwa": "Analiza harmoniczna i rozwinięcia ortogonalne",
+   "nazwa_en": "Harmonic Analysis and Orthogonal Expansions",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/analiza-harmoniczna"
+  },
+  {
+   "id": "dyskretna-analiza-harmoniczna",
+   "nazwa": "Dyskretna analiza harmoniczna i niekomutatywna probabilistyka",
+   "nazwa_en": "Discrete Harmonic Analysis and Noncommutative Probability",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/dyskretna-analiza-harmoniczna"
+  },
+  {
+   "id": "geometria",
+   "nazwa": "Geometria",
+   "nazwa_en": "Geometry",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/geometria"
+  },
+  {
+   "id": "rownania-rozniczkowe",
+   "nazwa": "Równania różniczkowe",
+   "nazwa_en": "Differential Equations",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/rownania-rozniczkowe"
+  },
+  {
+   "id": "dydaktyka",
+   "nazwa": "Seminarium Pracowni Dydaktyki i Popularyzacji Matematyki",
+   "nazwa_en": "Seminar of the Mathematics Education and Outreach Unit",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/dydaktyka"
+  },
+  {
+   "id": "statystyka",
+   "nazwa": "Statystyka",
+   "nazwa_en": "Statistics",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/statystyka"
+  },
+  {
+   "id": "teoria-modeli",
+   "nazwa": "Teoria modeli",
+   "nazwa_en": "Model Theory",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/teoria-modeli"
+  },
+  {
+   "id": "prawdopodobienstwo",
+   "nazwa": "Teoria prawdopodobieństwa i modelowanie stochastyczne",
+   "nazwa_en": "Probability Theory and Stochastic Modelling",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/prawdopodobienstwo"
+  },
+  {
+   "id": "topologia",
+   "nazwa": "Topologia",
+   "nazwa_en": "Topology",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/topologia"
+  }
+ ],
+ "referaty": [
+  {
+   "id": "rownania-rozniczkowe/2026-09-21-vazquez",
+   "seminarium": "rownania-rozniczkowe",
+   "tytul": "PDE models of diffusion: linear and nonlinear, local and nonlocal",
+   "prelegent": "Juan Luis Vázquez",
+   "afiliacja": "Universidad Autónoma de Madrid",
+   "termin": "2026-09-21T15:15",
+   "sala": "room HS",
+   "streszczenie": "",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/rownania-rozniczkowe#2026-09-21-vazquez"
+  },
+  {
+   "id": "rownania-rozniczkowe/2026-10-05-karch",
+   "seminarium": "rownania-rozniczkowe",
+   "tytul": "Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji",
+   "prelegent": "Grzegorz Karch",
+   "afiliacja": "Uniwersytet Wrocławski",
+   "termin": "2026-10-05T15:15",
+   "sala": "room 603",
+   "streszczenie": "",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/rownania-rozniczkowe#2026-10-05-karch"
+  },
+  {
+   "id": "rownania-rozniczkowe/2026-10-12-karch-2",
+   "seminarium": "rownania-rozniczkowe",
+   "tytul": "Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji",
+   "prelegent": "Grzegorz Karch",
+   "afiliacja": "Uniwersytet Wrocławski",
+   "termin": "2026-10-12T15:15",
+   "sala": "room 605",
+   "streszczenie": "",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/rownania-rozniczkowe#2026-10-12-karch-2"
+  },
+  {
+   "id": "statystyka/2026-10-13-morzywolek",
+   "seminarium": "statystyka",
+   "tytul": "Beyond Average Treatment Effects: Variable Importance for Treatment Effect Heterogeneity",
+   "prelegent": "Paweł Morzywołek",
+   "afiliacja": "Uniwersytet Kopenhaski",
+   "termin": "2026-10-13T14:15",
+   "sala": "room 603",
+   "streszczenie": "",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/statystyka#2026-10-13-morzywolek"
+  },
+  {
+   "id": "rownania-rozniczkowe/2026-10-19-lien",
+   "seminarium": "rownania-rozniczkowe",
+   "tytul": "A Schauder regularity theory for nonlocal viscous Hamilton–Jacobi equations",
+   "prelegent": "Robin Østern Lien",
+   "afiliacja": "NTNU",
+   "termin": "2026-10-19T15:15",
+   "sala": "room 605",
+   "streszczenie": "Viscous Hamilton–Jacobi equations arise as dynamic programming equations in optimal control and differential games, where the unknown function represents the value function of an optimally controlled process. We use a heat-semigroup approach to study the regularity of such equations with nonlocal and mixed local–nonlocal diffusions. Our framework covers a broad class of Lévy-type operators, including fractional Laplacians as well as nonsymmetric and strongly anisotropic operators. Using the Duhamel formulation together with smoothing estimates in Hölder spaces, we obtain optimal spatial Schauder estimates and explicit blow-up rates for higher-order Hölder norms as time approaches zero. We focus on two canonical regimes: Lipschitz initial data, leading to solutions with uniformly bounded gradients, and lower-regularity Hölder initial data, where gradients may blow up and their behavior…",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/rownania-rozniczkowe#2026-10-19-lien"
+  },
+  {
+   "id": "dyskretna-analiza-harmoniczna/2026-10-22-kogiso",
+   "seminarium": "dyskretna-analiza-harmoniczna",
+   "tytul": "Local functional equations for polynomials and related topics",
+   "prelegent": "Takeyoshi Kogiso",
+   "afiliacja": "Josai University",
+   "termin": "2026-10-22T09:00",
+   "sala": "D1.2, budynek C-16, Politechnika Wrocławska",
+   "streszczenie": "The functional equations for the Riemann zeta function have long been known to admit two classical proofs. One is based on the Mellin transform and an integral representation of the zeta function, while the other relies on Jacobi's theta function. Although these approaches are quite different, they are in fact two manifestations of the same underlying principle: The Poisson summation formula and the self-duality of the Fourier transform. The main theme of this lecture is how this remarkable phenomenon extends to higher dimensions. A successful framework for such a generalization is provided by the theory of prehomogeneous vector spaces, introduced by Mikio Sato. In this talk, I will discuss local functional equations associated with these spaces, the polynomials that satisfy them, and their intimate connections with representation theory, harmonic analysis and number theory, and…",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/dyskretna-analiza-harmoniczna#2026-10-22-kogiso"
+  },
+  {
+   "id": "rownania-rozniczkowe/2026-10-26-jakobsen",
+   "seminarium": "rownania-rozniczkowe",
+   "tytul": "Long time behaviour of mean field games with fractional diffusion",
+   "prelegent": "Espen Jakobsen",
+   "afiliacja": "NTNU",
+   "termin": "2026-10-26T15:15",
+   "sala": "room 605",
+   "streszczenie": "We discuss recent results on the long time behaviour of mean field games systems with fractional diffusion. The dynamics of the players are driven by independent jump processes, controlled through the drift, and confined by an external drift to guarantee ergodicity. In the case of globally Lipschitz, locally uniformly convex Hamiltonians, and weakly coupled and LL monotone costs, we prove that there is a unique solution $(u_T,m_T)$ to the problem in $(0,T)$, and we show that if T is sufficiently large, then $(u_T,m_T)$ satisfies the so-called turnpike property — it is exponentially close to the (unique) stationary ergodic state of the problem.",
+   "adres": "https://im-uwr.github.io/Web-Core/en/seminaria/rownania-rozniczkowe#2026-10-26-jakobsen"
+  }
+ ]
+}
