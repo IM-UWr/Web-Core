@@ -6,7 +6,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
-import KartaAktualnosci from '../components/KartaAktualnosci.astro';
+import Sciezka from '../components/SciezkaDzialu.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
 import ustawienia from '../data/ustawienia.json';
 import tekst from '../data/dzialy/studia.json';
@@ -120,10 +120,8 @@ const ikona = (a: string) =>
   : /zajecia|plan/.test(a) ? 'zegar'
   : 'strzalka';
 
-// ④ Aktualności dla studentów (komputer: trzy karty; telefon — wygląd „Portal”: zwarta lista sześciu).
-const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
-const aktualnosci = dlaStudentow.slice(0, 3);
-const aktualnosciTel = dlaStudentow.slice(0, 6);
+// ④ Aktualności dla studentów (wygląd „Portal”: zwarta lista sześciu).
+const aktualnosci = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci')).slice(0, 6);
 
 // ⑤ Kontakt: sekretariat dydaktyczny i zastępca dyrektora ds. dydaktycznych — z pól „Kontakt” kierunków (bez dubli).
 // Telefon podajemy tylko przy sekretariacie (administracja).
@@ -138,36 +136,128 @@ const osobyKontakt = [
 
 const tytul = T('Studia', 'Study');
 const wstep = w(tekst, 'wstep');
+// Blok na telefon ma własne id (przyrostek „-tel”) — także kotwica „Kierunki studiów” w ścieżce „Chcę studiować”.
+const naTelefon = (s: (typeof sciezki)[number]) => ({ ...s, id: `${s.id}-tel`, linki: s.linki.map((l) => (l.adres === '#kierunki' ? { ...l, adres: '#kierunki-tel' } : l)) });
 ---
 <Baza tytul={tytul} opis={wstep}>
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w jednym wierszu w nagłówku, zwarte karty kierunków, ramki:
-       Chcę studiować, Kontakt, Już studiuję, Więcej dla studentów, Aktualności (sześć), Warto wiedzieć.
-       Kontakt, aktualności, „Warto wiedzieć” i liczby mają osobne bloki .tylko-telefon (inna kolejność lub liczba pozycji). */}
+  {/* Wariant „Portal”: liczby w jednym wierszu w nagłówku (komputer i telefon). */}
   <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
-      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+      <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
   </NaglowekStrony>
-  <div class="wrap dz-wrap">
-    {liczby.length > 0 && (
-      <div class="stats tylko-komputer">
-        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-      </div>
+
+  {/* Komputer (≥ 761 px) — wariant „Portal”: kierunki w jednym rzędzie zwartych kart, pod nimi trzy kolumny
+       (ścieżki i kontakt | ścieżka i linki | aktualności i „Warto wiedzieć”). */}
+  <div class="wrap dz-wrap tylko-komputer">
+    {karty.length > 0 && (
+      <section class="zsec" aria-labelledby="kierunki">
+        <h2 id="kierunki">{T('Kierunki studiów', 'Programmes')}</h2>
+        <div class:list={['pt-cards', karty.length >= 5 ? 'pt-cards-5' : karty.length === 4 ? 'pt-cards-4' : 'pt-cards-3']}>
+          {karty.map((k) => (
+            <a class="pt-card" href={href(k.adres)}>
+              <span class="l">{k.poziom}</span>
+              <span class="n">{k.nazwa}<Ikona nazwa="strzalka" rozmiar={14} /></span>
+              {k.pelna && <span class="p">{k.pelna}</span>}
+              {k.opis && <span class="o">{k.opis}</span>}
+            </a>
+          ))}
+        </div>
+      </section>
     )}
 
+    <div class="zsec">
+      <div class="pt-grid">
+        <div class="pt-col">
+          {sciezki[0] && <Sciezka s={sciezki[0]} lang={lang} />}
+          {osobyKontakt.length > 0 && (
+            <section class="pt-box" aria-labelledby="kontakt">
+              <div class="pt-h"><h2 id="kontakt">{T('Kontakt', 'Contact')}</h2></div>
+              <ul class="pt-list dz-osoby">
+                {osobyKontakt.map((k) => (
+                  <li>
+                    <span class="dz-rola">{w(k, 'rola')}</span>
+                    <span class="pt-t">{k.osoba}</span>
+                    {k.zakres && <span class="pt-s">{k.zakres}</span>}
+                    <span class="dz-c">
+                      {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
+                      {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
+                      {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p class="pt-stopka"><a class="pt-all" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
+            </section>
+          )}
+        </div>
+
+        <div class="pt-col">
+          {sciezki[1] && <Sciezka s={sciezki[1]} lang={lang} />}
+          {pozostale.length > 0 && (
+            <section class="pt-box" aria-labelledby="wiecej">
+              <div class="pt-h"><h2 id="wiecej">{T('Więcej dla studentów', 'More for students')}</h2></div>
+              <ul class="pt-links">
+                {pozostale.map((l) => (
+                  <li>
+                    <a href={href(l.adres)}>
+                      <span>{l.etykieta}</span>
+                      <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />
+                      {isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        <div class="pt-col pt-szeroka-sr">
+          <section class="pt-box" aria-labelledby="aktualnosci">
+            <div class="pt-h">
+              <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
+              <a class="pt-all" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+            </div>
+            {aktualnosci.length > 0 ? (
+              <ul class="pt-list">
+                {aktualnosci.map((p) => (
+                  <li>
+                    <a class="pt-item" href={href(p.href)}>
+                      <time class="pt-d" datetime={p.data}>{short(p.data).slice(0, 5)}</time>
+                      <span class="pt-b">
+                        <span class="pt-k">{RODZAJE[p.rodzaj]?.[lang]}</span>
+                        <span class="pt-t">{p.tytul}</span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="pt-pusto">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
+            )}
+          </section>
+          <WartoWiedziec lang={lang} dzial="studia" uklad="portal" komputer />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Telefon (≤ 760 px) — wygląd „Portal” jak na głównej gałęzi: zwarte karty kierunków, ramki: Chcę studiować, Kontakt,
+       Już studiuję, Więcej dla studentów, Aktualności (sześć), Warto wiedzieć (style na dole). Cały blok jest poza
+       wyszukiwarką, a id mają przyrostek „-tel” (ta sama treść jest w bloku na komputer). */}
+  <div class="wrap dz-wrap tylko-telefon" data-pagefind-ignore>
     {karty.length > 0 && (
-      <section class="zsec dz-kierunki" aria-labelledby="kierunki">
-        <h2 id="kierunki">{T('Kierunki studiów', 'Programmes')}</h2>
+      <section class="zsec dz-kierunki" aria-labelledby="kierunki-tel">
+        <h2 id="kierunki-tel">{T('Kierunki studiów', 'Programmes')}</h2>
         <div class="prog-grid">
           {karty.map((k) => (
             <a class="prog dz-prog" href={href(k.adres)}>
               <span class="l">{k.poziom}</span>
-              <span class="n">{k.nazwa}<Ikona class="tylko-telefon" nazwa="strzalka" rozmiar={14} /></span>
+              <span class="n">{k.nazwa}<Ikona nazwa="strzalka" rozmiar={14} /></span>
               {k.pelna && <span class="p">{k.pelna}</span>}
               {k.opis && <span class="o">{k.opis}</span>}
-              <span class="go" aria-hidden="true">{T('Więcej', 'More')}<Ikona nazwa="strzalka" rozmiar={15} /></span>
             </a>
           ))}
         </div>
@@ -176,7 +266,7 @@ const wstep = w(tekst, 'wstep');
 
     {sciezki.length > 0 && (
       <div class="zsec dz-paths">
-        {sciezki.map((s, i) => (
+        {sciezki.map(naTelefon).map((s, i) => (
           <>
           <section class="dz-path" aria-labelledby={s.id}>
             <div class="dz-path-h">
@@ -199,7 +289,7 @@ const wstep = w(tekst, 'wstep');
             </ul>
           </section>
           {i === 0 && osobyKontakt.length > 0 && (
-            <section class="pt-box tylko-telefon" aria-labelledby="kontakt-tel" data-pagefind-ignore>
+            <section class="pt-box" aria-labelledby="kontakt-tel">
               <div class="pt-h"><h2 id="kontakt-tel">{T('Kontakt', 'Contact')}</h2></div>
               <ul class="pt-list dz-osoby">
                 {osobyKontakt.map((k) => (
@@ -224,45 +314,29 @@ const wstep = w(tekst, 'wstep');
     )}
 
     {pozostale.length > 0 && (
-      <section class="zsec dz-wiecej" aria-labelledby="wiecej">
-        <h2 id="wiecej">{T('Więcej dla studentów', 'More for students')}</h2>
+      <section class="zsec dz-wiecej" aria-labelledby="wiecej-tel">
+        <h2 id="wiecej-tel">{T('Więcej dla studentów', 'More for students')}</h2>
         <div class="tiles dz-tiles">
           {pozostale.map((l) => (
             <a class="tile" href={href(l.adres)}>
               <Ikona nazwa={ikona(l.adres)} />
               <span>{l.etykieta}</span>
-              <span class="tylko-telefon dz-wiecej-ico" data-pagefind-ignore><Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />{isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}</span>
+              <span class="dz-wiecej-ico"><Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />{isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}</span>
             </a>
           ))}
         </div>
       </section>
     )}
 
-    <WartoWiedziec lang={lang} dzial="studia" klasa="tylko-komputer" />
-
-    <section class="zsec tylko-komputer" aria-labelledby="aktualnosci">
-      <div class="dz-head">
-        <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
-        <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      {aktualnosci.length > 0 ? (
-        <div class="news-grid">
-          {aktualnosci.map((p) => <KartaAktualnosci p={p} lang={lang} />)}
-        </div>
-      ) : (
-        <p class="muted" style="margin:0">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
-      )}
-    </section>
-
-    <div class="dz-tel tylko-telefon" data-pagefind-ignore>
+    <div class="dz-tel">
       <section class="pt-box" aria-labelledby="aktualnosci-tel">
         <div class="pt-h">
           <h2 id="aktualnosci-tel">{T('Aktualności dla studentów', 'News for students')}</h2>
           <a class="pt-all" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
         </div>
-        {aktualnosciTel.length > 0 ? (
+        {aktualnosci.length > 0 ? (
           <ul class="pt-list">
-            {aktualnosciTel.map((p) => (
+            {aktualnosci.map((p) => (
               <li>
                 <a class="pt-item" href={href(p.href)}>
                   <time class="pt-d" datetime={p.data}>{short(p.data).slice(0, 5)}</time>
@@ -280,38 +354,14 @@ const wstep = w(tekst, 'wstep');
       </section>
       <WartoWiedziec lang={lang} dzial="studia" uklad="portal" />
     </div>
-
-    <section class="zsec tylko-komputer" aria-labelledby="kontakt" style="margin-bottom:0">
-      <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
-      {osobyKontakt.length > 0 && (
-        <ul class="people">
-          {osobyKontakt.map((k) => (
-            <li class="person">
-              <span class="dz-rola">{w(k, 'rola')}</span>
-              <span class="os-n">{k.osoba}</span>
-              {k.zakres && <span class="dz-zakres">{k.zakres}</span>}
-              <span class="os-c">
-                {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
-                {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
-                {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-    </section>
   </div>
 </Baza>
 
 <style>
-  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  /* (blok na komputer i blok na telefon — mało miejsca nad i pod treścią, jak w wariancie „Portal”) */
+  .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
   .dz-prog { min-height: 180px; }
   .dz-prog .p { margin-top: -4px; font-size: 14px; color: var(--muted); }
-  .dz-prog .go { margin-top: auto; padding-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
-  :global(:root[data-theme='dark']) .dz-prog .go { color: var(--accent); }
-  .dz-prog .go :global(svg) { transition: transform .15s; }
-  .dz-prog:hover .go :global(svg) { transform: translateX(3px); }
   .dz-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
   .dz-path { display: flex; flex-direction: column; gap: 14px; padding: 22px; border-radius: var(--radius-l); border: 1.5px solid var(--line); }
   .dz-path-h { display: flex; gap: 14px; align-items: flex-start; }
@@ -325,16 +375,15 @@ const wstep = w(tekst, 'wstep');
   .dz-path li a:hover { background: var(--tint); }
   .dz-path li a :global(svg) { flex: none; color: var(--muted); }
   .dz-tiles { padding-top: 0; }
-  .dz-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 10px; }
-  .dz-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
   .dz-rola { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
-  .people + .link-arrow { margin-top: 8px; }
-  @media (prefers-reduced-motion: reduce) { .dz-prog .go :global(svg) { transition: none; transform: none !important; } }
+  /* kontakt w ramce (komputer i telefon): osoby jako wiersze listy */
+  .dz-osoby > li { display: flex; flex-direction: column; gap: 1px; padding: 8px 2px; }
+  .dz-osoby .dz-rola { letter-spacing: .05em; }
+  .dz-c { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+  .dz-c a { color: var(--ink); }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {
-    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
     /* kierunki: zwarte karty (dwie w rzędzie, na wąskim telefonie jedna), strzałka przy nazwie */
     .dz-kierunki .prog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .dz-prog { min-height: 0; gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); background: var(--bg); color: var(--text); transition: border-color .15s, background-color .15s; }
@@ -344,7 +393,6 @@ const wstep = w(tekst, 'wstep');
     .dz-prog .n :global(.ico) { align-self: center; color: var(--muted); }
     .dz-prog .p { margin-top: 0; font-size: 13.5px; line-height: 1.35; }
     .dz-prog .o { font-size: 14px; line-height: 1.45; color: var(--text); }
-    .dz-prog .go { display: none; }
     /* ścieżki i kontakt: ramki jedna pod drugą */
     .zsec.dz-paths { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
     .dz-path { gap: 0; padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); }
@@ -357,10 +405,6 @@ const wstep = w(tekst, 'wstep');
     .dz-path ul { border-top: 0; }
     .dz-path li:last-child { border-bottom: 0; }
     .dz-path li a { gap: 10px; min-height: 40px; padding: 6px 4px; font-size: 15px; line-height: 1.3; }
-    .dz-osoby > li { display: flex; flex-direction: column; gap: 1px; padding: 8px 2px; }
-    .dz-osoby .dz-rola { letter-spacing: .05em; }
-    .dz-c { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
-    .dz-c a { color: var(--ink); }
     /* Więcej dla studentów: ramka z listą linków (napis z lewej, strzałka z prawej) */
     .zsec.dz-wiecej { margin: 0 0 12px; padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
     .zsec.dz-wiecej::before { content: none; }

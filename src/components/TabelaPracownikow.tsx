@@ -4,6 +4,9 @@
 // obejmuje całe pole (klasy .os-link / .os-a w global.css), a e-mail i zakład są osobnymi linkami.
 // Kolumna „Telefon” pojawia się tylko w sekcjach, w których ktoś ma numer (w praktyce: administracja).
 // Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
+// Wariant „Portal” (komputer): zakład i funkcja w osobnej kolumnie obok nazwiska (.z), więc osoba zajmuje jeden zwarty
+// wiersz. Na telefonie zostaje układ z głównej gałęzi — zakład pod nazwiskiem (.n small); każdy rodzaj ekranu chowa
+// drugi zapis (src/styles/portal.css).
 import { zTytulem } from '../lib/osoby';
 import { Fragment, useMemo, useState } from 'react';
 
@@ -72,7 +75,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     .map((g) => {
       const os = widoczne.filter((o) => o.grupa === g.id);
       const podsekcje: Podsekcja[] = g.id === 'doktorant' ? wedlugRoku(os, napisy) : [{ klucz: 'wszyscy', osoby: os }];
-      return { ...g, osoby: os, podsekcje, maTel: os.some((o) => !!o.telefon) };
+      return { ...g, osoby: os, podsekcje, maTel: os.some((o) => !!o.telefon), maZaklad: os.some((o) => !!o.zaklad), maFunkcje: os.some((o) => !!o.funkcja) };
     })
     .filter((g) => g.osoby.length > 0);
 
@@ -90,6 +93,11 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
               {linkZakladu && <a href={linkZakladu}>{nazwyZakladow[o.zaklad as string]}</a>}
             </small>
           )}
+        </div>
+        <div className="c z">
+          {o.funkcja}
+          {o.funkcja && linkZakladu && ' · '}
+          {linkZakladu && <a href={linkZakladu}>{nazwyZakladow[o.zaklad as string]}</a>}
         </div>
         <div className="c">
           {o.email && (
@@ -173,6 +181,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
           <h2 className="staff-h">{g.nazwa}</h2>
           <div className="staff-head" aria-hidden="true">
             <span>{napisy.imie}</span>
+            <span>{g.maZaklad ? (g.maFunkcje ? napisy.zakladFunkcja : napisy.zaklad) : napisy.funkcja}</span>
             <span>{napisy.email}</span>
             {g.maTel && <span>{napisy.telefon}</span>}
             <span>{napisy.pokoj}</span>

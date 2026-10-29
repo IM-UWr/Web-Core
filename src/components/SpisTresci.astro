@@ -1,14 +1,24 @@
 ---
 import Ikona from './Ikona.astro';
 // „Na tej stronie” — odnośniki do sekcji (nagłówków ##) bieżącej strony.
-// Wariant "bok" to przyklejony panel po prawej, "gora" to rozwijana lista nad treścią na telefonie.
-interface Props { naglowki: { depth: number; slug: string; text: string }[]; lang: 'pl' | 'en'; wariant: 'bok' | 'gora' }
+// Wariant "bok" to przyklejony panel po prawej, "gora" to rozwijana lista nad treścią na telefonie,
+// "pasek" (wariant „Portal”, strona kierunku) to przyklejony poziomy pasek pod nagłówkiem strony — treść ma wtedy pełną szerokość
+// (na telefonie pasek się chowa, zostaje lista "gora").
+interface Props { naglowki: { depth: number; slug: string; text: string }[]; lang: 'pl' | 'en'; wariant: 'bok' | 'gora' | 'pasek' }
 const { naglowki, lang, wariant } = Astro.props;
 const sekcje = naglowki.filter((h) => h.depth === 2);
 const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
 ---
 {sekcje.length >= 2 && (
-  wariant === 'bok' ? (
+  wariant === 'pasek' ? (
+    <nav class="toc-pasek" aria-label={tytul} data-pagefind-ignore>
+      <div class="wrap">
+        <ol>
+          {sekcje.map((h) => <li><a href={`#${h.slug}`} data-toc={h.slug}>{h.text}</a></li>)}
+        </ol>
+      </div>
+    </nav>
+  ) : wariant === 'bok' ? (
     <nav class="side-box toc toc-side" aria-label={tytul}>
       <h2>{tytul}</h2>
       <ol>
@@ -27,7 +37,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
 
 <script>
   // Podświetlanie sekcji, którą właśnie czytamy.
-  const linki = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-toc]'));
+  const linki = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-toc], .toc-pasek a[data-toc]'));
   if (linki.length && 'IntersectionObserver' in window) {
     const widoczne = new Set<string>();
     const ustaw = () => {

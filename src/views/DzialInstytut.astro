@@ -61,25 +61,127 @@ const zakladyOpis = wybierz(dzial, 'zaklady_opis', lang);
 const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
 ---
 <Baza tytul={naglowek} opis={lead || undefined}>
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w nagłówku, „W tym dziale” w ramkach, zakłady w zwartych kartach,
-       sukcesy w ramce, kontakt w ramce (osobny blok .tylko-telefon, linki pod adresem) i pod nim mapa. */}
+  {/* Wariant „Portal”: liczby w jednym wierszu w nagłówku (komputer i telefon). */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
-      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+      <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
   </NaglowekStrony>
-  <div class="wrap dz-wrap">
-    {liczby.length > 0 && (
-      <div class="stats tylko-komputer">
-        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-      </div>
-    )}
 
+  {/* Komputer (≥ 761 px) — wariant „Portal”: linki działu w kolumnach, zakłady w zwartej siatce, potem sukcesy | kontakt |
+       mapa obok siebie. */}
+  <div class="wrap dz-wrap tylko-komputer">
     {grupy.length > 0 && (
       <section class="zsec" aria-labelledby="w-dziale">
         <h2 id="w-dziale">{T('W tym dziale', 'In this section')}</h2>
+        <div class="pt-grid pt-rowne">
+          {grupy.map((g) => (
+            <div class="pt-box">
+              <div class="pt-h"><h3>{wybierz(g, 'nazwa', lang)}</h3></div>
+              <ul class="pt-links">
+                {g.linki.map((l) => (
+                  <li>
+                    <a href={href(l.adres)}>
+                      <span>{wybierz(l, 'etykieta', lang)}</span>
+                      <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {listaZakladow.length > 0 && (
+      <section class="zsec" aria-labelledby="zaklady">
+        <div class="dz-head">
+          <h2 id="zaklady">{T('Zakłady', 'Departments')}</h2>
+          <a class="pt-all" href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        </div>
+        {zakladyOpis && <p class="dz-intro">{zakladyOpis}</p>}
+        <div class="pt-cards pt-cards-3">
+          {listaZakladow.map((z) => {
+            const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
+            const kier = kierownik(z.data.kierownik);
+            return (
+              <article class="pt-card pt-link">
+                <h3 class="n"><a href={href(`/instytut/zaklady/${z.id}`)}>{wybierz(z.data, 'nazwa', lang)}</a></h3>
+                {obszary.length > 0 && <p class="pt-hasla">{obszary.slice(0, 4).map((o) => <span>{o}</span>)}</p>}
+                {kier && <p class="f">{T('Kierownik', 'Head')}: <span class="dz-kier">{kier}</span></p>}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    <div class="zsec" style="margin-bottom:0">
+      <div class="pt-grid">
+        {sukcesy.length > 0 && (
+          <section class="pt-box" aria-labelledby="sukcesy">
+            <div class="pt-h">
+              <h2 id="sukcesy">{T('Ostatnie sukcesy', 'Recent achievements')}</h2>
+              <a class="pt-all" href={href('/nauka/sukcesy')}>{T('Wszystkie sukcesy', 'All achievements')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+            </div>
+            {sukcesyOpis && <p class="pt-opis">{sukcesyOpis}</p>}
+            <ul class="pt-list">
+              {sukcesy.map((a) => {
+                const zajawka = (lang === 'en' && a.data.zajawka_en) || a.data.zajawka;
+                return (
+                  <li>
+                    <a class="pt-item" href={href(`/aktualnosci/${slugOf(a.id)}`)}>
+                      <span class="pt-b">
+                        <span class="pt-k"><time datetime={a.data.data.slice(0, 10)}>{long(a.data.data, lang, false)}</time></span>
+                        <span class="pt-t">{(lang === 'en' && a.data.tytul_en) || a.data.tytul}</span>
+                        {zajawka && <span class="pt-s">{zajawka}</span>}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
+
+        <section class="pt-box" aria-labelledby="kontakt">
+          <div class="pt-h"><h2 id="kontakt">{T('Kontakt i dojazd', 'Contact and getting here')}</h2></div>
+          <p class="dz-name">{t(lang, 'instytut')}, {t(lang, 'uwr')}</p>
+          <ul class="dz-kontakt">
+            {k.adres && <li><Ikona nazwa="pinezka" rozmiar={18} /><span>{k.adres}</span></li>}
+            {k.telefon && <li><Ikona nazwa="telefon" rozmiar={18} /><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></li>}
+            {k.email && <li><Ikona nazwa="mail" rozmiar={18} /><a href={`mailto:${k.email}`}>{k.email}</a></li>}
+            {godziny && <li><Ikona nazwa="zegar" rozmiar={18} /><span>{godziny}</span></li>}
+          </ul>
+          <p class="pt-stopka">
+            <a class="pt-all" href={href('/instytut/kontakt')}>{T('Wszystkie dane kontaktowe', 'Full contact details')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+            {mapa && <a class="pt-all" href={mapa}>{T('Pokaż na mapie', 'Show on map')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a>}
+          </p>
+        </section>
+
+        {mapaEmbed && (
+          <div class="dz-mapa pt-szeroka-sr" data-mapa={mapaEmbed} data-tytul={T('Mapa: Instytut Matematyczny, pl. Grunwaldzki 2, Wrocław', 'Map: Mathematical Institute, pl. Grunwaldzki 2, Wrocław')}>
+            <button type="button" class="dz-mapa-btn" data-mapa-pokaz>
+              <Ikona nazwa="pinezka" rozmiar={28} />
+              <span class="t">{T('Pokaż mapę Google', 'Show Google map')}</span>
+              <span class="s">{T('Mapa załaduje się z serwisu Google Maps — Google może zapisać pliki cookies.', 'The map loads from Google Maps — Google may set cookies.')}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* Telefon (≤ 760 px) — wygląd „Portal” jak na głównej gałęzi: „W tym dziale” w ramkach, zakłady w zwartych kartach,
+       sukcesy w ramce, kontakt w ramce (linki pod adresem) i pod nim mapa. Cały blok jest poza wyszukiwarką, a id mają
+       przyrostek „-tel” (ta sama treść jest w bloku na komputer). */}
+  <div class="wrap dz-wrap tylko-telefon" data-pagefind-ignore>
+    {grupy.length > 0 && (
+      <section class="zsec" aria-labelledby="w-dziale-tel">
+        <h2 id="w-dziale-tel">{T('W tym dziale', 'In this section')}</h2>
         <div class="dz-groups">
           {grupy.map((g) => (
             <div class="dz-g">
@@ -99,9 +201,9 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
     )}
 
     {listaZakladow.length > 0 && (
-      <section class="zsec dz-karty" aria-labelledby="zaklady">
-        <h2 id="zaklady">{T('Zakłady', 'Departments')}</h2>
-        <a class="pt-all dz-head-link tylko-telefon" data-pagefind-ignore href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+      <section class="zsec dz-karty" aria-labelledby="zaklady-tel">
+        <h2 id="zaklady-tel">{T('Zakłady', 'Departments')}</h2>
+        <a class="pt-all dz-head-link" href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
         {zakladyOpis && <p class="dz-intro">{zakladyOpis}</p>}
         <div class="spec-grid">
           {listaZakladow.map((z) => {
@@ -116,17 +218,14 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
             );
           })}
         </div>
-        <p class="dz-more tylko-komputer">
-          <a class="link-arrow" href={href('/instytut/struktura')}>{T('Struktura i zakłady', 'Structure and departments')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-        </p>
       </section>
     )}
 
     {sukcesy.length > 0 && (
-      <section class="zsec dz-ramka-sek dz-sukcesy" aria-labelledby="sukcesy">
-        <h2 id="sukcesy">{T('Ostatnie sukcesy', 'Recent achievements')}</h2>
-        <a class="pt-all dz-head-link tylko-telefon" data-pagefind-ignore href={href('/nauka/sukcesy')}>{T('Wszystkie sukcesy', 'All achievements')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
-        <span class="dz-kreska tylko-telefon" aria-hidden="true"></span>
+      <section class="zsec dz-ramka-sek dz-sukcesy" aria-labelledby="sukcesy-tel">
+        <h2 id="sukcesy-tel">{T('Ostatnie sukcesy', 'Recent achievements')}</h2>
+        <a class="pt-all dz-head-link" href={href('/nauka/sukcesy')}>{T('Wszystkie sukcesy', 'All achievements')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        <span class="dz-kreska" aria-hidden="true"></span>
         {sukcesyOpis && <p class="dz-intro">{sukcesyOpis}</p>}
         <div class="spec-grid">
           {sukcesy.map((a) => {
@@ -143,15 +242,11 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
             );
           })}
         </div>
-        <p class="dz-more tylko-komputer">
-          <a class="link-arrow" href={href('/nauka/sukcesy')}>{T('Wszystkie sukcesy', 'All achievements')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-        </p>
       </section>
     )}
 
-    <section class="zsec dz-kontakt-sek" aria-labelledby="kontakt">
-      <h2 id="kontakt" class="tylko-komputer">{T('Kontakt i dojazd', 'Contact and getting here')}</h2>
-      <div class="pt-box tylko-telefon" data-pagefind-ignore>
+    <section class="zsec dz-kontakt-sek" aria-labelledby="kontakt-tel">
+      <div class="pt-box">
         <div class="pt-h"><h2 id="kontakt-tel">{T('Kontakt i dojazd', 'Contact and getting here')}</h2></div>
         <p class="dz-name">{t(lang, 'instytut')}, {t(lang, 'uwr')}</p>
         <ul class="dz-kontakt">
@@ -166,15 +261,6 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
         </p>
       </div>
       <div class="dz-kontakt-uklad">
-      <div class="dz-card tylko-komputer">
-        <p class="dz-name">{t(lang, 'instytut')}, {t(lang, 'uwr')}</p>
-        <ul class="dz-kontakt">
-          {k.adres && <li><Ikona nazwa="pinezka" rozmiar={20} /><span>{k.adres}</span></li>}
-          {k.telefon && <li><Ikona nazwa="telefon" rozmiar={20} /><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></li>}
-          {k.email && <li><Ikona nazwa="mail" rozmiar={20} /><a href={`mailto:${k.email}`}>{k.email}</a></li>}
-          {godziny && <li><Ikona nazwa="zegar" rozmiar={20} /><span>{godziny}</span></li>}
-        </ul>
-      </div>
       {mapaEmbed && (
         <div class="dz-mapa" data-mapa={mapaEmbed} data-tytul={T('Mapa: Instytut Matematyczny, pl. Grunwaldzki 2, Wrocław', 'Map: Mathematical Institute, pl. Grunwaldzki 2, Wrocław')}>
           <button type="button" class="dz-mapa-btn" data-mapa-pokaz>
@@ -185,42 +271,41 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
         </div>
       )}
       </div>
-      <p class="dz-more tylko-komputer">
-        <a class="link-arrow" href={href('/instytut/kontakt')}>{T('Wszystkie dane kontaktowe', 'Full contact details')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-        {mapa && <a class="link-arrow" href={mapa}>{T('Pokaż na mapie', 'Show on map')}<Ikona nazwa="zewnetrzny" rozmiar={16} /></a>}
-      </p>
     </section>
   </div>
 </Baza>
 
 <style>
-  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
-  .dz-intro { margin: -4px 0 16px; max-width: 760px; color: var(--muted); font-size: 16px; line-height: 1.6; }
-  .dz-more { display: flex; flex-wrap: wrap; gap: 0 24px; margin: 10px 0 0; }
+  /* Blok na komputer i blok na telefon: mało miejsca nad i pod treścią, jak w wariancie „Portal”. */
+  .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
+  .dz-intro { margin: -2px 0 10px; max-width: 860px; color: var(--muted); font-size: 15px; line-height: 1.5; }
   .dz-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px 16px; }
   .dz-g h3 { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
   .dz-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
   .dz-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .dz-kontakt-uklad { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; align-items: stretch; }
-  .dz-card { padding: 20px 22px; border-radius: var(--radius-l); background: var(--surface); }
-  .dz-mapa { position: relative; min-height: 300px; border-radius: var(--radius-l); overflow: hidden; background: var(--surface); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; }
+  /* kontakt i mapa (komputer i telefon): ramka z adresem, obok (komputer) albo pod nią (telefon) mapa */
+  .dz-mapa { position: relative; align-self: stretch; min-height: 230px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; }
   .dz-mapa :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-  .dz-mapa-btn { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: center; cursor: pointer; }
+  .dz-mapa-btn { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 18px; border: 0; background: transparent; color: var(--ink); font: inherit; text-align: center; cursor: pointer; }
   .dz-mapa-btn :global(svg) { color: var(--primary); }
   :global(:root[data-theme='dark']) .dz-mapa-btn :global(svg) { color: var(--accent); }
-  .dz-mapa-btn .t { padding: 10px 18px; border-radius: 999px; background: var(--bg); font-weight: 700; box-shadow: var(--shadow); }
+  .dz-mapa-btn .t { padding: 9px 16px; border-radius: 999px; background: var(--bg); font-weight: 700; box-shadow: var(--shadow); }
   .dz-mapa-btn:hover .t { background: var(--primary); color: var(--primary-ink); }
-  .dz-mapa-btn .s { max-width: 320px; font-size: 13px; color: var(--muted); }
-  .dz-name { margin: 0 0 12px; font-weight: 800; color: var(--ink); }
-  .dz-kontakt { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; font-size: 17px; }
-  .dz-kontakt li { display: flex; align-items: flex-start; gap: 12px; }
+  .dz-mapa-btn .s { max-width: 300px; font-size: 13px; color: var(--muted); }
+  .dz-name { margin: 8px 0 6px; font-weight: 800; color: var(--ink); }
+  .dz-kontakt { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: 15px; }
+  .dz-kontakt li { display: flex; align-items: flex-start; gap: 10px; }
   .dz-kontakt li :global(svg) { flex: 0 0 auto; margin-top: 2px; color: var(--primary); }
   :global(:root[data-theme='dark']) .dz-kontakt li :global(svg) { color: var(--accent); }
 
+  /* ---------- komputer (≥ 761 px): wariant „Portal” (blok .tylko-komputer) ---------- */
+  .dz-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 8px; }
+  .dz-head h2 { margin: 0; font-size: 22px; font-weight: 800; scroll-margin-top: 16px; }
+  .dz-kier { color: var(--text); font-weight: 600; }
+
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Nauka”) ---------- */
   @media (max-width: 760px) {
-    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
     /* „W tym dziale”: każda grupa w ramce, linki jako wiersze (napis z lewej, strzałka z prawej) */
     .dz-groups { display: flex; flex-direction: column; gap: 12px; }
     .dz-g { padding: 10px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
@@ -239,7 +324,6 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
     .dz-karty > h2 { flex: 0 1 auto; margin: 0 0 8px; }
     .dz-karty > .dz-head-link, .dz-ramka-sek > .dz-head-link { flex: 0 0 auto; }
     .dz-karty > .dz-head-link { margin-bottom: 8px; }
-    .dz-intro { margin: -2px 0 10px; max-width: 860px; font-size: 15px; line-height: 1.5; }
     .dz-karty .spec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .dz-karty .spec { gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); line-height: 1.45; }
     .dz-karty .spec-link:hover, .dz-karty .spec-link:focus-within { box-shadow: none; transform: none; }
@@ -273,14 +357,7 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
     /* kontakt: ramka (blok tylko na telefon) i pod nią mapa; kreska sekcji tylko nad sukcesami */
     .zsec.dz-kontakt-sek { display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; padding-top: 0; border-top: 0; }
     .zsec.dz-kontakt-sek::before { content: none; }
-    .dz-kontakt-uklad { display: block; }
-    .dz-mapa { min-height: 230px; border: 1px solid var(--line); border-radius: var(--radius); }
-    .dz-mapa-btn { padding: 18px; }
-    .dz-mapa-btn .t { padding: 9px 16px; }
-    .dz-mapa-btn .s { max-width: 300px; }
-    .dz-name { margin: 8px 0 6px; }
-    .dz-kontakt { gap: 6px; font-size: 15px; }
-    .dz-kontakt li { align-items: center; gap: 10px; }
+    .dz-kontakt li { align-items: center; }
     .dz-kontakt a { display: inline-flex; align-items: center; min-height: 40px; }
   }
   @media (max-width: 560px) {
@@ -299,10 +376,15 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
     f.allowFullscreen = true;
     box.replaceChildren(f);
   };
+  // Strona ma dwie ramki mapy (blok na komputer i blok na telefon, jeden z nich ukryty): przy zapamiętanej zgodzie
+  // mapa ładuje się dopiero, gdy jej ramka jest widoczna — ukryta nie pobiera nic z Google.
+  const widoczna = 'IntersectionObserver' in window
+    ? new IntersectionObserver((wpisy, io) => wpisy.forEach((w) => { if (w.isIntersecting) { io.unobserve(w.target); pokaz(w.target as HTMLElement); } }))
+    : null;
   document.querySelectorAll<HTMLElement>('[data-mapa]').forEach((box) => {
     let zgoda = false;
     try { zgoda = localStorage.getItem('mapa-google') === '1'; } catch (e) {}
-    if (zgoda) pokaz(box);
+    if (zgoda) { if (widoczna) widoczna.observe(box); else pokaz(box); }
     box.querySelector('[data-mapa-pokaz]')?.addEventListener('click', () => {
       try { localStorage.setItem('mapa-google', '1'); } catch (e) {}
       pokaz(box);

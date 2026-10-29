@@ -1,23 +1,43 @@
 ---
 // Wydarzenie z kafelkiem daty (strona główna, kalendarz, panel boczny).
+// wiersz = zwarta pozycja listy <li> (wariant „Portal”: kolumna „Najbliższe wydarzenia”); musi stać w <ul class="pt-list">.
 import { u } from '../lib/url';
 import { wJezyku, RODZAJE } from '../lib/i18n';
 import { dayNum, monthShort, range, time, hasTime, type Lang } from '../lib/daty';
 import type { Wydarzenie } from '../lib/tresci';
 
-interface Props { w: Wydarzenie; lang: Lang; maly?: boolean; jasny?: boolean }
-const { w, lang, maly = false, jasny = false } = Astro.props;
+interface Props { w: Wydarzenie; lang: Lang; maly?: boolean; jasny?: boolean; wiersz?: boolean }
+const { w, lang, maly = false, jasny = false, wiersz = false } = Astro.props;
 const meta = [(w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang), w.miejsce].filter(Boolean).join(' · ');
+const koniec = w.koniec || w.koniecIcs || w.poczatek;
+const rodzaj = `${RODZAJE[w.rodzaj]?.[lang] ?? ''}${hasTime(w.poczatek) ? ` · ${time(w.poczatek)}` : ''}`;
 ---
-<a class="event" href={u(wJezyku(w.href, lang))} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
-  <span class={`datebox${maly ? ' small' : ''}${jasny ? ' light' : ''}`} aria-hidden="true">
-    <span class="d">{dayNum(w.poczatek)}</span>
-    <span class="m">{monthShort(w.poczatek, lang)}</span>
-  </span>
-  <span class="event-body">
-    <span class="k">{RODZAJE[w.rodzaj]?.[lang]}{hasTime(w.poczatek) ? ` · ${time(w.poczatek)}` : ''}</span>
-    <span class="t">{w.tytul}</span>
-    {w.podtytul && <span class="s" lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</span>}
-    <span class="s">{meta}</span>
-  </span>
-</a>
+{wiersz ? (
+  <li data-koniec={koniec}>
+    <a class="pt-item" href={u(wJezyku(w.href, lang))}>
+      <span class={`pt-dbox${jasny ? ' light' : ''}`} aria-hidden="true">
+        <span class="d">{dayNum(w.poczatek)}</span>
+        <span class="m">{monthShort(w.poczatek, lang)}</span>
+      </span>
+      <span class="pt-b">
+        <span class="pt-k">{rodzaj}</span>
+        <span class="pt-t">{w.tytul}</span>
+        {w.podtytul && <span class="pt-s" lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</span>}
+        <span class="pt-s">{meta}</span>
+      </span>
+    </a>
+  </li>
+) : (
+  <a class="event" href={u(wJezyku(w.href, lang))} data-koniec={koniec}>
+    <span class={`datebox${maly ? ' small' : ''}${jasny ? ' light' : ''}`} aria-hidden="true">
+      <span class="d">{dayNum(w.poczatek)}</span>
+      <span class="m">{monthShort(w.poczatek, lang)}</span>
+    </span>
+    <span class="event-body">
+      <span class="k">{rodzaj}</span>
+      <span class="t">{w.tytul}</span>
+      {w.podtytul && <span class="s" lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</span>}
+      <span class="s">{meta}</span>
+    </span>
+  </a>
+)}

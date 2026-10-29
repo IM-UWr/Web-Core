@@ -39,6 +39,8 @@ const napisy = {
   brak: lang === 'en' ? 'Nobody matches the search.' : 'Nikogo nie znaleziono.',
   zaklad: lang === 'en' ? 'Department' : 'Zakład',
   wszystkieZaklady: lang === 'en' ? 'All departments' : 'Wszystkie zakłady',
+  funkcja: lang === 'en' ? 'Role' : 'Funkcja',
+  zakladFunkcja: lang === 'en' ? 'Department / role' : 'Zakład / funkcja',
 };
 const lead = lang === 'en'
   ? 'Contact details of the staff, PhD students and administration of the Mathematical Institute.'
@@ -52,7 +54,6 @@ const lead = lang === 'en'
 </Baza>
 
 <style>
-  .pr-wrap { padding-top: 28px; padding-bottom: 64px; }
-  /* telefon (≤ 760 px): wygląd „Portal” — mniej miejsca nad i pod spisem */
-  @media (max-width: 760px) { .pr-wrap { padding-top: 16px; padding-bottom: 40px; } }
+  /* wygląd „Portal” (komputer i telefon): mniej miejsca nad i pod spisem */
+  .pr-wrap { padding-top: 16px; padding-bottom: 40px; }
 </style>

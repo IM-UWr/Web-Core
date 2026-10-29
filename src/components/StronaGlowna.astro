@@ -2,9 +2,7 @@
 // Strona główna (wspólna dla wersji polskiej i angielskiej).
 import Baza from '../layouts/Baza.astro';
 import Ikona from './Ikona.astro';
-import KartaAktualnosci from './KartaAktualnosci.astro';
 import KartaWydarzenia from './KartaWydarzenia.astro';
-import TabelaReferatow from './TabelaReferatow.astro';
 import ListaReferatow from './ListaReferatow.astro';
 import KafelekKoloryDni from './KafelekKoloryDni.astro';
 import WartoWiedziec from './WartoWiedziec.astro';
@@ -26,12 +24,11 @@ const KOLORY_DNI = '/studia/rok-akademicki';
 const dniWydarzen = Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5;
 const wydarzenia = await wydarzeniaNaGlowna(3, lang, dniWydarzen);
 const wyrozniona = await wyroznionaAktualnosc(lang);
-const lista = await aktualnosciNaGlowna(6, lang, wydarzenia.map((w) => w.href));
-// Pierwsza aktualność ze zdjęciem zajmuje dwie kolumny — wtedy pokazujemy o jedną mniej.
-const pierwszaZeZdjeciem = !!lista[0]?.zdjecie;
-const aktualnosci = pierwszaZeZdjeciem ? lista.slice(0, 5) : lista;
-// Telefon (wygląd „Portal”): zawsze sześć najnowszych w zwartej liście — data, rodzaj lub adresat, tytuł, miniatura.
-const etykieta = (p: (typeof lista)[number]) =>
+// Wariant „Portal”: zwarta lista aktualności (data, rodzaj lub adresat, tytuł; miniatura, gdy wpis ma zdjęcie) —
+// na komputerze jedenaście w lewej kolumnie, na telefonie sześć najnowszych.
+const aktualnosci = await aktualnosciNaGlowna(11, lang, wydarzenia.map((w) => w.href));
+const lista = aktualnosci.slice(0, 6);
+const etykieta = (p: (typeof aktualnosci)[number]) =>
   p.rodzaj !== 'ogloszenie' ? RODZAJE[p.rodzaj]?.[lang] : p.dla[0] ? ODBIORCY[p.dla[0]]?.[lang] : RODZAJE.ogloszenie[lang];
 const referaty = await referatyWTygodniu(lang);
 const tydzien = tydzienSeminariow();
@@ -86,12 +83,108 @@ const kafelki = [
     </div>
   </section>
 
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: pod banerem ramki jedna pod drugą: Na skróty (kafelki jako wiersze),
-       Aktualności (osobna, zwarta lista), Najbliższe wydarzenia, Seminaria, Warto wiedzieć (osobna lista), Studia.
-       Sekcje wspólne z komputerem zmieniają tylko wygląd (style na dole); bloki .tylko-telefon są z data-pagefind-ignore. */}
-  <section class="gl-skroty" aria-label={t(lang, 'naSkroty')}>
+  {/* Komputer (≥ 761 px) — wariant „Portal”: zaraz pod banerem trzy kolumny — aktualności | wydarzenia, seminaria tygodnia
+       i „Warto wiedzieć” | na skróty i studia. Style: src/styles/portal.css i <style> poniżej. */}
+  <div class="pt-sekcja pt-glowna tylko-komputer">
+    <div class="wrap pt-grid">
+      <section class="pt-box pt-akt" aria-labelledby="h2-akt">
+        <div class="pt-h">
+          <h2 id="h2-akt">{t(lang, 'aktualnosci')}</h2>
+          <a class="pt-all" href={href('/aktualnosci')}>{t(lang, 'wszystkieAktualnosci')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+        </div>
+        <ul class="pt-list">
+          {aktualnosci.map((p) => (
+            <li>
+              <a class="pt-item" href={href(p.href)}>
+                <time class="pt-d" datetime={p.data}>{short(p.data).slice(0, 5)}</time>
+                <span class="pt-b">
+                  <span class="pt-k">{etykieta(p)}</span>
+                  <span class="pt-t">{p.tytul}</span>
+                </span>
+                {p.zdjecie && <span class="pt-min"><img src={u(p.zdjecie)} alt="" loading="lazy" decoding="async" /></span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div class="pt-col">
+        {wydarzenia.length > 0 && (
+          <section class="pt-box" aria-labelledby="h2-wyd" data-wydarzenia>
+            <div class="pt-h">
+              <h2 id="h2-wyd">{t(lang, 'najblizsze')}</h2>
+              <a class="pt-all" href={href('/kalendarz')}>{t(lang, 'kalendarz')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+            </div>
+            <ul class="pt-list">
+              {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} wiersz />)}
+            </ul>
+          </section>
+        )}
+        <section class="pt-box" aria-labelledby="h2-sem">
+          <div class="pt-h">
+            <span class="pt-h-l">
+              <h2 id="h2-sem">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
+              <span class="pt-zakres">{range(tydzien.od, tydzien.do, lang)}</span>
+            </span>
+          </div>
+          <ListaReferatow
+            wiersze={referaty}
+            lang={lang}
+            etykieta={t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}
+            pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
+          />
+          <p class="pt-stopka"><a class="pt-all" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
+        </section>
+        <WartoWiedziec lang={lang} uklad="portal" komputer glowna limit={4} />
+      </div>
+
+      <div class="pt-col pt-szeroka-sr">
+        <section class="pt-box pt-skroty-box" aria-labelledby="h2-skroty">
+          <div class="pt-h"><h2 id="h2-skroty">{t(lang, 'naSkroty')}</h2></div>
+          <ul class="pt-skroty">
+            {skroty.kafelki.map((k) => (
+              <li>
+                {k.adres === KOLORY_DNI ? (
+                  <KafelekKoloryDni lang={lang} adres={k.adres} etykieta={wybierz(k, 'etykieta', lang)} />
+                ) : (
+                  <a class="tile" href={href(k.adres)}>
+                    <Ikona nazwa={k.ikona} />
+                    <span>{wybierz(k, 'etykieta', lang)}</span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section class="pt-box" aria-labelledby="h2-studia">
+          <div class="pt-h"><h2 id="h2-studia">{wybierz(st, 'tytul', lang)}</h2></div>
+          <p class="pt-opis">{wybierz(st, 'opis', lang)}</p>
+          <ul class="pt-list">
+            {kafelki.map((k) => (
+              <li>
+                <a class="pt-item" href={href(k.adres)}>
+                  <span class="pt-b">
+                    <span class="pt-k">{wybierz(k, 'poziom', lang)}</span>
+                    <span class="pt-t">{wybierz(k, 'nazwa', lang)}</span>
+                    {wybierz(k, 'opis', lang) && <span class="pt-s">{wybierz(k, 'opis', lang)}</span>}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p class="pt-stopka"><a class="btn btn-accent btn-small" href={st.rekrutacja}>{t(lang, 'rekrutacja')}<Ikona nazwa="strzalka" rozmiar={15} /></a></p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  {/* Telefon (≤ 760 px) — wygląd „Portal” jak na głównej gałęzi: pod banerem ramki jedna pod drugą: Na skróty (kafelki
+       jako wiersze), Aktualności (zwarta lista), Najbliższe wydarzenia, Seminaria, Warto wiedzieć, Studia (style na dole).
+       Wszystkie bloki .tylko-telefon są z data-pagefind-ignore i mają id z przyrostkiem „-tel” (treść jest też w bloku wyżej). */}
+  <section class="gl-skroty tylko-telefon" aria-label={t(lang, 'naSkroty')} data-pagefind-ignore>
     <div class="wrap tiles">
-      <div class="pt-h tylko-telefon"><h2 id="h2-skroty">{t(lang, 'naSkroty')}</h2></div>
+      <div class="pt-h"><h2 id="h2-skroty-tel">{t(lang, 'naSkroty')}</h2></div>
       {skroty.kafelki.map((k) => (
         k.adres === KOLORY_DNI ? (
           <KafelekKoloryDni lang={lang} adres={k.adres} etykieta={wybierz(k, 'etykieta', lang)} />
@@ -129,10 +222,10 @@ const kafelki = [
   </div>
 
   {wydarzenia.length > 0 && (
-    <section class="section wydarzenia-pas gl-box gl-wyd" aria-labelledby="h2-wyd" data-wydarzenia>
+    <section class="section wydarzenia-pas gl-box gl-wyd tylko-telefon" aria-labelledby="h2-wyd-tel" data-wydarzenia data-pagefind-ignore>
       <div class="wrap">
         <div class="section-head">
-          <h2 id="h2-wyd">{t(lang, 'najblizsze')}</h2>
+          <h2 id="h2-wyd-tel">{t(lang, 'najblizsze')}</h2>
           <a class="link-arrow" href={href('/kalendarz')}>{t(lang, 'kalendarz')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
         </div>
         <div class="event-grid">
@@ -142,19 +235,7 @@ const kafelki = [
     </section>
   )}
 
-  <section class="section tylko-komputer" aria-labelledby="h2-akt">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="h2-akt">{t(lang, 'aktualnosci')}</h2>
-        <a class="link-arrow" href={href('/aktualnosci')}>{t(lang, 'wszystkieAktualnosci')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      <div class="news-grid">
-        {aktualnosci.map((p, i) => <KartaAktualnosci p={p} lang={lang} wyrozniona={i === 0 && pierwszaZeZdjeciem} />)}
-      </div>
-    </div>
-  </section>
-
-  <section class="section section-alt gl-box gl-sem" aria-labelledby="h3-sem">
+  <section class="section section-alt gl-box gl-sem tylko-telefon" aria-labelledby="h3-sem" data-pagefind-ignore>
     <div class="wrap">
       <div class="sem-week sem-week-sam">
         <div class="section-head gl-sem-head">
@@ -162,19 +243,8 @@ const kafelki = [
             <h2 id="h3-sem" class="sem-week-h">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
             <span class="muted gl-sem-zakres">{range(tydzien.od, tydzien.do, lang)}</span>
           </div>
-          <div class="gl-sem-r tylko-komputer">
-            <a class="link-arrow" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-          </div>
         </div>
-        <div class="tylko-komputer">
-          <TabelaReferatow
-            wiersze={referaty}
-            lang={lang}
-            etykieta={t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}
-            pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
-          />
-        </div>
-        <div class="tylko-telefon" data-pagefind-ignore>
+        <div>
           <ListaReferatow
             wiersze={referaty}
             lang={lang}
@@ -191,14 +261,13 @@ const kafelki = [
     <WartoWiedziec lang={lang} uklad="portal" glowna limit={4} />
   </div>
 
-  <section class="section studia gl-box gl-studia" aria-labelledby="h2-studia">
+  <section class="section studia gl-box gl-studia tylko-telefon" aria-labelledby="h2-studia-tel" data-pagefind-ignore>
     <div class="wrap">
       <div class="studia-head">
         <div>
-          <h2 id="h2-studia">{wybierz(st, 'tytul', lang)}</h2>
+          <h2 id="h2-studia-tel">{wybierz(st, 'tytul', lang)}</h2>
           <p>{wybierz(st, 'opis', lang)}</p>
         </div>
-        <a class="btn btn-accent tylko-komputer" href={st.rekrutacja}>{t(lang, 'rekrutacja')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
       </div>
       <div class="prog-grid">
         {kafelki.map((k) => (
@@ -209,35 +278,41 @@ const kafelki = [
           </a>
         ))}
       </div>
-      <p class="pt-stopka tylko-telefon" data-pagefind-ignore><a class="btn btn-accent btn-small" href={st.rekrutacja}>{t(lang, 'rekrutacja')}<Ikona nazwa="strzalka" rozmiar={15} /></a></p>
+      <p class="pt-stopka"><a class="btn btn-accent btn-small" href={st.rekrutacja}>{t(lang, 'rekrutacja')}<Ikona nazwa="strzalka" rozmiar={15} /></a></p>
     </div>
   </section>
-
-  <WartoWiedziec lang={lang} uklad="glowna" limit={4} klasa="tylko-komputer" />
 </Baza>
 
 <script>
-  // Strona przebudowuje się 2× dziennie — wydarzenia, które już się skończyły, chowamy od razu w przeglądarce.
+  // Strona przebudowuje się 2× dziennie — wydarzenia, które już się skończyły, chowamy od razu w przeglądarce
+  // (ramka na komputer i sekcja na telefon).
   import { now, today, hasTime } from '../lib/daty';
-  const sekcja = document.querySelector<HTMLElement>('[data-wydarzenia]');
-  if (sekcja) {
-    const n = now();
-    const d = today();
+  const n = now();
+  const d = today();
+  document.querySelectorAll<HTMLElement>('[data-wydarzenia]').forEach((sekcja) => {
     const karty = Array.from(sekcja.querySelectorAll<HTMLElement>('[data-koniec]'));
     karty.forEach((k) => {
       const koniec = k.dataset.koniec || '';
       if (koniec && (hasTime(koniec) ? koniec < n : koniec < d)) k.remove();
     });
     if (!sekcja.querySelector('[data-koniec]')) sekcja.remove();
-  }
+  });
 </script>
 
 <style>
-  /* Seminaria tygodnia: tytuł i zakres dat obok siebie, link „Wszystkie seminaria” z prawej (komputer) */
+  /* ---------- komputer (≥ 761 px): wariant „Portal” — trzy kolumny pod banerem ---------- */
+  /* „Na skróty” w kolumnie: kafelki jako wiersze (ikona z lewej, napis obok; kafelek koloru dnia z opisem pod napisem) */
+  .pt-skroty { list-style: none; margin: 0; padding: 0; }
+  .pt-skroty li + li { border-top: 1px solid var(--line); }
+  .pt-skroty :global(.tile) { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; gap: 0 12px; min-height: 44px; padding: 8px 6px; border: 0; border-radius: 8px; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.3; }
+  .pt-skroty :global(.tile:hover) { background: var(--tint); }
+  .pt-skroty :global(.tile .kd-pod) { grid-column: 2; margin-top: 1px; }
+  .pt-glowna .pt-stopka { padding-top: 8px; }
+
+  /* Seminaria tygodnia na telefonie: tytuł i zakres dat obok siebie */
   .gl-sem-head { margin-bottom: 14px; }
   .gl-sem-l { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
   .gl-sem-zakres { font-size: 14px; font-weight: 600; }
-  .gl-sem-r { display: flex; flex-wrap: wrap; gap: 0 20px; }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” — ramki jedna pod drugą ---------- */
   @media (max-width: 760px) {

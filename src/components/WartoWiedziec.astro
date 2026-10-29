@@ -3,8 +3,9 @@
 // uklad: 'glowna' = pasek na stronie głównej (tylko pozycje „Pokaż na stronie głównej”),
 //        'dzial'  = sekcja na stronie działu (/nauka, /studia) albo „Zobacz też” na podstronie pozycji,
 //        'lista'  = sama siatka kart (strona /warto-wiedziec),
-//        'portal' = wariant „Portal” na telefonie: ramka .pt-box ze zwartą listą (rok lub miniatura, tytuł, zajawka);
-//                   stoi w bloku .tylko-telefon, więc id ma przyrostek „-tel” i nie trafia do wyszukiwarki;
+//        'portal' = wariant „Portal”: ramka .pt-box ze zwartą listą (rok lub miniatura, tytuł, zajawka);
+//                   domyślnie stoi w bloku .tylko-telefon, więc id ma przyrostek „-tel” i nie trafia do wyszukiwarki;
+//                   komputer = ta sama ramka w bloku na komputer (id bez przyrostka, w wyszukiwarce);
 //                   glowna = tylko pozycje „Pokaż na stronie głównej”.
 // klasa: dodatkowe klasy sekcji (np. tylko-komputer, gdy na telefonie stoi obok wersja 'portal').
 // Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
@@ -23,11 +24,12 @@ interface Props {
   uklad?: 'glowna' | 'dzial' | 'lista' | 'portal';
   // tylko dla układu 'portal'
   glowna?: boolean;
+  komputer?: boolean;
   klasa?: string;
   // identyfikator pozycji do pominięcia (np. bieżąca podstrona)
   pomin?: string;
 }
-const { lang, dzial, limit, naglowek, uklad = 'dzial', pomin, glowna = false, klasa } = Astro.props;
+const { lang, dzial, limit, naglowek, uklad = 'dzial', pomin, glowna = false, komputer = false, klasa } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 
@@ -60,14 +62,14 @@ const karty = pokaz.map((w) => {
 });
 
 const tytulSekcji = naglowek ?? T('Warto wiedzieć', 'Highlights');
-const idSekcji = (uklad === 'glowna' || glowna ? 'h2-warto' : `warto-wiedziec${pomin ? '-inne' : dzial ? `-${dzial}` : ''}`) + (uklad === 'portal' ? '-tel' : '');
+const idSekcji = (uklad === 'glowna' || glowna ? 'h2-warto' : `warto-wiedziec${pomin ? '-inne' : dzial ? `-${dzial}` : ''}`) + (uklad === 'portal' && !komputer ? '-tel' : '');
 const H = uklad === 'lista' ? 'h2' : 'h3';
 // Opakowanie: pasek strony głównej (.section-alt), sekcja działu (.zsec) albo sama siatka.
 const Zewn = uklad === 'lista' ? 'div' : 'section';
 const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial' ? 'zsec' : '', klasa].filter(Boolean).join(' ') || undefined;
 ---
 {karty.length > 0 && uklad === 'portal' && (
-  <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore>
+  <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore={!komputer}>
     <div class="pt-h">
       <h2 id={idSekcji}>{tytulSekcji}</h2>
       {wiecej && <a class="pt-all" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={14} /></a>}

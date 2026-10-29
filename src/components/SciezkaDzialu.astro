@@ -1,0 +1,27 @@
+---
+// Ramka „ścieżki” na stronie działu (wariant „Portal”): tytuł, krótki opis i lista linków ze strzałkami.
+// Używana na /studia („Chcę studiować”, „Już studiuję”). Style: .pt-box, .pt-links w src/styles/portal.css.
+import Ikona from './Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { s: { id: string; tytul: string; opis?: string; linki: { etykieta: string; adres: string }[] }; lang: Lang; kolumny?: boolean }
+const { s, lang, kolumny = false } = Astro.props;
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+---
+<section class="pt-box" aria-labelledby={s.id}>
+  <div class="pt-h"><h2 id={s.id}>{s.tytul}</h2></div>
+  {s.opis && <p class="pt-opis">{s.opis}</p>}
+  <ul class:list={['pt-links', { 'pt-links-2': kolumny }]}>
+    {s.linki.map((l) => (
+      <li>
+        <a href={href(l.adres)}>
+          <span>{l.etykieta}</span>
+          <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />
+          {isExternal(l.adres) && <span class="sr-only">{lang === 'en' ? '(external site)' : '(strona zewnętrzna)'}</span>}
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>

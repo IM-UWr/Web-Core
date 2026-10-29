@@ -79,8 +79,10 @@ const sekcje = [
 ].map((s) => ({ depth: 2, ...s }));
 ---
 <Baza tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany}>
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: fakty 2×2, zwartsze sekcje (style na dole). */}
-  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); przyciski w banerze, liczby pod nim. */}
+  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); przyciski w banerze, liczby pod nim.
+       Wariant „Portal”: na komputerze spis sekcji jako poziomy pasek pod banerem (zamiast panelu z prawej) — treść ma pełną
+       szerokość, „Dlaczego warto” stoi obok tekstu o kierunku, a krótkie sekcje parami obok siebie.
+       Telefon (≤ 760 px): jak na głównej gałęzi — fakty 2×2, zwartsze sekcje, spis sekcji jako rozwijana lista (style na dole). */}
   <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} lang={lang} nadtytul={d.podtytul ? w(d, 'podtytul') : undefined} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}>
     {d.przyciski.length > 0 && (
       <div class="btn-row kh-btns">
@@ -91,7 +93,8 @@ const sekcje = [
     )}
   </NaglowekStrony>
 
-  <div class="wrap layout kier">
+  <SpisTresci naglowki={sekcje} lang={lang} wariant="pasek" />
+  <div class="wrap kier">
     <div class="main">
       {d.fakty.length > 0 && (
         <div class="stats kh-fakty">
@@ -102,6 +105,7 @@ const sekcje = [
 
       <section class="zsec kier-o" aria-labelledby="o-kierunku">
         <h2 id="o-kierunku">{N.o}</h2>
+        <div class:list={['kier-o-in', { 'kier-o-2': d.dlaczego.length > 0 }]}>
         <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
         {d.dlaczego.length > 0 && (
           <div class="why-grid">
@@ -114,6 +118,7 @@ const sekcje = [
             ))}
           </div>
         )}
+        </div>
       </section>
 
       {d.etapy.length > 0 && (
@@ -225,6 +230,7 @@ const sekcje = [
         </section>
       )}
 
+      <div class="kier-2">
       {praktyki && (
         <section class="zsec" aria-labelledby="praktyki">
           <h2 id="praktyki">{T('Praktyki pedagogiczne', 'Teaching placements')}</h2>
@@ -241,6 +247,7 @@ const sekcje = [
           <div class="prose"><Fragment set:html={kariera} /></div>
         </section>
       )}
+      </div>
 
       {faq.length > 0 && (
         <section class="zsec" aria-labelledby="pytania">
@@ -256,6 +263,7 @@ const sekcje = [
         </section>
       )}
 
+      <div class="kier-2">
       {d.kontakt.length > 0 && (
         <section class="zsec" aria-labelledby="kontakt">
           <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
@@ -284,11 +292,8 @@ const sekcje = [
           </details>
         </section>
       )}
+      </div>
     </div>
-
-    <aside class="side tylko-komputer" data-pagefind-ignore>
-      <SpisTresci naglowki={sekcje} lang={lang} wariant="bok" />
-    </aside>
   </div>
 </Baza>
 
@@ -331,6 +336,34 @@ const sekcje = [
   .kh-fakty .stat { padding: 16px 18px; }
   .kh-fakty .stat .n { font-size: 24px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
 
+  /* ---------- wariant „Portal” (komputer i telefon) ---------- */
+  /* treść na pełną szerokość: bez panelu z prawej (na komputerze spis sekcji jest paskiem pod banerem, na telefonie listą nad treścią) */
+  .kier { display: block; padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(28px, 4vw, 44px); }
+  /* przebieg studiów: „kiedy” w jednym wierszu z nazwą etapu */
+  .step { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; }
+  .step > .desc, .step > .deadline { flex-basis: 100%; }
+  .step > .deadline { flex-basis: auto; }
+  /* specjalności: etykiety („Dla kogo”, „Po studiach”) w wierszu z treścią */
+  .spec .lbl { display: inline; margin-right: 6px; }
+  .spec-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  /* dokumenty programu, praktyk i akty prawne: siatka (na komputerze i szerszym telefonie dwie kolumny) */
+  .tabpanel .files, .zsec > .files, .more .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+
+  /* ---------- komputer (≥ 761 px): wariant „Portal” ---------- */
+  @media (min-width: 761px) {
+    /* liczby pod banerem jak na głównej gałęzi (kafelki z odstępem 12 px) */
+    .kh-fakty { gap: 12px; }
+    .why-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+    /* „O kierunku”: tekst z lewej, „Dlaczego warto” (2×2) z prawej */
+    .kier-o-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: 16px 32px; align-items: start; }
+    .kier-o-2 .why-grid { margin-top: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* krótkie sekcje parami obok siebie (praktyki | po studiach, kontakt | akty prawne) */
+    .kier-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 0 36px; align-items: start; }
+  }
+  @media (min-width: 761px) and (max-width: 980px) {
+    .kier-o-2 { grid-template-columns: minmax(0, 1fr); }
+  }
+
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {
     /* nagłówek: tekst, przyciski i fakty (2×2) ciaśniej */
@@ -338,20 +371,9 @@ const sekcje = [
     .kh-fakty { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 0 16px; }
     .kh-fakty .stat { padding: 12px 14px; }
     .kh-fakty .stat .n { font-size: 21px; }
-    /* treść na pełną szerokość (spis sekcji jest i tak rozwijaną listą nad treścią) */
-    .kier { display: block; padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(28px, 4vw, 44px); }
     /* „O kierunku”: „Dlaczego warto” pod tekstem, dwie w rzędzie (na wąskim telefonie jedna) */
     .kier-o .prose { display: flow-root; }
     .kier-o .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
-    /* przebieg studiów: „kiedy” w jednym wierszu z nazwą etapu */
-    .step { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; }
-    .step > .desc, .step > .deadline { flex-basis: 100%; }
-    .step > .deadline { flex-basis: auto; }
-    /* specjalności: etykiety („Dla kogo”, „Po studiach”) w wierszu z treścią */
-    .spec .lbl { display: inline; margin-right: 6px; }
-    .spec-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
-    /* dokumenty programu, praktyk i akty prawne: siatka (na szerszym telefonie dwie kolumny) */
-    .tabpanel .files, .zsec > .files, .more .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
     /* krótkie sekcje (praktyki, po studiach, kontakt, akty prawne): odstęp akapitu na końcu zostaje w sekcji, jak w wariancie */
     .zsec:is([aria-labelledby='praktyki'], [aria-labelledby='po-studiach'], [aria-labelledby='kontakt'], [aria-labelledby='akty']) { display: flow-root; }
   }
