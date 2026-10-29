@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:PDE models of diffusion: linear and nonlinear\, local and nonl
+ ocal
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:ref-rownania-rozniczkowe-2026-09-21-vazquez@im-uwr.github.io
+DTSTAMP:20261029T211127Z
+DTSTART;TZID=Europe/Warsaw:20260921T151500
+DTEND;TZID=Europe/Warsaw:20260921T164500
+SUMMARY:PDE models of diffusion: linear and nonlinear\, local and nonlocal
+LOCATION:sala HS
+DESCRIPTION:Juan Luis Vázquez (Universidad Autónoma de Madrid)\nSeminariu
+ m: Równania różniczkowe\nhttps://im-uwr.github.io/Web-Core/seminaria/ro
+ wnania-rozniczkowe#2026-09-21-vazquez
+URL:https://im-uwr.github.io/Web-Core/seminaria/rownania-rozniczkowe#2026-0
+ 9-21-vazquez
+END:VEVENT
+END:VCALENDAR

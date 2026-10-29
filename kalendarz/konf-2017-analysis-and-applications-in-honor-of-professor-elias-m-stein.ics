@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Analysis and Applications: in honor of Professor Elias M. Stei
+ n
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:konf-2017-analysis-and-applications-in-honor-of-professor-elias-m-stein
+ @im-uwr.github.io
+DTSTAMP:20261029T211127Z
+DTSTART;VALUE=DATE:20170904
+DTEND;VALUE=DATE:20170909
+SUMMARY:Analysis and Applications: in honor of Professor Elias M. Stein
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-analys
+ is-and-applications-in-honor-of-professor-elias-m-stein
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2017-analysis-and-a
+ pplications-in-honor-of-professor-elias-m-stein
+END:VEVENT
+END:VCALENDAR

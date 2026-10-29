@@ -1,0 +1,42 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:7th International Conference on Lévy Processes: Theory and Ap
+ plications
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:konf-2013-7th-international-conference-on-levy-processes-theory-and-app
+ lications@im-uwr.github.io
+DTSTAMP:20261029T211127Z
+DTSTART;VALUE=DATE:20130715
+DTEND;VALUE=DATE:20130720
+SUMMARY:7th International Conference on Lévy Processes: Theory and Applica
+ tions
+LOCATION:Wrocław
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2013-7th-in
+ ternational-conference-on-levy-processes-theory-and-applications
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2013-7th-internatio
+ nal-conference-on-levy-processes-theory-and-applications
+END:VEVENT
+END:VCALENDAR
