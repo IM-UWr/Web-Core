@@ -5,12 +5,14 @@
    Wartości są przeniesione z wariantu „Portal” (gałąź wariant-portal: global.css i tlo.css; tam obowiązują
    na każdej szerokości). Plik ładuje się po global.css i tlo.css, więc reguły z węższych progów tamtych plików
    (720, 560 px), które nadpisywały te same właściwości, są tu powtórzone niżej — inaczej przegrałyby kolejnością.
-   Klocki wariantu (.pt-box, .pt-list, …) są w portal.css; na tej gałęzi używają ich tylko bloki .tylko-telefon.
+   Klocki wariantu (.pt-box, .pt-list, …) są w portal.css. Na gałęzi wariant-portal korzystają z nich także bloki
+   .tylko-komputer (układ „Portal” na komputerze), a skala wariantu na komputerze jest na końcu portal.css.
    ========================================================================== */
 
 /* ---------- bloki tylko na jeden rodzaj ekranu ----------
    Gdy telefonowy układ wymaga innych znaczników (inna kolejność lub liczba pozycji), strona ma oba bloki:
-   .tylko-komputer (dotychczasowy) i .tylko-telefon (portalowy, z data-pagefind-ignore, bez powtórzonych id). */
+   .tylko-komputer (na tej gałęzi: kolumny „Portal”) i .tylko-telefon (jak na głównej gałęzi, z data-pagefind-ignore,
+   bez powtórzonych id). */
 @media (min-width: 761px) { .tylko-telefon { display: none !important; } }
 @media (max-width: 760px) { .tylko-komputer { display: none !important; } }
 
