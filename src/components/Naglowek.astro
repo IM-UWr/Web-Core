@@ -20,19 +20,22 @@ const aktywna = (p: Pozycja) => (p.adres ? pasuje(p.adres) : false) || (p.grupy 
 const tuJestem = (adres?: string) => !!adres && !isExternal(adres) && bezJezyka.replace(/\/$/, '') === adres.replace(/\/$/, '');
 const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
 const logo = (ustawienia as any).logo as string | undefined;
+// logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
+const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
 ---
 <header class:list={['hdr', { 'hdr-foto': naZdjeciu }]}>
   <div class="wrap hdr-row">
-    <a class="brand" href={u(wJezyku('/', lang))}>
-      {logo
-        ? <img src={u(logo)} alt="" width="44" height="44" />
-        : <span class="brand-logo" aria-hidden="true" style={`--logo-pelne:url(${u('/pliki/uwr-logo.png')});--logo-godlo:url(${u('/pliki/uwr-godlo.png')})`}></span>}
-      <span class="sr-only">{t(lang, 'uwr')}: </span>
-      <span class="brand-txt">
+    <div class="brand">
+      <a class:list={['brand-uwr', { 'brand-uwr-logo': !logo }]} href={uwrAdres} aria-label={t(lang, 'uwrStronaGlowna')}>
+        {logo
+          ? <img src={u(logo)} alt="" width="44" height="44" />
+          : <span class="brand-logo" aria-hidden="true" style={`--logo-pelne:url(${u('/pliki/uwr-logo.png')});--logo-godlo:url(${u('/pliki/uwr-godlo.png')})`}></span>}
+      </a>
+      <a class="brand-txt" href={u(wJezyku('/', lang))}>
         <span class="brand-name">{t(lang, 'instytut')}</span>
         <span class="brand-sub">{t(lang, 'wydzial')}</span>
-      </span>
-    </a>
+      </a>
+    </div>
 
     <nav class="nav" aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
       {menu.map((p, i) =>
