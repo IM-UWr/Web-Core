@@ -81,14 +81,20 @@ jobs:
         run: |
           WARIANTY=$(git ls-remote --heads origin 'wariant-*' | sed 's#.*refs/heads/wariant-##' | sort)
           if [ -z "$WARIANTY" ]; then echo "Brak gałęzi wariant-*"; exit 0; fi
+          # Pobranie gałęzi jedno po drugim (równoległe „git fetch” w jednym repozytorium wchodzą sobie w drogę),
+          # budowanie już równolegle.
+          git fetch -q --depth 1 origin $(for n in $WARIANTY; do echo "+refs/heads/wariant-$n:refs/remotes/origin/wariant-$n"; done) || true
+          for n in $WARIANTY; do git worktree add -q --detach "$RUNNER_TEMP/wariant-$n" "origin/wariant-$n" || true; done
           zbuduj() {
-            n="$1"; d="$RUNNER_TEMP/wariant-$n"
-            git fetch -q --depth 1 origin "wariant-$n" && git worktree add -q --detach "$d" FETCH_HEAD || return 1
-            cd "$d"
+            n="$1"; d="$RUNNER_TEMP/wariant-$n"; cd "$d" || return 1
+            echo "pobieranie treści" > etap.log
             python3 skrypty/pobierz_tresci.py --lokalnie "$GITHUB_WORKSPACE/.tresci" > tresci.log 2>&1 || return 1
+            echo "instalacja zależności" > etap.log
             if cmp -s package.json "$GITHUB_WORKSPACE/package.json"; then cp -al "$GITHUB_WORKSPACE/node_modules" node_modules || return 1
             else npm install --no-audit --no-fund --prefer-offline > install.log 2>&1 || return 1; fi
+            echo "budowanie" > etap.log
             SITE_URL="$SITE0" BASE_PATH="$BASE0/warianty/$n" npm run build > build.log 2>&1 || return 1
+            echo "zdjęcia i dokumenty z głównej strony" > etap.log
             rm -rf dist/pliki
             find dist -name '*.html' -print0 | xargs -0 perl -pi -e "s#\Q$BASE0/warianty/$n/pliki/\E#$BASE0/pliki/#g"
           }
@@ -102,7 +108,7 @@ jobs:
               ok="$ok $n"
               echo "::notice title=Wariant $n::$(find "$d/dist" -name '*.html' | wc -l) stron HTML, $(du -sh "$d/dist" | cut -f1)"
             else
-              echo "::warning title=Wariant $n się nie zbudował::$(cat "$d"/tresci.log "$d"/install.log "$d"/build.log 2>/dev/null | tail -c 1500 | tr '\n' ' ')"
+              echo "::warning title=Wariant $n się nie zbudował::etap: $(cat "$d/etap.log" 2>/dev/null || echo 'pobranie gałęzi') — $(cat "$d"/tresci.log "$d"/install.log "$d"/build.log 2>/dev/null | tail -n 20 | tr '\n' ' ' | tail -c 1500 | iconv -f utf-8 -t utf-8 -c)"
             fi
           done
           [ -z "$ok" ] && exit 0
