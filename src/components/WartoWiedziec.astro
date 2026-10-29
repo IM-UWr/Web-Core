@@ -69,7 +69,7 @@ const Zewn = uklad === 'lista' ? 'div' : 'section';
 const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial' ? 'zsec' : '', klasa].filter(Boolean).join(' ') || undefined;
 ---
 {karty.length > 0 && uklad === 'portal' && (
-  <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore={!komputer}>
+  <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore={komputer ? undefined : ''}>
     <div class="pt-h">
       <h2 id={idSekcji}>{tytulSekcji}</h2>
       {wiecej && <a class="pt-all" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={14} /></a>}
