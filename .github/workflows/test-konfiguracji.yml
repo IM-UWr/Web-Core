@@ -1,0 +1,53 @@
+name: Test konfiguracji (tymczasowy)
+
+# Sprawdza konfigurację organizacji przed migracją strony:
+#  - publikowanie GitHub Pages z GitHub Actions (strona testowa pod im-uwr.github.io/Web-Core/),
+#  - odbiór sygnału „tresc-zmieniona” z repozytoriów treści (aplikacja „powiadomienia”, klucz organizacji).
+# Zostanie zastąpiony właściwym budowaniem strony.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/test-konfiguracji.yml']
+  repository_dispatch:
+    types: [tresc-zmieniona]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Strona testowa
+        env:
+          ZDARZENIE: ${{ github.event_name }}
+          ZRODLO: ${{ github.event.client_payload.repo }}
+          COMMIT: ${{ github.event.client_payload.sha }}
+        run: |
+          mkdir -p dist
+          echo "::notice title=Zdarzenie::${ZDARZENIE} ${ZRODLO:+z ${ZRODLO} (${COMMIT:0:7})}"
+          cat > dist/index.html <<HTML
+          <!doctype html><html lang="pl"><meta charset="utf-8"><title>Test konfiguracji IM-UWr</title>
+          <p>Test konfiguracji IM-UWr działa.</p>
+          <p>Ostatnie zdarzenie: ${ZDARZENIE} ${ZRODLO:+— sygnał z ${ZRODLO}} ($(date -u +%FT%TZ)).</p>
+          HTML
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4
