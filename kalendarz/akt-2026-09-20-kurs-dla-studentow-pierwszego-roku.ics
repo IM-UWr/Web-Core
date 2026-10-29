@@ -1,0 +1,40 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Kurs dla studentów pierwszego roku
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:akt-2026-09-20-kurs-dla-studentow-pierwszego-roku@im-uwr.github.io
+DTSTAMP:20261029T234304Z
+DTSTART;VALUE=DATE:20260925
+DTEND;VALUE=DATE:20260926
+SUMMARY:Kurs dla studentów pierwszego roku
+LOCATION:Wydział Matematyki i Informatyki UWr
+DESCRIPTION:Kurs przygotowawczy dla osób przyjętych na pierwszy rok studi
+ ów na WMI UWr — od 25 września.\nhttps://im-uwr.github.io/Web-Core/akt
+ ualnosci/2026-09-20-kurs-dla-studentow-pierwszego-roku
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/2026-09-20-kurs-dla-stude
+ ntow-pierwszego-roku
+END:VEVENT
+END:VCALENDAR

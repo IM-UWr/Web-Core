@@ -1,0 +1,42 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Rozwiązania automorficzne (self-similar) równań konwekcji-d
+ yfuzji
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:ref-rownania-rozniczkowe-2026-10-12-karch-2@im-uwr.github.io
+DTSTAMP:20261029T234304Z
+DTSTART;TZID=Europe/Warsaw:20261012T151500
+DTEND;TZID=Europe/Warsaw:20261012T164500
+SUMMARY:Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzj
+ i
+LOCATION:sala 605
+DESCRIPTION:Grzegorz Karch (Uniwersytet Wrocławski)\nSeminarium: Równania
+  różniczkowe\nhttps://im-uwr.github.io/Web-Core/seminaria/rownania-rozni
+ czkowe#2026-10-12-karch-2
+URL:https://im-uwr.github.io/Web-Core/seminaria/rownania-rozniczkowe#2026-1
+ 0-12-karch-2
+END:VEVENT
+END:VCALENDAR
