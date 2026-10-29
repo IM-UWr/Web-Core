@@ -71,8 +71,9 @@ jobs:
       # Warianty wyglądu na komputer do porównania: każda gałąź wariant-<nazwa> jest budowana (równolegle) z tymi samymi
       # treściami pod <adres strony>/warianty/<nazwa>/. Zdjęcia i dokumenty biorą z głównej strony (/pliki/), więc
       # paczka prawie nie rośnie. Przełącznik w lewym dolnym rogu dodawany jest tu, przy publikacji, nie w kodzie
-      # strony; na telefonie (≤ 760 px) jest ukryty. Po wyborze wyglądu wystarczy usunąć gałęzie wariant-* (krok się
-      # pomija). Błąd budowania wariantu nie zatrzymuje publikacji głównej strony.
+      # strony; na telefonie (≤ 760 px) jest ukryty, a na podstronach z wyglad-podstron.json („zrobione”) go nie ma.
+      # Po wyborze wyglądu wystarczy usunąć gałęzie wariant-* (krok się pomija). Błąd budowania wariantu nie
+      # zatrzymuje publikacji głównej strony.
       - name: Warianty wyglądu (gałęzie wariant-*)
         continue-on-error: true
         env:
@@ -112,15 +113,8 @@ jobs:
             fi
           done
           [ -z "$ok" ] && exit 0
-          linki=""
-          for n in obecna $(for x in zwarta portal redakcyjna; do case " $ok " in *" $x "*) echo "$x";; esac; done) \
-                   $(for x in $ok; do case " zwarta portal redakcyjna " in *" $x "*) ;; *) echo "$x";; esac; done); do
-            case "$n" in obecna) e="Obecna"; w="";; zwarta) e="Zwarta"; w="$n";; portal) e="Portal"; w="$n";; redakcyjna) e="Redakcyjna"; w="$n";; *) e="$n"; w="$n";; esac
-            linki="$linki<a data-wariant=\"$w\" href=\"$BASE0/\">$e</a>"
-          done
-          export PASEK="<div class=\"wr-pasek\" data-pagefind-ignore role=\"navigation\" aria-label=\"Warianty wyglądu (podgląd)\"><span>Wariant:</span>$linki</div><style>.wr-pasek{position:fixed;left:10px;bottom:10px;z-index:9999;display:flex;flex-wrap:wrap;align-items:center;gap:2px;max-width:calc(100vw - 20px);padding:4px;border-radius:999px;background:#0b1630;box-shadow:0 4px 18px rgb(0 0 0/.35);font:700 12px/1 system-ui,sans-serif}.wr-pasek span{padding:0 6px 0 8px;color:#c4cee0}.wr-pasek a{padding:8px 10px;border-radius:999px;color:#fff;text-decoration:none}.wr-pasek a:hover{background:rgb(255 255 255/.14)}.wr-pasek a[aria-current]{background:#f2a33a;color:#101828}@media (max-width:760px){.wr-pasek{display:none}}</style><script>(function(){var b='$BASE0',p=location.pathname,s=p.slice(b.length),m=s.match(/^\\/warianty\\/([^\\/]+)/),c=m?m[1]:'',r=(m?s.slice(m[0].length):s)||'/';document.querySelectorAll('.wr-pasek a').forEach(function(a){var w=a.getAttribute('data-wariant');a.href=b+(w?'/warianty/'+w:'')+r+location.hash;if(w===c)a.setAttribute('aria-current','true');});})();</script>"
-          find dist -name '*.html' -print0 | xargs -0 perl -0pi -e 's/<\/body>/$ENV{PASEK}<\/body>/'
-          echo "::notice title=Warianty::opublikowane:$ok"
+          # Przełącznik w rogu stron i podstrony z wybranym wyglądem (wyglad-podstron.json): skrypty/warianty.py
+          python3 skrypty/warianty.py dist "$BASE0" $ok
 
       - uses: actions/upload-pages-artifact@v4
         with:
