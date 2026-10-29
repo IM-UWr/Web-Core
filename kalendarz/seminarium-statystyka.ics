@@ -1,0 +1,154 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Seminarium: Statystyka
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-22-kos@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260622T110000
+DTEND;TZID=Europe/Warsaw:20260622T123000
+SUMMARY:FDR Control via Sorted L-One Penalized Estimator (SLOPE) Method
+LOCATION:sala 602
+DESCRIPTION:Michał Kos (IM UWr)\nSeminarium: Statystyka\nhttps://im-uwr.gi
+ thub.io/Web-Core/seminaria/statystyka#2026-06-22-kos
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-kos
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-22-bogdan@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260622T111500
+DTEND;TZID=Europe/Warsaw:20260622T124500
+SUMMARY:From Structured Sparsity to Causal Effects: GSLOPE\, PCGLASSO\, and
+  SLOPE-Based Doubly Robust Inference
+LOCATION:sala 602
+DESCRIPTION:Małgorzata Bogdan (IM UWr)\nSeminarium: Statystyka\nhttps://im
+ -uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-bogdan
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-bogda
+ n
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-22-grzesiak@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260622T113000
+DTEND;TZID=Europe/Warsaw:20260622T130000
+SUMMARY:Evaluating Imputation Methods
+LOCATION:sala 602
+DESCRIPTION:Krystyna Grzesiak (IM UWr)\nSeminarium: Statystyka\nhttps://im-
+ uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-grzesiak
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-grzes
+ iak
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-22-nowakowski@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260622T114500
+DTEND;TZID=Europe/Warsaw:20260622T131500
+SUMMARY:missKnockoffs: A Model-X Knockoff Framework for Variable Selection 
+ with Missing Data
+LOCATION:sala 602
+DESCRIPTION:Dominik Nowakowski (Uniwersytet Medyczny w Białymstoku)\nSemin
+ arium: Statystyka\nhttps://im-uwr.github.io/Web-Core/seminaria/statystyka#
+ 2026-06-22-nowakowski
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-nowak
+ owski
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-24-pokora@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260624T110000
+DTEND;TZID=Europe/Warsaw:20260624T123000
+SUMMARY:Adaptive Bayesian SLOPE
+LOCATION:sala 605
+DESCRIPTION:Joanna Pokora (IM UWr)\nSeminarium: Statystyka\nhttps://im-uwr.
+ github.io/Web-Core/seminaria/statystyka#2026-06-24-pokora
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-pokor
+ a
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-24-bochenek@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260624T111500
+DTEND;TZID=Europe/Warsaw:20260624T124500
+SUMMARY:Network flow methods for alignment and deconvolution of multidimens
+ ional spectra
+LOCATION:sala 605
+DESCRIPTION:Maria Bochenek (MIM UW)\nSeminarium: Statystyka\nhttps://im-uwr
+ .github.io/Web-Core/seminaria/statystyka#2026-06-24-bochenek
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-boche
+ nek
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-24-staniak@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260624T113000
+DTEND;TZID=Europe/Warsaw:20260624T130000
+SUMMARY:Modeling Hydrogen-Deuterium Exchange Mass Spectrometry data via con
+ volutions of exchange probabilities
+LOCATION:sala 605
+DESCRIPTION:Mateusz Staniak (IM UWr)\nSeminarium: Statystyka\nhttps://im-uw
+ r.github.io/Web-Core/seminaria/statystyka#2026-06-24-staniak
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-stani
+ ak
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-24-tracz@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260624T114500
+DTEND;TZID=Europe/Warsaw:20260624T131500
+SUMMARY:Challenges of AP-MS data interpretation in biological relevance dri
+ ven studies
+LOCATION:sala 605
+DESCRIPTION:Michał Tracz (Wydział Biotechnologii UWr)\nSeminarium: Statys
+ tyka\nhttps://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-tr
+ acz
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-tracz
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-24-linke@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20260624T120000
+DTEND;TZID=Europe/Warsaw:20260624T133000
+SUMMARY:What Counts as Significant? Lessons from Applied Proteomics
+LOCATION:sala 605
+DESCRIPTION:Vanessa Linke (Międzynarodowy Instytut Biologii Molekularnej i
+  Komórkowej)\nSeminarium: Statystyka\nhttps://im-uwr.github.io/Web-Core/s
+ eminaria/statystyka#2026-06-24-linke
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-24-linke
+END:VEVENT
+BEGIN:VEVENT
+UID:ref-statystyka-2026-10-13-morzywolek@im-uwr.github.io
+DTSTAMP:20261029T232355Z
+DTSTART;TZID=Europe/Warsaw:20261013T141500
+DTEND;TZID=Europe/Warsaw:20261013T154500
+SUMMARY:Beyond Average Treatment Effects: Variable Importance for Treatment
+  Effect Heterogeneity
+LOCATION:sala 603
+DESCRIPTION:Paweł Morzywołek (Uniwersytet Kopenhaski)\nSeminarium: Statys
+ tyka\nhttps://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-10-13-mo
+ rzywolek
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-10-13-morzy
+ wolek
+END:VEVENT
+END:VCALENDAR
