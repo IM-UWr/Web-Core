@@ -1,0 +1,1 @@
+import{n as r,t,h as n}from"./daty.uoFrWalC.js";const c=r(),i=t();document.querySelectorAll("[data-wydarzenia]").forEach(e=>{Array.from(e.querySelectorAll("[data-koniec]")).forEach(a=>{const o=a.dataset.koniec||"";o&&(n(o)?o<c:o<i)&&a.remove()}),e.querySelector("[data-koniec]")||e.remove()});
