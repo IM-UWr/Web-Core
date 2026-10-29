@@ -1,0 +1,290 @@
+/* ==========================================================================
+   Wygląd „Zwarta” na komputerze (≥ 761 px) — tylko na podstronach, które go wybrały
+   Strona wybiera wygląd atrybutem <body data-uklad="…"> (prop `uklad` w Baza.astro, lista słów oddzielonych spacją):
+     zwarta        treść strony pod banerem (odstępy, czcionki, zaokrąglenia, kafelki, karty, listy) jak w wariancie Zwarta
+     zwarta-baner  baner podstrony (granatowy pas, nagłówek .page-head / .ph, baner strony głównej .hero) jak w wariancie Zwarta
+   (inne banery, np. „portal-baner”, są w uklad-portal.css; strona bierze jedno słowo „…-baner” albo żadne = baner z main).
+   Wartości są przeniesione z wariantu Zwarta (gałąź wariant-zwarta, src/styles/komputer.css). Każda reguła ma ten sam
+   selektor co tam, poprzedzony warunkiem w :where(…) — :where nie dodaje wagi, więc kolejność i siła reguł względem
+   global.css, tlo.css i stylów widoków są takie same jak w wariancie. Reguły treści działają tylko w <main>.
+   Nie są przeniesione reguły elementów wspólnych całej strony — zostają jak na main: nagłówek u góry (.hdr-row, .brand-*,
+   menu .nav / .dropdown / .mnav, .icon-btn, .hdr-search, --hdr-h), przyciski (.btn, .btn-small) i stopka.
+   Odstępy własne widoków (np. strona działu) są w stylach widoku, też w @media (min-width: 761px).
+   Telefon (≤ 760 px): wszystko poniżej siedzi w @media (min-width: 761px), więc telefon wygląda jak bez tego pliku.
+   ========================================================================== */
+
+@media (min-width: 761px) {
+  /* ---------- podstawy ----------
+     --tresc-gora / --tresc-dol — odstęp treści podstrony od nagłówka i od stopki (.layout poniżej, widoki stron);
+     zaokrąglenia, --section (pasy strony głównej) i czcionka podstawowa — tylko w treści (bez banera, nagłówka i stopki). */
+  :where([data-uklad~='zwarta']) { --tresc-gora: clamp(14px, 2vw, 22px); --tresc-dol: clamp(28px, 3.5vw, 44px); }
+  :where([data-uklad~='zwarta'] main > :not(.page-head, .hero)) {
+    --radius-s: 8px;
+    --radius: 12px;
+    --radius-l: 14px;
+    --section: clamp(20px, 2.4vw, 30px);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* ---------- etykiety i linki ze strzałką ---------- */
+  :where([data-uklad~='zwarta'] main) .link-arrow { min-height: 40px; }
+  :where([data-uklad~='zwarta'] main) .badge { padding: 2px 8px; font-size: 12.5px; }
+
+  /* ---------- kafelki na skróty: ikona obok napisu ---------- */
+  :where([data-uklad~='zwarta'] main) .tiles { gap: 10px; padding-top: 16px; }
+  :where([data-uklad~='zwarta'] main) .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 2px 12px; min-height: 52px; padding: 10px 14px; line-height: 1.3; flex-direction: row; }
+  :where([data-uklad~='zwarta'] main) .tile svg { width: 22px; height: 22px; }
+
+  /* ---------- sekcje ---------- */
+  :where([data-uklad~='zwarta'] main) .section-head { gap: 0 24px; margin-bottom: 10px; }
+  :where([data-uklad~='zwarta'] main) .section-head h2 { font-size: clamp(22px, 2.4vw, 28px); }
+  :where([data-uklad~='zwarta'] main) .section-head h3 { font-size: 19px; }
+
+  /* ---------- karty aktualności (cztery w rzędzie) ---------- */
+  :where([data-uklad~='zwarta'] main) .news-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
+  :where([data-uklad~='zwarta'] main) .news-card { gap: 5px; padding: 14px 16px; }
+  :where([data-uklad~='zwarta'] main) .news-card .t { font-size: 17px; line-height: 1.3; }
+  :where([data-uklad~='zwarta'] main) .news-card .x { line-height: 1.45; }
+  :where([data-uklad~='zwarta'] main) .news-meta { gap: 4px 10px; font-size: 13px; }
+  :where([data-uklad~='zwarta'] main) .news-card.featured .img { flex: 1 1 220px; min-height: 160px; }
+  :where([data-uklad~='zwarta'] main) .news-card.featured .body { flex: 1 1 220px; gap: 5px; padding: 14px 16px; }
+  :where([data-uklad~='zwarta'] main) .news-card.featured .t { font-size: 20px; }
+
+  /* ---------- wydarzenia i seminaria ---------- */
+  :where([data-uklad~='zwarta'] main) .event-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .event { gap: 12px; padding: 12px; }
+  :where([data-uklad~='zwarta'] main) .datebox { flex: 0 0 56px; height: 60px; border-radius: 10px; }
+  :where([data-uklad~='zwarta'] main) .datebox .d { font-size: 23px; }
+  :where([data-uklad~='zwarta'] main) .datebox .m { font-size: 12px; }
+  :where([data-uklad~='zwarta'] main) .datebox.small { flex-basis: 46px; height: 50px; border-radius: 9px; }
+  :where([data-uklad~='zwarta'] main) .datebox.small .d { font-size: 19px; }
+  :where([data-uklad~='zwarta'] main) .event .t { font-size: 16px; line-height: 1.25; }
+  :where([data-uklad~='zwarta'] main) .event-body { gap: 2px; }
+  :where([data-uklad~='zwarta'] main) .sem-week { margin-top: 20px; padding-top: 16px; }
+  :where([data-uklad~='zwarta'] main) .sem-week-sam { margin-top: 0; padding-top: 0; }
+  :where([data-uklad~='zwarta'] main) .sem-row { padding: 7px 14px; }
+  :where([data-uklad~='zwarta'] main) .sem-empty { padding: 10px 14px; }
+
+  /* ---------- studia ---------- */
+  :where([data-uklad~='zwarta'] main) .studia-head { gap: 8px 24px; margin-bottom: 12px; }
+  :where([data-uklad~='zwarta'] main) .studia-head h2 { margin: 0 0 2px; font-size: clamp(22px, 2.4vw, 28px); }
+  :where([data-uklad~='zwarta'] main) .studia-head p { font-size: 15px; }
+  :where([data-uklad~='zwarta'] main) .prog-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .prog { gap: 3px; padding: 12px 16px; }
+  :where([data-uklad~='zwarta'] main) .prog .l { font-size: 12px; }
+  :where([data-uklad~='zwarta'] main) .prog .n { font-size: 17px; }
+  :where([data-uklad~='zwarta'] main) .prog .o { line-height: 1.4; }
+
+  /* ---------- podstrony: układ treści z kolumną boczną ---------- */
+  :where([data-uklad~='zwarta'] main) .layout { gap: 24px 32px; padding-top: var(--tresc-gora); padding-bottom: var(--tresc-dol); }
+  :where([data-uklad~='zwarta'] main) .layout > .side { flex: 1 1 260px; max-width: 300px; gap: 14px; }
+  :where([data-uklad~='zwarta'] main) .side-box { gap: 8px; padding: 14px 16px; }
+  :where([data-uklad~='zwarta'] main) .side-box h2 { font-size: 18px; }
+  :where([data-uklad~='zwarta'] main) .side-box .event { padding: 10px; border-radius: 10px; }
+  :where([data-uklad~='zwarta'] main) .notice { padding: 10px 14px; }
+
+  /* treść artykułów i stron */
+  :where([data-uklad~='zwarta'] main) .prose { max-width: 800px; font-size: 16px; line-height: 1.55; }
+  :where([data-uklad~='zwarta'] main) .prose h2 { margin: 1.3em 0 .45em; font-size: 22px; }
+  :where([data-uklad~='zwarta'] main) .prose h3 { margin: 1.2em 0 .35em; font-size: 18px; }
+  :where([data-uklad~='zwarta'] main) .prose p, :where([data-uklad~='zwarta'] main) .prose ul, :where([data-uklad~='zwarta'] main) .prose ol { margin: 0 0 .75em; }
+  :where([data-uklad~='zwarta'] main) .prose li { margin: .15em 0; }
+  :where([data-uklad~='zwarta'] main) .prose table { margin: .75em 0 1.1em; font-size: 15px; }
+  :where([data-uklad~='zwarta'] main) .prose th, :where([data-uklad~='zwarta'] main) .prose td { padding: 6px 10px; }
+  :where([data-uklad~='zwarta'] main) .prose blockquote { margin: 1em 0; padding: 10px 14px; font-size: 16px; }
+
+  /* listy wpisów */
+  :where([data-uklad~='zwarta'] main) .month { margin: 14px 0 2px; }
+  :where([data-uklad~='zwarta'] main) .row-item { gap: 14px; padding: 10px 0; }
+  :where([data-uklad~='zwarta'] main) .row-item .body { gap: 2px; }
+  :where([data-uklad~='zwarta'] main) .row-item .t { font-size: 17px; line-height: 1.3; }
+  :where([data-uklad~='zwarta'] main) .row-item .x { font-size: 15px; line-height: 1.5; }
+  :where([data-uklad~='zwarta'] main) .row-item .thumb { flex: 0 0 108px; height: 72px; border-radius: 8px; }
+  :where([data-uklad~='zwarta'] main) .filters { gap: 8px; padding-top: 4px; }
+  :where([data-uklad~='zwarta'] main) .filters .chips { gap: 6px; }
+  :where([data-uklad~='zwarta'] main) .filters.filters-lewo { margin-bottom: 4px; }
+
+  /* blok wydarzenia we wpisie */
+  :where([data-uklad~='zwarta'] main) .event-box { gap: 10px 24px; padding: 12px 16px; }
+
+  /* załączniki i dokumenty: w kolumnach, gdy się mieszczą */
+  :where([data-uklad~='zwarta'] main) .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 6px 10px; flex-direction: row; }
+  :where([data-uklad~='zwarta'] main) .files li { min-width: 0; }
+  :where([data-uklad~='zwarta'] main) .files a { gap: 10px; height: 100%; min-height: 40px; padding: 7px 12px; border-radius: 10px; }
+
+  /* nawigacja nowszy / starszy */
+  :where([data-uklad~='zwarta'] main) .pn a { gap: 2px; padding: 10px 14px; border-radius: 10px; }
+
+  /* tabela pracowników */
+  :where([data-uklad~='zwarta'] main) .staff-tools { gap: 8px; margin-bottom: 8px; }
+  :where([data-uklad~='zwarta'] main) .staff-tools .chips { gap: 6px; }
+  :where([data-uklad~='zwarta'] main) .staff-count { margin-bottom: 4px; }
+  :where([data-uklad~='zwarta'] main) .search { height: 40px; }
+  :where([data-uklad~='zwarta'] main) .staff th { padding: 6px 10px; }
+  :where([data-uklad~='zwarta'] main) .staff td { padding: 7px 10px; }
+
+  /* seminaria */
+  :where([data-uklad~='zwarta'] main) .sem-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .sem-card { gap: 5px; padding: 14px 16px; }
+  :where([data-uklad~='zwarta'] main) .sem-card .t { font-size: 18px; }
+  :where([data-uklad~='zwarta'] main) article.talk { padding: 10px 0; }
+  :where([data-uklad~='zwarta'] main) .talk h3 { margin: 3px 0 2px; font-size: 17px; }
+  :where([data-uklad~='zwarta'] main) .info-list { gap: 4px 14px; font-size: 15px; }
+
+  /* artykuł (aktualność): nagłówek w treści, zdjęcie, bloki, udostępnianie, „← Wszystkie aktualności” */
+  :where([data-uklad~='zwarta'] main) .article-head { gap: 8px; margin-bottom: 16px; }
+  :where([data-uklad~='zwarta'] main) .article-head h1 { font-size: clamp(26px, 3.2vw, 36px); }
+  :where([data-uklad~='zwarta'] main) .article-head .lead { font-size: 17px; }
+  :where([data-uklad~='zwarta'] main) .article-figure { margin: 0 0 16px; max-width: 800px; }
+  :where([data-uklad~='zwarta'] main) .article-figure img { max-height: 420px; }
+  :where([data-uklad~='zwarta'] main) .article-block { margin-top: 20px; max-width: 800px; gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .article-block h2 { font-size: 19px; }
+  :where([data-uklad~='zwarta'] main) .share { gap: 8px; margin-top: 20px; padding-top: 14px; }
+  :where([data-uklad~='zwarta'] main) .crumbs-inline { padding-top: 12px; }
+  :where([data-uklad~='zwarta'] main .crumbs-inline) .wstecz { margin-bottom: 0; }
+  :where([data-uklad~='zwarta'] main .crumbs-inline) .wstecz a { min-height: 32px; font-size: 14px; }
+
+  /* spis sekcji strony */
+  :where([data-uklad~='zwarta'] main) .toc a { padding: 4px 0 4px 12px; }
+  :where([data-uklad~='zwarta'] main) .toc-top { margin-bottom: 14px; padding: 4px 14px; }
+  :where([data-uklad~='zwarta'] main) .toc-top summary { min-height: 40px; }
+  :where([data-uklad~='zwarta'] main) .toc-top ol { margin: 2px 0 8px; }
+  :where([data-uklad~='zwarta'] main) .toc-top a { display: flex; align-items: center; min-height: 40px; padding-block: 0; }
+  :where([data-uklad~='zwarta'] main) .side-nav a { min-height: 34px; }
+
+  /* granty */
+  :where([data-uklad~='zwarta'] main) .grant { padding: 10px 0; }
+  :where([data-uklad~='zwarta'] main) .grant h3 { margin: 3px 0 2px; font-size: 17px; }
+
+  /* zakłady; liczby działów jako wiersz „liczba + opis” */
+  :where([data-uklad~='zwarta'] main) .stats { gap: 10px; margin-bottom: 14px; }
+  :where([data-uklad~='zwarta'] main) .stat { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 9px 14px; }
+  :where([data-uklad~='zwarta'] main) .stat .n { flex: none; font-size: 26px; }
+  :where([data-uklad~='zwarta'] main) .stat .l { flex: 1 1 90px; min-width: 0; line-height: 1.3; }
+  :where([data-uklad~='zwarta'] main) .dept-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .dept { gap: 5px; padding: 14px 16px; }
+  :where([data-uklad~='zwarta'] main) .dept .t { font-size: 17px; }
+  :where([data-uklad~='zwarta'] main) .dept .f { padding-top: 6px; }
+  :where([data-uklad~='zwarta'] main) .zsec { margin-bottom: 24px; }
+  :where([data-uklad~='zwarta'] main) .zsec > h2 { margin: 0 0 10px; font-size: 22px; }
+  :where([data-uklad~='zwarta'] main) .subhead { margin: 14px 0 6px; }
+  :where([data-uklad~='zwarta'] main) .people { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
+  :where([data-uklad~='zwarta'] main) .person { gap: 1px; padding: 8px 12px; border-radius: 10px; }
+  :where([data-uklad~='zwarta'] main) .lead-person .os-n { font-size: 17px; }
+  :where([data-uklad~='zwarta'] main) .plain-list { gap: 3px; }
+  :where([data-uklad~='zwarta'] main) .more { margin-top: 6px; }
+  :where([data-uklad~='zwarta'] main) .more summary { min-height: 40px; }
+
+  /* kierunek studiów */
+  :where([data-uklad~='zwarta'] main) .entry-cards { gap: 10px; margin-bottom: 14px; }
+  :where([data-uklad~='zwarta'] main) .entry { gap: 12px; padding: 10px 14px; }
+  :where([data-uklad~='zwarta'] main) .entry strong { font-size: 16px; }
+  :where([data-uklad~='zwarta'] main) .why-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+  :where([data-uklad~='zwarta'] main) .why { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; align-content: start; gap: 3px 10px; padding: 11px 14px; flex-direction: row; }
+  :where([data-uklad~='zwarta'] main) .why strong { line-height: 1.3; }
+  :where([data-uklad~='zwarta'] main) .why > span { grid-column: 1 / -1; line-height: 1.45; }
+  :where([data-uklad~='zwarta'] main) .tracks { gap: 18px; margin-bottom: 8px; }
+  :where([data-uklad~='zwarta'] main) .track h3 { margin: 0 0 8px; font-size: 17px; }
+  :where([data-uklad~='zwarta'] main) .step { gap: 2px; padding: 0 0 11px 24px; }
+  :where([data-uklad~='zwarta'] main) .step strong { font-size: 16px; }
+  :where([data-uklad~='zwarta'] main) .step .desc { line-height: 1.45; }
+  :where([data-uklad~='zwarta'] main) .step .deadline { display: block; margin-top: 2px; padding: 3px 9px; flex-wrap: nowrap; align-items: normal; gap: normal; }
+  :where([data-uklad~='zwarta'] main) .step .deadline a { margin-left: 6px; }
+  :where([data-uklad~='zwarta'] main) .step .deadline svg { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+  :where([data-uklad~='zwarta'] main) .spec-grid { gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .spec { gap: 5px; padding: 12px 16px; line-height: 1.45; }
+  :where([data-uklad~='zwarta'] main) .spec h3 { font-size: 17px; line-height: 1.3; }
+  :where([data-uklad~='zwarta'] main) .spec .lbl { display: inline; margin-right: 6px; }
+  :where([data-uklad~='zwarta'] main) .spec .foot { padding-top: 6px; }
+  :where([data-uklad~='zwarta'] main) .year-pick { gap: 6px 12px; margin-bottom: 10px; }
+  :where([data-uklad~='zwarta'] main) .tabs { gap: 6px; margin-bottom: 10px; }
+  :where([data-uklad~='zwarta'] main) .faq summary { min-height: 44px; }
+  :where([data-uklad~='zwarta'] main) .faq .prose { padding-bottom: 8px; }
+
+  /* specjalność */
+  :where([data-uklad~='zwarta'] main) .callout { margin-top: 12px; padding: 10px 14px; }
+  :where([data-uklad~='zwarta'] main) .course-groups { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+  :where([data-uklad~='zwarta'] main) .course-group { padding: 12px 16px; }
+  :where([data-uklad~='zwarta'] main) .course-group h3 { margin: 0 0 6px; }
+  :where([data-uklad~='zwarta'] main) .course-group ul { gap: 5px; }
+  :where([data-uklad~='zwarta'] main) .course-group li { line-height: 1.4; }
+  :where([data-uklad~='zwarta'] main) .checks { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 4px 20px; }
+  :where([data-uklad~='zwarta'] main) .checks li { padding-left: 26px; font-size: 15px; line-height: 1.45; }
+
+  /* spis pracowników: niższe wiersze, zakład / funkcja w tej samej linii co nazwisko (gdy się mieści) */
+  :where([data-uklad~='zwarta'] main) .staff-dir { margin-bottom: 22px; }
+  :where([data-uklad~='zwarta'] main) .staff-dir > .staff-h { font-size: 20px; margin: 12px 0 4px; }
+  :where([data-uklad~='zwarta'] main) .staff-head, :where([data-uklad~='zwarta'] main) .staff-row { gap: 2px 16px; padding: 6px 12px; }
+  :where([data-uklad~='zwarta'] main) .staff-head { padding-top: 5px; padding-bottom: 5px; }
+  :where([data-uklad~='zwarta'] main) .staff-sub { margin: 14px 0 2px 12px; }
+  :where([data-uklad~='zwarta'] main) .staff-row { border-radius: 10px; line-height: 1.4; }
+  :where([data-uklad~='zwarta'] main) .staff-row::before { left: 12px; right: 12px; }
+  :where([data-uklad~='zwarta'] main) .staff-row .n small { display: inline-block; margin-left: 10px; }
+  :where([data-uklad~='zwarta'] main) .person.os-link .os-a .ico { top: 10px; right: 10px; }
+
+  /* sekcje stron (tlo.css: body[data-sekcje]) */
+  body[data-sekcje]:where([data-uklad~='zwarta']) .zsec > h2, body[data-sekcje]:where([data-uklad~='zwarta']) .zsec .dz-head h2, body[data-sekcje]:where([data-uklad~='zwarta']) .zsec .ww-head h2 { font-size: clamp(21px, 2.2vw, 24px); }
+  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .wrap > .zsec { padding: clamp(16px, 2.2vw, 26px) 0; }
+  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .main .zsec { padding: 16px 0; }
+  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .main .zsec:nth-child(even of .zsec) { margin-inline: calc(-1 * min(18px, var(--gutter))); padding-inline: min(18px, var(--gutter)); }
+  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) :is(.zsec > h2, .zsec .dz-head h2, .zsec .ww-head h2, .section-head h2, .studia-head h2)::before { width: 5px; margin-right: 10px; }
+  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .prose h2 { margin: 1.3em 0 .5em; padding: .3em .6em .3em .8em; border-radius: 10px; }
+  body[data-sekcje='linia']:where([data-uklad~='zwarta']) .zsec { margin-bottom: 20px; padding-top: 14px; }
+  body[data-sekcje='linia']:where([data-uklad~='zwarta']) :is(.section-head h2, .studia-head h2)::before { margin-bottom: 8px; }
+  body[data-sekcje='linia']:where([data-uklad~='zwarta']) .prose h2 { margin-top: 1.5em; padding-top: 14px; }
+  body[data-sekcje='linia']:where([data-uklad~='zwarta']) main > .section { padding-top: 6px; padding-bottom: clamp(14px, 1.8vw, 22px); }
+  body[data-sekcje='linia']:where([data-uklad~='zwarta']) main > .section > .wrap:first-child { padding-top: 16px; }
+  body[data-sekcje='karty']:where([data-uklad~='zwarta']) .zsec:not(.dz-paths) { margin-bottom: 14px; padding: clamp(14px, 2vw, 22px); }
+  body[data-sekcje='karty']:where([data-uklad~='zwarta']) .zsec.dz-paths { margin-bottom: 14px; }
+  body[data-sekcje='karty']:where([data-uklad~='zwarta']) .section { padding-top: clamp(8px, 1.2vw, 14px); padding-bottom: clamp(8px, 1.2vw, 14px); }
+  body[data-sekcje='karty']:where([data-uklad~='zwarta']) .section > .wrap { padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); }
+  body[data-sekcje='karty']:where([data-uklad~='zwarta']) .prose h2 { margin-top: 1.4em; padding-bottom: 8px; }
+
+  /* ==========================================================================
+     zwarta-baner: baner podstrony i strony głównej jak w wariancie Zwarta (niższy pas, mniejszy tytuł)
+     ========================================================================== */
+  :where([data-uklad~='zwarta-baner'] main > :is(.page-head, .hero)) {
+    --radius-s: 8px;
+    --radius: 12px;
+    --radius-l: 14px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* baner strony głównej */
+  :where([data-uklad~='zwarta-baner']) .hero { --hero-tekst: 640px; }
+  .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main .hero-fig::after { height: calc(var(--hdr-h) + 70px); }
+  :where([data-uklad~='zwarta-baner']) .hero-fig figcaption { bottom: 10px; padding: 3px 8px; }
+  :where([data-uklad~='zwarta-baner']) .hero-in { min-height: clamp(270px, 21.5vw, 320px); padding-top: 28px; padding-bottom: clamp(20px, 2vw, 28px); }
+  .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 20px); }
+  :where([data-uklad~='zwarta-baner']) .hero-txt { gap: 10px; }
+  :where([data-uklad~='zwarta-baner']) .hero-logo { height: clamp(30px, 2.6vw, 38px); margin-bottom: 0; }
+  :where([data-uklad~='zwarta-baner']) .hero h1 { font-size: clamp(34px, 3.4vw, 50px); line-height: 1; }
+  :where([data-uklad~='zwarta-baner']) .hero-lead { max-width: 36em; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.5; }
+  :where([data-uklad~='zwarta-baner']) .hero-btns { margin-top: 4px; }
+  :where([data-uklad~='zwarta-baner']) .hero-flag { min-height: 32px; }
+
+  /* nagłówek podstrony (global.css) */
+  :where([data-uklad~='zwarta-baner']) .page-head .wrap { padding-top: clamp(12px, 1.8vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); gap: 6px; }
+  :where([data-uklad~='zwarta-baner']) .page-head h1 { font-size: clamp(26px, 3.2vw, 38px); }
+  :where([data-uklad~='zwarta-baner']) .page-head .lead { max-width: 820px; font-size: 16px; line-height: 1.5; }
+  :where([data-uklad~='zwarta-baner'] .page-head) .wstecz { margin-bottom: 0; }
+  :where([data-uklad~='zwarta-baner']) .sem-koord { margin: 8px 0 0; }
+  :where([data-uklad~='zwarta-baner']) .sem-koord-n { font-size: 17px; }
+  :where([data-uklad~='zwarta-baner']) .sem-meta { gap: 4px 20px; margin: 8px 0 0; font-size: 15px; }
+  :where([data-uklad~='zwarta-baner'] .page-head) .wstecz a { min-height: 32px; font-size: 14px; }
+  :where([data-uklad~='zwarta-baner']) .eyebrow { font-size: 12.5px; }
+
+  /* pas nagłówka podstrony (tlo.css) */
+  :where([data-uklad~='zwarta-baner']) .ph { --ph-gora: clamp(12px, 1.8vw, 24px); --ph-min: clamp(0px, 12vw, 172px); }
+  :where([data-uklad~='zwarta-baner']) .ph .wrap { padding-top: var(--ph-gora); padding-bottom: clamp(16px, 2.2vw, 28px); min-height: var(--ph-min); }
+  :where([data-uklad~='zwarta-baner']) .ph .wrap > h1, :where([data-uklad~='zwarta-baner']) .ph .wrap > .lead { max-width: min(820px, 62%); }
+  :where([data-uklad~='zwarta-baner']) .ph h1 { font-size: clamp(28px, 3.2vw, 40px); }
+  :where([data-uklad~='zwarta-baner']) .ph-zdjecie.ph-z-foto .ph-foto { top: clamp(12px, 1.6vw, 18px); bottom: clamp(12px, 1.6vw, 18px); }
+  .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main > .ph:first-child > .wrap { padding-top: calc(var(--ph-gora) + var(--hdr-h)); min-height: calc(var(--ph-min) + var(--hdr-h)); }
+  .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main > .ph-granat:first-child::before { height: calc(var(--hdr-h) + 32px); }
+}
+
+/* reguła z węższego progu global.css, która nadpisuje tę samą właściwość (musi zostać po regułach powyżej) */
+@media (min-width: 761px) and (max-width: 900px) { :where([data-uklad~='zwarta'] main) .layout > .side { max-width: none; } }
