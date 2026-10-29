@@ -68,6 +68,54 @@ jobs:
           if [ -n "$warn" ]; then echo "::warning title=Ostrzeżenia budowania::${warn}"; fi
           echo "::notice title=Wynik budowania::$(find dist -name '*.html' | wc -l) stron HTML, $(du -sh dist | cut -f1)"
 
+      # Warianty wyglądu na komputer do porównania: każda gałąź wariant-<nazwa> jest budowana (równolegle) z tymi samymi
+      # treściami pod <adres strony>/warianty/<nazwa>/. Zdjęcia i dokumenty biorą z głównej strony (/pliki/), więc
+      # paczka prawie nie rośnie. Przełącznik w lewym dolnym rogu dodawany jest tu, przy publikacji, nie w kodzie
+      # strony; na telefonie (≤ 760 px) jest ukryty. Po wyborze wyglądu wystarczy usunąć gałęzie wariant-* (krok się
+      # pomija). Błąd budowania wariantu nie zatrzymuje publikacji głównej strony.
+      - name: Warianty wyglądu (gałęzie wariant-*)
+        continue-on-error: true
+        env:
+          BASE0: ${{ steps.pages.outputs.base_path }}
+          SITE0: ${{ steps.pages.outputs.origin }}
+        run: |
+          WARIANTY=$(git ls-remote --heads origin 'wariant-*' | sed 's#.*refs/heads/wariant-##' | sort)
+          if [ -z "$WARIANTY" ]; then echo "Brak gałęzi wariant-*"; exit 0; fi
+          zbuduj() {
+            n="$1"; d="$RUNNER_TEMP/wariant-$n"
+            git fetch -q --depth 1 origin "wariant-$n" && git worktree add -q --detach "$d" FETCH_HEAD || return 1
+            cd "$d"
+            python3 skrypty/pobierz_tresci.py --lokalnie "$GITHUB_WORKSPACE/.tresci" > tresci.log 2>&1 || return 1
+            if cmp -s package.json "$GITHUB_WORKSPACE/package.json"; then cp -al "$GITHUB_WORKSPACE/node_modules" node_modules || return 1
+            else npm install --no-audit --no-fund --prefer-offline > install.log 2>&1 || return 1; fi
+            SITE_URL="$SITE0" BASE_PATH="$BASE0/warianty/$n" npm run build > build.log 2>&1 || return 1
+            rm -rf dist/pliki
+            find dist -name '*.html' -print0 | xargs -0 perl -pi -e "s#\Q$BASE0/warianty/$n/pliki/\E#$BASE0/pliki/#g"
+          }
+          for n in $WARIANTY; do ( if zbuduj "$n" > /dev/null 2>&1; then echo 0; else echo 1; fi > "$RUNNER_TEMP/wynik-$n" ) & done
+          wait
+          ok=""
+          for n in $WARIANTY; do
+            d="$RUNNER_TEMP/wariant-$n"
+            if [ "$(cat "$RUNNER_TEMP/wynik-$n")" = 0 ]; then
+              mkdir -p "dist/warianty/$n" && cp -r "$d/dist/." "dist/warianty/$n/"
+              ok="$ok $n"
+              echo "::notice title=Wariant $n::$(find "$d/dist" -name '*.html' | wc -l) stron HTML, $(du -sh "$d/dist" | cut -f1)"
+            else
+              echo "::warning title=Wariant $n się nie zbudował::$(cat "$d"/tresci.log "$d"/install.log "$d"/build.log 2>/dev/null | tail -c 1500 | tr '\n' ' ')"
+            fi
+          done
+          [ -z "$ok" ] && exit 0
+          linki=""
+          for n in obecna $(for x in zwarta portal redakcyjna; do case " $ok " in *" $x "*) echo "$x";; esac; done) \
+                   $(for x in $ok; do case " zwarta portal redakcyjna " in *" $x "*) ;; *) echo "$x";; esac; done); do
+            case "$n" in obecna) e="Obecna"; w="";; zwarta) e="Zwarta"; w="$n";; portal) e="Portal"; w="$n";; redakcyjna) e="Redakcyjna"; w="$n";; *) e="$n"; w="$n";; esac
+            linki="$linki<a data-wariant=\"$w\" href=\"$BASE0/\">$e</a>"
+          done
+          export PASEK="<div class=\"wr-pasek\" data-pagefind-ignore role=\"navigation\" aria-label=\"Warianty wyglądu (podgląd)\"><span>Wariant:</span>$linki</div><style>.wr-pasek{position:fixed;left:10px;bottom:10px;z-index:9999;display:flex;flex-wrap:wrap;align-items:center;gap:2px;max-width:calc(100vw - 20px);padding:4px;border-radius:999px;background:#0b1630;box-shadow:0 4px 18px rgb(0 0 0/.35);font:700 12px/1 system-ui,sans-serif}.wr-pasek span{padding:0 6px 0 8px;color:#c4cee0}.wr-pasek a{padding:8px 10px;border-radius:999px;color:#fff;text-decoration:none}.wr-pasek a:hover{background:rgb(255 255 255/.14)}.wr-pasek a[aria-current]{background:#f2a33a;color:#101828}@media (max-width:760px){.wr-pasek{display:none}}</style><script>(function(){var b='$BASE0',p=location.pathname,s=p.slice(b.length),m=s.match(/^\\/warianty\\/([^\\/]+)/),c=m?m[1]:'',r=(m?s.slice(m[0].length):s)||'/';document.querySelectorAll('.wr-pasek a').forEach(function(a){var w=a.getAttribute('data-wariant');a.href=b+(w?'/warianty/'+w:'')+r+location.hash;if(w===c)a.setAttribute('aria-current','true');});})();</script>"
+          find dist -name '*.html' -print0 | xargs -0 perl -0pi -e 's/<\/body>/$ENV{PASEK}<\/body>/'
+          echo "::notice title=Warianty::opublikowane:$ok"
+
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
