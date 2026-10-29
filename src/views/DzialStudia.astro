@@ -120,10 +120,12 @@ const ikona = (a: string) =>
   : /zajecia|plan/.test(a) ? 'zegar'
   : 'strzalka';
 
-// ④ Aktualności dla studentów (komputer: trzy karty; telefon — wygląd „Portal”: zwarta lista sześciu).
+// ④ Aktualności dla studentów (komputer — wariant „Redakcyjna”: zwarta lista pięciu; telefon — wygląd „Portal”: zwarta lista sześciu).
 const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
-const aktualnosci = dlaStudentow.slice(0, 3);
+const aktualnosci = dlaStudentow.slice(0, 5);
 const aktualnosciTel = dlaStudentow.slice(0, 6);
+// Telefon: sekcje mają id z przyrostkiem „-tel” (na komputerze stoją ich odpowiedniki), więc kotwice na tej stronie też.
+const kotwicaTel = (a: string) => (a.startsWith('#') ? `${a}-tel` : a);
 
 // ⑤ Kontakt: sekretariat dydaktyczny i zastępca dyrektora ds. dydaktycznych — z pól „Kontakt” kierunków (bez dubli).
 // Telefon podajemy tylko przy sekretariacie (administracja).
@@ -140,9 +142,12 @@ const tytul = T('Studia', 'Study');
 const wstep = w(tekst, 'wstep');
 ---
 <Baza tytul={tytul} opis={wstep}>
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w jednym wierszu w nagłówku, zwarte karty kierunków, ramki:
+  {/* Komputer (≥ 761 px) — wariant „Redakcyjna”: liczby, potem każda sekcja w dwóch kolumnach — nagłówek po lewej (.k2-h),
+       treść po prawej (.k2-b): kierunki, ścieżki (Chcę studiować, Już studiuję), więcej dla studentów, „Warto wiedzieć”,
+       aktualności (zwarta lista), kontakt. Bloki .tylko-komputer.
+       Telefon (≤ 760 px) — wygląd „Portal”: liczby w jednym wierszu w nagłówku, zwarte karty kierunków, ramki:
        Chcę studiować, Kontakt, Już studiuję, Więcej dla studentów, Aktualności (sześć), Warto wiedzieć.
-       Kontakt, aktualności, „Warto wiedzieć” i liczby mają osobne bloki .tylko-telefon (inna kolejność lub liczba pozycji). */}
+       Bloki .tylko-telefon (data-pagefind-ignore, id z przyrostkiem „-tel”). */}
   <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
@@ -158,13 +163,108 @@ const wstep = w(tekst, 'wstep');
     )}
 
     {karty.length > 0 && (
-      <section class="zsec dz-kierunki" aria-labelledby="kierunki">
-        <h2 id="kierunki">{T('Kierunki studiów', 'Programmes')}</h2>
+      <section class="zsec k2 tylko-komputer" aria-labelledby="kierunki">
+        <div class="k2-h"><h2 id="kierunki">{T('Kierunki studiów', 'Programmes')}</h2></div>
+        <div class="k2-b prog-grid">
+          {karty.map((k) => (
+            <a class="prog dz-prog" href={href(k.adres)}>
+              <span class="l">{k.poziom}</span>
+              <span class="n">{k.nazwa}</span>
+              {k.pelna && <span class="p">{k.pelna}</span>}
+              {k.opis && <span class="o">{k.opis}</span>}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {sciezki.map((s) => (
+      <section class="zsec k2 tylko-komputer" aria-labelledby={s.id}>
+        <div class="k2-h">
+          <h2 id={s.id}>{s.tytul}</h2>
+          {s.opis && <p>{s.opis}</p>}
+        </div>
+        <ul class="k2-b dz-linki">
+          {s.linki.map((l) => (
+            <li>
+              <a href={href(l.adres)}>
+                <span>{l.etykieta}</span>
+                <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={15} />
+                {isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    {pozostale.length > 0 && (
+      <section class="zsec k2 tylko-komputer" aria-labelledby="wiecej">
+        <div class="k2-h"><h2 id="wiecej">{T('Więcej dla studentów', 'More for students')}</h2></div>
+        <ul class="k2-b dz-linki">
+          {pozostale.map((l) => (
+            <li>
+              <a href={href(l.adres)}>
+                <span>{l.etykieta}</span>
+                <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={15} />
+                {isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <WartoWiedziec lang={lang} dzial="studia" klasa="tylko-komputer" />
+
+    <section class="zsec k2 tylko-komputer" aria-labelledby="aktualnosci">
+      <div class="k2-h">
+        <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
+        <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </div>
+      {aktualnosci.length > 0 ? (
+        <div class="k2-b nlist">
+          {aktualnosci.map((p) => <KartaAktualnosci p={p} lang={lang} />)}
+        </div>
+      ) : (
+        <p class="k2-b muted" style="margin:0">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
+      )}
+    </section>
+
+    <section class="zsec k2 tylko-komputer" aria-labelledby="kontakt" style="margin-bottom:0">
+      <div class="k2-h">
+        <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
+        <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </div>
+      <div class="k2-b">
+        {osobyKontakt.length > 0 && (
+          <ul class="people">
+            {osobyKontakt.map((k) => (
+              <li class="person">
+                <span class="dz-rola">{w(k, 'rola')}</span>
+                <span class="os-n">{k.osoba}</span>
+                {k.zakres && <span class="dz-zakres">{k.zakres}</span>}
+                <span class="os-c">
+                  {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
+                  {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
+                  {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+
+    {/* ---------- telefon ---------- */}
+    {karty.length > 0 && (
+      <section class="zsec dz-kierunki tylko-telefon" aria-labelledby="kierunki-tel" data-pagefind-ignore>
+        <h2 id="kierunki-tel">{T('Kierunki studiów', 'Programmes')}</h2>
         <div class="prog-grid">
           {karty.map((k) => (
             <a class="prog dz-prog" href={href(k.adres)}>
               <span class="l">{k.poziom}</span>
-              <span class="n">{k.nazwa}<Ikona class="tylko-telefon" nazwa="strzalka" rozmiar={14} /></span>
+              <span class="n">{k.nazwa}<Ikona nazwa="strzalka" rozmiar={14} /></span>
               {k.pelna && <span class="p">{k.pelna}</span>}
               {k.opis && <span class="o">{k.opis}</span>}
               <span class="go" aria-hidden="true">{T('Więcej', 'More')}<Ikona nazwa="strzalka" rozmiar={15} /></span>
@@ -175,21 +275,21 @@ const wstep = w(tekst, 'wstep');
     )}
 
     {sciezki.length > 0 && (
-      <div class="zsec dz-paths">
+      <div class="zsec dz-paths tylko-telefon" data-pagefind-ignore>
         {sciezki.map((s, i) => (
           <>
-          <section class="dz-path" aria-labelledby={s.id}>
+          <section class="dz-path" aria-labelledby={`${s.id}-tel`}>
             <div class="dz-path-h">
               <Ikona nazwa={s.ikona} rozmiar={26} />
               <div>
-                <h2 id={s.id}>{s.tytul}</h2>
+                <h2 id={`${s.id}-tel`}>{s.tytul}</h2>
                 {s.opis && <p>{s.opis}</p>}
               </div>
             </div>
             <ul>
               {s.linki.map((l) => (
                 <li>
-                  <a href={href(l.adres)}>
+                  <a href={href(kotwicaTel(l.adres))}>
                     <span>{l.etykieta}</span>
                     <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />
                     {isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}
@@ -199,7 +299,7 @@ const wstep = w(tekst, 'wstep');
             </ul>
           </section>
           {i === 0 && osobyKontakt.length > 0 && (
-            <section class="pt-box tylko-telefon" aria-labelledby="kontakt-tel" data-pagefind-ignore>
+            <section class="pt-box" aria-labelledby="kontakt-tel">
               <div class="pt-h"><h2 id="kontakt-tel">{T('Kontakt', 'Contact')}</h2></div>
               <ul class="pt-list dz-osoby">
                 {osobyKontakt.map((k) => (
@@ -224,35 +324,19 @@ const wstep = w(tekst, 'wstep');
     )}
 
     {pozostale.length > 0 && (
-      <section class="zsec dz-wiecej" aria-labelledby="wiecej">
-        <h2 id="wiecej">{T('Więcej dla studentów', 'More for students')}</h2>
+      <section class="zsec dz-wiecej tylko-telefon" aria-labelledby="wiecej-tel" data-pagefind-ignore>
+        <h2 id="wiecej-tel">{T('Więcej dla studentów', 'More for students')}</h2>
         <div class="tiles dz-tiles">
           {pozostale.map((l) => (
             <a class="tile" href={href(l.adres)}>
               <Ikona nazwa={ikona(l.adres)} />
               <span>{l.etykieta}</span>
-              <span class="tylko-telefon dz-wiecej-ico" data-pagefind-ignore><Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />{isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}</span>
+              <span class="dz-wiecej-ico"><Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={16} />{isExternal(l.adres) && <span class="sr-only">{T('(strona zewnętrzna)', '(external site)')}</span>}</span>
             </a>
           ))}
         </div>
       </section>
     )}
-
-    <WartoWiedziec lang={lang} dzial="studia" klasa="tylko-komputer" />
-
-    <section class="zsec tylko-komputer" aria-labelledby="aktualnosci">
-      <div class="dz-head">
-        <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
-        <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      {aktualnosci.length > 0 ? (
-        <div class="news-grid">
-          {aktualnosci.map((p) => <KartaAktualnosci p={p} lang={lang} />)}
-        </div>
-      ) : (
-        <p class="muted" style="margin:0">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
-      )}
-    </section>
 
     <div class="dz-tel tylko-telefon" data-pagefind-ignore>
       <section class="pt-box" aria-labelledby="aktualnosci-tel">
@@ -280,56 +364,40 @@ const wstep = w(tekst, 'wstep');
       </section>
       <WartoWiedziec lang={lang} dzial="studia" uklad="portal" />
     </div>
-
-    <section class="zsec tylko-komputer" aria-labelledby="kontakt" style="margin-bottom:0">
-      <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
-      {osobyKontakt.length > 0 && (
-        <ul class="people">
-          {osobyKontakt.map((k) => (
-            <li class="person">
-              <span class="dz-rola">{w(k, 'rola')}</span>
-              <span class="os-n">{k.osoba}</span>
-              {k.zakres && <span class="dz-zakres">{k.zakres}</span>}
-              <span class="os-c">
-                {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
-                {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
-                {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-    </section>
   </div>
 </Baza>
 
 <style>
-  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
-  .dz-prog { min-height: 180px; }
-  .dz-prog .p { margin-top: -4px; font-size: 14px; color: var(--muted); }
+  /* Odstępy strony (.dz-wrap), listy linków (.dz-linki) i kolumny (.k2) na komputerze: global.css („Układ redakcyjny”).
+     Klasy wspólne dla bloków komputera i telefonu mają różne wartości w parach @media (max-width: 760px) / (min-width: 761px). */
+  .dz-prog .p { font-size: 14px; color: var(--muted); }
+  @media (max-width: 760px) { .dz-prog .p { margin-top: -4px; } }
+  @media (min-width: 761px) { .dz-prog .p { margin-top: -2px; } }
   .dz-prog .go { margin-top: auto; padding-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
   :global(:root[data-theme='dark']) .dz-prog .go { color: var(--accent); }
   .dz-prog .go :global(svg) { transition: transform .15s; }
   .dz-prog:hover .go :global(svg) { transform: translateX(3px); }
-  .dz-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
-  .dz-path { display: flex; flex-direction: column; gap: 14px; padding: 22px; border-radius: var(--radius-l); border: 1.5px solid var(--line); }
-  .dz-path-h { display: flex; gap: 14px; align-items: flex-start; }
-  .dz-path-h :global(svg) { flex: none; margin-top: 2px; color: var(--primary); }
-  :global(:root[data-theme='dark']) .dz-path-h :global(svg) { color: var(--accent); }
-  .dz-path h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--ink); scroll-margin-top: 16px; }
-  .dz-path p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
-  .dz-path ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-  .dz-path li { border-bottom: 1px solid var(--line); }
-  .dz-path li a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 10px 8px; font-weight: 700; color: var(--ink); text-decoration: none; }
-  .dz-path li a:hover { background: var(--tint); }
-  .dz-path li a :global(svg) { flex: none; color: var(--muted); }
-  .dz-tiles { padding-top: 0; }
-  .dz-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 10px; }
-  .dz-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
-  .dz-rola { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
-  .people + .link-arrow { margin-top: 8px; }
+  /* telefon: ścieżki (Chcę studiować, Już studiuję) w ramkach */
+  @media (max-width: 760px) {
+    .dz-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+    .dz-path { display: flex; flex-direction: column; gap: 14px; padding: 22px; border-radius: var(--radius-l); border: 1.5px solid var(--line); }
+    .dz-path-h { display: flex; gap: 14px; align-items: flex-start; }
+    .dz-path-h :global(svg) { flex: none; margin-top: 2px; color: var(--primary); }
+    :global(:root[data-theme='dark']) .dz-path-h :global(svg) { color: var(--accent); }
+    .dz-path h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--ink); scroll-margin-top: 16px; }
+    .dz-path p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+    .dz-path ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+    .dz-path li { border-bottom: 1px solid var(--line); }
+    .dz-path li a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 10px 8px; font-weight: 700; color: var(--ink); text-decoration: none; }
+    .dz-path li a:hover { background: var(--tint); }
+    .dz-path li a :global(svg) { flex: none; color: var(--muted); }
+  }
+  .dz-rola { font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  @media (max-width: 760px) { .dz-rola { font-size: 12px; } }
+  @media (min-width: 761px) { .dz-rola { font-size: 11.5px; } }
+  .dz-zakres { font-size: 14px; }
+  @media (max-width: 760px) { .dz-zakres { margin: 2px 0 4px; } }
+  @media (min-width: 761px) { .dz-zakres { margin: 1px 0 2px; } }
   @media (prefers-reduced-motion: reduce) { .dz-prog .go :global(svg) { transition: none; transform: none !important; } }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */

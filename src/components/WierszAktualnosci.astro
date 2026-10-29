@@ -1,7 +1,9 @@
 ---
-// Pozycja na liście aktualności.
+// Pozycja na liście aktualności. Klasa .row-item i atrybuty data-* są potrzebne filtrom i wyszukiwarce w ListaAktualnosci.astro.
 // Telefon (≤ 760 px) — wygląd „Portal”: zwarty wiersz — data (przed plakietkami) i plakietki w lewej kolumnie albo
-// (≤ 640 px) w jednym wierszu nad tytułem, z prawej mała miniatura; znaczniki te same co na komputerze.
+// (≤ 640 px) w jednym wierszu nad tytułem, z prawej mała miniatura (.body, tylko na telefonie).
+// Komputer (≥ 761 px) — wariant „Redakcyjna”: wiersz „data | tytuł, termin i zajawka | rodzaj i odbiorcy” + miniatura
+// (.nrow-*, tylko na komputerze; style w global.css). Miniatura .thumb jest wspólna.
 import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, range, type Lang } from '../lib/daty';
@@ -11,8 +13,8 @@ interface Props { p: PozycjaListy; lang: Lang }
 const { p, lang } = Astro.props;
 const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
 ---
-<a class="row-item wa-row" href={href} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
-  <span class="body">
+<a class="row-item wa-row nrow nrow-l" href={href} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
+  <span class="body tylko-telefon" data-pagefind-ignore>
     <span class="news-meta wa-meta">
       <span class={`badge badge-${p.rodzaj}`}>{RODZAJE[p.rodzaj]?.[lang]}</span>
       {p.dla.map((d) => <span class="badge">{ODBIORCY[d]?.[lang]}</span>)}
@@ -21,6 +23,16 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
     <span class="t">{p.tytul}</span>
     {p.wydarzenie && <span class="news-meta wa-kiedy"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</span>}
     {p.zajawka && <span class="x">{p.zajawka}</span>}
+  </span>
+  <time class="nrow-d tylko-komputer" datetime={p.data}>{short(p.data)}</time>
+  <span class="nrow-b tylko-komputer">
+    <span class="nrow-t">{p.tytul}</span>
+    {p.wydarzenie && <span class="nrow-k"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</span>}
+    {p.zajawka && <span class="nrow-x">{p.zajawka}</span>}
+  </span>
+  <span class={`nrow-r r-${p.rodzaj} tylko-komputer`}>
+    <span>{RODZAJE[p.rodzaj]?.[lang]}</span>
+    {p.dla.length > 0 && <small>{p.dla.map((d) => ODBIORCY[d]?.[lang]).join(', ')}</small>}
   </span>
   {p.zdjecie && <span class="thumb"><img src={u(p.zdjecie)} alt="" loading="lazy" /></span>}
 </a>

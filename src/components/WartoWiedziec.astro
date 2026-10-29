@@ -7,6 +7,10 @@
 //                   stoi w bloku .tylko-telefon, więc id ma przyrostek „-tel” i nie trafia do wyszukiwarki;
 //                   glowna = tylko pozycje „Pokaż na stronie głównej”.
 // klasa: dodatkowe klasy sekcji (np. tylko-komputer, gdy na telefonie stoi obok wersja 'portal').
+// Układy 'glowna', 'dzial' i 'lista' na komputerze (≥ 761 px) mają wygląd wariantu „Redakcyjna”: nagłówek w lewej kolumnie
+// (.k2), pozycje jako wiersze listy (rok | tytuł i zajawka | „Czytaj więcej” i miniatura). Na telefonie zostają karty
+// z dotychczasowym wyglądem — osobny blok .tylko-telefon (id z przyrostkiem „-tel”, poza wyszukiwarką), pomijany,
+// gdy sekcja i tak jest tylko na komputer (klasa „tylko-komputer”).
 // Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
 import { getCollection } from 'astro:content';
 import Ikona from './Ikona.astro';
@@ -65,6 +69,9 @@ const H = uklad === 'lista' ? 'h2' : 'h3';
 // Opakowanie: pasek strony głównej (.section-alt), sekcja działu (.zsec) albo sama siatka.
 const Zewn = uklad === 'lista' ? 'div' : 'section';
 const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial' ? 'zsec' : '', klasa].filter(Boolean).join(' ') || undefined;
+const tylkoKomputer = (klasa ?? '').split(/\s+/).includes('tylko-komputer');
+const klasaKomp = [klasaZewn, tylkoKomputer ? '' : 'tylko-komputer'].filter(Boolean).join(' ');
+const klasaTel = [klasaZewn, 'tylko-telefon'].filter(Boolean).join(' ');
 ---
 {karty.length > 0 && uklad === 'portal' && (
   <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore>
@@ -92,11 +99,48 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
   </section>
 )}
 {karty.length > 0 && uklad !== 'portal' && (
-  <Zewn class={klasaZewn} aria-labelledby={uklad === 'lista' ? undefined : idSekcji}>
+  <Zewn class={klasaKomp} aria-labelledby={uklad === 'lista' ? undefined : idSekcji}>
+    {/* komputer: nagłówek w lewej kolumnie (.k2), pozycje w wierszach */}
+    <div class={uklad === 'glowna' ? 'wrap k2' : uklad === 'dzial' ? 'k2' : undefined}>
+      {uklad !== 'lista' && (
+        <div class="k2-h">
+          <h2 id={idSekcji}>{tytulSekcji}</h2>
+          {wiecej && <a class="link-arrow" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+        </div>
+      )}
+      <div class={`ww-grid${uklad !== 'lista' ? ' k2-b' : ''}${karty.length === 1 ? ' ww-jedna' : ''}`}>
+        {karty.map((k) => (
+          <article class={`ww-card${k.cel ? ' ww-link' : ''}`}>
+            <span class="ww-rok">{k.rok}</span>
+            <div class="ww-body">
+              <H class="ww-t">
+                {k.cel ? (
+                  <a href={href(k.cel)}>{k.tytul}{k.zewnetrzny && <span class="sr-only"> {T('(strona zewnętrzna)', '(external site)')}</span>}</a>
+                ) : k.tytul}
+              </H>
+              {k.zajawka && <p class="ww-x">{k.zajawka}</p>}
+            </div>
+            {k.cel && (
+              <span class="ww-go" aria-hidden="true">{k.dalej}<Ikona nazwa={k.zewnetrzny ? 'zewnetrzny' : 'strzalka'} rozmiar={15} /></span>
+            )}
+            {k.obraz && (
+              <div class="ww-foto">
+                <img src={u(k.obraz)} alt="" loading="lazy" decoding="async" />
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+  </Zewn>
+)}
+{karty.length > 0 && uklad !== 'portal' && !tylkoKomputer && (
+  <Zewn class={klasaTel} aria-labelledby={uklad === 'lista' ? undefined : `${idSekcji}-tel`} data-pagefind-ignore>
+    {/* telefon: karty (zdjęcie lub rok u góry) */}
     <div class={uklad === 'glowna' ? 'wrap' : undefined}>
       {uklad !== 'lista' && (
         <div class={uklad === 'glowna' ? 'section-head' : 'ww-head'}>
-          <h2 id={idSekcji}>{tytulSekcji}</h2>
+          <h2 id={`${idSekcji}-tel`}>{tytulSekcji}</h2>
           {wiecej && <a class="link-arrow" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
         </div>
       )}
@@ -128,43 +172,80 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
 )}
 
 <style>
-  .ww-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 14px; }
-  .ww-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
-  .ww-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px; }
-  .ww-jedna { max-width: 560px; }
-  .ww-card {
-    position: relative; display: flex; flex-direction: column; overflow: hidden;
-    border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); color: var(--text);
+  /* Wspólne klasy obu bloków; różne wartości: @media (max-width: 760px) = karty na telefonie,
+     @media (min-width: 761px) = wiersze listy na komputerze (wariant „Redakcyjna”). Kolejność reguł jak dotąd. */
+  @media (max-width: 760px) {
+    .ww-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 14px; }
+    .ww-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
+    .ww-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px; }
+    .ww-jedna { max-width: 560px; }
   }
-  /* Górne pole: zdjęcie z rokiem na plakietce albo duży rok na jasnym tle */
-  .ww-media {
-    position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
-    min-height: 140px; padding: 18px 20px; background: var(--tint); color: var(--tint-ink);
+  /* komputer: pozycje jako wiersze listy — rok | tytuł i zajawka | „Czytaj więcej” i miniatura zdjęcia (gdy jest);
+     cała pozycja klikalna (link w tytule rozciągnięty na wiersz) */
+  @media (min-width: 761px) { .ww-grid { display: flex; flex-direction: column; border-top: 1px solid var(--rule); } }
+  .ww-card { position: relative; color: var(--text); }
+  @media (max-width: 760px) {
+    .ww-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
   }
-  .ww-media:not(.ww-foto)::after { content: ''; display: block; width: 44px; height: 4px; border-radius: 2px; background: var(--accent); }
-  .ww-media:not(.ww-foto) .ww-rok { font-size: clamp(36px, 4.4vw, 50px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-  .ww-foto { height: 160px; padding: 0; background: var(--photo); }
-  .ww-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
-  .ww-foto .ww-rok {
-    position: absolute; left: 14px; bottom: 14px; padding: 4px 12px; border-radius: 999px;
-    background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
+  @media (min-width: 761px) {
+    .ww-card { display: grid; grid-template-columns: 5em minmax(0, 1fr) 9.5em; grid-template-areas: 'r b g' 'r b f'; gap: 0 20px; align-items: baseline; padding: 10px 0 11px; border-bottom: 1px solid var(--line); }
   }
-  .ww-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; }
-  .ww-t { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; color: var(--ink); }
+  /* telefon — górne pole: zdjęcie z rokiem na plakietce albo duży rok na jasnym tle */
+  @media (max-width: 760px) {
+    .ww-media {
+      position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
+      min-height: 140px; padding: 18px 20px; background: var(--tint); color: var(--tint-ink);
+    }
+    .ww-media:not(.ww-foto)::after { content: ''; display: block; width: 44px; height: 4px; border-radius: 2px; background: var(--accent); }
+    .ww-media:not(.ww-foto) .ww-rok { font-size: clamp(36px, 4.4vw, 50px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .ww-foto { height: 160px; padding: 0; background: var(--photo); }
+    .ww-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
+    .ww-foto .ww-rok {
+      position: absolute; left: 14px; bottom: 14px; padding: 4px 12px; border-radius: 999px;
+      background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
+    }
+    .ww-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; }
+  }
+  @media (min-width: 761px) {
+    .ww-rok { grid-area: r; font-size: 14px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .ww-body { grid-area: b; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  }
+  .ww-t { margin: 0; font-weight: 800; line-height: 1.3; color: var(--ink); }
+  @media (max-width: 760px) { .ww-t { font-size: 19px; letter-spacing: -0.01em; } }
+  @media (min-width: 761px) { .ww-t { font-size: 16.5px; } }
   .ww-t a { color: inherit; text-decoration: none; }
-  .ww-x { margin: 0; font-size: 15px; line-height: 1.55; }
-  .ww-go { margin-top: auto; padding-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
+  .ww-x { margin: 0; font-size: 15px; }
+  @media (max-width: 760px) { .ww-x { line-height: 1.55; } }
+  @media (min-width: 761px) { .ww-x { line-height: 1.45; color: var(--muted); } }
+  .ww-go { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
+  @media (max-width: 760px) { .ww-go { margin-top: auto; padding-top: 6px; } }
+  @media (min-width: 761px) {
+    .ww-go { grid-area: g; justify-self: end; white-space: nowrap; }
+    :global(:root[data-theme='dark']) .ww-go { color: var(--accent); }
+  }
   .ww-go :global(svg) { transition: transform .15s; }
-  /* Karta klikalna w całości (link w tytule rozciągnięty na kartę), podświetlenie po najechaniu — jak .spec-link */
-  .ww-link { transition: border-color .15s, box-shadow .15s, transform .15s; }
-  .ww-link .ww-t a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
-  .ww-link:hover, .ww-link:focus-within { border-color: var(--ink); box-shadow: 0 6px 20px rgb(0 0 0 / .1); transform: translateY(-2px); }
-  .ww-link:hover .ww-t a { text-decoration: underline; text-underline-offset: 4px; }
+  /* telefon: karta klikalna w całości (link w tytule rozciągnięty na kartę), podświetlenie po najechaniu — jak .spec-link */
+  @media (max-width: 760px) { .ww-link { transition: border-color .15s, box-shadow .15s, transform .15s; } }
+  @media (min-width: 761px) {
+    .ww-foto { grid-area: f; justify-self: end; align-self: start; position: relative; width: 96px; height: 64px; margin-top: 6px; border-radius: var(--radius-s); overflow: hidden; background: var(--photo); }
+    .ww-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  }
+  .ww-link .ww-t a::after { content: ''; position: absolute; inset: 0; }
+  @media (max-width: 760px) {
+    .ww-link .ww-t a::after { border-radius: inherit; }
+    .ww-link:hover, .ww-link:focus-within { border-color: var(--ink); box-shadow: 0 6px 20px rgb(0 0 0 / .1); transform: translateY(-2px); }
+  }
+  .ww-link:hover .ww-t a { text-decoration: underline; }
+  @media (max-width: 760px) { .ww-link:hover .ww-t a { text-underline-offset: 4px; } }
+  @media (min-width: 761px) { .ww-link:hover .ww-t a { text-underline-offset: 3px; } }
   .ww-link:hover .ww-go :global(svg) { transform: translateX(3px); }
-  .ww-link:hover .ww-foto img { transform: scale(1.03); }
+  @media (max-width: 760px) { .ww-link:hover .ww-foto img { transform: scale(1.03); } }
   .ww-link .ww-t a:focus-visible { outline: none; }
   .ww-link:has(.ww-t a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) {
+  @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
     .ww-link, .ww-go :global(svg), .ww-foto img { transition: none; transform: none !important; }
+  }
+  @media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+    .ww-go :global(svg) { transition: none; transform: none !important; }
   }
 </style>

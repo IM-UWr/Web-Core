@@ -1,32 +1,23 @@
 ---
-// Karta aktualności na stronie głównej (wyróżniona = szeroka, ze zdjęciem).
+// Aktualność na stronie głównej i na stronach działów — w wariancie redakcyjnym jako zwarty wiersz listy
+// „data | tytuł i zajawka | rodzaj” (kontener: .nlist; style w global.css, „Układ redakcyjny”).
+// Tylko w blokach na komputer (.tylko-komputer); telefon ma własne listy .pt-list.
 import { u, isExternal } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, type Lang } from '../lib/daty';
 import type { PozycjaListy } from '../lib/tresci';
 
-interface Props { p: PozycjaListy; lang: Lang; wyrozniona?: boolean }
-const { p, lang, wyrozniona = false } = Astro.props;
+interface Props { p: PozycjaListy; lang: Lang }
+const { p, lang } = Astro.props;
 const etykieta = p.rodzaj !== 'ogloszenie' ? RODZAJE[p.rodzaj]?.[lang] : p.dla[0] ? ODBIORCY[p.dla[0]]?.[lang] : RODZAJE.ogloszenie[lang];
-const zdjecie = wyrozniona && p.zdjecie;
 const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
 ---
-<a class={`news-card${zdjecie ? ' featured' : ''}`} href={href}>
-  {zdjecie ? (
-    <>
-      <span class="img"><img src={u(p.zdjecie!)} alt={p.zdjecie_opis ?? ''} loading="lazy" /></span>
-      <span class="body">
-        <span class="news-meta"><span class={`badge badge-${p.rodzaj}`}>{etykieta}</span><time datetime={p.data}>{short(p.data)}</time></span>
-        <span class="t">{p.tytul}</span>
-        {p.zajawka && <span class="x">{p.zajawka}</span>}
-      </span>
-    </>
-  ) : (
-    <>
-      <span class="news-meta"><span class={`badge badge-${p.rodzaj}`}>{etykieta}</span><time datetime={p.data}>{short(p.data)}</time></span>
-      <span class="t">{p.tytul}</span>
-      {p.zajawka && <span class="x">{p.zajawka}</span>}
-    </>
-  )}
+<a class="nrow" href={href}>
+  <time class="nrow-d" datetime={p.data}>{short(p.data)}</time>
+  <span class="nrow-b">
+    <span class="nrow-t">{p.tytul}</span>
+    {p.zajawka && <span class="nrow-x">{p.zajawka}</span>}
+  </span>
+  <span class={`nrow-r r-${p.rodzaj}`}><span>{etykieta}</span></span>
 </a>

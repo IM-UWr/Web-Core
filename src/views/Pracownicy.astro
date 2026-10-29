@@ -38,6 +38,7 @@ const napisy = {
   link: 'WWW',
   brak: lang === 'en' ? 'Nobody matches the search.' : 'Nikogo nie znaleziono.',
   zaklad: lang === 'en' ? 'Department' : 'Zakład',
+  zakladFunkcja: lang === 'en' ? 'Department / role' : 'Zakład / funkcja',
   wszystkieZaklady: lang === 'en' ? 'All departments' : 'Wszystkie zakłady',
 };
 const lead = lang === 'en'
@@ -52,7 +53,8 @@ const lead = lang === 'en'
 </Baza>
 
 <style>
-  .pr-wrap { padding-top: 28px; padding-bottom: 64px; }
+  /* komputer: wariant „Redakcyjna” — zwarty odstęp nad i pod spisem */
+  .pr-wrap { padding-top: 18px; padding-bottom: 44px; }
   /* telefon (≤ 760 px): wygląd „Portal” — mniej miejsca nad i pod spisem */
   @media (max-width: 760px) { .pr-wrap { padding-top: 16px; padding-bottom: 40px; } }
 </style>

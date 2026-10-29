@@ -62,7 +62,9 @@ const brakDanych = !t0.kolor && !t0.nastepny;
   .kd-kafelek[data-kolor='pomaranczowy']:not([data-zamiana='']) { box-shadow: inset 0 0 0 2px var(--kd-p-mocny); }
   [data-kolor='niebieski'] > .kd-kropka { border: 0; background: var(--kd-n-mocny); color: #04222b; }
   [data-kolor='pomaranczowy'] > .kd-kropka { border: 0; background: var(--kd-p-mocny); color: #2b1700; }
-  .kd-pod { margin-top: -6px; font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--muted); }
+  .kd-pod { font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--muted); }
+  @media (max-width: 760px) { .kd-pod { margin-top: -6px; } }
+  @media (min-width: 761px) { .kd-pod { margin-top: 0; } }
   [data-kolor='brak'][data-nastepny] > .kd-pod::before { content: ''; display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; vertical-align: 0; }
   [data-kolor='brak'][data-nastepny='niebieski'] > .kd-pod::before { background: var(--kd-n-mocny); }
   [data-kolor='brak'][data-nastepny='pomaranczowy'] > .kd-pod::before { background: var(--kd-p-mocny); }
