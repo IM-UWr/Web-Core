@@ -1,0 +1,42 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Model Theory Conference in celebration of Ludomir Newelski's 6
+ 0th birthday
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:konf-2022-model-theory-conference-in-celebration-of-ludomir-newelski-s-
+ 60th-birthday@im-uwr.github.io
+DTSTAMP:20261029T233251Z
+DTSTART;VALUE=DATE:20221217
+DTEND;VALUE=DATE:20221222
+SUMMARY:Model Theory Conference in celebration of Ludomir Newelski's 60th b
+ irthday
+LOCATION:Będlewo
+DESCRIPTION:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-model-
+ theory-conference-in-celebration-of-ludomir-newelski-s-60th-birthday
+URL:https://im-uwr.github.io/Web-Core/nauka/konferencje/2022-model-theory-c
+ onference-in-celebration-of-ludomir-newelski-s-60th-birthday
+END:VEVENT
+END:VCALENDAR

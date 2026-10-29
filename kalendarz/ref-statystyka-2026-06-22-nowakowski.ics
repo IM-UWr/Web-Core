@@ -1,0 +1,42 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:missKnockoffs: A Model-X Knockoff Framework for Variable Selec
+ tion with Missing Data
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:ref-statystyka-2026-06-22-nowakowski@im-uwr.github.io
+DTSTAMP:20261029T233251Z
+DTSTART;TZID=Europe/Warsaw:20260622T114500
+DTEND;TZID=Europe/Warsaw:20260622T131500
+SUMMARY:missKnockoffs: A Model-X Knockoff Framework for Variable Selection 
+ with Missing Data
+LOCATION:sala 602
+DESCRIPTION:Dominik Nowakowski (Uniwersytet Medyczny w Białymstoku)\nSemin
+ arium: Statystyka\nhttps://im-uwr.github.io/Web-Core/seminaria/statystyka#
+ 2026-06-22-nowakowski
+URL:https://im-uwr.github.io/Web-Core/seminaria/statystyka#2026-06-22-nowak
+ owski
+END:VEVENT
+END:VCALENDAR
