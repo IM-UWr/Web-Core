@@ -1,5 +1,7 @@
 ---
 // Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
@@ -28,7 +30,7 @@ for (const p of lista) {
 const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
 const lead = lang === 'en' ? 'Announcements, events and achievements of the Mathematical Institute.' : 'Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.';
 ---
-<Baza tytul={t(lang, 'aktualnosci')} opis={lead}>
+<Baza tytul={t(lang, 'aktualnosci')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]} />
 
   <div class="wrap layout">
@@ -58,7 +60,7 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
         </section>
       ))}
       <p class="muted" data-pusto hidden>{lang === 'en' ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
-      <p class="muted" style="margin-top:28px">
+      <p class="muted la-archiwum">
         {lang === 'en' ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
         <a href={ustawienia.archiwum}>{lang === 'en' ? 'archive of the old website' : 'archiwum starej strony'}</a>.
       </p>
@@ -139,3 +141,13 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
     if (!pasek.querySelector('[data-koniec]')) pasek.remove();
   }
 </script>
+
+<style>
+  .la-archiwum { margin-top: 28px; }
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
+     Odstęp listy od banera stały (24 px), jak na stronach działów; mniej miejsca nad odnośnikiem do archiwum. */
+  @media (min-width: 761px) {
+    .layout { padding-top: 24px; }
+    .la-archiwum { margin-top: 18px; }
+  }
+</style>
