@@ -1,6 +1,9 @@
 ---
 // Publikacje: wykazy prac według lat (karty lat → podstrony z listą w HTML, PDF-y) i czasopisma redagowane w Instytucie.
 // Treść: src/data/publikacje.json (CMS) i src/data/publikacje/RRRR.json (wykazy). Liczby liczą się z wykazów.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -32,11 +35,19 @@ const liczby = [
 const nagCzasopisma = wybierz(dane as any, 'czasopisma_naglowek', lang) || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
 const archiwum = wybierz(dane as any, 'archiwum', lang);
 ---
-<Baza tytul={tytul} opis={lead}>
-  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} />
+<Baza tytul={tytul} opis={lead} uklad="zwarta portal-baner">
+  {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
+       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
+  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby tylko-komputer">
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
   <div class="wrap pub-strona">
     {liczby.length > 0 && (
-      <div class="stats">
+      <div class="stats tylko-telefon" data-pagefind-ignore>
         {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
       </div>
     )}
@@ -156,4 +167,12 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
     .pub-strona .stat:nth-child(2) { grid-column: 1 / -1; order: 3; }
   }
   @media (max-width: 340px) { .lata { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
+     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” (liczby są w banerze, kafelki .stats
+     pod nim — tylko na telefonie): pierwsza sekcja bez własnego górnego marginesu. */
+  @media (min-width: 761px) {
+    .pub-strona { padding-top: 24px; }
+    .pub-sekcja:first-of-type { margin-top: 0; }
+  }
 </style>

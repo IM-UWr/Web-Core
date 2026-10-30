@@ -1,5 +1,8 @@
 ---
 // Sukcesy: aktualności z rodzajem „sukces”, pogrupowane według lat (najnowsze na górze).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -33,15 +36,27 @@ const lead = T(
 const najstarszy = lata.length ? lata[lata.length - 1].rok : '';
 const najnowszy = lata.length ? lata[0].rok : '';
 const archiwumStarejStrony = 'https://www.math.uni.wroc.pl/sukcesy';
+// Liczby: na komputerze w banerze (.pt-liczby), na telefonie w kafelkach .stats pod banerem.
+const liczby = sukcesy.length > 0 ? [
+  { n: String(sukcesy.length), l: T('wpisów o sukcesach', 'achievement posts') },
+  { n: najstarszy === najnowszy ? najnowszy : `${najstarszy}–${najnowszy}`, l: T('lata', 'years') },
+] : [];
 ---
-<Baza tytul={naglowek} opis={lead}>
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} />
+<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
+  {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
+       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby tylko-komputer">
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
-      {sukcesy.length > 0 && (
-        <div class="stats">
-          <div class="stat"><span class="n">{sukcesy.length}</span><span class="l">{T('wpisów o sukcesach', 'achievement posts')}</span></div>
-          <div class="stat"><span class="n">{najstarszy === najnowszy ? najnowszy : `${najstarszy}–${najnowszy}`}</span><span class="l">{T('lata', 'years')}</span></div>
+      {liczby.length > 0 && (
+        <div class="stats tylko-telefon" data-pagefind-ignore>
+          {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
         </div>
       )}
       {sukcesy.length === 0 && <p class="muted">{T('Brak wpisów o sukcesach.', 'No achievement posts yet.')}</p>}
@@ -98,4 +113,12 @@ const archiwumStarejStrony = 'https://www.math.uni.wroc.pl/sukcesy';
   .sukcesy-ile { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 12px; letter-spacing: 0; }
   .sukcesy-thumb { flex-basis: 112px; height: 112px; }
   .sukcesy-thumb img { object-position: center top; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka”; pierwszy rok bez górnego marginesu (kafelki .stats
+     nad nim są tylko na telefonie). */
+  @media (min-width: 761px) {
+    .layout { padding-top: 24px; }
+    .sukcesy-rok:first-of-type .sukcesy-rok-h { margin-top: 0; }
+  }
 </style>

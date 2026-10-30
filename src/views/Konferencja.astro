@@ -1,5 +1,7 @@
 ---
 // Pojedyncza konferencja.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -20,7 +22,7 @@ const w: Wydarzenie = { rodzaj: 'konferencja', tytul, poczatek: d.poczatek, koni
 const przyszla = !d.odwolana && trwaLubBedzie(w);
 const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
 ---
-<Baza tytul={tytul} opis={`${range(d.poczatek, d.koniec, lang)}${d.miejsce ? ', ' + d.miejsce : ''}`} opublikowany={d.opublikowany} obraz={d.zdjecie}>
+<Baza tytul={tytul} opis={`${range(d.poczatek, d.koniec, lang)}${d.miejsce ? ', ' + d.miejsce : ''}`} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All conferences' : 'Wszystkie konferencje', adres: '/nauka/konferencje' }} />
   <div class="wrap layout">
     <div class="main">
@@ -46,3 +48,9 @@ const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
     <div class="side" aria-hidden="true"></div>
   </div>
 </Baza>
+
+<style>
+  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
+     do banera (reszta odstępów .layout — uklad-zwarta.css) */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+</style>

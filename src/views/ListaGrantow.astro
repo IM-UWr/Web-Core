@@ -2,6 +2,9 @@
 // Projekty i granty (/nauka/granty): liczby wyliczone z kolekcji, realizowane projekty jako karty,
 // zakończone jako zwarta lista pogrupowana wg roku zakończenia (najnowsze u góry), na końcu projekty bez podanych lat.
 // Bez wyszukiwarki i filtrów (decyzja właściciela strony). Prawy pasek: tylko spis „Na tej stronie” (sekcje i lata).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WierszGrantu from '../components/WierszGrantu.astro';
@@ -64,12 +67,18 @@ const sekcje = [
   { id: 'pozostale', tekst: T('Pozostałe', 'Other'), ile: bezLat.length, pokaz: bezLat.length > 0 },
 ].filter((s) => s.pokaz);
 ---
-<Baza tytul={naglowek} opis={lead}>
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} />
+<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
+  {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
+       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
+    <ul class="pt-liczby tylko-komputer">
+      {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+    </ul>
+  </NaglowekStrony>
 
   <div class="wrap layout">
     <div class="main">
-      <div class="stats gl-stats">
+      <div class="stats gl-stats tylko-telefon" data-pagefind-ignore>
         {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
       </div>
 
@@ -224,4 +233,8 @@ const sekcje = [
   .gl-spis .gl-lata a:hover { border-color: var(--ink); }
   .gl-spis .gl-lata a[aria-current] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
   .toc-side.gl-spis { max-height: calc(100vh - var(--hdr-h) - 32px); overflow-y: auto; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” — treść nie przylega do banera. */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
 </style>

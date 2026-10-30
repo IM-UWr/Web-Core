@@ -1,5 +1,7 @@
 ---
 // Obrony doktorskie: nadchodzące i odbyte.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import ustawienia from '../data/ustawienia.json';
@@ -18,7 +20,7 @@ const lead = lang === 'en'
   ? 'Public defences of doctoral theses in mathematics: notices, theses, abstracts and reviews.'
   : 'Publiczne obrony rozpraw doktorskich z matematyki: zawiadomienia, rozprawy, streszczenia i recenzje.';
 ---
-<Baza tytul={t(lang, 'obrony')} opis={lead}>
+<Baza tytul={t(lang, 'obrony')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'obrony')} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} />
   <div class="wrap layout">
     <div class="main">
@@ -41,3 +43,9 @@ const lead = lang === 'en'
     </div>
   </div>
 </Baza>
+
+<style>
+  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
+     do banera (reszta odstępów .layout — uklad-zwarta.css) */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+</style>

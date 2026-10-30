@@ -1,5 +1,7 @@
 ---
 // Konferencje: nadchodzące u góry, minione według lat.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -28,7 +30,7 @@ const lead = lang === 'en'
   ? 'Conferences and workshops organised or co-organised by members of the Mathematical Institute.'
   : 'Konferencje i warsztaty organizowane lub współorganizowane przez pracowników Instytutu Matematycznego.';
 ---
-<Baza tytul={naglowek} opis={lead}>
+<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: naglowek }]} />
   <div class="wrap layout">
     <div class="main">
@@ -80,3 +82,9 @@ const lead = lang === 'en'
     </aside>
   </div>
 </Baza>
+
+<style>
+  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
+     do banera (reszta odstępów .layout — uklad-zwarta.css) */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+</style>

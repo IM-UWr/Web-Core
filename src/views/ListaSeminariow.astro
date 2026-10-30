@@ -2,6 +2,8 @@
 // Lista seminariów z najbliższym referatem.
 // Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium bez zakładu (pole puste albo zakład,
 // którego nie ma na stronie) to seminarium niezależne — pokazuje się w osobnej grupie.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TabelaReferatow from '../components/TabelaReferatow.astro';
@@ -37,9 +39,9 @@ const lead = lang === 'en'
   ? 'Research seminars of the Mathematical Institute. Everyone is welcome.'
   : 'Seminaria naukowe Instytutu Matematycznego. Zapraszamy wszystkich zainteresowanych.';
 ---
-<Baza tytul={t(lang, 'seminaria')} opis={lead}>
+<Baza tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }} />
-  <div class="wrap" style="padding-top:32px;padding-bottom:64px;display:flex;flex-direction:column;gap:40px">
+  <div class="wrap ls-wrap">
     <section aria-labelledby="h-tydzien">
       <div class="section-head" style="margin-bottom:14px">
         <h2 id="h-tydzien" style="font-size:24px">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
@@ -84,3 +86,10 @@ const lead = lang === 'en'
     )}
   </div>
 </Baza>
+
+<style>
+  .ls-wrap { padding-top: 32px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 40px; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: mniejsze odstępy między sekcjami, odstęp od stopki jak na innych podstronach
+     (uklad-zwarta.css); nad pierwszą sekcją stały odstęp 24 px, jak na stronie działu „Nauka” */
+  @media (min-width: 761px) { .ls-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); gap: 24px; } }
+</style>

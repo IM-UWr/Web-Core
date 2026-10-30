@@ -1,5 +1,7 @@
 ---
 // Strona seminarium: informacje, nadchodzące i minione referaty ze streszczeniami.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (koordynatorzy i kontakt bez zmian), reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -36,7 +38,7 @@ const koordynatorzy = d.prowadzacy.map((imie) => {
 // Adres automatu listy mailingowej (Google Apps Script, patrz README → „Powiadomienia e-mail”); pusty = zapisy wyłączone.
 const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
 ---
-<Baza tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany}>
+<Baza tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={nazwa} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), adres: '/seminaria' }}>
     {(koordynatorzy.length > 0 || zakladySem.length > 0 || d.kontakt) && (
       <div class="sem-koord">
@@ -148,3 +150,9 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
     })
   );
 </script>
+
+<style>
+  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
+     do banera (reszta odstępów .layout — uklad-zwarta.css) */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+</style>

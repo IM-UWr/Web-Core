@@ -1,5 +1,7 @@
 ---
 // Pojedyncza obrona doktorska z dokumentami.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (tytuł rozprawy bez zmian), reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -30,7 +32,7 @@ const dokumenty = [
   ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${r.recenzent}`, plik: r.plik })),
 ].filter(Boolean) as { nazwa: string; plik: string }[];
 ---
-<Baza tytul={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article">
+<Baza tytul={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner">
   <NaglowekStrony tytul={d.kandydat} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All PhD defences' : 'Wszystkie obrony doktorskie', adres: '/obrony-doktorskie' }}>
     <p class="lead" lang="en" style="font-weight:600;color:var(--ink)">{d.tytul_rozprawy}</p>
   </NaglowekStrony>
@@ -66,3 +68,9 @@ const dokumenty = [
     <div class="side" aria-hidden="true"></div>
   </div>
 </Baza>
+
+<style>
+  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
+     do banera (reszta odstępów .layout — uklad-zwarta.css) */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+</style>

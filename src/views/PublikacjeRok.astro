@@ -1,5 +1,7 @@
 ---
 // Wykaz prac z danego roku (src/data/publikacje/RRRR.json): numerowana lista, opcjonalnie w grupach (rodzaje prac).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (przycisk „Wykaz w PDF” bez zmian), reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import SpisTresci from '../components/SpisTresci.astro';
@@ -50,7 +52,7 @@ const pochodzenie = w.pochodzenie === 'pdf'
 const doiUrl = (d: string) => `https://doi.org/${encodeURI(d)}`;
 const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
 ---
-<Baza tytul={tytul} opis={lead}>
+<Baza tytul={tytul} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={lead} lang={lang} wstecz={{ etykieta: T('Publikacje', 'Publications'), adres: '/nauka/publikacje' }}>
     {ten.pdf && (
       <p class="pr-akcje">
@@ -136,5 +138,9 @@ const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
   .pr-nav-n span { align-items: flex-end; }
   .pr-nav-a small { font-size: 12px; font-weight: 700; color: var(--muted); }
   @media (max-width: 520px) { .pr-lista { padding-left: 2.8em; } .pr { padding-left: 2px; } .pr-t { font-size: 15.5px; } }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka” — z spisem treści (.layout) i bez niego (.pr-wrap). */
+  @media (min-width: 761px) { .layout, .pr-wrap { padding-top: 24px; } }
 </style>
 

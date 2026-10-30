@@ -1,6 +1,8 @@
 ---
 // Strona projektu (powstaje dla każdego projektu): pod tytułem plakietki (źródło, program, stan), karta danych projektu,
 // opis (jeśli jest) i inne projekty tego samego zakładu. Jeden link wstecz — nad tytułem; prawy pasek pusty (jak konferencje).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (plakietki pod tytułem bez zmian), reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -46,7 +48,7 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
   .filter(Boolean)
   .join(', ');
 ---
-<Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany}>
+<Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lang={lang} wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }}>
     {tytulDrugi && <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
     <div class="tags">
@@ -132,4 +134,8 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
     .gr-karta { padding: 18px 16px; }
     .gr-inne .gw-lista { margin: 0 -14px; }
   }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad kartą projektu stały (24 px), jak na stronie działu „Nauka” — treść nie przylega do banera. */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
 </style>
