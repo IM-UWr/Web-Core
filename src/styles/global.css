@@ -172,6 +172,8 @@ body > main { flex: 1 0 auto; }
 /* lista rozwija się pod swoją pozycją menu (wyśrodkowana pod nią); --dx przesuwa ją, gdy wystawałaby poza ekran (skrypt w Naglowek.astro) */
 .dropdown { position: absolute; top: calc(100% - 4px); left: 50%; transform: translateX(calc(-50% + var(--dx, 0px))); width: max-content; max-width: calc(100vw - 2 * var(--gutter)); display: grid; grid-auto-flow: column; gap: 28px; padding: 22px 24px; border-radius: var(--radius-l); background: var(--bg); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .dropdown-group { display: flex; flex-direction: column; min-width: 180px; max-width: 250px; }
+/* lista z jedną grupą (np. Popularyzacja → Partnerzy) jest szersza, żeby dłuższe nazwy mieściły się w jednej linii */
+.dropdown-group:only-child { max-width: 380px; }
 .dropdown-group h3 { margin: 0 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .dropdown-group a { display: flex; align-items: center; gap: 6px; padding: 7px 0; font-size: 15px; font-weight: 600; text-decoration: none; color: var(--ink); line-height: 1.3; }
 /* link zewnętrzny: zwykły tekst z ikonką za ostatnim słowem (flex odsuwał ikonkę do prawej krawędzi, gdy napis się zawijał) */
