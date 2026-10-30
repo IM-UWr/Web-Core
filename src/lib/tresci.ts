@@ -237,9 +237,8 @@ export async function wydarzeniaNaGlowna(limit = 3, lang: Lang = 'pl', dniRobocz
   const granica = poDniachRoboczych(today(), dniRoboczych);
   const blisko = (await najblizszeWydarzenia(100, lang)).filter((w) => w.poczatek.slice(0, 10) <= granica);
   const terminy = (await przypomnieniaTerminow(lang)).filter((w) => today() >= w.widoczneOd! && today() <= w.poczatek);
-  // kolejność jak w najblizszeWydarzenia: chronologicznie, obrony na końcu
-  const wszystkie = [...blisko.filter((w) => w.rodzaj !== 'obrona'), ...terminy].sort((x, y) => (x.poczatek < y.poczatek ? -1 : 1));
-  return [...wszystkie, ...blisko.filter((w) => w.rodzaj === 'obrona')].slice(0, limit);
+  // ściśle chronologicznie (obrony razem z innymi wydarzeniami, według terminu)
+  return [...blisko, ...terminy].sort((x, y) => (x.poczatek < y.poczatek ? -1 : 1)).slice(0, limit);
 }
 
 // Terminy z tabel „Terminy i formularze” kierunków (pole „Przypomnienie”): wydarzenie typu „Termin”,

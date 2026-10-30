@@ -5,19 +5,17 @@
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
-import KartaWydarzenia from '../components/KartaWydarzenia.astro';
 import Ikona from '../components/Ikona.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
 import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { monthYear, type Lang } from '../lib/daty';
-import { listaAktualnosci, wydarzeniaNaGlowna } from '../lib/tresci';
+import { listaAktualnosci } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const lista = await listaAktualnosci(lang);
-// Najbliższe wydarzenia jak na stronie głównej: tylko gdy są blisko (Ustawienia → dni robocze); gdy brak — bez prawego paska, lista szersza.
-const wydarzenia = await wydarzeniaNaGlowna(3, lang, Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5);
+// Bez prawego paska „Najbliższe wydarzenia” (decyzja: lista na całą szerokość; wydarzenia są na głównej i w kalendarzu).
 
 // Grupowanie po miesiącach
 const grupy: { miesiac: string; pozycje: typeof lista }[] = [];
@@ -67,14 +65,6 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
       </p>
     </div>
 
-    {wydarzenia.length > 0 && (
-      <aside class="side" data-pagefind-ignore data-wydarzenia>
-        <div class="side-box side-plywajacy">
-          <h2>{t(lang, 'najblizsze')}</h2>
-          {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} maly />)}
-        </div>
-      </aside>
-    )}
   </div>
 </Baza>
 
@@ -130,17 +120,6 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
     const r = p.get('rodzaj');
     if (r) rodzajBtn.find((b) => b.dataset.rodzaj === r)?.click();
   }
-
-  // Zakończone wydarzenia chowamy od razu (strona przebudowuje się 2× dziennie); bez wydarzeń — bez paska.
-  import { now as teraz, today as dzis, hasTime as zGodzina } from '../lib/daty';
-  const pasek = document.querySelector<HTMLElement>('[data-wydarzenia]');
-  if (pasek) {
-    pasek.querySelectorAll<HTMLElement>('[data-koniec]').forEach((k) => {
-      const kon = k.dataset.koniec || '';
-      if (kon && (zGodzina(kon) ? kon < teraz() : kon < dzis())) k.remove();
-    });
-    if (!pasek.querySelector('[data-koniec]')) pasek.remove();
-  }
 </script>
 
 <style>
@@ -151,6 +130,9 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
     .layout { padding-top: 24px; }
     /* więcej miejsca między przyciskami filtrów a kreską pierwszego miesiąca (jak odstęp między sekcjami) */
     .filters.filters-lewo { margin-bottom: 22px; }
+    /* przyciski rodzajów i wyszukiwarka w jednym wierszu */
+    .filters.filters-lewo { flex-wrap: nowrap; }
+    .filters.filters-lewo > .chips { flex: 0 1 auto; }
     .la-archiwum { margin-top: 18px; }
   }
 </style>
