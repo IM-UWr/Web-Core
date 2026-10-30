@@ -194,7 +194,8 @@ const kierunki = defineCollection({
     podtytul_en: optStr,
     opis: optStr,
     opis_en: optStr,
-    fakty: lista(z.object({ wartosc: z.string(), etykieta: z.string(), etykieta_en: optStr })),
+    // wartosc_en — wartość w wersji angielskiej (np. „3 years”; puste = jak po polsku)
+    fakty: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr })),
     przyciski: lista(link),
     dlaczego: lista(z.object({ tytul: z.string(), tytul_en: optStr, opis: z.string(), opis_en: optStr, ikona: optStr })),
     etapy: lista(z.object({

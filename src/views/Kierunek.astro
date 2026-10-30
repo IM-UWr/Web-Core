@@ -84,12 +84,14 @@ const sekcje = [
 ---
 <Baza tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   {/* Telefon (≤ 760 px) — wygląd „Portal”: fakty 2×2, zwartsze sekcje (style na dole). */}
-  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); przyciski w banerze (pierwszy wyróżniony).
-       Komputer: pod przyciskami liczby kierunku w jednym wierszu (.pt-liczby, jak na stronie działu „Studia”).
+  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony).
+       Komputer: w banerze liczby kierunku w jednym wierszu (.pt-liczby, jak na stronie działu „Studia”); przyciski
+       (pierwszy wyróżniony) POD banerem, na początku treści — na banerze nie pasowały (decyzja 30.10.2026).
+       Telefon: przyciski w banerze jak dotąd.
        Telefon: jak dotąd — liczby w kafelkach .stats pod banerem (nie idą do banera, żeby telefon się nie zmienił). */}
   <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} lang={lang} nadtytul={d.podtytul ? w(d, 'podtytul') : undefined} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}>
     {d.przyciski.length > 0 && (
-      <div class="btn-row kh-btns">
+      <div class="btn-row kh-btns tylko-telefon" data-pagefind-ignore>
         {d.przyciski.map((p, i) => (
           <a class={`btn${i === 0 ? ' btn-accent' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
         ))}
@@ -97,16 +99,23 @@ const sekcje = [
     )}
     {d.fakty.length > 0 && (
       <ul class="pt-liczby kh-liczby tylko-komputer">
-        {d.fakty.map((f) => <li><span class="n">{f.wartosc}</span>{w(f, 'etykieta')}</li>)}
+        {d.fakty.map((f) => <li><span class="n">{w(f, 'wartosc')}</span>{w(f, 'etykieta')}</li>)}
       </ul>
     )}
   </NaglowekStrony>
 
   <div class="wrap layout kier">
     <div class="main">
+      {d.przyciski.length > 0 && (
+        <div class="btn-row kh-btns-pod tylko-komputer">
+          {d.przyciski.map((p, i) => (
+            <a class={`btn${i === 0 ? ' btn-accent' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
+          ))}
+        </div>
+      )}
       {d.fakty.length > 0 && (
         <div class="stats kh-fakty tylko-telefon" data-pagefind-ignore>
-          {d.fakty.map((f) => <div class="stat"><span class="n">{f.wartosc}</span><span class="l">{w(f, 'etykieta')}</span></div>)}
+          {d.fakty.map((f) => <div class="stat"><span class="n">{w(f, 'wartosc')}</span><span class="l">{w(f, 'etykieta')}</span></div>)}
         </div>
       )}
       <SpisTresci naglowki={sekcje} lang={lang} wariant="gora" />
@@ -346,8 +355,9 @@ const sekcje = [
      Przyciski w banerze trochę mniejsze (jak .btn-small, nieco szersze), liczby kierunku w wierszu pod nimi.
      Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Studia” — kreska sekcji nie przylega do banera. */
   @media (min-width: 761px) {
-    .kh-btns { gap: 8px; margin-top: 4px; }
-    .kh-btns .btn { min-height: 40px; padding: 0 18px; font-size: 14.5px; }
+    /* przyciski pod banerem (tylko komputer), nad pierwszą sekcją */
+    .kh-btns-pod { gap: 8px; margin: 0 0 24px; }
+    .kh-btns-pod .btn { min-height: 42px; padding: 0 18px; font-size: 14.5px; }
     .kh-liczby { margin-top: 6px; max-width: none; }
     .kier { padding-top: 24px; }
   }
