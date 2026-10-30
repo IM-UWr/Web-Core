@@ -2,6 +2,9 @@
 // Strona działu „Nauka” (/nauka, /en/nauka): wstęp, liczby, kafelki z menu „Nauka”, obszary badań zakładów,
 // seminaria w tym tygodniu, konferencje, realizowane projekty i obrony doktorskie.
 // Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
+// Telefon (≤ 760 px): wygląd „Portal” (bloki .tylko-telefon i style w @media (max-width: 760px)).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -83,24 +86,19 @@ const naglowek = T('Nauka', 'Research');
 const lead = wybierz(dzial, 'wstep', lang);
 const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
 ---
-<Baza tytul={naglowek} opis={lead || undefined}>
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w nagłówku, „W tym dziale” w ramkach, zaraz pod nimi seminaria,
+<Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
+  {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
+       Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, zaraz pod nimi seminaria,
        konferencje i obrony (osobny blok .tylko-telefon — na komputerze te sekcje stoją niżej), obszary badań w zwartych
        kartach, projekty w ramce i na końcu „Warto wiedzieć” (osobny blok). */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
-      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+      <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
   </NaglowekStrony>
   <div class="wrap dz-wrap">
-    {liczby.length > 0 && (
-      <div class="stats tylko-komputer">
-        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-      </div>
-    )}
-
     {grupy.length > 0 && (
       <section class="zsec" aria-labelledby="w-dziale">
         <h2 id="w-dziale">{T('W tym dziale', 'In this section')}</h2>
@@ -346,6 +344,22 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
   .dz-kod { color: var(--muted); font-variant-numeric: tabular-nums; }
   .dz-obrony { border-bottom: 1px solid var(--line); }
   .dz-obrony .t { font-size: 19px; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki i ramki (jak na „Instytucie”) ----------
+     Odstęp nad pierwszą sekcją stały (24 px): bursztynowy początek kreski sekcji nie przylega do dolnej krawędzi banera. */
+  @media (min-width: 761px) {
+    .dz-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
+    .dz-intro { margin: -4px 0 10px; max-width: 820px; font-size: 15px; line-height: 1.5; }
+    .dz-more { margin: 4px 0 0; }
+    .dz-groups { gap: 12px 16px; }
+    .dz-g h3 { margin: 0 0 6px; }
+    .dz-tiles { gap: 6px; }
+    .dz-tile { display: flex; min-height: 42px; padding-block: 6px; }
+    .dz-ile { font-size: 15px; }
+    .dz-granty { gap: 10px; }
+    .dz-granty h3 { font-size: 16px; }
+    .dz-obrony .t { font-size: 17px; }
+  }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */
   @media (max-width: 760px) {
