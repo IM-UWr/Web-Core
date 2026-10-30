@@ -126,6 +126,11 @@ body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-c
 .ph[data-dzial='inne'] .ph-m::before { -webkit-mask-image: url('../assets/naglowki/inne-a.svg'); mask-image: url('../assets/naglowki/inne-a.svg'); }
 .ph[data-dzial='inne'] .ph-m::after { -webkit-mask-image: url('../assets/naglowki/inne-b.svg'); mask-image: url('../assets/naglowki/inne-b.svg'); }
 
+/* Aktualności: bursztynowa fala jako SVG (animowana skryptem w NaglowekStrony.astro) zamiast maski ::after */
+.ph[data-dzial='aktualnosci'] .ph-m::after { display: none; }
+.ph-fala { position: absolute; top: 10px; left: 0; width: 100%; height: calc(100% - 20px); overflow: visible; }
+.ph-fala path { fill: none; stroke: var(--ph-akcent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
 /* --- wariant „Zdjęcie”: zdjęcie działu w zaokrąglonej ramce po prawej; spod jego lewej krawędzi wychodzi tylko bursztynowy akcent motywu --- */
 .ph-foto { margin: 0; overflow: hidden; background: var(--photo); }
 .ph-foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
