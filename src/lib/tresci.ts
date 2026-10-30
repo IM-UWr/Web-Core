@@ -1,6 +1,6 @@
 // Wspólne zapytania do treści: aktualności, wydarzenia, seminaria, obrony.
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { now, today, weekRange, weekday, addDays, hasTime, plusMinutes, type Lang } from './daty';
+import { now, today, weekday, addDays, hasTime, plusMinutes, type Lang } from './daty';
 import { swietaPanstwowe, pozycjeZamianDni } from './kolory-dni';
 import { zTytulem } from './osoby';
 
@@ -268,13 +268,12 @@ export async function przypomnieniaTerminow(lang: Lang = 'pl'): Promise<Wydarzen
   return out.sort((a, b) => (a.poczatek < b.poczatek ? -1 : 1));
 }
 
-// Tydzień pokazywany na stronie głównej: bieżący, a od soboty — następny.
+// Okno seminariów na stronie głównej i w /seminaria: od dziś na 7 dni do przodu (dziś + 6 dni), liczone przy
+// budowaniu strony (2× dziennie i po każdej zmianie treści). Dawniej: bieżący tydzień kalendarzowy, od soboty —
+// następny; pole `przyszly` zostaje dla zgodności widoków i zawsze jest false.
 export function tydzienSeminariow(): { od: string; do: string; przyszly: boolean } {
-  const d = today();
-  const wd = weekday(d);
-  const przyszly = wd === 6 || wd === 0;
-  const [od, doDnia] = weekRange(przyszly ? addDays(d, 3) : d);
-  return { od, do: doDnia, przyszly };
+  const od = today();
+  return { od, do: addDays(od, 6), przyszly: false };
 }
 
 export interface ReferatWLiscie { termin: string; sala?: string; seminarium: string; seminariumId: string; tytul: string; prelegent: string; href: string }
