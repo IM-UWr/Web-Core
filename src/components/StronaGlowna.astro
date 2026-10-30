@@ -26,7 +26,7 @@ const KOLORY_DNI = '/studia/rok-akademicki';
 const dniWydarzen = Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5;
 const wydarzenia = await wydarzeniaNaGlowna(3, lang, dniWydarzen);
 const wyrozniona = await wyroznionaAktualnosc(lang);
-const lista = await aktualnosciNaGlowna(6, lang, wydarzenia.map((w) => w.href));
+const lista = await aktualnosciNaGlowna(6, lang);
 // Pierwsza aktualność ze zdjęciem zajmuje dwie kolumny — wtedy pokazujemy o jedną mniej.
 const pierwszaZeZdjeciem = !!lista[0]?.zdjecie;
 const aktualnosci = pierwszaZeZdjeciem ? lista.slice(0, 5) : lista;
