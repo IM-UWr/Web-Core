@@ -12,6 +12,8 @@
   --ink: #111a2e;
   --text: #1e293b;
   --muted: #475569;
+  /* nazwy grup w menu (np. WYDARZENIA NAUKOWE): jaśniejsze niż --muted, żeby wyraźnie odróżniały się od linków; kontrast z białym 4,8:1 */
+  --menu-grupa: #64748b;
   --line: #dce3ee;
   --primary: #1b2d52;
   --primary-ink: #ffffff;
@@ -38,13 +40,15 @@
   color-scheme: light;
 }
 
-:root[data-theme='dark'] {
+/* .menu-ciemne: nagłówek i menu na telefon otwarte na ciemnym nagłówku (zdjęcie u góry, stopka na dole) — kolory trybu ciemnego */
+:root[data-theme='dark'], .menu-ciemne {
   --uwr: #d9e6f2;
   --bg: #0a1020;
   --surface: #111a2e;
   --ink: #ecf0f7;
   --text: #d6ddea;
   --muted: #9da9be;
+  --menu-grupa: #9da9be;
   --line: #243049;
   --primary: #f2a33a;
   --primary-ink: #101828;
@@ -174,7 +178,7 @@ body > main { flex: 1 0 auto; }
 .dropdown-group { display: flex; flex-direction: column; min-width: 180px; max-width: 250px; }
 /* lista z jedną grupą (np. Popularyzacja → Partnerzy) jest szersza, żeby dłuższe nazwy mieściły się w jednej linii */
 .dropdown-group:only-child { max-width: 380px; }
-.dropdown-group h3 { margin: 0 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.dropdown-group h3 { margin: 0 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--menu-grupa); }
 .dropdown-group a { display: flex; align-items: center; gap: 6px; padding: 7px 0; font-size: 15px; font-weight: 600; text-decoration: none; color: var(--ink); line-height: 1.3; }
 /* link zewnętrzny: zwykły tekst z ikonką za ostatnim słowem (flex odsuwał ikonkę do prawej krawędzi, gdy napis się zawijał) */
 .dropdown-group a.zew { display: block; }
@@ -188,8 +192,18 @@ body > main { flex: 1 0 auto; }
 .icon-btn svg { width: 20px; height: 20px; }
 .burger { display: none; background: var(--primary); color: var(--primary-ink); }
 .burger:hover { background: var(--primary); color: var(--primary-ink); filter: brightness(1.12); }
-.mnav { display: none; border-top: 1px solid var(--line); padding: 8px var(--gutter) 20px; }
-.mnav.open { display: block; max-height: calc(100vh - var(--hdr-h)); max-height: calc(100dvh - var(--hdr-h)); overflow-y: auto; overscroll-behavior: contain; }
+/* Menu na telefon: panel wysuwany z prawej pod nagłówkiem, nad treścią (strona się nie przesuwa ani nie przewija);
+   po lewej przyciemniony pasek strony (.mnav-tlo). --menu-top: dół nagłówka, ustawiany skryptem przy otwarciu. */
+.mnav { position: fixed; top: var(--menu-top, var(--hdr-h)); right: 0; bottom: 0; z-index: 31; width: min(86vw, 420px);
+  padding: 8px clamp(16px, 5vw, 24px) 24px; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); color: var(--ink);
+  border-left: 1px solid var(--line); box-shadow: -14px 0 36px rgb(0 0 0 / .2);
+  transform: translateX(100%); visibility: hidden; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; }
+.mnav.open { transform: none; visibility: visible; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+.mnav-tlo { position: fixed; inset: var(--menu-top, var(--hdr-h)) 0 0 0; z-index: 29; background: rgb(6 11 22 / .5);
+  opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s linear .3s; }
+.mnav-tlo.open { opacity: 1; visibility: visible; transition: opacity .3s, visibility 0s; }
+html.menu-otwarte { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .mnav, .mnav.open, .mnav-tlo, .mnav-tlo.open { transition: none; } }
 .mnav .mitem, .mnav > a { border-bottom: 1px solid var(--line); }
 .mnav > a { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 18px; font-weight: 700; text-decoration: none; color: var(--ink); cursor: pointer; }
 /* wiersz działu: napis (link do strony działu) | kreska | strzałka rozwijająca listę (strefa 52 px, strzałka w kolumnie strzałek innych wierszy) */
@@ -198,7 +212,7 @@ body > main { flex: 1 0 auto; }
 .mnav .mrow-btn { flex: 0 0 52px; display: flex; align-items: center; justify-content: flex-end; margin: 10px 0; padding: 0; border: 0; border-left: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer; }
 .mnav .mitem.open .mrow-btn .chev { transform: rotate(180deg); }
 .mnav .mgroup { padding: 0 0 12px 12px; }
-.mnav .mgroup h3 { margin: 10px 0 2px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.mnav .mgroup h3 { margin: 10px 0 2px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--menu-grupa); }
 .mnav .mgroup a { display: flex; align-items: center; gap: 6px; min-height: 40px; font-weight: 600; text-decoration: none; color: var(--ink); }
 .chev { transition: transform .15s; }
 details[open] > summary .chev { transform: rotate(180deg); }
@@ -577,8 +591,8 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 .burger[aria-expanded='true'] .when-closed { display: none; }
 .mnav > a { justify-content: space-between; }
 .mnav a[aria-current='page'] { color: var(--primary); }
-:root[data-theme='dark'] .mnav a[aria-current='page'] { color: var(--accent); }
-@media (min-width: 1181px) { .mnav, .mnav.open { display: none; } }
+:root[data-theme='dark'] .mnav a[aria-current='page'], .mnav.menu-ciemne a[aria-current='page'] { color: var(--accent); }
+@media (min-width: 1181px) { .mnav, .mnav.open, .mnav-tlo { display: none; } }
 [hidden] { display: none !important; }
 .article-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
 .article-head h1 { margin: 0; font-size: clamp(30px, 4.6vw, 46px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.08; }

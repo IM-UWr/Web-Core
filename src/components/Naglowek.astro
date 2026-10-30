@@ -98,42 +98,46 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
       </button>
     </div>
   </div>
-
-  <nav class="mnav" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
-    {/* Dział z listą: napis prowadzi na stronę działu (jak na komputerze), strzałka za kreską rozwija listę.
-         Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę. */}
-    {menu.map((p, i) =>
-      p.grupy ? (
-        <div class:list={['mitem', { open: aktywna(p) }]}>
-          <div class="mrow">
-            {p.adres ? (
-              <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
-            ) : (
-              <button type="button" class="mrow-link" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
-            )}
-            <button type="button" class="mrow-btn" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
-          </div>
-          <div class="mgroup" id={`mgroup-${i}`} hidden={!aktywna(p) || undefined}>
-            {p.grupy.map((g) => (
-              <>
-                <h3>{wybierz(g, 'nazwa', lang)}</h3>
-                {g.linki.map((l) => (
-                  <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
-                    {wybierz(l, 'etykieta', lang)}
-                    {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-                  </a>
-                ))}
-              </>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
-      )
-    )}
-    {inny && <a href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}>{t(lang, 'innyJezyk')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
-  </nav>
 </header>
+
+{/* Menu na telefon: panel wysuwany z prawej pod nagłówkiem, nad treścią strony (strona się nie przesuwa).
+     Po lewej zostaje przyciemniony pasek strony (.mnav-tlo) — klik w niego zamyka menu. Poza <header>, żeby
+     panel zawsze liczył położenie od okna (nagłówek na zdjęciu ma chwilami backdrop-filter). */}
+<div class="mnav-tlo" data-mnav-tlo aria-hidden="true"></div>
+<nav class="mnav" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
+  {/* Dział z listą: napis prowadzi na stronę działu (jak na komputerze), strzałka za kreską rozwija listę.
+       Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę. */}
+  {menu.map((p, i) =>
+    p.grupy ? (
+      <div class:list={['mitem', { open: aktywna(p) }]}>
+        <div class="mrow">
+          {p.adres ? (
+            <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
+          ) : (
+            <button type="button" class="mrow-link" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
+          )}
+          <button type="button" class="mrow-btn" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
+        </div>
+        <div class="mgroup" id={`mgroup-${i}`} hidden={!aktywna(p) || undefined}>
+          {p.grupy.map((g) => (
+            <>
+              <h3>{wybierz(g, 'nazwa', lang)}</h3>
+              {g.linki.map((l) => (
+                <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
+                  {wybierz(l, 'etykieta', lang)}
+                  {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
+                </a>
+              ))}
+            </>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
+    )
+  )}
+  {inny && <a href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}>{t(lang, 'innyJezyk')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
+</nav>
 
 <script>
   // Tryb ciemny
@@ -169,14 +173,40 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   odswiezNaglowek();
 
   // Menu na telefon
+  // Panel wysuwa się z prawej nad stroną; strona pod spodem się nie przewija. Gdy nagłówek jest ciemny
+  // (przezroczysty na zdjęciu u góry strony albo w kolorze stopki na dole), nagłówek i panel dostają kolory
+  // trybu ciemnego (.menu-ciemne) — zostają do końca chowania panelu, żeby nie mignęła biel.
   const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
   const mnav = document.getElementById('menu-telefon');
-  burger?.addEventListener('click', () => {
-    const otwarte = mnav?.classList.toggle('open') ?? false;
-    hdr?.classList.toggle('menu-otwarte', otwarte);
+  const mtlo = document.querySelector<HTMLElement>('[data-mnav-tlo]');
+  const ciemnyNaglowek = () =>
+    !!hdr && (hdr.classList.contains('hdr-stopka') || (hdr.classList.contains('hdr-foto') && !hdr.classList.contains('przewiniety')));
+  let zdejmijCiemne: number | undefined;
+  const ustawMenu = (otwarte: boolean) => {
+    if (!mnav || !burger || !hdr) return;
+    if (otwarte) {
+      window.clearTimeout(zdejmijCiemne);
+      const ciemne = ciemnyNaglowek();
+      [hdr, mnav, mtlo].forEach((el) => el?.classList.toggle('menu-ciemne', ciemne));
+      document.documentElement.style.setProperty('--menu-top', `${Math.max(0, Math.round(hdr.getBoundingClientRect().bottom))}px`);
+    } else {
+      zdejmijCiemne = window.setTimeout(() => [hdr, mnav, mtlo].forEach((el) => el?.classList.remove('menu-ciemne')), 320);
+    }
+    mnav.classList.toggle('open', otwarte);
+    mtlo?.classList.toggle('open', otwarte);
+    hdr.classList.toggle('menu-otwarte', otwarte);
+    document.documentElement.classList.toggle('menu-otwarte', otwarte);
     burger.setAttribute('aria-expanded', String(otwarte));
     burger.setAttribute('aria-label', (otwarte ? burger.dataset.zamknij : burger.dataset.otworz) || '');
+  };
+  const menuOtwarte = () => !!mnav?.classList.contains('open');
+  burger?.addEventListener('click', () => ustawMenu(!menuOtwarte()));
+  mtlo?.addEventListener('click', () => ustawMenu(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuOtwarte()) { ustawMenu(false); burger?.focus(); }
   });
+  // po przejściu do szerokiego ekranu (menu komputerowe) panel się zamyka, żeby strona znów się przewijała
+  window.matchMedia('(min-width: 1181px)').addEventListener('change', (m) => { if (m.matches && menuOtwarte()) ustawMenu(false); });
 
   // Menu na telefonie: strzałka rozwija listę działu, otwarcie jednej zamyka poprzednią
   const mpozycje = Array.from(document.querySelectorAll<HTMLElement>('.mnav .mitem'));
