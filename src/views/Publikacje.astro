@@ -6,6 +6,7 @@
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
 // Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
 // Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola publikacje_tekst / publikacje_tekst_en; puste = brak).
+// Między wykazami a czasopismami — drugi, krótki tekst (pola czasopisma_tekst / czasopisma_tekst_en; puste = brak), jak na stronie „Seminaria”.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
@@ -82,6 +83,10 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
         })}
       </ol>
     </section>
+
+    {/* Między wykazami a czasopismami — krótki tekst o czasopismach (jak tekst na stronie „Seminaria”);
+         bez czasopism nie ma też tekstu. */}
+    {czasopisma.length > 0 && <TekstWstepny pole="czasopisma_tekst" lang={lang} />}
 
     {czasopisma.length > 0 && (
       <section class="zsec" aria-labelledby="czasopisma">
