@@ -54,9 +54,10 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
         <button type="button" class="chip" data-dla-wyczysc>{lang === 'en' ? 'Show all' : 'Pokaż wszystkie'}</button>
       </p>
       {grupy.map((g) => (
-        <section data-grupa>
+        <section class="lista-miesiac" data-grupa>
           <h2 class="month">{g.miesiac}</h2>
-          {g.pozycje.map((p) => <WierszAktualnosci p={p} lang={lang} />)}
+          {/* komputer: miesiąc jako sekcja z kreską (.lista-miesiac), wpisy jako osobne białe karty (.karty-lista) — global.css; telefon bez zmian */}
+          <div class="karty-lista">{g.pozycje.map((p) => <WierszAktualnosci p={p} lang={lang} />)}</div>
         </section>
       ))}
       <p class="muted" data-pusto hidden>{lang === 'en' ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
