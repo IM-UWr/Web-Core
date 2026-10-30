@@ -260,7 +260,6 @@
   :where([data-uklad~='zwarta-baner']) .hero-in { min-height: clamp(270px, 21.5vw, 320px); padding-top: 28px; padding-bottom: clamp(20px, 2vw, 28px); }
   .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 20px); }
   :where([data-uklad~='zwarta-baner']) .hero-txt { gap: 10px; }
-  :where([data-uklad~='zwarta-baner']) .hero-logo { height: clamp(30px, 2.6vw, 38px); margin-bottom: 0; }
   :where([data-uklad~='zwarta-baner']) .hero h1 { font-size: clamp(34px, 3.4vw, 50px); line-height: 1; }
   :where([data-uklad~='zwarta-baner']) .hero-lead { max-width: 36em; font-size: clamp(15px, 1.15vw, 17px); line-height: 1.5; }
   :where([data-uklad~='zwarta-baner']) .hero-btns { margin-top: 4px; }

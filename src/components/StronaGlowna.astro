@@ -72,7 +72,7 @@ const kafelki = [
         {wyrozniona && (
           <a class="hero-flag" href={href(wyrozniona.href)}>{wyrozniona.tytul}<Ikona nazwa="strzalka" rozmiar={15} /></a>
         )}
-        <span class="hero-logo" role="img" aria-label={t(lang, 'uwr')} style={`--logo-pelne:url(${u('/pliki/uwr-logo.png')})`}></span>
+        {/* bez logotypu UWr nad tytułem — logo uczelni (z nazwą w aria-label linku) jest już w nagłówku */}
         <h1 id="h1-glowna">{t(lang, 'instytut')}</h1>
         <p class="hero-lead">{lang === 'en' ? ustawienia.wstep_en : ustawienia.wstep}</p>
         <div class="btn-row hero-btns">

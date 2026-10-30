@@ -28,9 +28,9 @@
   /* ---------- baner (strona główna): niższy ---------- */
   .hero { --hero-tekst: 720px; }
   .hero-in { min-height: clamp(240px, 19vw, 280px); padding-top: 24px; padding-bottom: clamp(20px, 2.2vw, 28px); }
-  .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 22px); }
+  /* +40 px = miejsce po logotypie UWr nad tytułem (30 px + odstęp 10 px) — tytuł zostaje tam, gdzie był, nie klei się do nagłówka */
+  .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 62px); }
   .hero-txt { gap: 10px; }
-  .hero-logo { height: clamp(30px, 2.6vw, 38px); margin-bottom: 0; }
   .hero h1 { font-size: clamp(34px, 3.9vw, 56px); line-height: 1.02; letter-spacing: -0.03em; }
   .hero-lead { max-width: 40em; font-size: clamp(16px, 1.2vw, 17px); line-height: 1.5; }
   .hero-btns { margin-top: 2px; }
@@ -183,8 +183,9 @@
 }
 @media (max-width: 720px) {
   .hero-fig { height: calc(var(--hdr-h) + 160px); }
-  .hero-in { min-height: 0; padding-top: 130px; padding-bottom: 22px; }
-  .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 108px); }
+  /* tytuł zaczyna się tuż nad dolnym brzegiem zdjęcia, na przejściu w granat (+40 px po logotypie UWr, jak wyżej) */
+  .hero-in { min-height: 0; padding-top: 170px; padding-bottom: 22px; }
+  .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 148px); }
   .hero-bez-zdjecia .hero-in { padding-top: 24px; }
 }
 @media (max-width: 560px) {

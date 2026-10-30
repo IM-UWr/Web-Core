@@ -214,9 +214,9 @@ details[open] > summary .chev { transform: rotate(180deg); }
 }
 
 /* ---------- baner (strona główna) ----------
-   Zdjęcie na całą szerokość, na nim z lewej u dołu: plakietka wyróżnionej aktualności, logotyp UWr, nazwa, wstęp
-   i przyciski (bez karty). Przyciemnienie tylko pod tekstem: pas od lewej do końca kolumny tekstu (--hero-tekst),
-   dalej wygasa — prawa część zdjęcia zostaje naturalna. Najsłabsze miejsce pod tekstem ma krycie 0.68, więc biały
+   Zdjęcie na całą szerokość, na nim z lewej u dołu: plakietka wyróżnionej aktualności, nazwa, wstęp i przyciski
+   (bez karty; bez logotypu UWr — logo uczelni jest w nagłówku). Przyciemnienie tylko pod tekstem: pas od lewej
+   do końca kolumny tekstu (--hero-tekst), dalej wygasa — prawa część zdjęcia zostaje naturalna. Najsłabsze miejsce pod tekstem ma krycie 0.68, więc biały
    tekst ma kontrast ≥ 4.5:1 nawet na całkiem białym zdjęciu. U góry osobne przyciemnienie pod napisami nagłówka.
    Nagłówek (.hdr-foto) jest przezroczysty, dopóki dół .hero-fig nie dojdzie do nagłówka (skrypt w Naglowek.astro).
    Telefon: zdjęcie u góry przechodzi od dołu w granat, tekst pod nim na granacie. */
@@ -233,7 +233,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 36px); }
 .hero-bez-zdjecia .hero-in { min-height: 0; }
 .hero-txt { max-width: var(--hero-tekst); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-.hero-logo { display: block; height: clamp(40px, 4vw, 52px); aspect-ratio: 500 / 160; margin-bottom: 4px; background: #fff; -webkit-mask: var(--logo-pelne) left center / contain no-repeat; mask: var(--logo-pelne) left center / contain no-repeat; }
 .hero h1 { margin: 0; color: #fff; font-size: clamp(42px, 5.4vw, 76px); font-weight: 800; line-height: .98; letter-spacing: -0.035em; }
 .hero-lead { margin: 0; max-width: 32em; font-size: clamp(17px, 1.3vw, 19px); line-height: 1.55; color: #fff; }
 .hero-btns { margin-top: 8px; }
