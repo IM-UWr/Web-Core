@@ -54,14 +54,14 @@ const liczby = [
 const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Studia' || m.etykieta_en === 'Study');
 const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
-// „O studiach” — akapity z CMS (oddzielone pustą linią) i ramka „W skrócie” obok (komputer):
-// lista {wartosc, opis, opis_en}; pozycje bez wartości pomijamy.
+// „O studiach” — akapity z CMS (oddzielone pustą linią) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”
+// na stronie „Instytut”): lista {wartosc, opis, opis_en}, fakty jeden pod drugim; pozycje bez wartości pomijamy.
 const oStudiach = ((w(tekst, 'o_studiach') as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 type Fakt = { wartosc?: string; opis?: string; opis_en?: string };
 const fakty = (((tekst as any).o_studiach_fakty ?? []) as Fakt[])
   .filter((f) => f?.wartosc?.trim())
   .map((f) => ({ w: f.wartosc!.trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
-// (zakres lat, np. 2022–2025, nie łamie się po półpauzie — wąska kolumna ramki)
+// (zakres lat, np. 2022–2025, nie łamie się po półpauzie — wąska kolumna ramki, 300 px)
 
 // Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;
 // telefon — wygląd „Portal”: zwarta lista sześciu).
@@ -86,7 +86,9 @@ const wstep = w(tekst, 'wstep');
 <Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
        Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, tekst „O studiach” (bez ramki „W skrócie”),
-       aktualności (sześć), „Warto wiedzieć” i kontakt — osobny blok .tylko-telefon (inna kolejność i liczba pozycji). */}
+       aktualności (sześć), „Warto wiedzieć” i kontakt — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
+       Linki do pełnych podstron („Wszystkie”, „Kto za co odpowiada — wszystkie kontakty”) — zawsze w nagłówku sekcji
+       (komputer: .zsec-head w global.css; telefon: nagłówek ramki .pt-h), z prawej. */}
   <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">
@@ -96,7 +98,7 @@ const wstep = w(tekst, 'wstep');
   </NaglowekStrony>
   <div class="wrap dz-wrap">
     {grupy.length > 0 && (
-      <section class="zsec" aria-labelledby="w-dziale">
+      <section class="zsec dz-pierwsza" aria-labelledby="w-dziale">
         <h2 id="w-dziale">{T('W tym dziale', 'In this section')}</h2>
         <div class="dz-groups">
           {grupy.map((g) => (
@@ -126,7 +128,7 @@ const wstep = w(tekst, 'wstep');
           {fakty.length > 0 && (
             <aside class="dz-o-fakty tylko-komputer" aria-labelledby="w-skrocie">
               <p class="dz-o-fakty-h" id="w-skrocie">{T('W skrócie', 'At a glance')}</p>
-              <dl style={`--kol: ${Math.min(fakty.length, 3)}`}>
+              <dl>
                 {fakty.map((f) => <div><dt>{f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
               </dl>
             </aside>
@@ -138,7 +140,7 @@ const wstep = w(tekst, 'wstep');
     <WartoWiedziec lang={lang} dzial="studia" klasa="tylko-komputer" />
 
     <section class="zsec tylko-komputer" aria-labelledby="aktualnosci">
-      <div class="dz-head">
+      <div class="zsec-head">
         <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
         <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
       </div>
@@ -178,7 +180,10 @@ const wstep = w(tekst, 'wstep');
       <WartoWiedziec lang={lang} dzial="studia" uklad="portal" />
       {osobyKontakt.length > 0 && (
         <section class="pt-box" aria-labelledby="kontakt-tel">
-          <div class="pt-h"><h2 id="kontakt-tel">{T('Kontakt', 'Contact')}</h2></div>
+          <div class="pt-h">
+            <h2 id="kontakt-tel">{T('Kontakt', 'Contact')}</h2>
+            <a class="pt-all" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
+          </div>
           <ul class="pt-list dz-osoby">
             {osobyKontakt.map((k) => (
               <li>
@@ -193,13 +198,15 @@ const wstep = w(tekst, 'wstep');
               </li>
             ))}
           </ul>
-          <p class="pt-stopka"><a class="pt-all" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
         </section>
       )}
     </div>
 
     <section class="zsec tylko-komputer" aria-labelledby="kontakt" style="margin-bottom:0">
-      <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
+      <div class="zsec-head">
+        <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
+        <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+      </div>
       {osobyKontakt.length > 0 && (
         <ul class="people">
           {osobyKontakt.map((k) => (
@@ -216,7 +223,6 @@ const wstep = w(tekst, 'wstep');
           ))}
         </ul>
       )}
-      <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
     </section>
   </div>
 </Baza>
@@ -224,6 +230,10 @@ const wstep = w(tekst, 'wstep');
 <style>
   /* „W tym dziale” i „O studiach” — układ wspólny ze stronami działów „Instytut” i „Nauka”. */
   .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  /* „W tym dziale” zaraz pod banerem — bez kreski sekcji nad nagłówkiem (komputer i telefon; jak „Najbliższe seminaria”
+     w ListaSeminariow.astro): tytuł zaczyna się w odstępie .dz-wrap od banera */
+  .zsec.dz-pierwsza { border-top: 0; padding-top: 0; }
+  .zsec.dz-pierwsza::before, .zsec.dz-pierwsza > h2::before { display: none; }
   .dz-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px 16px; }
   .dz-g h3 { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
@@ -231,29 +241,20 @@ const wstep = w(tekst, 'wstep');
   /* „O studiach”: zwykłe akapity w wygodnej szerokości do czytania */
   .dz-o-tekst p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
   .dz-o-tekst p:last-child { margin-bottom: 0; }
-  /* ramka „W skrócie” (tylko komputer): wartości z bursztynową kreską, opis pod spodem — jak na „Instytucie”, ale zwarta:
-     tekst „O studiach” to kilka zdań, więc fakty stoją obok siebie (najwyżej trzy w rzędzie, --kol = ich liczba)
-     i ramka nie jest dużo wyższa od tekstu */
-  .dz-o-fakty { padding: 14px 18px 16px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-  .dz-o-fakty-h { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-o-fakty dl { display: grid; grid-template-columns: repeat(var(--kol, 3), minmax(0, 1fr)); gap: 12px 16px; margin: 0; }
+  /* ramka „W skrócie” (tylko komputer): duże wartości z bursztynową kreską, opis pod spodem, fakty jeden pod drugim —
+     jak „O Instytucie” na stronie „Instytut” (DzialInstytut.astro) */
+  .dz-o-fakty { padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
+  .dz-o-fakty-h { margin: 0 0 12px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .dz-o-fakty dl { display: grid; gap: 14px; margin: 0; }
   .dz-o-fakty dl > div { padding-left: 12px; border-left: 3px solid var(--accent); }
-  .dz-o-fakty dt { font-size: 22px; font-weight: 800; line-height: 1.1; color: var(--ink); }
-  .dz-o-fakty dd { margin: 3px 0 0; font-size: 13.5px; line-height: 1.38; color: var(--muted); }
-  /* komputer: ramka pod tekstem (w jego szerokości); od 1280 px (pełna szerokość treści) tekst i ramka obok siebie, ramka po prawej */
+  .dz-o-fakty dt { font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--ink); }
+  .dz-o-fakty dd { margin: 3px 0 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
+  /* komputer: tekst i ramka obok siebie (ramka 300 px po prawej) */
   @media (min-width: 761px) {
-    .dz-o-uklad { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
-    .dz-o-fakty { max-width: 820px; }
+    .dz-o-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
   }
-  @media (min-width: 1280px) {
-    .dz-o-uklad { grid-template-columns: minmax(0, 1fr) 540px; gap: 32px; align-items: start; }
-    .dz-o-fakty { max-width: none; }
-  }
-  .dz-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 10px; }
-  .dz-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
   .dz-rola { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
-  .people + .link-arrow { margin-top: 8px; }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki (jak na „Instytucie” i „Nauce”) ----------
      Odstęp nad pierwszą sekcją stały (24 px): bursztynowy początek kreski sekcji nie przylega do dolnej krawędzi banera. */
@@ -263,10 +264,7 @@ const wstep = w(tekst, 'wstep');
     .dz-g h3 { margin: 0 0 6px; }
     .dz-tiles { gap: 6px; }
     .dz-tile { display: flex; min-height: 42px; padding-block: 6px; }
-    .dz-head { margin-bottom: 8px; }
-    .dz-head h2 { font-size: 22px; }
     .dz-zakres { margin: 0 0 2px; }
-    .people + .link-arrow { margin-top: 4px; }
   }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stronami „Instytut” i „Nauka”) ---------- */

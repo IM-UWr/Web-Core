@@ -163,7 +163,7 @@ const kafelki = [
             <h2 id="h3-sem" class="sem-week-h">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
             <span class="muted gl-sem-zakres">{range(tydzien.od, tydzien.do, lang)}</span>
           </div>
-          <div class="gl-sem-r tylko-komputer">
+          <div class="gl-sem-r">
             <a class="link-arrow" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
           </div>
         </div>
@@ -182,7 +182,6 @@ const kafelki = [
             etykieta={t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}
             pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
           />
-          <p class="pt-stopka"><a class="pt-all" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
         </div>
       </div>
     </div>
@@ -235,7 +234,8 @@ const kafelki = [
 </script>
 
 <style>
-  /* Seminaria tygodnia: tytuł i zakres dat obok siebie, link „Wszystkie seminaria” z prawej (komputer) */
+  /* Seminaria tygodnia: tytuł i zakres dat obok siebie, link „Wszystkie seminaria” z prawej — na komputerze i na telefonie
+     (tam w nagłówku ramki, jak „Kalendarz” przy wydarzeniach; gdy się nie mieści — pod tytułem), nie na dole ramki */
   .gl-sem-head { margin-bottom: 14px; }
   .gl-sem-l { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
   .gl-sem-zakres { font-size: 14px; font-weight: 600; }

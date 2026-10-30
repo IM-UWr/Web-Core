@@ -95,7 +95,7 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
   <Zewn class={klasaZewn} aria-labelledby={uklad === 'lista' ? undefined : idSekcji}>
     <div class={uklad === 'glowna' ? 'wrap' : undefined}>
       {uklad !== 'lista' && (
-        <div class={uklad === 'glowna' ? 'section-head' : 'ww-head'}>
+        <div class={uklad === 'glowna' ? 'section-head' : 'zsec-head'}>
           <h2 id={idSekcji}>{tytulSekcji}</h2>
           {wiecej && <a class="link-arrow" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
         </div>
@@ -128,8 +128,7 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
 )}
 
 <style>
-  .ww-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 20px; margin-bottom: 14px; }
-  .ww-head h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
+  /* nagłówek sekcji działu: tytuł i link „Wszystkie” z prawej — wspólny .zsec-head (global.css), jak w innych sekcjach .zsec */
   .ww-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px; }
   .ww-jedna { max-width: 560px; }
   .ww-card {

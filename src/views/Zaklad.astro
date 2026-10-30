@@ -171,7 +171,11 @@ const wszystkieZaklady = await zaklady();
 
       {konf.length > 0 && (
         <section class="zsec" aria-labelledby="konferencje">
-          <h2 id="konferencje">{T('Konferencje', 'Conferences')}</h2>
+          {/* link do pełnej listy w nagłówku sekcji, z prawej (.zsec-head w global.css) — gdy nie wszystkie się tu mieszczą */}
+          <div class="zsec-head">
+            <h2 id="konferencje">{T('Konferencje', 'Conferences')}</h2>
+            {konf.length > 8 && <a class="link-arrow" href={u(wJezyku('/nauka/konferencje', lang))}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+          </div>
           <ul class="plain-list">
             {konf.slice(0, 8).map((k) => (
               <li>
@@ -182,7 +186,6 @@ const wszystkieZaklady = await zaklady();
               </li>
             ))}
           </ul>
-          {konf.length > 8 && <a class="link-arrow" href={u(wJezyku('/nauka/konferencje', lang))}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
         </section>
       )}
 

@@ -93,15 +93,17 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
 
       {zaklad && inne.length > 0 && (
         <section class="gr-inne" aria-labelledby="inne-projekty">
-          <h2 id="inne-projekty">{T('Inne projekty zakładu', 'Other projects of the department')}</h2>
+          <div class="zsec-head gr-inne-head">
+            <h2 id="inne-projekty">{T('Inne projekty zakładu', 'Other projects of the department')}</h2>
+            {inne.length > 5 && (
+              <a class="link-arrow" href={`${adresZakladu(zaklad.id)}#granty`}>
+                {T(`Wszystkie projekty zakładu (${inne.length + 1})`, `All department projects (${inne.length + 1})`)}<Ikona nazwa="strzalka" rozmiar={16} />
+              </a>
+            )}
+          </div>
           <ul class="gw-lista">
             {inne.slice(0, 5).map((g) => <WierszGrantu grant={g} kierownicy={kierownicyGrantu(g.data.kierownik, osoby)} lang={lang} />)}
           </ul>
-          {inne.length > 5 && (
-            <a class="link-arrow gr-wiecej" href={`${adresZakladu(zaklad.id)}#granty`}>
-              {T(`Wszystkie projekty zakładu (${inne.length + 1})`, `All department projects (${inne.length + 1})`)}<Ikona nazwa="strzalka" rozmiar={16} />
-            </a>
-          )}
         </section>
       )}
     </div>
@@ -128,8 +130,10 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
   .gr-opis { margin-top: 28px; }
 
   .gr-inne { margin-top: 40px; }
-  .gr-inne h2 { margin: 0 0 10px; font-size: 22px; font-weight: 800; }
-  .gr-wiecej { margin-top: 6px; }
+  /* tytuł z linkiem „Wszystkie projekty zakładu” z prawej — wspólny nagłówek .zsec-head (global.css), link na górze,
+     nie pod listą; tytuł i odstęp pod nim jak dotąd (22 px, 10 px) */
+  .gr-inne-head { margin-bottom: 10px; }
+  .gr-inne h2 { margin: 0; font-size: 22px; font-weight: 800; }
   @media (max-width: 520px) {
     .gr-karta { padding: 18px 16px; }
     .gr-inne .gw-lista { margin: 0 -14px; }

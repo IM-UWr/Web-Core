@@ -169,6 +169,8 @@
   :where([data-uklad~='zwarta'] main) .dept .f { padding-top: 6px; }
   :where([data-uklad~='zwarta'] main) .zsec { margin-bottom: 24px; }
   :where([data-uklad~='zwarta'] main) .zsec > h2 { margin: 0 0 10px; font-size: 22px; }
+  :where([data-uklad~='zwarta'] main) .zsec-head { margin-bottom: 10px; }
+  :where([data-uklad~='zwarta'] main) .zsec-head > h2 { font-size: 22px; }
   :where([data-uklad~='zwarta'] main) .subhead { margin: 14px 0 6px; }
   :where([data-uklad~='zwarta'] main) .people { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
   :where([data-uklad~='zwarta'] main) .person { gap: 1px; padding: 8px 12px; border-radius: 10px; }
@@ -225,11 +227,11 @@
   :where([data-uklad~='zwarta'] main) .person.os-link .os-a .ico { top: 10px; right: 10px; }
 
   /* sekcje stron (tlo.css: body[data-sekcje]) */
-  body[data-sekcje]:where([data-uklad~='zwarta']) .zsec > h2, body[data-sekcje]:where([data-uklad~='zwarta']) .zsec .dz-head h2, body[data-sekcje]:where([data-uklad~='zwarta']) .zsec .ww-head h2 { font-size: clamp(21px, 2.2vw, 24px); }
+  body[data-sekcje]:where([data-uklad~='zwarta']) .zsec > h2, body[data-sekcje]:where([data-uklad~='zwarta']) .zsec .zsec-head h2 { font-size: clamp(21px, 2.2vw, 24px); }
   body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .wrap > .zsec { padding: clamp(16px, 2.2vw, 26px) 0; }
   body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .main .zsec { padding: 16px 0; }
   body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .main .zsec:nth-child(even of .zsec) { margin-inline: calc(-1 * min(18px, var(--gutter))); padding-inline: min(18px, var(--gutter)); }
-  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) :is(.zsec > h2, .zsec .dz-head h2, .zsec .ww-head h2, .section-head h2, .studia-head h2)::before { width: 5px; margin-right: 10px; }
+  body[data-sekcje='pasy']:where([data-uklad~='zwarta']) :is(.zsec > h2, .zsec .zsec-head h2, .section-head h2, .studia-head h2)::before { width: 5px; margin-right: 10px; }
   body[data-sekcje='pasy']:where([data-uklad~='zwarta']) .prose h2 { margin: 1.3em 0 .5em; padding: .3em .6em .3em .8em; border-radius: 10px; }
   body[data-sekcje='linia']:where([data-uklad~='zwarta']) .zsec { margin-bottom: 20px; padding-top: 14px; }
   body[data-sekcje='linia']:where([data-uklad~='zwarta']) :is(.section-head h2, .studia-head h2)::before { margin-bottom: 8px; }

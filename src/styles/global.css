@@ -631,6 +631,17 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 .dept .f { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; }
 .zsec { margin-bottom: 36px; }
 .zsec > h2 { margin: 0 0 14px; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
+/* Nagłówek sekcji z linkiem do pełnej podstrony („Wszystkie … →”) — na całej stronie link stoi na górze sekcji,
+   z prawej, w jednej linii z tytułem (jak „Najbliższe wydarzenia” → „Kalendarz” na stronie głównej), nie pod treścią.
+   <div class="zsec-head"><h2>…</h2><a class="link-arrow">…</a></div>; dwa linki i więcej — w <div class="zsec-linki">
+   (trzymają się razem; na wąskim ekranie zawijają się pod tytuł). Tytuł wygląda jak samo h2 sekcji (.zsec > h2;
+   rozmiary w uklad-zwarta.css, telefon.css i tlo.css), odstęp pod nagłówkiem też ten sam. Link nie podwyższa wiersza:
+   ujemny margines pionowy zjada nadmiar jego min-height (cel kliknięcia zostaje wysoki), więc treść sekcji zaczyna się
+   tam, gdzie pod samym tytułem. */
+.zsec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; margin: 0 0 14px; }
+.zsec-head > h2 { margin: 0; font-size: 26px; font-weight: 800; scroll-margin-top: 16px; }
+.zsec-head .link-arrow { margin-block: -10px; }
+.zsec-linki { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; }
 .subhead { margin: 22px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .people { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px; }
 .person { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; background: var(--surface); min-width: 0; }

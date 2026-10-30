@@ -126,6 +126,8 @@
   .dept .t { font-size: 17px; }
   .zsec { margin-bottom: 24px; }
   .zsec > h2 { margin: 0 0 10px; font-size: 22px; }
+  .zsec-head { margin-bottom: 10px; }
+  .zsec-head > h2 { font-size: 22px; }
   .people { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
   .person { gap: 1px; padding: 9px 12px; }
 
@@ -164,10 +166,10 @@
   .ph-m, .ph-zdjecie.ph-z-foto .ph-m, .ph-granat.ph-z-foto .ph-m { height: 120px; width: 70%; opacity: .7; }
 
   /* ---------- tlo.css: sekcje ---------- */
-  body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .dz-head h2, body[data-sekcje] .zsec .ww-head h2 { font-size: clamp(20px, 2.2vw, 23px); letter-spacing: -0.015em; }
+  body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .zsec-head h2 { font-size: clamp(20px, 2.2vw, 23px); letter-spacing: -0.015em; }
   body[data-sekcje='pasy'] .wrap > .zsec { padding: clamp(16px, 2.2vw, 26px) 0; }
   body[data-sekcje='pasy'] .main .zsec { padding: 16px 0; }
-  body[data-sekcje='pasy'] :is(.zsec > h2, .zsec .dz-head h2, .zsec .ww-head h2, .section-head h2, .studia-head h2)::before { width: 5px; margin-right: 11px; }
+  body[data-sekcje='pasy'] :is(.zsec > h2, .zsec .zsec-head h2, .section-head h2, .studia-head h2)::before { width: 5px; margin-right: 11px; }
   body[data-sekcje='pasy'] .prose h2 { margin: 1.4em 0 .55em; padding: .3em .7em .3em .85em; }
   body[data-sekcje='pasy'] .prose > h2:first-child { margin-top: 0; }
   body[data-sekcje='linia'] .zsec { margin-bottom: 20px; padding-top: 16px; }

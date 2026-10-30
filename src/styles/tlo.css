@@ -179,14 +179,14 @@ body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-c
    ========================================================================== */
 body[data-sekcje] { --sek-pas: rgb(232 238 247 / .55); --sek-karta: rgb(255 255 255 / .95); --sek-cien: 0 10px 30px rgb(11 27 58 / .07); }
 :root[data-theme='dark'] body[data-sekcje] { --sek-pas: rgb(24 36 62 / .6); --sek-karta: rgb(14 22 40 / .95); --sek-cien: 0 10px 30px rgb(0 0 0 / .35); }
-body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .dz-head h2, body[data-sekcje] .zsec .ww-head h2 { font-size: clamp(26px, 3vw, 30px); letter-spacing: -0.02em; }
+body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .zsec-head h2 { font-size: clamp(26px, 3vw, 30px); letter-spacing: -0.02em; }
 
 /* --- 1. Pasy: sekcje na przemian na jasnym pasie i na tle; tytuł sekcji z bursztynowym znacznikiem --- */
 body[data-sekcje='pasy'] .wrap > .zsec { margin: 0; padding: clamp(28px, 4vw, 44px) 0; }
 body[data-sekcje='pasy'] .wrap > .zsec:nth-child(even of .zsec) { background: var(--sek-pas); box-shadow: 0 0 0 100vmax var(--sek-pas); clip-path: inset(0 -100vmax); }
 body[data-sekcje='pasy'] .main .zsec { margin: 0; padding: 26px 0; }
 body[data-sekcje='pasy'] .main .zsec:nth-child(even of .zsec) { margin-inline: calc(-1 * min(24px, var(--gutter))); padding-inline: min(24px, var(--gutter)); border-radius: var(--radius-l); background: var(--sek-pas); }
-body[data-sekcje='pasy'] :is(.zsec > h2, .zsec .dz-head h2, .zsec .ww-head h2, .section-head h2, .studia-head h2)::before { content: ''; display: inline-block; width: 6px; height: .8em; margin-right: 14px; border-radius: 3px; background: var(--accent); vertical-align: -.02em; }
+body[data-sekcje='pasy'] :is(.zsec > h2, .zsec .zsec-head h2, .section-head h2, .studia-head h2)::before { content: ''; display: inline-block; width: 6px; height: .8em; margin-right: 14px; border-radius: 3px; background: var(--accent); vertical-align: -.02em; }
 body[data-sekcje='pasy'] .section-alt { background: var(--sek-pas); border-block: 1px solid var(--line); }
 body[data-sekcje='pasy'] .prose h2 { margin: 1.8em 0 .7em; padding: .42em .75em .42em .9em; border-radius: 12px; background: var(--sek-pas); box-shadow: inset 5px 0 0 var(--accent); }
 body[data-sekcje='pasy'] .prose > h2:first-child { margin-top: 0; }
