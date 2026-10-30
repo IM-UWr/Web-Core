@@ -10,7 +10,6 @@ import { u, isExternal } from '../lib/url';
 import { t, wJezyku } from '../lib/i18n';
 import { longWithDay, short, dayNum, monthShort, plusMinutes, type Lang } from '../lib/daty';
 import { slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../lib/tresci';
-import { adresIcs } from '../lib/kalendarz';
 
 interface Props { obrona: Obrona; lang: Lang }
 const { obrona, lang } = Astro.props;
@@ -45,13 +44,8 @@ const dokumenty = [
           {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{d.miejsce}</dd></>}
           {d.promotorzy.length > 0 && <><dt>{t(lang, 'promotorzy')}</dt><dd>{d.promotorzy.join(', ')}</dd></>}
         </dl>
-        <div class="actions">
-          {przyszla ? (
-            <>
-              <a class="btn btn-small" href={u(adresIcs(w.uid))} download><Ikona nazwa="kalendarz" rozmiar={16} />{t(lang, 'dodajDoKalendarza')}</a>
-            </>
-          ) : <span class="status">{t(lang, 'odbylo')}</span>}
-        </div>
+        {/* bez przycisku „Dodaj do kalendarza” (decyzja: nigdzie na stronie); po terminie — informacja, że obrona się odbyła */}
+        {!przyszla && <div class="actions"><span class="status">{t(lang, 'odbylo')}</span></div>}
       </section>
 
       {d.zdjecie && (

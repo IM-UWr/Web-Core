@@ -15,7 +15,6 @@ import { short, longWithDay, range, dayNum, monthShort, now, today, hasTime, plu
 import { slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
 import ustawienia from '../data/ustawienia.json';
 import { renderMarkdown } from '../lib/markdown';
-import { adresIcs } from '../lib/kalendarz';
 
 interface Props {
   wpis: Aktualnosc;
@@ -73,16 +72,10 @@ const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
             <dd>{wydarzenie.koniec && wydarzenie.koniec.slice(0, 10) !== wydarzenie.poczatek.slice(0, 10) ? range(wydarzenie.poczatek, wydarzenie.koniec, lang) : longWithDay(wydarzenie.poczatek, lang) + (wydarzenie.koniec && hasTime(wydarzenie.koniec) ? `–${wydarzenie.koniec.slice(11, 16)}` : '')}</dd>
             {wydarzenie.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{wydarzenie.miejsce}</dd></>}
           </dl>
-          <div class="actions">
-            {minelo ? (
-              <span class="status">{t(lang, 'odbylo')}</span>
-            ) : (
-              <>
-                {trwa && <span class="status">{t(lang, 'trwa')}</span>}
-                <a class="btn btn-small" href={u(adresIcs(wydarzenie.uid))} download><Ikona nazwa="kalendarz" rozmiar={16} />{t(lang, 'dodajDoKalendarza')}</a>
-              </>
-            )}
-          </div>
+          {/* bez przycisku „Dodaj do kalendarza” (decyzja: nigdzie na stronie); zostaje stan: trwa / odbyło się */}
+          {(minelo || trwa) && (
+            <div class="actions"><span class="status">{t(lang, minelo ? 'odbylo' : 'trwa')}</span></div>
+          )}
         </section>
       )}
 
