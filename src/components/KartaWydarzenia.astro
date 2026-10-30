@@ -1,23 +1,34 @@
 ---
 // Wydarzenie z kafelkiem daty (strona główna, kalendarz, panel boczny).
-import { u } from '../lib/url';
+// Konferencje nie mają naszych podstron: link prowadzi na stronę konferencji (adres zewnętrzny, ikona przy tytule),
+// a konferencja bez strony to karta bez linku (<div>, ten sam wygląd, bez podświetlenia po najechaniu).
+import TytulZewn from './TytulZewn.astro';
+import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE } from '../lib/i18n';
 import { dayNum, monthShort, range, time, hasTime, type Lang } from '../lib/daty';
 import type { Wydarzenie } from '../lib/tresci';
 
 interface Props { w: Wydarzenie; lang: Lang; maly?: boolean; jasny?: boolean }
 const { w, lang, maly = false, jasny = false } = Astro.props;
+const zewn = !!w.href && isExternal(w.href);
+const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
+const Tag = adres ? 'a' : 'div';
 const meta = [(w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang), w.miejsce].filter(Boolean).join(' · ');
 ---
-<a class="event" href={u(wJezyku(w.href, lang))} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
+<Tag class:list={['event', !adres && 'event-bez-linku']} href={adres} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
   <span class={`datebox${maly ? ' small' : ''}${jasny ? ' light' : ''}`} aria-hidden="true">
     <span class="d">{dayNum(w.poczatek)}</span>
     <span class="m">{monthShort(w.poczatek, lang)}</span>
   </span>
   <span class="event-body">
     <span class="k">{RODZAJE[w.rodzaj]?.[lang]}{hasTime(w.poczatek) ? ` · ${time(w.poczatek)}` : ''}</span>
-    <span class="t">{w.tytul}</span>
+    <span class="t"><TytulZewn tekst={w.tytul} zewn={zewn} rozmiar={13} /></span>
     {w.podtytul && <span class="s" lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</span>}
     <span class="s">{meta}</span>
   </span>
-</a>
+</Tag>
+
+<style>
+  /* karta bez linku: bez podświetlenia po najechaniu */
+  .event-bez-linku:hover { box-shadow: none; }
+</style>

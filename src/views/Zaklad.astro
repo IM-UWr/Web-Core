@@ -8,6 +8,7 @@ import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
+import TytulZewn from '../components/TytulZewn.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { range, long, short, now, today, hasTime, type Lang } from '../lib/daty';
@@ -174,7 +175,8 @@ const wszystkieZaklady = await zaklady();
           <ul class="plain-list">
             {konf.slice(0, 8).map((k) => (
               <li>
-                <a href={u(wJezyku(`/nauka/konferencje/${slugOf(k.id)}`, lang))}>{wybierz(k.data, 'tytul', lang)}</a>
+                {/* konferencje nie mają naszych podstron: link na stronę konferencji, bez strony — sam tytuł */}
+                {k.data.strona ? <a href={k.data.strona}><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} rozmiar={13} /></a> : wybierz(k.data, 'tytul', lang)}
                 <span class="muted"> — {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? `, ${k.data.miejsce}` : ''}</span>
                 {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="badge badge-konferencja" style="margin-left:6px">{T('nadchodząca', 'upcoming')}</span>}
               </li>

@@ -6,7 +6,8 @@
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
-import { u, absolute } from '../lib/url';
+import TytulZewn from '../components/TytulZewn.astro';
+import { u, absolute, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE } from '../lib/i18n';
 import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
 import { wszystkieWydarzenia, trwaLubBedzie, seminaria } from '../lib/tresci';
@@ -17,6 +18,9 @@ const { lang } = Astro.props;
 // Dwa widoki: „Nadchodzące” (trwające i przyszłe, od najbliższego) i „Archiwum” (cała historia, od najnowszego).
 const wszystkie = await wszystkieWydarzenia(lang);
 type W = (typeof wszystkie)[number];
+// Adres pozycji: nasza podstrona albo strona zewnętrzna (konferencje nie mają naszych podstron — link prowadzi na stronę
+// konferencji, z ikoną przy tytule); konferencja bez podanej strony — pozycja bez linku (<div>, bez podświetlenia).
+const adres = (w: W) => (w.href ? (isExternal(w.href) ? w.href : u(wJezyku(w.href, lang))) : undefined);
 const poMiesiacach = (lista: W[]) => {
   const grupy: { miesiac: string; pozycje: W[] }[] = [];
   for (const w of lista) {
@@ -68,8 +72,8 @@ const lead = lang === 'en'
             <section class="lista-miesiac" data-grupa>
               <h2 class="month">{g.miesiac}</h2>
               <div class="karty-lista">
-              {g.pozycje.map((w) => (
-                <a class="row-item" href={u(wJezyku(w.href, lang))} data-rodzaj={w.rodzaj}>
+              {g.pozycje.map((w) => { const Tag = w.href ? 'a' : 'div'; return (
+                <Tag class:list={['row-item', !w.href && 'kal-bez-linku']} href={adres(w)} data-rodzaj={w.rodzaj}>
                   <span class={`datebox small${w.rodzaj === 'referat' ? ' light' : ''}`} aria-hidden="true">
                     <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
                   </span>
@@ -79,12 +83,12 @@ const lead = lang === 'en'
                       <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
                       {w.miejsce && <span>· {w.miejsce}</span>}
                     </span>
-                    <span class="t" style="font-size:18px">{w.tytul}</span>
+                    <span class="t" style="font-size:18px"><TytulZewn tekst={w.tytul} zewn={!!w.href && isExternal(w.href)} /></span>
                     {w.podtytul && <span class="x">{w.podtytul}</span>}
                     {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
                   </span>
-                </a>
-              ))}
+                </Tag>
+              ); })}
               </div>
             </section>
           ))}
@@ -135,6 +139,9 @@ const lead = lang === 'en'
     .kal-pusto { border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
     .kal-pusto { margin: 0; padding: 16px 18px; }
   }
+  /* pozycja bez linku (konferencja bez strony): bez podświetlenia ramki i podkreślenia po najechaniu */
+  .karty-lista > .kal-bez-linku:hover { border-color: var(--line); }
+  .kal-bez-linku:hover :global(.t) { text-decoration: none; }
   /* przyciski widoku pod banerem, nad listą miesięcy */
   .kal-widok { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
 </style>

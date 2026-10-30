@@ -1,0 +1,18 @@
+---
+// Tytuł linku do strony zewnętrznej z ikoną „zewnętrzny” na końcu (np. konferencje — prowadzą na stronę konferencji).
+// Ostatnie słowo i ikona są nierozdzielne (white-space: nowrap), żeby ikona nie przechodziła sama do nowej linii.
+// Bez `zewn` — sam tytuł (np. konferencja bez podanej strony).
+import Ikona from './Ikona.astro';
+
+interface Props { tekst: string; zewn?: boolean; rozmiar?: number }
+const { tekst, zewn = true, rozmiar = 14 } = Astro.props;
+const i = tekst.trimEnd().lastIndexOf(' ');
+const poczatek = i >= 0 ? tekst.slice(0, i + 1) : '';
+const koniec = i >= 0 ? tekst.trimEnd().slice(i + 1) : tekst.trimEnd();
+---
+{zewn ? <>{poczatek}<span class="tz">{koniec}<Ikona nazwa="zewnetrzny" rozmiar={rozmiar} class="tz-ico" /></span></> : tekst}
+
+<style>
+  .tz { white-space: nowrap; }
+  .tz :global(.tz-ico) { display: inline-block; margin-left: 5px; vertical-align: -1px; color: var(--muted); }
+</style>

@@ -1,14 +1,20 @@
 ---
-// Konferencje: nadchodzące u góry, minione według lat.
+// Konferencje: nadchodzące u góry (sekcja .zsec jak na stronach działów), minione według lat.
+// Konferencje nie mają naszych podstron: każda pozycja prowadzi od razu na stronę konferencji (pole `strona`, ta sama
+// karta przeglądarki, ikona „zewnętrzny” przy tytule); konferencja bez strony — pozycja bez linku (<div>, bez podświetlenia).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku); lista jak w kalendarzu — wspólny
+// styl list z global.css: rok = sekcja z kreską (.lista-miesiac), konferencje = osobne białe karty (.karty-lista);
+// nadchodzące (.event) w takich samych kartach, jedna pod drugą.
+// Telefon (≤ 760 px): lata jako małe etykiety, konferencje jako wiersze (cały wiersz jest linkiem); „Nadchodzące”
+// z kreską sekcji.
+// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola konferencje_tekst / konferencje_tekst_en; puste = brak).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
-import Ikona from '../components/Ikona.astro';
-import { u } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
+import TekstWstepny from '../components/TekstWstepny.astro';
+import TytulZewn from '../components/TytulZewn.astro';
 import { dayNum, monthShort, range, type Lang } from '../lib/daty';
-import { konferencje, slugOf, trwaLubBedzie, type Konferencja } from '../lib/tresci';
+import { konferencje, trwaLubBedzie, type Konferencja } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -23,7 +29,9 @@ for (const k of minione) {
   else lata.push({ rok: r, lista: [k] });
 }
 const tytul = (k: Konferencja) => (lang === 'en' && k.data.tytul_en) || k.data.tytul;
-const href = (k: Konferencja) => u(wJezyku(`/nauka/konferencje/${slugOf(k.id)}`, lang));
+// adres strony konferencji (zewnętrzny) albo brak — wtedy pozycja bez linku
+const href = (k: Konferencja) => k.data.strona || undefined;
+const Tag = (k: Konferencja) => (href(k) ? 'a' : 'div');
 const odwolana = lang === 'en' ? 'cancelled' : 'odwołana';
 const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
 const lead = lang === 'en'
@@ -34,40 +42,42 @@ const lead = lang === 'en'
   <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: naglowek }]} />
   <div class="wrap layout">
     <div class="main">
-      <section aria-labelledby="h-nadch" style="margin-bottom:32px">
-        <h2 id="h-nadch" style="font-size:24px;margin:0 0 14px">{lang === 'en' ? 'Upcoming' : 'Nadchodzące'}</h2>
-        {przyszle.length === 0 && <p class="muted" style="margin:0">{lang === 'en' ? 'No upcoming conferences announced.' : 'Nie zapowiedziano jeszcze kolejnych konferencji.'}</p>}
+      <TekstWstepny pole="konferencje_tekst" lang={lang} />
+      <section class="zsec kf-nadch" aria-labelledby="h-nadch">
+        <h2 id="h-nadch">{lang === 'en' ? 'Upcoming' : 'Nadchodzące'}</h2>
+        {przyszle.length === 0 && <p class="muted kf-brak">{lang === 'en' ? 'No upcoming conferences announced.' : 'Nie zapowiedziano jeszcze kolejnych konferencji.'}</p>}
         <div class="event-grid">
-          {przyszle.map((k) => (
-            <a class="event event-szare" href={href(k)}>
+          {przyszle.map((k) => { const T = Tag(k); return (
+            <T class:list={['event event-szare', !href(k) && 'kf-bez-linku']} href={href(k)}>
               <span class="datebox" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
               <span class="event-body">
                 <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                <span class="t">{tytul(k)}</span>
+                <span class="t"><TytulZewn tekst={tytul(k)} zewn={!!href(k)} /></span>
                 {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
               </span>
-            </a>
-          ))}
+            </T>
+          ); })}
         </div>
       </section>
 
       {lata.map((g) => (
-        <section aria-labelledby={`rok-${g.rok}`}>
-          <h2 id={`rok-${g.rok}`} class="month" style="font-size:15px;margin-top:28px">{g.rok}</h2>
-          {g.lista.map((k) => (
-            <div class="row-item conf-row">
-              <span class="datebox small light" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
-              <span class="body">
-                <a class="t" href={href(k)} style="font-size:18px;text-decoration:none">{tytul(k)}</a>
-                <span class="news-meta">
-                  <span>{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                  {k.data.miejsce && <span>· {k.data.miejsce}</span>}
-                  {k.data.odwolana && <span class="badge">{odwolana}</span>}
-                  {k.data.strona && <a href={k.data.strona} class="link-arrow" style="min-height:0;font-size:14px">{lang === 'en' ? 'Website' : 'Strona konferencji'}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>}
+        <section class="lista-miesiac" aria-labelledby={`rok-${g.rok}`}>
+          <h2 id={`rok-${g.rok}`} class="month kf-rok">{g.rok}</h2>
+          <div class="karty-lista">
+            {g.lista.map((k) => { const T = Tag(k); return (
+              <T class:list={['row-item conf-row', !href(k) && 'kf-bez-linku']} href={href(k)}>
+                <span class="datebox small light" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+                <span class="body">
+                  <span class="t"><TytulZewn tekst={tytul(k)} zewn={!!href(k)} /></span>
+                  <span class="news-meta">
+                    <span>{range(k.data.poczatek, k.data.koniec, lang)}</span>
+                    {k.data.miejsce && <span>· {k.data.miejsce}</span>}
+                    {k.data.odwolana && <span class="badge">{odwolana}</span>}
+                  </span>
                 </span>
-              </span>
-            </div>
-          ))}
+              </T>
+            ); })}
+          </div>
         </section>
       ))}
     </div>
@@ -84,7 +94,28 @@ const lead = lang === 'en'
 </Baza>
 
 <style>
-  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
-     do banera (reszta odstępów .layout — uklad-zwarta.css) */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+  .kf-brak { margin: 0; }
+  .conf-row .t { font-size: 18px; }
+  /* konferencja bez strony: bez podświetlenia i podkreślenia po najechaniu */
+  .kf-bez-linku:hover { box-shadow: none; }
+  .kf-bez-linku:hover .t { text-decoration: none; }
+  /* telefon (≤ 760 px): lata jako małe etykiety nad wierszami, jak dotąd (na komputerze — .lista-miesiac w global.css) */
+  @media (max-width: 760px) { .kf-rok { margin-top: 28px; font-size: 15px; } }
+
+  /* ---------- komputer (≥ 761 px) ----------
+     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” (reszta odstępów .layout — uklad-zwarta.css).
+     Minione: karty .karty-lista (global.css), jak w kalendarzu. Nadchodzące (.event, tło i ramka z .event-szare) —
+     takie same karty jedna pod drugą: odstęp 10 px, wnętrze i data jak w kalendarzu (.row-item z .datebox.small). */
+  @media (min-width: 761px) {
+    .layout { padding-top: 24px; }
+    .karty-lista > .kf-bez-linku:hover { border-color: var(--line); }
+    .kf-nadch .event-grid { display: flex; flex-direction: column; gap: 10px; }
+    .kf-nadch .event { align-items: flex-start; gap: 14px; padding: 16px 20px; border-radius: var(--radius-l); transition: border-color .15s; }
+    .kf-nadch .event:hover { border-color: var(--ink); box-shadow: none; }
+    .kf-nadch .event.kf-bez-linku:hover { border-color: var(--line); }
+    .kf-nadch .datebox { flex: 0 0 46px; height: 50px; border-radius: 9px; }
+    .kf-nadch .datebox .d { font-size: 19px; }
+    .kf-nadch .event .t { font-size: 18px; }
+  }
+  @media (min-width: 761px) and (prefers-reduced-motion: reduce) { .kf-nadch .event { transition: none; } }
 </style>

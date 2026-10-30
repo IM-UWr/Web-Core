@@ -68,7 +68,9 @@ export function plikIcs(wydarzenia: Wydarzenie[], nazwa: string, site: URL | und
     ...VTIMEZONE,
   ];
   for (const w of wydarzenia) {
-    const opis = [w.podtytul, w.opis, absolute(w.href, site)].filter(Boolean).join('\n');
+    // adres: nasza podstrona albo strona zewnętrzna (konferencje); konferencja bez strony — bez linku i bez pola URL
+    const adres = w.href ? absolute(w.href, site) : undefined;
+    const opis = [w.podtytul, w.opis, adres].filter(Boolean).join('\n');
     lines.push(
       'BEGIN:VEVENT',
       `UID:${w.uid}@${host}`,
@@ -77,7 +79,7 @@ export function plikIcs(wydarzenia: Wydarzenie[], nazwa: string, site: URL | und
       `SUMMARY:${esc(w.tytul)}`,
       ...(w.miejsce ? [`LOCATION:${esc(w.miejsce)}`] : []),
       `DESCRIPTION:${esc(opis)}`,
-      `URL:${absolute(w.href, site)}`,
+      ...(adres ? [`URL:${adres}`] : []),
       'END:VEVENT'
     );
   }
@@ -99,7 +101,7 @@ export function linkGoogle(w: Wydarzenie, site: URL | undefined): string {
     text: w.tytul,
     dates,
     ctz: 'Europe/Warsaw',
-    details: [w.podtytul, absolute(w.href, site)].filter(Boolean).join('\n'),
+    details: [w.podtytul, w.href && absolute(w.href, site)].filter(Boolean).join('\n'),
   });
   if (w.miejsce) p.set('location', w.miejsce);
   return `https://calendar.google.com/calendar/render?${p.toString()}`;

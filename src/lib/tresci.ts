@@ -158,7 +158,9 @@ export interface Wydarzenie {
   // koniec do kalendarza .ics i do ustalania, czy wydarzenie trwa (domyślnie +2 h / +1,5 h)
   koniecIcs?: string;
   miejsce?: string;
-  href: string;
+  // adres pozycji: ścieżka na naszej stronie (/aktualnosci/…) albo adres zewnętrzny (strona konferencji — konferencje
+  // nie mają własnych podstron); brak = pozycja bez linku (konferencja bez podanej strony)
+  href?: string;
   uid: string;
   opis?: string;
   // od kiedy pokazywać w „Najbliższych wydarzeniach” (terminy z tabel kierunków); bez pola — reguła dni roboczych
@@ -189,7 +191,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
     if (k.data.odwolana) continue;
     out.push({
       rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, poczatek: k.data.poczatek, koniec: k.data.koniec,
-      miejsce: k.data.miejsce, href: `/nauka/konferencje/${slugOf(k.id)}`, uid: `konf-${slugOf(k.id)}`,
+      miejsce: k.data.miejsce, href: k.data.strona || undefined, uid: `konf-${slugOf(k.id)}`,
     });
   }
   for (const r of ref) {
