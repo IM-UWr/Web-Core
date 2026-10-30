@@ -39,7 +39,7 @@ const dokumenty = [
   <div class="wrap layout">
     <div class="main">
       <section class="event-box" aria-label={lang === 'en' ? 'Defence details' : 'Szczegóły obrony'}>
-        <span class="datebox" aria-hidden="true"><span class="d">{dayNum(d.termin)}</span><span class="m">{monthShort(d.termin, lang)}</span></span>
+        <span class:list={['datebox', { minione: !przyszla }]} aria-hidden="true"><span class="d">{dayNum(d.termin)}</span><span class="m">{monthShort(d.termin, lang)}</span></span>
         <dl>
           <dt>{t(lang, 'kiedy')}</dt><dd>{longWithDay(d.termin, lang)}</dd>
           {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{d.miejsce}</dd></>}

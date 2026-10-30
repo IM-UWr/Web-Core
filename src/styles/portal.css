@@ -68,7 +68,7 @@
 .pt-dbox { flex: 0 0 46px; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: var(--primary); color: var(--primary-ink); line-height: 1; }
 .pt-dbox .d { font-size: 19px; font-weight: 800; }
 .pt-dbox .m { margin-top: 2px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; }
-.pt-dbox.light { background: var(--tint); color: var(--tint-ink); }
+.pt-dbox.minione { background: var(--minione-tlo); color: var(--minione-tekst); }
 /* miniatura zdjęcia przy wpisie */
 .pt-min { flex: 0 0 72px; height: 54px; border-radius: 8px; overflow: hidden; background: var(--photo); }
 .pt-min img { display: block; width: 100%; height: 100%; object-fit: cover; }

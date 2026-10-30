@@ -74,7 +74,7 @@ const lead = lang === 'en'
               <div class="karty-lista">
               {g.pozycje.map((w) => { const Tag = w.href ? 'a' : 'div'; return (
                 <Tag class:list={['row-item', !w.href && 'kal-bez-linku']} href={adres(w)} data-rodzaj={w.rodzaj}>
-                  <span class={`datebox small${w.rodzaj === 'referat' ? ' light' : ''}`} aria-hidden="true">
+                  <span class={`datebox small${trwaLubBedzie(w) ? '' : ' minione'}`} aria-hidden="true">
                     <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
                   </span>
                   <span class="body">

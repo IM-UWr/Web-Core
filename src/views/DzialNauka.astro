@@ -132,7 +132,7 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
             {pokazKonf.map((k) => { const Tag = k.data.strona ? 'a' : 'div'; return (
               <li>
                 <Tag class:list={['pt-item', !k.data.strona && 'dz-bez-linku']} href={k.data.strona || undefined}>
-                  <span class={`pt-dbox${nadchodzaceKonf.length ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+                  <span class={`pt-dbox${konfTrwa(k) ? '' : ' minione'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
                   <span class="pt-b">
                     <span class="pt-k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
                     <span class="pt-t"><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} zewn={!!k.data.strona} rozmiar={13} /></span>
@@ -212,7 +212,7 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
         <div class="event-grid">
           {pokazKonf.map((k) => { const Tag = k.data.strona ? 'a' : 'div'; return (
             <Tag class:list={['event dz-event', !k.data.strona && 'dz-bez-linku']} href={k.data.strona || undefined}>
-              <span class={`datebox${nadchodzaceKonf.length ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+              <span class={`datebox${konfTrwa(k) ? '' : ' minione'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
               <span class="event-body">
                 <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
                 <span class="t"><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} zewn={!!k.data.strona} rozmiar={13} /></span>

@@ -6,17 +6,18 @@ import TytulZewn from './TytulZewn.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE } from '../lib/i18n';
 import { dayNum, monthShort, range, time, hasTime, type Lang } from '../lib/daty';
-import type { Wydarzenie } from '../lib/tresci';
+import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
 
-interface Props { w: Wydarzenie; lang: Lang; maly?: boolean; jasny?: boolean }
-const { w, lang, maly = false, jasny = false } = Astro.props;
+interface Props { w: Wydarzenie; lang: Lang; maly?: boolean }
+const { w, lang, maly = false } = Astro.props;
+const minione = !trwaLubBedzie(w); // kafelek daty: granatowy = nadchodzące, szary = minione
 const zewn = !!w.href && isExternal(w.href);
 const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
 const Tag = adres ? 'a' : 'div';
 const meta = [(w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang), w.miejsce].filter(Boolean).join(' · ');
 ---
 <Tag class:list={['event', !adres && 'event-bez-linku']} href={adres} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
-  <span class={`datebox${maly ? ' small' : ''}${jasny ? ' light' : ''}`} aria-hidden="true">
+  <span class={`datebox${maly ? ' small' : ''}${minione ? ' minione' : ''}`} aria-hidden="true">
     <span class="d">{dayNum(w.poczatek)}</span>
     <span class="m">{monthShort(w.poczatek, lang)}</span>
   </span>

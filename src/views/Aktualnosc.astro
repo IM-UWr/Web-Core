@@ -67,7 +67,7 @@ const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
 
       {wydarzenie && (
         <section class="event-box ak-wydarzenie" aria-label={lang === 'en' ? 'Event details' : 'Szczegóły wydarzenia'}>
-          <span class="datebox" aria-hidden="true"><span class="d">{dayNum(wydarzenie.poczatek)}</span><span class="m">{monthShort(wydarzenie.poczatek, lang)}</span></span>
+          <span class:list={['datebox', { minione: minelo }]} aria-hidden="true"><span class="d">{dayNum(wydarzenie.poczatek)}</span><span class="m">{monthShort(wydarzenie.poczatek, lang)}</span></span>
           <dl>
             <dt>{t(lang, 'kiedy')}</dt>
             <dd>{wydarzenie.koniec && wydarzenie.koniec.slice(0, 10) !== wydarzenie.poczatek.slice(0, 10) ? range(wydarzenie.poczatek, wydarzenie.koniec, lang) : longWithDay(wydarzenie.poczatek, lang) + (wydarzenie.koniec && hasTime(wydarzenie.koniec) ? `–${wydarzenie.koniec.slice(11, 16)}` : '')}</dd>
