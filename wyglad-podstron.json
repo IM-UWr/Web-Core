@@ -1,6 +1,11 @@
 {
-  "_opis": "Podstrony z wybranym wyglądem na komputer (porównywanie wariantów z gałęzi wariant-*). Na tych stronach nie ma przełącznika wariantów, a w każdym wariancie (/warianty/<nazwa>/...) pokazuje się wersja z głównej strony. 'strona' to adres bez przedrostka /en (wersja angielska liczy się razem); '*' = dowolny fragment adresu, np. '/aktualnosci/*' = wszystkie wpisy. 'uklad' — który wariant wybrano (kod tego wyglądu jest już na main).",
+  "_opis": "Podstrony z wybranym wyglądem na komputer (porównywanie wariantów z gałęzi wariant-*). Na tych stronach nie ma przełącznika wariantów, a w każdym wariancie (/warianty/<nazwa>/...) pokazuje się wersja z głównej strony. 'strona' to adres bez przedrostka /en (wersja angielska liczy się razem); '*' = dowolny fragment adresu, np. '/aktualnosci/*' = wszystkie wpisy. 'uklad' — który wariant wybrano (kod tego wyglądu jest już na main). Strony z ustawionym propem `uklad` (np. uklad=\"zwarta portal-baner\") są pomijane automatycznie — nie trzeba ich tu wpisywać (skrypty/warianty.py).",
   "zrobione": [
-    { "strona": "/", "uklad": "obecna", "data": "2026-10-30", "uwagi": "strona główna" }
+    {
+      "strona": "/",
+      "uklad": "obecna",
+      "data": "2026-10-30",
+      "uwagi": "strona główna"
+    }
   ]
 }

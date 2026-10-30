@@ -7,6 +7,8 @@
 - Podstrony z pliku wyglad-podstron.json („zrobione”) mają wybrany wygląd na main: w każdym wariancie ich strona
   zostaje zastąpiona wersją z głównej strony (linki w treści prowadzą dalej w obrębie wariantu) i nie dostaje
   przełącznika.
+- Tak samo traktowane są wszystkie strony, które na main mają już ustawiony wygląd: prop `uklad` w Baza.astro
+  (np. uklad="zwarta portal-baner") daje <body data-uklad="…"> — bez wpisu w wyglad-podstron.json (decyzja 30.10.2026).
 - Na pozostałych stronach (główna i warianty) w lewym dolnym rogu pojawia się przełącznik; na telefonie jest ukryty.
 
     python3 skrypty/warianty.py --zostalo <dist>
@@ -44,6 +46,15 @@ def strony(katalog):
     return out
 
 
+# <body … data-uklad="…"> — strona z ustawionym wyglądem (Baza.astro, prop `uklad`)
+UKLAD = re.compile(r'<body\b[^>]*\sdata-uklad="[^"]+"')
+
+
+def ma_uklad(sciezka):
+    with open(sciezka, encoding='utf-8') as f:
+        return bool(UKLAD.search(f.read()))
+
+
 def wybrana(adres, wzory):
     return any(adres == w or fnmatch.fnmatchcase(adres, w) for w in wzory)
 
@@ -69,7 +80,7 @@ def pasek(base, warianty):
 def main(dist, base, warianty):
     wzory = zrobione()
     glowne = strony(dist)
-    wybrane = {a for a in glowne if wybrana(a, wzory)}
+    wybrane = {a for a in glowne if wybrana(a, wzory) or ma_uklad(glowne[a])}
     # 1. w wariantach: wybrane podstrony = wersja z głównej strony; linki <a> do stron zostają w obrębie wariantu
     for w in warianty:
         kat = os.path.join(dist, 'warianty', w)
@@ -135,8 +146,9 @@ def zostalo(dist):
     wzory = zrobione()
     trasy = szablony()
     grupy = {}
-    for a in sorted(strony(dist)):
-        if a.startswith('/en/') or a == '/en/' or wybrana(a, wzory):
+    glowne = strony(dist)
+    for a in sorted(glowne):
+        if a.startswith('/en/') or a == '/en/' or wybrana(a, wzory) or ma_uklad(glowne[a]):
             continue
         pasujace = [t for t in trasy if t[0].match(a.rstrip('/') or '/') or t[0].match(a)]
         if pasujace:
