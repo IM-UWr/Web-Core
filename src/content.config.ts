@@ -123,6 +123,9 @@ const obrony = defineCollection({
   schema: z.object({
     kandydat: z.string(),
     tytul_rozprawy: z.string(),
+    // zdjęcie (opcjonalne) — na karcie na stronie głównej, na liście aktualności i na stronie obrony
+    zdjecie: optStr,
+    zdjecie_opis: optStr,
     promotorzy: strList,
     termin: date,
     miejsce: optStr,

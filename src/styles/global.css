@@ -289,6 +289,9 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .news-card.featured .body { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; padding: 24px; }
 .news-card.featured .t { font-size: 24px; }
 @media (max-width: 800px) { .news-card.featured { grid-column: auto; } }
+/* zwykła karta ze zdjęciem: zdjęcie na całą szerokość karty nad tekstem (od krawędzi do krawędzi) */
+.news-card.z-foto .img-nad { display: block; margin: -22px -22px 4px; height: 150px; background: var(--photo); border-radius: var(--radius-l) var(--radius-l) 0 0; overflow: hidden; }
+.news-card.z-foto .img-nad img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 /* ---------- wydarzenia i seminaria ---------- */
 .event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }

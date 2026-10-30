@@ -324,7 +324,8 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
     if (o.data.w_aktualnosciach === false) continue;
     items.push({
       rodzaj: 'obrona', tytul: o.data.kandydat, data: o.data.data_ogloszenia || o.data.termin.slice(0, 10),
-      zajawka: o.data.tytul_rozprawy, dla: [], href: `/obrony-doktorskie/${slugOf(o.id)}`, wydarzenie: o.data.termin, id: `obr-${slugOf(o.id)}`,
+      zajawka: o.data.tytul_rozprawy, zdjecie: o.data.zdjecie, zdjecie_opis: o.data.zdjecie_opis, dla: [],
+      href: `/obrony-doktorskie/${slugOf(o.id)}`, wydarzenie: o.data.termin, id: `obr-${slugOf(o.id)}`,
     });
   }
   // Ogłoszenia o zamianach dni z src/data/kolory-dni.json — tylko od N dni roboczych przed zamianą do dnia zamiany.

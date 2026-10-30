@@ -54,6 +54,12 @@ const dokumenty = [
         </div>
       </section>
 
+      {d.zdjecie && (
+        <figure class="article-figure" style="margin-top:24px">
+          <img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />
+          {d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}
+        </figure>
+      )}
       <div class="prose" style="margin-top:24px"><Content /></div>
 
       {dokumenty.length > 0 && (

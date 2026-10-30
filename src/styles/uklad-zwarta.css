@@ -50,6 +50,7 @@
   :where([data-uklad~='zwarta'] main) .news-card.featured .img { flex: 1 1 220px; min-height: 160px; }
   :where([data-uklad~='zwarta'] main) .news-card.featured .body { flex: 1 1 220px; gap: 5px; padding: 14px 16px; }
   :where([data-uklad~='zwarta'] main) .news-card.featured .t { font-size: 20px; }
+  :where([data-uklad~='zwarta'] main) .news-card.z-foto .img-nad { margin: -14px -16px 4px; height: 120px; }
 
   /* ---------- wydarzenia i seminaria ---------- */
   :where([data-uklad~='zwarta'] main) .event-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; }
