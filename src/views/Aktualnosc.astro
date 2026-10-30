@@ -1,15 +1,16 @@
 ---
 import Wstecz from '../components/Wstecz.astro';
 // Pojedyncza aktualność: blok wydarzenia, zdjęcie, treść, galeria, załączniki, nowszy/starszy wpis.
+// Bez przycisku „Udostępnij / Kopiuj adres” (decyzja 30.10.2026: nigdzie na stronie).
 // Wygląd na komputerze (≥ 761 px): jak w wariancie „Zwarta” (uklad="zwarta", style: src/styles/uklad-zwarta.css i blok niżej);
-// treść wpisu (zdjęcie, tekst, galeria, album, załączniki, „Udostępnij”) w białej ramce .ak-ramka — wzór tła nie prześwituje
+// treść wpisu (zdjęcie, tekst, galeria, album, załączniki) w białej ramce .ak-ramka — wzór tła nie prześwituje
 // pod tekstem. Telefon (≤ 760 px) bez zmian: ramka nie ma tam żadnego stylu (zwykły blok, marginesy jak dotąd).
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import Ikona from '../components/Ikona.astro';
 import KartaWydarzenia from '../components/KartaWydarzenia.astro';
 import Galeria from '../components/Galeria.tsx';
-import { u, isExternal, absolute } from '../lib/url';
+import { u, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, longWithDay, range, dayNum, monthShort, now, today, hasTime, plusMinutes, type Lang } from '../lib/daty';
 import { slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
@@ -45,7 +46,6 @@ const trwa = wydarzenie && !minelo && (hasTime(wydarzenie.poczatek) ? wydarzenie
 // Najbliższe wydarzenia jak na stronie głównej (tylko gdy są blisko); gdy brak — bez prawego paska, treść szersza.
 const najblizsze = (await wydarzeniaNaGlowna(4, lang, Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5)).filter((w) => w.href !== `/aktualnosci/${slug}`).slice(0, 3);
 const href = (a: string) => (isExternal(a) ? a : u(a));
-const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
 ---
 <Baza tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta">
   <div class="wrap crumbs-inline">
@@ -121,11 +121,6 @@ const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
             </ul>
           </section>
         )}
-
-        <div class="share">
-          <span>{t(lang, 'udostepnij')}:</span>
-          <button type="button" class="btn btn-small" data-kopiuj={adres} data-ok={t(lang, 'skopiowano')}><Ikona nazwa="link" rozmiar={16} /><span>{t(lang, 'kopiuj')}</span></button>
-        </div>
       </div>
 
       {(nowszy || starszy) && (

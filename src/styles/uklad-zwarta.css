@@ -141,7 +141,6 @@
   :where([data-uklad~='zwarta'] main) .article-figure img { max-height: 420px; }
   :where([data-uklad~='zwarta'] main) .article-block { margin-top: 20px; max-width: 800px; gap: 10px; }
   :where([data-uklad~='zwarta'] main) .article-block h2 { font-size: 19px; }
-  :where([data-uklad~='zwarta'] main) .share { gap: 8px; margin-top: 20px; padding-top: 14px; }
   :where([data-uklad~='zwarta'] main) .crumbs-inline { padding-top: 12px; }
   :where([data-uklad~='zwarta'] main .crumbs-inline) .wstecz { margin-bottom: 0; }
   :where([data-uklad~='zwarta'] main .crumbs-inline) .wstecz a { min-height: 32px; font-size: 14px; }

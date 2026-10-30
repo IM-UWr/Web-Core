@@ -581,7 +581,6 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 .article-figure figcaption { margin-top: 8px; font-size: 14px; color: var(--muted); }
 .article-block { margin-top: 32px; max-width: 760px; display: flex; flex-direction: column; gap: 14px; }
 .article-block h2 { margin: 0; font-size: 22px; font-weight: 800; }
-.share { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 15px; font-weight: 700; color: var(--muted); }
 .status { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--tint); color: var(--tint-ink); font-size: 14px; font-weight: 700; }
 .crumbs-inline { padding-top: 20px; }
 @media (max-width: 760px) { .staff td:empty { display: none; } }

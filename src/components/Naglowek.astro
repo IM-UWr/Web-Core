@@ -202,18 +202,6 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   dopasujListy();
   window.addEventListener('resize', dopasujListy, { passive: true });
   document.fonts?.ready.then(dopasujListy);
-  // Przyciski „Kopiuj adres” (data-kopiuj="adres")
-  document.querySelectorAll<HTMLButtonElement>('[data-kopiuj]').forEach((b) =>
-    b.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(b.dataset.kopiuj || location.href);
-        const s = b.querySelector('span') ?? b;
-        const stary = s.textContent;
-        s.textContent = b.dataset.ok ?? 'OK';
-        setTimeout(() => (s.textContent = stary), 2000);
-      } catch (e) {}
-    })
-  );
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;

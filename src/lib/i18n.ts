@@ -90,8 +90,6 @@ const T = {
     g_administracja: 'Administracja',
     g_emeryt: 'Emerytowani pracownicy',
     subskrypcja: 'Subskrypcja kalendarza',
-    kopiuj: 'Kopiuj adres',
-    skopiowano: 'Skopiowano',
     dodajGoogle: 'Dodaj w Kalendarzu Google',
     pobierzIcs: 'Pobierz plik .ics',
     wszystkieWydarzeniaKal: 'Wszystkie wydarzenia i referaty',
@@ -107,7 +105,6 @@ const T = {
     jakSubskrybowac: 'Dodaj kalendarz do swojej aplikacji kalendarza, a nowe wydarzenia pojawią się w nim same. Skopiuj adres i wklej go w opcji „Dodaj kalendarz z adresu URL”.',
     pokazMinione: 'Pokaż minione',
     miejsce: 'Miejsce',
-    udostepnij: 'Udostępnij',
   },
   en: {
     instytut: 'Mathematical Institute',
@@ -198,8 +195,6 @@ const T = {
     g_administracja: 'Administration',
     g_emeryt: 'Retired staff',
     subskrypcja: 'Calendar subscription',
-    kopiuj: 'Copy link',
-    skopiowano: 'Copied',
     dodajGoogle: 'Add to Google Calendar',
     pobierzIcs: 'Download .ics file',
     wszystkieWydarzeniaKal: 'All events and seminar talks',
@@ -215,7 +210,6 @@ const T = {
     jakSubskrybowac: 'Add the calendar to your calendar app and new events will appear automatically. Copy the link and paste it into the "Add calendar from URL" option.',
     pokazMinione: 'Show past',
     miejsce: 'Place',
-    udostepnij: 'Share',
   },
 } as const;
 
