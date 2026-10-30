@@ -159,9 +159,10 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   const odswiezNaglowek = () => {
     if (!hdr) return;
     // na stronie ze zdjęciem nagłówek zostaje przezroczysty, dopóki nie zbliżymy się do końca zdjęcia
-    // (strona główna: zdjęcie .hero-fig; podstrony: granatowy pas .ph na samej górze — wtedy biały dopiero przy jego końcu)
-    const foto = hdr.classList.contains('hdr-foto') ? document.querySelector<HTMLElement>('.hero-fig, #tresc > .ph') : null;
-    const zapas = foto?.classList.contains('ph') ? 16 : 72;
+    // (strona główna: cały ciemny pas .hero — na telefonie zdjęcie jest tylko w jego górnej części, niżej granat;
+    // podstrony: granatowy pas .ph na samej górze) — nagłówek bieleje dopiero, gdy pas prawie schowa się pod nim
+    const foto = hdr.classList.contains('hdr-foto') ? document.querySelector<HTMLElement>('#tresc > .hero, #tresc > .ph') : null;
+    const zapas = foto?.classList.contains('ph') ? 16 : 8;
     const przewiniety = foto ? foto.getBoundingClientRect().bottom <= hdr.offsetHeight + zapas : window.scrollY > 40;
     hdr.classList.toggle('przewiniety', przewiniety);
     if (stopka) {
@@ -214,6 +215,8 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && menuOtwarte()) { ustawMenu(false); burger?.focus(); }
   });
+  // powrót przyciskiem „wstecz” na stronę zapamiętaną z otwartym menu (bfcache): menu zamknięte, strona się przewija
+  window.addEventListener('pageshow', (e) => { if (e.persisted && menuOtwarte()) ustawMenu(false); });
   // po przejściu do szerokiego ekranu (menu komputerowe) panel się zamyka, żeby strona znów się przewijała
   window.matchMedia('(min-width: 1181px)').addEventListener('change', (m) => { if (m.matches && menuOtwarte()) ustawMenu(false); });
 
