@@ -1,6 +1,7 @@
 ---
-// Popularyzacja matematyki: karty inicjatyw w grupach (dla uczniów, nauczycieli…).
-// Dane: src/data/popularyzacja.json (edycja w Pages CMS: Ustawienia strony → Popularyzacja).
+// Popularyzacja matematyki: linki do stron partnerów (Fundacja, Portal, PTM), potem karty inicjatyw w grupach
+// (dla uczniów, nauczycieli…). Grupa bez kart pokazuje „To be announced”.
+// Dane: src/data/popularyzacja.json (edycja w Pages CMS, repozytorium Web-Popularyzacja).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
@@ -18,7 +19,8 @@ type Pozycja = {
   adres?: Tekst; przycisk?: Tekst; przycisk_en?: Tekst; zdjecie?: Tekst; archiwalne?: boolean | null;
 };
 type Grupa = { nazwa: string; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; pozycje?: Pozycja[] | null };
-type Dane = { tytul: string; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; grupy?: Grupa[] | null };
+type Link = { nazwa: string; nazwa_en?: Tekst; adres?: Tekst };
+type Dane = { tytul: string; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; linki?: Link[] | null; grupy?: Grupa[] | null };
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -35,8 +37,12 @@ const host = (a: string) => {
 const slug = (s: string) =>
   s.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'grupa';
 
+const linki = (d.linki ?? [])
+  .filter((l) => l && l.nazwa && (l.adres ?? '').trim())
+  .map((l) => ({ ...l, adres: (l.adres ?? '').trim() }));
+// Grupy bez kart zostają na stronie (nagłówek + „To be announced”).
 const grupy = (d.grupy ?? [])
-  .filter((g) => g && g.nazwa && (g.pozycje ?? []).length > 0)
+  .filter((g) => g && g.nazwa)
   .map((g) => ({ ...g, slug: slug(g.nazwa), pozycje: (g.pozycje ?? []).filter((p) => p && p.nazwa) }));
 const sekcje = grupy.map((g) => ({ depth: 2, slug: g.slug, text: w(g, 'nazwa') }));
 const tytul = w(d, 'tytul') || T('Popularyzacja matematyki', 'Mathematics outreach');
@@ -46,12 +52,29 @@ const lead = w(d, 'wstep');
   <NaglowekStrony tytul={tytul} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: tytul }]} />
   <div class="wrap layout">
     <div class="main">
+      {linki.length > 0 && (
+        <nav class="pop-linki" aria-label={T('Partnerzy', 'Partners')}>
+          {linki.map((l) => {
+            const zew = isExternal(l.adres);
+            return (
+              <a class="pop-link" href={href(l.adres)}>
+                <span class="pop-link-t">{w(l, 'nazwa')}{zew && <span class="sr-only"> {T('(strona zewnętrzna)', '(external website)')}</span>}</span>
+                <span class="pop-host" aria-hidden="true">{zew ? host(l.adres) : T('Przejdź do strony', 'Visit page')}<Ikona nazwa={zew ? 'zewnetrzny' : 'strzalka'} rozmiar={14} /></span>
+              </a>
+            );
+          })}
+        </nav>
+      )}
+
       <SpisTresci naglowki={sekcje} lang={lang} wariant="gora" />
 
       {grupy.map((g) => (
         <section class="zsec" aria-labelledby={g.slug}>
           <h2 id={g.slug}>{w(g, 'nazwa')}</h2>
           {g.opis && <p class="muted pop-lead">{w(g, 'opis')}</p>}
+          {g.pozycje.length === 0 ? (
+            <p class="spec spec-off pop-tba" lang={lang === 'pl' ? 'en' : undefined}>To be announced</p>
+          ) : (
           <div class="spec-grid">
             {g.pozycje.map((p) => {
               const adres = (p.adres ?? '').trim();
@@ -77,6 +100,7 @@ const lead = w(d, 'wstep');
               );
             })}
           </div>
+          )}
         </section>
       ))}
     </div>
@@ -91,6 +115,16 @@ const lead = w(d, 'wstep');
   .pop-lead { margin: -6px 0 16px; font-size: 16px; max-width: 70ch; }
   .pop-cta { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; }
   .pop-host { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+
+  /* Linki do stron partnerów nad sekcjami: rząd kafelków (na wąskim ekranie jeden pod drugim). */
+  .pop-linki { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 14px; margin: 0 0 36px; }
+  .pop-link { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--radius-l); text-decoration: none; color: var(--ink); transition: border-color .15s, box-shadow .15s, background-color .15s, transform .15s; }
+  .pop-link:hover, .pop-link:focus-visible { border-color: var(--ink); background: var(--tint); box-shadow: 0 6px 20px rgb(0 0 0 / .08); transform: translateY(-2px); color: var(--ink); }
+  .pop-link:hover .pop-link-t { text-decoration: underline; text-underline-offset: 4px; }
+  .pop-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .pop-link-t { font-size: 18px; font-weight: 800; line-height: 1.3; }
+  .pop-link .pop-host { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; }
+  .pop-tba { margin: 0; color: var(--muted); font-weight: 700; }
   .pop-img { display: block; width: calc(100% + 40px); max-width: none; margin: -20px -20px 4px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-l) var(--radius-l) 0 0; background: var(--photo); }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
@@ -100,5 +134,15 @@ const lead = w(d, 'wstep');
     .layout { padding-top: 24px; }
     .pop-lead { margin: -4px 0 10px; font-size: 15px; line-height: 1.5; }
     .pop-img { width: calc(100% + 32px); margin: -12px -16px 4px; }
+    .pop-linki { gap: 10px; margin-bottom: 24px; }
+    .pop-link { gap: 4px; padding: 12px 16px; }
+    .pop-link-t { font-size: 17px; }
+  }
+
+  /* telefon: jak karty .spec w telefon.css */
+  @media (max-width: 760px) {
+    .pop-linki { gap: 10px; margin-bottom: 24px; }
+    .pop-link { gap: 4px; padding: 13px 16px; }
+    .pop-link-t { font-size: 17px; }
   }
 </style>
