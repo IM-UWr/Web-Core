@@ -10,6 +10,7 @@ import '../styles/uklad-portal.css';
 // Telefon (≤ 760 px): wygląd wariantu „Portal” — klocki (portal.css) i nadpisania odstępów i skali (telefon.css).
 import '../styles/portal.css';
 import '../styles/telefon.css';
+import '../styles/przejscia.css';
 import Naglowek from '../components/Naglowek.astro';
 import Stopka from '../components/Stopka.astro';
 import { u, absolute, stripBase } from '../lib/url';
@@ -86,6 +87,17 @@ const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : unde
         d.setAttribute('data-theme', m);
       })();
     </script>
+    {/* Wczytywanie z wyprzedzeniem stron, nad którymi stoi kursor (Chrome/Edge; inne przeglądarki pomijają). Bez plików z /pliki i /grafiki. */}
+    <script type="speculationrules" is:inline set:html={JSON.stringify({
+      prefetch: [{
+        where: { and: [
+          { href_matches: u('/*') },
+          { not: { href_matches: [u('/pliki/*'), u('/grafiki/*'), u('/pagefind/*'), u('/*.xml'), u('/*.pdf')] } },
+          { not: { selector_matches: '[download], [target=_blank]' } },
+        ] },
+        eagerness: 'moderate',
+      }],
+    })} />
     <slot name="head" />
   </head>
   <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined}>

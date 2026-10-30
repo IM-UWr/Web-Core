@@ -1,0 +1,33 @@
+/* ==========================================================================
+   Przejścia między stronami i łagodne wejście treści (bez JavaScriptu).
+   1) Przejście między dokumentami (View Transitions API, Chrome/Edge 126+, Safari 18.2+):
+      stara strona gaśnie, nowa się pojawia, nagłówek stoi w miejscu (osobna nazwa).
+      Przeglądarki bez obsługi (Firefox) przechodzą zwyczajnie.
+   2) Wejście treści: tekst w pasie nagłówka podstrony / na zdjęciu strony głównej
+      i treść pod nim delikatnie wjeżdżają (12 px) i się rozjaśniają. Same pasy i zdjęcie
+      stoją, żeby pod przezroczystym nagłówkiem nie mignęła biel.
+   Przy „ogranicz ruch” w systemie nic się nie animuje.
+   Na razie tylko na telefonie (≤ 760 px) — na próbę; na komputerze strony przechodzą jak dotąd.
+   ========================================================================== */
+
+@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+
+  .hdr { view-transition-name: naglowek; }
+
+  ::view-transition-old(root) { animation: 160ms cubic-bezier(.4, 0, 1, 1) both vt-znika; }
+  ::view-transition-new(root) { animation: 260ms cubic-bezier(.22, 1, .36, 1) both vt-pojawia; }
+  @keyframes vt-znika { to { opacity: 0; } }
+  @keyframes vt-pojawia { from { opacity: 0; } }
+
+  /* fill-mode: backwards — po skończeniu nie zostaje żaden translate, więc elementy
+     position: fixed w treści (np. lightbox galerii) liczą położenie od okna jak dotąd */
+  #tresc > .page-head > .wrap,
+  #tresc > .hero .hero-in,
+  #tresc > :not(.page-head, .hero, script) {
+    animation: wejscie .5s cubic-bezier(.22, 1, .36, 1) backwards;
+  }
+  #tresc > :not(.page-head, .hero, script) { animation-delay: 60ms; }
+  /* .01 zamiast 0: przy starcie od zera Chrome liczy LCP dopiero po końcu animacji (+~0,5 s) */
+  @keyframes wejscie { from { opacity: .01; translate: 0 12px; } }
+}
