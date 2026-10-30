@@ -100,12 +100,20 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   </div>
 
   <nav class="mnav" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
-    {menu.map((p) =>
+    {/* Dział z listą: napis prowadzi na stronę działu (jak na komputerze), strzałka za kreską rozwija listę.
+         Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę. */}
+    {menu.map((p, i) =>
       p.grupy ? (
-        <details open={aktywna(p) || undefined}>
-          <summary>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="dol" class="chev" rozmiar={18} /></summary>
-          <div class="mgroup">
-            {p.adres && <a class="mgroup-top" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{lang === 'en' ? 'Overview' : 'Przegląd działu'}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+        <div class:list={['mitem', { open: aktywna(p) }]}>
+          <div class="mrow">
+            {p.adres ? (
+              <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
+            ) : (
+              <button type="button" class="mrow-link" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
+            )}
+            <button type="button" class="mrow-btn" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
+          </div>
+          <div class="mgroup" id={`mgroup-${i}`} hidden={!aktywna(p) || undefined}>
             {p.grupy.map((g) => (
               <>
                 <h3>{wybierz(g, 'nazwa', lang)}</h3>
@@ -118,7 +126,7 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
               </>
             ))}
           </div>
-        </details>
+        </div>
       ) : (
         <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
       )
@@ -169,6 +177,23 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
     burger.setAttribute('aria-expanded', String(otwarte));
     burger.setAttribute('aria-label', (otwarte ? burger.dataset.zamknij : burger.dataset.otworz) || '');
   });
+
+  // Menu na telefonie: strzałka rozwija listę działu, otwarcie jednej zamyka poprzednią
+  const mpozycje = Array.from(document.querySelectorAll<HTMLElement>('.mnav .mitem'));
+  const ustawM = (m: HTMLElement, otwarta: boolean) => {
+    m.classList.toggle('open', otwarta);
+    m.querySelector('.mgroup')?.toggleAttribute('hidden', !otwarta);
+    m.querySelectorAll('[data-mrozwin]').forEach((b) => b.setAttribute('aria-expanded', String(otwarta)));
+  };
+  mpozycje.forEach((m) =>
+    m.querySelectorAll<HTMLButtonElement>('[data-mrozwin]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const otworz = !m.classList.contains('open');
+        mpozycje.forEach((x) => x !== m && ustawM(x, false));
+        ustawM(m, otworz);
+      })
+    )
+  );
 
   // Menu działów: klik w napis otwiera stronę działu, lista rozwija się po najechaniu myszką
   // albo strzałką (klawiatura, ekrany dotykowe). Tylko jedna otwarta; Esc i klik obok zamykają.

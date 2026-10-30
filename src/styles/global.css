@@ -190,12 +190,14 @@ body > main { flex: 1 0 auto; }
 .burger:hover { background: var(--primary); color: var(--primary-ink); filter: brightness(1.12); }
 .mnav { display: none; border-top: 1px solid var(--line); padding: 8px var(--gutter) 20px; }
 .mnav.open { display: block; max-height: calc(100vh - var(--hdr-h)); max-height: calc(100dvh - var(--hdr-h)); overflow-y: auto; overscroll-behavior: contain; }
-.mnav details, .mnav > a { border-bottom: 1px solid var(--line); }
-.mnav summary, .mnav > a { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 18px; font-weight: 700; text-decoration: none; color: var(--ink); cursor: pointer; list-style: none; }
-.mnav summary::-webkit-details-marker { display: none; }
+.mnav .mitem, .mnav > a { border-bottom: 1px solid var(--line); }
+.mnav > a { display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 18px; font-weight: 700; text-decoration: none; color: var(--ink); cursor: pointer; }
+/* wiersz działu: napis (link do strony działu) | kreska | strzałka rozwijająca listę (strefa 52 px, strzałka w kolumnie strzałek innych wierszy) */
+.mnav .mrow { display: flex; align-items: stretch; min-height: 52px; }
+.mnav .mrow-link { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; padding: 0; border: 0; background: none; font: inherit; font-size: 18px; font-weight: 700; text-align: left; text-decoration: none; color: var(--ink); cursor: pointer; }
+.mnav .mrow-btn { flex: 0 0 52px; display: flex; align-items: center; justify-content: flex-end; margin: 10px 0; padding: 0; border: 0; border-left: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer; }
+.mnav .mitem.open .mrow-btn .chev { transform: rotate(180deg); }
 .mnav .mgroup { padding: 0 0 12px 12px; }
-.mnav .mgroup-top { display: flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 800; text-decoration: none; color: var(--primary); }
-:root[data-theme='dark'] .mnav .mgroup-top { color: var(--accent); }
 .mnav .mgroup h3 { margin: 10px 0 2px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .mnav .mgroup a { display: flex; align-items: center; gap: 6px; min-height: 40px; font-weight: 600; text-decoration: none; color: var(--ink); }
 .chev { transition: transform .15s; }
