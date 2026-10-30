@@ -133,6 +133,9 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
     /* przyciski rodzajów i wyszukiwarka w jednym wierszu */
     .filters.filters-lewo { flex-wrap: nowrap; }
     .filters.filters-lewo > .chips { flex: 0 1 auto; }
+    /* wyszukiwarka trochę szersza (300 px zamiast ok. 255), żeby podpowiedź „Szukaj w aktualnościach” nie była ucinana
+       przy szerszych czcionkach (np. na Windowsie) */
+    .filters.filters-lewo .search { width: 300px; }
     .la-archiwum { margin-top: 18px; }
   }
 </style>
