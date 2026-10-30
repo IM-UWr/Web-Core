@@ -347,6 +347,8 @@ const warto_wiedziec = defineCollection({
     zajawka_en: optStr,
     dzial: z.preprocess(empty, z.enum(['nauka', 'studia', 'instytut']).default('instytut')),
     na_glownej: published,
+    // „Zawsze pokazuj na stronie głównej” — pozycja nie bierze udziału w losowaniu (patrz WartoWiedziec.astro)
+    zawsze: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
     kolejnosc: z.preprocess(empty, z.coerce.number().default(100)),
     obraz: optStr,
     obraz_opis: optStr,

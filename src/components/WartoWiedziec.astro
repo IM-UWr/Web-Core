@@ -8,6 +8,9 @@
 //                   glowna = tylko pozycje „Pokaż na stronie głównej”.
 // klasa: dodatkowe klasy sekcji (np. tylko-komputer, gdy na telefonie stoi obok wersja 'portal').
 // Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
+// Strona główna (uklad 'glowna' i 'portal' z glowna) — LOSOWANIE przy każdym wejściu (decyzja 30.10.2026): w HTML są
+// wszystkie pozycje „na głównej”, widoczne pierwsze `limit` (najpierw „Zawsze pokazuj”, potem wg kolejności — to widzą
+// wyszukiwarki i przeglądarki bez JS), a skrypt inline zaraz pod listą przed narysowaniem strony losuje pozostałe miejsca.
 import { getCollection } from 'astro:content';
 import Ikona from './Ikona.astro';
 import { u, isExternal } from '../lib/url';
@@ -38,9 +41,13 @@ const wybrane = wszystkie
   .filter((w) => (uklad !== 'glowna' && !glowna) || w.data.na_glownej)
   .filter((w) => !dzial || w.data.dzial === dzial)
   .filter((w) => slugOf(w.id) !== pomin);
-const pokaz = limit ? wybrane.slice(0, limit) : wybrane;
+// losowanie tylko na stronie głównej; „Zawsze pokazuj” na początku (sort stabilny — dalej wg kolejności)
+const losuj = (uklad === 'glowna' || glowna) && !!limit;
+const pula = losuj ? [...wybrane].sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze)) : wybrane;
+const pokaz = losuj ? pula : limit ? wybrane.slice(0, limit) : wybrane;
+const ileWidac = losuj ? Math.min(limit!, pula.length) : pokaz.length;
 // Link do pełnej listy tylko wtedy, gdy są pozycje, których tu nie widać.
-const wiecej = uklad !== 'lista' && pokaz.length < wszystkie.filter((w) => slugOf(w.id) !== pomin).length;
+const wiecej = uklad !== 'lista' && ileWidac < wszystkie.filter((w) => slugOf(w.id) !== pomin).length;
 
 const karty = pokaz.map((w) => {
   const d = w.data;
@@ -49,6 +56,7 @@ const karty = pokaz.map((w) => {
   const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
   return {
     id: slugOf(w.id),
+    zawsze: d.zawsze,
     tytul: wybierz(d, 'tytul', lang),
     zajawka: wybierz(d, 'zajawka', lang),
     rok: d.rok,
@@ -59,6 +67,12 @@ const karty = pokaz.map((w) => {
   };
 });
 
+// Skrypt losowania (inline, zaraz pod listą — działa, zanim strona się narysuje, więc nie ma mignięcia):
+// „Zawsze pokazuj” zostają na początku, pozostałe miejsca losowo z reszty (tasowanie Fishera–Yatesa).
+const LOSUJ = `(function(box){if(!box||!box.dataset.losuj)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
+  `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
+  `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
+  `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
 const tytulSekcji = naglowek ?? T('Warto wiedzieć', 'Highlights');
 const idSekcji = (uklad === 'glowna' || glowna ? 'h2-warto' : `warto-wiedziec${pomin ? '-inne' : dzial ? `-${dzial}` : ''}`) + (uklad === 'portal' ? '-tel' : '');
 const H = uklad === 'lista' ? 'h2' : 'h3';
@@ -72,11 +86,11 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
       <h2 id={idSekcji}>{tytulSekcji}</h2>
       {wiecej && <a class="pt-all" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={14} /></a>}
     </div>
-    <ul class="pt-list">
-      {karty.map((k) => {
+    <ul class="pt-list" data-losuj={losuj ? limit : undefined}>
+      {karty.map((k, i) => {
         const Tag = k.cel ? 'a' : 'div';
         return (
-          <li>
+          <li hidden={losuj && i >= limit!} data-zawsze={k.zawsze || undefined}>
             <Tag class="pt-item" href={k.cel ? href(k.cel) : undefined}>
               {k.obraz ? <span class="pt-min"><img src={u(k.obraz)} alt="" loading="lazy" decoding="async" /></span> : k.rok && <span class="pt-d">{k.rok}</span>}
               <span class="pt-b">
@@ -89,6 +103,7 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
         );
       })}
     </ul>
+    {losuj && <script is:inline set:html={LOSUJ} />}
   </section>
 )}
 {karty.length > 0 && uklad !== 'portal' && (
@@ -100,9 +115,9 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
           {wiecej && <a class="link-arrow" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
         </div>
       )}
-      <div class={`ww-grid${karty.length === 1 ? ' ww-jedna' : ''}`}>
-        {karty.map((k) => (
-          <article class={`ww-card${k.cel ? ' ww-link' : ''}`}>
+      <div class={`ww-grid${ileWidac === 1 ? ' ww-jedna' : ''}`} data-losuj={losuj ? limit : undefined}>
+        {karty.map((k, i) => (
+          <article class={`ww-card${k.cel ? ' ww-link' : ''}`} hidden={losuj && i >= limit!} data-zawsze={k.zawsze || undefined}>
             {(k.obraz || k.rok) && (
               <div class={`ww-media${k.obraz ? ' ww-foto' : ''}`}>
                 {k.obraz && <img src={u(k.obraz)} alt="" loading="lazy" decoding="async" />}
@@ -123,6 +138,7 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
           </article>
         ))}
       </div>
+      {losuj && <script is:inline set:html={LOSUJ} />}
     </div>
   </Zewn>
 )}
@@ -131,6 +147,8 @@ const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial
   /* nagłówek sekcji działu: tytuł i link „Wszystkie” z prawej — wspólny .zsec-head (global.css), jak w innych sekcjach .zsec */
   .ww-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px; }
   .ww-jedna { max-width: 560px; }
+  /* pozycje niewylosowane (atrybut hidden) — display z .ww-card / list nie może ich pokazać */
+  .ww-grid > [hidden], .pt-list > li[hidden] { display: none !important; }
   .ww-card {
     position: relative; display: flex; flex-direction: column; overflow: hidden;
     border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); color: var(--text);
