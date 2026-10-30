@@ -44,8 +44,9 @@ const ozdobny = wariant !== 'prosty';
 // Granatowy pas na samej górze strony: nagłówek strony (menu) jest u góry przezroczysty i leży na pasie,
 // jak na stronie głównej na zdjęciu (klasa .hdr-foto, style w global.css). Skrypt działa od razu przy wczytywaniu,
 // zanim pas się narysuje, żeby nic nie przeskakiwało; bez JS — zwykły biały nagłówek nad pasem.
+// Między nagłówkiem a <main> mogą stać tylko skrypty/style i menu na telefon (.mnav, .mnav-tlo).
 const naPasie = wariant === 'granat'
-  ? "(function(s){var p=s.parentElement,h=document.querySelector('.hdr');if(h&&p&&!p.previousElementSibling&&p.parentElement&&p.parentElement.id==='tresc'&&(function(n){while(n&&/^(SCRIPT|TEMPLATE|STYLE|LINK)$/.test(n.tagName))n=n.nextElementSibling;return n===p.parentElement;})(h.nextElementSibling))h.classList.add('hdr-foto');})(document.currentScript)"
+  ? "(function(s){var p=s.parentElement,h=document.querySelector('.hdr');if(h&&p&&!p.previousElementSibling&&p.parentElement&&p.parentElement.id==='tresc'&&(function(n){while(n&&(/^(SCRIPT|TEMPLATE|STYLE|LINK)$/.test(n.tagName)||/(^| )mnav/.test(n.className)))n=n.nextElementSibling;return n===p.parentElement;})(h.nextElementSibling))h.classList.add('hdr-foto');})(document.currentScript)"
   : '';
 ---
 <div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto']} data-dzial={ozdobny ? dzial : undefined}>
