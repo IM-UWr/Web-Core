@@ -1,7 +1,7 @@
 ---
 // Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta jak w „Zwarta” (uklad="zwarta portal-baner"),
-// miesiące jako sekcje z kreską jak na stronach działów, pozycje w białej ramce. Filtry rodzaju w banerze;
+// miesiące jako sekcje z kreską jak na stronach działów, pozycje jako osobne białe karty (.karty-lista w global.css). Filtry rodzaju w banerze;
 // pod banerem przyciski widoku „Nadchodzące” / „Archiwum”. Telefon (≤ 760 px): poza przyciskami widoku bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -65,9 +65,9 @@ const lead = lang === 'en'
         <div data-widok={v.id} hidden={i > 0} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
           {v.grupy.length === 0 && <p class="muted kal-pusto">{v.pusty}</p>}
           {v.grupy.map((g) => (
-            <section class="kal-miesiac" data-grupa>
+            <section class="lista-miesiac" data-grupa>
               <h2 class="month">{g.miesiac}</h2>
-              <div class="kal-ramka">
+              <div class="karty-lista">
               {g.pozycje.map((w) => (
                 <a class="row-item" href={u(wJezyku(w.href, lang))} data-rodzaj={w.rodzaj}>
                   <span class={`datebox small${w.rodzaj === 'referat' ? ' light' : ''}`} aria-hidden="true">
@@ -127,18 +127,12 @@ const lead = lang === 'en'
 
 <style>
   /* ---------- komputer (≥ 761 px): wygląd „Zwarta” jak na stronach działów ----------
-     24 px od banera; miesiąc = sekcja z kreską i bursztynowym początkiem — te same wartości co .zsec przy oprawie
-     sekcji „linia” w wyglądzie „Zwarta” (tlo.css + uklad-zwarta.css; klasy .zsec nie dajemy, bo zmieniłaby telefon);
-     pozycje miesiąca w jednej białej ramce, oddzielone cienką linią; pusty kalendarz — komunikat w ramce. */
+     24 px od banera; miesiąc = sekcja z kreską (.lista-miesiac, global.css — jak .zsec przy oprawie „linia”;
+     klasy .zsec nie dajemy, bo zmieniłaby telefon);
+     pozycje miesiąca jako osobne białe karty (.karty-lista, global.css); pusty kalendarz — komunikat w takiej karcie. */
   @media (min-width: 761px) {
     .kal-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
-    .kal-miesiac { position: relative; margin-bottom: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
-    .kal-miesiac::before { content: ''; position: absolute; top: -2px; left: 0; width: 64px; height: 3px; border-radius: 2px; background: var(--accent); }
-    .kal-miesiac .month { margin: 0 0 12px; font-size: clamp(21px, 2.2vw, 24px); font-weight: 800; letter-spacing: -0.02em; text-transform: none; color: var(--ink); }
-    .kal-ramka, .kal-pusto { border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-    .kal-ramka { overflow: hidden; }
-    .kal-ramka :global(.row-item) { padding: 14px 18px; border: 0; border-radius: 0; }
-    .kal-ramka :global(.row-item + .row-item) { border-top: 1px solid var(--line); }
+    .kal-pusto { border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
     .kal-pusto { margin: 0; padding: 16px 18px; }
   }
   /* przyciski widoku pod banerem, nad listą miesięcy */
