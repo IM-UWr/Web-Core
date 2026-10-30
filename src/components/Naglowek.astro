@@ -109,16 +109,16 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
        Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę. */}
   {menu.map((p, i) =>
     p.grupy ? (
-      <div class:list={['mitem', { open: aktywna(p) }]}>
+      <div class="mitem">
         <div class="mrow">
           {p.adres ? (
             <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
           ) : (
-            <button type="button" class="mrow-link" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
+            <button type="button" class="mrow-link" data-mrozwin aria-expanded="false" aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
           )}
-          <button type="button" class="mrow-btn" data-mrozwin aria-expanded={aktywna(p) ? 'true' : 'false'} aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
+          <button type="button" class="mrow-btn" data-mrozwin aria-expanded="false" aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
         </div>
-        <div class="mgroup" id={`mgroup-${i}`} hidden={!aktywna(p) || undefined}>
+        <div class="mgroup" id={`mgroup-${i}`} hidden>
           {p.grupy.map((g) => (
             <>
               <h3>{wybierz(g, 'nazwa', lang)}</h3>
@@ -173,19 +173,26 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   odswiezNaglowek();
 
   // Menu na telefon
-  // Panel wysuwa się z prawej nad stroną; strona pod spodem się nie przewija. Gdy nagłówek jest ciemny
-  // (przezroczysty na zdjęciu u góry strony albo w kolorze stopki na dole), nagłówek i panel dostają kolory
-  // trybu ciemnego (.menu-ciemne) — zostają do końca chowania panelu, żeby nie mignęła biel.
+  // Panel wysuwa się z prawej nad stroną; strona pod spodem się nie przewija. Otwiera się ze zwiniętymi listami.
+  // Gdy góra ekranu jest ciemna (nagłówek przezroczysty na zdjęciu, granatowy pas pod nagłówkiem u góry podstrony,
+  // nagłówek w kolorze stopki na dole), nagłówek i panel dostają kolory trybu ciemnego (.menu-ciemne) — zostają do
+  // końca chowania panelu, żeby nie mignęła biel.
   const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
   const mnav = document.getElementById('menu-telefon');
   const mtlo = document.querySelector<HTMLElement>('[data-mnav-tlo]');
-  const ciemnyNaglowek = () =>
-    !!hdr && (hdr.classList.contains('hdr-stopka') || (hdr.classList.contains('hdr-foto') && !hdr.classList.contains('przewiniety')));
+  const ciemnyNaglowek = () => {
+    if (!hdr) return false;
+    if (hdr.classList.contains('hdr-stopka') || (hdr.classList.contains('hdr-foto') && !hdr.classList.contains('przewiniety'))) return true;
+    // granatowy pas na górze podstrony (.ph-granat) jeszcze widoczny pod nagłówkiem
+    const pas = document.querySelector<HTMLElement>('#tresc > .ph-granat:first-child');
+    return !!pas && pas.getBoundingClientRect().bottom > hdr.getBoundingClientRect().bottom + 24;
+  };
   let zdejmijCiemne: number | undefined;
   const ustawMenu = (otwarte: boolean) => {
     if (!mnav || !burger || !hdr) return;
     if (otwarte) {
       window.clearTimeout(zdejmijCiemne);
+      mpozycje.forEach((x) => ustawM(x, false));
       const ciemne = ciemnyNaglowek();
       [hdr, mnav, mtlo].forEach((el) => el?.classList.toggle('menu-ciemne', ciemne));
       document.documentElement.style.setProperty('--menu-top', `${Math.max(0, Math.round(hdr.getBoundingClientRect().bottom))}px`);
