@@ -1,13 +1,17 @@
 ---
-// Sukcesy: aktualności z rodzajem „sukces”, pogrupowane według lat (najnowsze na górze).
+// Sukcesy: aktualności z rodzajem „sukces”, pogrupowane według lat (najnowsze na górze). Na komputerze jak w kalendarzu
+// (wspólny styl list z global.css): rok = sekcja z kreską (.lista-miesiac), wpisy = osobne białe karty (.karty-lista);
+// telefon — lata jako małe etykiety i wiersze, jak dotąd.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola sukcesy_tekst / sukcesy_tekst_en; puste = brak).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import TekstWstepny from '../components/TekstWstepny.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
+import { wJezyku } from '../lib/i18n';
 import { short, type Lang } from '../lib/daty';
 import { aktualnosci, slugOf, type Aktualnosc } from '../lib/tresci';
 
@@ -54,6 +58,7 @@ const liczby = sukcesy.length > 0 ? [
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
+      <TekstWstepny pole="sukcesy_tekst" lang={lang} />
       {liczby.length > 0 && (
         <div class="stats tylko-telefon" data-pagefind-ignore>
           {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
@@ -62,8 +67,9 @@ const liczby = sukcesy.length > 0 ? [
       {sukcesy.length === 0 && <p class="muted">{T('Brak wpisów o sukcesach.', 'No achievement posts yet.')}</p>}
 
       {lata.map((g) => (
-        <section aria-labelledby={`rok-${g.rok}`} class="sukcesy-rok">
+        <section aria-labelledby={`rok-${g.rok}`} class="lista-miesiac sukcesy-rok">
           <h2 id={`rok-${g.rok}`} class="month sukcesy-rok-h">{g.rok}<span class="sukcesy-ile">{g.lista.length}</span></h2>
+          <div class="karty-lista">
           {g.lista.map((a) => (
             <a class="row-item" href={href(a)}>
               <span class="body">
@@ -74,6 +80,7 @@ const liczby = sukcesy.length > 0 ? [
               {zdjecie(a) && <span class="thumb sukcesy-thumb"><img src={zdjecie(a)} alt="" loading="lazy" /></span>}
             </a>
           ))}
+          </div>
         </section>
       ))}
     </div>
@@ -96,29 +103,22 @@ const liczby = sukcesy.length > 0 ? [
         <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy/historia', lang))}>{T('Zestawienie historyczne', 'Historical overview')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
         <a class="link-arrow" href={archiwumStarejStrony}>{T('Archiwum starej strony', 'Archive of the old website')}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>
       </div>
-      <div class="side-box">
-        <h2>{t(lang, 'aktualnosci')}</h2>
-        <p style="margin:0;font-size:15px">{T(
-          'Każdy sukces to wpis w aktualnościach — tam znajdziesz też ogłoszenia i wydarzenia.',
-          'Each achievement is a news post — the news page also lists announcements and events.',
-        )}</p>
-        <a class="link-arrow" href={u(wJezyku('/aktualnosci', lang))}>{t(lang, 'wszystkieAktualnosci')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
     </aside>
   </div>
 </Baza>
 
 <style>
-  .sukcesy-rok-h { display: flex; align-items: center; gap: 10px; font-size: 15px; margin-top: 28px; scroll-margin-top: 16px; }
+  .sukcesy-rok-h { display: flex; align-items: center; gap: 10px; scroll-margin-top: 16px; }
+  /* telefon (≤ 760 px): rok jako mała etykieta nad wierszami (na komputerze — .lista-miesiac w global.css) */
+  @media (max-width: 760px) { .sukcesy-rok-h { margin-top: 28px; font-size: 15px; } }
   .sukcesy-ile { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 12px; letter-spacing: 0; }
   .sukcesy-thumb { flex-basis: 112px; height: 112px; }
   .sukcesy-thumb img { object-position: center top; }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
-     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka”; pierwszy rok bez górnego marginesu (kafelki .stats
-     nad nim są tylko na telefonie). */
+     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka”; licznik wpisów przy roku w linii tytułu sekcji. */
   @media (min-width: 761px) {
     .layout { padding-top: 24px; }
-    .sukcesy-rok:first-of-type .sukcesy-rok-h { margin-top: 0; }
+    .sukcesy-ile { font-weight: 800; }
   }
 </style>

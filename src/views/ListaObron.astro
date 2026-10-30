@@ -1,9 +1,12 @@
 ---
-// Obrony doktorskie: nadchodzące i odbyte.
+// Obrony doktorskie: nadchodzące i odbyte — sekcje .zsec jak na stronach działów (kreska sekcji, tytuł h2);
+// na komputerze obrony jako osobne białe karty, jak w kalendarzu (.karty-lista w global.css; telefon — wiersze jak dotąd).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola obrony_tekst / obrony_tekst_en; puste = brak).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import TekstWstepny from '../components/TekstWstepny.astro';
 import ustawienia from '../data/ustawienia.json';
 import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
@@ -24,9 +27,11 @@ const lead = lang === 'en'
   <NaglowekStrony tytul={t(lang, 'obrony')} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} />
   <div class="wrap layout">
     <div class="main">
+    <TekstWstepny pole="obrony_tekst" lang={lang} />
     {[{ h: t(lang, 'nadchodzaceObrony'), lista: przyszle }, { h: t(lang, 'odbyteObrony'), lista: odbyte }].map(({ h, lista }) => lista.length > 0 && (
-      <section style="margin-bottom:36px">
-        <h2 style="font-size:24px;margin:0 0 6px">{h}</h2>
+      <section class="zsec">
+        <h2>{h}</h2>
+        <div class="karty-lista">
         {lista.map((o: Obrona) => (
           <a class="row-item" href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>
             <span class="datebox small" aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
@@ -37,6 +42,7 @@ const lead = lang === 'en'
             </span>
           </a>
         ))}
+        </div>
       </section>
     ))}
     <p class="muted">{t(lang, 'archiwumObron')} <a href={`${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`}>{t(lang, 'archiwum')}</a>.</p>

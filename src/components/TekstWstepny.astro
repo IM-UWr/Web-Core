@@ -1,0 +1,29 @@
+---
+// Tekst wprowadzający na podstronach działu „Nauka” (seminaria, konferencje, obrony, granty, publikacje, sukcesy):
+// kilka akapitów z CMS — src/data/dzialy/nauka.json, pole `<pole>` i `<pole>_en` (Ustawienia → Strona działu „Nauka”).
+// Akapity oddzielone pustą linią; brak pola albo puste pole = nic się nie pokazuje (komponent nie zostawia odstępu).
+// Akapity jak „O Instytucie” na /instytut/ (.dz-o-tekst): szerokość do 820 px, 16 px / 1.65; telefon 15 px / 1.55.
+import dzial from '../data/dzialy/nauka.json';
+import { wybierz } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { pole: string; lang: Lang; class?: string }
+const { pole, lang, class: klasa } = Astro.props;
+const akapity = ((wybierz(dzial as Record<string, any>, pole, lang) as string) || '')
+  .split(/\n\s*\n/)
+  .map((a) => a.trim())
+  .filter(Boolean);
+---
+{akapity.length > 0 && <div class:list={['tekst-wstepny', klasa]}>{akapity.map((a) => <p>{a}</p>)}</div>}
+
+<style>
+  .tekst-wstepny { margin-bottom: 28px; }
+  .tekst-wstepny p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
+  .tekst-wstepny p:last-child { margin-bottom: 0; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp pod tekstem jak pod sekcją .zsec (uklad-zwarta.css) */
+  @media (min-width: 761px) { .tekst-wstepny { margin-bottom: 24px; } }
+  @media (max-width: 760px) {
+    .tekst-wstepny { margin-bottom: 20px; }
+    .tekst-wstepny p { font-size: 15px; line-height: 1.55; }
+  }
+</style>

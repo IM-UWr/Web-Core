@@ -1,7 +1,8 @@
 ---
-// Strona seminarium: informacje, nadchodzące i minione referaty ze streszczeniami.
+// Strona seminarium: informacje, nadchodzące i minione referaty ze streszczeniami — sekcje .zsec jak na stronach
+// działów (kreska sekcji, tytuł h2).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (koordynatorzy i kontakt bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -61,8 +62,8 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
     <div class="main">
       <div class="prose"><Content /></div>
 
-      <section aria-labelledby="h-nad" style="margin-top:24px">
-        <h2 id="h-nad" style="font-size:26px;margin:0 0 4px">{t(lang, 'nadchodzace')}</h2>
+      <section class="zsec sm-sek" aria-labelledby="h-nad">
+        <h2 id="h-nad">{t(lang, 'nadchodzace')}</h2>
         {nadchodzace.length === 0 && <p class="muted">{t(lang, 'brakNadchodzacych')}</p>}
         {nadchodzace.map(({ r, C }) => (
           <article class="talk" id={slugOf(r.id)}>
@@ -81,8 +82,8 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
       </section>
 
       {minione.length > 0 && (
-        <section aria-labelledby="h-min" style="margin-top:36px">
-          <h2 id="h-min" style="font-size:22px;margin:0 0 4px">{t(lang, 'minione')}</h2>
+        <section class="zsec sm-sek" aria-labelledby="h-min">
+          <h2 id="h-min">{t(lang, 'minione')}</h2>
           {minione.map(({ r, C }) => (
             <article class="talk" id={slugOf(r.id)}>
               <div class="talk-meta"><span>{short(r.data.termin)}{hasTime(r.data.termin) ? `, ${time(r.data.termin)}` : ''}</span>{r.data.sala && <span>· {sala(r.data.sala, lang)}</span>}</div>
@@ -152,6 +153,9 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
 </script>
 
 <style>
+  /* sekcje referatów: kreska sekcji po opisie seminarium; pod tytułem od razu pierwszy referat (ma własny odstęp) */
+  .prose + .sm-sek { margin-top: 24px; }
+  .sm-sek > h2 { margin-bottom: 4px; }
   /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
      do banera (reszta odstępów .layout — uklad-zwarta.css) */
   @media (min-width: 761px) { .layout { padding-top: 24px; } }

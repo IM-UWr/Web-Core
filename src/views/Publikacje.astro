@@ -1,11 +1,14 @@
 ---
 // Publikacje: wykazy prac według lat (karty lat → podstrony z listą w HTML, PDF-y) i czasopisma redagowane w Instytucie.
 // Treść: src/data/publikacje.json (CMS) i src/data/publikacje/RRRR.json (wykazy). Liczby liczą się z wykazów.
+// Sekcje (wykazy, czasopisma) to .zsec jak na stronach działów (kreska sekcji, tytuł h2, pod nim krótki opis).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola publikacje_tekst / publikacje_tekst_en; puste = brak).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import TekstWstepny from '../components/TekstWstepny.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
@@ -46,20 +49,19 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
     )}
   </NaglowekStrony>
   <div class="wrap pub-strona">
+    <TekstWstepny pole="publikacje_tekst" lang={lang} />
     {liczby.length > 0 && (
       <div class="stats tylko-telefon" data-pagefind-ignore>
         {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
       </div>
     )}
 
-    <section class="pub-sekcja" aria-labelledby="wykazy">
-      <div class="pub-sekcja-g">
-        <h2 id="wykazy">{T('Wykazy prac według lat', 'Lists of publications by year')}</h2>
-        <p class="muted">{T(
-          'Wybierz rok, aby zobaczyć listę prac. Pliki PDF to wykazy w oryginalnej postaci.',
-          'Choose a year to see the list of works. The PDF files are the lists in their original form.',
-        )}</p>
-      </div>
+    <section class="zsec" aria-labelledby="wykazy">
+      <h2 id="wykazy">{T('Wykazy prac według lat', 'Lists of publications by year')}</h2>
+      <p class="muted pub-opis">{T(
+        'Wybierz rok, aby zobaczyć listę prac. Pliki PDF to wykazy w oryginalnej postaci.',
+        'Choose a year to see the list of works. The PDF files are the lists in their original form.',
+      )}</p>
       <ol class="lata" role="list">
         {wszystkie.map((r) => {
           const cel = r.wykaz ? href(`/nauka/publikacje/${r.rok}`) : r.pdf ? href(r.pdf) : undefined;
@@ -82,10 +84,8 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
     </section>
 
     {czasopisma.length > 0 && (
-      <section class="pub-sekcja" aria-labelledby="czasopisma">
-        <div class="pub-sekcja-g">
-          <h2 id="czasopisma">{nagCzasopisma}</h2>
-        </div>
+      <section class="zsec" aria-labelledby="czasopisma">
+        <h2 id="czasopisma">{nagCzasopisma}</h2>
         <div class="czasopisma">
           {czasopisma.map((c) => {
             const opis = wybierz(c as any, 'opis', lang);
@@ -119,10 +119,8 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
 
 <style>
   .pub-strona { padding-top: clamp(24px, 4vw, 40px); padding-bottom: clamp(40px, 6vw, 72px); }
-  .pub-sekcja { margin-top: clamp(28px, 4vw, 44px); }
-  .pub-sekcja-g { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; margin-bottom: 16px; }
-  .pub-sekcja-g h2 { margin: 0; font-size: clamp(24px, 3vw, 30px); font-weight: 800; letter-spacing: -0.02em; scroll-margin-top: 16px; }
-  .pub-sekcja-g p { margin: 0; font-size: 15px; max-width: 560px; }
+  /* opis pod tytułem sekcji (jak opis „Obszarów badań” na stronie „Nauka”) */
+  .pub-opis { margin: -4px 0 14px; max-width: 760px; font-size: 15px; line-height: 1.55; }
 
   /* Siatka lat: klikalne karty (cała karta jest odnośnikiem; PDF osobno). */
   .lata { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 164px), 1fr)); gap: 12px; }
@@ -170,9 +168,9 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
      Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” (liczby są w banerze, kafelki .stats
-     pod nim — tylko na telefonie): pierwsza sekcja bez własnego górnego marginesu. */
+     pod nim — tylko na telefonie); odstęp od stopki jak na innych podstronach (uklad-zwarta.css). */
   @media (min-width: 761px) {
-    .pub-strona { padding-top: 24px; }
-    .pub-sekcja:first-of-type { margin-top: 0; }
+    .pub-strona { padding-top: 24px; padding-bottom: var(--tresc-dol); }
+    .pub-opis { margin-bottom: 10px; }
   }
 </style>

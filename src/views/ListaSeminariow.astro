@@ -2,11 +2,15 @@
 // Lista seminariów z najbliższym referatem.
 // Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium bez zakładu (pole puste albo zakład,
 // którego nie ma na stronie) to seminarium niezależne — pokazuje się w osobnej grupie.
+// Między najbliższymi seminariami a grupami — tekst wprowadzający z CMS (TekstWstepny: src/data/dzialy/nauka.json,
+// pola seminaria_tekst / _en; akapity oddzielone pustą linią, puste pole = bez tekstu). Sekcje jak na stronach działów: .zsec z tytułem h2
+// (kreska sekcji, odstępy i rozmiar tytułu z global.css, tlo.css, telefon.css i uklad-zwarta.css).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TabelaReferatow from '../components/TabelaReferatow.astro';
+import TekstWstepny from '../components/TekstWstepny.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
 import { long, now, today, hasTime, type Lang } from '../lib/daty';
@@ -42,32 +46,32 @@ const lead = lang === 'en'
 <Baza tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }} />
   <div class="wrap ls-wrap">
-    <section aria-labelledby="h-tydzien">
-      <div class="section-head" style="margin-bottom:14px">
-        <h2 id="h-tydzien" style="font-size:24px">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
-      </div>
-      <div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden">
+    <section class="zsec" aria-labelledby="h-tydzien">
+      <h2 id="h-tydzien">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
+      <div class="ls-ramka">
         <TabelaReferatow wiersze={wTygodniu} lang={lang} etykieta={t(lang, 'seminariaTydzien')} pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')} />
       </div>
     </section>
 
+    <TekstWstepny pole="seminaria_tekst" lang={lang} />
+
     {grupy.map((g) => (
-      <section aria-labelledby={g.id}>
-        <h2 id={g.id} style="font-size:24px;margin:0 0 14px">{g.tytul}</h2>
+      <section class="zsec" aria-labelledby={g.id}>
+        <h2 id={g.id}>{g.tytul}</h2>
         <div class="sem-cards">
           {g.lista.map((s) => {
             const r = nastepny(s.id);
             const zs = zakladySem(s);
             return (
               <a class="sem-card" href={u(wJezyku(`/seminaria/${s.id}`, lang))}>
-                {zs.length > 0 && <span class="muted" style="font-size:14px;font-weight:600">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</span>}
+                {zs.length > 0 && <span class="muted ls-zaklad">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</span>}
                 <span class="t">{nazwa(s)}</span>
                 {r ? (
-                  <span style="font-size:15px;padding-top:10px;border-top:1px solid var(--line)">
-                    <strong style="color:var(--ink)">{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — {r.data.tytul} <span class="muted">({r.data.prelegent})</span>
+                  <span class="ls-ref">
+                    <strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — {r.data.tytul} <span class="muted">({r.data.prelegent})</span>
                   </span>
                 ) : (
-                  <span class="muted" style="font-size:14px;padding-top:10px;border-top:1px solid var(--line)">{t(lang, 'brakNadchodzacych')}</span>
+                  <span class="muted ls-ref ls-brak">{t(lang, 'brakNadchodzacych')}</span>
                 )}
               </a>
             );
@@ -77,8 +81,8 @@ const lead = lang === 'en'
     ))}
 
     {nieaktywne.length > 0 && (
-      <section aria-labelledby="h-nieaktywne">
-        <h2 id="h-nieaktywne" style="font-size:20px">{T('Pozostałe seminaria', 'Other seminars')}</h2>
+      <section class="zsec" aria-labelledby="h-nieaktywne">
+        <h2 id="h-nieaktywne">{T('Pozostałe seminaria', 'Other seminars')}</h2>
         <ul>
           {nieaktywne.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
         </ul>
@@ -88,8 +92,20 @@ const lead = lang === 'en'
 </Baza>
 
 <style>
-  .ls-wrap { padding-top: 32px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 40px; }
-  /* komputer (≥ 761 px), wariant „Zwarta”: mniejsze odstępy między sekcjami, odstęp od stopki jak na innych podstronach
-     (uklad-zwarta.css); nad pierwszą sekcją stały odstęp 24 px, jak na stronie działu „Nauka” */
-  @media (min-width: 761px) { .ls-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); gap: 24px; } }
+  /* sekcje .zsec jak na stronach działów (odstępy między nimi — margines .zsec); odstępy kontenera jak .dz-wrap */
+  .ls-wrap { padding-top: 32px; padding-bottom: 64px; }
+  .ls-ramka { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  /* karta seminarium: zakład nad nazwą, pod kreską najbliższy referat albo „brak” */
+  .ls-zaklad { font-size: 14px; font-weight: 600; }
+  .ls-ref { font-size: 15px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .ls-ref strong { color: var(--ink); }
+  .ls-brak { font-size: 14px; }
+
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css); nad pierwszą
+     sekcją stały odstęp 24 px, jak na stronie działu „Nauka” */
+  @media (min-width: 761px) { .ls-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }
+  /* telefon (≤ 760 px): odstępy jak na stronach działów (wygląd „Portal”) */
+  @media (max-width: 760px) {
+    .ls-wrap { padding-top: 4px; padding-bottom: 36px; }
+  }
 </style>

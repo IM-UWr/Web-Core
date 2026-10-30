@@ -1,5 +1,7 @@
 ---
 // Wykaz prac z danego roku (src/data/publikacje/RRRR.json): numerowana lista, opcjonalnie w grupach (rodzaje prac).
+// Na komputerze jak w kalendarzu (wspólny styl list): grupa z nagłówkiem = sekcja z kreską (.lista-miesiac z global.css),
+// prace = osobne białe karty z odstępem 10 px (numer na lewo od karty); telefon — wiersze jak dotąd.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (przycisk „Wykaz w PDF” bez zmian), reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
@@ -67,7 +69,7 @@ const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
         <p class="pr-nota">{pochodzenie}{pochodzenie && uwagi ? ' ' : ''}{uwagi}</p>
       )}
       {grupy.map((g) => (
-        <section class="pr-grupa" aria-labelledby={g.id || undefined}>
+        <section class:list={['pr-grupa', g.pelny && 'lista-miesiac']} aria-labelledby={g.id || undefined}>
           {g.pelny && <h2 id={g.id} class="pr-h">{g.pelny}<span class="pr-ile">{g.prace.length}</span></h2>}
           <ol class="pr-lista" start={g.start}>
             {g.prace.map((p) => (
@@ -140,7 +142,16 @@ const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
   @media (max-width: 520px) { .pr-lista { padding-left: 2.8em; } .pr { padding-left: 2px; } .pr-t { font-size: 15.5px; } }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
-     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka” — z spisem treści (.layout) i bez niego (.pr-wrap). */
-  @media (min-width: 761px) { .layout, .pr-wrap { padding-top: 24px; } }
+     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka” — z spisem treści (.layout) i bez niego (.pr-wrap).
+     Prace jako osobne białe karty (jak .karty-lista w global.css: tło strony, ramka, zaokrąglenie, odstęp 10 px);
+     numer zostaje na lewo od karty. Grupa z nagłówkiem — sekcja z kreską (.lista-miesiac), tytuł jak tytuł sekcji. */
+  @media (min-width: 761px) {
+    .layout, .pr-wrap { padding-top: 24px; }
+    .pr-nota { margin-bottom: 14px; }
+    .pr-lista > .pr, .pr-lista > .pr:first-child { padding: 12px 18px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
+    .pr-lista > .pr + .pr { margin-top: 10px; }
+    .pr-grupa + .pr-grupa { margin-top: 0; }
+    .pr-h { margin: 0 0 12px; font-size: clamp(21px, 2.2vw, 24px); letter-spacing: -0.02em; }
+  }
 </style>
 
