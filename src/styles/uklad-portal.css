@@ -21,8 +21,11 @@
   :where([data-uklad~='portal-baner'] .page-head) .wstecz a { min-height: 32px; font-size: 14px; }
 
   /* pas nagłówka podstrony (tlo.css): niższy, liczby działu w jednym wierszu pod opisem */
-  :where([data-uklad~='portal-baner']) .ph .wrap { padding-top: clamp(14px, 1.8vw, 22px); padding-bottom: clamp(18px, 2.2vw, 26px); min-height: clamp(0px, 13vw, 190px); }
+  /* minimalna wysokość banera = wysokość banera strony „Studia” na szerokim ekranie (348 px; decyzja 30.10.2026),
+     żeby banery działów i podstron (Aktualności, Popularyzacja, Instytut…) nie były niższe; treść banera wyśrodkowana w pionie */
+  :where([data-uklad~='portal-baner']) { --baner-min: 348px; }
+  :where([data-uklad~='portal-baner']) .ph .wrap { padding-top: clamp(14px, 1.8vw, 22px); padding-bottom: clamp(18px, 2.2vw, 26px); min-height: max(var(--baner-min), clamp(0px, 13vw, 190px)); display: flex; flex-direction: column; justify-content: center; }
   :where([data-uklad~='portal-baner']) .ph .wrap > h1, :where([data-uklad~='portal-baner']) .ph .wrap > .lead { max-width: min(860px, 64%); }
   :where([data-uklad~='portal-baner']) .ph h1 { font-size: clamp(28px, 3.4vw, 42px); }
-  .js :where([data-uklad~='portal-baner']) .hdr-foto ~ main > .ph:first-child > .wrap { padding-top: calc(clamp(14px, 1.8vw, 22px) + var(--hdr-h)); min-height: calc(clamp(0px, 13vw, 190px) + var(--hdr-h)); }
+  .js :where([data-uklad~='portal-baner']) .hdr-foto ~ main > .ph:first-child > .wrap { padding-top: calc(clamp(14px, 1.8vw, 22px) + var(--hdr-h)); min-height: max(var(--baner-min), calc(clamp(0px, 13vw, 190px) + var(--hdr-h))); }
 }
