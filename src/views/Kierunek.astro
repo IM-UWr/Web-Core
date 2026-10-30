@@ -346,6 +346,10 @@ const sekcje = [
 
 <style>
   .kh-btns { margin-top: 6px; }
+  /* „O kierunku” — pierwsza sekcja: bez kreski sekcji nad nagłówkiem (komputer i telefon; jak „W tym dziale” na stronach
+     działów i „Najbliższe seminaria”; decyzja 30.10.2026) */
+  .zsec.kier-o { border-top: 0; padding-top: 0; }
+  .zsec.kier-o::before, .zsec.kier-o > h2::before { display: none; }
   .kh-fakty { margin: 0 0 22px; }
   /* liczby kierunku mniejsze niż w statystykach działów (34 px) — „6 semestrów”, „licencjat” mieszczą się w kafelku */
   .kh-fakty .stat { padding: 16px 18px; }
