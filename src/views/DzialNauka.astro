@@ -1,6 +1,7 @@
 ---
 // Strona działu „Nauka” (/nauka, /en/nauka): wstęp, liczby, kafelki z menu „Nauka”, tekst „Badania w Instytucie”
-// (z ramką „W skrócie” na komputerze), realizowane projekty, konferencje i „Warto wiedzieć”
+// (z ramką „W skrócie” na komputerze), realizowane projekty i konferencje
+// („Warto wiedzieć” tylko na stronie głównej i na /warto-wiedziec — decyzja 30.10.2026)
 // (seminaria tygodnia i obrony są na swoich stronach; liczby w banerze zostają).
 // Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
@@ -10,7 +11,6 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
-import WartoWiedziec from '../components/WartoWiedziec.astro';
 import dzial from '../data/dzialy/nauka.json';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
@@ -88,7 +88,7 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
        Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, zaraz pod nimi
        konferencje (osobny blok .tylko-telefon — na komputerze pod projektami), tekst „Badania w Instytucie”
-       (bez ramki „W skrócie”), projekty w ramce i na końcu „Warto wiedzieć” (osobny blok). */}
+       (bez ramki „W skrócie”), projekty w ramce. */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">
@@ -227,13 +227,6 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
         </div>
       )}
     </section>
-
-    {/* „Warto wiedzieć” na samym dole strony (komputer — ten blok; telefon — blok niżej) */}
-    <WartoWiedziec lang={lang} dzial="nauka" klasa="tylko-komputer" />
-
-    <div class="tylko-telefon" data-pagefind-ignore>
-      <WartoWiedziec lang={lang} dzial="nauka" uklad="portal" />
-    </div>
   </div>
 </Baza>
 
@@ -291,12 +284,6 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
     .dz-ile { font-size: 15px; }
     .dz-granty { gap: 10px; }
     .dz-granty h3 { font-size: 16px; }
-  }
-
-  /* komputer: karty „Warto wiedzieć” z tą samą wielkością czcionki co karty projektów i konferencji (tytuł 16 px, opis 14 px) */
-  @media (min-width: 761px) {
-    .dz-wrap :global(.ww-t) { font-size: 16px; line-height: 1.3; }
-    .dz-wrap :global(.ww-x) { font-size: 14px; line-height: 1.5; }
   }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */

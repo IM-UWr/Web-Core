@@ -1,6 +1,7 @@
 ---
 // Strona działu „Studia” (/studia, /en/studia): wstęp, liczby, kafelki z menu „Studia”, krótki tekst „O studiach”
-// z ramką „W skrócie”, „Warto wiedzieć”, aktualności dla studentów i kontakt. Teksty: src/data/dzialy/studia.json;
+// z ramką „W skrócie”, aktualności dla studentów i kontakt
+// („Warto wiedzieć” tylko na stronie głównej i na /warto-wiedziec — decyzja 30.10.2026). Teksty: src/data/dzialy/studia.json;
 // reszta z kolekcji i menu, więc nowy kierunek, specjalność czy link w menu „Studia” sam pojawia się na tej stronie.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
@@ -11,7 +12,6 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import KartaAktualnosci from '../components/KartaAktualnosci.astro';
-import WartoWiedziec from '../components/WartoWiedziec.astro';
 import tekst from '../data/dzialy/studia.json';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE } from '../lib/i18n';
@@ -86,7 +86,7 @@ const wstep = w(tekst, 'wstep');
 <Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
        Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, tekst „O studiach” (bez ramki „W skrócie”),
-       aktualności (sześć), „Warto wiedzieć” i kontakt — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
+       aktualności (sześć) i kontakt — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
        Linki do pełnych podstron („Wszystkie”, „Kto za co odpowiada — wszystkie kontakty”) — zawsze w nagłówku sekcji
        (komputer: .zsec-head w global.css; telefon: nagłówek ramki .pt-h), z prawej. */}
   <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
@@ -137,8 +137,6 @@ const wstep = w(tekst, 'wstep');
       </section>
     )}
 
-    <WartoWiedziec lang={lang} dzial="studia" klasa="tylko-komputer" />
-
     <section class="zsec tylko-komputer" aria-labelledby="aktualnosci">
       <div class="zsec-head">
         <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
@@ -177,7 +175,6 @@ const wstep = w(tekst, 'wstep');
           <p class="pt-pusto">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
         )}
       </section>
-      <WartoWiedziec lang={lang} dzial="studia" uklad="portal" />
       {osobyKontakt.length > 0 && (
         <section class="pt-box" aria-labelledby="kontakt-tel">
           <div class="pt-h">
@@ -288,7 +285,7 @@ const wstep = w(tekst, 'wstep');
     .dz-osoby .dz-rola { letter-spacing: .05em; }
     .dz-c { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
     .dz-c a { color: var(--ink); }
-    /* aktualności, „Warto wiedzieć” i kontakt (bloki tylko na telefon) */
+    /* aktualności i kontakt (bloki tylko na telefon) */
     .dz-tel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
   }
 </style>
