@@ -448,6 +448,11 @@ details[open] > summary .chev { transform: rotate(180deg); }
   .lista-miesiac { position: relative; margin-bottom: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
   .lista-miesiac::before { content: ''; position: absolute; top: -2px; left: 0; width: 64px; height: 3px; border-radius: 2px; background: var(--accent); }
   .lista-miesiac > .month { margin: 0 0 12px; font-size: clamp(21px, 2.2vw, 24px); font-weight: 800; letter-spacing: -0.02em; text-transform: none; color: var(--ink); }
+  /* spis pracowników: każda grupa (Nauczyciele akademiccy, Doktoranci…) jako sekcja z kreską — oddziela listę od przycisków filtrów */
+  .staff-dir { position: relative; padding-top: 14px; border-top: 1px solid var(--line); }
+  .staff-dir::before { content: ''; position: absolute; top: -2px; left: 0; width: 64px; height: 3px; border-radius: 2px; background: var(--accent); }
+  .staff-count + .staff-dir { margin-top: 18px; }
+  .staff-dir > .staff-h { margin-top: 0; }
 }
 .row-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 560px) { .row-item .thumb { display: none; } }
