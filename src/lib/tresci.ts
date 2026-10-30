@@ -312,7 +312,12 @@ export interface PozycjaListy {
   id: string;
   // pilne = automatyczne ogłoszenie o zamianie dni (src/lib/kolory-dni.ts) — na stronie głównej zawsze na górze
   pilne?: boolean;
+  // koniec wydarzenia (wpis z polem „Wydarzenie: początek” albo obrona) — po nim wpis znika z Aktualności na stronie głównej
+  koniec?: string;
 }
+
+// Czy wydarzenie z wpisu już się odbyło (wpis bez wydarzenia — nigdy).
+const odbyloSie = (p: PozycjaListy) => !!p.wydarzenie && !trwaLubBedzie({ poczatek: p.wydarzenie, koniec: p.koniec });
 
 export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
   const [akt, obr] = await Promise.all([aktualnosci(), obrony()]);
@@ -320,6 +325,7 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
     rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, data: a.data.data,
     zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zdjecie: a.data.zdjecie,
     zdjecie_opis: a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
+    koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
     wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`,
   }));
   for (const o of obr) {
@@ -328,7 +334,7 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
       rodzaj: 'obrona', tytul: o.data.kandydat, data: o.data.data_ogloszenia || o.data.termin.slice(0, 10),
       // obrona zawsze ma zdjęcie: własne z CMS albo domyślna grafika (public/grafiki/obrona-domyslna.jpg)
       zajawka: o.data.tytul_rozprawy, zdjecie: o.data.zdjecie || ZDJECIE_OBRONY, zdjecie_opis: o.data.zdjecie ? o.data.zdjecie_opis : '', dla: [],
-      href: `/obrony-doktorskie/${slugOf(o.id)}`, wydarzenie: o.data.termin, id: `obr-${slugOf(o.id)}`,
+      href: `/obrony-doktorskie/${slugOf(o.id)}`, wydarzenie: o.data.termin, koniec: koniecDomyslny(o.data.termin, 120), id: `obr-${slugOf(o.id)}`,
     });
   }
   // Ogłoszenia o zamianach dni z src/data/kolory-dni.json — tylko od N dni roboczych przed zamianą do dnia zamiany.
@@ -337,20 +343,23 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
   return items.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0) || a.id.localeCompare(b.id));
 }
 
-// Strona główna: wyróżnione na górze, potem chronologicznie; bez dubli z "Najbliższymi wydarzeniami".
-export async function aktualnosciNaGlowna(limit = 6, lang: Lang = 'pl', wNajblizszych: string[] = []): Promise<PozycjaListy[]> {
-  const lista = await listaAktualnosci(lang);
-  const pominiete = new Set(wNajblizszych);
+// Strona główna (decyzja z 30.10.2026): Aktualności to zapowiedzi — chronologicznie według daty publikacji (obrony razem
+// z innymi wpisami), a wpis, którego wydarzenie już się odbyło, znika (liczone przy budowaniu strony, 2× dziennie).
+// Dublowanie z „Najbliższymi wydarzeniami” (kalendarium-przypomnienie) jest dozwolone. Na górze nadal: automatyczne
+// ogłoszenie o zamianie dni, potem wpisy wyróżnione („Wyróżnij na stronie głównej do…”).
+export async function aktualnosciNaGlowna(limit = 6, lang: Lang = 'pl'): Promise<PozycjaListy[]> {
+  const lista = (await listaAktualnosci(lang)).filter((p) => !odbyloSie(p));
   const d = today();
+  const wyrozniony = (p: PozycjaListy) => !!p.wyroznij_do && p.wyroznij_do >= d;
   const pilne = lista.filter((p) => p.pilne);
-  const wyroznione = lista.filter((p) => !p.pilne && p.wyroznij_do && p.wyroznij_do >= d);
-  const reszta = lista.filter((p) => !p.pilne && !(p.wyroznij_do && p.wyroznij_do >= d) && !pominiete.has(p.href));
-  // obrony doktorskie na dalszym planie: po zwykłych aktualnościach
-  return [...pilne, ...wyroznione, ...reszta.filter((p) => p.rodzaj !== 'obrona'), ...reszta.filter((p) => p.rodzaj === 'obrona')].slice(0, limit);
+  const wyroznione = lista.filter((p) => !p.pilne && wyrozniony(p));
+  const reszta = lista.filter((p) => !p.pilne && !wyrozniony(p));
+  return [...pilne, ...wyroznione, ...reszta].slice(0, limit);
 }
 
+// Żółty pasek w banerze: pierwszy wyróżniony wpis (bez wpisów, których wydarzenie już się odbyło).
 export async function wyroznionaAktualnosc(lang: Lang = 'pl'): Promise<PozycjaListy | undefined> {
   const lista = await listaAktualnosci(lang);
   const d = today();
-  return lista.find((p) => p.wyroznij_do && p.wyroznij_do >= d);
+  return lista.find((p) => p.wyroznij_do && p.wyroznij_do >= d && !odbyloSie(p));
 }
