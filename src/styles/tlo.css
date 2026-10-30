@@ -88,7 +88,7 @@ body[data-tlo] .section-alt { background: rgb(242 245 251 / .78); }
 body[data-tlo] .toc-side { box-shadow: none; }
 /* karty i ramki, które miały tylko obramowanie (przezroczyste wnętrze), dostają pełne tło strony — wzór nie
    przebija pod tekstem; :where() = zerowa specyficzność, więc własne tła i podświetlenia (np. .spec-off, :hover) wygrywają */
-:where(body[data-tlo]) :where(.dz-path, .spec, .dept, .sem-card, .entry, .course-group, .files a, .pn a) { background-color: var(--bg); }
+:where(body[data-tlo]) :where(.spec, .dept, .sem-card, .entry, .course-group, .files a, .pn a) { background-color: var(--bg); }
 /* Kafelki wypełnione kolorem --surface zlewały się z jasnym tłem — na wzorze dostają pełne tło karty, cienką ramkę
    i lekki cień. :where(body…) = specyficzność jak samej klasy, więc :hover i własne kolory (np. kafelek kolorów dni) wygrywają. */
 body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-cien: 0 1px 2px rgb(11 27 58 / .05), 0 6px 18px rgb(11 27 58 / .07); }
@@ -208,9 +208,8 @@ body[data-sekcje='linia'] main > .section > .wrap:first-child::after { content: 
 body[data-sekcje='linia'] main > .section :is(.section-head h2, .studia-head h2)::before { content: none; }
 
 /* --- 3. Karty: każda sekcja na osobnej, pełnej karcie nad tłem --- */
+/* :not(.dz-paths) — bez klasy na stronach (ścieżki „Studiów” usunięte), ale trzyma dotychczasową siłę selektora */
 body[data-sekcje='karty'] .zsec:not(.dz-paths) { margin-bottom: 22px; padding: clamp(20px, 3vw, 32px); border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--sek-karta); box-shadow: var(--sek-cien); }
-body[data-sekcje='karty'] .zsec.dz-paths { margin-bottom: 22px; }
-body[data-sekcje='karty'] .zsec.dz-paths .dz-path { background: var(--sek-karta); box-shadow: var(--sek-cien); }
 body[data-sekcje='karty'] .section { padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); }
 body[data-sekcje='karty'] .section-alt { background: transparent; }
 body[data-sekcje='karty'] .section > .wrap { padding-top: clamp(22px, 3vw, 34px); padding-bottom: clamp(22px, 3vw, 34px); border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--sek-karta); box-shadow: var(--sek-cien); }

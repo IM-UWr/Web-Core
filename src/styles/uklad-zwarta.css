@@ -236,7 +236,6 @@
   body[data-sekcje='linia']:where([data-uklad~='zwarta']) main > .section { padding-top: 6px; padding-bottom: clamp(14px, 1.8vw, 22px); }
   body[data-sekcje='linia']:where([data-uklad~='zwarta']) main > .section > .wrap:first-child { padding-top: 16px; }
   body[data-sekcje='karty']:where([data-uklad~='zwarta']) .zsec:not(.dz-paths) { margin-bottom: 14px; padding: clamp(14px, 2vw, 22px); }
-  body[data-sekcje='karty']:where([data-uklad~='zwarta']) .zsec.dz-paths { margin-bottom: 14px; }
   body[data-sekcje='karty']:where([data-uklad~='zwarta']) .section { padding-top: clamp(8px, 1.2vw, 14px); padding-bottom: clamp(8px, 1.2vw, 14px); }
   body[data-sekcje='karty']:where([data-uklad~='zwarta']) .section > .wrap { padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); }
   body[data-sekcje='karty']:where([data-uklad~='zwarta']) .prose h2 { margin-top: 1.4em; padding-bottom: 8px; }
