@@ -289,6 +289,12 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
     .dz-granty h3 { font-size: 16px; }
   }
 
+  /* komputer: karty „Warto wiedzieć” z tą samą wielkością czcionki co karty projektów i konferencji (tytuł 16 px, opis 14 px) */
+  @media (min-width: 761px) {
+    .dz-wrap :global(.ww-t) { font-size: 16px; line-height: 1.3; }
+    .dz-wrap :global(.ww-x) { font-size: 14px; line-height: 1.5; }
+  }
+
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */
   @media (max-width: 760px) {
     .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
