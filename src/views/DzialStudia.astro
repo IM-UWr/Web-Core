@@ -2,6 +2,9 @@
 // Strona działu „Studia” (/studia, /en/studia): kierunki, dwie ścieżki (kandydat / student), pozostałe linki z menu
 // „Studia”, aktualności dla studentów i kontakt. Teksty: src/data/dzialy/studia.json; reszta z kolekcji, menu i Ustawień,
 // więc nowy kierunek, specjalność czy link w menu sam pojawia się na tej stronie.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
+// Telefon (≤ 760 px): wygląd „Portal” (bloki .tylko-telefon i style w @media (max-width: 760px)).
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -120,9 +123,10 @@ const ikona = (a: string) =>
   : /zajecia|plan/.test(a) ? 'zegar'
   : 'strzalka';
 
-// ④ Aktualności dla studentów (komputer: trzy karty; telefon — wygląd „Portal”: zwarta lista sześciu).
+// ④ Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;
+//    telefon — wygląd „Portal”: zwarta lista sześciu).
 const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
-const aktualnosci = dlaStudentow.slice(0, 3);
+const aktualnosci = dlaStudentow.slice(0, 4);
 const aktualnosciTel = dlaStudentow.slice(0, 6);
 
 // ⑤ Kontakt: sekretariat dydaktyczny i zastępca dyrektora ds. dydaktycznych — z pól „Kontakt” kierunków (bez dubli).
@@ -139,24 +143,19 @@ const osobyKontakt = [
 const tytul = T('Studia', 'Study');
 const wstep = w(tekst, 'wstep');
 ---
-<Baza tytul={tytul} opis={wstep}>
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: liczby w jednym wierszu w nagłówku, zwarte karty kierunków, ramki:
+<Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
+  {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
+       Telefon (≤ 760 px) — wygląd „Portal”: zwarte karty kierunków, ramki:
        Chcę studiować, Kontakt, Już studiuję, Więcej dla studentów, Aktualności (sześć), Warto wiedzieć.
-       Kontakt, aktualności, „Warto wiedzieć” i liczby mają osobne bloki .tylko-telefon (inna kolejność lub liczba pozycji). */}
+       Kontakt, aktualności i „Warto wiedzieć” mają osobne bloki .tylko-telefon (inna kolejność lub liczba pozycji). */}
   <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
-      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+      <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
   </NaglowekStrony>
   <div class="wrap dz-wrap">
-    {liczby.length > 0 && (
-      <div class="stats tylko-komputer">
-        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-      </div>
-    )}
-
     {karty.length > 0 && (
       <section class="zsec dz-kierunki" aria-labelledby="kierunki">
         <h2 id="kierunki">{T('Kierunki studiów', 'Programmes')}</h2>
@@ -306,7 +305,8 @@ const wstep = w(tekst, 'wstep');
 
 <style>
   .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
-  .dz-prog { min-height: 180px; }
+  /* karty kierunków na białym tle (tło strony) z ramką — jak pozostałe karty na stronie, nie szare .prog z global.css */
+  .dz-prog { min-height: 180px; background: var(--bg); }
   .dz-prog .p { margin-top: -4px; font-size: 14px; color: var(--muted); }
   .dz-prog .go { margin-top: auto; padding-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
   :global(:root[data-theme='dark']) .dz-prog .go { color: var(--accent); }
@@ -331,6 +331,26 @@ const wstep = w(tekst, 'wstep');
   .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
   .people + .link-arrow { margin-top: 8px; }
   @media (prefers-reduced-motion: reduce) { .dz-prog .go :global(svg) { transition: none; transform: none !important; } }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” — niższe karty kierunków i ścieżek, linki ścieżki w dwóch kolumnach ----------
+     Odstęp nad pierwszą sekcją stały (24 px), jak na „Instytucie” i „Nauce”: kreska sekcji nie przylega do banera. */
+  @media (min-width: 761px) {
+    .dz-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
+    .dz-prog { min-height: 0; }
+    .dz-prog .go { padding-top: 2px; }
+    .dz-paths { gap: 12px; }
+    .dz-path { gap: 8px; padding: 14px 16px; }
+    .dz-path-h { gap: 12px; }
+    .dz-path h2 { font-size: 19px; }
+    .dz-path p { margin: 0; line-height: 1.4; }
+    /* linki ścieżki w dwóch kolumnach, gdy się mieszczą (dłuższa lista „Już studiuję” o połowę niższa) */
+    .dz-path ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); column-gap: 16px; }
+    .dz-path li a { min-height: 40px; padding: 4px 8px; }
+    .dz-head { margin-bottom: 8px; }
+    .dz-head h2 { font-size: 22px; }
+    .dz-zakres { margin: 0 0 2px; }
+    .people + .link-arrow { margin-top: 4px; }
+  }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {
