@@ -240,6 +240,8 @@ const kafelki = [
   .gl-sem-l { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
   .gl-sem-zakres { font-size: 14px; font-weight: 600; }
   .gl-sem-r { display: flex; flex-wrap: wrap; gap: 0 20px; }
+  /* komputer: odstęp między kafelkami „Na skróty” a kreską sekcji „Najbliższe wydarzenia” (dotąd kreska stykała się z kafelkami) */
+  @media (min-width: 761px) { .gl-skroty { padding-bottom: 40px; } }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” — ramki jedna pod drugą ---------- */
   @media (max-width: 760px) {
