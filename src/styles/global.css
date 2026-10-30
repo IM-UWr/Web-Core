@@ -466,6 +466,9 @@ details[open] > summary .chev { transform: rotate(180deg); }
 
 /* tabela pracowników */
 .staff-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+/* przyciski grup i licznik osób (dotąd style w atrybucie w TabelaPracownikow.tsx — tu, żeby wygląd „Zwarta” mógł je zmienić) */
+.staff-tools .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.staff-count { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
 .search { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); color: var(--muted); min-width: min(320px, 100%); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 16px; color: var(--ink); outline: none; }
 .search:focus-within { border-color: var(--ink); }

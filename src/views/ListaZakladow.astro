@@ -1,5 +1,8 @@
 ---
 // Struktura Instytutu: liczby (liczone z tabeli pracowników) i karty zakładów.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -24,10 +27,16 @@ const liczby = [
 const naglowek = T('Struktura i zakłady', 'Structure and departments');
 const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracownia Dydaktyki i Popularyzacji Matematyki.', 'The Institute consists of eight research departments and the Mathematics Education and Outreach Unit.');
 ---
-<Baza tytul={naglowek} opis={lead}>
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: naglowek }]} />
-  <div class="wrap" style="padding-top:32px;padding-bottom:64px">
-    <div class="stats">
+<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
+  {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Instytut”).
+       Telefon: jak dotąd — kafelki .stats pod banerem (nie przenosimy liczb do banera, żeby telefon się nie zmienił). */}
+  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: naglowek }]}>
+    <ul class="pt-liczby tylko-komputer">
+      {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+    </ul>
+  </NaglowekStrony>
+  <div class="wrap lz-wrap">
+    <div class="stats tylko-telefon" data-pagefind-ignore>
       {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
     </div>
 
@@ -55,3 +64,10 @@ const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracowni
     </p>
   </div>
 </Baza>
+
+<style>
+  .lz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css);
+     nad kartami zakładów stały odstęp 24 px, jak na stronie działu „Instytut” */
+  @media (min-width: 761px) { .lz-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }
+</style>
