@@ -51,12 +51,19 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
               {p.grupy.map((g) => (
                 <div class="dropdown-group">
                   <h3>{wybierz(g, 'nazwa', lang)}</h3>
-                  {g.linki.map((l) => (
-                    <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
-                      {wybierz(l, 'etykieta', lang)}
-                      {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-                    </a>
-                  ))}
+                  {g.linki.map((l) => {
+                    // Ikonka linku zewnętrznego stoi tuż za ostatnim słowem (sklejona z nim, żeby nie spadła sama
+                    // do nowej linii) — także gdy długi napis się zawija.
+                    const tekst = wybierz(l, 'etykieta', lang) as string;
+                    const s = tekst.lastIndexOf(' ');
+                    return isExternal(l.adres) ? (
+                      <a class="zew" href={href(l.adres)}>
+                        {s > 0 && tekst.slice(0, s + 1)}<span class="nw">{tekst.slice(s + 1)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></span>
+                      </a>
+                    ) : (
+                      <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>{tekst}</a>
+                    );
+                  })}
                 </div>
               ))}
             </div>
