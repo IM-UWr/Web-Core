@@ -14,7 +14,7 @@ import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import TytulZewn from '../components/TytulZewn.astro';
 import { dayNum, monthShort, range, type Lang } from '../lib/daty';
-import { konferencje, trwaLubBedzie, type Konferencja } from '../lib/tresci';
+import { miejsce, konferencje, trwaLubBedzie, type Konferencja } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -53,7 +53,7 @@ const lead = lang === 'en'
               <span class="event-body">
                 <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
                 <span class="t"><TytulZewn tekst={tytul(k)} zewn={!!href(k)} /></span>
-                {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
+                {k.data.miejsce && <span class="s">{miejsce(k.data.miejsce, lang)}</span>}
               </span>
             </T>
           ); })}
@@ -71,7 +71,7 @@ const lead = lang === 'en'
                   <span class="t"><TytulZewn tekst={tytul(k)} zewn={!!href(k)} /></span>
                   <span class="news-meta">
                     <span>{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                    {k.data.miejsce && <span>· {k.data.miejsce}</span>}
+                    {k.data.miejsce && <span>· {miejsce(k.data.miejsce, lang)}</span>}
                     {k.data.odwolana && <span class="badge">{odwolana}</span>}
                   </span>
                 </span>

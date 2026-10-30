@@ -18,7 +18,7 @@ import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { today, addDays, range, dayNum, monthShort, longWithDay, type Lang } from '../lib/daty';
 import { menuGlowne } from '../lib/menu';
 import {
-  seminaria, konferencje, granty, obrony, trwaLubBedzie, slugOf,
+  seminaria, konferencje, granty, obrony, trwaLubBedzie, slugOf, miejsce,
   type Grant, type Konferencja, type Obrona,
 } from '../lib/tresci';
 
@@ -189,7 +189,7 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
               <span class="event-body">
                 <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
                 <span class="t"><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} zewn={!!k.data.strona} rozmiar={13} /></span>
-                {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
+                {k.data.miejsce && <span class="s">{miejsce(k.data.miejsce, lang)}</span>}
                 {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
               </span>
             </Tag>
@@ -219,7 +219,7 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
                   <span class="pt-b">
                     <span class="pt-k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
                     <span class="pt-t"><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} zewn={!!k.data.strona} rozmiar={13} /></span>
-                    {k.data.miejsce && <span class="pt-s">{k.data.miejsce}</span>}
+                    {k.data.miejsce && <span class="pt-s">{miejsce(k.data.miejsce, lang)}</span>}
                     {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
                   </span>
                 </Tag>

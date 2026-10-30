@@ -15,7 +15,7 @@ import { range, long, short, now, today, hasTime, type Lang } from '../lib/daty'
 import { renderMarkdown } from '../lib/markdown';
 import {
   zaklady, pracownicy, seminaria, referaty, granty, konferencje, obrony, aktualnosci,
-  seminariumReferatu, slugOf, sala, zakladGrantu, rangaStopnia, trwaLubBedzie, type Zaklad, type Pracownik,
+  seminariumReferatu, slugOf, sala, miejsce, zakladGrantu, rangaStopnia, trwaLubBedzie, type Zaklad, type Pracownik,
 } from '../lib/tresci';
 
 interface Props { zaklad: Zaklad; lang: Lang }
@@ -181,7 +181,7 @@ const wszystkieZaklady = await zaklady();
               <li>
                 {/* konferencje nie mają naszych podstron: link na stronę konferencji, bez strony — sam tytuł */}
                 {k.data.strona ? <a href={k.data.strona}><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} rozmiar={13} /></a> : wybierz(k.data, 'tytul', lang)}
-                <span class="muted"> — {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? `, ${k.data.miejsce}` : ''}</span>
+                <span class="muted"> — {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? `, ${miejsce(k.data.miejsce, lang)}` : ''}</span>
                 {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="badge badge-konferencja" style="margin-left:6px">{T('nadchodząca', 'upcoming')}</span>}
               </li>
             ))}

@@ -147,6 +147,24 @@ export function sala(s: string | undefined, lang: Lang = 'pl'): string | undefin
   return /^[\w.\-]{1,6}$/.test(s) ? `${lang === 'en' ? 'room' : 'sala'} ${s}` : s;
 }
 
+// Miejsce wydarzenia, obrony albo konferencji. Pola miejsca nie mają wersji angielskiej, więc na stronach /en
+// typowe polskie fragmenty tłumaczymy tutaj („sala WS, Instytut Matematyczny UWr” → „room WS, Mathematical
+// Institute, University of Wrocław”, „Warszawa” → „Warsaw”). Nazwy spoza listy zostają bez zmian; po polsku — bez zmian.
+const MIEJSCA_EN: [RegExp, string][] = [
+  [/Wydział Matematyki i Informatyki UWr/g, 'Faculty of Mathematics and Computer Science, University of Wrocław'],
+  [/Instytut Matematyczny UWr/g, 'Mathematical Institute, University of Wrocław'],
+  [/Instytut Informatyki UWr/g, 'Institute of Computer Science, University of Wrocław'],
+  [/(^|, )sale ([\w.]+) i ([\w.]+)/g, '$1rooms $2 and $3'],
+  [/(^|, )sale /g, '$1rooms '],
+  [/(^|, )sala /g, '$1room '],
+  [/Warszawa/g, 'Warsaw'],
+  [/Wiedeń/g, 'Vienna'],
+];
+export function miejsce(s: string | null | undefined, lang: Lang = 'pl'): string | undefined {
+  if (!s) return undefined;
+  return lang === 'en' ? MIEJSCA_EN.reduce((m, [re, en]) => m.replace(re, en), s) : s;
+}
+
 // Wspólny format pozycji kalendarza.
 export interface Wydarzenie {
   rodzaj: 'wydarzenie' | 'obrona' | 'referat' | 'konferencja' | 'termin';
@@ -178,20 +196,20 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
     out.push({
       rodzaj: 'wydarzenie', tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, poczatek: a.data.wydarzenie_poczatek,
       koniec: a.data.wydarzenie_koniec, koniecIcs: a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120),
-      miejsce: a.data.wydarzenie_miejsce, href: `/aktualnosci/${slugOf(a.id)}`, uid: `akt-${slugOf(a.id)}`, opis: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka,
+      miejsce: miejsce(a.data.wydarzenie_miejsce, lang), href: `/aktualnosci/${slugOf(a.id)}`, uid: `akt-${slugOf(a.id)}`, opis: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka,
     });
   }
   for (const o of obr) {
     out.push({
       rodzaj: 'obrona', tytul: o.data.kandydat, podtytul: o.data.tytul_rozprawy, poczatek: o.data.termin,
-      koniecIcs: koniecDomyslny(o.data.termin, 120), miejsce: o.data.miejsce, href: `/obrony-doktorskie/${slugOf(o.id)}`, uid: `obr-${slugOf(o.id)}`,
+      koniecIcs: koniecDomyslny(o.data.termin, 120), miejsce: miejsce(o.data.miejsce, lang), href: `/obrony-doktorskie/${slugOf(o.id)}`, uid: `obr-${slugOf(o.id)}`,
     });
   }
   for (const k of konf) {
     if (k.data.odwolana) continue;
     out.push({
       rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, poczatek: k.data.poczatek, koniec: k.data.koniec,
-      miejsce: k.data.miejsce, href: k.data.strona || undefined, uid: `konf-${slugOf(k.id)}`,
+      miejsce: miejsce(k.data.miejsce, lang), href: k.data.strona || undefined, uid: `konf-${slugOf(k.id)}`,
     });
   }
   for (const r of ref) {

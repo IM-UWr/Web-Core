@@ -216,7 +216,7 @@ const sekcje = [
             <div class="tabpanel" role={wieleProgramow ? 'tabpanel' : undefined} id={`prog-${i}`} aria-labelledby={wieleProgramow ? `tab-${i}` : undefined} data-panel>              {p.dotyczy && <p class="notice" style="margin:0 0 12px">{w(p, 'dotyczy')}</p>}
               <ul class="files">
                 {p.dokumenty.map((x) => (
-                  <li><a href={href(x.plik)}><Ikona nazwa="plik" /><span>{w(x, 'nazwa')}{x.opis && <small class="muted" style="display:block;font-weight:500">{x.opis}</small>}</span></a></li>
+                  <li><a href={href(x.plik)}><Ikona nazwa="plik" /><span>{w(x, 'nazwa')}{x.opis && <small class="muted" style="display:block;font-weight:500">{w(x, 'opis')}</small>}</span></a></li>
                 ))}
               </ul>
             </div>

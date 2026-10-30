@@ -9,7 +9,7 @@ import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku } from '../lib/i18n';
 import { longWithDay, short, dayNum, monthShort, plusMinutes, type Lang } from '../lib/daty';
-import { slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../lib/tresci';
+import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../lib/tresci';
 
 interface Props { obrona: Obrona; lang: Lang }
 const { obrona, lang } = Astro.props;
@@ -19,7 +19,7 @@ const { Content } = await render(obrona);
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const tytul = `${lang === 'en' ? 'PhD defence' : 'Obrona doktoratu'}: ${d.kandydat}`;
 const w: Wydarzenie = {
-  rodzaj: 'obrona', tytul, podtytul: d.tytul_rozprawy, poczatek: d.termin, koniecIcs: plusMinutes(d.termin, 120), miejsce: d.miejsce,
+  rodzaj: 'obrona', tytul, podtytul: d.tytul_rozprawy, poczatek: d.termin, koniecIcs: plusMinutes(d.termin, 120), miejsce: miejsce(d.miejsce, lang),
   href: `/obrony-doktorskie/${slug}`, uid: `obr-${slug}`,
 };
 const przyszla = trwaLubBedzie(w);
@@ -41,7 +41,7 @@ const dokumenty = [
         <span class:list={['datebox', { minione: !przyszla }]} aria-hidden="true"><span class="d">{dayNum(d.termin)}</span><span class="m">{monthShort(d.termin, lang)}</span></span>
         <dl>
           <dt>{t(lang, 'kiedy')}</dt><dd>{longWithDay(d.termin, lang)}</dd>
-          {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{d.miejsce}</dd></>}
+          {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{miejsce(d.miejsce, lang)}</dd></>}
           {d.promotorzy.length > 0 && <><dt>{t(lang, 'promotorzy')}</dt><dd>{d.promotorzy.join(', ')}</dd></>}
         </dl>
         {/* bez przycisku „Dodaj do kalendarza” (decyzja: nigdzie na stronie); po terminie — informacja, że obrona się odbyła */}

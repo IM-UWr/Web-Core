@@ -13,7 +13,7 @@ import Galeria from '../components/Galeria.tsx';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, longWithDay, range, dayNum, monthShort, now, today, hasTime, plusMinutes, type Lang } from '../lib/daty';
-import { slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
+import { miejsce, slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
 import ustawienia from '../data/ustawienia.json';
 import { renderMarkdown } from '../lib/markdown';
 
@@ -37,7 +37,7 @@ const tylkoPolski = lang === 'en' && !d.tresc_en;
 const wydarzenie: Wydarzenie | undefined = d.wydarzenie_poczatek
   ? {
       rodzaj: 'wydarzenie', tytul, poczatek: d.wydarzenie_poczatek, koniec: d.wydarzenie_koniec,
-      koniecIcs: d.wydarzenie_koniec || (hasTime(d.wydarzenie_poczatek) ? plusMinutes(d.wydarzenie_poczatek, 120) : undefined), miejsce: d.wydarzenie_miejsce,
+      koniecIcs: d.wydarzenie_koniec || (hasTime(d.wydarzenie_poczatek) ? plusMinutes(d.wydarzenie_poczatek, 120) : undefined), miejsce: miejsce(d.wydarzenie_miejsce, lang),
       href: `/aktualnosci/${slug}`, uid: `akt-${slug}`, opis: zajawka,
     }
   : undefined;
