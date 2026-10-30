@@ -1,5 +1,6 @@
 ---
-// Struktura Instytutu: liczby (liczone z tabeli pracowników) i karty zakładów.
+// Struktura Instytutu: liczby (liczone z tabeli pracowników), krótki tekst o organizacji Instytutu (z CMS: pole
+// struktura_tekst w src/data/dzialy/instytut.json, akapity oddzielone pustą linią) i karty zakładów.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
 // Telefon (≤ 760 px) bez zmian: liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
@@ -10,6 +11,7 @@ import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { zaklady, pracownicy, rangaStopnia } from '../lib/tresci';
+import dzial from '../data/dzialy/instytut.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -25,6 +27,7 @@ const liczby = [
   { n: osoby.filter((o) => o.data.grupa === 'doktorant').length, l: T('doktorantów', 'PhD students') },
 ];
 const naglowek = T('Struktura i zakłady', 'Structure and departments');
+const tekst = ((wybierz(dzial, 'struktura_tekst', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracownia Dydaktyki i Popularyzacji Matematyki.', 'The Institute consists of eight research departments and the Mathematics Education and Outreach Unit.');
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
@@ -39,6 +42,9 @@ const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracowni
     <div class="stats tylko-telefon" data-pagefind-ignore>
       {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
     </div>
+
+    {/* tekst o organizacji Instytutu, żeby strona nie zaczynała się od razu od listy zakładów (komputer i telefon) */}
+    {tekst.length > 0 && <div class="lz-tekst">{tekst.map((a) => <p>{a}</p>)}</div>}
 
     <div class="dept-grid">
       {lista.map((z) => {
@@ -67,6 +73,11 @@ const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracowni
 
 <style>
   .lz-wrap { padding-top: 32px; padding-bottom: 64px; }
+  /* tekst nad kartami — jak „O Instytucie” na stronie działu: akapity w wygodnej szerokości do czytania */
+  .lz-tekst { margin: 0 0 28px; }
+  .lz-tekst p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
+  .lz-tekst p:last-child { margin-bottom: 0; }
+  @media (max-width: 760px) { .lz-tekst { margin: 20px 0 22px; } .lz-tekst p { font-size: 15px; line-height: 1.55; } }
   /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css);
      nad kartami zakładów stały odstęp 24 px, jak na stronie działu „Instytut” */
   @media (min-width: 761px) { .lz-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }
