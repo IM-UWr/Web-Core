@@ -3,6 +3,8 @@
 // Dane: src/data/wladze.json (Pages CMS: Ustawienia strony → Władze Instytutu). Pierwsza osoba na liście = dyrektor (duża karta).
 // Tytuł, e-mail, pokój, stronę i zakład bierzemy z kolekcji pracowników po polu „imie_nazwisko” (dokładnie jak w Pracownikach).
 // Telefony podajemy tylko przy sekretariacie (administracja) — przy pracownikach naukowych nie.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -100,7 +102,7 @@ const radaHtml = await renderMarkdown(w(d.rada, 'opis') || undefined);
 const linki = (d.linki ?? []).filter((l) => l && l.adres && l.etykieta);
 
 ---
-<Baza tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined}>
+<Baza tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={lead || undefined} lang={lang} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }} />
 
   <div class="wrap layout">
@@ -336,6 +338,12 @@ const linki = (d.linki ?? []).filter((l) => l && l.adres && l.etykieta);
   .wl-linki li { border-top: 1px solid var(--line); }
   .wl-linki li:last-child { border-bottom: 1px solid var(--line); }
   .wl-linki .link-arrow { width: 100%; justify-content: space-between; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy treści — .layout w uklad-zwarta.css) ----------
+     Odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Instytut” — treść nie przylega do banera. */
+  @media (min-width: 761px) {
+    .layout { padding-top: 24px; }
+  }
 
   @media (max-width: 640px) {
     .wl-dyr { grid-template-columns: minmax(0, 1fr); align-items: start; }

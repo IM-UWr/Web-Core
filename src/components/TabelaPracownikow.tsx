@@ -152,7 +152,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
             ))}
           </select>
         </label>
-        <div className="chips" role="group" aria-label={napisy.grupa} style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div className="chips" role="group" aria-label={napisy.grupa}>
           <button type="button" className="chip" aria-pressed={grupa === ''} onClick={() => setGrupa('')}>
             {napisy.wszyscy}
           </button>
@@ -164,7 +164,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
         </div>
       </div>
 
-      <p className="count" aria-live="polite" style={{ margin: '0 0 8px', fontSize: 14, color: 'var(--muted)' }}>
+      <p className="count staff-count" aria-live="polite">
         {napisy.osob}: {widoczne.length}
       </p>
 

@@ -2,6 +2,8 @@
 // Lista pracowników. Każda osoba to osobny plik w src/content/pracownicy (edycja w Pages CMS).
 // Kolejność: alfabetycznie po nazwisku; doktorantów komponent dzieli dodatkowo według roku studiów.
 // Telefony podajemy tylko przy administracji (pilnuje tego skrypty/sprawdz_tresci.py).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import { getCollection } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -44,7 +46,7 @@ const lead = lang === 'en'
   ? 'Contact details of the staff, PhD students and administration of the Mathematical Institute.'
   : 'Dane kontaktowe pracowników, doktorantów i administracji Instytutu Matematycznego.';
 ---
-<Baza tytul={t(lang, 'pracownicy')} opis={lead}>
+<Baza tytul={t(lang, 'pracownicy')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'pracownicy')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]} />
   <div class="wrap pr-wrap">
     <TabelaPracownikow client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
@@ -55,4 +57,7 @@ const lead = lang === 'en'
   .pr-wrap { padding-top: 28px; padding-bottom: 64px; }
   /* telefon (≤ 760 px): wygląd „Portal” — mniej miejsca nad i pod spisem */
   @media (max-width: 760px) { .pr-wrap { padding-top: 16px; padding-bottom: 40px; } }
+  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css);
+     nad wyszukiwarką stały odstęp 24 px, jak na stronie działu „Instytut” */
+  @media (min-width: 761px) { .pr-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }
 </style>
