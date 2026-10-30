@@ -1,6 +1,6 @@
 ---
 // Strona działu „Studia” (/studia, /en/studia): wstęp, liczby, kafelki z menu „Studia”, krótki tekst „O studiach”
-// z ramką „W skrócie”, aktualności dla studentów i kontakt
+// z ramką „W skrócie” i aktualności dla studentów (bez sekcji „Kontakt” — kontakty są w „Sprawach studenckich”, decyzja 30.10.2026)
 // („Warto wiedzieć” tylko na stronie głównej i na /warto-wiedziec — decyzja 30.10.2026). Teksty: src/data/dzialy/studia.json;
 // reszta z kolekcji i menu, więc nowy kierunek, specjalność czy link w menu „Studia” sam pojawia się na tej stronie.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
@@ -70,25 +70,14 @@ const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes
 const aktualnosci = dlaStudentow.slice(0, 4);
 const aktualnosciTel = dlaStudentow.slice(0, 6);
 
-// Kontakt: sekretariat dydaktyczny i zastępca dyrektora ds. dydaktycznych — z pól „Kontakt” kierunków (bez dubli).
-// Telefon podajemy tylko przy sekretariacie (administracja).
-type Kontakt = Kierunek['data']['kontakt'][number];
-const kontakty = kierunki.flatMap((k) => k.data.kontakt);
-const klucz = (k: Kontakt) => (k.email || k.osoba).trim().toLowerCase();
-const unikalne = (lista: Kontakt[]) => lista.filter((k, i) => lista.findIndex((x) => klucz(x) === klucz(k)) === i);
-const osobyKontakt = [
-  ...unikalne(kontakty.filter((k) => /^sekretariat dydaktyczny/i.test(k.rola.trim()))).map((k) => ({ ...k, zakres: w(tekst, 'sekretariat_zakres'), tel: k.telefon })),
-  ...unikalne(kontakty.filter((k) => /^zastępca dyrektora (im )?ds\. dydaktycznych/i.test(k.rola.trim()))).map((k) => ({ ...k, zakres: '', tel: undefined })),
-];
-
 const tytul = T('Studia', 'Study');
 const wstep = w(tekst, 'wstep');
 ---
 <Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
        Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, tekst „O studiach” (bez ramki „W skrócie”),
-       aktualności (sześć) i kontakt — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
-       Linki do pełnych podstron („Wszystkie”, „Kto za co odpowiada — wszystkie kontakty”) — zawsze w nagłówku sekcji
+       aktualności (sześć) — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
+       Link do pełnej listy („Wszystkie”) — zawsze w nagłówku sekcji
        (komputer: .zsec-head w global.css; telefon: nagłówek ramki .pt-h), z prawej. */}
   <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
@@ -138,7 +127,7 @@ const wstep = w(tekst, 'wstep');
       </section>
     )}
 
-    <section class="zsec tylko-komputer" aria-labelledby="aktualnosci">
+    <section class="zsec tylko-komputer" aria-labelledby="aktualnosci" style="margin-bottom:0">
       <div class="zsec-head">
         <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
         <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
@@ -176,52 +165,8 @@ const wstep = w(tekst, 'wstep');
           <p class="pt-pusto">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
         )}
       </section>
-      {osobyKontakt.length > 0 && (
-        <section class="pt-box" aria-labelledby="kontakt-tel">
-          <div class="pt-h">
-            <h2 id="kontakt-tel">{T('Kontakt', 'Contact')}</h2>
-            <a class="pt-all" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
-          </div>
-          <ul class="pt-list dz-osoby">
-            {osobyKontakt.map((k) => (
-              <li>
-                <span class="dz-rola">{w(k, 'rola')}</span>
-                <span class="pt-t">{k.osoba}</span>
-                {k.zakres && <span class="pt-s">{k.zakres}</span>}
-                <span class="dz-c">
-                  {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
-                  {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
-                  {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
     </div>
 
-    <section class="zsec tylko-komputer" aria-labelledby="kontakt" style="margin-bottom:0">
-      <div class="zsec-head">
-        <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
-        <a class="link-arrow" href={href('/studia/sprawy-studenckie')}>{T('Kto za co odpowiada — wszystkie kontakty', 'Who handles what — all contacts')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      {osobyKontakt.length > 0 && (
-        <ul class="people">
-          {osobyKontakt.map((k) => (
-            <li class="person">
-              <span class="dz-rola">{w(k, 'rola')}</span>
-              <span class="os-n">{k.osoba}</span>
-              {k.zakres && <span class="dz-zakres">{k.zakres}</span>}
-              <span class="os-c">
-                {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
-                {k.tel && <span>{T('tel.', 'phone')} {k.tel}</span>}
-                {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
   </div>
 </Baza>
 
@@ -251,8 +196,6 @@ const wstep = w(tekst, 'wstep');
   @media (min-width: 761px) {
     .dz-o-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
   }
-  .dz-rola { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-zakres { font-size: 14px; margin: 2px 0 4px; }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki (jak na „Instytucie” i „Nauce”) ----------
      Odstęp nad pierwszą sekcją stały (24 px): bursztynowy początek kreski sekcji nie przylega do dolnej krawędzi banera. */
@@ -262,7 +205,6 @@ const wstep = w(tekst, 'wstep');
     .dz-g h3 { margin: 0 0 6px; }
     .dz-tiles { gap: 6px; }
     .dz-tile { display: flex; min-height: 42px; padding-block: 6px; }
-    .dz-zakres { margin: 0 0 2px; }
   }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stronami „Instytut” i „Nauka”) ---------- */
@@ -281,12 +223,7 @@ const wstep = w(tekst, 'wstep');
     .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
     :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
     .dz-o-tekst p { font-size: 15px; line-height: 1.55; }
-    /* kontakt (ramka w bloku tylko na telefon) */
-    .dz-osoby > li { display: flex; flex-direction: column; gap: 1px; padding: 8px 2px; }
-    .dz-osoby .dz-rola { letter-spacing: .05em; }
-    .dz-c { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
-    .dz-c a { color: var(--ink); }
-    /* aktualności i kontakt (bloki tylko na telefon) */
+    /* aktualności (blok tylko na telefon) */
     .dz-tel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
   }
 </style>
