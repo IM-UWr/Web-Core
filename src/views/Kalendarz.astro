@@ -1,7 +1,8 @@
 ---
 // Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta jak w „Zwarta” (uklad="zwarta portal-baner"),
-// miesiące jako sekcje z kreską jak na stronach działów, pozycje w białej ramce. Telefon (≤ 760 px) bez zmian.
+// miesiące jako sekcje z kreską jak na stronach działów, pozycje w białej ramce. Filtry rodzaju w banerze;
+// pod banerem przyciski widoku „Nadchodzące” / „Archiwum”. Telefon (≤ 760 px): poza przyciskami widoku bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -43,12 +44,7 @@ const lead = lang === 'en'
 ---
 <Baza tytul={t(lang, 'kalendarz')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <div class="filters kal-filtry">
-      {/* widok: nadchodzące / archiwum (ten sam styl przycisków co filtry obok) */}
-      <div class="chips" role="group" aria-label={lang === 'en' ? 'View' : 'Widok'}>
-        {widoki.map((v, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
-      </div>
-      <span class="kal-kreska" aria-hidden="true"></span>
+    <div class="filters">
       <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
         <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
         <button type="button" class="chip" aria-pressed="false" data-rodzaj="wydarzenie">{RODZAJE.wydarzenie[lang]}</button>
@@ -61,6 +57,10 @@ const lead = lang === 'en'
 
   <div class="wrap layout kal-wrap">
     <div class="main">
+      {/* widok pod banerem: nadchodzące / archiwum (przyciski jak w tabeli pracowników) */}
+      <div class="chips kal-widok" role="group" aria-label={lang === 'en' ? 'View' : 'Widok'}>
+        {widoki.map((v, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
+      </div>
       {widoki.map((v, i) => (
         <div data-widok={v.id} hidden={i > 0} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
           {v.grupy.length === 0 && <p class="muted kal-pusto">{v.pusty}</p>}
@@ -141,8 +141,6 @@ const lead = lang === 'en'
     .kal-ramka :global(.row-item + .row-item) { border-top: 1px solid var(--line); }
     .kal-pusto { margin: 0; padding: 16px 18px; }
   }
-  /* dwie grupy przycisków w jednym wierszu: widok | rodzaj, rozdzielone cienką kreską */
-  .kal-filtry { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px 14px; }
-  .kal-kreska { align-self: stretch; width: 1px; min-height: 28px; background: rgb(255 255 255 / .35); }
-  @media (max-width: 760px) { .kal-kreska { display: none; } }
+  /* przyciski widoku pod banerem, nad listą miesięcy */
+  .kal-widok { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
 </style>
