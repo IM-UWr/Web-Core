@@ -212,8 +212,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
       </section>
     )}
 
-    <WartoWiedziec lang={lang} dzial="nauka" klasa="tylko-komputer" />
-
     <section class="zsec tylko-komputer" aria-labelledby="seminaria">
       <h2 id="seminaria">{naglowekSeminariow}</h2>
       <p class="dz-intro">{range(tydzien.od, tydzien.do, lang)}</p>
@@ -318,6 +316,9 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
         <a class="link-arrow" href={href('/obrony-doktorskie')}>{T('Wszystkie obrony', 'All PhD defences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
       </p>
     </section>
+
+    {/* „Warto wiedzieć” na samym dole strony (komputer — ten blok; telefon — blok niżej) */}
+    <WartoWiedziec lang={lang} dzial="nauka" klasa="tylko-komputer" />
 
     <div class="tylko-telefon" data-pagefind-ignore>
       <WartoWiedziec lang={lang} dzial="nauka" uklad="portal" />
