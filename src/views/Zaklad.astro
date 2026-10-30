@@ -1,5 +1,8 @@
 ---
 // Podstrona zakładu: opis, skład (z tabeli pracowników), seminaria, granty, konferencje, obrony, aktualności.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (bez liczb — zakład ich nie ma; w banerze obszary badań),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px) bez zmian.
 import { zTytulem } from '../lib/osoby';
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
@@ -69,7 +72,7 @@ const naglowki = [
 ];
 const wszystkieZaklady = await zaklady();
 ---
-<Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie}>
+<Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={nazwa} lead={opis} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
     {obszary.length > 0 && <div class="tags">{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
   </NaglowekStrony>
@@ -212,3 +215,9 @@ const wszystkieZaklady = await zaklady();
     </aside>
   </div>
 </Baza>
+
+<style>
+  /* komputer (≥ 761 px): odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Instytut” — bursztynowy
+     początek kreski sekcji nie przylega do banera (reszta odstępów .layout — uklad-zwarta.css) */
+  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+</style>

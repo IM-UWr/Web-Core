@@ -128,19 +128,20 @@ const kafelki = [
     </section>
   </div>
 
-  {wydarzenia.length > 0 && (
-    <section class="section wydarzenia-pas gl-box gl-wyd" aria-labelledby="h2-wyd" data-wydarzenia>
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="h2-wyd">{t(lang, 'najblizsze')}</h2>
-          <a class="link-arrow" href={href('/kalendarz')}>{t(lang, 'kalendarz')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-        </div>
-        <div class="event-grid">
-          {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} />)}
-        </div>
+  {/* Najbliższe wydarzenia — sekcja jest zawsze; gdy nic nie ma (albo skrypt niżej schowa zakończone), pokazuje
+       komunikat „Brak zapowiedzianych wydarzeń.” (jak puste „Najbliższe seminaria”). */}
+  <section class="section wydarzenia-pas gl-box gl-wyd" aria-labelledby="h2-wyd" data-wydarzenia>
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="h2-wyd">{t(lang, 'najblizsze')}</h2>
+        <a class="link-arrow" href={href('/kalendarz')}>{t(lang, 'kalendarz')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
       </div>
-    </section>
-  )}
+      <div class="event-grid">
+        {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} />)}
+      </div>
+      <p class="sem-empty" data-wydarzenia-pusto hidden={wydarzenia.length > 0}>{t(lang, 'brakWydarzen')}</p>
+    </div>
+  </section>
 
   <section class="section tylko-komputer" aria-labelledby="h2-akt">
     <div class="wrap">
@@ -228,7 +229,8 @@ const kafelki = [
       const koniec = k.dataset.koniec || '';
       if (koniec && (hasTime(koniec) ? koniec < n : koniec < d)) k.remove();
     });
-    if (!sekcja.querySelector('[data-koniec]')) sekcja.remove();
+    // wszystkie się skończyły → komunikat zamiast pustej sekcji
+    if (!sekcja.querySelector('[data-koniec]')) sekcja.querySelector<HTMLElement>('[data-wydarzenia-pusto]')?.removeAttribute('hidden');
   }
 </script>
 

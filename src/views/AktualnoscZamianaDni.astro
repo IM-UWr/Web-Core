@@ -3,6 +3,9 @@
 // Tekst z szablonu w src/data/kolory-dni.json (pole „aktualnosci”, Pages CMS → Kalendarz zajęć), dane z tej samej zamiany.
 // Na listach aktualności pozycja jest tylko w oknie widoczności (od N dni roboczych przed zamianą do dnia zamiany);
 // sama strona istnieje zawsze (stare linki działają), poza oknem bez indeksowania i bez wyszukiwarki strony.
+// Wygląd na komputerze (≥ 761 px): jak w wariancie „Zwarta” (uklad="zwarta", style: src/styles/uklad-zwarta.css i blok niżej);
+// tekst ogłoszenia i przycisk kalendarza w białej ramce .zd-ramka (jak treść zwykłej aktualności) — wzór tła nie prześwituje
+// pod tekstem. Telefon (≤ 760 px) bez zmian: ramka nie ma tam żadnego stylu.
 import Baza from '../layouts/Baza.astro';
 import Wstecz from '../components/Wstecz.astro';
 import Ikona from '../components/Ikona.astro';
@@ -24,14 +27,14 @@ const dla = ['studenci', 'pracownicy'];
 const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dni', 'day-swaps')}`;
 ---
-<Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie}>
+<Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie} uklad="zwarta">
   {!a.wOknie && <meta slot="head" name="robots" content="noindex" />}
   <div class="wrap crumbs-inline">
     <Wstecz etykieta={t(lang, 'wszystkieAktualnosci')} adres="/aktualnosci" lang={lang} />
   </div>
 
   <div class="wrap layout zd" style="padding-top:16px">
-    <article class="main">
+    <article class="main zd-main">
       <header class="article-head">
         <div class="news-meta">
           <span class="badge badge-ogloszenie">{RODZAJE.ogloszenie[lang]}</span>
@@ -52,11 +55,14 @@ const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dn
         </div>
       </section>
 
-      <div class="prose">
-        <Fragment set:html={html} />
-      </div>
+      {/* Tekst ogłoszenia w ramce (na komputerze biała karta; na telefonie zwykły blok bez stylu). */}
+      <div class="zd-ramka">
+        <div class="prose">
+          <Fragment set:html={html} />
+        </div>
 
-      <p><a class="btn" href={kalendarz}><Ikona nazwa="kalendarz" rozmiar={18} />{T('Kalendarz zajęć — rok akademicki', 'Class calendar — academic year')}</a></p>
+        <p><a class="btn" href={kalendarz}><Ikona nazwa="kalendarz" rozmiar={18} />{T('Kalendarz zajęć — rok akademicki', 'Class calendar — academic year')}</a></p>
+      </div>
     </article>
 
     <aside class="side" data-pagefind-ignore>
@@ -91,5 +97,16 @@ const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dn
   @media (max-width: 520px) {
     .zd-dzien { align-items: flex-start; gap: 14px; padding: 16px; }
     .zd-skrot { width: 56px; height: 56px; font-size: 19px; }
+  }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta”, tekst w białej ramce ----------
+     Ramka jak treść zwykłej aktualności (Aktualnosc.astro, .ak-ramka): tło strony, cienka ramka, zaokrąglenie --radius-l.
+     Kolumna wpisu najwyżej na szerokość ramki z tekstem; karta dnia na całą szerokość kolumny, równo z ramką. */
+  @media (min-width: 761px) {
+    .zd-main { --zd-odstep: clamp(20px, 2.2vw, 32px); max-width: calc(800px + 2 * var(--zd-odstep) + 2px); }
+    .zd-dzien { margin-bottom: 16px; padding: 16px 20px; max-width: none; }
+    .zd-skrot { width: 64px; height: 64px; font-size: 22px; }
+    .zd-ramka { padding: var(--zd-odstep); border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
+    .zd-ramka > :last-child { margin-bottom: 0; }
   }
 </style>

@@ -1,6 +1,9 @@
 ---
 import Wstecz from '../components/Wstecz.astro';
 // Pojedyncza aktualność: blok wydarzenia, zdjęcie, treść, galeria, załączniki, nowszy/starszy wpis.
+// Wygląd na komputerze (≥ 761 px): jak w wariancie „Zwarta” (uklad="zwarta", style: src/styles/uklad-zwarta.css i blok niżej);
+// treść wpisu (zdjęcie, tekst, galeria, album, załączniki, „Udostępnij”) w białej ramce .ak-ramka — wzór tła nie prześwituje
+// pod tekstem. Telefon (≤ 760 px) bez zmian: ramka nie ma tam żadnego stylu (zwykły blok, marginesy jak dotąd).
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import Ikona from '../components/Ikona.astro';
@@ -45,13 +48,13 @@ const najblizsze = (await wydarzeniaNaGlowna(4, lang, Number((ustawienia as any)
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
 ---
-<Baza tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article">
+<Baza tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta">
   <div class="wrap crumbs-inline">
     <Wstecz etykieta={t(lang, 'wszystkieAktualnosci')} adres="/aktualnosci" lang={lang} />
   </div>
 
   <div class="wrap layout" style="padding-top:16px">
-    <article class="main">
+    <article class="main ak-main">
       <header class="article-head">
         <div class="news-meta">
           <span class={`badge badge-${d.rodzaj}`}>{RODZAJE[d.rodzaj][lang]}</span>
@@ -63,7 +66,7 @@ const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
       </header>
 
       {wydarzenie && (
-        <section class="event-box" aria-label={lang === 'en' ? 'Event details' : 'Szczegóły wydarzenia'} style="margin-bottom:28px">
+        <section class="event-box ak-wydarzenie" aria-label={lang === 'en' ? 'Event details' : 'Szczegóły wydarzenia'}>
           <span class="datebox" aria-hidden="true"><span class="d">{dayNum(wydarzenie.poczatek)}</span><span class="m">{monthShort(wydarzenie.poczatek, lang)}</span></span>
           <dl>
             <dt>{t(lang, 'kiedy')}</dt>
@@ -83,54 +86,57 @@ const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
         </section>
       )}
 
-      {d.zdjecie && (
-        <figure class="article-figure">
-          <img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />
-          {d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}
-        </figure>
-      )}
+      {/* Treść wpisu w ramce (na komputerze biała karta; na telefonie zwykły blok bez stylu). */}
+      <div class="ak-ramka">
+        {d.zdjecie && (
+          <figure class="article-figure">
+            <img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />
+            {d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}
+          </figure>
+        )}
 
-      {tylkoPolski && <p class="notice" lang="en">{t('en', 'wersjaPolska')}</p>}
-      <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
-        {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
-      </div>
+        {tylkoPolski && <p class="notice" lang="en">{t('en', 'wersjaPolska')}</p>}
+        <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
+          {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
+        </div>
 
-      {d.galeria.length > 0 && (
-        <section class="article-block" aria-labelledby="h-galeria">
-          <h2 id="h-galeria">{t(lang, 'galeria')}</h2>
-          <Galeria
-            client:visible
-            zdjecia={d.galeria.map((g) => ({ src: u(g.plik), podpis: g.podpis }))}
-            etykieta={t(lang, 'galeria')}
-            zamknij={lang === 'en' ? 'Close' : 'Zamknij'}
-            poprzednie={lang === 'en' ? 'Previous photo' : 'Poprzednie zdjęcie'}
-            nastepne={lang === 'en' ? 'Next photo' : 'Następne zdjęcie'}
-          />
-        </section>
-      )}
+        {d.galeria.length > 0 && (
+          <section class="article-block" aria-labelledby="h-galeria">
+            <h2 id="h-galeria">{t(lang, 'galeria')}</h2>
+            <Galeria
+              client:visible
+              zdjecia={d.galeria.map((g) => ({ src: u(g.plik), podpis: g.podpis }))}
+              etykieta={t(lang, 'galeria')}
+              zamknij={lang === 'en' ? 'Close' : 'Zamknij'}
+              poprzednie={lang === 'en' ? 'Previous photo' : 'Poprzednie zdjęcie'}
+              nastepne={lang === 'en' ? 'Next photo' : 'Następne zdjęcie'}
+            />
+          </section>
+        )}
 
-      {d.album && (
-        <p class="article-block"><a class="btn" href={d.album}><Ikona nazwa="zdjecia" rozmiar={18} />{t(lang, 'album')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>
-      )}
+        {d.album && (
+          <p class="article-block ak-album"><a class="btn" href={d.album}><Ikona nazwa="zdjecia" rozmiar={18} />{t(lang, 'album')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>
+        )}
 
-      {d.zalaczniki.length > 0 && (
-        <section class="article-block" aria-labelledby="h-zal">
-          <h2 id="h-zal">{t(lang, 'zalaczniki')}</h2>
-          <ul class="files">
-            {d.zalaczniki.map((z) => (
-              <li><a href={href(z.plik)}><Ikona nazwa="plik" />{z.nazwa || z.plik.split('/').pop()}</a></li>
-            ))}
-          </ul>
-        </section>
-      )}
+        {d.zalaczniki.length > 0 && (
+          <section class="article-block" aria-labelledby="h-zal">
+            <h2 id="h-zal">{t(lang, 'zalaczniki')}</h2>
+            <ul class="files">
+              {d.zalaczniki.map((z) => (
+                <li><a href={href(z.plik)}><Ikona nazwa="plik" />{z.nazwa || z.plik.split('/').pop()}</a></li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-      <div class="share">
-        <span>{t(lang, 'udostepnij')}:</span>
-        <button type="button" class="btn btn-small" data-kopiuj={adres} data-ok={t(lang, 'skopiowano')}><Ikona nazwa="link" rozmiar={16} /><span>{t(lang, 'kopiuj')}</span></button>
+        <div class="share">
+          <span>{t(lang, 'udostepnij')}:</span>
+          <button type="button" class="btn btn-small" data-kopiuj={adres} data-ok={t(lang, 'skopiowano')}><Ikona nazwa="link" rozmiar={16} /><span>{t(lang, 'kopiuj')}</span></button>
+        </div>
       </div>
 
       {(nowszy || starszy) && (
-        <nav class="pn" aria-label={lang === 'en' ? 'Other posts' : 'Inne wpisy'} style="margin-top:28px">
+        <nav class="pn ak-pn" aria-label={lang === 'en' ? 'Other posts' : 'Inne wpisy'}>
           {nowszy ? (
             <a href={u(wJezyku(`/aktualnosci/${slugOf(nowszy.id)}`, lang))}><span class="l">← {t(lang, 'nowszy')}</span><span class="t">{tytulInny(nowszy)}</span></a>
           ) : <span />}
@@ -152,3 +158,22 @@ const adres = absolute(wJezyku(`/aktualnosci/${slug}`, lang), Astro.site);
   </div>
 </Baza>
 
+<style>
+  .ak-wydarzenie { margin-bottom: 28px; }
+  .ak-pn { margin-top: 28px; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta”, treść wpisu w białej ramce ----------
+     Ramka jak inne białe karty na komputerze (tło strony, cienka ramka, zaokrąglenie --radius-l), w środku wygodny odstęp.
+     Kolumna wpisu najwyżej na szerokość ramki z tekstem (800 px tekstu + odstępy ramki): blok wydarzenia, ramka i „Nowszy /
+     Starszy wpis” mają tę samą szerokość także bez prawego paska (wtedy wolne miejsce zostaje po prawej, jak dotąd obok tekstu). */
+  @media (min-width: 761px) {
+    .ak-main { --ak-odstep: clamp(20px, 2.2vw, 32px); max-width: calc(800px + 2 * var(--ak-odstep) + 2px); }
+    .ak-wydarzenie { margin-bottom: 16px; }
+    .ak-ramka { padding: var(--ak-odstep); border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
+    .ak-ramka > :first-child { margin-top: 0; }
+    .ak-ramka > :last-child { margin-bottom: 0; }
+    /* przycisk „Pełny album zdjęć” w szerokości napisu, nie przez całą ramkę */
+    .ak-album { align-items: flex-start; }
+    .ak-pn { margin-top: 16px; }
+  }
+</style>
