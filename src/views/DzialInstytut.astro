@@ -54,10 +54,11 @@ const naglowek = T('Instytut', 'Institute');
 const lead = wybierz(dzial, 'wstep', lang);
 const oInstytucie = ((wybierz(dzial, 'o_instytucie', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 // Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
-type Fakt = { wartosc?: string; opis?: string; opis_en?: string };
+// wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
+type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
 const fakty = (((dzial as any).o_instytucie_fakty ?? []) as Fakt[])
   .filter((f) => f?.wartosc?.trim())
-  .map((f) => ({ w: f.wartosc!.trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
+  .map((f) => ({ w: ((lang === 'en' && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
 const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">

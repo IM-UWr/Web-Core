@@ -57,10 +57,11 @@ const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 // „O studiach” — akapity z CMS (oddzielone pustą linią) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”
 // na stronie „Instytut”): lista {wartosc, opis, opis_en}, fakty jeden pod drugim; pozycje bez wartości pomijamy.
 const oStudiach = ((w(tekst, 'o_studiach') as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
-type Fakt = { wartosc?: string; opis?: string; opis_en?: string };
+// wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
+type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
 const fakty = (((tekst as any).o_studiach_fakty ?? []) as Fakt[])
   .filter((f) => f?.wartosc?.trim())
-  .map((f) => ({ w: f.wartosc!.trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
+  .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
 // (zakres lat, np. 2022–2025, nie łamie się po półpauzie — wąska kolumna ramki, 300 px)
 
 // Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;
