@@ -1,5 +1,8 @@
 ---
 // Podstrona specjalności. Treść: src/content/specjalnosci/<id>.md (edycja w Pages CMS).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (etykiety specjalności w banerze jak dotąd),
+// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px) bez zmian.
 import { zTytulem } from '../lib/osoby';
 import { render, getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
@@ -55,7 +58,7 @@ const sekcje = [
   ...(opiekunowie.length ? [{ slug: 'opiekun', text: T('Opiekun specjalności', 'Coordinator') }] : []),
 ].map((s) => ({ depth: 2, ...s }));
 ---
-<Baza tytul={`${nazwa} — ${nazwaKierunku}`} opis={w(d, 'opis')} opublikowany={d.opublikowany}>
+<Baza tytul={`${nazwa} — ${nazwaKierunku}`} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); etykiety specjalności w banerze. */}
   <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} lang={lang} nadtytul={`${nazwaKierunku} · ${T('specjalność', 'specialisation')}`} wstecz={{ etykieta: nazwaKierunku, adres: `/studia/${d.kierunek}#specjalnosci` }}>
     <div class="tags">
@@ -65,7 +68,7 @@ const sekcje = [
     </div>
   </NaglowekStrony>
 
-  <div class="wrap layout">
+  <div class="wrap layout sp-uklad">
     <div class="main">
       <SpisTresci naglowki={sekcje} lang={lang} wariant="gora" />
 
@@ -220,3 +223,9 @@ const sekcje = [
     </aside>
   </div>
 </Baza>
+
+<style>
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Studia” — kreska sekcji nie przylega do banera. */
+  @media (min-width: 761px) { .sp-uklad { padding-top: 24px; } }
+</style>

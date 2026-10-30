@@ -34,15 +34,17 @@ const rodzic = linkiDzialu.filter((l) => !isExternal(l.adres) && adres.startsWit
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 // Prawy pasek: domyślnie tylko spis „Na tej stronie”, bez menu działu (decyzja właściciela); pole „Prawy pasek” w CMS może to zmienić dla strony.
 const pasek = d.pasek_boczny ?? 'spis';
-// Wygląd na komputerze (≥ 761 px): strony działu „Instytut” (adres /instytut/…, także po angielsku /en/instytut/…, np. kontakt
-// i infrastruktura informatyczna z podstronami) mają baner jak w wariancie „Portal” i treść jak w wariancie „Zwarta”,
-// tak jak strona działu i pozostałe podstrony Instytutu. Ten widok obsługuje też strony innych działów (np. /studia/…) —
-// tam wygląd się nie zmienia (bez propu `uklad`). Telefon (≤ 760 px) bez zmian na wszystkich stronach.
-const wygladInstytutu = adres.startsWith('/instytut/');
+// Wygląd na komputerze (≥ 761 px): strony działów „Instytut” i „Studia” (adres /instytut/… lub /studia/…; `adres` to id pliku,
+// więc obejmuje też wersje angielskie /en/instytut/…, /en/studia/…) — np. kontakt, infrastruktura informatyczna z podstronami,
+// pierwszy rok, egzaminy i dyplom, sprawy studenckie, podstrony szkoły doktorskiej — mają baner jak w wariancie „Portal”
+// i treść jak w wariancie „Zwarta”, tak jak strony tych działów i ich pozostałe podstrony. Strony innych działów z tego
+// widoku — bez zmian (bez propu `uklad`). Telefon (≤ 760 px) bez zmian na wszystkich stronach.
+const DZIALY_PORTAL_ZWARTA = ['/instytut/', '/studia/'];
+const wygladPortalZwarta = DZIALY_PORTAL_ZWARTA.some((p) => adres.startsWith(p));
 ---
-<Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladInstytutu ? 'zwarta portal-baner' : undefined}>
+<Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}>
   <NaglowekStrony tytul={tytul} lead={opis} lang={lang} okruszki={[...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang), adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang), adres: rodzic.adres }] : []), { etykieta: tytul }]} />
-  <div class:list={['wrap layout', wygladInstytutu && 'st-odstep']}>
+  <div class:list={['wrap layout', wygladPortalZwarta && 'st-odstep']}>
     <div class="main">
       {(pasek === 'spis' || pasek === 'oba') && <SpisTresci naglowki={naglowki} lang={lang} wariant="gora" />}
       {tylkoPolski && <p class="notice">{t('en', 'wersjaPolska')}</p>}
@@ -71,7 +73,7 @@ const wygladInstytutu = adres.startsWith('/instytut/');
 </Baza>
 
 <style>
-  /* komputer (≥ 761 px), strony Instytutu: odstęp nad treścią stały (24 px), jak na stronie działu „Instytut” — kreska
+  /* komputer (≥ 761 px), strony Instytutu i Studiów: odstęp nad treścią stały (24 px), jak na stronach działów — kreska
      pierwszej sekcji nie przylega do banera (reszta odstępów .layout — uklad-zwarta.css) */
   @media (min-width: 761px) { .st-odstep { padding-top: 24px; } }
 </style>

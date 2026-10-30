@@ -1,5 +1,9 @@
 ---
 // Strona kierunku studiów (np. Matematyka). Treść: src/content/kierunki/<kierunek>.md (edycja w Pages CMS).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (opis → przyciski z pola `przyciski` → liczby z pola
+// `fakty` w jednym wierszu, jak na stronie działu „Studia”), reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku); spis „Na tej stronie” z prawej.
+// Telefon (≤ 760 px) bez zmian: liczby w kafelkach 2×2 pod banerem (blok .tylko-telefon).
 import { zTytulem } from '../lib/osoby';
 import { render, getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
@@ -78,9 +82,11 @@ const sekcje = [
   ...(d.akty.length ? [{ slug: 'akty', text: T('Akty prawne', 'Regulations') }] : []),
 ].map((s) => ({ depth: 2, ...s }));
 ---
-<Baza tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany}>
+<Baza tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   {/* Telefon (≤ 760 px) — wygląd „Portal”: fakty 2×2, zwartsze sekcje (style na dole). */}
-  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); przyciski w banerze, liczby pod nim. */}
+  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); przyciski w banerze (pierwszy wyróżniony).
+       Komputer: pod przyciskami liczby kierunku w jednym wierszu (.pt-liczby, jak na stronie działu „Studia”).
+       Telefon: jak dotąd — liczby w kafelkach .stats pod banerem (nie idą do banera, żeby telefon się nie zmienił). */}
   <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} lang={lang} nadtytul={d.podtytul ? w(d, 'podtytul') : undefined} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}>
     {d.przyciski.length > 0 && (
       <div class="btn-row kh-btns">
@@ -89,12 +95,17 @@ const sekcje = [
         ))}
       </div>
     )}
+    {d.fakty.length > 0 && (
+      <ul class="pt-liczby kh-liczby tylko-komputer">
+        {d.fakty.map((f) => <li><span class="n">{f.wartosc}</span>{w(f, 'etykieta')}</li>)}
+      </ul>
+    )}
   </NaglowekStrony>
 
   <div class="wrap layout kier">
     <div class="main">
       {d.fakty.length > 0 && (
-        <div class="stats kh-fakty">
+        <div class="stats kh-fakty tylko-telefon" data-pagefind-ignore>
           {d.fakty.map((f) => <div class="stat"><span class="n">{f.wartosc}</span><span class="l">{w(f, 'etykieta')}</span></div>)}
         </div>
       )}
@@ -330,6 +341,16 @@ const sekcje = [
   /* liczby kierunku mniejsze niż w statystykach działów (34 px) — „6 semestrów”, „licencjat” mieszczą się w kafelku */
   .kh-fakty .stat { padding: 16px 18px; }
   .kh-fakty .stat .n { font-size: 24px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+
+  /* ---------- komputer (≥ 761 px): baner „Portal”, treść „Zwarta” (reszta odstępów .layout — uklad-zwarta.css) ----------
+     Przyciski w banerze trochę mniejsze (jak .btn-small, nieco szersze), liczby kierunku w wierszu pod nimi.
+     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Studia” — kreska sekcji nie przylega do banera. */
+  @media (min-width: 761px) {
+    .kh-btns { gap: 8px; margin-top: 4px; }
+    .kh-btns .btn { min-height: 40px; padding: 0 18px; font-size: 14.5px; }
+    .kh-liczby { margin-top: 6px; max-width: none; }
+    .kier { padding-top: 24px; }
+  }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {

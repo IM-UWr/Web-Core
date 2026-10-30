@@ -7,6 +7,8 @@
 // semestru z podświetleniem widocznej sekcji (SpisTresci.astro; kotwice #zimowy-o, #letni-l …), na węższych ekranach zwinięty nad planem.
 // Dane: src/data/plan/plan.json — pobierane automatycznie z USOS (anonimowo) przez skrypty/plan/pobierz_plan.py,
 // uruchamiany przez workflow .github/workflows/plan-zajec.yml kilka razy dziennie. Danych nie edytuje się ręcznie.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css, plan.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import PrzelacznikSemestrow from '../components/PrzelacznikSemestrow.astro';
@@ -104,7 +106,7 @@ const aktywny = semestry[wybierzSemestr(semestry.map((x) => ({ od: x.s.od, do: x
 let licznik = 0;
 const idPrzedmiotu = () => `pz-p${++licznik}`;
 ---
-<Baza tytul={T.tytul} opis={T.lead}>
+<Baza tytul={T.tytul} opis={T.lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={T.tytul} lead={T.lead} lang={lang} okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]} />
 
   <div class="wrap layout plan-strona">
@@ -180,3 +182,9 @@ const idPrzedmiotu = () => `pz-p${++licznik}`;
     )}
   </div>
 </Baza>
+
+<style>
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad przełącznikiem semestrów stały (24 px), jak na stronie działu „Studia” — treść nie przylega do banera. */
+  @media (min-width: 761px) { .plan-strona { padding-top: 24px; } }
+</style>

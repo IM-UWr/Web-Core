@@ -6,6 +6,8 @@
 // (data-ps-dla); bez JS widać oba semestry, każdy podpisany.
 // Jedno źródło dat: terminy semestru, okresy zajęć, dni wolne i zamiany dni są w src/data/kolory-dni.json (Pages CMS),
 // kolory liczy src/lib/kolory-dni.ts — ta strona jest też podglądem dla redaktora.
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -86,7 +88,7 @@ const naglowki = [
   ...dalej.naglowki,
 ];
 ---
-<Baza tytul={naglowek} opis={lead}>
+<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Studia', 'Study'), adres: '/studia' }, { etykieta: naglowek }]} />
   <div class="wrap layout kd">
     <div class="main">
@@ -316,4 +318,18 @@ const naglowki = [
   :global(html.js) .kd-podpis-ps { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .kd-wspolny { margin-top: 18px; }
   .kd-sem h3 { margin-top: 1.4em; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
+     Odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Studia” — treść nie przylega do banera.
+     Pole „Dziś” w dniu bez zajęć (bez koloru) — białe jak pozostałe karty, nie szare; wstęp „Kolorów dni” czcionką treści (16 px).
+     Nagłówki „Kolory dni” i „Do pobrania” jak nagłówek „Rok w skrócie” (.prose h2) i sekcje innych stron: kreska
+     z bursztynowym początkiem nad tytułem (Ustawienia → „Sekcje”: linia — tlo.css), ten sam rozmiar (uklad-zwarta.css). */
+  @media (min-width: 761px) {
+    .kd { padding-top: 24px; }
+    .kd-dzis[data-kolor='brak'] { background: var(--bg); }
+    .kd-wstep { font-size: 16px; line-height: 1.55; }
+    .kd-h2 { margin: 1.3em 0 .45em; font-size: 22px; }
+    :global(body[data-sekcje='linia']) .kd-h2 { position: relative; margin-top: 1.5em; padding-top: 14px; border-top: 1px solid var(--line); }
+    :global(body[data-sekcje='linia']) .kd-h2::before { content: ''; position: absolute; top: -2px; left: 0; width: 64px; height: 3px; border-radius: 2px; background: var(--accent); }
+  }
 </style>
