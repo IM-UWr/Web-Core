@@ -53,6 +53,11 @@ const mapaEmbed = k.adres ? `https://www.google.com/maps?q=${encodeURIComponent(
 const naglowek = T('Instytut', 'Institute');
 const lead = wybierz(dzial, 'wstep', lang);
 const oInstytucie = ((wybierz(dzial, 'o_instytucie', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+// Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
+type Fakt = { wartosc?: string; opis?: string; opis_en?: string };
+const fakty = (((dzial as any).o_instytucie_fakty ?? []) as Fakt[])
+  .filter((f) => f?.wartosc?.trim())
+  .map((f) => ({ w: f.wartosc!.trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
 const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
@@ -93,7 +98,17 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
     {oInstytucie.length > 0 && (
       <section class="zsec dz-o" aria-labelledby="o-instytucie">
         <h2 id="o-instytucie">{T('O Instytucie', 'About the Institute')}</h2>
-        {oInstytucie.map((a) => <p>{a}</p>)}
+        <div class="dz-o-uklad">
+          <div class="dz-o-tekst">{oInstytucie.map((a) => <p>{a}</p>)}</div>
+          {fakty.length > 0 && (
+            <aside class="dz-o-fakty tylko-komputer" aria-labelledby="w-skrocie">
+              <p class="dz-o-fakty-h" id="w-skrocie">{T('W skrócie', 'At a glance')}</p>
+              <dl>
+                {fakty.map((f) => <div><dt>{f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
+              </dl>
+            </aside>
+          )}
+        </div>
       </section>
     )}
 
@@ -177,8 +192,19 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
   .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
   .dz-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
   /* „O Instytucie”: zwykłe akapity w wygodnej szerokości do czytania */
-  .dz-o p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
-  .dz-o p:last-child { margin-bottom: 0; }
+  .dz-o-tekst p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
+  .dz-o-tekst p:last-child { margin-bottom: 0; }
+  /* ramka „W skrócie” (tylko komputer): duże wartości z bursztynową kreską, opis pod spodem */
+  .dz-o-fakty { padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
+  .dz-o-fakty-h { margin: 0 0 12px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .dz-o-fakty dl { display: grid; gap: 14px; margin: 0; }
+  .dz-o-fakty dl > div { padding-left: 12px; border-left: 3px solid var(--accent); }
+  .dz-o-fakty dt { font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--ink); }
+  .dz-o-fakty dd { margin: 3px 0 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
+  /* komputer: tekst i ramka obok siebie (ramka 300 px po prawej) */
+  @media (min-width: 761px) {
+    .dz-o-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+  }
   .dz-kontakt-uklad { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; align-items: stretch; }
   .dz-card { padding: 20px 22px; border-radius: var(--radius-l); background: var(--surface); }
   /* komputer: biała karta z ramką (jak w global.css, „Karty na komputerze”); telefon bez zmian */
@@ -229,7 +255,7 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
     .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
     :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
     .dz-ramka-sek > .dz-head-link { flex: 0 0 auto; }
-    .dz-o p { font-size: 15px; line-height: 1.55; }
+    .dz-o-tekst p { font-size: 15px; line-height: 1.55; }
     .dz-intro { margin: -2px 0 10px; max-width: 860px; font-size: 15px; line-height: 1.5; }
     /* sukcesy: sekcja w ramce (kreska sekcji nad nią zostaje); ramka narysowana pod treścią (::after), wpisy jako wiersze */
     .zsec.dz-ramka-sek { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 14px; margin-bottom: 12px; padding: 27px 15px 9px; }
