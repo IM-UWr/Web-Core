@@ -106,7 +106,9 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
 <div class="mnav-tlo" data-mnav-tlo aria-hidden="true"></div>
 <nav class="mnav" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
   {/* Dział z listą: napis prowadzi na stronę działu (jak na komputerze), strzałka za kreską rozwija listę.
-       Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę. */}
+       Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę.
+       Na pierwszej pozycji „Strona główna” — na wszystkich stronach poza samą stroną główną. */}
+  {bezJezyka !== '/' && <a href={u(wJezyku('/', lang))}>{t(lang, 'stronaGlowna')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
   {menu.map((p, i) =>
     p.grupy ? (
       <div class="mitem">
