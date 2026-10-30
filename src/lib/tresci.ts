@@ -342,7 +342,7 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
   const items: PozycjaListy[] = akt.map((a) => ({
     rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, data: a.data.data,
     zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zdjecie: a.data.zdjecie,
-    zdjecie_opis: a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
+    zdjecie_opis: (lang === 'en' && a.data.zdjecie_opis_en) || a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
     koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
     wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`,
   }));
@@ -351,7 +351,7 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
     items.push({
       rodzaj: 'obrona', tytul: o.data.kandydat, data: o.data.data_ogloszenia || o.data.termin.slice(0, 10),
       // obrona zawsze ma zdjęcie: własne z CMS albo domyślna grafika (public/grafiki/obrona-domyslna.jpg)
-      zajawka: o.data.tytul_rozprawy, zdjecie: o.data.zdjecie || ZDJECIE_OBRONY, zdjecie_opis: o.data.zdjecie ? o.data.zdjecie_opis : '', dla: [],
+      zajawka: o.data.tytul_rozprawy, zdjecie: o.data.zdjecie || ZDJECIE_OBRONY, zdjecie_opis: o.data.zdjecie ? (lang === 'en' && o.data.zdjecie_opis_en) || o.data.zdjecie_opis : '', dla: [],
       href: `/obrony-doktorskie/${slugOf(o.id)}`, wydarzenie: o.data.termin, koniec: koniecDomyslny(o.data.termin, 120), id: `obr-${slugOf(o.id)}`,
     });
   }

@@ -36,6 +36,9 @@ const etykieta = (p: (typeof lista)[number]) =>
 const referaty = await referatyWTygodniu(lang);
 const tydzien = tydzienSeminariow();
 const baner = ustawienia.baner;
+// opis zdjęcia (alt) i podpis (np. „Fot. …” / „Photo: …”) w wybranym języku — pola opis_en / podpis_en, puste = po polsku
+const banerOpis = wybierz(baner, 'opis', lang);
+const banerPodpis = wybierz(baner, 'podpis', lang);
 const st = ustawienia.studia;
 // Kafelki „Studia”: kierunki z sekcji Kierunki (pole „Pokaż na stronie głównej”) + dodatkowe kafelki z Ustawień.
 const kafelki = [
@@ -60,11 +63,11 @@ const kafelki = [
           src={u(baner.zdjecie)}
           srcset={(baner as any).zdjecie_male ? `${u((baner as any).zdjecie_male)} 1200w, ${u(baner.zdjecie)} 2400w` : undefined}
           sizes="100vw"
-          alt={baner.opis}
+          alt={banerOpis}
           style={`object-position:${baner.kadr || 'center'}`}
           fetchpriority="high"
         />
-        {baner.podpis && <figcaption>{baner.podpis}</figcaption>}
+        {banerPodpis && <figcaption>{banerPodpis}</figcaption>}
       </figure>
     )}
     <div class="wrap hero-in">

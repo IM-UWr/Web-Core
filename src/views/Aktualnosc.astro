@@ -11,7 +11,7 @@ import Ikona from '../components/Ikona.astro';
 import KartaWydarzenia from '../components/KartaWydarzenia.astro';
 import Galeria from '../components/Galeria.tsx';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { t, wJezyku, wybierz, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, longWithDay, range, dayNum, monthShort, now, today, hasTime, plusMinutes, type Lang } from '../lib/daty';
 import { miejsce, slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
 import ustawienia from '../data/ustawienia.json';
@@ -29,6 +29,8 @@ const slug = slugOf(wpis.id);
 const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
 const zajawka = (lang === 'en' && d.zajawka_en) || d.zajawka;
 const tytulInny = (w?: Aktualnosc) => (w ? (lang === 'en' && w.data.tytul_en) || w.data.tytul : '');
+// podpis zdjęcia i nazwy załączników: wersja angielska (pola *_en), a gdy pusta — po polsku
+const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
 
 const { Content } = await render(wpis);
 const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
@@ -83,8 +85,8 @@ const href = (a: string) => (isExternal(a) ? a : u(a));
       <div class="ak-ramka">
         {d.zdjecie && (
           <figure class="article-figure">
-            <img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />
-            {d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}
+            <img src={u(d.zdjecie)} alt={opisZdjecia} />
+            {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
           </figure>
         )}
 
@@ -116,7 +118,7 @@ const href = (a: string) => (isExternal(a) ? a : u(a));
             <h2 id="h-zal">{t(lang, 'zalaczniki')}</h2>
             <ul class="files">
               {d.zalaczniki.map((z) => (
-                <li><a href={href(z.plik)}><Ikona nazwa="plik" />{z.nazwa || z.plik.split('/').pop()}</a></li>
+                <li><a href={href(z.plik)}><Ikona nazwa="plik" />{wybierz(z, 'nazwa', lang) || z.plik.split('/').pop()}</a></li>
               ))}
             </ul>
           </section>

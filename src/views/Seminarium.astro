@@ -12,6 +12,7 @@ import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
 import { longWithDay, short, time, now, today, hasTime, type Lang } from '../lib/daty';
 import { referaty, seminariumReferatu, slugOf, sala, zaklady, pracownicy, type Seminarium } from '../lib/tresci';
 import { zTytulem } from '../lib/osoby';
+import { renderMarkdown } from '../lib/markdown';
 import ustawienia from '../data/ustawienia.json';
 
 interface Props { seminarium: Seminarium; lang: Lang }
@@ -19,6 +20,8 @@ const { seminarium, lang } = Astro.props;
 const d = seminarium.data;
 const nazwa = (lang === 'en' && d.nazwa_en) || d.nazwa;
 const { Content } = await render(seminarium);
+// opis seminarium po angielsku (pole tresc_en); puste = wersja angielska pokazuje opis po polsku
+const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
 const wszystkie = (await referaty()).filter((r) => seminariumReferatu(r) === seminarium.id);
 const n = now();
 const przyszle = (r: (typeof wszystkie)[number]) => (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today());
@@ -60,7 +63,7 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
-      <div class="prose"><Content /></div>
+      <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
 
       <section class="zsec sm-sek" aria-labelledby="h-nad">
         <h2 id="h-nad">{t(lang, 'nadchodzace')}</h2>

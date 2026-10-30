@@ -24,6 +24,7 @@ const d = zaklad.data;
 const id = zaklad.id;
 const nazwa = wybierz(d, 'nazwa', lang);
 const opis = wybierz(d, 'opis', lang);
+const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
 const obszary = lang === 'en' && d.obszary_en.length ? d.obszary_en : d.obszary;
 const { Content } = await render(zaklad);
 const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
@@ -83,7 +84,7 @@ const wszystkieZaklady = await zaklady();
 
       <section class="zsec" aria-labelledby="o-zakladzie">
         <h2 id="o-zakladzie">{T('O zakładzie', 'About')}</h2>
-        {d.zdjecie && <figure class="article-figure"><img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />{d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}</figure>}
+        {d.zdjecie && <figure class="article-figure"><img src={u(d.zdjecie)} alt={opisZdjecia} />{opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}</figure>}
         <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
         {d.strona && <p><a class="link-arrow" href={d.strona}>{T('Strona zespołu', 'Group website')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
       </section>

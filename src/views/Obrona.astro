@@ -7,7 +7,7 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
+import { t, wJezyku, wybierz } from '../lib/i18n';
 import { longWithDay, short, dayNum, monthShort, plusMinutes, type Lang } from '../lib/daty';
 import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../lib/tresci';
 
@@ -23,6 +23,7 @@ const w: Wydarzenie = {
   href: `/obrony-doktorskie/${slug}`, uid: `obr-${slug}`,
 };
 const przyszla = trwaLubBedzie(w);
+const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
 const dokumenty = [
   d.zawiadomienie && { nazwa: t(lang, 'zawiadomienie'), plik: d.zawiadomienie },
   d.rozprawa && { nazwa: t(lang, 'rozprawa'), plik: d.rozprawa },
@@ -50,8 +51,8 @@ const dokumenty = [
 
       {d.zdjecie && (
         <figure class="article-figure" style="margin-top:24px">
-          <img src={u(d.zdjecie)} alt={d.zdjecie_opis ?? ''} />
-          {d.zdjecie_opis && <figcaption>{d.zdjecie_opis}</figcaption>}
+          <img src={u(d.zdjecie)} alt={opisZdjecia} />
+          {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
         </figure>
       )}
       <div class="prose" style="margin-top:24px"><Content /></div>

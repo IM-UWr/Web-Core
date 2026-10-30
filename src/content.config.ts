@@ -25,7 +25,7 @@ const idList = z.preprocess((v) => (v == null || v === '' ? [] : (Array.isArray(
 const strList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.string()));
 const published = z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean());
 
-const plik = z.object({ nazwa: optStr, plik: z.string() });
+const plik = z.object({ nazwa: optStr, nazwa_en: optStr, plik: z.string() });
 const plikList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(plik));
 
 const aktualnosci = defineCollection({
@@ -38,6 +38,7 @@ const aktualnosci = defineCollection({
     zajawka: optStr,
     zdjecie: optStr,
     zdjecie_opis: optStr,
+    zdjecie_opis_en: optStr,
     galeria: z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.object({ plik: z.string(), podpis: optStr }))),
     album: optStr,
     zalaczniki: plikList,
@@ -75,6 +76,7 @@ const pracownicy = defineCollection({
     stopien: optStr,
     grupa: z.preprocess(empty, z.enum(['nauczyciel', 'doktorant', 'administracja', 'emeryt']).default('nauczyciel')),
     funkcja: optStr,
+    funkcja_en: optStr,
     zaklad: optId,
     rok_studiow: z.preprocess(empty, z.coerce.number().int().optional()),
     email: optStr,
@@ -99,6 +101,7 @@ const seminaria = defineCollection({
     zaklad: idList,
     aktywne: published,
     do_uzupelnienia: strList,
+    tresc_en: optStr,
     opublikowany: published,
   }),
 });
@@ -126,6 +129,7 @@ const obrony = defineCollection({
     // zdjęcie (opcjonalne) — na karcie na stronie głównej, na liście aktualności i na stronie obrony
     zdjecie: optStr,
     zdjecie_opis: optStr,
+    zdjecie_opis_en: optStr,
     promotorzy: strList,
     termin: date,
     miejsce: optStr,
@@ -161,6 +165,7 @@ const zaklady = defineCollection({
     strona: optStr,
     zdjecie: optStr,
     zdjecie_opis: optStr,
+    zdjecie_opis_en: optStr,
     tresc_en: optStr,
     opublikowany: published,
   }),

@@ -18,9 +18,13 @@ const { lang } = Astro.props;
 const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
 const osoby: Osoba[] = (await getCollection('pracownicy'))
   .filter((p) => p.data.opublikowany !== false)
-  .map((p) => ({ id: p.id, ...p.data }))
+  // funkcja (np. „Sekretariat”) po angielsku z pola funkcja_en, a gdy puste — po polsku
+  .map((p) => {
+    const funkcja = wybierz(p.data, 'funkcja', lang);
+    return { id: p.id, ...p.data, ...(funkcja ? { funkcja } : {}) };
+  })
   .sort((a, b) => nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl'))
-  .map(({ opublikowany, ...o }: any) => o);
+  .map(({ opublikowany, funkcja_en, ...o }: any) => o);
 const grupy = (['nauczyciel', 'doktorant', 'administracja', 'emeryt'] as const)
   .filter((g) => osoby.some((o) => o.grupa === g))
   .map((g) => ({ id: g, nazwa: t(lang, `g_${g}`) }));
