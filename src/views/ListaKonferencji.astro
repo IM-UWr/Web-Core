@@ -37,7 +37,7 @@ const lead = lang === 'en'
         {przyszle.length === 0 && <p class="muted" style="margin:0">{lang === 'en' ? 'No upcoming conferences announced.' : 'Nie zapowiedziano jeszcze kolejnych konferencji.'}</p>}
         <div class="event-grid">
           {przyszle.map((k) => (
-            <a class="event" href={href(k)} style="background:var(--surface)">
+            <a class="event event-szare" href={href(k)}>
               <span class="datebox" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
               <span class="event-body">
                 <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>

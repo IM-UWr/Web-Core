@@ -113,6 +113,8 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
   .gr-trwa::before { content: ''; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--accent); }
 
   .gr-karta { padding: 24px; border-radius: var(--radius-l); background: var(--surface); border: 1px solid var(--line); }
+  /* komputer: białe karty (jak w global.css, „Karty na komputerze”); telefon bez zmian */
+  @media (min-width: 761px) { .gr-karta { background: var(--bg); } }
   .gr-fakty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 18px 28px; margin: 0; }
   .gr-fakty > div { min-width: 0; }
   .gr-szeroki { grid-column: 1 / -1; }

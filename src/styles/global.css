@@ -741,3 +741,15 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
   .os-link:has(.os-a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { .os-link { transition: none; } }
+
+/* ---------- Karty na komputerze (≥ 761 px): białe tło strony zamiast szarego --surface ----------
+   Większość kart (.tile, .stat, .side-box, .event-box, .why, .person, .dz-card, .cz …) jest biała dzięki tłu strony
+   (tlo.css, „Kafelki wypełnione kolorem --surface”). Tu karty, których tamta reguła nie obejmuje: kierunki (.prog)
+   i konferencje na liście (.event-szare); karty z własnym szarym tłem w stylach widoków (.gr-karta, .cz, .dz-card,
+   konferencje na „Nauce”) — tam, w @media (min-width: 761px).
+   Szare zostają: podświetlenia po najechaniu, menu, wyszukiwarka, nagłówki tabel, weekendy w kalendarzu, liczniki,
+   notki i nieaktywne specjalności (.spec-off). Telefon (≤ 760 px) bez zmian — wygląd „Portal”. */
+.event-szare { background: var(--surface); }
+@media (min-width: 761px) {
+  .prog, .event-szare { background: var(--bg); border: 1px solid var(--line); }
+}

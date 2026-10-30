@@ -134,6 +134,8 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
   /* Czasopisma */
   .czasopisma { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
   .cz { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: var(--radius-l); background: var(--surface); min-width: 0; overflow-wrap: anywhere; }
+  /* komputer: białe karty z ramką (jak w global.css, „Karty na komputerze”); telefon bez zmian */
+  @media (min-width: 761px) { .cz { background: var(--bg); border: 1px solid var(--line); } }
   .cz h3 { margin: 0; font-size: 21px; font-weight: 800; line-height: 1.25; color: var(--ink); }
   .cz-o { margin: 0; font-size: 15px; line-height: 1.6; }
   .cz-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; }
