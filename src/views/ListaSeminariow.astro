@@ -46,7 +46,7 @@ const lead = lang === 'en'
 <Baza tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }} />
   <div class="wrap ls-wrap">
-    <section class="zsec" aria-labelledby="h-tydzien">
+    <section class="zsec ls-pierwsza" aria-labelledby="h-tydzien">
       <h2 id="h-tydzien">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
       <div class="ls-ramka">
         <TabelaReferatow wiersze={wTygodniu} lang={lang} etykieta={t(lang, 'seminariaTydzien')} pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')} />
@@ -95,6 +95,9 @@ const lead = lang === 'en'
   /* sekcje .zsec jak na stronach działów (odstępy między nimi — margines .zsec); odstępy kontenera jak .dz-wrap */
   .ls-wrap { padding-top: 32px; padding-bottom: 64px; }
   .ls-ramka { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  /* „Najbliższe seminaria” zaraz pod banerem — bez kreski sekcji nad nagłówkiem (komputer i telefon) */
+  .zsec.ls-pierwsza { border-top: 0; padding-top: 0; }
+  .zsec.ls-pierwsza::before, .zsec.ls-pierwsza > h2::before { display: none; }
   /* karta seminarium: zakład nad nazwą, pod kreską najbliższy referat albo „brak” */
   .ls-zaklad { font-size: 14px; font-weight: 600; }
   .ls-ref { font-size: 15px; padding-top: 10px; border-top: 1px solid var(--line); }
