@@ -1,5 +1,7 @@
 ---
 // Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
+// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta jak w „Zwarta” (uklad="zwarta portal-baner"),
+// miesiące jako sekcje z kreską jak na stronach działów, pozycje w białej ramce. Telefon (≤ 760 px) bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -11,14 +13,23 @@ import { adresIcs } from '../lib/kalendarz';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const wszystkie = (await wszystkieWydarzenia(lang)).filter(trwaLubBedzie);
-const grupy: { miesiac: string; pozycje: typeof wszystkie }[] = [];
-for (const w of wszystkie) {
-  const m = monthYear(w.poczatek, lang);
-  const ost = grupy[grupy.length - 1];
-  if (ost && ost.miesiac === m) ost.pozycje.push(w);
-  else grupy.push({ miesiac: m, pozycje: [w] });
-}
+// Dwa widoki: „Nadchodzące” (trwające i przyszłe, od najbliższego) i „Archiwum” (cała historia, od najnowszego).
+const wszystkie = await wszystkieWydarzenia(lang);
+type W = (typeof wszystkie)[number];
+const poMiesiacach = (lista: W[]) => {
+  const grupy: { miesiac: string; pozycje: W[] }[] = [];
+  for (const w of lista) {
+    const m = monthYear(w.poczatek, lang);
+    const ost = grupy[grupy.length - 1];
+    if (ost && ost.miesiac === m) ost.pozycje.push(w);
+    else grupy.push({ miesiac: m, pozycje: [w] });
+  }
+  return grupy;
+};
+const widoki = [
+  { id: 'nadchodzace', etykieta: lang === 'en' ? 'Upcoming' : 'Nadchodzące', grupy: poMiesiacach(wszystkie.filter(trwaLubBedzie)), pusty: t(lang, 'brakWydarzen') },
+  { id: 'archiwum', etykieta: lang === 'en' ? 'Archive' : 'Archiwum', grupy: poMiesiacach(wszystkie.filter((w) => !trwaLubBedzie(w)).reverse()), pusty: lang === 'en' ? 'No past events.' : 'Brak minionych wydarzeń.' },
+];
 const sem = (await seminaria()).filter((s) => s.data.aktywne);
 const kanaly = [
   { nazwa: t(lang, 'wszystkieWydarzeniaKal'), plik: 'wszystko' },
@@ -27,12 +38,17 @@ const kanaly = [
 ];
 const webcal = (plik: string) => absolute(adresIcs(plik), Astro.site).replace(/^https?:/, 'webcal:');
 const lead = lang === 'en'
-  ? 'Upcoming events, PhD defences and seminar talks at the Mathematical Institute.'
-  : 'Nadchodzące wydarzenia, obrony doktorskie i referaty seminaryjne w Instytucie Matematycznym.';
+  ? 'Events, PhD defences, conferences and seminar talks at the Mathematical Institute — upcoming and past.'
+  : 'Wydarzenia, obrony doktorskie, konferencje i referaty seminaryjne w Instytucie Matematycznym — nadchodzące i archiwalne.';
 ---
-<Baza tytul={t(lang, 'kalendarz')} opis={lead}>
+<Baza tytul={t(lang, 'kalendarz')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <div class="filters">
+    <div class="filters kal-filtry">
+      {/* widok: nadchodzące / archiwum (ten sam styl przycisków co filtry obok) */}
+      <div class="chips" role="group" aria-label={lang === 'en' ? 'View' : 'Widok'}>
+        {widoki.map((v, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
+      </div>
+      <span class="kal-kreska" aria-hidden="true"></span>
       <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
         <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
         <button type="button" class="chip" aria-pressed="false" data-rodzaj="wydarzenie">{RODZAJE.wydarzenie[lang]}</button>
@@ -43,30 +59,37 @@ const lead = lang === 'en'
     </div>
   </NaglowekStrony>
 
-  <div class="wrap layout">
+  <div class="wrap layout kal-wrap">
     <div class="main">
-      {grupy.length === 0 && <p class="muted">{t(lang, 'brakWydarzen')}</p>}
-      {grupy.map((g) => (
-        <section data-grupa>
-          <h2 class="month">{g.miesiac}</h2>
-          {g.pozycje.map((w) => (
-            <a class="row-item" href={u(wJezyku(w.href, lang))} data-rodzaj={w.rodzaj}>
-              <span class={`datebox small${w.rodzaj === 'referat' ? ' light' : ''}`} aria-hidden="true">
-                <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
-              </span>
-              <span class="body">
-                <span class="news-meta">
-                  <span class={`badge badge-${w.rodzaj}`}>{RODZAJE[w.rodzaj][lang]}</span>
-                  <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
-                  {w.miejsce && <span>· {w.miejsce}</span>}
-                </span>
-                <span class="t" style="font-size:18px">{w.tytul}</span>
-                {w.podtytul && <span class="x">{w.podtytul}</span>}
-                {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
-              </span>
-            </a>
+      {widoki.map((v, i) => (
+        <div data-widok={v.id} hidden={i > 0} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
+          {v.grupy.length === 0 && <p class="muted kal-pusto">{v.pusty}</p>}
+          {v.grupy.map((g) => (
+            <section class="kal-miesiac" data-grupa>
+              <h2 class="month">{g.miesiac}</h2>
+              <div class="kal-ramka">
+              {g.pozycje.map((w) => (
+                <a class="row-item" href={u(wJezyku(w.href, lang))} data-rodzaj={w.rodzaj}>
+                  <span class={`datebox small${w.rodzaj === 'referat' ? ' light' : ''}`} aria-hidden="true">
+                    <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
+                  </span>
+                  <span class="body">
+                    <span class="news-meta">
+                      <span class={`badge badge-${w.rodzaj}`}>{RODZAJE[w.rodzaj][lang]}</span>
+                      <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
+                      {w.miejsce && <span>· {w.miejsce}</span>}
+                    </span>
+                    <span class="t" style="font-size:18px">{w.tytul}</span>
+                    {w.podtytul && <span class="x">{w.podtytul}</span>}
+                    {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
+                  </span>
+                </a>
+              ))}
+              </div>
+            </section>
           ))}
-        </section>
+          <p class="muted kal-pusto" data-pusty-filtr hidden>{lang === 'en' ? 'Nothing of this kind here.' : 'Brak pozycji tego rodzaju.'}</p>
+        </div>
       ))}
     </div>
 
@@ -74,13 +97,52 @@ const lead = lang === 'en'
 </Baza>
 
 <script>
-  const btn = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
-  const poz = Array.from(document.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]'));
-  const grupy = Array.from(document.querySelectorAll<HTMLElement>('[data-grupa]'));
-  btn.forEach((b) => b.addEventListener('click', () => {
-    const r = b.dataset.rodzaj ?? '';
-    btn.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
-    poz.forEach((p) => (p.hidden = !!r && p.dataset.rodzaj !== r));
-    grupy.forEach((g) => (g.hidden = !g.querySelector('.row-item:not([hidden])')));
+  // Widok (Nadchodzące / Archiwum, w adresie #archiwum) i filtr rodzaju — działają razem.
+  const btnRodzaj = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
+  const btnWidok = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
+  const widoki = Array.from(document.querySelectorAll<HTMLElement>('[data-widok]'));
+  let rodzaj = '';
+  let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
+  const pokaz = () => {
+    btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
+    btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
+    widoki.forEach((v) => {
+      v.hidden = v.dataset.widok !== widok;
+      v.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]').forEach((p) => (p.hidden = !!rodzaj && p.dataset.rodzaj !== rodzaj));
+      const grupy = Array.from(v.querySelectorAll<HTMLElement>('[data-grupa]'));
+      grupy.forEach((g) => (g.hidden = !g.querySelector('.row-item:not([hidden])')));
+      // komunikat „brak pozycji tego rodzaju” tylko, gdy widok ma pozycje, ale filtr wszystkie schował
+      const pf = v.querySelector<HTMLElement>('[data-pusty-filtr]');
+      if (pf) pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
+    });
+  };
+  btnRodzaj.forEach((b) => b.addEventListener('click', () => { rodzaj = b.dataset.rodzaj ?? ''; pokaz(); }));
+  btnWidok.forEach((b) => b.addEventListener('click', () => {
+    widok = b.dataset.widokBtn ?? 'nadchodzace';
+    history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
+    pokaz();
   }));
+  pokaz();
 </script>
+
+<style>
+  /* ---------- komputer (≥ 761 px): wygląd „Zwarta” jak na stronach działów ----------
+     24 px od banera; miesiąc = sekcja z kreską i bursztynowym początkiem — te same wartości co .zsec przy oprawie
+     sekcji „linia” w wyglądzie „Zwarta” (tlo.css + uklad-zwarta.css; klasy .zsec nie dajemy, bo zmieniłaby telefon);
+     pozycje miesiąca w jednej białej ramce, oddzielone cienką linią; pusty kalendarz — komunikat w ramce. */
+  @media (min-width: 761px) {
+    .kal-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
+    .kal-miesiac { position: relative; margin-bottom: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .kal-miesiac::before { content: ''; position: absolute; top: -2px; left: 0; width: 64px; height: 3px; border-radius: 2px; background: var(--accent); }
+    .kal-miesiac .month { margin: 0 0 12px; font-size: clamp(21px, 2.2vw, 24px); font-weight: 800; letter-spacing: -0.02em; text-transform: none; color: var(--ink); }
+    .kal-ramka, .kal-pusto { border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
+    .kal-ramka { overflow: hidden; }
+    .kal-ramka :global(.row-item) { padding: 14px 18px; border: 0; border-radius: 0; }
+    .kal-ramka :global(.row-item + .row-item) { border-top: 1px solid var(--line); }
+    .kal-pusto { margin: 0; padding: 16px 18px; }
+  }
+  /* dwie grupy przycisków w jednym wierszu: widok | rodzaj, rozdzielone cienką kreską */
+  .kal-filtry { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px 14px; }
+  .kal-kreska { align-self: stretch; width: 1px; min-height: 28px; background: rgb(255 255 255 / .35); }
+  @media (max-width: 760px) { .kal-kreska { display: none; } }
+</style>
