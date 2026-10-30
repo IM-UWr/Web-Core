@@ -1,6 +1,6 @@
 ---
 // Strona działu „Nauka” (/nauka, /en/nauka): wstęp, liczby, kafelki z menu „Nauka”, obszary badań zakładów,
-// konferencje, realizowane projekty, obrony doktorskie i „Warto wiedzieć” (seminaria tygodnia są na stronie głównej i w /seminaria).
+// realizowane projekty, konferencje i „Warto wiedzieć” (seminaria tygodnia i obrony są na swoich stronach; liczby w banerze zostają).
 // Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
@@ -57,7 +57,6 @@ const konfWRoku = listaKonferencji.filter((k) => k.data.poczatek.slice(0, 4) ===
 // Obrony: najbliższe, a po nich ostatnio odbyte — razem trzy.
 const obronaBedzie = (o: Obrona) => trwaLubBedzie({ poczatek: o.data.termin });
 const odbyteObrony = listaObron.filter((o) => !obronaBedzie(o));
-const pokazObrony = [...listaObron.filter(obronaBedzie).reverse(), ...odbyteObrony].slice(0, 3);
 const rokTemu = addDays(dzis, -365);
 const obronyRok = odbyteObrony.filter((o) => o.data.termin.slice(0, 10) >= rokTemu);
 
@@ -84,7 +83,7 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
        Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, zaraz pod nimi
-       konferencje i obrony (osobny blok .tylko-telefon — na komputerze te sekcje stoją niżej), obszary badań w zwartych
+       konferencje (osobny blok .tylko-telefon — na komputerze pod projektami), obszary badań w zwartych
        kartach, projekty w ramce i na końcu „Warto wiedzieć” (osobny blok). */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
@@ -143,32 +142,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
         )}
         <p class="pt-stopka"><a class="pt-all" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
       </section>
-
-      <section class="pt-box" aria-labelledby="obrony-tel">
-        <div class="pt-h"><h2 id="obrony-tel">{t(lang, 'obrony')}</h2></div>
-        {pokazObrony.length === 0 && <p class="pt-pusto">{T('Brak zapowiedzianych obron.', 'No PhD defences announced.')}</p>}
-        {pokazObrony.length > 0 && (
-          <ul class="pt-list">
-            {pokazObrony.map((o) => {
-              const bedzie = obronaBedzie(o);
-              return (
-                <li>
-                  <a class="pt-item" href={href(`/obrony-doktorskie/${slugOf(o.id)}`)}>
-                    <span class={`pt-dbox${bedzie ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
-                    <span class="pt-b">
-                      <span class="pt-k">{bedzie && <>{T('nadchodząca', 'upcoming')} · </>}<span class="pt-k-m">{longWithDay(o.data.termin, lang)}</span></span>
-                      <span class="pt-t">{o.data.kandydat}</span>
-                      <span class="pt-s" lang="en">{o.data.tytul_rozprawy}</span>
-                      {o.data.miejsce && <span class="pt-s">{o.data.miejsce}</span>}
-                    </span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <p class="pt-stopka"><a class="pt-all" href={href('/obrony-doktorskie')}>{T('Wszystkie obrony', 'All PhD defences')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
-      </section>
     </div>
 
     {listaZakladow.length > 0 && (
@@ -190,34 +163,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
         </p>
       </section>
     )}
-
-    <section class="zsec tylko-komputer" aria-labelledby="konferencje">
-      <h2 id="konferencje">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2>
-      {nadchodzaceKonf.length === 0 && (
-        <p class="dz-intro">
-          {T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}
-          {pokazKonf.length > 0 && ` ${T('Ostatnio odbyły się:', 'Most recent:')}`}
-        </p>
-      )}
-      {pokazKonf.length > 0 && (
-        <div class="event-grid">
-          {pokazKonf.map((k) => (
-            <a class="event dz-event" href={href(`/nauka/konferencje/${slugOf(k.id)}`)}>
-              <span class={`datebox${nadchodzaceKonf.length ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
-              <span class="event-body">
-                <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                <span class="t">{wybierz(k.data, 'tytul', lang)}</span>
-                {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
-                {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
-              </span>
-            </a>
-          ))}
-        </div>
-      )}
-      <p class="dz-more">
-        <a class="link-arrow" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </p>
-    </section>
 
     <section class="zsec dz-ramka-sek" aria-labelledby="granty">
       <h2 id="granty">{T('Realizowane projekty', 'Ongoing projects')} <span class="muted dz-ile">({realizowane.length})</span></h2>
@@ -251,32 +196,31 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
       </p>
     </section>
 
-    <section class="zsec tylko-komputer" aria-labelledby="obrony">
-      <h2 id="obrony">{t(lang, 'obrony')}</h2>
-      {pokazObrony.length === 0 && <p class="dz-intro">{T('Brak zapowiedzianych obron.', 'No PhD defences announced.')}</p>}
-      {pokazObrony.length > 0 && (
-        <div class="dz-obrony">
-          {pokazObrony.map((o) => {
-            const bedzie = obronaBedzie(o);
-            return (
-              <a class="row-item" href={href(`/obrony-doktorskie/${slugOf(o.id)}`)}>
-                <span class={`datebox small${bedzie ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
-                <span class="body">
-                  <span class="news-meta">
-                    {bedzie && <span class="badge badge-obrona">{T('nadchodząca', 'upcoming')}</span>}
-                    <span>{longWithDay(o.data.termin, lang)}</span>
-                    {o.data.miejsce && <span>· {o.data.miejsce}</span>}
-                  </span>
-                  <span class="t">{o.data.kandydat}</span>
-                  <span class="x" lang="en">{o.data.tytul_rozprawy}</span>
-                </span>
-              </a>
-            );
-          })}
+    <section class="zsec tylko-komputer" aria-labelledby="konferencje">
+      <h2 id="konferencje">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2>
+      {nadchodzaceKonf.length === 0 && (
+        <p class="dz-intro">
+          {T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}
+          {pokazKonf.length > 0 && ` ${T('Ostatnio odbyły się:', 'Most recent:')}`}
+        </p>
+      )}
+      {pokazKonf.length > 0 && (
+        <div class="event-grid">
+          {pokazKonf.map((k) => (
+            <a class="event dz-event" href={href(`/nauka/konferencje/${slugOf(k.id)}`)}>
+              <span class={`datebox${nadchodzaceKonf.length ? '' : ' light'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
+              <span class="event-body">
+                <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
+                <span class="t">{wybierz(k.data, 'tytul', lang)}</span>
+                {k.data.miejsce && <span class="s">{k.data.miejsce}</span>}
+                {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
+              </span>
+            </a>
+          ))}
         </div>
       )}
       <p class="dz-more">
-        <a class="link-arrow" href={href('/obrony-doktorskie')}>{T('Wszystkie obrony', 'All PhD defences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+        <a class="link-arrow" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
       </p>
     </section>
 
@@ -307,8 +251,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
   .dz-granty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
   .dz-granty h3 { font-size: 17px; line-height: 1.3; }
   .dz-kod { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .dz-obrony { border-bottom: 1px solid var(--line); }
-  .dz-obrony .t { font-size: 19px; }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki i ramki (jak na „Instytucie”) ----------
      Odstęp nad pierwszą sekcją stały (24 px): bursztynowy początek kreski sekcji nie przylega do dolnej krawędzi banera. */
@@ -323,7 +265,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
     .dz-ile { font-size: 15px; }
     .dz-granty { gap: 10px; }
     .dz-granty h3 { font-size: 16px; }
-    .dz-obrony .t { font-size: 17px; }
   }
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */
@@ -341,7 +282,7 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
     .dz-tile:hover { background: var(--tint); }
     .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
     :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
-    /* konferencje i obrony (blok tylko na telefon): ramki jedna pod drugą */
+    /* konferencje (blok tylko na telefon) */
     .dz-tel { display: flex; flex-direction: column; gap: 12px; }
     /* obszary badań: tytuł i link w jednym wierszu, zwarte karty (hasła jako tekst) */
     .dz-karty { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 20px; }
