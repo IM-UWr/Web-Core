@@ -108,8 +108,9 @@ const sekcje = [
     <div class="main">
       {d.przyciski.length > 0 && (
         <div class="btn-row kh-btns-pod tylko-komputer">
+          {/* pierwszy przycisk granatowy (jak wybrany filtr w Aktualnościach), nie złoty — decyzja 30.10.2026 */}
           {d.przyciski.map((p, i) => (
-            <a class={`btn${i === 0 ? ' btn-accent' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
+            <a class={`btn${i === 0 ? ' btn-primary' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
           ))}
         </div>
       )}
