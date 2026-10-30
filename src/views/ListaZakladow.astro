@@ -46,23 +46,27 @@ const lead = T('W skład Instytutu wchodzi osiem zakładów naukowych i Pracowni
     {/* tekst o organizacji Instytutu, żeby strona nie zaczynała się od razu od listy zakładów (komputer i telefon) */}
     {tekst.length > 0 && <div class="lz-tekst">{tekst.map((a) => <p>{a}</p>)}</div>}
 
-    <div class="dept-grid">
-      {lista.map((z) => {
-        const n = osoby.filter((o) => o.data.zaklad === z.id).length;
-        const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
-        return (
-          <a class="dept" href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>
-            <span class="t">{wybierz(z.data, 'nazwa', lang)}</span>
-            {z.data.opis && <span class="o">{wybierz(z.data, 'opis', lang)}</span>}
-            <span class="tags">{obszary.slice(0, 4).map((o) => <span class="badge">{o}</span>)}</span>
-            <span class="f">
-              {z.data.kierownik && <span><span class="muted">{T('Kierownik', 'Head')}:</span> {z.data.kierownik}</span>}
-              <span class="muted">{n} {T('osób', 'people')}</span>
-            </span>
-          </a>
-        );
-      })}
-    </div>
+    {/* karty zakładów pod własnym nagłówkiem sekcji (kreska jak w innych sekcjach), oddzielone od tekstu wstępu */}
+    <section class="zsec lz-zaklady" aria-labelledby="zaklady-lista">
+      <h2 id="zaklady-lista">{T('Zakłady i pracownia', 'Departments and unit')}</h2>
+      <div class="dept-grid">
+        {lista.map((z) => {
+          const n = osoby.filter((o) => o.data.zaklad === z.id).length;
+          const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
+          return (
+            <a class="dept" href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>
+              <span class="t">{wybierz(z.data, 'nazwa', lang)}</span>
+              {z.data.opis && <span class="o">{wybierz(z.data, 'opis', lang)}</span>}
+              <span class="tags">{obszary.slice(0, 4).map((o) => <span class="badge">{o}</span>)}</span>
+              <span class="f">
+                {z.data.kierownik && <span><span class="muted">{T('Kierownik', 'Head')}:</span> {z.data.kierownik}</span>}
+                <span class="muted">{n} {T('osób', 'people')}</span>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
 
     <p class="muted" style="margin-top:28px;font-size:15px">
       {T('Obszary badań Instytutu: podstawy matematyki, teoria modeli, algebra, kombinatoryka, teoria liczb, geometria i topologia różniczkowa, geometryczna teoria grup, równania różniczkowe, analiza harmoniczna, teoria miary, analiza funkcjonalna, teoria prawdopodobieństwa, procesy stochastyczne, statystyka matematyczna.',
