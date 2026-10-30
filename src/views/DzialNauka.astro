@@ -1,6 +1,6 @@
 ---
 // Strona działu „Nauka” (/nauka, /en/nauka): wstęp, liczby, kafelki z menu „Nauka”, obszary badań zakładów,
-// seminaria w tym tygodniu, konferencje, realizowane projekty i obrony doktorskie.
+// konferencje, realizowane projekty, obrony doktorskie i „Warto wiedzieć” (seminaria tygodnia są na stronie głównej i w /seminaria).
 // Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
@@ -8,8 +8,6 @@
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
-import TabelaReferatow from '../components/TabelaReferatow.astro';
-import ListaReferatow from '../components/ListaReferatow.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
 import dzial from '../data/dzialy/nauka.json';
 import { u, isExternal } from '../lib/url';
@@ -17,7 +15,7 @@ import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { today, addDays, range, dayNum, monthShort, longWithDay, type Lang } from '../lib/daty';
 import { menuGlowne } from '../lib/menu';
 import {
-  zaklady, seminaria, konferencje, granty, obrony, referatyWTygodniu, tydzienSeminariow, trwaLubBedzie, slugOf,
+  zaklady, seminaria, konferencje, granty, obrony, trwaLubBedzie, slugOf,
   type Grant, type Konferencja, type Obrona, type Zaklad,
 } from '../lib/tresci';
 
@@ -49,9 +47,6 @@ const lata = (g: Grant) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== 
 const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 
 const aktywneSeminaria = listaSeminariow.filter((s) => s.data.aktywne !== false);
-const referaty = await referatyWTygodniu(lang);
-const tydzien = tydzienSeminariow();
-const naglowekSeminariow = t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien');
 
 // Konferencje: nadchodzące i trwające (najbliższe najpierw); gdy brak — trzy ostatnie.
 const konfTrwa = (k: Konferencja) => trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec });
@@ -88,7 +83,7 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
-       Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, zaraz pod nimi seminaria,
+       Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w ramkach, zaraz pod nimi
        konferencje i obrony (osobny blok .tylko-telefon — na komputerze te sekcje stoją niżej), obszary badań w zwartych
        kartach, projekty w ramce i na końcu „Warto wiedzieć” (osobny blok). */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
@@ -121,22 +116,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
     )}
 
     <div class="zsec dz-tel tylko-telefon" data-pagefind-ignore>
-      <section class="pt-box" aria-labelledby="seminaria-tel">
-        <div class="pt-h">
-          <span class="pt-h-l">
-            <h2 id="seminaria-tel">{naglowekSeminariow}</h2>
-            <span class="pt-zakres">{range(tydzien.od, tydzien.do, lang)}</span>
-          </span>
-        </div>
-        <ListaReferatow
-          wiersze={referaty}
-          lang={lang}
-          etykieta={naglowekSeminariow}
-          pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
-        />
-        <p class="pt-stopka"><a class="pt-all" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={14} /></a></p>
-      </section>
-
       <section class="pt-box" aria-labelledby="konferencje-tel">
         <div class="pt-h"><h2 id="konferencje-tel">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2></div>
         {nadchodzaceKonf.length === 0 && (
@@ -211,22 +190,6 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
         </p>
       </section>
     )}
-
-    <section class="zsec tylko-komputer" aria-labelledby="seminaria">
-      <h2 id="seminaria">{naglowekSeminariow}</h2>
-      <p class="dz-intro">{range(tydzien.od, tydzien.do, lang)}</p>
-      <div class="dz-ramka">
-        <TabelaReferatow
-          wiersze={referaty}
-          lang={lang}
-          etykieta={naglowekSeminariow}
-          pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
-        />
-      </div>
-      <p class="dz-more">
-        <a class="link-arrow" href={href('/seminaria')}>{t(lang, 'wszystkieSeminaria')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </p>
-    </section>
 
     <section class="zsec tylko-komputer" aria-labelledby="konferencje">
       <h2 id="konferencje">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2>
@@ -339,7 +302,8 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
   /* Tylko na stronie „Nauka”. */
   .dz-ile { font-size: 16px; font-weight: 600; }
   .dz-ramka { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  .dz-event { background: var(--surface); }
+  /* konferencje w takich samych kartach jak projekty (.spec): tło strony i cienka ramka */
+  .dz-event { background: var(--bg); border: 1px solid var(--line); }
   .dz-granty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
   .dz-granty h3 { font-size: 17px; line-height: 1.3; }
   .dz-kod { color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -377,7 +341,7 @@ const obszaryOpis = wybierz(dzial, 'obszary_opis', lang);
     .dz-tile:hover { background: var(--tint); }
     .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
     :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
-    /* seminaria, konferencje, obrony (blok tylko na telefon): ramki jedna pod drugą */
+    /* konferencje i obrony (blok tylko na telefon): ramki jedna pod drugą */
     .dz-tel { display: flex; flex-direction: column; gap: 12px; }
     /* obszary badań: tytuł i link w jednym wierszu, zwarte karty (hasła jako tekst) */
     .dz-karty { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 20px; }
