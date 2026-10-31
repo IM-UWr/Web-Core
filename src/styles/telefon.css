@@ -204,6 +204,20 @@
      na jasnym pasie (inne warianty nagłówka) — w kolorze linii motywu. Komputer: bursztynowa jak dotąd. */
   .ph-fala path { stroke: var(--ph-linie); }
   .ph-granat .ph-fala path { stroke: rgb(232 239 248 / .55); }
+  /* Statyczny rysunek działu (bez JS, do startu animacji, strony bez motywu): bursztynowy akcent motywu szary jak linie —
+     jedynym bursztynem na ekranie jest hasło (zlecenia 01 i 02). Komputer bez zmian. */
+  .ph-m::after { background: var(--ph-linie); }
+  /* Animacja w tle banera (src/scripts/baner/silnik.ts, motyw z data-animacja; zlecenie 02, decyzje 31.10.2026): płótna
+     .ph-anim na całą szerokość pasa, pod tekstem; po pierwszej klatce pas dostaje .ph-anim-gra — płótna łagodnie się
+     pojawiają, a statyczny rysunek .ph-m gaśnie. Kolor rysunku: token --ph-rysunek (składowe RGB, krycie daje motyw) —
+     szaro-biały, słabo widoczny (wzór: Lorenz v3). */
+  .ph { --ph-rysunek: 27, 45, 82; }
+  .ph-granat { --ph-rysunek: 255, 255, 255; }
+  :root[data-theme='dark'] .ph { --ph-rysunek: 210, 222, 240; }
+  .ph-anim { position: absolute; left: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .8s ease; }
+  .ph-anim-gra .ph-anim { opacity: 1; }
+  .ph-m { transition: opacity .8s ease; }
+  .ph.ph-anim-gra .ph-m { opacity: 0; }
 
   /* ---------- tlo.css: sekcje ---------- */
   body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .zsec-head h2 { font-size: clamp(20px, 2.2vw, 23px); letter-spacing: -0.015em; }
