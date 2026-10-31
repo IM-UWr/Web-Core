@@ -4,7 +4,8 @@ import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
 import { t } from '../lib/i18n';
 ---
-<Baza tytul={t('pl', 'nieZnaleziono')} opublikowany={false} alternatywa={null} szukaj={false}>
+{/* poza indeksem (noindex, bez canonical, bez Pagefind), ale bez paska „Podgląd” — strona jest opublikowana (zlecenie 01) */}
+<Baza tytul={t('pl', 'nieZnaleziono')} pozaIndeksem alternatywa={null} szukaj={false}>
   <div class="wrap" style="padding-top:64px;padding-bottom:96px">
     <p class="badge" style="margin:0 0 12px">404</p>
     <h1 style="font-size:clamp(32px,5vw,48px);margin:0 0 12px">{t('pl', 'nieZnaleziono')}</h1>

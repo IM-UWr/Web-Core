@@ -3,15 +3,20 @@
 // Na komputerze jak w kalendarzu (wspólny styl list): grupa z nagłówkiem = sekcja z kreską (.lista-miesiac z global.css),
 // prace = osobne białe karty z odstępem 10 px (numer na lewo od karty); telefon — wiersze jak dotąd.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (przycisk „Wykaz w PDF” bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner jak w działach — hasło (nauka.json: rocznik_haslo /
+// rocznik_haslo_en) zamiast opisu i liczby pod kreską (LiczbyBanera): prace w wykazie · prace ze współautorami ·
+// czasopisma i wydawnictwa (publikacjeDane.ts; zera pomijane). Przycisk „Wykaz w PDF” — pod banerem (.pr-pod).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import { lata, odmiana, tekstHtml, type Praca } from './publikacjeDane';
+import { lata, odmiana, tekstHtml, liczbaWspolautorskich, liczbaZrodel, type Praca } from './publikacjeDane';
+import dzial from '../data/dzialy/nauka.json';
 
 interface Props { rok: number; lang: Lang }
 const { rok, lang } = Astro.props;
@@ -32,6 +37,13 @@ const n = ten.liczba;
 const lead = en
   ? `List of works published in ${rok} — ${n} ${n === 1 ? 'entry' : 'entries'}.`
   : `Wykaz prac opublikowanych w roku ${rok} — ${n} ${odmiana(n, 'pozycja', 'pozycje', 'pozycji')}.`;
+// Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i liczby w banerze.
+const haslo = ((dzial as any)[en ? 'rocznik_haslo_en' : 'rocznik_haslo'] as string | undefined) || undefined;
+const liczbyTelefon: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+  { n, pl: ['praca w wykazie', 'prace w wykazie', 'prac w wykazie'], en: ['paper in the list', 'papers in the list'] },
+  { n: liczbaWspolautorskich(w), pl: ['praca ze współautorami', 'prace ze współautorami', 'prac ze współautorami'], en: ['co-authored paper', 'co-authored papers'] },
+  { n: liczbaZrodel(w), pl: ['czasopismo lub wydawnictwo', 'czasopisma i wydawnictwa', 'czasopism i wydawnictw'], en: ['journal or book', 'journals and books'] },
+];
 
 // Grupy (np. „Artykuły problemowe”); nagłówek z innym rokiem wydania: „Rok 2017: …”.
 const slug = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -55,15 +67,22 @@ const doiUrl = (d: string) => `https://doi.org/${encodeURI(d)}`;
 const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
 ---
 <Baza tytul={tytul} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} wstecz={{ etykieta: T('Publikacje', 'Publications'), adres: '/nauka/publikacje' }}>
+  {/* Telefon: przycisk PDF z banera chowa styl na końcu pliku (.page-head .pr-akcje), jego kopia stoi pod banerem (.pr-pod). */}
+  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Publikacje', 'Publications'), adres: '/nauka/publikacje' }}>
     {ten.pdf && (
       <p class="pr-akcje">
         <a class="pr-pdf" href={href(ten.pdf)}><Ikona nazwa="plik" rozmiar={18} />{T('Wykaz w PDF', 'List as PDF')}</a>
       </p>
     )}
+    <LiczbyBanera lang={lang} pozycje={liczbyTelefon} />
   </NaglowekStrony>
   <div class={`wrap ${zSpisem ? 'layout' : 'pr-wrap'}`}>
     <div class="main pr-main">
+      {ten.pdf && (
+        <p class="pr-pod tylko-telefon" data-pagefind-ignore>
+          <a class="pr-pdf" href={href(ten.pdf)}><Ikona nazwa="plik" rozmiar={18} />{T('Wykaz w PDF', 'List as PDF')}</a>
+        </p>
+      )}
       {zSpisem && <SpisTresci naglowki={naglowki} lang={lang} wariant="gora" />}
       {(pochodzenie || uwagi) && (
         <p class="pr-nota">{pochodzenie}{pochodzenie && uwagi ? ' ' : ''}{uwagi}</p>
@@ -140,6 +159,13 @@ const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
   .pr-nav-n span { align-items: flex-end; }
   .pr-nav-a small { font-size: 12px; font-weight: 700; color: var(--muted); }
   @media (max-width: 520px) { .pr-lista { padding-left: 2.8em; } .pr { padding-left: 2px; } .pr-t { font-size: 15.5px; } }
+
+  /* ---------- telefon (≤ 760 px; zlecenie 01): w banerze nic klikalnego poza „←” ----------
+     Przycisk „Wykaz w PDF” z banera znika, jego kopia (.pr-pod) stoi na początku treści, nad spisem i notą. */
+  @media (max-width: 760px) {
+    :global(.page-head) .pr-akcje { display: none; }
+    .pr-pod { margin: 0 0 16px; }
+  }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
      Odstęp nad listą stały (24 px), jak na stronie działu „Nauka” — z spisem treści (.layout) i bez niego (.pr-wrap).

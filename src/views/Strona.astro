@@ -4,6 +4,7 @@ import { render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import Ikona from '../components/Ikona.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import { menuGlowne } from '../lib/menu';
@@ -17,6 +18,12 @@ const { strona, lang } = Astro.props;
 const d = strona.data;
 const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
 const opis = (lang === 'en' && d.opis_en) || d.opis;
+// Baner na telefonie (zlecenie 01): hasło z pól haslo / haslo_en (po angielsku tylko haslo_en — bez polskich resztek;
+// puste = opis jak dotąd) i stałe liczby z pola „liczby” (wartość + etykieta; po angielsku tylko pozycje z etykieta_en).
+const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
+const liczby = d.liczby
+  .filter((l) => lang !== 'en' || l.etykieta_en)
+  .map((l) => ({ n: l.n, n_en: l.n_en, pl: l.etykieta, en: l.etykieta_en }));
 const { Content, headings } = await render(strona);
 const en = lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en) : undefined;
 const htmlEn = en?.html ?? '';
@@ -43,7 +50,9 @@ const DZIALY_PORTAL_ZWARTA = ['/instytut/', '/studia/'];
 const wygladPortalZwarta = DZIALY_PORTAL_ZWARTA.some((p) => adres.startsWith(p));
 ---
 <Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}>
-  <NaglowekStrony tytul={tytul} lead={opis} lang={lang} okruszki={[...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang), adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang), adres: rodzic.adres }] : []), { etykieta: tytul }]} />
+  <NaglowekStrony tytul={tytul} lead={opis} haslo={haslo} lang={lang} okruszki={[...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang), adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang), adres: rodzic.adres }] : []), { etykieta: tytul }]}>
+    <LiczbyBanera lang={lang} pozycje={liczby} />
+  </NaglowekStrony>
   <div class:list={['wrap layout', wygladPortalZwarta && 'st-odstep']}>
     <div class="main">
       {(pasek === 'spis' || pasek === 'oba') && <SpisTresci naglowki={naglowki} lang={lang} wariant="gora" />}

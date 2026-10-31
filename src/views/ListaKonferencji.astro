@@ -13,7 +13,9 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import TytulZewn from '../components/TytulZewn.astro';
-import { dayNum, monthShort, range, type Lang } from '../lib/daty';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import dzial from '../data/dzialy/nauka.json';
+import { dayNum, monthShort, range, today, type Lang } from '../lib/daty';
 import { miejsce, konferencje, trwaLubBedzie, type Konferencja } from '../lib/tresci';
 
 interface Props { lang: Lang }
@@ -37,9 +39,25 @@ const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
 const lead = lang === 'en'
   ? 'Conferences and workshops organised or co-organised by members of the Mathematical Institute.'
   : 'Konferencje i warsztaty organizowane lub współorganizowane przez pracowników Instytutu Matematycznego.';
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json,
+// konferencje_haslo / _en) i trzy liczby pod kreską — konferencje bez odwołanych: w bieżącym roku (dzień budowania) ·
+// wszystkie od pierwszego roku w danych · we Wrocławiu (miejsce zawiera „Wrocław”). Etykieta bez rzeczownika
+// („w 2026 roku”), więc ta sama dla każdej liczby.
+const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'konferencje_haslo_en' : 'konferencje_haslo'] as string | undefined) || undefined;
+const odbywane = wszystkie.filter((k) => !k.data.odwolana);
+const rokTeraz = today().slice(0, 4);
+const pierwszyRok = odbywane.map((k) => k.data.poczatek.slice(0, 4)).sort()[0] ?? rokTeraz;
+const stala = (pl: string, en: string) => ({ pl: [pl, pl, pl] as [string, string, string], en: [en, en] as [string, string] });
+const liczby = [
+  { n: odbywane.filter((k) => k.data.poczatek.startsWith(rokTeraz)).length, ...stala(`w ${rokTeraz} roku`, `in ${rokTeraz}`) },
+  { n: odbywane.length, ...stala(`od ${pierwszyRok} roku`, `since ${pierwszyRok}`) },
+  { n: odbywane.filter((k) => /Wrocław/.test(k.data.miejsce ?? '')).length, ...stala('we Wrocławiu', 'in Wrocław') },
+];
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: naglowek }]} />
+  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: naglowek }]}>
+    <LiczbyBanera lang={lang} pozycje={liczby} />
+  </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
       <TekstWstepny pole="konferencje_tekst" lang={lang} />

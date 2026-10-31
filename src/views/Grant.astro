@@ -2,7 +2,9 @@
 // Strona projektu (powstaje dla każdego projektu): pod tytułem plakietki (źródło, program, stan), karta danych projektu,
 // opis (jeśli jest) i inne projekty tego samego zakładu. Jeden link wstecz — nad tytułem; prawy pasek pusty (jak konferencje).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (plakietki pod tytułem bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tylko „←”, tytuł i hasło złożone z pól projektu
+// (źródło, program, lata — np. „NCN · 2025–2028”), bez liczb i kreski; plakietki i tytuł w drugim języku — pod banerem.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -34,6 +36,23 @@ const FINANSOWANIE: Record<string, [string, string]> = {
 };
 const finansowanie = FINANSOWANIE[d.rodzaj] ? T(...FINANSOWANIE[d.rodzaj]) : rodzaj;
 
+// Hasło w banerze na telefonie — składane z pól projektu: źródło (krótko), program (jeśli jest) i lata realizacji,
+// np. „NCN · 2025–2028”, „NCN, grant promotorski · 2009–2011”. Program wielką literą (nazwa konkursu, np. OPUS) stoi
+// zaraz po źródle („NCN OPUS”), małą — po przecinku. Pole „program” nie ma wersji angielskiej: po angielsku znane
+// polskie nazwy tłumaczymy (PROGRAMY_EN), resztę zostawiamy (nazwy konkursów są takie same w obu językach).
+// Źródło krótko, żeby hasło mieściło się w jednej linijce przy 360 px (UE — jak plakietka: „UE i międzynarodowe”).
+const ZRODLO_HASLA: Record<string, [string, string]> = {
+  ncn: ['NCN', 'NCN'],
+  ue: ['UE i międzynarodowe', 'EU and international'],
+  wewnetrzny: ['Środki wewnętrzne', 'Internal funding'],
+  inny: ['Inne źródła', 'Other sources'],
+};
+const PROGRAMY_EN: Record<string, string> = { 'grant promotorski': 'supervisor grant' };
+const program = d.program?.trim() ? (lang === 'en' ? PROGRAMY_EN[d.program.trim().toLowerCase()] ?? d.program.trim() : d.program.trim()) : '';
+const zrodloHasla = ZRODLO_HASLA[d.rodzaj] ? T(...ZRODLO_HASLA[d.rodzaj]) : rodzaj;
+const skad = program ? `${zrodloHasla}${/^\p{Lu}/u.test(program) ? ' ' : ', '}${program}` : zrodloHasla;
+const haslo = [skad, okres].filter(Boolean).join(' · ');
+
 // Kierownik (albo kilku) ze spisu pracowników: imię i nazwisko z tytułem; link do strony domowej, a gdy jej brak — do zakładu.
 const osoby = await pracownicy();
 const kierownicy = kierownicyGrantu(d.kierownik, osoby);
@@ -49,7 +68,9 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
   .join(', ');
 ---
 <Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lang={lang} wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }}>
+  {/* Telefon: tytuł w drugim języku i plakietki z banera chowa styl na końcu pliku (.page-head .lead / .tags), a ich kopia
+       stoi pod banerem (.gr-pod.tylko-telefon); komputer bez zmian. */}
+  <NaglowekStrony tytul={tytul} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }}>
     {tytulDrugi && <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
     <div class="tags">
       <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>
@@ -59,6 +80,14 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
+      <div class="gr-pod tylko-telefon" data-pagefind-ignore>
+        <div class="news-meta">
+          <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>
+          {program && <span class="badge">{program}</span>}
+          {d.rok_do !== undefined && <span class="badge">{trwa ? T('realizowany', 'ongoing') : T('zakończony', 'completed')}</span>}
+        </div>
+        {tytulDrugi && <p class="gr-pod-tytul" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
+      </div>
       <section class="gr-karta" aria-label={T('Informacje o projekcie', 'Project details')}>
         <dl class="gr-fakty">
           <div><dt>{T('Finansowanie', 'Funding')}</dt><dd>{finansowanie}{d.program ? ` — ${d.program}` : ''}</dd></div>
@@ -137,6 +166,16 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
   @media (max-width: 520px) {
     .gr-karta { padding: 18px 16px; }
     .gr-inne .gw-lista { margin: 0 -14px; }
+  }
+
+  /* ---------- telefon (≤ 760 px; zlecenie 01): w banerze tylko „←”, tytuł i hasło ----------
+     Tytuł w drugim języku i plakietki z banera (elementy tego widoku w gnieździe NaglowekStrony) znikają; ich kopia
+     stoi nad kartą danych (.gr-pod): plakietki w jednej rodzinie etykiet list (.news-meta .badge, telefon.css),
+     pod nimi tytuł w drugim języku szarym tekstem. */
+  @media (max-width: 760px) {
+    :global(.page-head) .lead, :global(.page-head) .tags { display: none; }
+    .gr-pod { margin: 0 0 18px; }
+    .gr-pod-tytul { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
   }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------

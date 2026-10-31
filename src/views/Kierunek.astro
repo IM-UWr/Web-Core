@@ -3,13 +3,16 @@
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (opis → przyciski z pola `przyciski` → liczby z pola
 // `fakty` w jednym wierszu, jak na stronie działu „Studia”), reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku); spis „Na tej stronie” z prawej.
-// Telefon (≤ 760 px) bez zmian: liczby w kafelkach 2×2 pod banerem (blok .tylko-telefon).
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — hasło z pól `haslo` / `haslo_en` zamiast opisu
+// i trzy liczby z faktów (LiczbyBanera.astro); bez przycisków i bez kafelków faktów — pod banerem od razu
+// „Na tej stronie” i „O kierunku”.
 import { zTytulem } from '../lib/osoby';
 import { render, getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import Ikona from '../components/Ikona.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
@@ -69,6 +72,35 @@ const wieleProgramow = d.programy.length > 1;
 // Strona „Egzaminy i dyplom” opisuje egzaminy kierunku matematyka — inne kierunki jej nie linkują.
 const linkDyplom = kierunek.id === 'matematyka';
 
+// Baner na telefonie (zlecenie 01): hasło z pól haslo / haslo_en (po angielsku tylko haslo_en — bez polskich resztek;
+// puste = opis jak dotąd) i trzy liczby z faktów — pierwsze trzy, których wartość zaczyna się od cyfry („3 lata”, „180”;
+// bez „licencjat”, „A+”, „PL / EN”); po angielsku tylko fakty z etykieta_en. Kolumny na telefonie są wąskie, więc:
+// • etykieta: krótka z pola etykieta_krotka / etykieta_krotka_en, jeśli fakt ją ma, inaczej pełna bez dopowiedzenia
+//   w nawiasie i po przecinku („studia I stopnia (licencjackie)” → „studia I stopnia”);
+// • wartość „liczba + słowo” dłuższa niż 8 znaków dzieli się na liczbę i słowo-etykietę („6 semestrów” → „6” / „semestrów”).
+// Szkoła doktorska: na początku liczba doktorantów (spis pracowników, grupa „doktorant”), po niej dwa fakty.
+// Komputer bez zmian: pełne fakty w wierszu w banerze (.kh-liczby).
+const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
+const bezDopowiedzenia = (s: string) => s.replace(/\s*\([^)]*\)/g, '').replace(/,.*$/, '').trim();
+type Fakt = (typeof d.fakty)[number];
+const ileDoktorantow = doktorat ? osoby.filter((o) => o.data.grupa === 'doktorant').length : 0;
+const liczbyTel = [
+  ...(ileDoktorantow > 0 ? [{ n: ileDoktorantow, pl: ['doktorant', 'doktorantów', 'doktorantów'] as [string, string, string], en: ['PhD student', 'PhD students'] as [string, string] }] : []),
+  ...(d.fakty as Fakt[])
+    .filter((f) => /^\d/.test(w(f, 'wartosc')) && (lang !== 'en' || f.etykieta_en))
+    .map((f) => {
+      const wartosc = w(f, 'wartosc').trim();
+      const etykieta = (lang === 'en' ? f.etykieta_krotka_en : f.etykieta_krotka) || bezDopowiedzenia(w(f, 'etykieta'));
+      const m = wartosc.length > 8 ? wartosc.match(/^(\d+)\s+(\S+)$/) : null;
+      return m ? { n: m[1], pl: m[2] } : { n: wartosc, pl: etykieta };
+    }),
+].slice(0, 3);
+// Nadtytuł na telefonie w jednej linii: bez dopowiedzeń w nawiasie („Studia I stopnia (licencjackie)” → „Studia I stopnia”),
+// a dłuższy niż 40 znaków — tylko pierwszy człon przed „ · ” (szkoła doktorska: „Kolegium Doktorskie Matematyki”).
+// NaglowekStrony ma jeden nadtytuł, więc wersja na telefon leży w slocie i jest przestawiana nad tytuł (style na dole).
+const nadtytul = d.podtytul ? w(d, 'podtytul') : undefined;
+const nadtytulTel = nadtytul && ((s) => (s.length > 40 ? s.split(' · ')[0] : s))(nadtytul.replace(/\s*\([^)]*\)/g, '').trim());
+
 const sekcje = [
   { slug: 'o-kierunku', text: N.o },
   ...(d.etapy.length ? [{ slug: 'przebieg', text: N.przebieg }] : []),
@@ -83,20 +115,14 @@ const sekcje = [
 ].map((s) => ({ depth: 2, ...s }));
 ---
 <Baza tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: fakty 2×2, zwartsze sekcje (style na dole). */}
+  {/* Telefon (≤ 760 px) — wygląd „Portal”: zwartsze sekcje (style na dole). */}
   {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony).
        Komputer: w banerze liczby kierunku w jednym wierszu (.pt-liczby, jak na stronie działu „Studia”); przyciski
        (pierwszy wyróżniony) POD banerem, na początku treści — na banerze nie pasowały (decyzja 30.10.2026).
-       Telefon: przyciski w banerze jak dotąd.
-       Telefon: jak dotąd — liczby w kafelkach .stats pod banerem (nie idą do banera, żeby telefon się nie zmienił). */}
-  <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} lang={lang} nadtytul={d.podtytul ? w(d, 'podtytul') : undefined} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}>
-    {d.przyciski.length > 0 && (
-      <div class="btn-row kh-btns tylko-telefon" data-pagefind-ignore>
-        {d.przyciski.map((p, i) => (
-          <a class={`btn${i === 0 ? ' btn-accent' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
-        ))}
-      </div>
-    )}
+       Telefon (zlecenie 01): krótszy nadtytuł (nadtytulTelefon), hasło i trzy liczby w kolumnach (LiczbyBanera, .tylko-telefon);
+       przyciski i kafelki faktów znikają z telefonu (dawne bloki .kh-btns i .kh-fakty usunięte) — linki są w treści strony. */}
+  <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo} lang={lang} nadtytul={nadtytul} nadtytulTelefon={nadtytulTel || undefined} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}>
+    <LiczbyBanera lang={lang} pozycje={liczbyTel} />
     {d.fakty.length > 0 && (
       <ul class="pt-liczby kh-liczby tylko-komputer">
         {d.fakty.map((f) => <li><span class="n">{w(f, 'wartosc')}</span>{w(f, 'etykieta')}</li>)}
@@ -112,11 +138,6 @@ const sekcje = [
           {d.przyciski.map((p, i) => (
             <a class={`btn${i === 0 ? ' btn-primary' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
           ))}
-        </div>
-      )}
-      {d.fakty.length > 0 && (
-        <div class="stats kh-fakty tylko-telefon" data-pagefind-ignore>
-          {d.fakty.map((f) => <div class="stat"><span class="n">{w(f, 'wartosc')}</span><span class="l">{w(f, 'etykieta')}</span></div>)}
         </div>
       )}
       <SpisTresci naglowki={sekcje} lang={lang} wariant="gora" />
@@ -348,15 +369,10 @@ const sekcje = [
 </script>
 
 <style>
-  .kh-btns { margin-top: 6px; }
   /* „O kierunku” — pierwsza sekcja: bez kreski sekcji nad nagłówkiem (komputer i telefon; jak „W tym dziale” na stronach
      działów i „Najbliższe seminaria”; decyzja 30.10.2026) */
   .zsec.kier-o { border-top: 0; padding-top: 0; }
   .zsec.kier-o::before, .zsec.kier-o > h2::before { display: none; }
-  .kh-fakty { margin: 0 0 22px; }
-  /* liczby kierunku mniejsze niż w statystykach działów (34 px) — „6 semestrów”, „licencjat” mieszczą się w kafelku */
-  .kh-fakty .stat { padding: 16px 18px; }
-  .kh-fakty .stat .n { font-size: 24px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
 
   /* ---------- komputer (≥ 761 px): baner „Portal”, treść „Zwarta” (reszta odstępów .layout — uklad-zwarta.css) ----------
      Przyciski w banerze trochę mniejsze (jak .btn-small, nieco szersze), liczby kierunku w wierszu pod nimi.
@@ -371,11 +387,6 @@ const sekcje = [
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {
-    /* nagłówek: tekst, przyciski i fakty (2×2) ciaśniej */
-    .kh-btns { margin-top: 4px; }
-    .kh-fakty { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 0 16px; }
-    .kh-fakty .stat { padding: 12px 14px; }
-    .kh-fakty .stat .n { font-size: 21px; }
     /* treść na pełną szerokość (spis sekcji jest i tak rozwijaną listą nad treścią) */
     .kier { display: block; padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(28px, 4vw, 44px); }
     /* „O kierunku”: „Dlaczego warto” pod tekstem, dwie w rzędzie (na wąskim telefonie jedna) */

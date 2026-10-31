@@ -2,13 +2,15 @@
 // Podstrona specjalności. Treść: src/content/specjalnosci/<id>.md (edycja w Pages CMS).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (etykiety specjalności w banerze jak dotąd),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px) bez zmian.
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — nadtytuł „Specjalność · skrót”, hasło z pól
+// `haslo` / `haslo_en` zamiast opisu i trzy liczby policzone z danych specjalności (LiczbyBanera.astro); bez etykiet w banerze.
 import { zTytulem } from '../lib/osoby';
 import { render, getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import Ikona from '../components/Ikona.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
@@ -45,6 +47,28 @@ const opiekunowie = d.opiekunowie.map((o) => ({ ...o, osoba: znajdz(o.imie_nazwi
 const nazwa = w(d, 'nazwa');
 const sem = d.seminaria.length ? (await seminaria()).filter((s) => d.seminaria.includes(s.id)).sort((a, b) => d.seminaria.indexOf(a.id) - d.seminaria.indexOf(b.id)) : [];
 
+// Baner na telefonie (zlecenie 01). Hasło z pól haslo / haslo_en (po angielsku tylko haslo_en — bez polskich resztek;
+// puste = opis jak dotąd). Nadtytuł „Specjalność” ze skrótem (i „wygaszana”) zamiast „<kierunek> · specjalność” — kierunek
+// jest w linku powrotu; etykiety z banera (skrót, poziom) są w nadtytule i w liczbach. Liczby — z danych specjalności:
+// • stopnie studiów: cyfry rzymskie z pola „poziom” („studia I i II stopnia” → „I i II”);
+// • semestr wyboru: pierwszy etap „Jak przebiega”, którego tytuł mówi o deklaracji albo wyborze specjalności — numer
+//   semestru z pola „kiedy” („Koniec semestru 4” → „4. sem.”);
+// • przedmioty specjalności: pozycje grup „Czego się uczysz” z bieżącego programu (nazwa grupy z „program od …”),
+//   bez grup przedmiotów wspólnych kierunku (np. „Przedmioty wspólne z wymaganiami specjalności”).
+// Brak danych = pozycja pominięta (LiczbyBanera.astro). Komputer bez zmian.
+const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
+const nadtytulTel = [T('Specjalność', 'Specialisation'), d.skrot, d.wygaszana ? T('wygaszana', 'phased out') : ''].filter(Boolean).join(' · ');
+const stopnie = (d.poziom ?? '').match(/\b(?:III|II|I)\b/g) ?? [];
+const semWyboru = d.etapy.find((e) => /deklaracj|wyb[oó]r specjalno/i.test(e.tytul))?.kiedy.match(/\d+/)?.[0];
+const ilePrzedmiotow = d.przedmioty
+  .filter((g) => /program od/i.test(g.grupa) && !/wspóln/i.test(g.grupa))
+  .reduce((s, g) => s + g.lista.length, 0);
+const liczbyTel = [
+  { n: stopnie.join(' i '), n_en: stopnie.join(' and '), pl: 'stopień studiów', en: stopnie.length > 1 ? 'study cycles' : 'study cycle' },
+  { n: semWyboru ? `${semWyboru}. sem.` : '', n_en: semWyboru ? `sem. ${semWyboru}` : '', pl: 'wybór specjalności', en: 'choice of specialisation' },
+  { n: ilePrzedmiotow, pl: ['przedmiot specjalności', 'przedmioty specjalności', 'przedmiotów specjalności'] as [string, string, string], en: ['specialisation course', 'specialisation courses'] as [string, string] },
+];
+
 const sekcje = [
   { slug: 'o-specjalnosci', text: T('O specjalności', 'About') },
   ...(d.etapy.length ? [{ slug: 'przebieg', text: T('Jak przebiega', 'How it works') }] : []),
@@ -59,9 +83,11 @@ const sekcje = [
 ].map((s) => ({ depth: 2, ...s }));
 ---
 <Baza tytul={`${nazwa} — ${nazwaKierunku}`} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); etykiety specjalności w banerze. */}
-  <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} lang={lang} nadtytul={`${nazwaKierunku} · ${T('specjalność', 'specialisation')}`} wstecz={{ etykieta: nazwaKierunku, adres: `/studia/${d.kierunek}#specjalnosci` }}>
-    <div class="tags">
+  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony); etykiety specjalności w banerze (komputer).
+       Telefon: nadtytuł „Specjalność · skrót” (nadtytulTelefon), hasło i liczby; etykiety ukryte. */}
+  <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo} lang={lang} nadtytul={`${nazwaKierunku} · ${T('specjalność', 'specialisation')}`} nadtytulTelefon={nadtytulTel} wstecz={{ etykieta: nazwaKierunku, adres: `/studia/${d.kierunek}#specjalnosci` }}>
+    <LiczbyBanera lang={lang} pozycje={liczbyTel} />
+    <div class="tags tylko-komputer">
       {d.skrot && <span class="badge">{d.skrot}</span>}
       {d.poziom && <span class="badge">{w(d, 'poziom')}</span>}
       {d.wygaszana && <span class="badge">{T('wygaszana', 'phased out')}</span>}

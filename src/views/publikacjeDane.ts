@@ -26,6 +26,16 @@ for (const m of Object.values(pliki)) if (m.default?.rok) wykazy[Number(m.defaul
 
 export const liczbaPrac = (w?: Wykaz) => (w ? w.grupy.reduce((s, g) => s + (g.prace?.length ?? 0), 0) : 0);
 
+// Liczby w banerze rocznika na telefonie (zlecenie 01): prace z co najmniej dwoma autorami w polu „autorzy”
+// (nazwiska rozdzielone przecinkiem, średnikiem, „and”, „i” albo „&”) oraz różne tytuły z pola „źródło” — tekst do
+// pierwszej cyfry, bez końcowych znaków przestankowych. To przybliżenie: warianty zapisu tego samego czasopisma liczą
+// się osobno, a wykazy bez pola „źródło” (tylko „opis”) dają 0 — wtedy banerowi zostają dwie liczby.
+const prace = (w?: Wykaz) => (w ? w.grupy.flatMap((g) => g.prace ?? []) : []);
+export const liczbaWspolautorskich = (w?: Wykaz) =>
+  prace(w).filter((p) => (p.autorzy ?? '').split(/,|;|&|\band\b|\bi\b/).filter((a) => a.trim()).length >= 2).length;
+export const liczbaZrodel = (w?: Wykaz) =>
+  new Set(prace(w).map((p) => (p.zrodlo ?? '').replace(/\d[\s\S]*$/, '').trim().replace(/[\s,.:;(–-]+$/, '').trim()).filter(Boolean)).size;
+
 export interface Rok extends RokWpis { wykaz?: Wykaz; liczba: number; pdf?: string }
 // Lata z pliku CMS + lata, dla których jest tylko wykaz HTML; od najnowszego.
 export function lata(): Rok[] {

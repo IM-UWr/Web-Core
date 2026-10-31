@@ -1,14 +1,17 @@
 ---
 // Pojedyncza obrona doktorska z dokumentami.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (tytuł rozprawy bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px): baner w układzie działów (zlecenie 01) — opis przy `haslo` niżej.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import dzial from '../data/dzialy/nauka.json';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
-import { longWithDay, short, dayNum, monthShort, plusMinutes, type Lang } from '../lib/daty';
+import { longWithDay, short, dayNum, monthShort, time, plusMinutes, type Lang } from '../lib/daty';
 import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../lib/tresci';
 
 interface Props { obrona: Obrona; lang: Lang }
@@ -31,13 +34,28 @@ const dokumenty = [
   d.streszczenie_en && { nazwa: t(lang, 'streszczenieEn'), plik: d.streszczenie_en },
   ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${r.recenzent}`, plik: r.plik })),
 ].filter(Boolean) as { nazwa: string; plik: string }[];
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Obrony doktorskie”, imię i nazwisko,
+// hasło (src/data/dzialy/nauka.json, obrona_haslo / _en), kreska i trzy pozycje: data („20 paź”, pod nią dzień tygodnia
+// i rok) · godzina (pod nią sala — pierwszy człon miejsca, gdy to sala; inaczej „godzina”) · liczba recenzji.
+// Tytuł rozprawy na telefonie pod banerem (.ob-rozprawa), w banerze tylko na komputerze.
+const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'obrona_haslo_en' : 'obrona_haslo'] as string | undefined) || undefined;
+const salaObrony = miejsce(d.miejsce, lang)?.split(',')[0].trim();
+// (napisy i ich etykiety są już w języku strony — LiczbyBanera bierze `pl`, gdy nie ma `en`)
+const liczby = [
+  { n: `${dayNum(d.termin)} ${monthShort(d.termin, lang)}`, pl: `${longWithDay(d.termin, lang).split(',')[0]}, ${d.termin.slice(0, 4)}` },
+  { n: time(d.termin), pl: salaObrony && /^(sala|sale|room|rooms)\s/i.test(salaObrony) ? salaObrony : lang === 'en' ? 'time' : 'godzina' },
+  { n: d.recenzje.length, pl: ['recenzja', 'recenzje', 'recenzji'] as [string, string, string], en: ['review', 'reviews'] as [string, string] },
+];
 ---
 <Baza tytul={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={d.kandydat} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All PhD defences' : 'Wszystkie obrony doktorskie', adres: '/obrony-doktorskie' }}>
-    <p class="lead" lang="en" style="font-weight:600;color:var(--ink)">{d.tytul_rozprawy}</p>
+  <NaglowekStrony tytul={d.kandydat} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All PhD defences' : 'Wszystkie obrony doktorskie', telefon: t(lang, 'obrony'), adres: '/obrony-doktorskie' }}>
+    <LiczbyBanera lang={lang} pozycje={liczby} />
+    <p class="lead tylko-komputer" lang="en" style="font-weight:600;color:var(--ink)">{d.tytul_rozprawy}</p>
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
+      {/* telefon: tytuł rozprawy zaraz pod banerem (kopia z banera, bez indeksowania) */}
+      <p class="ob-rozprawa tylko-telefon" lang="en" data-pagefind-ignore>{d.tytul_rozprawy}</p>
       <section class="event-box" aria-label={lang === 'en' ? 'Defence details' : 'Szczegóły obrony'}>
         <span class:list={['datebox', { minione: !przyszla }]} aria-hidden="true"><span class="d">{dayNum(d.termin)}</span><span class="m">{monthShort(d.termin, lang)}</span></span>
         <dl>
@@ -74,4 +92,8 @@ const dokumenty = [
   /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
      do banera (reszta odstępów .layout — uklad-zwarta.css) */
   @media (min-width: 761px) { .layout { padding-top: 24px; } }
+  /* telefon (≤ 760 px; zlecenie 01): tytuł rozprawy pod banerem — jak dawniej w banerze (półgruby, w kolorze tytułów) */
+  @media (max-width: 760px) {
+    .ob-rozprawa { margin: 0 0 18px; font-size: 17px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
+  }
 </style>

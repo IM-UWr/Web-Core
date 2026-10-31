@@ -12,6 +12,9 @@ import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TabelaReferatow from '../components/TabelaReferatow.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import dzial from '../data/dzialy/nauka.json';
+import { wPrzyszlosci, ETYKIETY } from '../lib/liczbyTerminow';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
 import { long, now, today, hasTime, type Lang } from '../lib/daty';
@@ -43,9 +46,23 @@ const nazwa = (s: (typeof sem)[number]) => (lang === 'en' && s.data.nazwa_en) ||
 const lead = lang === 'en'
   ? 'Research seminars of the Mathematical Institute. Everyone is welcome.'
   : 'Seminaria naukowe Instytutu Matematycznego. Zapraszamy wszystkich zainteresowanych.';
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json, seminaria_haslo / _en)
+// i trzy liczby pod kreską: seminaria (aktywne, jak karty niżej) · zapowiedziane referaty (wszystkich seminariów, definicja
+// wspólna z Kalendarzem — src/lib/liczbyTerminow.ts) · referaty w archiwum (minione referaty opublikowanych seminariów).
+const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'seminaria_haslo_en' : 'seminaria_haslo'] as string | undefined) || undefined;
+const idSem = new Set(sem.map((s) => s.id));
+const refSem = ref.filter((r) => idSem.has(seminariumReferatu(r)));
+const zapowiedziane = refSem.filter((r) => wPrzyszlosci(r.data.termin)).length;
+const liczby = [
+  { n: aktywne.length, pl: ['seminarium', 'seminaria', 'seminariów'] as [string, string, string], en: ['seminar', 'seminars'] as [string, string] },
+  { n: zapowiedziane, ...ETYKIETY.referaty },
+  { n: refSem.length - zapowiedziane, ...ETYKIETY.archiwum },
+];
 ---
 <Baza tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }} />
+  <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
+    <LiczbyBanera lang={lang} pozycje={liczby} />
+  </NaglowekStrony>
   <div class="wrap ls-wrap">
     <section class="zsec ls-pierwsza" aria-labelledby="h-tydzien">
       <h2 id="h-tydzien">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>

@@ -1,5 +1,7 @@
 ---
 // Lista „Warto wiedzieć” (/warto-wiedziec, /en/warto-wiedziec): wszystkie opublikowane pozycje kolekcji warto_wiedziec.
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tytuł i bursztynowe hasło (pole warto_wiedziec_haslo /
+// warto_wiedziec_haslo_en w src/data/dzialy/instytut.json; puste = opis jak dotąd) zamiast opisu; bez kreski i liczb.
 import { getCollection } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -8,6 +10,7 @@ import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
+import dzial from '../data/dzialy/instytut.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -19,9 +22,11 @@ const lead = T(
   'Wyjątkowe wydarzenia i osiągnięcia, którymi Instytut Matematyczny chwali się od lat.',
   'Exceptional events and achievements the Mathematical Institute has been proud of for years.',
 );
+// hasło w banerze na telefonie — po angielsku tylko pole _en (bez polskich resztek)
+const haslo = ((lang === 'en' ? (dzial as any).warto_wiedziec_haslo_en : (dzial as any).warto_wiedziec_haslo) as string | undefined) || undefined;
 ---
 <Baza tytul={tytul} opis={lead}>
-  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} />
+  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} />
   <div class="wrap" style="padding-top:32px;padding-bottom:64px">
     {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="muted">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
     <p style="margin:24px 0 0">

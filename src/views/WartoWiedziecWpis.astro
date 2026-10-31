@@ -1,5 +1,8 @@
 ---
 // Podstrona pozycji „Warto wiedzieć” (powstaje tylko, gdy pozycja ma treść).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tytuł i bursztynowe hasło składane z pól wpisu —
+// „rok · dział” (np. „2017 · Nauka”; bez roku sam dział); rok i link do działu znikają z banera, a zajawka i link do działu
+// stoją pod banerem. Bez kreski i liczb. Komputer bez zmian.
 import { render, type CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -27,13 +30,16 @@ const DZIALY = {
   instytut: { pl: 'Instytut', en: 'Institute', adres: '/instytut' },
 } as const;
 const dzial = DZIALY[d.dzial];
+// hasło na telefonie: „rok · dział” (EN: „2017 · Research”), bez roku — sam dział
+const haslo = [d.rok?.trim(), dzial[lang]].filter(Boolean).join(' · ');
 const zewnetrzny = !!d.link && isExternal(d.link);
 const etykietaLinku = wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More'));
 const opisObrazu = wybierz(d, 'obraz_opis', lang);
 const wszystkie = T('Warto wiedzieć', 'Highlights');
 ---
 <Baza tytul={tytul} opis={zajawka || undefined} obraz={d.obraz} opublikowany={d.opublikowany} typ="article">
-  <NaglowekStrony tytul={tytul} lead={zajawka || undefined} lang={lang} wstecz={{ etykieta: wszystkie, adres: '/warto-wiedziec' }}>
+  <NaglowekStrony tytul={tytul} lead={zajawka || undefined} haslo={haslo} lang={lang} wstecz={{ etykieta: wszystkie, adres: '/warto-wiedziec' }}>
+    {/* rok i link do działu — w banerze tylko na komputerze (telefon: hasło „rok · dział”, link pod banerem) */}
     <p class="ww-meta">
       {d.rok && <span class="badge badge-sukces">{d.rok}</span>}
       <a href={href(dzial.adres)}>{dzial[lang]}</a>
@@ -41,6 +47,11 @@ const wszystkie = T('Warto wiedzieć', 'Highlights');
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
+      {/* telefon: zajawka (w banerze jest tylko na komputerze) i link do działu, zaraz pod banerem */}
+      <div class="ww-pod tylko-telefon" data-pagefind-ignore>
+        {zajawka && <p class="ww-zajawka">{zajawka}</p>}
+        <p class="ww-dzial"><a class="link-arrow" href={href(dzial.adres)}>{T('Dział', 'Section')}: {dzial[lang]}<Ikona nazwa="strzalka" rozmiar={16} /></a></p>
+      </div>
       {d.obraz && (
         <figure class="article-figure">
           <img src={u(d.obraz)} alt={opisObrazu} />
@@ -67,4 +78,13 @@ const wszystkie = T('Warto wiedzieć', 'Highlights');
 <style>
   .ww-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; font-size: 15px; font-weight: 700; }
   .ww-meta a { color: var(--muted); }
+  /* telefon (zlecenie 01): rok (bursztynowa etykieta) i link do działu nie w banerze — jedynym bursztynem banera jest
+     hasło; zajawka i link pod banerem */
+  @media (max-width: 760px) {
+    .ww-meta { display: none; }
+    .ww-pod { margin: 0 0 14px; }
+    /* link ma 44 px wysokości (cel dotykowy) — sam daje odstęp od zajawki */
+    .ww-zajawka { margin: 0 0 2px; font-size: 17px; line-height: 1.55; color: var(--text); }
+    .ww-dzial { margin: 0; }
+  }
 </style>

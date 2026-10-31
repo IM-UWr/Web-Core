@@ -4,17 +4,21 @@
 // Sekcje (wykazy, czasopisma) to .zsec jak na stronach działów (kreska sekcji, tytuł h2, pod nim krótki opis).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner jak w działach — hasło (nauka.json: publikacje_haslo /
+// publikacje_haslo_en) zamiast opisu i trzy liczby pod kreską (LiczbyBanera): pozycje w wykazach · roczniki z wykazem
+// (z zakresem lat) · czasopisma redagowane w Instytucie. Dawnych kafelków .stats pod banerem już nie ma (te same liczby są w banerze).
 // Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola publikacje_tekst / publikacje_tekst_en; puste = brak).
 // Między wykazami a czasopismami — drugi, krótki tekst (pola czasopisma_tekst / czasopisma_tekst_en; puste = brak), jak na stronie „Seminaria”.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { dane, lata, odmiana } from './publikacjeDane';
+import dzial from '../data/dzialy/nauka.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -36,26 +40,33 @@ const liczby = [
   ...(najnowszy ? [{ n: najnowszy === najstarszy ? String(najnowszy) : `${najstarszy}–${najnowszy}`, l: T('lata objęte wykazami', 'years covered') }] : []),
   ...(czasopisma.length ? [{ n: String(czasopisma.length), l: T(`${odmiana(czasopisma.length, 'czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych')} w Instytucie`, czasopisma.length === 1 ? 'journal edited at the Institute' : 'journals edited at the Institute') }] : []),
 ];
+// Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i trzy liczby w banerze.
+// Roczniki = lata z wykazem prac (HTML), zakres — od najstarszego do najnowszego z nich; suma jak na komputerze
+// (z separatorem tysięcy wg języka), dlatego jako gotowy napis z odmianą.
+const haslo = ((dzial as any)[en ? 'publikacje_haslo_en' : 'publikacje_haslo'] as string | undefined) || undefined;
+const lataWykazow = zWykazem.length ? (zWykazem.length === 1 ? String(zWykazem[0].rok) : `${zWykazem[zWykazem.length - 1].rok}–${zWykazem[0].rok}`) : '';
+const liczbyTelefon = [
+  { n: suma ? suma.toLocaleString('pl-PL') : '', n_en: suma.toLocaleString('en-GB'), pl: `${odmiana(suma, 'pozycja', 'pozycje', 'pozycji')} w wykazach`, en: suma === 1 ? 'entry in the lists' : 'entries in the lists' },
+  { n: zWykazem.length, pl: [`rocznik, ${lataWykazow}`, `roczniki, ${lataWykazow}`, `roczników, ${lataWykazow}`], en: [`year, ${lataWykazow}`, `years, ${lataWykazow}`] },
+  // bez „w IM” — przy 360 px „redagowane w IM” nie mieści się w kolumnie i etykieta szłaby na trzy linijki
+  { n: czasopisma.length, pl: ['czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych'], en: ['journal we edit', 'journals we edit'] },
+] as ({ n: string; n_en?: string; pl: string; en?: string } | { n: number; pl: [string, string, string]; en: [string, string] })[];
 const nagCzasopisma = wybierz(dane as any, 'czasopisma_naglowek', lang) || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
 const archiwum = wybierz(dane as any, 'archiwum', lang);
 ---
 <Baza tytul={tytul} opis={lead} uklad="zwarta portal-baner">
   {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
-       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
-  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }}>
+       Telefon: hasło zamiast opisu i trzy liczby pod kreską (LiczbyBanera, .tylko-telefon). */}
+  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }}>
     {liczby.length > 0 && (
       <ul class="pt-liczby tylko-komputer">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
+    <LiczbyBanera lang={lang} pozycje={liczbyTelefon} />
   </NaglowekStrony>
   <div class="wrap pub-strona">
     <TekstWstepny pole="publikacje_tekst" lang={lang} />
-    {liczby.length > 0 && (
-      <div class="stats tylko-telefon" data-pagefind-ignore>
-        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-      </div>
-    )}
 
     <section class="zsec" aria-labelledby="wykazy">
       <h2 id="wykazy">{T('Wykazy prac według lat', 'Lists of publications by year')}</h2>
@@ -164,16 +175,12 @@ const archiwum = wybierz(dane as any, 'archiwum', lang);
     .rok-n { font-size: 23px; } .rok-ile { font-size: 13px; }
     .rok-badge { font-size: 11px; padding: 1px 7px; }
     .rok-pdf { min-height: 28px; padding: 0 8px; font-size: 12px; }
-    .pub-strona .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .pub-strona .stat { padding: 14px 16px; }
-    .pub-strona .stat .n { font-size: 26px; }
-    .pub-strona .stat:nth-child(2) { grid-column: 1 / -1; order: 3; }
   }
   @media (max-width: 340px) { .lata { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
-     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” (liczby są w banerze, kafelki .stats
-     pod nim — tylko na telefonie); odstęp od stopki jak na innych podstronach (uklad-zwarta.css). */
+     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” (liczby są w banerze);
+     odstęp od stopki jak na innych podstronach (uklad-zwarta.css). */
   @media (min-width: 761px) {
     .pub-strona { padding-top: 24px; padding-bottom: var(--tresc-dol); }
     .pub-opis { margin-bottom: 10px; }

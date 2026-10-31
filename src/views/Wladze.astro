@@ -4,7 +4,9 @@
 // Tytuł, e-mail, pokój, stronę i zakład bierzemy z kolekcji pracowników po polu „imie_nazwisko” (dokładnie jak w Pracownikach).
 // Telefony podajemy tylko przy sekretariacie (administracja) — przy pracownikach naukowych nie.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tytuł i bursztynowe hasło (pola haslo / haslo_en
+// w src/data/wladze.json; puste = wstęp jak dotąd) zamiast wstępu; bez kreski i liczb.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -25,7 +27,7 @@ type Osoba = {
 };
 type Link = { etykieta: string; etykieta_en?: Tekst; adres: string };
 type Dane = {
-  tytul?: Tekst; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst;
+  tytul?: Tekst; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; haslo?: Tekst; haslo_en?: Tekst;
   osoby?: Osoba[] | null;
   sekretariat?: {
     nazwa?: Tekst; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; email?: Tekst; telefony?: string[] | null;
@@ -44,6 +46,8 @@ const w = (o: any, pole: string) => (o ? wybierz(o, pole, lang) : '');
 const d = wladze as Dane;
 const tytul = w(d, 'tytul') || T('Władze Instytutu', 'Institute management');
 const lead = w(d, 'wstep');
+// hasło w banerze na telefonie — po angielsku tylko haslo_en (bez polskich resztek)
+const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
 
 // Dane osób z kolekcji pracowników
 const kadra = await pracownicy();
@@ -103,7 +107,7 @@ const linki = (d.linki ?? []).filter((l) => l && l.adres && l.etykieta);
 
 ---
 <Baza tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead || undefined} lang={lang} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }} />
+  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }} />
 
   <div class="wrap layout">
     <div class="main">

@@ -2,8 +2,8 @@
 // Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
-// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby z ostatnich 30 dni (ogłoszenia, wydarzenia,
-// seminaria), filtry w jednym wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią. Baner, wiersz
+// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby (nowe ogłoszenia, nadchodzące wydarzenia,
+// zapowiedziane referaty — zlecenie 01), filtry w jednym wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią. Baner, wiersz
 // filtrów i etykiety — wspólne z Kalendarzem (LiczbyBanera, FiltrISzukaj, EtykietaRodzaju; jeden styl, decyzja 31.10.2026).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -13,8 +13,9 @@ import LiczbyBanera from '../components/LiczbyBanera.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
 import { t, wJezyku, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
-import { monthYear, today, addDays, type Lang } from '../lib/daty';
-import { listaAktualnosci, referaty, seminaria, seminariumReferatu } from '../lib/tresci';
+import { monthYear, type Lang } from '../lib/daty';
+import { listaAktualnosci } from '../lib/tresci';
+import { liczbyTerminow, noweOgloszenia, ETYKIETY } from '../lib/liczbyTerminow';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -36,23 +37,14 @@ const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w In
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 
 // Liczby w banerze — na razie tylko na telefonie, pod hasłem, jak w innych działach (decyzja 31.10.2026; komputer później):
-// wpisy danego rodzaju z datą publikacji w ostatnich 30 dniach (względem dnia budowania). Pozycje z zerem pomijamy
-// (LiczbyBanera.astro — wspólne z Kalendarzem).
-// Trzecia liczba to seminaria zamiast sukcesów (decyzja 31.10.2026: sukcesy zdarzają się rzadko, w miesiącu bywa zero):
-// referaty opublikowanych seminariów z terminem w tych samych 30 dniach, do dnia budowania włącznie (jak w kalendarzu:
-// referaty z src/lib/tresci.ts, seminarium referatu — pole „Seminarium” albo folder).
-// Etykieta okresu „z 30 dni” zamiast „w ostatnim miesiącu” (decyzja 31.10.2026): krótsza — „ogłoszenia / z 30 dni”
-// mieści się w dwóch linijkach przy 360 i 390 px (dłuższa zajmowała trzy).
-const dzis = today();
-const miesiacTemu = addDays(dzis, -30);
-const wOknie = (d: string) => d.slice(0, 10) >= miesiacTemu && d.slice(0, 10) <= dzis;
-const wMiesiacu = (r: string) => lista.filter((p) => p.rodzaj === r && wOknie(p.data)).length;
-const idSeminariow = new Set((await seminaria()).map((s) => s.id));
-const referatyWMiesiacu = (await referaty()).filter((r) => idSeminariow.has(seminariumReferatu(r)) && wOknie(r.data.termin)).length;
-const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
-  { n: wMiesiacu('ogloszenie'), pl: ['ogłoszenie', 'ogłoszenia', 'ogłoszeń'], en: ['announcement', 'announcements'] },
-  { n: wMiesiacu('wydarzenie'), pl: ['wydarzenie', 'wydarzenia', 'wydarzeń'], en: ['event', 'events'] },
-  { n: referatyWMiesiacu, pl: ['seminarium', 'seminaria', 'seminariów'], en: ['seminar', 'seminars'] },
+// nowe ogłoszenia (z datą publikacji z ostatnich 30 dni) · nadchodzące wydarzenia · zapowiedziane referaty — definicje
+// wspólne z Kalendarzem i innymi banerami (src/lib/liczbyTerminow.ts; zlecenie 01). Etykiety bez okresu „z 30 dni”
+// (zlecenie 01: liczby wydarzeń i referatów nie mają okna czasowego). Pozycje z zerem pomijamy (LiczbyBanera.astro).
+const terminy = await liczbyTerminow();
+const liczby = [
+  { n: await noweOgloszenia(lista), ...ETYKIETY.ogloszenia },
+  { n: terminy.wydarzenia, ...ETYKIETY.wydarzenia },
+  { n: terminy.referaty, ...ETYKIETY.referaty },
 ];
 // Filtr rodzaju: na komputerze przyciski, na telefonie lista rozwijana obok pola szukania (jeden wiersz; decyzja 31.10.2026;
 // FiltrISzukaj.astro — wspólny z Kalendarzem). Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts), podpowiedź
@@ -63,7 +55,7 @@ const szukajKrotko = T('Szukaj', 'Search');
 ---
 <Baza tytul={t(lang, 'aktualnosci')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]}>
-    <LiczbyBanera lang={lang} okres={T('z 30 dni', 'in 30 days')} pozycje={liczby} />
+    <LiczbyBanera lang={lang} pozycje={liczby} />
   </NaglowekStrony>
 
   <div class="wrap layout">

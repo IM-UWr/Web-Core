@@ -5,10 +5,13 @@
 // Sekcje (Realizowane, Zakończone, Pozostałe) to .zsec jak na stronach działów (kreska sekcji, tytuł h2).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner jak w działach — hasło (nauka.json: granty_haslo / granty_haslo_en)
+// zamiast opisu i trzy liczby pod kreską (LiczbyBanera): realizowane · zakończone · łącznie. Dawnych kafelków .stats pod
+// banerem już nie ma (liczby są w banerze, jak na stronach działów).
 // Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola granty_tekst / granty_tekst_en; puste = brak).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import WierszGrantu from '../components/WierszGrantu.astro';
 import Ikona from '../components/Ikona.astro';
@@ -16,6 +19,7 @@ import { u } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { today, type Lang } from '../lib/daty';
 import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, slugOf, type Grant } from '../lib/tresci';
+import dzial from '../data/dzialy/nauka.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -57,6 +61,14 @@ const liczby = [
     .filter((r) => ileRodzaju(r) > 0)
     .map((r) => ({ n: ileRodzaju(r), l: r === 'ncn' ? T('z Narodowego Centrum Nauki', 'funded by the National Science Centre') : T('z programów UE i międzynarodowych', 'EU and international') })),
 ];
+// Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i trzy liczby w banerze;
+// projekty bez podanych lat liczą się tylko do „łącznie” (jak sekcja „Pozostałe”).
+const haslo = ((dzial as any)[lang === 'en' ? 'granty_haslo_en' : 'granty_haslo'] as string | undefined) || undefined;
+const liczbyTelefon = [
+  { n: realizowane.length, pl: ['realizowany projekt', 'realizowane projekty', 'realizowanych projektów'], en: ['ongoing project', 'ongoing projects'] },
+  { n: zakonczone.length, pl: ['zakończony', 'zakończone', 'zakończonych'], en: ['completed', 'completed'] },
+  { n: wszystkie.length, pl: ['projekt łącznie', 'projekty łącznie', 'projektów łącznie'], en: ['project in total', 'projects in total'] },
+] as { n: number; pl: [string, string, string]; en: [string, string] }[];
 
 const naglowek = T('Projekty i granty', 'Research projects and grants');
 const lead = T(
@@ -72,19 +84,17 @@ const sekcje = [
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
   {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
-       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
+       Telefon: hasło zamiast opisu i trzy liczby pod kreską (LiczbyBanera, .tylko-telefon). */}
+  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
     <ul class="pt-liczby tylko-komputer">
       {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
     </ul>
+    <LiczbyBanera lang={lang} pozycje={liczbyTelefon} />
   </NaglowekStrony>
 
   <div class="wrap layout">
     <div class="main">
       <TekstWstepny pole="granty_tekst" lang={lang} />
-      <div class="stats gl-stats tylko-telefon" data-pagefind-ignore>
-        {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-      </div>
 
       {sekcje.length > 1 && (
         <details class="toc toc-top gl-spis" data-pagefind-ignore>
@@ -209,7 +219,6 @@ const sekcje = [
 </script>
 
 <style>
-  .gl-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); margin-bottom: 36px; }
   .gl-ile { font-size: .65em; font-weight: 600; }
   .gl-uwaga { margin: -8px 0 10px; font-size: 15px; }
   .gl-karta h3 { line-height: 1.3; overflow-wrap: anywhere; }

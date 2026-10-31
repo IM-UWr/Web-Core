@@ -4,7 +4,7 @@
 // miesiące jako sekcje z kreską jak na stronach działów, pozycje jako osobne białe karty (.karty-lista w global.css). Filtry rodzaju w banerze;
 // pod banerem przyciski widoku „Nadchodzące” / „Archiwum”.
 // Telefon (≤ 760 px; decyzja 31.10.2026 — jeden styl z Aktualnościami): w banerze tytuł, bursztynowe hasło zamiast opisu
-// i trzy liczby z najbliższych 30 dni (LiczbyBanera); przyciski rodzajów z banera schowane (.tylko-komputer), pod banerem
+// i trzy liczby: obrony, referaty, wydarzenia (LiczbyBanera; zlecenie 01); przyciski rodzajów z banera schowane (.tylko-komputer), pod banerem
 // wiersz filtrów jak w Aktualnościach — lista rozwijana rodzajów i pole szukania (FiltrISzukaj, tylko telefon), pod nim
 // zwarty przełącznik „Nadchodzące | Archiwum” (te same przyciski widoku, inny wygląd). Stan filtrów wspólny dla przycisków
 // komputera i listy rozwijanej (skrypt niżej), więc przejście przez 760 px go nie gubi; etykiety — EtykietaRodzaju (B1).
@@ -17,8 +17,9 @@ import TytulZewn from '../components/TytulZewn.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE } from '../lib/i18n';
-import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, today, addDays, type Lang } from '../lib/daty';
+import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
 import { wszystkieWydarzenia, trwaLubBedzie } from '../lib/tresci';
+import { liczbyTerminow, ETYKIETY } from '../lib/liczbyTerminow';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -49,16 +50,14 @@ const lead = lang === 'en'
 // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
 const haslo = T('Co, gdzie i kiedy', 'What, where and when');
 
-// Liczby w banerze (telefon; decyzja 31.10.2026): pozycje z najbliższych 30 dni od dnia budowania — te, które są
-// w „Nadchodzących” (trwają albo dopiero będą) i zaczynają się najpóźniej 30 dni po dniu budowania. Seminaria = referaty
-// seminariów, wydarzenia = wpisy z polem „Wydarzenie: początek”, obrony doktorskie. Konferencje nie są liczone.
-// Etykieta okresu „w ciągu 30 dni” — mieści się w dwóch linijkach przy 360 i 390 px (sprawdzone pomiarem).
-const za30 = addDays(today(), 30);
-const w30 = (r: W['rodzaj']) => wszystkie.filter((w) => w.rodzaj === r && trwaLubBedzie(w) && w.poczatek.slice(0, 10) <= za30).length;
-const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
-  { n: w30('referat'), pl: ['seminarium', 'seminaria', 'seminariów'], en: ['seminar', 'seminars'] },
-  { n: w30('wydarzenie'), pl: ['wydarzenie', 'wydarzenia', 'wydarzeń'], en: ['event', 'events'] },
-  { n: w30('obrona'), pl: ['obrona', 'obrony', 'obron'], en: ['defence', 'defences'] },
+// Liczby w banerze (telefon; decyzja użytkownika, zlecenie 01): nadchodzące obrony · zapowiedziane referaty · nadchodzące
+// wydarzenia (z konferencjami, bez seminariów i obron) — bez okna 30 dni i bez etykiety okresu; definicje wspólne
+// z Aktualnościami (src/lib/liczbyTerminow.ts). Pozycje z zerem pomijamy (LiczbyBanera.astro).
+const terminy = await liczbyTerminow();
+const liczby = [
+  { n: terminy.obrony, ...ETYKIETY.obrony },
+  { n: terminy.referaty, ...ETYKIETY.referaty },
+  { n: terminy.wydarzenia, ...ETYKIETY.wydarzenia },
 ];
 // Filtry na telefonie: lista rozwijana (kolejność jak w decyzji: Seminaria, Wydarzenia, Obrony, Konferencje) i szukanie
 // po tekście pozycji — jak w Aktualnościach. Na komputerze przyciski w banerze, bez pola szukania (bez zmian).
@@ -69,7 +68,7 @@ const szukajKrotko = T('Szukaj', 'Search');
 ---
 <Baza tytul={t(lang, 'kalendarz')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <LiczbyBanera lang={lang} okres={T('w ciągu 30 dni', 'in the next 30 days')} pozycje={liczby} />
+    <LiczbyBanera lang={lang} pozycje={liczby} />
     <div class="filters tylko-komputer">
       <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
         <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>

@@ -3,15 +3,20 @@
 // Kolejność: alfabetycznie po nazwisku; doktorantów komponent dzieli dodatkowo według roku studiów.
 // Telefony podajemy tylko przy administracji (pilnuje tego skrypty/sprawdz_tresci.py).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner we wspólnym układzie — tytuł, bursztynowe hasło (pole
+// pracownicy_haslo / pracownicy_haslo_en w src/data/dzialy/instytut.json; puste = opis jak dotąd), kreska i liczby
+// (osoby · zakłady · doktoranci); pod banerem jeden wiersz filtrów jak w Aktualnościach (TabelaPracownikow.tsx).
 import { getCollection } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TabelaPracownikow, { type Osoba } from '../components/TabelaPracownikow.tsx';
 import { t, wybierz, wJezyku } from '../lib/i18n';
 import { u } from '../lib/url';
 import { zaklady as pobierzZaklady } from '../lib/tresci';
 import type { Lang } from '../lib/daty';
+import dzial from '../data/dzialy/instytut.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -25,10 +30,23 @@ const osoby: Osoba[] = (await getCollection('pracownicy'))
   })
   .sort((a, b) => nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl'))
   .map(({ opublikowany, funkcja_en, ...o }: any) => o);
+// krotko: nazwa grupy w liście rozwijanej na telefonie (grupa „Kto”; krócej, żeby mieściła się w wąskim polu)
+const KROTKO: Record<string, [string, string]> = { emeryt: ['Emerytowani', 'Retired'] };
 const grupy = (['nauczyciel', 'doktorant', 'administracja', 'emeryt'] as const)
   .filter((g) => osoby.some((o) => o.grupa === g))
-  .map((g) => ({ id: g, nazwa: t(lang, `g_${g}`) }));
-const zaklady = (await pobierzZaklady()).map((z) => ({ id: z.id, nazwa: wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang), href: u(wJezyku(`/instytut/zaklady/${z.id}`, lang)) }));
+  .map((g) => ({ id: g, nazwa: t(lang, `g_${g}`), krotko: KROTKO[g]?.[lang === 'en' ? 1 : 0] ?? t(lang, `g_${g}`) }));
+const listaZakladow = await pobierzZaklady();
+const zaklady = listaZakladow.map((z) => ({ id: z.id, nazwa: wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang), href: u(wJezyku(`/instytut/zaklady/${z.id}`, lang)) }));
+
+// Baner na telefonie: hasło (po angielsku tylko pole _en — bez polskich resztek) i liczby z danych: osoby w spisie ·
+// zakłady naukowe (bez Pracowni Dydaktyki — liczymy wpisy, których nazwa zaczyna się od „Zakład”) · doktoranci
+// (męskoosobowy — przy 2–4 też dopełniacz: „dwóch doktorantów”, „22 doktorantów”).
+const haslo = ((lang === 'en' ? (dzial as any).pracownicy_haslo_en : (dzial as any).pracownicy_haslo) as string | undefined) || undefined;
+const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+  { n: osoby.length, pl: ['osoba', 'osoby', 'osób'], en: ['person', 'people'] },
+  { n: listaZakladow.filter((z) => /^zakład/i.test(z.data.nazwa.trim())).length, pl: ['zakład', 'zakłady', 'zakładów'], en: ['department', 'departments'] },
+  { n: osoby.filter((o) => o.grupa === 'doktorant').length, pl: ['doktorant', 'doktorantów', 'doktorantów'], en: ['PhD student', 'PhD students'] },
+];
 const napisy = {
   szukaj: lang === 'en' ? 'Search by name, room, e-mail…' : 'Szukaj: nazwisko, pokój, e-mail…',
   grupa: lang === 'en' ? 'Group' : 'Grupa',
@@ -45,13 +63,24 @@ const napisy = {
   brak: lang === 'en' ? 'Nobody matches the search.' : 'Nikogo nie znaleziono.',
   zaklad: lang === 'en' ? 'Department' : 'Zakład',
   wszystkieZaklady: lang === 'en' ? 'All departments' : 'Wszystkie zakłady',
+  // telefon: wiersz filtrów (lista „Wszyscy ▾” z grupami „Kto” i „Zakład” + pole „Szukaj”) i licznik po przefiltrowaniu
+  filtr: lang === 'en' ? 'Filter by group or department' : 'Filtruj według grupy albo zakładu',
+  kto: lang === 'en' ? 'Who' : 'Kto',
+  szukajKrotko: lang === 'en' ? 'Search' : 'Szukaj',
+  znaleziono: lang === 'en' ? 'Found' : 'Znaleziono',
+  // forma rzeczownika po liczebniku: 1 · 2–4 (bez 12–14) · 5+ (po angielsku dwie ostatnie takie same)
+  osoba1: lang === 'en' ? 'person' : 'osobę',
+  osoba2: lang === 'en' ? 'people' : 'osoby',
+  osoba5: lang === 'en' ? 'people' : 'osób',
 };
 const lead = lang === 'en'
   ? 'Contact details of the staff, PhD students and administration of the Mathematical Institute.'
   : 'Dane kontaktowe pracowników, doktorantów i administracji Instytutu Matematycznego.';
 ---
 <Baza tytul={t(lang, 'pracownicy')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'pracownicy')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]} />
+  <NaglowekStrony tytul={t(lang, 'pracownicy')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]}>
+    <LiczbyBanera lang={lang} pozycje={liczby} />
+  </NaglowekStrony>
   <div class="wrap pr-wrap">
     <TabelaPracownikow client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
   </div>
@@ -61,6 +90,12 @@ const lead = lang === 'en'
   .pr-wrap { padding-top: 28px; padding-bottom: 64px; }
   /* telefon (≤ 760 px): wygląd „Portal” — mniej miejsca nad i pod spisem */
   @media (max-width: 760px) { .pr-wrap { padding-top: 16px; padding-bottom: 40px; } }
+  /* telefon (zlecenie 01): licznik „Znaleziono N osób” pod wierszem filtrów (TabelaPracownikow.tsx) — jak dawny
+     „Liczba osób”; pusty (bez filtra) nie zajmuje miejsca */
+  @media (max-width: 760px) {
+    .pr-wrap :global(.staff-znaleziono) { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+    .pr-wrap :global(.staff-znaleziono:empty) { margin: 0; }
+  }
   /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css);
      nad wyszukiwarką stały odstęp 24 px, jak na stronie działu „Instytut” */
   @media (min-width: 761px) { .pr-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }

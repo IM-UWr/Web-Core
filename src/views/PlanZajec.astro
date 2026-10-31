@@ -8,13 +8,16 @@
 // Dane: src/data/plan/plan.json — pobierane automatycznie z USOS (anonimowo) przez skrypty/plan/pobierz_plan.py,
 // uruchamiany przez workflow .github/workflows/plan-zajec.yml kilka razy dziennie. Danych nie edytuje się ręcznie.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css, plan.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css, plan.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): w banerze hasło zamiast opisu — pola `plan_haslo` / `plan_haslo_en`
+// w src/data/dzialy/studia.json (Pages CMS: strona działu „Studia”); bez kreski i liczb. Puste pole = opis jak dotąd.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import PrzelacznikSemestrow from '../components/PrzelacznikSemestrow.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import { wybierzSemestr } from '../components/wyborSemestru';
 import surowe from '../data/plan/plan.json';
+import studia from '../data/dzialy/studia.json';
 import { today, type Lang } from '../lib/daty';
 import '../styles/plan.css';
 
@@ -28,6 +31,9 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const dane = surowe as unknown as Dane;
 const en = lang === 'en';
+// hasło na telefonie (po angielsku tylko plan_haslo_en — bez polskich resztek)
+const tekstStudiow = studia as { plan_haslo?: string; plan_haslo_en?: string };
+const haslo = (en ? tekstStudiow.plan_haslo_en : tekstStudiow.plan_haslo) || undefined;
 
 const T = en
   ? {
@@ -107,7 +113,7 @@ let licznik = 0;
 const idPrzedmiotu = () => `pz-p${++licznik}`;
 ---
 <Baza tytul={T.tytul} opis={T.lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={T.tytul} lead={T.lead} lang={lang} okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]} />
+  <NaglowekStrony tytul={T.tytul} lead={T.lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]} />
 
   <div class="wrap layout plan-strona">
     <div class="main">

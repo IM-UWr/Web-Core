@@ -1,16 +1,23 @@
 ---
-// Liczby pod hasłem w banerze — na razie tylko na telefonie (decyzja 31.10.2026; komputer później): wspólne dla Aktualności
-// i Kalendarza. Trzy kolumny z kreską nad nimi (.pt-liczby w portal.css): liczba, pod nią etykieta „<rzeczownik> <okres>”,
-// np. „2 / ogłoszenia z 30 dni”, „5 / seminariów w ciągu 30 dni”, łamana równo (text-wrap: balance) — najwyżej dwie linijki
-// przy 360 i 390 px (sprawdzone pomiarem dla PL i EN; stałe złamanie przed okresem dawało po angielsku trzy linijki:
-// „seminars / in the next 30 / days”). Rzeczownik w odmianie po liczebniku (odmiana w i18n.ts), jednoliterowe wyrazy
-// z twardą spacją (bezSierotek). Pozycje z zerem pomijamy; bez żadnej — bez listy. Zwykłe liczby, nieklikalne.
+// Liczby pod hasłem w banerze — tylko na telefonie (decyzje 31.10.2026; komputer później): wspólne dla działów i podstron
+// (zlecenie 01). Trzy kolumny z kreską nad nimi (.pt-liczby w portal.css): liczba, pod nią etykieta, łamana równo
+// (text-wrap: balance) — najwyżej dwie linijki przy 360 i 390 px. Pozycja to albo liczba z odmianą rzeczownika
+// (odmiana w i18n.ts; np. „5 / zapowiedzianych referatów”), opcjonalnie z okresem („… z 30 dni”), albo gotowy krótki napis
+// z etykietą (np. „3 lata / studia I stopnia”, „20 paź / 2026”). Jednoliterowe wyrazy z twardą spacją (bezSierotek).
+// Liczby równe 0 i puste napisy pomijamy; bez żadnej pozycji — bez listy (i bez kreski). Zwykłe liczby, nieklikalne.
 import { odmiana, bezSierotek } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
-interface Props { lang: Lang; okres: string; pozycje: { n: number; pl: [string, string, string]; en: [string, string] }[] }
+type Liczba = { n: number; pl: [string, string, string]; en: [string, string] };
+type Napis = { n: string; n_en?: string; pl: string; en?: string };
+interface Props { lang: Lang; okres?: string; pozycje: (Liczba | Napis)[] }
 const { lang, okres, pozycje } = Astro.props;
-const liczby = pozycje.filter((x) => x.n > 0).map((x) => ({ n: x.n, l: bezSierotek(`${odmiana(x.n, x.pl, x.en, lang)} ${okres}`) }));
+const en = lang === 'en';
+const liczby = pozycje
+  .filter((x) => (typeof x.n === 'number' ? x.n > 0 : x.n.trim() !== ''))
+  .map((x) => typeof x.n === 'number'
+    ? { n: String(x.n), l: bezSierotek(`${odmiana(x.n, (x as Liczba).pl, (x as Liczba).en, lang)}${okres ? ` ${okres}` : ''}`) }
+    : { n: (en && (x as Napis).n_en) || x.n, l: bezSierotek((en && (x as Napis).en) || (x as Napis).pl) });
 ---
 {liczby.length > 0 && (
   <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>

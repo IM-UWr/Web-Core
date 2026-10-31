@@ -9,17 +9,19 @@ import type { Lang } from '../lib/daty';
 import ustawienia from '../data/ustawienia.json';
 
 // Nad tytułem: link „← poziom wyżej”. Cel: `wstecz` albo ostatni z `okruszki`, który ma adres, albo strona główna.
+// wstecz.telefon: krótsza etykieta tylko na telefonie (np. „Seminaria” zamiast „Wszystkie seminaria”; Wstecz.astro).
 // nadtytul: mała etykieta nad tytułem (np. „Studia I i II stopnia” na stronie kierunku).
+// nadtytulTelefon: inny (krótszy) nadtytuł tylko na telefonie (np. „Specjalność · AD”; zlecenie 01) — pełny zostaje na komputerze.
 // haslo: krótkie hasło działu — na telefonie (≤ 760 px) zamiast opisu `lead`, wyróżnione (bursztyn na granatowym pasie);
 // na komputerze niewidoczne, tam zostaje pełny opis (decyzja 31.10.2026). Puste/brak = telefon pokazuje opis jak dotąd.
 // Działy: pola `haslo` / `haslo_en` w src/data/dzialy/*.json i src/data/popularyzacja.json; Aktualności — w kodzie widoku.
 // motyw: animacja w tle banera na telefonie (nazwa pliku w src/scripts/baner/motywy/); domyślnie z mapy strona → motyw
 // w src/lib/motywyBanerow.ts. Bez motywu — statyczny rysunek działu (.ph-m), tak jak na komputerze.
-interface Props { tytul: string; lead?: string; haslo?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string }; nadtytul?: string; motyw?: string }
-const { tytul, lead, lang, okruszki = [], wstecz, nadtytul } = Astro.props;
+interface Props { tytul: string; lead?: string; haslo?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string }
+const { tytul, lead, lang, okruszki = [], wstecz, nadtytul, nadtytulTelefon } = Astro.props;
 const haslo = Astro.props.haslo?.trim() || undefined;
 const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
-const cel = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
+const cel: { etykieta: string; adres: string; telefon?: string } = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
 
 // Dział strony (po pierwszym członie adresu, bez /en) — od niego zależy motyw graficzny i zdjęcie.
 const DZIALY: Record<string, string> = {
@@ -92,8 +94,9 @@ const motyw = ozdobny ? (Astro.props.motyw ?? motywStrony(stripBase(Astro.url.pa
         <img src={zdjecie} alt="" decoding="async" style={foto?.kadr ? `object-position:${foto.kadr}` : undefined} />
       </figure>
     )}
-    <Wstecz etykieta={cel.etykieta} adres={cel.adres} lang={lang} />
-    {nadtytul && <p class="eyebrow">{nadtytul}</p>}
+    <Wstecz etykieta={cel.etykieta} telefon={cel.telefon} adres={cel.adres} lang={lang} />
+    {nadtytul && <p class:list={['eyebrow', nadtytulTelefon !== undefined && 'tylko-komputer']}>{nadtytul}</p>}
+    {nadtytulTelefon && <p class="eyebrow tylko-telefon" data-pagefind-ignore>{nadtytulTelefon}</p>}
     <h1>{tytul}</h1>
     {/* Hasło i opis jako dwa rodzeństwa w .wrap (wchodzą z tą samą animacją co tytuł — przejscia.css);
          przełączanie klasami .tylko-telefon / .tylko-komputer (telefon.css), style hasła w telefon.css. */}

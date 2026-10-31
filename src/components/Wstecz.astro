@@ -1,14 +1,18 @@
 ---
 // Powrót o poziom wyżej („← Wszystkie seminaria”) — zamiast okruszków.
+// telefon: krótsza etykieta tylko na telefonie (≤ 760 px), np. „← Seminaria” (zlecenie 01, decyzja 31.10.2026);
+// komputer bez zmian.
 import Ikona from './Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
-interface Props { etykieta: string; adres: string; lang: Lang }
-const { etykieta, adres, lang } = Astro.props;
+interface Props { etykieta: string; adres: string; lang: Lang; telefon?: string }
+const { etykieta, adres, lang, telefon } = Astro.props;
 const href = isExternal(adres) ? adres : u(wJezyku(adres, lang));
 ---
 <nav class="wstecz" aria-label={lang === 'en' ? 'Back' : 'Powrót'}>
-  <a href={href}><Ikona nazwa="wstecz" rozmiar={18} /><span>{etykieta}</span></a>
+  <a href={href}><Ikona nazwa="wstecz" rozmiar={18} />{telefon && telefon !== etykieta
+    ? <><span class="tylko-komputer">{etykieta}</span><span class="tylko-telefon">{telefon}</span></>
+    : <span>{etykieta}</span>}</a>
 </nav>

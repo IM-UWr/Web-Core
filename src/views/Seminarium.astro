@@ -3,6 +3,7 @@
 // działów (kreska sekcji, tytuł h2).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (koordynatorzy i kontakt bez zmian), reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01): w banerze hasło i liczby, koordynatorzy pod banerem — opis przy `haslo` niżej.
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -10,8 +11,10 @@ import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
-import { longWithDay, short, time, now, today, hasTime, type Lang } from '../lib/daty';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import { longWithDay, short, time, hasTime, type Lang } from '../lib/daty';
 import { referaty, seminariumReferatu, slugOf, sala, zaklady, pracownicy, type Seminarium } from '../lib/tresci';
+import { wPrzyszlosci, ETYKIETY } from '../lib/liczbyTerminow';
 import { zTytulem } from '../lib/osoby';
 import { renderMarkdown } from '../lib/markdown';
 import ustawienia from '../data/ustawienia.json';
@@ -24,8 +27,8 @@ const { Content } = await render(seminarium);
 // opis seminarium po angielsku (pole tresc_en); puste = wersja angielska pokazuje opis po polsku
 const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
 const wszystkie = (await referaty()).filter((r) => seminariumReferatu(r) === seminarium.id);
-const n = now();
-const przyszle = (r: (typeof wszystkie)[number]) => (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today());
+// „Nadchodzące” = referaty z terminem w przyszłości — ta sama definicja co „zapowiedziane referaty” w banerach (liczbyTerminow.ts)
+const przyszle = (r: (typeof wszystkie)[number]) => wPrzyszlosci(r.data.termin);
 const nadchodzace = await Promise.all(wszystkie.filter(przyszle).map(async (r) => ({ r, C: (await render(r)).Content })));
 const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(async (r) => ({ r, C: (await render(r)).Content })));
 const href = (a: string) => (isExternal(a) ? a : u(a));
@@ -42,11 +45,23 @@ const koordynatorzy = d.prowadzacy.map((imie) => {
 });
 // Adres automatu listy mailingowej (Google Apps Script, patrz README → „Powiadomienia e-mail”); pusty = zapisy wyłączone.
 const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Seminaria”, tytuł, hasło o tematyce
+// seminarium, kreska i liczby. Hasło: pole `haslo` / `haslo_en` seminarium (CMS); puste — nazwa zakładu w języku strony
+// (bez zakładu — bez hasła, jak dotąd). Koordynatorzy, e-mail i zakład — w zwartym bloku pod banerem (.sm-koord);
+// w banerze zostają tylko na komputerze (.sem-koord.tylko-komputer).
+const haslo = (lang === 'en' ? d.haslo_en : d.haslo)?.trim() || (zakladySem[0] ? wybierz(zakladySem[0].data, 'nazwa', lang) : undefined);
+const liczby = [
+  { n: nadchodzace.length, ...ETYKIETY.referaty },
+  { n: minione.length, ...ETYKIETY.archiwum },
+  { n: koordynatorzy.length, pl: ['koordynator', 'koordynatorów', 'koordynatorów'] as [string, string, string], en: ['coordinator', 'coordinators'] as [string, string] },
+];
+const maKoord = koordynatorzy.length > 0 || zakladySem.length > 0 || !!d.kontakt;
 ---
 <Baza tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={nazwa} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), adres: '/seminaria' }}>
-    {(koordynatorzy.length > 0 || zakladySem.length > 0 || d.kontakt) && (
-      <div class="sem-koord">
+  <NaglowekStrony tytul={nazwa} haslo={haslo} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}>
+    <LiczbyBanera lang={lang} pozycje={liczby} />
+    {maKoord && (
+      <div class="sem-koord tylko-komputer">
         {koordynatorzy.length > 0 && (
           <p class="sem-koord-osoby">
             <span class="sem-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
@@ -64,6 +79,24 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
+      {/* telefon: koordynatorzy, e-mail i zakład pod banerem (wzór: .przekazanie/prototypy/uklad-banerow-zmiany-dom.js);
+           kopia bloku z banera, więc bez indeksowania */}
+      {maKoord && (
+        <div class="sm-koord tylko-telefon" data-pagefind-ignore>
+          {koordynatorzy.length > 0 && (
+            <>
+              <p class="sm-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</p>
+              <p class="sm-koord-n">{koordynatorzy.map((k, i) => <>{i > 0 && ', '}{k.strona ? <a href={k.strona}>{k.nazwa}</a> : k.nazwa}</>)}</p>
+            </>
+          )}
+          {(d.kontakt || zakladySem.length > 0) && (
+            <p class="sm-koord-meta kropki">
+              {d.kontakt && <span><a href={`mailto:${d.kontakt}`}>{d.kontakt}</a></span>}
+              {zakladySem.map((z, i) => <span class:list={[(i > 0 || d.kontakt) && 'kropka']}><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a></span>)}
+            </p>
+          )}
+        </div>
+      )}
       <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
 
       <section class="zsec sm-sek" aria-labelledby="h-nad">
@@ -163,4 +196,15 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
   /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
      do banera (reszta odstępów .layout — uklad-zwarta.css) */
   @media (min-width: 761px) { .layout { padding-top: 24px; } }
+  /* telefon (≤ 760 px; zlecenie 01): zwarty blok koordynatorów pod banerem — mała etykieta, nazwiska, pod nimi e-mail
+     i zakład w jednym wierszu (separator „·” nigdy na początku linii: .kropki, global.css); kreska oddziela blok od opisu */
+  @media (max-width: 760px) {
+    .sm-koord { margin: 0 0 18px; padding: 0 0 16px; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--muted); }
+    .sm-koord p { margin: 0; }
+    .sm-koord .sm-koord-l { margin-bottom: 4px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .sm-koord-n { color: var(--ink); }
+    .sm-koord .sm-koord-meta { display: flex; flex-wrap: wrap; gap: 0 .3em; margin-top: 6px; }
+    .sm-koord-meta a { overflow-wrap: anywhere; }
+    .sm-koord a { color: var(--ink); }
+  }
 </style>

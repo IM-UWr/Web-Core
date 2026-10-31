@@ -7,9 +7,12 @@
 // Jedno źródło dat: terminy semestru, okresy zajęć, dni wolne i zamiany dni są w src/data/kolory-dni.json (Pages CMS),
 // kolory liczy src/lib/kolory-dni.ts — ta strona jest też podglądem dla redaktora.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
+// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): w banerze hasło zamiast opisu (pola `haslo` / `haslo_en`
+// w src/data/rok-akademicki.md) i trzy liczby bieżącego semestru: dni zajęć · dni niebieskie · dni pomarańczowe.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import Ikona from '../components/Ikona.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import PrzelacznikSemestrow from '../components/PrzelacznikSemestrow.astro';
@@ -21,7 +24,7 @@ import { renderMarkdownZNaglowkami } from '../lib/markdown';
 import { today, long, longWithDay, range, daysBetween, type Lang } from '../lib/daty';
 import {
   semestry, nazwaSemestru, tekstDnia, wolneSemestru, zamianySemestru, terminySemestru, nazwaDnia, dzienTygodnia, opisZamiany,
-  NAZWA_KOLORU, SKROT_PLANU, type Semestr,
+  statystykiSemestru, NAZWA_KOLORU, SKROT_PLANU, type Semestr,
 } from '../lib/kolory-dni';
 import { wybierzSemestr } from '../components/wyborSemestru';
 
@@ -75,6 +78,17 @@ const pdfy = [...zakladki, ...archiwum].filter((s) => s.pdf);
 const ps = (id: string) => (panele ? { 'data-ps-dla': id, 'data-ps-aktywny': id === aktywny ? '' : undefined } : {});
 const semestrySwitch = zakladki.map((s) => ({ id: idPanelu(s), etykieta: nazwaSemestru(s, lang), od: s.poczatek, do: s.koniec }));
 
+// Baner na telefonie (zlecenie 01): hasło (po angielsku tylko haslo_en — bez polskich resztek; puste = opis jak dotąd)
+// i liczby semestru wybranego przy budowie tak jak przełącznik (wybierzSemestr: trwający albo najbliższy) — te same,
+// co w opisie kalendarza („75 dni zajęć (40 niebieskich, 35 pomarańczowych)”, KoloryDniSemestr.astro). Zera pomijane.
+const haslo = (en ? fm.haslo_en : fm.haslo) || undefined;
+const stBiezacego = zakladki[iAktywny] ? statystykiSemestru(zakladki[iAktywny]) : undefined;
+const liczbyTel = stBiezacego ? [
+  { n: stBiezacego.razem, pl: ['dzień zajęć', 'dni zajęć', 'dni zajęć'] as [string, string, string], en: ['class day', 'class days'] as [string, string] },
+  { n: stBiezacego.niebieskie, pl: ['dzień niebieski', 'dni niebieskie', 'dni niebieskich'] as [string, string, string], en: ['blue day', 'blue days'] as [string, string] },
+  { n: stBiezacego.pomaranczowe, pl: ['dzień pomarańczowy', 'dni pomarańczowe', 'dni pomarańczowych'] as [string, string, string], en: ['orange day', 'orange days'] as [string, string] },
+] : [];
+
 const ID = {
   kolory: T('kolory-dni', 'day-colours'),
   rok: T('rok-w-skrócie', 'the-year-at-a-glance'),
@@ -89,7 +103,9 @@ const naglowki = [
 ];
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Studia', 'Study'), adres: '/studia' }, { etykieta: naglowek }]} />
+  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: T('Studia', 'Study'), adres: '/studia' }, { etykieta: naglowek }]}>
+    <LiczbyBanera lang={lang} pozycje={liczbyTel} />
+  </NaglowekStrony>
   <div class="wrap layout kd">
     <div class="main">
       <SpisTresci naglowki={naglowki} lang={lang} wariant="gora" />

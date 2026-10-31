@@ -4,16 +4,20 @@
 // telefon — lata jako małe etykiety i wiersze, jak dotąd.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner jak w działach — hasło (nauka.json: sukcesy_haslo /
+// sukcesy_haslo_en) zamiast opisu i trzy liczby pod kreską (LiczbyBanera): wpisy o sukcesach · z nich w bieżącym roku ·
+// lata w archiwum (od najstarszego wpisu do bieżącego roku). Dawnych kafelków .stats pod banerem już nie ma.
 // Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola sukcesy_tekst / sukcesy_tekst_en; puste = brak).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
-import { short, type Lang } from '../lib/daty';
+import { short, today, type Lang } from '../lib/daty';
 import { aktualnosci, slugOf, type Aktualnosc } from '../lib/tresci';
+import dzial from '../data/dzialy/nauka.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -40,30 +44,37 @@ const lead = T(
 const najstarszy = lata.length ? lata[lata.length - 1].rok : '';
 const najnowszy = lata.length ? lata[0].rok : '';
 const archiwumStarejStrony = 'https://www.math.uni.wroc.pl/sukcesy';
-// Liczby: na komputerze w banerze (.pt-liczby), na telefonie w kafelkach .stats pod banerem.
+// Liczby na komputerze (w banerze, .pt-liczby.tylko-komputer).
 const liczby = sukcesy.length > 0 ? [
   { n: String(sukcesy.length), l: T('wpisów o sukcesach', 'achievement posts') },
   { n: najstarszy === najnowszy ? najnowszy : `${najstarszy}–${najnowszy}`, l: T('lata', 'years') },
 ] : [];
+// Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i trzy liczby w banerze.
+// Bieżący rok z daty budowy (today()); lata w archiwum — od roku najstarszego wpisu do bieżącego włącznie.
+const haslo = ((dzial as any)[lang === 'en' ? 'sukcesy_haslo_en' : 'sukcesy_haslo'] as string | undefined) || undefined;
+const rok = today().slice(0, 4);
+const wTymRoku = lata.find((g) => g.rok === rok)?.lista.length ?? 0;
+const lat = najstarszy ? Number(rok) - Number(najstarszy) + 1 : 0;
+const liczbyTelefon: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+  { n: sukcesy.length, pl: ['wpis o sukcesach', 'wpisy o sukcesach', 'wpisów o sukcesach'], en: ['achievement post', 'achievement posts'] },
+  { n: wTymRoku, pl: [`w ${rok} roku`, `w ${rok} roku`, `w ${rok} roku`], en: [`in ${rok}`, `in ${rok}`] },
+  { n: lat, pl: [`rok w archiwum, od ${najstarszy}`, `lata w archiwum, od ${najstarszy}`, `lat w archiwum, od ${najstarszy}`], en: [`year archived, since ${najstarszy}`, `years archived, since ${najstarszy}`] },
+];
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
   {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
-       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
+       Telefon: hasło zamiast opisu i trzy liczby pod kreską (LiczbyBanera, .tylko-telefon). */}
+  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby tylko-komputer">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
+    <LiczbyBanera lang={lang} pozycje={liczbyTelefon} />
   </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
       <TekstWstepny pole="sukcesy_tekst" lang={lang} />
-      {liczby.length > 0 && (
-        <div class="stats tylko-telefon" data-pagefind-ignore>
-          {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-        </div>
-      )}
       {sukcesy.length === 0 && <p class="muted">{T('Brak wpisów o sukcesach.', 'No achievement posts yet.')}</p>}
 
       {lata.map((g) => (

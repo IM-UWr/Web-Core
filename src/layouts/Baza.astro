@@ -24,6 +24,9 @@ interface Props {
   obraz?: string;
   // false = strona w trybie podglądu (pole „Opublikowany” odznaczone)
   opublikowany?: boolean;
+  // true = strona poza wyszukiwarkami i indeksem Pagefind (noindex, bez canonical i hreflang), ale bez paska podglądu —
+  // strona błędu 404 (zlecenie 01)
+  pozaIndeksem?: boolean;
   // adres strony w drugim języku, jeśli inny niż domyślny /en/...
   alternatywa?: string | null;
   typ?: 'website' | 'article';
@@ -36,7 +39,9 @@ interface Props {
   uklad?: string;
 }
 
-const { tytul, opis, obraz, opublikowany = true, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true, uklad } = Astro.props;
+const { tytul, opis, obraz, opublikowany = true, pozaIndeksem = false, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true, uklad } = Astro.props;
+// do indeksu (canonical, hreflang, Pagefind) — tylko strony opublikowane i nie oznaczone jako poza indeksem
+const wIndeksie = opublikowany && !pozaIndeksem;
 const sciezka = stripBase(Astro.url.pathname);
 const lang = jezykZeSciezki(sciezka);
 const pelnyTytul = stronaGlowna ? `${t(lang, 'instytut')} · ${t(lang, 'uwr')}` : `${tytul} · ${t(lang, 'instytut')} UWr`;
@@ -63,10 +68,10 @@ const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : unde
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pelnyTytul}</title>
     <meta name="description" content={opisMeta} />
-    {opublikowany && <link rel="canonical" href={kanoniczny} />}
-    {(!opublikowany || testowa) && <meta name="robots" content="noindex, nofollow" />}
-    {opublikowany && plAdres && <link rel="alternate" hreflang="pl" href={absolute(plAdres, Astro.site)} />}
-    {opublikowany && enAdres && <link rel="alternate" hreflang="en" href={absolute(enAdres, Astro.site)} />}
+    {wIndeksie && <link rel="canonical" href={kanoniczny} />}
+    {(!wIndeksie || testowa) && <meta name="robots" content="noindex, nofollow" />}
+    {wIndeksie && plAdres && <link rel="alternate" hreflang="pl" href={absolute(plAdres, Astro.site)} />}
+    {wIndeksie && enAdres && <link rel="alternate" hreflang="en" href={absolute(enAdres, Astro.site)} />}
     <meta property="og:type" content={typ} />
     <meta property="og:title" content={stronaGlowna ? t(lang, 'instytut') : tytul} />
     <meta property="og:description" content={opisMeta} />
@@ -107,7 +112,7 @@ const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : unde
     {!opublikowany && (
       <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>
     )}
-    <main id="tresc" {...(opublikowany && szukaj ? { 'data-pagefind-body': '' } : {})}>
+    <main id="tresc" {...(wIndeksie && szukaj ? { 'data-pagefind-body': '' } : {})}>
       <slot />
     </main>
     <Stopka lang={lang} />

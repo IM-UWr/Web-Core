@@ -1,13 +1,18 @@
 ---
 // Wyszukiwarka (Pagefind — indeks budowany po `astro build`).
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze pod tytułem bursztynowe hasło (pola szukaj_haslo /
+// szukaj_haslo_en w src/data/ustawienia.json; puste = baner jak dotąd); bez kreski i liczb.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import { u } from '../lib/url';
 import { t } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
+import ustawienia from '../data/ustawienia.json';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
+// po angielsku tylko pole _en (bez polskich resztek)
+const haslo = ((lang === 'en' ? (ustawienia as any).szukaj_haslo_en : (ustawienia as any).szukaj_haslo) as string | undefined) || undefined;
 const bundle = u('/pagefind/');
 const teksty = lang === 'en'
   ? { placeholder: 'Search the website', zero_results: 'No results for [SEARCH_TERM]', load_more: 'More results', clear_search: 'Clear' }
@@ -15,7 +20,7 @@ const teksty = lang === 'en'
 ---
 <Baza tytul={t(lang, 'szukaj')} szukaj={false}>
   <link slot="head" rel="stylesheet" href={u('/pagefind/pagefind-ui.css')} />
-  <NaglowekStrony tytul={t(lang, 'szukajNaStronie')} lang={lang} okruszki={[{ etykieta: t(lang, 'szukaj') }]} />
+  <NaglowekStrony tytul={t(lang, 'szukajNaStronie')} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'szukaj') }]} />
   <div class="wrap" style="padding-top:28px;padding-bottom:72px">
     <div id="szukajka" style="max-width:900px"></div>
     <noscript><p>{lang === 'en' ? 'Search requires JavaScript.' : 'Wyszukiwarka wymaga włączonej obsługi JavaScript.'}</p></noscript>

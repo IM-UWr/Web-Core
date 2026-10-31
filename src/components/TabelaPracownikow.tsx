@@ -4,8 +4,13 @@
 // obejmuje całe pole (klasy .os-link / .os-a w global.css), a e-mail i zakład są osobnymi linkami.
 // Kolumna „Telefon” pojawia się tylko w sekcjach, w których ktoś ma numer (w praktyce: administracja).
 // Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
+// Filtry: na komputerze pole szukania, lista zakładów i przyciski grup (.staff-tools); na telefonie (≤ 760 px; zlecenie 01,
+// decyzja 31.10.2026) jeden wiersz jak w Aktualnościach (klasy .filters-lewo / .fl-rodzaj / .fl-szukaj z telefon.css):
+// lista „Wszyscy ▾” z grupami „Kto” i „Zakład” (wybór działa jak przycisk grupy albo lista zakładów — jedno albo drugie)
+// i pole „Szukaj”. Stan wspólny dla obu układów. Na telefonie zamiast „Liczba osób: N” — po przefiltrowaniu
+// „Znaleziono N osób” (aria-live).
 import { zTytulem } from '../lib/osoby';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState, type ReactNode } from 'react';
 
 export interface Osoba {
   id: string;
@@ -23,7 +28,8 @@ export interface Osoba {
 
 interface Props {
   osoby: Osoba[];
-  grupy: { id: string; nazwa: string }[];
+  // krotko: nazwa w liście rozwijanej na telefonie (bez niej — nazwa)
+  grupy: { id: string; nazwa: string; krotko?: string }[];
   zaklady: { id: string; nazwa: string; href: string }[];
   napisy: Record<string, string>;
 }
@@ -35,6 +41,19 @@ const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
 const poNazwisku = (a: Osoba, b: Osoba) =>
   nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl');
 const maRok = (o: Osoba) => typeof o.rok_studiow === 'number' && Number.isFinite(o.rok_studiow);
+// Forma rzeczownika po liczebniku (jak odmiana() w i18n.ts — tu bez importu słowników do skryptu strony):
+// 1 · 2–4 (bez 12–14) · 5 i więcej; po angielsku napisy dają dwie ostatnie formy takie same.
+const forma = (n: number, f1: string, f2: string, f5: string) => {
+  if (n === 1) return f1;
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? f2 : f5;
+};
+// Ikony jak w Ikona.astro („szukaj”, „dol”)
+const ikona = (sciezki: ReactNode) => (
+  <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 18, height: 18 }}>
+    {sciezki}
+  </svg>
+);
 
 interface Podsekcja { klucz: string; tytul?: string; osoby: Osoba[] }
 
@@ -133,9 +152,52 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     );
   };
 
+  // Telefon: jedna lista zamiast przycisków grup i listy zakładów — wartość „g:<grupa>” albo „z:<zakład>”;
+  // wybór jednego zeruje drugie (na komputerze oba filtry można łączyć — lista pokazuje wtedy zakład).
+  const wybor = zaklad ? `z:${zaklad}` : grupa ? `g:${grupa}` : '';
+  const wybierz = (v: string) => {
+    setGrupa(v.startsWith('g:') ? v.slice(2) : '');
+    setZaklad(v.startsWith('z:') ? v.slice(2) : '');
+  };
+  const przefiltrowane = !!(q.trim() || grupa || zaklad);
+  const n = widoczne.length;
+  const znaleziono = !przefiltrowane ? '' : n === 0 ? napisy.brak : `${napisy.znaleziono} ${n} ${forma(n, napisy.osoba1, napisy.osoba2, napisy.osoba5)}`;
+
   return (
     <div>
-      <div className="staff-tools">
+      {/* telefon (≤ 760 px): jeden wiersz filtrów — lista „Wszyscy ▾” i pole „Szukaj” (style: telefon.css, „Wiersz filtrów list”) */}
+      <div className="filters filters-lewo tylko-telefon" data-pagefind-ignore>
+        <label className="fl-rodzaj">
+          <span className="sr-only">{napisy.filtr}</span>
+          <select value={wybor} autoComplete="off" onChange={(e) => wybierz(e.target.value)}>
+            <option value="">{napisy.wszyscy}</option>
+            <optgroup label={napisy.kto}>
+              {grupy.map((g) => (
+                <option key={g.id} value={`g:${g.id}`}>{g.krotko || g.nazwa}</option>
+              ))}
+            </optgroup>
+            {zaklady.length > 0 && (
+              <optgroup label={napisy.zaklad}>
+                {zaklady.map((z) => (
+                  <option key={z.id} value={`z:${z.id}`}>{z.nazwa}</option>
+                ))}
+              </optgroup>
+            )}
+          </select>
+          {ikona(<path d="M6 9l6 6 6-6" />)}
+        </label>
+        <div className="fl-szukaj" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+          <label className="search">
+            {ikona(<><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></>)}
+            <span className="sr-only">{napisy.szukaj}</span>
+            <input type="search" value={q} placeholder={napisy.szukajKrotko} onChange={(e) => setQ(e.target.value)} />
+          </label>
+        </div>
+      </div>
+      {/* telefon: licznik tylko po przefiltrowaniu (zawsze w drzewie — region aria-live musi istnieć przed zmianą) */}
+      <p className="staff-znaleziono tylko-telefon" aria-live="polite">{znaleziono}</p>
+
+      <div className="staff-tools tylko-komputer">
         <label className="search">
           <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 18, height: 18 }}>
             <circle cx="11" cy="11" r="7" />
@@ -165,7 +227,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
         </div>
       </div>
 
-      <p className="count staff-count" aria-live="polite">
+      <p className="count staff-count tylko-komputer" aria-live="polite">
         {napisy.osob}: {widoczne.length}
       </p>
 
@@ -193,7 +255,8 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
           ))}
         </section>
       ))}
-      {widoczne.length === 0 && <p style={{ color: 'var(--muted)' }}>{napisy.brak}</p>}
+      {/* telefon: ten napis jest w liczniku „Znaleziono…” nad listą */}
+      {widoczne.length === 0 && <p className="tylko-komputer" style={{ color: 'var(--muted)' }}>{napisy.brak}</p>}
     </div>
   );
 }

@@ -28,6 +28,17 @@ const published = z.preprocess((v) => (v == null || v === '' ? true : v), z.bool
 const plik = z.object({ nazwa: optStr, nazwa_en: optStr, plik: z.string() });
 const plikList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(plik));
 
+// Baner podstrony na telefonie (zlecenie 01, decyzje 31.10.2026): krótkie bursztynowe hasło zamiast opisu (puste = opis
+// jak dotąd albo reguła widoku) i — tylko tam, gdzie liczb nie da się policzyć z danych — stałe liczby pod kreską
+// (wartość, np. „8” albo „3 lata”, i etykieta). Komputer bez zmian.
+const haslo = { haslo: optStr, haslo_en: optStr };
+const liczbyBanera = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.object({
+  n: z.preprocess((v) => (typeof v === 'number' ? String(v) : v), z.string()),
+  n_en: optStr,
+  etykieta: z.string(),
+  etykieta_en: optStr,
+})));
+
 const aktualnosci = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/aktualnosci' }),
   schema: z.object({
@@ -65,6 +76,8 @@ const strony = defineCollection({
     // prawy pasek: spis „Na tej stronie”, menu działu (podstrony) albo oba
     // puste = domyślnie tylko spis „Na tej stronie” (bez menu działu)
     pasek_boczny: z.preprocess(empty, z.enum(['oba', 'spis', 'menu', 'brak']).optional()),
+    ...haslo,
+    liczby: liczbyBanera,
     opublikowany: published,
   }),
 });
@@ -102,6 +115,7 @@ const seminaria = defineCollection({
     aktywne: published,
     do_uzupelnienia: strList,
     tresc_en: optStr,
+    ...haslo,
     opublikowany: published,
   }),
 });
@@ -167,6 +181,7 @@ const zaklady = defineCollection({
     zdjecie_opis: optStr,
     zdjecie_opis_en: optStr,
     tresc_en: optStr,
+    ...haslo,
     opublikowany: published,
   }),
 });
@@ -200,7 +215,8 @@ const kierunki = defineCollection({
     opis: optStr,
     opis_en: optStr,
     // wartosc_en — wartość w wersji angielskiej (np. „3 years”; puste = jak po polsku)
-    fakty: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr })),
+    // etykieta_krotka(_en) — krótsza etykieta do liczb w banerze na telefonie (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
+    fakty: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr, etykieta_krotka: optStr, etykieta_krotka_en: optStr })),
     przyciski: lista(link),
     dlaczego: lista(z.object({ tytul: z.string(), tytul_en: optStr, opis: z.string(), opis_en: optStr, ikona: optStr })),
     etapy: lista(z.object({
@@ -249,6 +265,7 @@ const kierunki = defineCollection({
     kontakt: lista(z.object({ rola: z.string(), rola_en: optStr, osoba: z.string(), email: optStr, telefon: optStr, pokoj: optStr })),
     akty: lista(dokument),
     tresc_en: optStr,
+    ...haslo,
     opublikowany: published,
   }),
 });
@@ -300,6 +317,7 @@ const specjalnosci = defineCollection({
     tresc_en: optStr,
     zrodla: strList,
     do_uzupelnienia: strList,
+    ...haslo,
     opublikowany: published,
   }),
 });

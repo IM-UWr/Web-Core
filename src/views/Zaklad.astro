@@ -2,11 +2,13 @@
 // Podstrona zakładu: opis, skład (z tabeli pracowników), seminaria, granty, konferencje, obrony, aktualności.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (bez liczb — zakład ich nie ma; w banerze obszary badań),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px) bez zmian.
+// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner we wspólnym układzie — tytuł, bursztynowe hasło (pola haslo /
+// haslo_en zakładu; puste = opis jak dotąd), kreska i liczby (pracownicy · projekty · konferencje); obszary badań pod banerem.
 import { zTytulem } from '../lib/osoby';
 import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
@@ -63,6 +65,17 @@ const konf = (await konferencje()).filter((k) => k.data.zaklad === id);
 const obr = (await obrony()).filter((o) => o.data.zaklad === id);
 const akt = (await aktualnosci()).filter((a) => a.data.zaklad === id).slice(0, 5);
 
+// Baner na telefonie: hasło (po angielsku tylko haslo_en — bez polskich resztek) i liczby z danych strony:
+// nauczyciele akademiccy zakładu (z kierownikiem) · projekty (realizowane i zakończone) · konferencje z polem „zakład”.
+// Zera pomijamy (LiczbyBanera.astro) — np. pracownia bez projektów i konferencji ma jedną liczbę. „Pracownik” jest
+// męskoosobowy — przy 2–4 też dopełniacz („czterech pracowników”, „22 pracowników”).
+const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
+const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+  { n: czlonkowie.filter((o) => o.data.grupa === 'nauczyciel').length, pl: ['pracownik', 'pracowników', 'pracowników'], en: ['staff member', 'staff members'] },
+  { n: gr.length, pl: ['projekt badawczy', 'projekty badawcze', 'projektów badawczych'], en: ['research project', 'research projects'] },
+  { n: konf.length, pl: ['konferencja', 'konferencje', 'konferencji'], en: ['conference', 'conferences'] },
+];
+
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const naglowki = [
   { depth: 2, slug: 'o-zakladzie', text: T('O zakładzie', 'About') },
@@ -76,12 +89,16 @@ const naglowki = [
 const wszystkieZaklady = await zaklady();
 ---
 <Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={nazwa} lead={opis} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
+  <NaglowekStrony tytul={nazwa} lead={opis} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
+    {/* obszary badań w banerze tylko na komputerze (na telefonie — pod banerem, niżej; styl na końcu pliku) */}
     {obszary.length > 0 && <div class="tags">{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
+    <LiczbyBanera lang={lang} pozycje={liczby} />
   </NaglowekStrony>
 
   <div class="wrap layout">
     <div class="main">
+      {/* telefon: obszary badań pod banerem (w banerze zostaje tylko szkielet: tytuł, hasło, liczby) */}
+      {obszary.length > 0 && <div class="tags zk-obszary tylko-telefon" data-pagefind-ignore>{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
 
       <section class="zsec" aria-labelledby="o-zakladzie">
         <h2 id="o-zakladzie">{T('O zakładzie', 'About')}</h2>
@@ -227,4 +244,9 @@ const wszystkieZaklady = await zaklady();
   /* komputer (≥ 761 px): odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Instytut” — bursztynowy
      początek kreski sekcji nie przylega do banera (reszta odstępów .layout — uklad-zwarta.css) */
   @media (min-width: 761px) { .layout { padding-top: 24px; } }
+  /* telefon (≤ 760 px; zlecenie 01): obszary badań nie w banerze, tylko pod nim — nad sekcją „O zakładzie” */
+  @media (max-width: 760px) {
+    :global(.page-head) .tags { display: none; }
+    .zk-obszary { margin: 0 0 22px; }
+  }
 </style>
