@@ -3,6 +3,8 @@
 // (z ramką „W skrócie” na komputerze), realizowane projekty i konferencje
 // („Warto wiedzieć” tylko na stronie głównej i na /warto-wiedziec — decyzja 30.10.2026)
 // (seminaria tygodnia i obrony są na swoich stronach; liczby w banerze zostają).
+// Liczby w banerze: projekty, konferencje w roku, doktoraty w ostatnim roku — bez liczby seminariów (decyzja 31.10.2026:
+// po trzy liczby w każdym dziale, na telefonie w trzech kolumnach; krótkie etykiety, żeby mieściły się w dwóch linijkach).
 // Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
@@ -18,7 +20,7 @@ import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { today, addDays, range, dayNum, monthShort, longWithDay, type Lang } from '../lib/daty';
 import { menuGlowne } from '../lib/menu';
 import {
-  seminaria, konferencje, granty, obrony, trwaLubBedzie, slugOf, miejsce,
+  konferencje, granty, obrony, trwaLubBedzie, slugOf, miejsce,
   type Grant, type Konferencja, type Obrona,
 } from '../lib/tresci';
 
@@ -35,8 +37,8 @@ const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
   return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
 };
 
-const [listaSeminariow, listaKonferencji, listaGrantow, listaObron] = await Promise.all([
-  seminaria(), konferencje(), granty(), obrony(),
+const [listaKonferencji, listaGrantow, listaObron] = await Promise.all([
+  konferencje(), granty(), obrony(),
 ]);
 const dzis = today();
 const rok = Number(dzis.slice(0, 4));
@@ -48,8 +50,6 @@ const maOpis = (g: Grant) => !!g.body?.trim();
 const przyklady = [...realizowane.filter(maOpis), ...realizowane.filter((g) => !maOpis(g))].slice(0, 4);
 const lata = (g: Grant) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
 const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
-
-const aktywneSeminaria = listaSeminariow.filter((s) => s.data.aktywne !== false);
 
 // Konferencje: nadchodzące i trwające (najbliższe najpierw); gdy brak — trzy ostatnie.
 const konfTrwa = (k: Konferencja) => trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec });
@@ -65,10 +65,9 @@ const obronyRok = odbyteObrony.filter((o) => o.data.termin.slice(0, 10) >= rokTe
 
 // Pasek liczb (pozycje z zerem pomijamy).
 const liczby = [
-  { n: realizowane.length, l: odm(realizowane.length, ['realizowany projekt badawczy', 'realizowane projekty badawcze', 'realizowanych projektów badawczych'], ['ongoing research project', 'ongoing research projects']) },
-  { n: aktywneSeminaria.length, l: odm(aktywneSeminaria.length, ['aktywne seminarium', 'aktywne seminaria', 'aktywnych seminariów'], ['active seminar', 'active seminars']) },
+  { n: realizowane.length, l: odm(realizowane.length, ['realizowany projekt', 'realizowane projekty', 'realizowanych projektów'], ['ongoing project', 'ongoing projects']) },
   { n: konfWRoku.length, l: `${odm(konfWRoku.length, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'])} ${T(`w ${rok} roku`, `in ${rok}`)}` },
-  { n: obronyRok.length, l: `${odm(obronyRok.length, ['obrona doktorska', 'obrony doktorskie', 'obron doktorskich'], ['PhD defence', 'PhD defences'])} ${T('w ostatnich 12 miesiącach', 'in the last 12 months')}` },
+  { n: obronyRok.length, l: `${odm(obronyRok.length, ['doktorat', 'doktoraty', 'doktoratów'], ['PhD', 'PhDs'])} ${T('w ostatnim roku', 'in the past year')}` },
 ].filter((x) => x.n > 0);
 
 // Kafelki: grupy i linki z menu „Nauka” (nowy link w menu sam pojawi się tutaj).
