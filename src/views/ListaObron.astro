@@ -36,7 +36,7 @@ const lead = lang === 'en'
           <a class="row-item" href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>
             <span class:list={['datebox small', { minione: !trwaLubBedzie({ poczatek: o.data.termin }) }]} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
             <span class="body">
-              <span class="news-meta"><span>{longWithDay(o.data.termin, lang)}</span>{o.data.miejsce && <span>· {miejsce(o.data.miejsce, lang)}</span>}</span>
+              <span class="news-meta kropki"><span>{longWithDay(o.data.termin, lang)}</span>{o.data.miejsce && <span class="kropka">{miejsce(o.data.miejsce, lang)}</span>}</span>
               <span class="t" style="font-size:19px">{o.data.kandydat}</span>
               <span class="x" lang="en">{o.data.tytul_rozprawy}</span>
             </span>

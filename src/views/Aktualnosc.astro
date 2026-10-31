@@ -57,10 +57,10 @@ const href = (a: string) => (isExternal(a) ? a : u(a));
   <div class="wrap layout" style="padding-top:16px">
     <article class="main ak-main">
       <header class="article-head">
-        <div class="news-meta">
+        <div class="news-meta kropki">
           <span class={`badge badge-${d.rodzaj}`}>{RODZAJE[d.rodzaj][lang]}</span>
           <span>{t(lang, 'opublikowano')} <time datetime={d.data}>{short(d.data)}</time></span>
-          {d.dla.length > 0 && <span>· {t(lang, 'dla')}: {d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>}
+          {d.dla.length > 0 && <span class="kropka">{t(lang, 'dla')}: {d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>}
         </div>
         <h1>{tytul}</h1>
         {zajawka && <p class="lead">{zajawka}</p>}

@@ -9,6 +9,7 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
+import TytulReferatu from '../components/TytulReferatu.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { range, long, short, now, today, hasTime, type Lang } from '../lib/daty';
@@ -133,7 +134,7 @@ const wszystkieZaklady = await zaklady();
                 <a class="sem-card" href={u(wJezyku(`/seminaria/${s.id}`, lang))}>
                   <span class="t">{wybierz(s.data, 'nazwa', lang)}</span>
                   {r ? (
-                    <span style="font-size:15px;padding-top:10px;border-top:1px solid var(--line)"><strong style="color:var(--ink)">{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — {r.data.tytul} <span class="muted">({r.data.prelegent})</span></span>
+                    <span style="font-size:15px;padding-top:10px;border-top:1px solid var(--line)"><strong style="color:var(--ink)">{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="muted">({r.data.prelegent})</span></span>
                   ) : (
                     <span class="muted" style="font-size:14px;padding-top:10px;border-top:1px solid var(--line)">{t(lang, 'brakNadchodzacych')}</span>
                   )}
@@ -150,7 +151,7 @@ const wszystkieZaklady = await zaklady();
           {grTrwa.length === 0 && <p class="muted">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
           {grTrwa.map((g) => (
             <article class="grant">
-              <div class="news-meta"><span class="badge badge-wydarzenie">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span>· {g.data.kod}</span>}</div>
+              <div class="news-meta kropki"><span class="badge badge-wydarzenie">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span class="kropka">{g.data.kod}</span>}</div>
               <h3><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></h3>
               {g.data.kierownik && <p class="who"><span class="muted">{T('Kierownik', 'PI')}:</span> {g.data.kierownik}</p>}
             </article>
@@ -160,7 +161,7 @@ const wszystkieZaklady = await zaklady();
               <summary>{T('Zakończone projekty', 'Completed projects')} ({grKon.length})</summary>
               {grKon.map((g) => (
                 <article class="grant">
-                  <div class="news-meta"><span class="badge">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span>· {g.data.kod}</span>}</div>
+                  <div class="news-meta kropki"><span class="badge">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span class="kropka">{g.data.kod}</span>}</div>
                   <h3 style="font-size:16px"><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></h3>
                   {g.data.kierownik && <p class="who muted" style="font-size:14px">{g.data.kierownik}</p>}
                 </article>

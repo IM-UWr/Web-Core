@@ -152,8 +152,10 @@ const sekcje = [
                       {e.opis && <span class="desc">{w(e, 'opis')}</span>}
                       {e.termin && (
                         <span class="deadline">
-                          <Ikona nazwa="zegar" rozmiar={14} />{w(e, 'termin')}
-                          {e.formularz && (e.formularz_adres ? <a href={e.formularz_adres}>{e.formularz}</a> : <span class="muted"> · {e.formularz}</span>)}
+                          {/* formularz bez linku: „·” na końcu terminu, z niełamliwą spacją — trzyma się poprzedniego słowa
+                              i nigdy nie zaczyna linii (decyzja 31.10.2026; .kropki z global.css nie pasuje — ramka ma wypełnienie) */}
+                          <Ikona nazwa="zegar" rozmiar={14} />{e.formularz && !e.formularz_adres ? <span>{w(e, 'termin')}<span class="muted">{'\u00a0·'}</span></span> : w(e, 'termin')}
+                          {e.formularz && (e.formularz_adres ? <a href={e.formularz_adres}>{e.formularz}</a> : <span class="muted">{e.formularz}</span>)}
                         </span>
                       )}
                     </li>

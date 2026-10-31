@@ -13,15 +13,21 @@ const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, la
 const k = ustawienia.kontakt;
 const partnerzy = (ustawienia.partnerzy ?? []) as { nazwa: string; logo: string; adres?: string }[];
 const rok = new Date().getFullYear();
+// Telefon: adres w wąskiej kolumnie (stopka w dwóch kolumnach — global.css; decyzja 31.10.2026) — kod pocztowy z miastem
+// się nie łamie („50-” / „384”), a e-mail może przejść do nowej linii tylko po „@”. Na komputerze (szeroka kolumna) wygląd
+// bez zmian (span sięga do końca linii — tekst przed nim składa się tak samo jak dawniej).
+const kod = /\b\d{2}-\d{3}\b/.exec(k.adres);
+const adres = kod ? [k.adres.slice(0, kod.index), k.adres.slice(kod.index)] : [k.adres, ''];
+const [mailNazwa, mailDomena] = k.email.includes('@') ? [k.email.slice(0, k.email.indexOf('@') + 1), k.email.slice(k.email.indexOf('@') + 1)] : [k.email, ''];
 ---
 <footer class="ftr">
   <div class="wrap ftr-in">
     <div class="ftr-cols">
       <div class="ftr-main">
         <span class="n">{t(lang, 'instytut')}</span>
-        <span class="a">{t(lang, 'uwr')}<br />{k.adres}</span>
+        <span class="a">{t(lang, 'uwr')}<br />{adres[0]}{adres[1] && <span class="ftr-nw">{adres[1]}</span>}</span>
         <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a>
-        <a href={`mailto:${k.email}`}>{k.email}</a>
+        <a href={`mailto:${k.email}`}>{mailNazwa}{mailDomena && <><wbr />{mailDomena}</>}</a>
         <span style="display:flex;gap:4px;margin-top:6px">
           {ustawienia.facebook && <a class="icon-btn" style="color:inherit" href={ustawienia.facebook} aria-label="Facebook"><Ikona nazwa="facebook" /></a>}
           {ustawienia.youtube && <a class="icon-btn" style="color:inherit" href={ustawienia.youtube} aria-label="YouTube"><Ikona nazwa="youtube" /></a>}

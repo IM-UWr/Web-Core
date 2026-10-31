@@ -36,10 +36,10 @@ const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dn
   <div class="wrap layout zd" style="padding-top:16px">
     <article class="main zd-main">
       <header class="article-head">
-        <div class="news-meta">
+        <div class="news-meta kropki">
           <span class="badge badge-ogloszenie">{RODZAJE.ogloszenie[lang]}</span>
           <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od)}</time></span>
-          <span>· {t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>
+          <span class="kropka">{t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>
         </div>
         <h1>{a.tytul}</h1>
       </header>

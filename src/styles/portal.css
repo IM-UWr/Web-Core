@@ -131,6 +131,11 @@ a.pt-card:hover, .pt-card.pt-link:hover, .pt-card.pt-link:focus-within { border-
 @media (max-width: 760px) {
   .pt-all { min-height: 40px; }
   .pt-box { padding: 10px 14px 8px; }
+  /* nagłówek ramki bez pionowego bursztynowego paska (decyzja 31.10.2026): na tle strony sekcje zaczynają się kreską
+     z bursztynowym początkiem (tlo.css) — na telefonie jeden znacznik sekcji. Ramka, kreska pod nagłówkiem i sam
+     nagłówek bez zmian. Komputer bez zmian (na tej gałęzi .pt-h stoi tylko w blokach .tylko-telefon: strona główna — Na skróty,
+     Aktualności, Warto wiedzieć; Studia, Nauka, Instytut — po jednej ramce). */
+  .pt-h h2::before, .pt-h h3::before { content: none; }
 }
 
 /* lista pozycji obok siebie (np. „Warto wiedzieć” pod kolumnami strony głównej) */

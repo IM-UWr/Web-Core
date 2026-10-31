@@ -7,6 +7,7 @@ import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
+import TytulReferatu from '../components/TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
 import { longWithDay, short, time, now, today, hasTime, type Lang } from '../lib/daty';
@@ -70,11 +71,11 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
         {nadchodzace.length === 0 && <p class="muted">{t(lang, 'brakNadchodzacych')}</p>}
         {nadchodzace.map(({ r, C }) => (
           <article class="talk" id={slugOf(r.id)}>
-            <div class="talk-meta">
+            <div class="talk-meta kropki">
               <strong style="color:var(--ink)">{longWithDay(r.data.termin, lang)}</strong>
-              {r.data.sala && <span>· {sala(r.data.sala, lang)}</span>}
+              {r.data.sala && <span class="kropka">{sala(r.data.sala, lang)}</span>}
             </div>
-            <h3>{r.data.tytul}</h3>
+            <h3><TytulReferatu tekst={r.data.tytul} /></h3>
             <div class="who">{r.data.prelegent}{r.data.afiliacja && <span class="muted"> ({r.data.afiliacja})</span>}</div>
             {r.body?.trim() && <div class="prose" style="font-size:16px;margin-top:10px"><C /></div>}
             {r.data.pliki.length > 0 && (
@@ -89,8 +90,8 @@ const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
           <h2 id="h-min">{t(lang, 'minione')}</h2>
           {minione.map(({ r, C }) => (
             <article class="talk" id={slugOf(r.id)}>
-              <div class="talk-meta"><span>{short(r.data.termin)}{hasTime(r.data.termin) ? `, ${time(r.data.termin)}` : ''}</span>{r.data.sala && <span>· {sala(r.data.sala, lang)}</span>}</div>
-              <h3 style="font-size:17px">{r.data.tytul}</h3>
+              <div class="talk-meta kropki"><span>{short(r.data.termin)}{hasTime(r.data.termin) ? `, ${time(r.data.termin)}` : ''}</span>{r.data.sala && <span class="kropka">{sala(r.data.sala, lang)}</span>}</div>
+              <h3 style="font-size:17px"><TytulReferatu tekst={r.data.tytul} /></h3>
               <div class="who">{r.data.prelegent}{r.data.afiliacja && <span class="muted"> ({r.data.afiliacja})</span>}</div>
               {r.body?.trim() && (
                 <details>

@@ -7,6 +7,7 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
+import TytulReferatu from '../components/TytulReferatu.astro';
 import { u, absolute, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE } from '../lib/i18n';
 import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
@@ -78,12 +79,12 @@ const lead = lang === 'en'
                     <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
                   </span>
                   <span class="body">
-                    <span class="news-meta">
+                    <span class="news-meta kropki">
                       <span class={`badge badge-${w.rodzaj}`}>{RODZAJE[w.rodzaj][lang]}</span>
                       <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
-                      {w.miejsce && <span>· {w.miejsce}</span>}
+                      {w.miejsce && <span class="kropka">{w.miejsce}</span>}
                     </span>
-                    <span class="t" style="font-size:18px"><TytulZewn tekst={w.tytul} zewn={!!w.href && isExternal(w.href)} /></span>
+                    <span class="t" style="font-size:18px">{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : <TytulZewn tekst={w.tytul} zewn={!!w.href && isExternal(w.href)} />}</span>
                     {w.podtytul && <span class="x">{w.podtytul}</span>}
                     {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
                   </span>

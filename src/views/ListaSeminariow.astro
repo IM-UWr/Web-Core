@@ -10,6 +10,7 @@
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TabelaReferatow from '../components/TabelaReferatow.astro';
+import TytulReferatu from '../components/TytulReferatu.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
@@ -68,7 +69,7 @@ const lead = lang === 'en'
                 <span class="t">{nazwa(s)}</span>
                 {r ? (
                   <span class="ls-ref">
-                    <strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — {r.data.tytul} <span class="muted">({r.data.prelegent})</span>
+                    <strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="muted">({r.data.prelegent})</span>
                   </span>
                 ) : (
                   <span class="muted ls-ref ls-brak">{t(lang, 'brakNadchodzacych')}</span>

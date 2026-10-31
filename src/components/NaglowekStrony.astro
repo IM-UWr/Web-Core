@@ -45,6 +45,9 @@ const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ??
 const foto = wariant === 'zdjecie' || wariant === 'granat' ? (ust.zdjecia ?? DOMYSLNE.zdjecia)[dzial] : undefined;
 const zdjecie = foto?.zdjecie ? u(foto.zdjecie) : undefined;
 const ozdobny = wariant !== 'prosty';
+// Długi tytuł (> 20 znaków, np. „Analiza harmoniczna i rozwinięcia ortogonalne”): klasa .ph-dlugi — na telefonie tytuł
+// 27 px zamiast 28 px (telefon.css); rysunek działu bez zmian. Komputer bez zmian (decyzja 31.10.2026).
+const dlugi = ozdobny && tytul.trim().length > 20;
 // Granatowy pas na samej górze strony: nagłówek strony (menu) jest u góry przezroczysty i leży na pasie,
 // jak na stronie głównej na zdjęciu (klasa .hdr-foto, style w global.css). Skrypt działa od razu przy wczytywaniu,
 // zanim pas się narysuje, żeby nic nie przeskakiwało; bez JS — zwykły biały nagłówek nad pasem.
@@ -99,7 +102,7 @@ const falaSkrypt = `(function(s){
   ustaw();
 })(document.currentScript)`;
 ---
-<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto']} data-dzial={ozdobny ? dzial : undefined}>
+<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi']} data-dzial={ozdobny ? dzial : undefined}>
   {naPasie && <script is:inline set:html={naPasie} />}
   <div class="wrap">
     {ozdobny && (

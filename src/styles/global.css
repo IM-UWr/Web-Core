@@ -304,6 +304,17 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .news-card .t { font-size: 20px; font-weight: 800; line-height: 1.25; letter-spacing: -0.01em; color: var(--ink); }
 .news-card .x { font-size: 15px; line-height: 1.6; }
 .news-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; color: var(--muted); }
+/* Separator „·” w wierszu z odstępami (flex + gap: .news-meta, .talk-meta…), np. „pt. 10:15 · sala 603” — kropka nigdy
+   nie zaczyna linii (decyzja 31.10.2026; każda szerokość). Kontener .kropki, element po separatorze .kropka (bez „· ” w tekście).
+   Kropka stoi w lewym wypełnieniu elementu (szerokość „· ” w Manrope = 0,427 em), element jest o tyle cofnięty w lewo, a element
+   przed nim dostaje tyle samo marginesu z prawej — w środku linii wszystko stoi tam, gdzie dawne „· sala”. Gdy element
+   przechodzi do nowej linii, kropka wypada poza lewą krawędź kontenera i jest ucinana (clip-path tylko z lewej), tekst
+   zaczyna się równo z krawędzią, a para „· sala” nigdy się nie rozrywa. Kontener nie może mieć lewego wypełnienia.
+   Przycięcie 1 px na lewo od krawędzi: wygładzone brzegi pierwszego elementu (np. plakietki) zostają, kropka i tak znika. */
+.kropki { --kropka: .427em; clip-path: inset(-100vh -100vw -100vh -1px); }
+.kropki > .kropka { position: relative; margin-left: calc(-1 * var(--kropka)); padding-left: var(--kropka); }
+.kropki > .kropka::before { content: '·'; content: '·' / ''; position: absolute; top: 0; left: 0; }
+.kropki > :has(+ .kropka) { margin-right: var(--kropka); }
 .news-card.featured { padding: 0; flex-direction: row; flex-wrap: wrap; overflow: hidden; grid-column: span 2; }
 .news-card.featured .img { flex: 1 1 260px; min-height: 240px; background: var(--photo); }
 .news-card.featured .img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
@@ -393,6 +404,13 @@ details[open] > summary .chev { transform: rotate(180deg); }
   .ftr-col a { min-height: 30px; }
   .ftr-bottom { gap: 4px 24px; padding-top: 10px; }
   .ftr-bottom a { min-height: 32px; }
+}
+/* Telefon (≤ 760 px): adres i kolumny linków w dwóch kolumnach, w tej samej kolejności (decyzja 31.10.2026) —
+   stopka ok. 1/3 niższa niż przy jednej kolumnie. Odstępy — telefon.css. */
+@media (max-width: 760px) {
+  .ftr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* kod pocztowy z miastem w adresie (Stopka.astro) w całości; na komputerze bez stylu */
+  .ftr-nw { white-space: nowrap; }
 }
 
 /* ---------- podstrony ---------- */

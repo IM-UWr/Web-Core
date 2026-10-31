@@ -14,7 +14,13 @@ const minione = !trwaLubBedzie(w); // kafelek daty: granatowy = nadchodzące, sz
 const zewn = !!w.href && isExternal(w.href);
 const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
 const Tag = adres ? 'a' : 'div';
-const meta = [(w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang), w.miejsce].filter(Boolean).join(' · ');
+// Separator „·” nigdy na początku linii (decyzja 31.10.2026): kropka trzyma się poprzedniego słowa (niełamliwa spacja przed nią),
+// linia może się złamać dopiero za nią. Żeby zamiast tego nie łamał się zakres („18:15–” / „19:45”), po półpauzie między cyframi
+// stoi niewidoczny łącznik słów (U+2060). Gdy linia łamie się gdzie indziej — wygląda jak dawniej (tekst w jednym ciągu).
+// Rodzaj i godzina („Wydarzenie · 18:15”): niełamliwe spacje po obu stronach kropki.
+const KROPKA = '\u00a0·\u00a0';
+const kiedy = ((w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang)).replace(/(\d)–(?=\d)/g, '$1–\u2060');
+const meta = [kiedy, w.miejsce].filter(Boolean).join('\u00a0· ');
 ---
 <Tag class:list={['event', !adres && 'event-bez-linku']} href={adres} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
   <span class={`datebox${maly ? ' small' : ''}${minione ? ' minione' : ''}`} aria-hidden="true">
@@ -22,7 +28,7 @@ const meta = [(w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + r
     <span class="m">{monthShort(w.poczatek, lang)}</span>
   </span>
   <span class="event-body">
-    <span class="k">{RODZAJE[w.rodzaj]?.[lang]}{hasTime(w.poczatek) ? ` · ${time(w.poczatek)}` : ''}</span>
+    <span class="k">{RODZAJE[w.rodzaj]?.[lang]}{hasTime(w.poczatek) ? `${KROPKA}${time(w.poczatek)}` : ''}</span>
     <span class="t"><TytulZewn tekst={w.tytul} zewn={zewn} rozmiar={13} /></span>
     {w.podtytul && <span class="s" lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</span>}
     <span class="s">{meta}</span>

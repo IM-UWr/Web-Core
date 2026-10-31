@@ -1,0 +1,11 @@
+---
+// Tytuł referatu w treści strony: wzory w $…$ przez KaTeX — ten sam renderer co treść, w trybie inline, bez <p>
+// (src/lib/markdown.ts, renderTytulZWzorami; decyzja 31.10.2026). Tytuł bez wzorów — zwykły tekst, jak dotąd.
+// Tylko do treści strony: w atrybutach (title, alt), meta, .ics i e-mailach tytuł zostaje zwykłym tekstem.
+import { renderTytulZWzorami } from '../lib/markdown';
+
+interface Props { tekst: string }
+const { tekst } = Astro.props;
+const html = await renderTytulZWzorami(tekst);
+---
+{html ? <Fragment set:html={html} /> : tekst}

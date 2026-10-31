@@ -86,7 +86,8 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
           {(o.funkcja || linkZakladu) && (
             <small>
               {o.funkcja}
-              {o.funkcja && linkZakladu && ' · '}
+              {/* „·” z niełamliwymi spacjami: nigdy na początku linii (decyzja 31.10.2026) */}
+              {o.funkcja && linkZakladu && '\u00a0·\u00a0'}
               {linkZakladu && <a href={linkZakladu}>{nazwyZakladow[o.zaklad as string]}</a>}
             </small>
           )}

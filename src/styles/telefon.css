@@ -85,13 +85,22 @@
   .prose th, .prose td { padding: 6px 10px; }
   .prose blockquote { margin: 1em 0; padding: 10px 16px; font-size: 16px; }
 
-  /* listy wpisów */
+  /* listy wpisów — rytm wiersza (decyzja 31.10.2026): Aktualności, Kalendarz, obrony, konferencje, sukcesy (wszystko z .row-item;
+     siatka .wa-row — WierszAktualnosci.astro). 18 px odstępu nad i pod treścią wiersza i między kolumnami (column-gap —
+     w siatce .wa-row samo gap ustawiłoby też odstęp między jej wierszami); tytuł 17,5 px / 1,3 (!important — widoki dają
+     tytułom własny rozmiar w atrybucie style albo w stylach widoku); opis 15 px / 1,55 w kolorze --muted, najwyżej 2 linie;
+     miniatura 76 × 76 px z zaokrągleniem 14 px (tam, gdzie jest widoczna — ≤ 560 px zwykłe listy chowają miniatury, global.css). */
   .month { margin: 14px 0 2px; }
-  .row-item { gap: 16px; padding: 12px 0; }
+  .row-item { column-gap: 18px; padding: 18px 0; }
   .row-item .body { gap: 3px; }
-  .row-item .t { font-size: 17px; }
-  .row-item .x { font-size: 15px; line-height: 1.5; }
-  .row-item .thumb { flex: 0 0 120px; height: 80px; border-radius: 10px; }
+  .row-item .t { font-size: 17.5px !important; line-height: 1.3; }
+  .row-item .x { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+    font-size: 15px; line-height: 1.55; color: var(--muted); }
+  .row-item .thumb { flex: 0 0 76px; width: 76px; height: 76px; border-radius: 14px; }
+  /* Jasne kafelki dat — tylko jasny motyw (decyzja 31.10.2026): tło #eef2f9 z cienką ramką, dzień i miesiąc w granacie zamiast
+     pełnego granatowego kwadratu. .datebox (Kalendarz, obrony, konferencje, wydarzenia, wpis) i .pt-dbox (konferencje
+     na „Nauce”). Minione (szare) bez zmian; ciemny motyw bez zmian (osobne propozycje). */
+  :root:not([data-theme='dark']) :is(.datebox, .pt-dbox):not(.minione) { border: 1px solid var(--line); background: #eef2f9; color: var(--primary); }
 
   .event-box { gap: 12px 24px; padding: 14px 18px; }
   .files { gap: 6px; }
@@ -151,8 +160,19 @@
   .callout { margin-top: 12px; padding: 12px 16px; }
   .course-group { padding: 12px 16px; }
 
+  /* Lżejsze podkreślenia (decyzja 31.10.2026): linki w treści, listach i banerze — kreska 1 px w 40% koloru tekstu, 3 px od liter
+     (gdzie link jest podkreślony; przyciski bez zmian). Baner seminarium: koordynatorzy 600 zamiast 700 (kreska jak wyżej,
+     w 40% bieli). Spis pracowników niżej: zakład zwykłym szarym tekstem (nadal link), e-mail z cienką jasną kreską. */
+  main a:not(.btn) { text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 3px; }
+  .ph .sem-koord-n { font-weight: 600; }
+
   /* spis pracowników: osoba w jednym zwartym wierszu (nazwisko, pod nim zakład, dalej e-mail, pokój, WWW obok siebie) */
   .staff-row { display: flex; flex-wrap: wrap; gap: 0 14px; padding: 8px 12px; }
+  /* zakład bez podkreślenia; e-mail jako całość przechodzi do nowej linii, zanim się złamie — w środku tylko w miejscu
+     łącznika, w dowolnym miejscu dopiero w ostateczności (break-word zamiast anywhere z .staff-row; decyzja 31.10.2026) */
+  .staff-row .n small a { text-decoration: none; }
+  .staff-row .c { min-width: 0; }
+  .staff-row a[href^='mailto'] { display: inline-block; max-width: 100%; overflow-wrap: break-word; }
   .staff-row .n { flex: 1 1 100%; margin-bottom: 0; }
   .staff-row .n small { font-weight: 400; line-height: 1.4; }
   .staff-sub { margin: 12px 0 0 12px; }
@@ -163,6 +183,13 @@
   .ph .wrap { min-height: 0; padding-top: 12px; padding-bottom: 18px; }
   .js .hdr-foto ~ main > .ph:first-child > .wrap { min-height: 0; padding-top: calc(12px + var(--hdr-h)); }
   .ph h1 { font-size: clamp(28px, 3.4vw, 42px); }
+  /* długi tytuł (> 20 znaków, klasa .ph-dlugi z NaglowekStrony.astro; decyzja 31.10.2026): 27 px zamiast 28 px (tyle daje
+     clamp wyżej na każdej szerokości ≤ 760 px); rysunek działu bez zmian */
+  .ph.ph-dlugi h1 { font-size: 27px; }
+  /* Oddech pod banerem (decyzja 31.10.2026): pierwszy element treści zawsze 26 px pod dolną krawędzią pasa — jedna reguła
+     dla każdego kontenera pod pasem (.dz-wrap, .ls-wrap, .lz-wrap, .pr-wrap, .layout, .kal-wrap, .kier…); !important, bo
+     widoki ustawiają ten odstęp w swoich stylach (o większej wadze) albo w atrybucie style. */
+  main > .ph + .wrap { padding-top: 26px !important; }
   .ph-m, .ph-zdjecie.ph-z-foto .ph-m, .ph-granat.ph-z-foto .ph-m { height: 120px; width: 70%; opacity: .7; }
   /* Hasło działu zamiast opisu (NaglowekStrony.astro: .ph-haslo.tylko-telefon, opis dostaje wtedy .tylko-komputer;
      decyzja 31.10.2026): jedno krótkie zdanie, bursztynowe na granatowym pasie (--accent = #f2a33a w .ph-granat),

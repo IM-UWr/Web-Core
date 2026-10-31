@@ -2,10 +2,13 @@
 // Referaty tygodnia jako zwarta lista (wygląd „Portal” na telefonie): dzień i godzina z lewej, obok seminarium
 // (i sala), tytuł i prelegent. Ten sam zestaw danych co TabelaReferatow (tabela na komputerze); stoi w blokach
 // .tylko-telefon. Style: .pt-list w src/styles/portal.css.
+// Separator „·” przed salą z niełamliwymi spacjami po obu stronach: nigdy nie zaczyna linii, „· sala” się nie rozrywa
+// (decyzja 31.10.2026). Tytuł referatu ze wzorami przez KaTeX (TytulReferatu.astro).
 import { u } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { dayShort, short, time, type Lang } from '../lib/daty';
 import { sala } from '../lib/tresci';
+import TytulReferatu from './TytulReferatu.astro';
 
 interface Wiersz { termin: string; sala?: string; seminarium: string; tytul: string; prelegent: string; href: string }
 interface Props { wiersze: Wiersz[]; lang: Lang; pusty: string; etykieta: string }
@@ -20,8 +23,8 @@ const { wiersze, lang, pusty, etykieta } = Astro.props;
         <a class="pt-item" href={u(wJezyku(w.href, lang))}>
           <span class="pt-d pt-d-szer">{`${dayShort(w.termin, lang)} ${short(w.termin).slice(0, 5)}`}<br />{time(w.termin)}</span>
           <span class="pt-b">
-            <span class="pt-k">{w.seminarium}{sala(w.sala, lang) && <span class="pt-k-m"> · {sala(w.sala, lang)}</span>}</span>
-            <span class="pt-t">{w.tytul}</span>
+            <span class="pt-k">{w.seminarium}{sala(w.sala, lang) && <span class="pt-k-m">{'\u00a0·\u00a0'}{sala(w.sala, lang)}</span>}</span>
+            <span class="pt-t"><TytulReferatu tekst={w.tytul} /></span>
             <span class="pt-s">{w.prelegent}</span>
           </span>
         </a>
