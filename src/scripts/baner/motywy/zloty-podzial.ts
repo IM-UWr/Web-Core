@@ -9,7 +9,7 @@
 import type { Fabryka, Pudlo, Ustawienia } from '../typy';
 import { S } from '../wspolne';
 
-export const ustawienia: Ustawienia = { granica: 12, przejscie: 60, podHaslem: 40 };
+export const ustawienia: Ustawienia = { granica: 12, przejscie: 60 };
 
 const POM = 0.14, WYNIK = 0.28, PUNKTY = 0.34, TEMPO_B = 60, TEMPO_P = 30, PRZERWA = 9, WIELKOSC = 0.92, PION = 0.45;
 const START = 0.6, P_EL = 0.15, P_KROK = 0.45, PRZED = 0.3, PO = 0.5, GAS = 1.6, ODDECH = 0.7, LINIA = 2, MIEKKO = 20;
@@ -64,7 +64,7 @@ const motyw: Fabryka = (G, t0) => {
   // pole konstrukcji: nad hasłem (od paska menu do górnej krawędzi hasła), bez hasła — całe pole rysunku
   let fTop = G.y0, fDol = G.y1, bx = K.bbox.slice();
   if (G.haslo) {
-    fTop = G.menu + 6; fDol = Math.round(G.haslo.t - 6);
+    fTop = G.y0; fDol = Math.round(G.haslo.t - 6);
     // rzeczywisty zasięg łuków i odcinków (bbox konstrukcji nie obejmuje całych łuków), żeby nic nie zeszło na hasło
     const ex = [Infinity, Infinity, -Infinity, -Infinity];
     const dodaj = (x: number, y: number) => { ex[0] = Math.min(ex[0], x); ex[1] = Math.min(ex[1], y); ex[2] = Math.max(ex[2], x); ex[3] = Math.max(ex[3], y); };
@@ -95,7 +95,7 @@ const motyw: Fabryka = (G, t0) => {
         const a = X(e.a!), b = X(e.b!), dl = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / dl, uy = (b[1] - a[1]) / dl, ee = sk * e.e!;
         Object.assign(o, { x0: a[0] - ux * ee, y0: a[1] - uy * ee, x1: b[0] + ux * ee, y1: b[1] + uy * ee, len: dl + 2 * ee });
       } else {
-        const p = X(e.p!), q = przytnij(p[0], p[1], e.d![0], e.d![1], widacOd - 2, prawo, top - 2, dol + 2);
+        const p = X(e.p!), q = przytnij(p[0], p[1], e.d![0], e.d![1], widacOd - 2, prawo, top, dol);
         if (!q) return;
         Object.assign(o, { x0: q[0], y0: q[1], x1: q[2], y1: q[3], len: Math.hypot(q[2] - q[0], q[3] - q[1]) });
         o.miekko = Math.min(0.45, MIEKKO / Math.max(1, o.len));

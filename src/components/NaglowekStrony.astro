@@ -15,9 +15,11 @@ import ustawienia from '../data/ustawienia.json';
 // haslo: krótkie hasło działu — na telefonie (≤ 760 px) zamiast opisu `lead`, wyróżnione (bursztyn na granatowym pasie);
 // na komputerze niewidoczne, tam zostaje pełny opis (decyzja 31.10.2026). Puste/brak = telefon pokazuje opis jak dotąd.
 // Działy: pola `haslo` / `haslo_en` w src/data/dzialy/*.json i src/data/popularyzacja.json; Aktualności — w kodzie widoku.
-// motyw: animacja w tle banera na telefonie (nazwa pliku w src/scripts/baner/motywy/); domyślnie z mapy strona → motyw
+// motyw: animacja w tle banera na telefonie — „nazwa” albo „nazwa/wariant” (nazwa pliku w src/scripts/baner/motywy/);
+// domyślnie z mapy strona → motyw. motywDane: dane z budowy strony dla motywu (JSON w data-animacja-dane), np. pary
+// współautorów rocznika publikacji.
 // w src/lib/motywyBanerow.ts. Bez motywu — statyczny rysunek działu (.ph-m), tak jak na komputerze.
-interface Props { tytul: string; lead?: string; haslo?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string }
+interface Props { tytul: string; lead?: string; haslo?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown }
 const { tytul, lead, lang, okruszki = [], wstecz, nadtytul, nadtytulTelefon } = Astro.props;
 const haslo = Astro.props.haslo?.trim() || undefined;
 const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
@@ -79,9 +81,11 @@ const fala = dzial === 'aktualnosci' && ozdobny ? (() => {
 
 // Animacja w tle banera (tylko telefon): baner deklaruje motyw w data-animacja, skrypt silnika wczytuje tylko kod tego motywu.
 // (Nie data-motyw — tym atrybutem Naglowek.astro oznacza przycisk trybu jasny/ciemny i podpina pod niego kliknięcie.)
-const motyw = ozdobny ? (Astro.props.motyw ?? motywStrony(stripBase(Astro.url.pathname))) : undefined;
+const motywPelny = ozdobny ? (Astro.props.motyw ?? motywStrony(stripBase(Astro.url.pathname))) : undefined;
+const [motyw, motywWariant] = motywPelny ? motywPelny.split('/') : [];
+const motywDane = motyw && Astro.props.motywDane !== undefined ? JSON.stringify(Astro.props.motywDane) : undefined;
 ---
-<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi']} data-dzial={ozdobny ? dzial : undefined} data-animacja={motyw}>
+<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi']} data-dzial={ozdobny ? dzial : undefined} data-animacja={motyw} data-animacja-wariant={motywWariant} data-animacja-dane={motywDane}>
   {naPasie && <script is:inline set:html={naPasie} />}
   <div class="wrap">
     {ozdobny && (

@@ -6,18 +6,24 @@ export type Pudlo = [number, number, number, number]; // x0, y0, x1, y1
 /** Linia tekstu w banerze (Range.getClientRects, sklejone w wiersze). */
 export interface Linia { t: number; b: number; r: number }
 
-/** Geometria banera, policzona z prawdziwych elementów (.wstecz, .eyebrow, h1, .ph-haslo, .pt-liczby). */
+/** Geometria banera, policzona z prawdziwych elementów (.wstecz, .eyebrow, h1, .ph-haslo). */
 export interface Pole {
   W: number; H: number;
   /** poziome brzegi treści (16 px od krawędzi) */
   x0: number; x1: number;
-  /** pole rysunku w pionie: od linku „←” do kreski nad liczbami (12 px odstępu); bez liczb — do dołu banera minus 12 px */
+  /** pole rysunku w pionie (zlecenie 07): od dołu paska menu + 6 px (bez paska na banerze — 30 px nad pierwszą linią
+   *  tekstu, nie mniej niż 6) do połowy wysokości hasła (bez hasła — do połowy ostatniej linii tytułu); motyw ma się w nim
+   *  zmieścić (przesunąć w górę, a gdy trzeba — lekko zmniejszyć); maska tylko łagodnie wygasza brzegi */
   y0: number; y1: number;
   /** dół paska menu, gdy menu leży na banerze (przezroczysty nagłówek), inaczej 0 */
   menu: number;
   tytul: Linia[];
   haslo: Linia | null;
-  /** krycie maski „obrys linii” w punkcie (0 pod tekstem, 1 tam, gdzie rysunek widać w pełni) */
+  /** wariant motywu z mapy strona → motyw (np. „zaklad” — wariant zakładu dla motywu seminarium) */
+  wariant?: string;
+  /** dane z budowy strony (atrybut data-animacja-dane, JSON), np. pary współautorów; kształt zależy od motywu */
+  dane?: unknown;
+  /** krycie maski „obrys linii” w punkcie (0 pod tekstem i poza polem, 1 tam, gdzie rysunek widać w pełni) */
   widac(x: number, y: number): number;
   /** granica zanikania (x, od którego zaczyna się przejście) na wysokości y */
   granica(y: number): number;
@@ -41,10 +47,8 @@ export interface Motyw {
 
 /** Parametry maski, które motyw podaje silnikowi przed pomiarem. */
 export interface Ustawienia {
-  /** odstęp granicy zanikania od końca linii tytułu (px) */
+  /** odstęp granicy zanikania od końca każdej linii tekstu (px) */
   granica?: number;
-  /** o ile maska może zachodzić w lewo pod hasło, licząc od granicy przy tytule (px) */
-  podHaslem?: number;
   /** szerokość łagodnego przejścia (px) */
   przejscie?: number;
 }

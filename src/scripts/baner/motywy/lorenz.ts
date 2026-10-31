@@ -66,8 +66,8 @@ const motyw: Fabryka = (G, t0) => {
   const cx = G.W / 2, cy = (G.y0 + G.y1) / 2, hm = (hmin + hmax) / 2, vm = (vmin + vmax) / 2;
   const X = new Float32Array(n), Y = new Float32Array(n);
   for (i = 0; i < n; i++) { X[i] = cx + (tr.h[i] - hm) * s; Y[i] = cy - (tr.v[i] - vm) * s; }
-  // obrót wokół środka lewego skrzydła (prawa część wyżej), potem zmniejszenie, jeśli rysunek wyszedłby nad pasek menu
-  // albo pod kreskę nad liczbami
+  // obrót wokół środka lewego skrzydła (prawa część wyżej), potem zmniejszenie, jeśli rysunek wyszedłby poza pole
+  // (zlecenie 07: od paska menu + 6 px do połowy hasła)
   let px = Infinity;
   for (i = 0; i < n; i++) px = Math.min(px, X[i]);
   px += (cx - px) * 0.5;
@@ -78,7 +78,7 @@ const motyw: Fabryka = (G, t0) => {
     X[i] = px + dx * co + dy * si; Y[i] = cy + dy * co - dx * si;
     ymin = Math.min(ymin, Y[i]); ymax = Math.max(ymax, Y[i]);
   }
-  const gora = G.menu ? G.menu + 6 : G.y0;
+  const gora = G.y0;
   const fs = Math.min(1, (cy - gora) / Math.max(1e-6, cy - ymin), (G.y1 - cy) / Math.max(1e-6, ymax - cy));
   if (fs < 1) for (i = 0; i < n; i++) { X[i] = px + (X[i] - px) * fs; Y[i] = cy + (Y[i] - cy) * fs; }
   const sciezka = new Path2D();

@@ -2,13 +2,13 @@
 // Budowanie raz przy wejściu: przez 20 s płynnie dochodzą kolejne wyrazy (od samej sinusoidy do 13 wyrazów).
 // Potem fala stoi i lekko „oddycha” wagami wyższych harmonicznych (30%), a co losową przerwę (średnio 12 s, ±60%)
 // rozkłada się do losowo 4–9 wyrazów i składa w tempie budowania (16 s na zejście o 8 wyrazów). Słabe linie pod spodem
-// to sumy częściowe do 1, 3 i 7 harmonicznej. Pod hasłem maska sięga 70 px dalej w lewo niż przy tytule.
+// to sumy częściowe do 1, 3 i 7 harmonicznej. Fala wypełnia pole rysunku (do połowy hasła; zlecenie 07 — spłaszczona w pionie).
 // Klatka tylko wtedy, gdy któryś punkt fali przesunął się o ≥ 0,5 px; zegar budzi się 15 razy/s w trakcie zmian
 // i 4 razy/s, gdy fala tylko oddycha.
 import type { Fabryka, Ustawienia } from '../typy';
 import { S, ogr } from '../wspolne';
 
-export const ustawienia: Ustawienia = { granica: 12, przejscie: 60, podHaslem: 70 };
+export const ustawienia: Ustawienia = { granica: 12, przejscie: 60 };
 
 const FALA = 0.14, SUMY = 0.06;                          // krycie fali i sum częściowych
 const J = 13, WYSOKOSC = 0.8, OKRES = 120, BUDOWA = 20;  // wyrazy, część wysokości pola, okres (px), budowanie (s)

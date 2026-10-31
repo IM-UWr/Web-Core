@@ -50,7 +50,8 @@ function dendryt(P: [number, number][]): [number, number, number][] {
 
 const motyw: Fabryka = (G, t0) => {
   // punkty losowane w polu szerokim na co najmniej 430 px, zaczepionym z lewej: węższy ekran pokazuje ten sam rysunek
-  const P = losujPunkty(PUNKTY, 0, G.y0 + 2, Math.max(G.W, 430), G.y1 + 7), E = dendryt(P), m = E.length;
+  // (zlecenie 07: punkty najwyżej do dołu pola, czyli połowy hasła; z odstępem na promień kropki)
+  const P = losujPunkty(PUNKTY, 0, G.y0 + 2, Math.max(G.W, 430), G.y1 - 2), E = dendryt(P), m = E.length;
   // gałęzie, które mogą znikać: środek widoczny i w obrębie banera; od najdłuższej
   const ciecia: number[] = [];
   for (let i = 0; i < m; i++) {

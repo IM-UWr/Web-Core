@@ -5,11 +5,14 @@
 // i do chwili startu też zostaje .ph-m; po pierwszej klatce .ph dostaje klasę .ph-anim-gra (telefon.css chowa wtedy .ph-m).
 //
 // Zasady (wspólne dla wszystkich motywów):
-// - pole rysunku: od linku „←” do kreski nad liczbami z odstępem 12 px (bez liczb — do dołu banera minus 12 px);
+// - pole rysunku (zlecenie 07, decyzja 31.10.2026, 23:52): u góry od dołu paska menu + 6 px (bez paska na banerze —
+//   30 px nad pierwszą linią tekstu, nie mniej niż 6), na dole do połowy wysokości hasła (bez hasła — do połowy ostatniej
+//   linii tytułu); liczby i kreska nie wyznaczają pola. Motyw ma się w nim zmieścić sam (przesunięcie w górę, potem
+//   lekkie zmniejszenie), maska tylko zabezpiecza: 6 px łagodnego przejścia od góry pola, 12 px nad jego dołem, niżej nic;
 // - maska „obrys linii”: granica zanikania liczona osobno dla każdej linii linku „←”, nadtytułu, tytułu i hasła
-//   (Range.getClientRects), łagodne przejście ok. 60 px; pod hasłem maska nie sięga dalej niż przy ostatniej linii
-//   tytułu, a motyw może ją jeszcze cofnąć (ustawienia.podHaslem). Maska alfa liczona raz na układ, nakładana
-//   przez destination-in;
+//   (Range.getClientRects), z granicą motywu (ustawienia.granica) i łagodnym przejściem ok. 60 px; tekst to jedna bryła —
+//   przerwa między kolejnymi liniami dostaje granicę dłuższej z sąsiednich linii; hasło maskowane na całą długość.
+//   Maska alfa liczona raz na układ, nakładana przez destination-in;
 // - pętla na setTimeout (bez requestAnimationFrame); motyw sam mówi, kiedy coś się zmieni o ≥ 0,5 px, a w spoczynku
 //   zegar śpi; pauza poza ekranem (IntersectionObserver) i w karcie w tle (visibilitychange);
 // - prefers-reduced-motion: reduce — gotowy, nieruchomy rysunek, bez pętli; płótna najwyżej 1,5 px urządzenia na px CSS;
@@ -58,9 +61,12 @@ class Baner {
   private sc = 1; private cT = 0;
   private t = 0; private prev: number | null = null; private ostZa = 0; private timer = 0;
   private gra = false; private naEkranie = true; private aktywny = false; private klucz = '';
+  // dane motywu z budowy strony (data-animacja-dane, JSON; np. pary współautorów rocznika) — przekazywane w Pole.dane
+  private dane: unknown;
   private czekaUklad = 0;
 
   constructor(private ph: HTMLElement, private nazwa: string) {
+    try { this.dane = ph.dataset.animacjaDane ? JSON.parse(ph.dataset.animacjaDane) : undefined; } catch { this.dane = undefined; }
     // nowy pomiar dopiero po pierwszym układzie (start() sam czeka na koniec wejścia treści i na krój)
     const odswiez = () => { if (!this.m) return; clearTimeout(this.czekaUklad); this.czekaUklad = window.setTimeout(() => this.uklad(), 120); };
     new ResizeObserver(odswiez).observe(ph);
@@ -107,22 +113,33 @@ class Baner {
   // ---------- pomiar i maska ----------
   private zmierz(u: Ustawienia) {
     const ph = this.ph, bb = ph.getBoundingClientRect(), W = ph.clientWidth, H = ph.clientHeight;
-    const q = (s: string) => { const e = ph.querySelector(s); return widoczny(e) ? e : null; };
-    const wst = q('.wstecz a') ?? q('.wstecz'), brw = q('.eyebrow'), h1 = q('h1'), has = q('.ph-haslo'), lic = q('.pt-liczby');
-    const y0 = Math.round(wst ? wst.getBoundingClientRect().top - bb.top + 2 : h1 ? h1.getBoundingClientRect().top - bb.top - 8 : 12);
-    const y1 = Math.round((lic ? lic.getBoundingClientRect().top - bb.top : H) - 12);
+    // pierwszy widoczny element (np. dwa nadtytuły: komputera i telefonu — widać jeden)
+    const q = (s: string) => Array.from(ph.querySelectorAll(s)).find(widoczny) ?? null;
+    const wst = q('.wstecz a') ?? q('.wstecz'), brw = q('.eyebrow'), h1 = q('h1'), has = q('.ph-haslo');
     const hdr = document.querySelector<HTMLElement>('.hdr.hdr-foto');
     const menu = hdr && ph.parentElement?.firstElementChild === ph ? hdr.offsetHeight : 0;
     const gr = u.granica ?? 12;
     const tytul = h1 ? wiersze(h1, bb) : [];
     const hasla = has ? wiersze(has, bb) : [];
-    // prostokąty „zakazane” dla rysunku: każda linia tekstu z granicą zanikania na prawo od jej końca
-    const prz: Linia[] = [];
-    if (wst) linie(wst, bb).forEach((l) => prz.push({ t: l.t, b: l.b, r: l.r + gr + 2 }));
-    if (brw) linie(brw, bb).forEach((l) => prz.push({ t: l.t, b: l.b, r: l.r + gr }));
-    tytul.forEach((l) => prz.push({ t: l.t, b: l.b, r: l.r + gr }));
-    const ost = tytul[tytul.length - 1];
-    hasla.forEach((l) => prz.push({ t: l.t, b: l.b, r: Math.min(l.r + 8, ost ? ost.r + gr : l.r + 8) - (u.podHaslem ?? 0) }));
+    // pole: od paska menu (+ 6 px) albo 30 px nad tekstem do połowy hasła / ostatniej linii tytułu
+    const pierwszy = wst ?? brw ?? h1;
+    const goraTekstu = pierwszy ? pierwszy.getBoundingClientRect().top - bb.top : 36;
+    const y0 = Math.round(menu ? menu + 6 : Math.max(6, goraTekstu - 30));
+    const dolny = hasla.length ? { t: hasla[0].t, b: hasla[hasla.length - 1].b } : tytul[tytul.length - 1];
+    const y1 = Math.round(dolny ? (dolny.t + dolny.b) / 2 : H - 12);
+    // prostokąty „zakazane” dla rysunku: każda linia tekstu z granicą zanikania na prawo od jej końca (hasło na całą
+    // długość), a przerwy między kolejnymi liniami — z granicą dłuższej z dwóch sąsiednich (tekst to jedna bryła)
+    const linieTekstu: Linia[] = [];
+    if (wst) linie(wst, bb).forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr + 2 }));
+    if (brw) linie(brw, bb).forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr }));
+    tytul.forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr }));
+    hasla.forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr }));
+    linieTekstu.sort((a, b) => a.t - b.t);
+    const prz: Linia[] = [...linieTekstu];
+    for (let i = 0; i + 1 < linieTekstu.length; i++) {
+      const a = linieTekstu[i], b = linieTekstu[i + 1];
+      if (b.t > a.b) prz.push({ t: a.b, b: b.t, r: Math.max(a.r, b.r) });
+    }
     return { W, H, y0, y1, menu, tytul, haslo: hasla.length ? { t: hasla[0].t, b: hasla[hasla.length - 1].b, r: Math.max(...hasla.map((l) => l.r)) } : null, prz };
   }
 
@@ -139,8 +156,8 @@ class Baner {
     this.klucz = klucz;
     this.zatrzymajPetle();
 
-    // płótna: cała szerokość, w pionie od paska menu (albo pola rysunku) do dołu pola, z zapasem
-    const cT = Math.max(0, Math.min(z.y0, z.menu ? z.menu + 6 : z.y0) - 6), cB = Math.min(z.H, z.y1 + 8), cH = cB - cT;
+    // płótna: cała szerokość, w pionie dokładnie pole rysunku
+    const cT = Math.max(0, z.y0), cB = Math.min(z.H, z.y1), cH = Math.max(1, cB - cT);
     const sc = Math.min(window.devicePixelRatio || 1, DPR_MAX), bw = Math.max(1, Math.round(z.W * sc)), bh = Math.max(1, Math.round(cH * sc));
     this.cT = cT; this.sc = sc;
 
@@ -159,18 +176,21 @@ class Baner {
     }
     const w = u.przejscie ?? 60;
     const wiersz = (y: number) => g[ogr(Math.floor(y - cT), 0, n - 1)];
+    const pion = (y: number) => S((y - z.y0) / 6) * S((z.y1 - y) / 12);
     const maska = (this.maska ??= document.createElement('canvas'));
     maska.width = bw; maska.height = bh;
     const mc = maska.getContext('2d')!, im = mc.createImageData(bw, bh), d = im.data;
     for (let j = 0; j < bh; j++) {
-      const gg = wiersz(cT + (j + 0.5) / sc);
-      for (let i = 0; i < bw; i++) d[4 * (j * bw + i) + 3] = Math.round(255 * S(((i + 0.5) / sc - gg) / w));
+      // pionowo: 6 px łagodnego wejścia od góry pola i 12 px wygaszenia nad jego dołem (zabezpieczenie; motyw mieści się sam)
+      const y = cT + (j + 0.5) / sc, gg = wiersz(y), pv = pion(y);
+      for (let i = 0; i < bw; i++) d[4 * (j * bw + i) + 3] = Math.round(255 * pv * S(((i + 0.5) / sc - gg) / w));
     }
     mc.putImageData(im, 0, 0);
 
     const G: Pole = {
       W: z.W, H: z.H, x0: 16, x1: z.W - 16, y0: z.y0, y1: z.y1, menu: z.menu, tytul: z.tytul, haslo: z.haslo,
-      widac: (x, y) => S((x - wiersz(y)) / w),
+      wariant: ph.dataset.animacjaWariant || undefined, dane: this.dane,
+      widac: (x, y) => S((x - wiersz(y)) / w) * pion(y),
       granica: (y) => wiersz(y),
       rgba: (a) => `rgba(${kolor},${a.toFixed(4)})`,
     };
