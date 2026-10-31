@@ -1,16 +1,20 @@
 /* ==========================================================================
    Przejścia między stronami i łagodne wejście treści (bez JavaScriptu).
+   Na całej stronie (telefon i komputer) — na próbę od 31.10.2026 (od 30.10.2026 było tylko na telefonie, ≤ 760 px).
    1) Przejście między dokumentami (View Transitions API, Chrome/Edge 126+, Safari 18.2+):
       stara strona gaśnie, nowa się pojawia, nagłówek stoi w miejscu (osobna nazwa).
       Przeglądarki bez obsługi (Firefox) przechodzą zwyczajnie.
    2) Wejście treści: tekst w pasie nagłówka podstrony / na zdjęciu strony głównej
-      i treść pod nim delikatnie wjeżdżają (12 px) i się rozjaśniają. Same pasy i zdjęcie
+      i treść pod nim delikatnie wjeżdżają (12 px) i się rozjaśniają. Same pasy, zdjęcia i motyw działu
       stoją, żeby pod przezroczystym nagłówkiem nie mignęła biel.
+      W pasie podstrony animują się dzieci .wrap (link „←”, nadtytuł, tytuł, opis, liczby działu, filtry),
+      a nie cały .wrap: zdjęcie działu (.ph-foto) i motyw (.ph-m) leżą w .wrap z ujemnym z-index —
+      animowany .wrap tworzyłby na czas animacji własny kontekst warstw, zdjęcie wychodziłoby nad przyciemnienie
+      pod nagłówkiem (.ph-granat::before), a po końcu animacji góra pasa nagle by ciemniała.
    Przy „ogranicz ruch” w systemie nic się nie animuje.
-   Na razie tylko na telefonie (≤ 760 px) — na próbę; na komputerze strony przechodzą jak dotąd.
    ========================================================================== */
 
-@media (max-width: 760px) and (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
 
   .hdr { view-transition-name: naglowek; }
@@ -20,9 +24,10 @@
   @keyframes vt-znika { to { opacity: 0; } }
   @keyframes vt-pojawia { from { opacity: 0; } }
 
-  /* fill-mode: backwards — po skończeniu nie zostaje żaden translate, więc elementy
-     position: fixed w treści (np. lightbox galerii) liczą położenie od okna jak dotąd */
-  #tresc > .page-head > .wrap,
+  /* fill-mode: backwards — po skończeniu nie zostaje żaden translate ani opacity, więc elementy
+     position: fixed w treści (np. lightbox galerii) liczą położenie od okna, a sticky (spis „Na tej stronie”,
+     nagłówek planu zajęć) działa jak dotąd */
+  #tresc > .page-head > .wrap > :not(.ph-m, .ph-foto),
   #tresc > .hero .hero-in,
   #tresc > :not(.page-head, .hero, script) {
     animation: wejscie .5s cubic-bezier(.22, 1, .36, 1) backwards;
