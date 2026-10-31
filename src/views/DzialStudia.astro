@@ -72,6 +72,8 @@ const aktualnosciTel = dlaStudentow.slice(0, 6);
 
 const tytul = T('Studia', 'Study');
 const wstep = w(tekst, 'wstep');
+// Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
+const haslo = w(tekst, 'haslo');
 ---
 <Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
@@ -79,7 +81,7 @@ const wstep = w(tekst, 'wstep');
        aktualności (sześć) — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
        Link do pełnej listy („Wszystkie”) — zawsze w nagłówku sekcji
        (komputer: .zsec-head w global.css; telefon: nagłówek ramki .pt-h), z prawej. */}
-  <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
+  <NaglowekStrony tytul={tytul} lead={wstep} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}

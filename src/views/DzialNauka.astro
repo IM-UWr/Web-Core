@@ -76,6 +76,8 @@ const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
 const naglowek = T('Nauka', 'Research');
 const lead = wybierz(dzial, 'wstep', lang);
+// Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
+const haslo = wybierz(dzial, 'haslo', lang);
 // „Badania w Instytucie”: akapity z CMS (pole badania_tekst / badania_tekst_en; akapity oddzielone pustą linią).
 const badania = ((wybierz(dzial, 'badania_tekst', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 // Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
@@ -90,7 +92,7 @@ const fakty = (((dzial as any).badania_fakty ?? []) as Fakt[])
        Telefon (≤ 760 px) — wygląd „Portal”, kolejność jak na komputerze: „W tym dziale” w jednej ramce, tekst
        „Badania w Instytucie” (bez ramki „W skrócie”), projekty w ramce, na końcu konferencje (osobny blok
        .tylko-telefon tuż za sekcją .tylko-komputer). */}
-  <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
+  <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}

@@ -52,6 +52,8 @@ const mapaEmbed = k.adres ? `https://www.google.com/maps?q=${encodeURIComponent(
 
 const naglowek = T('Instytut', 'Institute');
 const lead = wybierz(dzial, 'wstep', lang);
+// Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
+const haslo = wybierz(dzial, 'haslo', lang);
 const oInstytucie = ((wybierz(dzial, 'o_instytucie', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 // Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
 // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
@@ -66,7 +68,7 @@ const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
        Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w jednej ramce, tekst „O Instytucie”,
        sukcesy w ramce, kontakt w ramce (osobny blok .tylko-telefon, linki w nagłówku ramki) i pod nim mapa.
        Linki do pełnych podstron („Wszystkie sukcesy”, „Wszystkie dane kontaktowe”) — zawsze w nagłówku sekcji, z prawej. */}
-  <NaglowekStrony tytul={naglowek} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
+  <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}

@@ -164,6 +164,13 @@
   .js .hdr-foto ~ main > .ph:first-child > .wrap { min-height: 0; padding-top: calc(12px + var(--hdr-h)); }
   .ph h1 { font-size: clamp(28px, 3.4vw, 42px); }
   .ph-m, .ph-zdjecie.ph-z-foto .ph-m, .ph-granat.ph-z-foto .ph-m { height: 120px; width: 70%; opacity: .7; }
+  /* Hasło działu zamiast opisu (NaglowekStrony.astro: .ph-haslo.tylko-telefon, opis dostaje wtedy .tylko-komputer;
+     decyzja 31.10.2026): jedno krótkie zdanie, bursztynowe na granatowym pasie (--accent = #f2a33a w .ph-granat),
+     bez kreski pod spodem. Na jasnym pasie (inne warianty) — kolor tytułu, bo bursztyn na jasnym tle byłby nieczytelny.
+     Odstęp do kreski nad liczbami działu: 8 px więcej niż pod zwykłym opisem. */
+  .ph-haslo { margin: 0; font-size: 18px; font-weight: 600; line-height: 1.35; text-align: left; text-wrap: balance; color: var(--ink); }
+  .ph-granat .ph-haslo { color: var(--accent); }
+  .ph-haslo ~ .pt-liczby { margin-top: 10px; }
 
   /* ---------- tlo.css: sekcje ---------- */
   body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .zsec-head h2 { font-size: clamp(20px, 2.2vw, 23px); letter-spacing: -0.015em; }

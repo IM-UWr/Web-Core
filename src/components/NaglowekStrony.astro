@@ -9,8 +9,12 @@ import ustawienia from '../data/ustawienia.json';
 
 // Nad tytułem: link „← poziom wyżej”. Cel: `wstecz` albo ostatni z `okruszki`, który ma adres, albo strona główna.
 // nadtytul: mała etykieta nad tytułem (np. „Studia I i II stopnia” na stronie kierunku).
-interface Props { tytul: string; lead?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string }; nadtytul?: string }
+// haslo: krótkie hasło działu — na telefonie (≤ 760 px) zamiast opisu `lead`, wyróżnione (bursztyn na granatowym pasie);
+// na komputerze niewidoczne, tam zostaje pełny opis (decyzja 31.10.2026). Puste/brak = telefon pokazuje opis jak dotąd.
+// Działy: pola `haslo` / `haslo_en` w src/data/dzialy/*.json i src/data/popularyzacja.json; Aktualności — w kodzie widoku.
+interface Props { tytul: string; lead?: string; haslo?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string }; nadtytul?: string }
 const { tytul, lead, lang, okruszki = [], wstecz, nadtytul } = Astro.props;
+const haslo = Astro.props.haslo?.trim() || undefined;
 const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
 const cel = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
 
@@ -112,7 +116,10 @@ const falaSkrypt = `(function(s){
     <Wstecz etykieta={cel.etykieta} adres={cel.adres} lang={lang} />
     {nadtytul && <p class="eyebrow">{nadtytul}</p>}
     <h1>{tytul}</h1>
-    {lead && <p class="lead">{lead}</p>}
+    {/* Hasło i opis jako dwa rodzeństwa w .wrap (wchodzą z tą samą animacją co tytuł — przejscia.css);
+         przełączanie klasami .tylko-telefon / .tylko-komputer (telefon.css), style hasła w telefon.css. */}
+    {haslo && <p class="ph-haslo tylko-telefon" data-pagefind-ignore>{haslo}</p>}
+    {lead && <p class:list={['lead', haslo && 'tylko-komputer']}>{lead}</p>}
     <slot />
   </div>
 </div>

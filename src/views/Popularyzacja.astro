@@ -20,7 +20,7 @@ type Pozycja = {
 };
 type Grupa = { nazwa: string; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; pozycje?: Pozycja[] | null };
 type Link = { nazwa: string; nazwa_en?: Tekst; adres?: Tekst };
-type Dane = { tytul: string; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; linki?: Link[] | null; grupy?: Grupa[] | null };
+type Dane = { tytul: string; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; haslo?: Tekst; haslo_en?: Tekst; linki?: Link[] | null; grupy?: Grupa[] | null };
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -47,9 +47,11 @@ const grupy = (d.grupy ?? [])
 const sekcje = grupy.map((g) => ({ depth: 2, slug: g.slug, text: w(g, 'nazwa') }));
 const tytul = w(d, 'tytul') || T('Popularyzacja matematyki', 'Mathematics outreach');
 const lead = w(d, 'wstep');
+// Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
+const haslo = w(d, 'haslo');
 ---
 <Baza tytul={tytul} opis={lead || undefined} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: tytul }]} />
+  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]} />
   <div class="wrap layout">
     <div class="main">
       {linki.length > 0 && (

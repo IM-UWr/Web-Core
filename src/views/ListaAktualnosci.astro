@@ -27,9 +27,11 @@ for (const p of lista) {
 }
 const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
 const lead = lang === 'en' ? 'Announcements, events and achievements of the Mathematical Institute.' : 'Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.';
+// Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
+const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w Instytucie';
 ---
 <Baza tytul={t(lang, 'aktualnosci')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]} />
+  <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]} />
 
   <div class="wrap layout">
     <div class="main" data-lista>
