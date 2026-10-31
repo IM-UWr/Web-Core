@@ -118,7 +118,8 @@ a.pt-card:hover, .pt-card.pt-link:hover, .pt-card.pt-link:focus-within { border-
 .pt-liczby .n { font-size: 22px; font-weight: 800; line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; }
 /* Telefon (≤ 760 px): liczby obok siebie w kolumnach (tyle kolumn, ile liczb; w działach po 3), etykieta pod liczbą,
    nad nimi cienka kreska (decyzja 31.10.2026). Na telefonie widać je tylko na stronach działów (Instytut, Nauka,
-   Studia); na pozostałych podstronach lista ma .tylko-komputer. */
+   Studia; Aktualności i Popularyzacja — lista z .tylko-telefon, na komputerze bez liczb); na pozostałych podstronach
+   lista ma .tylko-komputer. */
 @media (max-width: 760px) {
   .pt-liczby { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0 12px; max-width: none;
     margin-top: 2px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }

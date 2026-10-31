@@ -43,11 +43,12 @@ const specjalnosci = (await getCollection('specjalnosci')).filter(
 const wszystkieStopnie = [...new Set(kierunki.flatMap((k) => [...stopnie(k)]))].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
 const nKierunkow = kierunki.filter((k) => !doktorat(k)).length;
 // Liczby w banerze: kierunki, specjalności, stopnie studiów. Bez liczby nauczycieli akademickich — jest na stronie
-// „Instytut” (decyzja 31.10.2026: bez powtórzeń między działami).
+// „Instytut” (decyzja 31.10.2026: bez powtórzeń między działami). Krótkie etykiety, bez „do wyboru” i „(I, II, III)”
+// (decyzja 31.10.2026: na telefonie każda w jednej linijce; po angielsku „programmes” zamiast „degree programmes”).
 const liczby = [
-  { n: nKierunkow, l: T(odm(nKierunkow, 'kierunek studiów', 'kierunki studiów', 'kierunków studiów'), nKierunkow === 1 ? 'degree programme' : 'degree programmes') },
-  { n: specjalnosci.length, l: T(odm(specjalnosci.length, 'specjalność do wyboru', 'specjalności do wyboru', 'specjalności do wyboru'), specjalnosci.length === 1 ? 'specialisation' : 'specialisations') },
-  { n: wszystkieStopnie.length, l: `${T(odm(wszystkieStopnie.length, 'stopień studiów', 'stopnie studiów', 'stopni studiów'), wszystkieStopnie.length === 1 ? 'level of study' : 'levels of study')} (${wszystkieStopnie.join(', ')})` },
+  { n: nKierunkow, l: T(odm(nKierunkow, 'kierunek studiów', 'kierunki studiów', 'kierunków studiów'), nKierunkow === 1 ? 'programme' : 'programmes') },
+  { n: specjalnosci.length, l: T(odm(specjalnosci.length, 'specjalność', 'specjalności', 'specjalności'), specjalnosci.length === 1 ? 'specialisation' : 'specialisations') },
+  { n: wszystkieStopnie.length, l: T(odm(wszystkieStopnie.length, 'stopień studiów', 'stopnie studiów', 'stopni studiów'), wszystkieStopnie.length === 1 ? 'level of study' : 'levels of study') },
 ].filter((x) => x.n > 0);
 
 // Kafelki: grupy i linki z menu „Studia” (kierunki wstawiane automatycznie; nowy link w menu sam pojawi się tutaj).

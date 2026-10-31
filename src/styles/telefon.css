@@ -171,6 +171,12 @@
   .ph-haslo { margin: 0; font-size: 18px; font-weight: 600; line-height: 1.35; text-align: left; text-wrap: balance; color: var(--ink); }
   .ph-granat .ph-haslo { color: var(--accent); }
   .ph-haslo ~ .pt-liczby { margin-top: 10px; }
+  /* Fala Fouriera w banerze Aktualności (tlo.css, NaglowekStrony.astro) szara jak linie rysunku zamiast bursztynowej:
+     na ekranie jeden bursztynowy akcent — na telefonie jest nim hasło (decyzja 31.10.2026). Animacja bez zmian.
+     Na granatowym pasie (jasny i ciemny motyw) biaława, trochę wyraźniejsza niż linie motywu (grubsza kreska);
+     na jasnym pasie (inne warianty nagłówka) — w kolorze linii motywu. Komputer: bursztynowa jak dotąd. */
+  .ph-fala path { stroke: var(--ph-linie); }
+  .ph-granat .ph-fala path { stroke: rgb(232 239 248 / .55); }
 
   /* ---------- tlo.css: sekcje ---------- */
   body[data-sekcje] .zsec > h2, body[data-sekcje] .zsec .zsec-head h2 { font-size: clamp(20px, 2.2vw, 23px); letter-spacing: -0.015em; }

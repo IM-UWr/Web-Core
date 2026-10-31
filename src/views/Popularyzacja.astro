@@ -3,7 +3,8 @@
 // (dla uczniów, nauczycieli…). Grupa bez kart pokazuje „To be announced”.
 // Dane: src/data/popularyzacja.json (edycja w Pages CMS, repozytorium Web-Popularyzacja).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian, poza paskiem
+// liczb w banerze (na razie „TBA”, niżej).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -51,7 +52,14 @@ const lead = w(d, 'wstep');
 const haslo = w(d, 'haslo');
 ---
 <Baza tytul={tytul} opis={lead || undefined} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]} />
+  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
+    {/* TYMCZASOWE (31.10.2026): pasek liczb jak w innych działach (telefon: pod hasłem, kreska, trzy kolumny), na razie
+         trzy „TBA” bez etykiet. Później trzy stałe fakty wpisywane w CMS (wartość + opis, jak ramka „W skrócie”).
+         Tylko telefon; komputer bez zmian. */}
+    <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+      {[1, 2, 3].map(() => <li><span class="n" lang={lang === 'pl' ? 'en' : undefined}>TBA</span></li>)}
+    </ul>
+  </NaglowekStrony>
   <div class="wrap layout">
     <div class="main">
       {linki.length > 0 && (

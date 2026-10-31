@@ -230,6 +230,16 @@ export const RODZAJE: Record<string, { pl: string; en: string }> = {
   termin: { pl: 'Termin', en: 'Deadline' },
 };
 
+// Nazwy rodzajów w filtrach listy aktualności (przyciski na komputerze, lista rozwijana na telefonie) — w liczbie mnogiej;
+// plakietki przy wpisach zostają w liczbie pojedynczej (RODZAJE) — decyzja 31.10.2026.
+export const RODZAJE_FILTRY: Record<string, { pl: string; en: string }> = {
+  ogloszenie: { pl: 'Ogłoszenia', en: 'Announcements' },
+  wydarzenie: { pl: 'Wydarzenia', en: 'Events' },
+  sukces: { pl: 'Sukcesy', en: 'Achievements' },
+  kariera: { pl: 'Kariera', en: 'Careers' },
+  obrona: { pl: 'Obrony', en: 'PhD defences' },
+};
+
 export const RODZAJE_GRANTOW: Record<string, { pl: string; en: string }> = {
   ncn: { pl: 'NCN', en: 'NCN' },
   ue: { pl: 'UE i międzynarodowe', en: 'EU and international' },

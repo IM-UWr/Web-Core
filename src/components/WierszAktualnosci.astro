@@ -2,6 +2,10 @@
 // Pozycja na liście aktualności.
 // Telefon (≤ 760 px) — wygląd „Portal”: zwarty wiersz — data (przed plakietkami) i plakietki w lewej kolumnie albo
 // (≤ 640 px) w jednym wierszu nad tytułem, z prawej mała miniatura; znaczniki te same co na komputerze.
+// Plakietki w jednej linijce (decyzja 31.10.2026): data i rodzaj zawsze widoczne, odbiorcy, którzy się nie mieszczą,
+// zwijają się od końca do jednej plakietki „+N” (liczy skrypt niżej dla rzeczywistej szerokości). Zwinięte plakietki są
+// schowane tylko wizualnie (czytnik ekranu dalej je czyta), „+N” jest aria-hidden. Bez JS — zawijanie jak dawniej.
+// Pełna lista odbiorców jest na stronie wpisu (Aktualnosc.astro, „dla: …”).
 import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, range, type Lang } from '../lib/daty';
@@ -13,9 +17,10 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
 ---
 <a class="row-item wa-row" href={href} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
   <span class="body">
-    <span class="news-meta wa-meta">
+    <span class="news-meta wa-meta" data-wa-meta>
       <span class={`badge badge-${p.rodzaj}`}>{RODZAJE[p.rodzaj]?.[lang]}</span>
-      {p.dla.map((d) => <span class="badge">{ODBIORCY[d]?.[lang]}</span>)}
+      {p.dla.map((d) => <span class="badge" data-wa-dla>{ODBIORCY[d]?.[lang]}</span>)}
+      {p.dla.length > 0 && <span class="badge wa-wiecej" data-wa-wiecej aria-hidden="true" hidden></span>}
       <time datetime={p.data}>{short(p.data)}</time>
     </span>
     <span class="t">{p.tytul}</span>
@@ -25,7 +30,102 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
   {p.zdjecie && <span class="thumb"><img src={u(p.zdjecie)} alt="" loading="lazy" /></span>}
 </a>
 
+<script>
+  // Plakietki odbiorców zwijane do „+N”, gdy wiersz plakietek się nie mieści (każda szerokość ekranu; tylko gdy
+  // plakietki stoją w wierszu — na telefonie 641–760 px są w kolumnie jedna pod drugą i nic się nie zwija).
+  // Pomiar w trzech krokach dla wszystkich widocznych wierszy naraz (zapis → odczyt → zapis), bez pętli układu:
+  // przy wczytaniu, po wczytaniu czcionek, po zmianie szerokości okna (z opóźnieniem) i po filtrowaniu listy
+  // (zdarzenie „wa-przelicz” z ListaAktualnosci.astro; wiersze schowane nie są mierzone).
+  const metas = Array.from(document.querySelectorAll<HTMLElement>('[data-wa-meta]'));
+
+  function przelicz() {
+    // 1. odczyt: które wiersze są widoczne i ułożone w wierszu
+    const doPomiaru: HTMLElement[] = [];
+    for (const m of metas) {
+      const wiecej = m.querySelector<HTMLElement>('[data-wa-wiecej]');
+      if (!wiecej || !m.getClientRects().length) continue;
+      if (getComputedStyle(m).flexDirection.startsWith('column')) {
+        m.classList.remove('wa-1linia');
+        m.querySelectorAll('.wa-zwiniete').forEach((b) => b.classList.remove('wa-zwiniete'));
+        wiecej.hidden = true;
+        continue;
+      }
+      doPomiaru.push(m);
+    }
+    // 2. zapis: wszystko w jednej linijce, wszyscy odbiorcy i „+N” (z największą liczbą) widoczni
+    for (const m of doPomiaru) {
+      const dla = m.querySelectorAll<HTMLElement>('[data-wa-dla]');
+      const wiecej = m.querySelector<HTMLElement>('[data-wa-wiecej]')!;
+      m.classList.add('wa-1linia');
+      dla.forEach((b) => b.classList.remove('wa-zwiniete'));
+      wiecej.textContent = `+${dla.length}`;
+      wiecej.hidden = false;
+    }
+    // 3. odczyt: szerokości (jeden przebieg układu dla wszystkich wierszy)
+    const wyniki = doPomiaru.map((m) => {
+      const cs = getComputedStyle(m);
+      const r = m.getBoundingClientRect();
+      const lewo = r.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft);
+      const miejsce = r.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight) - lewo;
+      const odstep = parseFloat(cs.columnGap) || 0;
+      let prawo = lewo;
+      for (const el of Array.from(m.children) as HTMLElement[]) {
+        if (!el.hidden) prawo = Math.max(prawo, el.getBoundingClientRect().right);
+      }
+      const szer = Array.from(m.querySelectorAll<HTMLElement>('[data-wa-dla]')).map((b) => b.getBoundingClientRect().width + odstep);
+      const plus = m.querySelector<HTMLElement>('[data-wa-wiecej]')!.getBoundingClientRect().width + odstep;
+      // długość linijki przy k zwiniętych odbiorcach (od końca); k = 0 — bez „+N”
+      let dl = prawo - lewo - plus;
+      let k = 0;
+      while (dl > miejsce + 0.5 && k < szer.length) {
+        dl -= szer[szer.length - 1 - k];
+        if (k === 0) dl += plus;
+        k++;
+      }
+      return { k, miesci: dl <= miejsce + 0.5 };
+    });
+    // 4. zapis: zwinięcie; gdy nawet bez odbiorców się nie mieści — zawijanie jak dawniej, nic nie zwinięte
+    doPomiaru.forEach((m, i) => {
+      const { k, miesci } = wyniki[i];
+      const dla = Array.from(m.querySelectorAll<HTMLElement>('[data-wa-dla]'));
+      const wiecej = m.querySelector<HTMLElement>('[data-wa-wiecej]')!;
+      const zwin = miesci ? k : 0;
+      m.classList.toggle('wa-1linia', miesci);
+      dla.forEach((b, j) => b.classList.toggle('wa-zwiniete', j >= dla.length - zwin));
+      wiecej.textContent = `+${zwin}`;
+      wiecej.hidden = zwin === 0;
+    });
+  }
+
+  if (metas.length) {
+    przelicz();
+    document.fonts?.ready.then(przelicz);
+    let szerokosc = window.innerWidth;
+    let czekaj = 0;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === szerokosc) return; // np. pasek adresu na telefonie zmienia tylko wysokość
+      szerokosc = window.innerWidth;
+      clearTimeout(czekaj);
+      czekaj = window.setTimeout(przelicz, 150);
+    });
+    let klatka = 0;
+    document.addEventListener('wa-przelicz', () => {
+      if (!klatka) klatka = requestAnimationFrame(() => { klatka = 0; przelicz(); });
+    });
+  }
+</script>
+
 <style>
+  /* plakietki w jednej linijce (klasę dodaje skrypt, gdy po zwinięciu odbiorców wszystko się mieści);
+     min-width: 0 — na telefonie (≤ 640 px) wiersz plakietek jest elementem siatki i bez tego rozpychałby ją do pełnej
+     długości linijki zamiast mieć szerokość wiersza (pomiar w skrypcie) */
+  .wa-meta { min-width: 0; }
+  .wa-meta.wa-1linia { flex-wrap: nowrap; }
+  .wa-meta.wa-1linia > * { flex-shrink: 0; white-space: nowrap; }
+  /* zwinięci odbiorcy: schowani tylko wizualnie (jak .sr-only), czytnik ekranu dalej ich czyta */
+  .wa-meta .badge.wa-zwiniete { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+  .wa-wiecej { font-variant-numeric: tabular-nums; }
   /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
   @media (max-width: 760px) {
     .wa-row { display: grid; grid-template-columns: 136px minmax(0, 1fr) auto; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 18px; row-gap: 0; align-items: start; }

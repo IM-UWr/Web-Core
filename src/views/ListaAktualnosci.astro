@@ -1,15 +1,17 @@
 ---
 // Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian.
+// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
+// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby z ostatniego miesiąca, filtry w jednym
+// wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
 import Ikona from '../components/Ikona.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
-import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
-import { monthYear, type Lang } from '../lib/daty';
+import { t, wJezyku, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
+import { monthYear, today, addDays, type Lang } from '../lib/daty';
 import { listaAktualnosci } from '../lib/tresci';
 
 interface Props { lang: Lang }
@@ -29,23 +31,69 @@ const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filt
 const lead = lang === 'en' ? 'Announcements, events and achievements of the Mathematical Institute.' : 'Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.';
 // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
 const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w Instytucie';
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+
+// Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta (jak w DzialNauka.astro).
+const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
+  if (lang === 'en') return n === 1 ? en[0] : en[1];
+  if (n === 1) return pl[0];
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
+};
+// Liczby w banerze — na razie tylko na telefonie, pod hasłem, jak w innych działach (decyzja 31.10.2026; komputer później):
+// wpisy danego rodzaju z datą publikacji w ostatnich 30 dniach (względem dnia budowania). Pozycje z zerem pomijamy.
+// Zwykłe liczby, nieklikalne (jak w Nauce i Instytucie).
+const dzis = today();
+const miesiacTemu = addDays(dzis, -30);
+const wMiesiacu = (r: string) => lista.filter((p) => p.rodzaj === r && p.data.slice(0, 10) >= miesiacTemu && p.data.slice(0, 10) <= dzis).length;
+const liczby = ([
+  ['ogloszenie', ['ogłoszenie', 'ogłoszenia', 'ogłoszeń'], ['announcement', 'announcements']],
+  ['wydarzenie', ['wydarzenie', 'wydarzenia', 'wydarzeń'], ['event', 'events']],
+  ['sukces', ['sukces', 'sukcesy', 'sukcesów'], ['achievement', 'achievements']],
+] as [string, [string, string, string], [string, string]][])
+  .map(([r, pl, en]) => { const n = wMiesiacu(r); return { r, n, l: `${odm(n, pl, en)} ${T('w ostatnim miesiącu', 'in the past month')}` }; })
+  .filter((x) => x.n > 0);
+// Filtr rodzaju: na komputerze przyciski, na telefonie lista rozwijana obok pola szukania (jeden wiersz; decyzja 31.10.2026).
+// Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts), podpowiedź w polu szukania na telefonie krótsza.
+const filtrEtykieta = T('Filtruj według rodzaju', 'Filter by type');
+const szukajDlugo = T('Szukaj w aktualnościach', 'Search news');
+const szukajKrotko = T('Szukaj', 'Search');
+// Podpowiedź na telefonie ustawiana od razu za polem (zanim strona się narysuje, więc bez mignięcia); przy zmianie
+// szerokości okna przez 760 px przełącza ją skrypt na dole.
+const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(max-width: 760px)').matches)i.placeholder=${JSON.stringify(szukajKrotko)};}catch(e){}})(document.currentScript.previousElementSibling)`;
 ---
 <Baza tytul={t(lang, 'aktualnosci')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]} />
+  <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
 
   <div class="wrap layout">
     <div class="main" data-lista>
       {/* Rodzaje wpisów i wyszukiwarka w lewej kolumnie, nad listą (wyszukiwarka zaraz za przyciskami; bez wydarzeń kolumna jest szersza). */}
       <div class="filters filters-lewo">
-        <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter by type' : 'Filtruj według rodzaju'}>
+        <div class="chips tylko-komputer" role="group" aria-label={filtrEtykieta}>
           <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
-          {rodzaje.map((r) => <button type="button" class="chip" aria-pressed="false" data-rodzaj={r}>{RODZAJE[r][lang]}</button>)}
+          {rodzaje.map((r) => <button type="button" class="chip" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        {/* telefon: te same rodzaje jako lista rozwijana (wspólny stan z przyciskami w skrypcie niżej) */}
+        <label class="la-rodzaj tylko-telefon" data-pagefind-ignore>
+          <span class="sr-only">{filtrEtykieta}</span>
+          <select data-rodzaj-lista autocomplete="off">
+            <option value="">{t(lang, 'wszystkie')}</option>
+            {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
+          </select>
+          <Ikona nazwa="dol" rozmiar={18} />
+        </label>
+        <div class="la-szukaj" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
           <label class="search">
             <Ikona nazwa="szukaj" rozmiar={18} />
-            <span class="sr-only">{lang === 'en' ? 'Search news' : 'Szukaj w aktualnościach'}</span>
-            <input type="search" data-szukaj placeholder={lang === 'en' ? 'Search news' : 'Szukaj w aktualnościach'} />
+            <span class="sr-only">{szukajDlugo}</span>
+            <input type="search" data-szukaj placeholder={szukajDlugo} data-podp-komputer={szukajDlugo} data-podp-telefon={szukajKrotko} />
+            <script is:inline set:html={podpowiedzTel} />
           </label>
         </div>
       </div>
@@ -77,10 +125,12 @@ const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w In
   const pusto = document.querySelector<HTMLElement>('[data-pusto]');
   const szukaj = document.querySelector<HTMLInputElement>('[data-szukaj]');
   const rodzajBtn = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
+  const rodzajLista = document.querySelector<HTMLSelectElement>('[data-rodzaj-lista]');
   const dlaInfo = document.querySelector<HTMLElement>('[data-dla-info]');
   let rodzaj = '';
   let dla = '';
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
+  const znanyRodzaj = (r: string) => rodzajBtn.some((b) => (b.dataset.rodzaj ?? '') === r);
 
   function filtruj() {
     const q = norm(szukaj?.value.trim() ?? '');
@@ -92,12 +142,19 @@ const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w In
     }
     for (const g of grupy) g.hidden = !g.querySelector('.row-item:not([hidden])');
     if (pusto) pusto.hidden = ile > 0;
+    // plakietki odbiorców zwinięte do „+N” (WierszAktualnosci.astro) liczą się tylko w widocznych wierszach — przelicz
+    document.dispatchEvent(new Event('wa-przelicz'));
   }
-  rodzajBtn.forEach((b) => b.addEventListener('click', () => {
-    rodzaj = b.dataset.rodzaj ?? '';
-    rodzajBtn.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+  // Rodzaj: wspólny stan przycisków (komputer) i listy rozwijanej (telefon). Oba elementy są zawsze w dokumencie
+  // (jeden schowany przez CSS), więc przejście przez 760 px (obrót telefonu, zmiana okna) nie gubi filtra.
+  function ustawRodzaj(r: string) {
+    rodzaj = znanyRodzaj(r) ? r : '';
+    rodzajBtn.forEach((o) => o.setAttribute('aria-pressed', String((o.dataset.rodzaj ?? '') === rodzaj)));
+    if (rodzajLista) rodzajLista.value = rodzaj;
     filtruj();
-  }));
+  }
+  rodzajBtn.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
+  rodzajLista?.addEventListener('change', () => ustawRodzaj(rodzajLista?.value ?? ''));
   // ?dla=… z linku (np. „Aktualności dla studentów”): zawężenie z informacją i przyciskiem „Pokaż wszystkie”
   const ustawDla = (d: string) => {
     const znane = !!d && !!dlaInfo?.querySelector(`[data-dla-etykieta="${CSS.escape(d)}"]`);
@@ -115,17 +172,43 @@ const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w In
     history.replaceState(history.state, '', url);
   });
   szukaj?.addEventListener('input', filtruj);
+  // Podpowiedź w polu szukania: na telefonie krótka („Szukaj”), na komputerze pełna. Przy wczytaniu ustawia ją
+  // skrypt wpisany zaraz za polem; tu — przy zmianie szerokości okna przez 760 px.
+  const naTelefonie = window.matchMedia('(max-width: 760px)');
+  const podpowiedz = () => {
+    if (!szukaj) return;
+    const tekst = naTelefonie.matches ? szukaj.dataset.podpTelefon : szukaj.dataset.podpKomputer;
+    if (tekst) szukaj.placeholder = tekst;
+  };
+  naTelefonie.addEventListener('change', podpowiedz);
   if (lista) {
     const p = new URLSearchParams(location.search);
     const d = p.get('dla');
     if (d) ustawDla(d);
     const r = p.get('rodzaj');
-    if (r) rodzajBtn.find((b) => b.dataset.rodzaj === r)?.click();
+    // lista rozwijana zawsze zgodna ze stanem (także gdy przeglądarka przywróciła jej wartość po powrocie na stronę)
+    ustawRodzaj(r && znanyRodzaj(r) ? r : '');
   }
 </script>
 
 <style>
   .la-archiwum { margin-top: 28px; }
+  /* ---------- telefon (≤ 760 px): filtry w jednym wierszu (decyzja 31.10.2026) ----------
+     Z lewej lista rozwijana rodzajów (ok. 42% szerokości; szersza, gdy najdłuższa nazwa się nie mieści — np. „Announcements”
+     po angielsku albo „Wydarzenia” przy 360 px), z prawej pole szukania z krótką podpowiedzią; obie 44 px wysokości,
+     zaokrąglone jak pole szukania. Czcionka listy 16 px — mniejsza powoduje powiększanie strony na iPhonie.
+     Przyciski rodzajów (.chips) mają .tylko-komputer. Strzałka listy to ikona „dol”. */
+  @media (max-width: 760px) {
+    .filters.filters-lewo { flex-wrap: nowrap; gap: 8px; }
+    .la-rodzaj { position: relative; display: flex; flex: 0 0 auto; min-width: 42%; max-width: 60%; color: var(--muted); }
+    .la-rodzaj select { appearance: none; -webkit-appearance: none; flex: 1 1 auto; width: auto; min-width: 0; height: 44px; margin: 0; padding: 0 34px 0 15px;
+      border: 1.5px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink);
+      font: inherit; font-size: 16px; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+    .la-rodzaj select:focus-visible { border-color: var(--ink); }
+    .la-rodzaj :global(.ico) { position: absolute; top: 50%; right: 12px; translate: 0 -50%; pointer-events: none; }
+    .la-szukaj { flex: 1 1 0; min-width: 0; }
+    .la-szukaj .search { flex: 1 1 auto; min-width: 0; height: 44px; }
+  }
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
      Odstęp listy od banera stały (24 px), jak na stronach działów; mniej miejsca nad odnośnikiem do archiwum. */
   @media (min-width: 761px) {
