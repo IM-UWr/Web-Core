@@ -276,3 +276,9 @@ export function wybierz<T extends Record<string, any>>(obj: T, pole: string, lan
   if (lang === 'en' && obj[pole + '_en']) return obj[pole + '_en'];
   return obj[pole] ?? '';
 }
+
+// Polska typografia (decyzja 31.10.2026): po jednoliterowych wyrazach (a, i, o, u, w, z) twarda spacja, żeby nie
+// zostawały na końcu linijki — np. etykiety liczb w banerach działów: „w ostatnim miesiącu”, „zakłady i pracownie”.
+export function bezSierotek(s: string): string {
+  return s.replace(/(?<=^|[\s\u00a0(„"])([aiouwzAIOUWZ]) +/g, '$1\u00a0');
+}

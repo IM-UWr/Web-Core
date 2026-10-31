@@ -1,0 +1,145 @@
+---
+// „W tym dziale” — grupy i linki z menu działu (strony działów „Instytut”, „Nauka”, „Studia”: DzialInstytut.astro,
+// DzialNauka.astro, DzialStudia.astro; nowy link w menu sam pojawi się tutaj). Jeden komponent zamiast trzech kopii
+// markupu i stylów (decyzja 31.10.2026).
+// Komputer (≥ 761 px): kafelki w kolumnach, bez zwijania (wariant „Zwarta”, jak dotąd).
+// Telefon (≤ 760 px; decyzja 31.10.2026): akordeon — każda grupa to jeden wiersz-przycisk (nazwa, z prawej liczba
+// stron i strzałka ⌄), po dotknięciu rozwija się lista linków (wygląd jak dotąd); otwarcie jednej grupy zwija pozostałe,
+// domyślnie wszystkie zwinięte. Nagłówek grupy zostaje nagłówkiem (h3) z przyciskiem w środku (aria-expanded,
+// aria-controls); zwinięta lista ma display: none (niewidoczna także dla czytnika ekranu).
+// Bez JS (brak klasy .js na <html>, ustawianej w Baza.astro przed narysowaniem strony): przycisków nie ma, wszystkie
+// grupy rozwinięte jak dotąd. Zwijanie robi sam CSS (tylko w @media (max-width: 760px)), więc po zmianie szerokości
+// okna na komputerową widać zwykłe kafelki, a po powrocie — akordeon w tym samym stanie; skrypt przełącza tylko stan.
+import Ikona from './Ikona.astro';
+import { u, isExternal } from '../lib/url';
+import { wJezyku, wybierz } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import type { Grupa } from '../lib/menu';
+
+interface Props { grupy: Grupa[]; lang: Lang }
+const { grupy, lang } = Astro.props;
+const en = lang === 'en';
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+// Liczba stron w grupie: 1 strona, 2–4 strony (bez 12–14), 5+ stron; po angielsku 1 page / N pages.
+const ileStron = (n: number) => {
+  if (en) return `${n} ${n === 1 ? 'page' : 'pages'}`;
+  if (n === 1) return '1 strona';
+  const j = n % 10, d = n % 100;
+  return `${n} ${j >= 2 && j <= 4 && (d < 12 || d > 14) ? 'strony' : 'stron'}`;
+};
+---
+{grupy.length > 0 && (
+  <section class="zsec dz-pierwsza" aria-labelledby="w-dziale" data-akordeon>
+    <h2 id="w-dziale">{en ? 'In this section' : 'W tym dziale'}</h2>
+    <div class="dz-groups">
+      {grupy.map((g, i) => (
+        <div class="dz-g">
+          {/* .dz-g-nazwa — komputer i telefon bez JS; .dz-g-btn — telefon z JS (pomijany przez wyszukiwarkę: ta sama nazwa) */}
+          <h3><span class="dz-g-nazwa">{wybierz(g, 'nazwa', lang)}</span><button type="button" class="dz-g-btn" aria-expanded="false" aria-controls={`w-dziale-${i + 1}`} data-akordeon-przycisk data-pagefind-ignore><span class="dz-g-t">{wybierz(g, 'nazwa', lang)}</span><span class="dz-g-ile">{ileStron(g.linki.length)}</span><Ikona nazwa="dol" rozmiar={16} /></button></h3>
+          <div class="tiles dz-tiles" id={`w-dziale-${i + 1}`}>
+            {g.linki.map((l) => (
+              <a class="tile dz-tile" href={href(l.adres)}>
+                <span>{wybierz(l, 'etykieta', lang)}</span>
+                <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={20} />
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  /* „W tym dziale” zaraz pod banerem — bez kreski sekcji nad nagłówkiem (komputer i telefon; jak „Najbliższe seminaria”
+     w ListaSeminariow.astro): tytuł zaczyna się w odstępie .dz-wrap od banera */
+  .zsec.dz-pierwsza { border-top: 0; padding-top: 0; }
+  .zsec.dz-pierwsza::before, .zsec.dz-pierwsza > h2::before { display: none; }
+  .dz-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px 16px; }
+  .dz-g h3 { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
+  .dz-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
+  /* przycisk grupy — tylko telefon z JS (niżej) */
+  .dz-g-btn { display: none; }
+
+  /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki ---------- */
+  @media (min-width: 761px) {
+    .dz-groups { gap: 12px 16px; }
+    .dz-g h3 { margin: 0 0 6px; }
+    .dz-tiles { gap: 6px; }
+    .dz-tile { display: flex; min-height: 42px; padding-block: 6px; }
+  }
+
+  /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
+  @media (max-width: 760px) {
+    /* Bez JS (jak dotąd): jedna ramka, grupy oddzielone małymi szarymi podtytułami, linki jako wiersze */
+    .dz-groups { display: block; padding: 2px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+    .dz-g + .dz-g { margin-top: 6px; }
+    .dz-g h3 { margin: 12px 0 2px; }
+    .dz-tiles { display: block; }
+    .dz-tile { gap: 10px; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.3; }
+    .dz-tile + .dz-tile { min-height: 41px; border-top: 1px solid var(--line); }
+    .dz-tile:hover { background: var(--tint); }
+    .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
+    :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
+
+    /* Z JS — akordeon (decyzja 31.10.2026; wzór: makieta „B: rozwijane grupy”): wiersze-przyciski w tej samej ramce,
+       oddzielone cienkimi kreskami; nazwa 17 px / 700 w kolorze --ink, z prawej liczba stron (14 px, --muted) i strzałka.
+       Zwinięta lista — display: none; otwarta grupa ma klasę .dz-otwarta (i aria-expanded="true" na przycisku). */
+    :global(.js) .dz-groups { padding: 2px 14px; }
+    :global(.js) .dz-g + .dz-g { margin-top: 0; border-top: 1px solid var(--line); }
+    :global(.js) .dz-g h3 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
+    :global(.js) .dz-g-nazwa { display: none; }
+    :global(.js) .dz-g-btn { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; margin: 0; padding: 15px 2px;
+      border: 0; border-radius: 0; background: transparent; color: var(--ink); font: inherit; line-height: 1.25; text-align: left; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; }
+    /* zamiast niebieskiego podświetlenia dotyku przeglądarki — tło jak przy najechaniu na link (w obu motywach) */
+    :global(.js) .dz-g-btn:active { background: var(--tint); }
+    :global(.js) .dz-g-btn:focus-visible { border-radius: 4px; }
+    .dz-g-t { flex: 1 1 auto; min-width: 0; }
+    .dz-g-ile { flex: none; font-size: 14px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .dz-g-btn :global(svg) { flex: none; width: 16px; height: 16px; stroke-width: 2.4; color: var(--ink); transition: transform .2s ease; }
+    .dz-g-btn[aria-expanded='true'] :global(svg) { transform: rotate(180deg); }
+    :global(.js) .dz-g:not(.dz-otwarta) .dz-tiles { display: none; }
+    /* otwarta lista: wiersze jak dotąd, pod ostatnim trochę miejsca przed kreską następnej grupy */
+    :global(.js) .dz-otwarta .dz-tiles { padding-bottom: 6px; }
+  }
+  @media (max-width: 760px) and (hover: hover) {
+    :global(.js) .dz-g-btn:hover { background: var(--tint); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dz-g-btn :global(svg) { transition: none; }
+  }
+</style>
+
+<script>
+  // „W tym dziale” na telefonie — akordeon (decyzja 31.10.2026): dotknięcie grupy rozwija jej listę i zwija pozostałe
+  // (naraz otwarta najwyżej jedna), drugie dotknięcie zwija. Zwijanie i rozwijanie robi CSS (tylko ≤ 760 px), więc na
+  // komputerze stan nie ma znaczenia. Dotknięty wiersz zostaje w tym samym miejscu ekranu, gdy zwija się grupa nad nim.
+  // Rozwijanie łagodne (200 ms); przy „ogranicz ruch” bez animacji.
+  const ograniczRuch = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-akordeon]').forEach((sekcja) => {
+    const przyciski = Array.from(sekcja.querySelectorAll<HTMLButtonElement>('[data-akordeon-przycisk]'));
+    const ustaw = (b: HTMLButtonElement, otwarta: boolean) => {
+      b.setAttribute('aria-expanded', String(otwarta));
+      b.closest('.dz-g')?.classList.toggle('dz-otwarta', otwarta);
+    };
+    przyciski.forEach((b) => b.addEventListener('click', () => {
+      const otworz = b.getAttribute('aria-expanded') !== 'true';
+      const przed = b.getBoundingClientRect().top;
+      przyciski.forEach((inny) => { if (inny !== b) ustaw(inny, false); });
+      ustaw(b, otworz);
+      const roznica = b.getBoundingClientRect().top - przed;
+      if (Math.abs(roznica) >= 1) window.scrollBy({ top: roznica, behavior: 'instant' as ScrollBehavior });
+      const lista = document.getElementById(b.getAttribute('aria-controls') || '');
+      if (!otworz || !lista || ograniczRuch.matches || typeof lista.animate !== 'function') return;
+      const wys = lista.offsetHeight;
+      if (!wys) return;
+      lista.style.overflow = 'hidden';
+      const anim = lista.animate([{ height: '0px', opacity: 0 }, { height: `${wys}px`, opacity: 1 }], { duration: 200, easing: 'ease-out' });
+      const koniec = () => { lista.style.overflow = ''; };
+      anim.onfinish = koniec;
+      anim.oncancel = koniec;
+    }));
+  });
+</script>

@@ -119,11 +119,13 @@ a.pt-card:hover, .pt-card.pt-link:hover, .pt-card.pt-link:focus-within { border-
 /* Telefon (≤ 760 px): liczby obok siebie w kolumnach (tyle kolumn, ile liczb; w działach po 3), etykieta pod liczbą,
    nad nimi cienka kreska (decyzja 31.10.2026). Na telefonie widać je tylko na stronach działów (Instytut, Nauka,
    Studia; Aktualności i Popularyzacja — lista z .tylko-telefon, na komputerze bez liczb); na pozostałych podstronach
-   lista ma .tylko-komputer. */
+   lista ma .tylko-komputer.
+   Etykiety łamią się równo (text-wrap: balance — np. „wydarzenia / w ostatnim miesiącu” zamiast „wydarzenia w ostatnim /
+   miesiącu”), najwyżej w dwóch linijkach; jednoliterowe wyrazy z twardą spacją (bezSierotek w i18n.ts; decyzja 31.10.2026). */
 @media (max-width: 760px) {
   .pt-liczby { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0 12px; max-width: none;
     margin-top: 2px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
-  .pt-liczby li { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; font-size: 12.5px; line-height: 1.25; }
+  .pt-liczby li { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; font-size: 12.5px; line-height: 1.25; text-wrap: balance; }
   .pt-liczby .n { font-size: 22px; }
 }
 

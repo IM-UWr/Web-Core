@@ -2,17 +2,17 @@
 // Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
-// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby z ostatniego miesiąca, filtry w jednym
-// wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią.
+// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby z ostatniego miesiąca (ogłoszenia, wydarzenia,
+// seminaria), filtry w jednym wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
 import Ikona from '../components/Ikona.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
-import { t, wJezyku, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
+import { t, wJezyku, RODZAJE_FILTRY, ODBIORCY, bezSierotek } from '../lib/i18n';
 import { monthYear, today, addDays, type Lang } from '../lib/daty';
-import { listaAktualnosci } from '../lib/tresci';
+import { listaAktualnosci, referaty, seminaria, seminariumReferatu } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -43,15 +43,21 @@ const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
 // Liczby w banerze — na razie tylko na telefonie, pod hasłem, jak w innych działach (decyzja 31.10.2026; komputer później):
 // wpisy danego rodzaju z datą publikacji w ostatnich 30 dniach (względem dnia budowania). Pozycje z zerem pomijamy.
 // Zwykłe liczby, nieklikalne (jak w Nauce i Instytucie).
+// Trzecia liczba to seminaria zamiast sukcesów (decyzja 31.10.2026: sukcesy zdarzają się rzadko, w miesiącu bywa zero):
+// referaty opublikowanych seminariów z terminem w tych samych 30 dniach, do dnia budowania włącznie (jak w kalendarzu:
+// referaty z src/lib/tresci.ts, seminarium referatu — pole „Seminarium” albo folder).
 const dzis = today();
 const miesiacTemu = addDays(dzis, -30);
-const wMiesiacu = (r: string) => lista.filter((p) => p.rodzaj === r && p.data.slice(0, 10) >= miesiacTemu && p.data.slice(0, 10) <= dzis).length;
+const wOknie = (d: string) => d.slice(0, 10) >= miesiacTemu && d.slice(0, 10) <= dzis;
+const wMiesiacu = (r: string) => lista.filter((p) => p.rodzaj === r && wOknie(p.data)).length;
+const idSeminariow = new Set((await seminaria()).map((s) => s.id));
+const referatyWMiesiacu = (await referaty()).filter((r) => idSeminariow.has(seminariumReferatu(r)) && wOknie(r.data.termin)).length;
 const liczby = ([
-  ['ogloszenie', ['ogłoszenie', 'ogłoszenia', 'ogłoszeń'], ['announcement', 'announcements']],
-  ['wydarzenie', ['wydarzenie', 'wydarzenia', 'wydarzeń'], ['event', 'events']],
-  ['sukces', ['sukces', 'sukcesy', 'sukcesów'], ['achievement', 'achievements']],
-] as [string, [string, string, string], [string, string]][])
-  .map(([r, pl, en]) => { const n = wMiesiacu(r); return { r, n, l: `${odm(n, pl, en)} ${T('w ostatnim miesiącu', 'in the past month')}` }; })
+  [wMiesiacu('ogloszenie'), ['ogłoszenie', 'ogłoszenia', 'ogłoszeń'], ['announcement', 'announcements']],
+  [wMiesiacu('wydarzenie'), ['wydarzenie', 'wydarzenia', 'wydarzeń'], ['event', 'events']],
+  [referatyWMiesiacu, ['seminarium', 'seminaria', 'seminariów'], ['seminar', 'seminars']],
+] as [number, [string, string, string], [string, string]][])
+  .map(([n, pl, en]) => ({ n, l: `${odm(n, pl, en)} ${T('w ostatnim miesiącu', 'in the past month')}` }))
   .filter((x) => x.n > 0);
 // Filtr rodzaju: na komputerze przyciski, na telefonie lista rozwijana obok pola szukania (jeden wiersz; decyzja 31.10.2026).
 // Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts), podpowiedź w polu szukania na telefonie krótsza.
@@ -66,7 +72,7 @@ const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(ma
   <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
-        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
       </ul>
     )}
   </NaglowekStrony>
