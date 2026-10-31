@@ -1,0 +1,1 @@
+import{n as c,t as n,h as i}from"./daty.uoFrWalC.js";const t=document.querySelector("[data-wydarzenia]");if(t){const o=c(),r=n();Array.from(t.querySelectorAll("[data-koniec]")).forEach(a=>{const e=a.dataset.koniec||"";e&&(i(e)?e<o:e<r)&&a.remove()}),t.querySelector("[data-koniec]")||t.querySelector("[data-wydarzenia-pusto]")?.removeAttribute("hidden")}

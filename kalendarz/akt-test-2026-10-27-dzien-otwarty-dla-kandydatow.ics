@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Instytut Matematyczny UWr//Strona IM//PL
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Testowe: Dzień otwarty matematyki dla kandydatów
+X-WR-TIMEZONE:Europe/Warsaw
+REFRESH-INTERVAL;VALUE=DURATION:PT6H
+X-PUBLISHED-TTL:PT6H
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:akt-test-2026-10-27-dzien-otwarty-dla-kandydatow@im-uwr.github.io
+DTSTAMP:20261031T135443Z
+DTSTART;TZID=Europe/Warsaw:20261128T100000
+DTEND;TZID=Europe/Warsaw:20261128T140000
+SUMMARY:Testowe: Dzień otwarty matematyki dla kandydatów
+LOCATION:Instytut Matematyczny UWr\, pl. Grunwaldzki 2
+DESCRIPTION:Mini-wykłady\, rozmowy ze studentami i kołami naukowymi oraz 
+ wszystko o rekrutacji na matematykę. Sobota\, 28 listopada\, 10:00–14:0
+ 0.\nhttps://im-uwr.github.io/Web-Core/aktualnosci/test-2026-10-27-dzien-ot
+ warty-dla-kandydatow
+URL:https://im-uwr.github.io/Web-Core/aktualnosci/test-2026-10-27-dzien-otw
+ arty-dla-kandydatow
+END:VEVENT
+END:VCALENDAR
