@@ -17,7 +17,7 @@ import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE } from '../lib/i18n';
 import { short, type Lang } from '../lib/daty';
 import { listaKierunkow, menuGlowne } from '../lib/menu';
-import { listaAktualnosci, pracownicy } from '../lib/tresci';
+import { listaAktualnosci } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -42,12 +42,12 @@ const specjalnosci = (await getCollection('specjalnosci')).filter(
 );
 const wszystkieStopnie = [...new Set(kierunki.flatMap((k) => [...stopnie(k)]))].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
 const nKierunkow = kierunki.filter((k) => !doktorat(k)).length;
-const nNauczycieli = (await pracownicy()).filter((o) => o.data.grupa === 'nauczyciel').length;
+// Liczby w banerze: kierunki, specjalności, stopnie studiów. Bez liczby nauczycieli akademickich — jest na stronie
+// „Instytut” (decyzja 31.10.2026: bez powtórzeń między działami).
 const liczby = [
   { n: nKierunkow, l: T(odm(nKierunkow, 'kierunek studiów', 'kierunki studiów', 'kierunków studiów'), nKierunkow === 1 ? 'degree programme' : 'degree programmes') },
   { n: specjalnosci.length, l: T(odm(specjalnosci.length, 'specjalność do wyboru', 'specjalności do wyboru', 'specjalności do wyboru'), specjalnosci.length === 1 ? 'specialisation' : 'specialisations') },
   { n: wszystkieStopnie.length, l: `${T(odm(wszystkieStopnie.length, 'stopień studiów', 'stopnie studiów', 'stopni studiów'), wszystkieStopnie.length === 1 ? 'level of study' : 'levels of study')} (${wszystkieStopnie.join(', ')})` },
-  { n: nNauczycieli, l: T(odm(nNauczycieli, 'nauczyciel akademicki', 'nauczycieli akademickich', 'nauczycieli akademickich'), nNauczycieli === 1 ? 'academic teacher' : 'academic teachers') },
 ].filter((x) => x.n > 0);
 
 // Kafelki: grupy i linki z menu „Studia” (kierunki wstawiane automatycznie; nowy link w menu sam pojawi się tutaj).
