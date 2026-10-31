@@ -230,15 +230,25 @@ export const RODZAJE: Record<string, { pl: string; en: string }> = {
   termin: { pl: 'Termin', en: 'Deadline' },
 };
 
-// Nazwy rodzajów w filtrach listy aktualności (przyciski na komputerze, lista rozwijana na telefonie) — w liczbie mnogiej;
-// plakietki przy wpisach zostają w liczbie pojedynczej (RODZAJE) — decyzja 31.10.2026.
+// Nazwy rodzajów w filtrach list (Aktualności: przyciski na komputerze, lista rozwijana na telefonie; Kalendarz: lista
+// rozwijana na telefonie) — w liczbie mnogiej; plakietki przy wpisach zostają w liczbie pojedynczej (RODZAJE) — decyzja 31.10.2026.
 export const RODZAJE_FILTRY: Record<string, { pl: string; en: string }> = {
   ogloszenie: { pl: 'Ogłoszenia', en: 'Announcements' },
   wydarzenie: { pl: 'Wydarzenia', en: 'Events' },
   sukces: { pl: 'Sukcesy', en: 'Achievements' },
   kariera: { pl: 'Kariera', en: 'Careers' },
   obrona: { pl: 'Obrony', en: 'PhD defences' },
+  referat: { pl: 'Seminaria', en: 'Seminars' },
+  konferencja: { pl: 'Konferencje', en: 'Conferences' },
 };
+
+// Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta — np. liczby w banerach (LiczbyBanera.astro).
+export function odmiana(n: number, pl: [string, string, string], en: [string, string], lang: Lang): string {
+  if (lang === 'en') return n === 1 ? en[0] : en[1];
+  if (n === 1) return pl[0];
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
+}
 
 export const RODZAJE_GRANTOW: Record<string, { pl: string; en: string }> = {
   ncn: { pl: 'NCN', en: 'NCN' },
@@ -253,6 +263,12 @@ export const ODBIORCY: Record<string, { pl: string; en: string }> = {
   pracownicy: { pl: 'Pracownicy', en: 'Staff' },
   kandydaci: { pl: 'Kandydaci', en: 'Prospective students' },
 };
+
+// Nazwa odbiorców małymi literami w zwykłym tekście („studenci, doktoranci”; decyzja 31.10.2026): wyrazy zaczynające się
+// wielką literą zmniejszone, skróty z wielkimi literami w środku zostają („PhD students”, nie „phd students”).
+export function odbiorcyMalymi(d: string, lang: Lang): string {
+  return (ODBIORCY[d]?.[lang] ?? d).split(' ').map((w) => (/^\p{Lu}\p{Ll}*$/u.test(w) ? w.toLowerCase() : w)).join(' ');
+}
 
 // Wersja angielska ma te same adresy z przedrostkiem /en (np. /en/aktualnosci).
 export function jezykZeSciezki(pathname: string): Lang {

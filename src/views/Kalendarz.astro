@@ -2,20 +2,27 @@
 // Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta jak w „Zwarta” (uklad="zwarta portal-baner"),
 // miesiące jako sekcje z kreską jak na stronach działów, pozycje jako osobne białe karty (.karty-lista w global.css). Filtry rodzaju w banerze;
-// pod banerem przyciski widoku „Nadchodzące” / „Archiwum”. Telefon (≤ 760 px): poza przyciskami widoku bez zmian.
+// pod banerem przyciski widoku „Nadchodzące” / „Archiwum”.
+// Telefon (≤ 760 px; decyzja 31.10.2026 — jeden styl z Aktualnościami): w banerze tytuł, bursztynowe hasło zamiast opisu
+// i trzy liczby z najbliższych 30 dni (LiczbyBanera); przyciski rodzajów z banera schowane (.tylko-komputer), pod banerem
+// wiersz filtrów jak w Aktualnościach — lista rozwijana rodzajów i pole szukania (FiltrISzukaj, tylko telefon), pod nim
+// zwarty przełącznik „Nadchodzące | Archiwum” (te same przyciski widoku, inny wygląd). Stan filtrów wspólny dla przycisków
+// komputera i listy rozwijanej (skrypt niżej), więc przejście przez 760 px go nie gubi; etykiety — EtykietaRodzaju (B1).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
-import Ikona from '../components/Ikona.astro';
+import FiltrISzukaj from '../components/FiltrISzukaj.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import EtykietaRodzaju from '../components/EtykietaRodzaju.astro';
 import TytulZewn from '../components/TytulZewn.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
-import { u, absolute, isExternal } from '../lib/url';
+import { u, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE } from '../lib/i18n';
-import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
-import { wszystkieWydarzenia, trwaLubBedzie, seminaria } from '../lib/tresci';
-import { adresIcs } from '../lib/kalendarz';
+import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, today, addDays, type Lang } from '../lib/daty';
+import { wszystkieWydarzenia, trwaLubBedzie } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 // Dwa widoki: „Nadchodzące” (trwające i przyszłe, od najbliższego) i „Archiwum” (cała historia, od najnowszego).
 const wszystkie = await wszystkieWydarzenia(lang);
 type W = (typeof wszystkie)[number];
@@ -33,23 +40,37 @@ const poMiesiacach = (lista: W[]) => {
   return grupy;
 };
 const widoki = [
-  { id: 'nadchodzace', etykieta: lang === 'en' ? 'Upcoming' : 'Nadchodzące', grupy: poMiesiacach(wszystkie.filter(trwaLubBedzie)), pusty: t(lang, 'brakWydarzen') },
-  { id: 'archiwum', etykieta: lang === 'en' ? 'Archive' : 'Archiwum', grupy: poMiesiacach(wszystkie.filter((w) => !trwaLubBedzie(w)).reverse()), pusty: lang === 'en' ? 'No past events.' : 'Brak minionych wydarzeń.' },
+  { id: 'nadchodzace', etykieta: T('Nadchodzące', 'Upcoming'), grupy: poMiesiacach(wszystkie.filter(trwaLubBedzie)), pusty: t(lang, 'brakWydarzen') },
+  { id: 'archiwum', etykieta: T('Archiwum', 'Archive'), grupy: poMiesiacach(wszystkie.filter((w) => !trwaLubBedzie(w)).reverse()), pusty: T('Brak minionych wydarzeń.', 'No past events.') },
 ];
-const sem = (await seminaria()).filter((s) => s.data.aktywne);
-const kanaly = [
-  { nazwa: t(lang, 'wszystkieWydarzeniaKal'), plik: 'wszystko' },
-  { nazwa: t(lang, 'tylkoWydarzenia'), plik: 'wydarzenia' },
-  ...sem.map((s) => ({ nazwa: `${RODZAJE.referat[lang]}: ${(lang === 'en' && s.data.nazwa_en) || s.data.nazwa}`, plik: `seminarium-${s.id}` })),
-];
-const webcal = (plik: string) => absolute(adresIcs(plik), Astro.site).replace(/^https?:/, 'webcal:');
 const lead = lang === 'en'
   ? 'Events, PhD defences, conferences and seminar talks at the Mathematical Institute — upcoming and past.'
   : 'Wydarzenia, obrony doktorskie, konferencje i referaty seminaryjne w Instytucie Matematycznym — nadchodzące i archiwalne.';
+// Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
+const haslo = T('Co, gdzie i kiedy', 'What, where and when');
+
+// Liczby w banerze (telefon; decyzja 31.10.2026): pozycje z najbliższych 30 dni od dnia budowania — te, które są
+// w „Nadchodzących” (trwają albo dopiero będą) i zaczynają się najpóźniej 30 dni po dniu budowania. Seminaria = referaty
+// seminariów, wydarzenia = wpisy z polem „Wydarzenie: początek”, obrony doktorskie. Konferencje nie są liczone.
+// Etykieta okresu „w ciągu 30 dni” — mieści się w dwóch linijkach przy 360 i 390 px (sprawdzone pomiarem).
+const za30 = addDays(today(), 30);
+const w30 = (r: W['rodzaj']) => wszystkie.filter((w) => w.rodzaj === r && trwaLubBedzie(w) && w.poczatek.slice(0, 10) <= za30).length;
+const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+  { n: w30('referat'), pl: ['seminarium', 'seminaria', 'seminariów'], en: ['seminar', 'seminars'] },
+  { n: w30('wydarzenie'), pl: ['wydarzenie', 'wydarzenia', 'wydarzeń'], en: ['event', 'events'] },
+  { n: w30('obrona'), pl: ['obrona', 'obrony', 'obron'], en: ['defence', 'defences'] },
+];
+// Filtry na telefonie: lista rozwijana (kolejność jak w decyzji: Seminaria, Wydarzenia, Obrony, Konferencje) i szukanie
+// po tekście pozycji — jak w Aktualnościach. Na komputerze przyciski w banerze, bez pola szukania (bez zmian).
+const rodzajeListy = ['referat', 'wydarzenie', 'obrona', 'konferencja'];
+const filtrEtykieta = T('Filtruj według rodzaju', 'Filter by type');
+const szukajDlugo = T('Szukaj w kalendarzu', 'Search calendar');
+const szukajKrotko = T('Szukaj', 'Search');
 ---
 <Baza tytul={t(lang, 'kalendarz')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <div class="filters">
+  <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
+    <LiczbyBanera lang={lang} okres={T('w ciągu 30 dni', 'in the next 30 days')} pozycje={liczby} />
+    <div class="filters tylko-komputer">
       <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
         <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
         <button type="button" class="chip" aria-pressed="false" data-rodzaj="wydarzenie">{RODZAJE.wydarzenie[lang]}</button>
@@ -62,7 +83,11 @@ const lead = lang === 'en'
 
   <div class="wrap layout kal-wrap">
     <div class="main">
-      {/* widok pod banerem: nadchodzące / archiwum (przyciski jak w tabeli pracowników) */}
+      {/* telefon: wiersz filtrów jak w Aktualnościach (wspólny stan z przyciskami w banerze — skrypt niżej) */}
+      <div class="filters filters-lewo tylko-telefon">
+        <FiltrISzukaj lang={lang} rodzaje={rodzajeListy} etykieta={filtrEtykieta} szukajDlugo={szukajDlugo} szukajKrotko={szukajKrotko} szukajTylkoTelefon />
+      </div>
+      {/* widok pod banerem: nadchodzące / archiwum (przyciski jak w tabeli pracowników; na telefonie — przełącznik segmentowy) */}
       <div class="chips kal-widok" role="group" aria-label={lang === 'en' ? 'View' : 'Widok'}>
         {widoki.map((v, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
       </div>
@@ -80,7 +105,7 @@ const lead = lang === 'en'
                   </span>
                   <span class="body">
                     <span class="news-meta kropki">
-                      <span class={`badge badge-${w.rodzaj}`}>{RODZAJE[w.rodzaj][lang]}</span>
+                      <EtykietaRodzaju rodzaj={w.rodzaj} lang={lang} />
                       <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
                       {w.miejsce && <span class="kropka">{w.miejsce}</span>}
                     </span>
@@ -93,7 +118,7 @@ const lead = lang === 'en'
               </div>
             </section>
           ))}
-          <p class="muted kal-pusto" data-pusty-filtr hidden>{lang === 'en' ? 'Nothing of this kind here.' : 'Brak pozycji tego rodzaju.'}</p>
+          <p class="muted kal-pusto" data-pusty-filtr data-pusty-szukaj={T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')} hidden>{T('Brak pozycji tego rodzaju.', 'Nothing of this kind here.')}</p>
         </div>
       ))}
     </div>
@@ -102,32 +127,53 @@ const lead = lang === 'en'
 </Baza>
 
 <script>
-  // Widok (Nadchodzące / Archiwum, w adresie #archiwum) i filtr rodzaju — działają razem.
+  // Widok (Nadchodzące / Archiwum, w adresie #archiwum), filtr rodzaju (przyciski w banerze na komputerze, lista rozwijana
+  // na telefonie; w adresie także ?rodzaj=…, jak w Aktualnościach) i szukanie po tekście pozycji (pole tylko na telefonie)
+  // — działają razem. Przyciski i lista są zawsze w dokumencie (jedno schowane przez CSS), stan trzyma skrypt, więc
+  // przejście przez 760 px (obrót telefonu, zmiana okna) nie gubi filtra ani widoku. Szukanie liczy się tylko na telefonie
+  // (na komputerze pola nie widać); wpisany tekst zostaje w polu i wraca po powrocie do wąskiego ekranu.
   const btnRodzaj = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
   const btnWidok = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
   const widoki = Array.from(document.querySelectorAll<HTMLElement>('[data-widok]'));
+  const rodzajLista = document.querySelector<HTMLSelectElement>('[data-rodzaj-lista]');
+  const szukaj = document.querySelector<HTMLInputElement>('[data-szukaj]');
+  const naTelefonie = window.matchMedia('(max-width: 760px)');
+  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
+  const znanyRodzaj = (r: string) => btnRodzaj.some((b) => (b.dataset.rodzaj ?? '') === r);
   let rodzaj = '';
   let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
   const pokaz = () => {
+    const q = naTelefonie.matches ? norm(szukaj?.value.trim() ?? '') : '';
     btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
     btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
+    if (rodzajLista) rodzajLista.value = rodzaj;
     widoki.forEach((v) => {
       v.hidden = v.dataset.widok !== widok;
-      v.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]').forEach((p) => (p.hidden = !!rodzaj && p.dataset.rodzaj !== rodzaj));
+      // szukanie w treści pozycji (etykieta, termin, miejsce, tytuł, prelegent, seminarium) — bez kafelka daty („2 LIS”)
+      v.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]').forEach((p) => (p.hidden = (!!rodzaj && p.dataset.rodzaj !== rodzaj) || (!!q && !norm(p.querySelector('.body')?.textContent ?? '').includes(q))));
       const grupy = Array.from(v.querySelectorAll<HTMLElement>('[data-grupa]'));
       grupy.forEach((g) => (g.hidden = !g.querySelector('.row-item:not([hidden])')));
-      // komunikat „brak pozycji tego rodzaju” tylko, gdy widok ma pozycje, ale filtr wszystkie schował
+      // komunikat „brak pozycji” tylko, gdy widok ma pozycje, ale filtr (albo szukanie) wszystkie schował
       const pf = v.querySelector<HTMLElement>('[data-pusty-filtr]');
-      if (pf) pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
+      if (pf) {
+        pf.dataset.pustyRodzaj ??= pf.textContent ?? '';
+        pf.textContent = (q ? pf.dataset.pustySzukaj : pf.dataset.pustyRodzaj) ?? '';
+        pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
+      }
     });
   };
-  btnRodzaj.forEach((b) => b.addEventListener('click', () => { rodzaj = b.dataset.rodzaj ?? ''; pokaz(); }));
+  const ustawRodzaj = (r: string) => { rodzaj = znanyRodzaj(r) ? r : ''; pokaz(); };
+  btnRodzaj.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
+  rodzajLista?.addEventListener('change', () => ustawRodzaj(rodzajLista.value));
+  szukaj?.addEventListener('input', pokaz);
+  naTelefonie.addEventListener('change', pokaz);
   btnWidok.forEach((b) => b.addEventListener('click', () => {
     widok = b.dataset.widokBtn ?? 'nadchodzace';
     history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
     pokaz();
   }));
-  pokaz();
+  // ?rodzaj=… z adresu; lista rozwijana zawsze zgodna ze stanem (także gdy przeglądarka przywróciła jej wartość po powrocie)
+  ustawRodzaj(new URLSearchParams(location.search).get('rodzaj') ?? '');
 </script>
 
 <style>
@@ -145,4 +191,14 @@ const lead = lang === 'en'
   .kal-bez-linku:hover :global(.t) { text-decoration: none; }
   /* przyciski widoku pod banerem, nad listą miesięcy */
   .kal-widok { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+  /* ---------- telefon (≤ 760 px): zwarty przełącznik segmentowy „Nadchodzące | Archiwum” (decyzja 31.10.2026) ----------
+     Jedna linia pod wierszem filtrów, 36 px wysokości (ramka 1 + wypełnienie 3 + przycisk 28 + 3 + 1): szare tło z cienką
+     ramką, wybrany widok w kolorze znacznika (token --znacznik, jak aktywny filtr — telefon.css). Odstępy: 10 px pod wierszem
+     filtrów, 8 px nad miesiącem (+ jego 14 px — razem tyle, ile w Aktualnościach między filtrami a miesiącem). */
+  @media (max-width: 760px) {
+    .filters.filters-lewo { margin-bottom: 10px; }
+    .kal-widok { display: flex; flex-wrap: nowrap; gap: 2px; width: max-content; max-width: 100%; margin: 0 0 8px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+    .kal-widok .chip { min-height: 28px; padding: 0 14px; border: 0; background: transparent; font-size: 14px; line-height: 1; }
+    .kal-widok .chip[aria-pressed='true'] { background: var(--znacznik, var(--primary)); color: var(--znacznik-ink, var(--primary-ink)); }
+  }
 </style>

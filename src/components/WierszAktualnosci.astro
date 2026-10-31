@@ -6,8 +6,13 @@
 // zwijają się od końca do jednej plakietki „+N” (liczy skrypt niżej dla rzeczywistej szerokości). Zwinięte plakietki są
 // schowane tylko wizualnie (czytnik ekranu dalej je czyta), „+N” jest aria-hidden. Bez JS — zawijanie jak dawniej.
 // Pełna lista odbiorców jest na stronie wpisu (Aktualnosc.astro, „dla: …”).
+// Etykiety B1 (decyzja 31.10.2026; telefon): rodzaj — EtykietaRodzaju.astro (wspólna z Kalendarzem), odbiorcy nie jako
+// plakietki, tylko zwykły szary tekst małymi literami po przecinku („studenci, doktoranci”), „+N” — tym samym tekstem,
+// pogrubiony. Na komputerze odbiorcy jak dotąd (plakietki z wielką literą): każdy odbiorca ma oba napisy
+// (.tylko-komputer / .tylko-telefon), skrypt zwijania mierzy cały element [data-wa-dla].
+import EtykietaRodzaju from './EtykietaRodzaju.astro';
 import { u, isExternal } from '../lib/url';
-import { wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { wJezyku, ODBIORCY, odbiorcyMalymi } from '../lib/i18n';
 import { short, range, type Lang } from '../lib/daty';
 import type { PozycjaListy } from '../lib/tresci';
 
@@ -18,8 +23,8 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
 <a class="row-item wa-row" href={href} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
   <span class="body">
     <span class="news-meta wa-meta" data-wa-meta>
-      <span class={`badge badge-${p.rodzaj}`}>{RODZAJE[p.rodzaj]?.[lang]}</span>
-      {p.dla.map((d) => <span class="badge" data-wa-dla>{ODBIORCY[d]?.[lang]}</span>)}
+      <EtykietaRodzaju rodzaj={p.rodzaj} lang={lang} />
+      {p.dla.map((d) => <span class="badge wa-dla" data-wa-dla><span class="tylko-komputer">{ODBIORCY[d]?.[lang]}</span><span class="tylko-telefon">{odbiorcyMalymi(d, lang)}</span></span>)}
       {p.dla.length > 0 && <span class="badge wa-wiecej" data-wa-wiecej aria-hidden="true" hidden></span>}
       <time datetime={p.data}>{short(p.data)}</time>
     </span>
@@ -135,7 +140,12 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
     .wa-row > .body { display: contents; }
     .wa-meta { grid-column: 1; grid-row: 1 / 4; flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 2px; }
     .wa-meta time { order: -1; font-size: 14px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .wa-meta .badge { padding: 1px 8px; font-size: 12.5px; white-space: nowrap; }
+    /* etykieta rodzaju: kształt, rozmiar i kolory B1 — telefon.css (.news-meta .badge) */
+    .wa-meta .badge { white-space: nowrap; }
+    /* odbiorcy i „+N” (B1, decyzja 31.10.2026): zwykły szary tekst 13,5 px, bez tła, „+N” pogrubiony */
+    .wa-meta .wa-dla, .wa-meta .wa-wiecej { padding: 0; border-radius: 0; background: none; box-shadow: none;
+      font-size: 13.5px; font-weight: 500; line-height: 1.5; letter-spacing: 0; color: var(--et-dla, var(--muted)); }
+    .wa-meta .wa-wiecej { font-weight: 700; }
     .wa-row .t { grid-column: 2; grid-row: 1; }
     .wa-kiedy { grid-column: 2; grid-row: 2; margin-top: 3px; }
     .wa-row .x { grid-column: 2; grid-row: 3; margin-top: 3px; }
@@ -144,7 +154,10 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
   @media (max-width: 640px) {
     .wa-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto minmax(0, 1fr); }
     .wa-meta { grid-column: 1 / -1; grid-row: 1; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 4px; padding-top: 0; }
-    .wa-meta time { margin-right: 6px; }
+    .wa-meta time { margin-right: 4px; }
+    /* odbiorcy w jednej linijce po przecinku — przecinek po każdym, za którym stoi jeszcze widoczny (niezwinięty) odbiorca:
+       „studenci, doktoranci +1” (w kolumnie 641–760 px — jeden pod drugim, bez przecinków) */
+    .wa-meta .wa-dla:has(~ .wa-dla:not(.wa-zwiniete))::after { content: ','; }
     .wa-row .t { grid-column: 1; grid-row: 2; }
     .wa-kiedy { grid-column: 1; grid-row: 3; }
     .wa-row .x { grid-column: 1; grid-row: 4; }

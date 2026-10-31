@@ -1,0 +1,45 @@
+---
+// Wiersz filtrów listy na telefonie: lista rozwijana rodzajów i pole szukania obok siebie — wspólny dla Aktualności
+// i Kalendarza (decyzja 31.10.2026; style w telefon.css, „Wiersz filtrów list”). Stoi w <div class="filters filters-lewo">
+// strony, obok przycisków rodzajów dla komputera (.tylko-komputer; na komputerze lista rozwijana jest schowana).
+// Stan filtrów (przyciski ↔ lista, szukanie) trzyma skrypt strony: lista ma [data-rodzaj-lista], pole — [data-szukaj].
+// szukajTylkoTelefon: pole szukania tylko na telefonie (Kalendarz — na komputerze bez pola, wygląd bez zmian).
+import Ikona from './Ikona.astro';
+import { t, RODZAJE_FILTRY } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { lang: Lang; rodzaje: string[]; etykieta: string; szukajDlugo: string; szukajKrotko: string; szukajTylkoTelefon?: boolean }
+const { lang, rodzaje, etykieta, szukajDlugo, szukajKrotko, szukajTylkoTelefon = false } = Astro.props;
+// Podpowiedź na telefonie ustawiana od razu za polem (zanim strona się narysuje, więc bez mignięcia); przy zmianie
+// szerokości okna przez 760 px przełącza ją skrypt na dole.
+const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(max-width: 760px)').matches)i.placeholder=${JSON.stringify(szukajKrotko)};}catch(e){}})(document.currentScript.previousElementSibling)`;
+---
+<label class="fl-rodzaj tylko-telefon" data-pagefind-ignore>
+  <span class="sr-only">{etykieta}</span>
+  <select data-rodzaj-lista autocomplete="off">
+    <option value="">{t(lang, 'wszystkie')}</option>
+    {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r]?.[lang]}</option>)}
+  </select>
+  <Ikona nazwa="dol" rozmiar={18} />
+</label>
+<div class:list={['fl-szukaj', szukajTylkoTelefon && 'tylko-telefon']} style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+  <label class="search">
+    <Ikona nazwa="szukaj" rozmiar={18} />
+    <span class="sr-only">{szukajDlugo}</span>
+    <input type="search" data-szukaj placeholder={szukajDlugo} data-podp-komputer={szukajDlugo} data-podp-telefon={szukajKrotko} />
+    <script is:inline set:html={podpowiedzTel} />
+  </label>
+</div>
+
+<script>
+  // Podpowiedź w polu szukania: na telefonie krótka („Szukaj”), na komputerze pełna. Przy wczytaniu ustawia ją skrypt
+  // wpisany zaraz za polem; tu — przy zmianie szerokości okna przez 760 px.
+  const naTelefonie = window.matchMedia('(max-width: 760px)');
+  const pola = Array.from(document.querySelectorAll<HTMLInputElement>('input[data-szukaj][data-podp-telefon]'));
+  naTelefonie.addEventListener('change', () => {
+    for (const p of pola) {
+      const tekst = naTelefonie.matches ? p.dataset.podpTelefon : p.dataset.podpKomputer;
+      if (tekst) p.placeholder = tekst;
+    }
+  });
+</script>

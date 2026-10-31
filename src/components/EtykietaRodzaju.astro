@@ -1,0 +1,13 @@
+---
+// Etykieta rodzaju wpisu (.badge .badge-<rodzaj>) w wierszach list — jedna rodzina etykiet w Aktualnościach i w Kalendarzu
+// (decyzja 31.10.2026, wariant B1: wygląd na telefonie w telefon.css, blok „Znaczniki i etykiety”).
+// „Obrona doktorska”: przed napisem ikonka biretu 14 px w kolorze tekstu (aria-hidden; „mgiełka z biretem”). Ikonka jest
+// widoczna tylko z etykietami B1 (na razie telefon); na komputerze ukryta (global.css: .badge > .et-ikona), wygląd bez zmian.
+import Ikona from './Ikona.astro';
+import { RODZAJE } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { rodzaj: string; lang: Lang }
+const { rodzaj, lang } = Astro.props;
+---
+<span class={`badge badge-${rodzaj}`}>{rodzaj === 'obrona' && <Ikona nazwa="biret" class="et-ikona" rozmiar={14} />}{RODZAJE[rodzaj]?.[lang]}</span>

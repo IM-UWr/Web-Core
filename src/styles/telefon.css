@@ -99,7 +99,7 @@
   .row-item .thumb { flex: 0 0 76px; width: 76px; height: 76px; border-radius: 14px; }
   /* Jasne kafelki dat — tylko jasny motyw (decyzja 31.10.2026): tło #eef2f9 z cienką ramką, dzień i miesiąc w granacie zamiast
      pełnego granatowego kwadratu. .datebox (Kalendarz, obrony, konferencje, wydarzenia, wpis) i .pt-dbox (konferencje
-     na „Nauce”). Minione (szare) bez zmian; ciemny motyw bez zmian (osobne propozycje). */
+     na „Nauce”). Minione (szare) bez zmian; ciemny motyw — token --znacznik (blok „Znaczniki i etykiety” niżej). */
   :root:not([data-theme='dark']) :is(.datebox, .pt-dbox):not(.minione) { border: 1px solid var(--line); background: #eef2f9; color: var(--primary); }
 
   .event-box { gap: 12px 24px; padding: 14px 18px; }
@@ -215,6 +215,71 @@
   body[data-sekcje='linia'] .zsec { margin-bottom: 20px; padding-top: 16px; }
   body[data-sekcje='linia'] :is(.section-head h2, .studia-head h2)::before { margin-bottom: 10px; }
   body[data-sekcje='linia'] .prose h2 { margin-top: 1.6em; padding-top: 14px; }
+}
+
+/* ---------- Znaczniki i etykiety (decyzja 31.10.2026: ciemny motyw A1 „stalowy granat”, etykiety B1) ----------
+   Na razie tylko telefon. Reguły, które używają tokenów --znacznik*, są w global.css i portal.css (z zapasem
+   var(--znacznik, var(--primary)) — bez tokenu jak dotąd); tu tylko wartości tokenów i reguły etykiet B1.
+   Rozszerzenie na komputer: definicje tokenów przenieść do global.css (:root i :root[data-theme='dark'], .menu-ciemne),
+   a reguły etykiet B1 — wyjąć z @media. */
+@media (max-width: 760px) {
+  /* A1. Znacznik: kafelek daty (.datebox, .pt-dbox), etykieta „Wydarzenie”, aktywny filtr (.chip[aria-pressed]),
+     przycisk menu (.burger). Jasny motyw: ten sam granat co --primary (nic się nie zmienia). Ciemny motyw: stalowy
+     granat zamiast bursztynu, miesiąc na kafelku bursztynowy; tekstowe akcenty (.pt-k, .pt-all, .link-arrow, .event .k,
+     .sem-row .sem, .talk summary, .more summary) jasnoniebieskie; tekst na jasnym tle --tint jasnoszary zamiast bursztynu.
+     .menu-ciemne (nagłówek i menu na ciemnym pasie w jasnym motywie) — jak ciemny motyw (global.css robi tak samo).
+     Granatowy baner (.ph-granat, oba motywy): aktywny filtr biały z granatowym tekstem.
+     Bursztyn zostaje: hasło, rysunek w banerze, miesiąc na kafelku, kreski sekcji, linki w treści, przyciski .btn-primary. */
+  :root { --znacznik: #1b2d52; --znacznik-ink: #ffffff; }
+  :root[data-theme='dark'], .menu-ciemne { --znacznik: #2b4170; --znacznik-ink: #f1f4fa; --znacznik-tekst: #a9c0e8; --znacznik-miesiac: #f2a33a; }
+  :root[data-theme='dark'] { --tint-ink: #d3dcea; }
+  .ph-granat { --znacznik: #ffffff; --znacznik-ink: #1b2d52; }
+
+  /* B1. Etykiety w wierszach list (.news-meta .badge: Aktualności, Kalendarz, wpis, konferencje, projekty…) — jedna
+     rodzina: lekko zaokrąglony prostokąt (6 px, nie pastylka — etykieta nie udaje przycisku filtra), jeden rozmiar,
+     rodzaj rozróżnia odcień „mgiełki”: szara (domyślna: Seminarium, Ogłoszenie, Kariera, Termin, odwołana…), granatowa
+     (Wydarzenie), bursztynowa z ciemnym tekstem (Sukces, Konferencja), mocniejsza granatowa z biretem (Obrona doktorska;
+     ikonka — EtykietaRodzaju.astro). Odbiorcy (studenci, doktoranci…) to zwykły szary tekst — WierszAktualnosci.astro
+     (kolor --et-dla). */
+  :root {
+    --et-promien: 6px;
+    --et-szary-tlo: #eceef2; --et-szary: #4a5466;
+    --et-granat-tlo: #dce6f7; --et-granat: #18305f;
+    --et-burs-tlo: #fcebd2; --et-burs: #6b3f05;
+    --et-obrona-tlo: #c3d2ee; --et-obrona: #0f2552;
+    --et-dla: #5b6577;
+  }
+  :root[data-theme='dark'] {
+    --et-szary-tlo: rgb(255 255 255 / .065); --et-szary: #aab5c7;
+    --et-granat-tlo: rgb(110 150 230 / .26); --et-granat: #d3e1fb;
+    --et-burs-tlo: rgb(242 163 58 / .16); --et-burs: #f6c47a;
+    --et-obrona-tlo: rgb(120 160 235 / .42); --et-obrona: #eef3ff;
+    --et-dla: #9da9be;
+  }
+  .news-meta .badge { padding: 1px 8px; border-radius: var(--et-promien); font-size: 12.5px; font-weight: 700; line-height: 1.5; letter-spacing: 0;
+    background: var(--et-szary-tlo); color: var(--et-szary); box-shadow: none; }
+  .news-meta .badge-wydarzenie { background: var(--et-granat-tlo); color: var(--et-granat); }
+  .news-meta :is(.badge-sukces, .badge-konferencja) { background: var(--et-burs-tlo); color: var(--et-burs); }
+  .news-meta .badge-obrona { gap: 4px; background: var(--et-obrona-tlo); color: var(--et-obrona); }
+  .news-meta .badge > .et-ikona { display: block; }
+}
+
+/* ---------- Wiersz filtrów list (decyzja 31.10.2026; Aktualności i Kalendarz — FiltrISzukaj.astro) ---------- */
+@media (max-width: 760px) {
+  /* Z lewej lista rozwijana rodzajów
+     (ok. 42% szerokości; szersza, gdy najdłuższa nazwa się nie mieści — np. „Announcements” po angielsku albo „Wydarzenia”
+     przy 360 px), z prawej pole szukania z krótką podpowiedzią; obie 44 px wysokości, zaokrąglone jak pole szukania.
+     Czcionka listy 16 px — mniejsza powoduje powiększanie strony na iPhonie. Przyciski rodzajów (komputer) mają
+     .tylko-komputer. Strzałka listy to ikona „dol”. */
+  .filters.filters-lewo { flex-wrap: nowrap; gap: 8px; }
+  .fl-rodzaj { position: relative; display: flex; flex: 0 0 auto; min-width: 42%; max-width: 60%; color: var(--muted); }
+  .fl-rodzaj select { appearance: none; -webkit-appearance: none; flex: 1 1 auto; width: auto; min-width: 0; height: 44px; margin: 0; padding: 0 34px 0 15px;
+    border: 1.5px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink);
+    font: inherit; font-size: 16px; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+  .fl-rodzaj select:focus-visible { border-color: var(--ink); }
+  .fl-rodzaj .ico { position: absolute; top: 50%; right: 12px; translate: 0 -50%; pointer-events: none; }
+  .fl-szukaj { flex: 1 1 0; min-width: 0; }
+  .fl-szukaj .search { flex: 1 1 auto; min-width: 0; height: 44px; }
 }
 
 /* węższe progi z global.css — powtórzone, bo reguły wyżej przyszły później */

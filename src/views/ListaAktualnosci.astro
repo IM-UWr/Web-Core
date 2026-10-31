@@ -2,15 +2,17 @@
 // Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
-// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby z ostatniego miesiąca (ogłoszenia, wydarzenia,
-// seminaria), filtry w jednym wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią.
+// Telefon (≤ 760 px; decyzja 31.10.2026): pod hasłem w banerze trzy liczby z ostatnich 30 dni (ogłoszenia, wydarzenia,
+// seminaria), filtry w jednym wierszu — lista rozwijana rodzajów i pole szukania z krótką podpowiedzią. Baner, wiersz
+// filtrów i etykiety — wspólne z Kalendarzem (LiczbyBanera, FiltrISzukaj, EtykietaRodzaju; jeden styl, decyzja 31.10.2026).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
-import Ikona from '../components/Ikona.astro';
+import FiltrISzukaj from '../components/FiltrISzukaj.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
-import { t, wJezyku, RODZAJE_FILTRY, ODBIORCY, bezSierotek } from '../lib/i18n';
+import { t, wJezyku, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
 import { monthYear, today, addDays, type Lang } from '../lib/daty';
 import { listaAktualnosci, referaty, seminaria, seminariumReferatu } from '../lib/tresci';
 
@@ -33,48 +35,35 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
 const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w Instytucie';
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 
-// Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta (jak w DzialNauka.astro).
-const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
-  if (lang === 'en') return n === 1 ? en[0] : en[1];
-  if (n === 1) return pl[0];
-  const j = n % 10, d = n % 100;
-  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
-};
 // Liczby w banerze — na razie tylko na telefonie, pod hasłem, jak w innych działach (decyzja 31.10.2026; komputer później):
-// wpisy danego rodzaju z datą publikacji w ostatnich 30 dniach (względem dnia budowania). Pozycje z zerem pomijamy.
-// Zwykłe liczby, nieklikalne (jak w Nauce i Instytucie).
+// wpisy danego rodzaju z datą publikacji w ostatnich 30 dniach (względem dnia budowania). Pozycje z zerem pomijamy
+// (LiczbyBanera.astro — wspólne z Kalendarzem).
 // Trzecia liczba to seminaria zamiast sukcesów (decyzja 31.10.2026: sukcesy zdarzają się rzadko, w miesiącu bywa zero):
 // referaty opublikowanych seminariów z terminem w tych samych 30 dniach, do dnia budowania włącznie (jak w kalendarzu:
 // referaty z src/lib/tresci.ts, seminarium referatu — pole „Seminarium” albo folder).
+// Etykieta okresu „z 30 dni” zamiast „w ostatnim miesiącu” (decyzja 31.10.2026): krótsza — „ogłoszenia / z 30 dni”
+// mieści się w dwóch linijkach przy 360 i 390 px (dłuższa zajmowała trzy).
 const dzis = today();
 const miesiacTemu = addDays(dzis, -30);
 const wOknie = (d: string) => d.slice(0, 10) >= miesiacTemu && d.slice(0, 10) <= dzis;
 const wMiesiacu = (r: string) => lista.filter((p) => p.rodzaj === r && wOknie(p.data)).length;
 const idSeminariow = new Set((await seminaria()).map((s) => s.id));
 const referatyWMiesiacu = (await referaty()).filter((r) => idSeminariow.has(seminariumReferatu(r)) && wOknie(r.data.termin)).length;
-const liczby = ([
-  [wMiesiacu('ogloszenie'), ['ogłoszenie', 'ogłoszenia', 'ogłoszeń'], ['announcement', 'announcements']],
-  [wMiesiacu('wydarzenie'), ['wydarzenie', 'wydarzenia', 'wydarzeń'], ['event', 'events']],
-  [referatyWMiesiacu, ['seminarium', 'seminaria', 'seminariów'], ['seminar', 'seminars']],
-] as [number, [string, string, string], [string, string]][])
-  .map(([n, pl, en]) => ({ n, l: `${odm(n, pl, en)} ${T('w ostatnim miesiącu', 'in the past month')}` }))
-  .filter((x) => x.n > 0);
-// Filtr rodzaju: na komputerze przyciski, na telefonie lista rozwijana obok pola szukania (jeden wiersz; decyzja 31.10.2026).
-// Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts), podpowiedź w polu szukania na telefonie krótsza.
+const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+  { n: wMiesiacu('ogloszenie'), pl: ['ogłoszenie', 'ogłoszenia', 'ogłoszeń'], en: ['announcement', 'announcements'] },
+  { n: wMiesiacu('wydarzenie'), pl: ['wydarzenie', 'wydarzenia', 'wydarzeń'], en: ['event', 'events'] },
+  { n: referatyWMiesiacu, pl: ['seminarium', 'seminaria', 'seminariów'], en: ['seminar', 'seminars'] },
+];
+// Filtr rodzaju: na komputerze przyciski, na telefonie lista rozwijana obok pola szukania (jeden wiersz; decyzja 31.10.2026;
+// FiltrISzukaj.astro — wspólny z Kalendarzem). Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts), podpowiedź
+// w polu szukania na telefonie krótsza.
 const filtrEtykieta = T('Filtruj według rodzaju', 'Filter by type');
 const szukajDlugo = T('Szukaj w aktualnościach', 'Search news');
 const szukajKrotko = T('Szukaj', 'Search');
-// Podpowiedź na telefonie ustawiana od razu za polem (zanim strona się narysuje, więc bez mignięcia); przy zmianie
-// szerokości okna przez 760 px przełącza ją skrypt na dole.
-const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(max-width: 760px)').matches)i.placeholder=${JSON.stringify(szukajKrotko)};}catch(e){}})(document.currentScript.previousElementSibling)`;
 ---
 <Baza tytul={t(lang, 'aktualnosci')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]}>
-    {liczby.length > 0 && (
-      <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
-        {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
-      </ul>
-    )}
+    <LiczbyBanera lang={lang} okres={T('z 30 dni', 'in 30 days')} pozycje={liczby} />
   </NaglowekStrony>
 
   <div class="wrap layout">
@@ -85,23 +74,8 @@ const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(ma
           <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
           {rodzaje.map((r) => <button type="button" class="chip" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
         </div>
-        {/* telefon: te same rodzaje jako lista rozwijana (wspólny stan z przyciskami w skrypcie niżej) */}
-        <label class="la-rodzaj tylko-telefon" data-pagefind-ignore>
-          <span class="sr-only">{filtrEtykieta}</span>
-          <select data-rodzaj-lista autocomplete="off">
-            <option value="">{t(lang, 'wszystkie')}</option>
-            {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
-          </select>
-          <Ikona nazwa="dol" rozmiar={18} />
-        </label>
-        <div class="la-szukaj" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-          <label class="search">
-            <Ikona nazwa="szukaj" rozmiar={18} />
-            <span class="sr-only">{szukajDlugo}</span>
-            <input type="search" data-szukaj placeholder={szukajDlugo} data-podp-komputer={szukajDlugo} data-podp-telefon={szukajKrotko} />
-            <script is:inline set:html={podpowiedzTel} />
-          </label>
-        </div>
+        {/* telefon: te same rodzaje jako lista rozwijana (wspólny stan z przyciskami w skrypcie niżej) i pole szukania */}
+        <FiltrISzukaj lang={lang} rodzaje={rodzaje} etykieta={filtrEtykieta} szukajDlugo={szukajDlugo} szukajKrotko={szukajKrotko} />
       </div>
       <p class="dla-info" data-dla-info hidden>
         <span>{lang === 'en' ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
@@ -178,15 +152,7 @@ const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(ma
     history.replaceState(history.state, '', url);
   });
   szukaj?.addEventListener('input', filtruj);
-  // Podpowiedź w polu szukania: na telefonie krótka („Szukaj”), na komputerze pełna. Przy wczytaniu ustawia ją
-  // skrypt wpisany zaraz za polem; tu — przy zmianie szerokości okna przez 760 px.
-  const naTelefonie = window.matchMedia('(max-width: 760px)');
-  const podpowiedz = () => {
-    if (!szukaj) return;
-    const tekst = naTelefonie.matches ? szukaj.dataset.podpTelefon : szukaj.dataset.podpKomputer;
-    if (tekst) szukaj.placeholder = tekst;
-  };
-  naTelefonie.addEventListener('change', podpowiedz);
+  // (podpowiedź w polu szukania przy zmianie szerokości okna — FiltrISzukaj.astro)
   if (lista) {
     const p = new URLSearchParams(location.search);
     const d = p.get('dla');
@@ -199,22 +165,7 @@ const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(ma
 
 <style>
   .la-archiwum { margin-top: 28px; }
-  /* ---------- telefon (≤ 760 px): filtry w jednym wierszu (decyzja 31.10.2026) ----------
-     Z lewej lista rozwijana rodzajów (ok. 42% szerokości; szersza, gdy najdłuższa nazwa się nie mieści — np. „Announcements”
-     po angielsku albo „Wydarzenia” przy 360 px), z prawej pole szukania z krótką podpowiedzią; obie 44 px wysokości,
-     zaokrąglone jak pole szukania. Czcionka listy 16 px — mniejsza powoduje powiększanie strony na iPhonie.
-     Przyciski rodzajów (.chips) mają .tylko-komputer. Strzałka listy to ikona „dol”. */
-  @media (max-width: 760px) {
-    .filters.filters-lewo { flex-wrap: nowrap; gap: 8px; }
-    .la-rodzaj { position: relative; display: flex; flex: 0 0 auto; min-width: 42%; max-width: 60%; color: var(--muted); }
-    .la-rodzaj select { appearance: none; -webkit-appearance: none; flex: 1 1 auto; width: auto; min-width: 0; height: 44px; margin: 0; padding: 0 34px 0 15px;
-      border: 1.5px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink);
-      font: inherit; font-size: 16px; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-    .la-rodzaj select:focus-visible { border-color: var(--ink); }
-    .la-rodzaj :global(.ico) { position: absolute; top: 50%; right: 12px; translate: 0 -50%; pointer-events: none; }
-    .la-szukaj { flex: 1 1 0; min-width: 0; }
-    .la-szukaj .search { flex: 1 1 auto; min-width: 0; height: 44px; }
-  }
+  /* telefon (≤ 760 px): filtry w jednym wierszu — FiltrISzukaj.astro, style w telefon.css („Wiersz filtrów list”) */
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
      Odstęp listy od banera stały (24 px), jak na stronach działów; mniej miejsca nad odnośnikiem do archiwum. */
   @media (min-width: 761px) {
@@ -226,7 +177,7 @@ const podpowiedzTel = `(function(i){try{if(i&&window.matchMedia&&matchMedia('(ma
     .filters.filters-lewo > .chips { flex: 0 1 auto; }
     /* wyszukiwarka trochę szersza (300 px zamiast ok. 255), żeby podpowiedź „Szukaj w aktualnościach” nie była ucinana
        przy szerszych czcionkach (np. na Windowsie) */
-    .filters.filters-lewo .search { width: 300px; }
+    .filters.filters-lewo :global(.search) { width: 300px; }
     .la-archiwum { margin-top: 18px; }
   }
 </style>
