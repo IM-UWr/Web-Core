@@ -11,15 +11,17 @@ import { sala } from '../lib/tresci';
 import TytulReferatu from './TytulReferatu.astro';
 
 interface Wiersz { termin: string; sala?: string; seminarium: string; tytul: string; prelegent: string; href: string }
-interface Props { wiersze: Wiersz[]; lang: Lang; pusty: string; etykieta: string }
-const { wiersze, lang, pusty, etykieta } = Astro.props;
+// id — identyfikator listy (aria-controls przycisku „Zobacz więcej”); widoczne — ile pierwszych pozycji widać od razu,
+// dalsze dostają klasę .nadmiar (chowa je strona, która ma przycisk; strona główna na telefonie, zlecenie 06)
+interface Props { wiersze: Wiersz[]; lang: Lang; pusty: string; etykieta: string; id?: string; widoczne?: number }
+const { wiersze, lang, pusty, etykieta, id, widoczne = Infinity } = Astro.props;
 ---
 {wiersze.length === 0 ? (
   <p class="pt-pusto">{pusty}</p>
 ) : (
-  <ul class="pt-list" aria-label={etykieta}>
-    {wiersze.map((w) => (
-      <li>
+  <ul class="pt-list" id={id} aria-label={etykieta}>
+    {wiersze.map((w, i) => (
+      <li class={i >= widoczne ? 'nadmiar' : undefined}>
         <a class="pt-item" href={u(wJezyku(w.href, lang))}>
           <span class="pt-d pt-d-szer">{`${dayShort(w.termin, lang)} ${short(w.termin).slice(0, 5)}`}<br />{time(w.termin)}</span>
           <span class="pt-b">

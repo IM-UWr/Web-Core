@@ -1,0 +1,29 @@
+---
+// Przycisk „••• Zobacz więcej (N)” pod listą, w której widać tylko pierwsze pozycje (strona główna na telefonie,
+// zlecenie 06). Dalsze pozycje listy mają klasę .nadmiar; chowa je CSS tylko z JS (.js), więc bez skryptu widać
+// całą listę, a przycisku nie ma. Po rozwinięciu napis „Zwiń” bez kropek i licznika. Obsługa i style: StronaGlowna.astro.
+// lista — id listy (aria-controls), ukryte — liczba schowanych pozycji (N; skrypt przelicza ją dla wydarzeń).
+import { t } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+interface Props { lista: string; ukryte: number; lang: Lang }
+const { lista, ukryte, lang } = Astro.props;
+---
+<button type="button" class="wiecej-row" aria-expanded="false" aria-controls={lista} data-wiecej={t(lang, 'zobaczWiecej')} data-zwin={t(lang, 'zwin')} hidden={ukryte <= 0}>
+  <span class="kr" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span class="wt">{t(lang, 'zobaczWiecej')}</span>
+  <span class="ile">({ukryte})</span>
+</button>
+
+<style>
+  /* przycisk na całą szerokość ramki, z kreską nad sobą; bez JS go nie ma (wtedy lista jest pełna) */
+  .wiecej-row { display: none; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 44px; margin: 0; padding: 4px 0 2px;
+    border: 0; border-top: 1px solid var(--line); background: none; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.3;
+    color: var(--znacznik-tekst, var(--primary)); cursor: pointer; }
+  :global(.js) .wiecej-row:not([hidden]) { display: flex; }
+  .kr { display: inline-flex; gap: 4px; }
+  .kr i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .75; }
+  .ile { font-weight: 600; color: var(--muted); }
+  /* rozwinięta sekcja: sam napis „Zwiń” */
+  :global(.rozw) .wiecej-row :is(.kr, .ile) { display: none; }
+</style>

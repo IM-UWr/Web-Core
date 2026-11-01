@@ -8,13 +8,14 @@ import TabelaReferatow from './TabelaReferatow.astro';
 import ListaReferatow from './ListaReferatow.astro';
 import KafelekKoloryDni from './KafelekKoloryDni.astro';
 import WartoWiedziec from './WartoWiedziec.astro';
+import ZobaczWiecej from './ZobaczWiecej.astro';
 import ustawienia from '../data/ustawienia.json';
 import skroty from '../data/skroty.json';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { range, short, type Lang } from '../lib/daty';
 import { listaKierunkow } from '../lib/menu';
-import { wydarzeniaNaGlowna, aktualnosciNaGlowna, wyroznionaAktualnosc, referatyWTygodniu, tydzienSeminariow } from '../lib/tresci';
+import { wydarzeniaNaGlowna, wydarzeniaNaTelefon, aktualnosciNaGlowna, wyroznionaAktualnosc, referatyWTygodniu, tydzienSeminariow } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -25,6 +26,12 @@ const KOLORY_DNI = '/studia/rok-akademicki';
 // Wydarzenia tylko, gdy są blisko (domyślnie 5 dni roboczych przed początkiem) — inaczej sekcji nie ma.
 const dniWydarzen = Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5;
 const wydarzenia = await wydarzeniaNaGlowna(3, lang, dniWydarzen);
+// Telefon (zlecenie 06): nadchodzące wydarzenia z 30 dni kalendarzowych (pole wydarzenia_dni_telefon) i przypomnienia
+// terminów, najwyżej 10. W sekcjach wydarzeń, aktualności i seminariów widać pierwsze 3 pozycje (dalsze mają .nadmiar),
+// resztę pokazuje przycisk „Zobacz więcej (N)” — skrypt i style na dole pliku.
+const dniTelefon = Number((ustawienia as any).wydarzenia_dni_telefon ?? 30) || 30;
+const wydarzeniaTel = await wydarzeniaNaTelefon(10, lang, dniTelefon);
+const WIDOCZNE = 3;
 const wyrozniona = await wyroznionaAktualnosc(lang);
 const lista = await aktualnosciNaGlowna(6, lang);
 // Pierwsza aktualność ze zdjęciem zajmuje dwie kolumny — wtedy pokazujemy o jedną mniej.
@@ -39,6 +46,13 @@ const baner = ustawienia.baner;
 // opis zdjęcia (alt) i podpis (np. „Fot. …” / „Photo: …”) w wybranym języku — pola opis_en / podpis_en, puste = po polsku
 const banerOpis = wybierz(baner, 'opis', lang);
 const banerPodpis = wybierz(baner, 'podpis', lang);
+// Telefon (≤ 760 px, zlecenie 06 — wariant B2): zdjęcie budynku na cały pierwszy ekran (osobny plik, <source> w <picture>),
+// tytuł, bursztynowe hasło i podtytuł na dole; przy przewijaniu baner zwija się w pas pod nagłówkiem. Pola Ustawień:
+// haslo / haslo_en, baner.zdjecie_telefon, baner.podpis_telefon / podpis_telefon_en (puste = bez podpisu).
+const b2 = !!baner.zdjecie;
+const zdjecieTel = ((baner as any).zdjecie_telefon as string | undefined) || '';
+const podpisTel = wybierz(baner, 'podpis_telefon', lang);
+const haslo = wybierz(ustawienia, 'haslo', lang) || (lang === 'en' ? 'Research, education and outreach' : 'Badania, studia i popularyzacja');
 const st = ustawienia.studia;
 // Kafelki „Studia”: kierunki z sekcji Kierunki (pole „Pokaż na stronie głównej”) + dodatkowe kafelki z Ustawień.
 const kafelki = [
@@ -55,21 +69,30 @@ const kafelki = [
 ];
 ---
 <Baza tytul={t(lang, 'instytut')} stronaGlowna>
-  {/* Baner: zdjęcie na całą szerokość, tekst na przyciemnieniu z lewej (na telefonie pod zdjęciem). Style: global.css, „baner (strona główna)”. */}
-  <section class:list={['hero', { 'hero-bez-zdjecia': !baner.zdjecie }]} aria-labelledby="h1-glowna">
+  {/* Baner: zdjęcie na całą szerokość, tekst na przyciemnieniu z lewej. Style: global.css, „baner (strona główna)”.
+       Telefon (≤ 760 px, .hero-b2): własne zdjęcie (<source> w <picture> — telefon pobiera tylko je, komputer tylko
+       zdjęcie komputera) na cały pierwszy ekran, na dole tytuł, hasło i podtytuł na ciemnej otoczce oraz przycisk
+       „Na skróty i wydarzenia”; przy przewijaniu baner zwija się w pas z hasłem (.hero-maly) pod nagłówkiem.
+       Elementy .tylko-telefon nie istnieją dla komputera (display: none). Style: telefon.css, „Strona główna B2”;
+       skrypt zwijania: na dole pliku. */}
+  <section class:list={['hero', { 'hero-bez-zdjecia': !baner.zdjecie, 'hero-b2': b2 }]} aria-labelledby="h1-glowna">
     {baner.zdjecie && (
       <figure class="hero-fig">
-        <img
-          src={u(baner.zdjecie)}
-          srcset={(baner as any).zdjecie_male ? `${u((baner as any).zdjecie_male)} 1200w, ${u(baner.zdjecie)} 2400w` : undefined}
-          sizes="100vw"
-          alt={banerOpis}
-          style={`object-position:${baner.kadr || 'center'}`}
-          fetchpriority="high"
-        />
+        <picture>
+          {zdjecieTel && <source media="(max-width: 760px)" srcset={u(zdjecieTel)} width="884" height="1779" />}
+          <img
+            src={u(baner.zdjecie)}
+            srcset={(baner as any).zdjecie_male ? `${u((baner as any).zdjecie_male)} 1200w, ${u(baner.zdjecie)} 2400w` : undefined}
+            sizes="100vw"
+            alt={banerOpis}
+            style={`object-position:${baner.kadr || 'center'}`}
+            fetchpriority="high"
+          />
+        </picture>
         {banerPodpis && <figcaption>{banerPodpis}</figcaption>}
       </figure>
     )}
+    {b2 && podpisTel && <p class="hero-podpis tylko-telefon" data-pagefind-ignore>{podpisTel}</p>}
     <div class="wrap hero-in">
       <div class="hero-txt">
         {wyrozniona && (
@@ -77,6 +100,8 @@ const kafelki = [
         )}
         {/* bez logotypu UWr nad tytułem — logo uczelni (z nazwą w aria-label linku) jest już w nagłówku */}
         <h1 id="h1-glowna">{t(lang, 'instytut')}</h1>
+        {b2 && <p class="hero-haslo tylko-telefon" data-pagefind-ignore>{haslo}</p>}
+        {b2 && <p class="hero-pod tylko-telefon" data-pagefind-ignore>{t(lang, 'wydzialUwr')}</p>}
         <p class="hero-lead">{lang === 'en' ? ustawienia.wstep_en : ustawienia.wstep}</p>
         <div class="btn-row hero-btns">
           {ustawienia.przyciski.map((b, i) => (
@@ -87,6 +112,12 @@ const kafelki = [
         </div>
       </div>
     </div>
+    {b2 && (
+      <>
+        <div class="hero-maly tylko-telefon" aria-hidden="true" data-pagefind-ignore>{haslo}</div>
+        <a class="hero-dalej tylko-telefon" href="#h2-skroty" data-pagefind-ignore>{t(lang, 'naSkrotyIWydarzenia')}<Ikona nazwa="dol" rozmiar={20} /></a>
+      </>
+    )}
   </section>
 
   {/* Telefon (≤ 760 px) — wygląd „Portal”: pod banerem ramki jedna pod drugą, w tej samej kolejności co na komputerze
@@ -96,7 +127,8 @@ const kafelki = [
        z data-pagefind-ignore. */}
   <section class="gl-skroty" aria-label={t(lang, 'naSkroty')}>
     <div class="wrap tiles">
-      <div class="pt-h tylko-telefon"><h2 id="h2-skroty">{t(lang, 'naSkroty')}</h2></div>
+      {/* tabindex: przycisk „Na skróty i wydarzenia” w banerze przenosi tu fokus (sam po zwinięciu banera znika) */}
+      <div class="pt-h tylko-telefon"><h2 id="h2-skroty" tabindex="-1">{t(lang, 'naSkroty')}</h2></div>
       {skroty.kafelki.map((k) => (
         k.adres === KOLORY_DNI ? (
           <KafelekKoloryDni lang={lang} adres={k.adres} etykieta={wybierz(k, 'etykieta', lang)} />
@@ -110,18 +142,28 @@ const kafelki = [
     </div>
   </section>
 
-  {/* Najbliższe wydarzenia — sekcja jest zawsze; gdy nic nie ma (albo skrypt niżej schowa zakończone), pokazuje
-       komunikat „Brak zapowiedzianych wydarzeń.” (jak puste „Najbliższe seminaria”). */}
+  {/* Nadchodzące wydarzenia — sekcja jest zawsze; gdy nic nie ma (albo skrypt niżej schowa zakończone), pokazuje
+       komunikat „Brak zapowiedzianych wydarzeń.” (jak puste „Najbliższe seminaria”). Komputer: 3 wydarzenia z najbliższych
+       dni roboczych; telefon (osobny blok): do 10 z 30 dni, widać 3 i „Zobacz więcej”. */}
   <section class="section wydarzenia-pas gl-box gl-wyd" aria-labelledby="h2-wyd" data-wydarzenia>
     <div class="wrap">
       <div class="section-head">
-        <h2 id="h2-wyd">{t(lang, 'najblizsze')}</h2>
+        <h2 id="h2-wyd">{t(lang, 'nadchodzaceWydarzenia')}</h2>
         <a class="link-arrow" href={href('/kalendarz')}>{t(lang, 'kalendarz')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
       </div>
-      <div class="event-grid">
-        {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} />)}
+      <div class="tylko-komputer" data-wydarzenia-blok>
+        <div class="event-grid">
+          {wydarzenia.map((w) => <KartaWydarzenia w={w} lang={lang} />)}
+        </div>
+        <p class="sem-empty" data-wydarzenia-pusto hidden={wydarzenia.length > 0}>{t(lang, 'brakWydarzen')}</p>
       </div>
-      <p class="sem-empty" data-wydarzenia-pusto hidden={wydarzenia.length > 0}>{t(lang, 'brakWydarzen')}</p>
+      <div class="tylko-telefon" data-wydarzenia-blok data-zw data-pagefind-ignore>
+        <div class="event-grid" id="wyd-tel">
+          {wydarzeniaTel.map((w, i) => <KartaWydarzenia w={w} lang={lang} klasa={i >= WIDOCZNE ? 'nadmiar' : undefined} />)}
+        </div>
+        {wydarzeniaTel.length > WIDOCZNE && <ZobaczWiecej lista="wyd-tel" ukryte={wydarzeniaTel.length - WIDOCZNE} lang={lang} />}
+        <p class="sem-empty" data-wydarzenia-pusto hidden={wydarzeniaTel.length > 0}>{t(lang, 'brakWydarzen')}</p>
+      </div>
     </div>
   </section>
 
@@ -138,14 +180,14 @@ const kafelki = [
   </section>
 
   <div class="wrap gl-tel tylko-telefon" data-pagefind-ignore>
-    <section class="pt-box" aria-labelledby="h2-akt-tel">
+    <section class="pt-box" aria-labelledby="h2-akt-tel" data-zw>
       <div class="pt-h">
         <h2 id="h2-akt-tel">{t(lang, 'aktualnosci')}</h2>
         <a class="pt-all" href={href('/aktualnosci')}>{t(lang, 'wszystkieAktualnosci')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
       </div>
-      <ul class="pt-list">
-        {lista.map((p) => (
-          <li>
+      <ul class="pt-list" id="akt-tel">
+        {lista.map((p, i) => (
+          <li class={i >= WIDOCZNE ? 'nadmiar' : undefined}>
             <a class="pt-item" href={href(p.href)}>
               <time class="pt-d" datetime={p.data}>{short(p.data).slice(0, 5)}</time>
               <span class="pt-b">
@@ -157,6 +199,7 @@ const kafelki = [
           </li>
         ))}
       </ul>
+      {lista.length > WIDOCZNE && <ZobaczWiecej lista="akt-tel" ukryte={lista.length - WIDOCZNE} lang={lang} />}
     </section>
   </div>
 
@@ -180,13 +223,16 @@ const kafelki = [
             pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
           />
         </div>
-        <div class="tylko-telefon" data-pagefind-ignore>
+        <div class="tylko-telefon" data-pagefind-ignore data-zw>
           <ListaReferatow
             wiersze={referaty}
             lang={lang}
             etykieta={t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}
             pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}
+            id="sem-tel"
+            widoczne={WIDOCZNE}
           />
+          {referaty.length > WIDOCZNE && <ZobaczWiecej lista="sem-tel" ukryte={referaty.length - WIDOCZNE} lang={lang} />}
         </div>
       </div>
     </div>
@@ -222,19 +268,177 @@ const kafelki = [
 </Baza>
 
 <script>
-  // Strona przebudowuje się 2× dziennie — wydarzenia, które już się skończyły, chowamy od razu w przeglądarce.
   import { now, today, hasTime } from '../lib/daty';
-  const sekcja = document.querySelector<HTMLElement>('[data-wydarzenia]');
-  if (sekcja) {
+
+  // ---------- „••• Zobacz więcej” (telefon, zlecenie 06; wzór: wnetrze.js makiety) ----------
+  // Sekcja [data-zw] ma listę (id w aria-controls przycisku .wiecej-row — ZobaczWiecej.astro); pozycje od czwartej mają
+  // .nadmiar i są schowane (display: none, więc też poza kolejnością Tab), dopóki sekcja nie ma .rozw. Rozwinięta jest
+  // najwyżej jedna sekcja: rozwinięcie jednej zwija pozostałe. Strona nie skacze: kotwicą jest ostatnia widoczna pozycja
+  // sekcji (przy rozwijaniu) albo sam przycisk (przy zwijaniu) — po zmianie przewijamy o różnicę jej położenia, bez
+  // animacji (to wyrównuje też zwinięcie sekcji wyżej). Fokus zostaje na przycisku, bez obwódki po kliknięciu palcem.
+  const WIDOCZNE = 3;
+  const pozycje = (b: HTMLButtonElement) =>
+    Array.from(document.getElementById(b.getAttribute('aria-controls') || '')?.children ?? []) as HTMLElement[];
+  const ustawSekcje = (sekcja: Element, rozwinieta: boolean) => {
+    sekcja.classList.toggle('rozw', rozwinieta);
+    const b = sekcja.querySelector<HTMLButtonElement>('.wiecej-row');
+    if (!b) return;
+    b.setAttribute('aria-expanded', String(rozwinieta));
+    const napis = b.querySelector('.wt');
+    if (napis) napis.textContent = (rozwinieta ? b.dataset.zwin : b.dataset.wiecej) || '';
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-zw] .wiecej-row').forEach((b) =>
+    b.addEventListener('click', () => {
+      const sekcja = b.closest('[data-zw]');
+      if (!sekcja) return;
+      const rozwin = !sekcja.classList.contains('rozw');
+      const widoczne = pozycje(b).filter((p) => !p.classList.contains('nadmiar'));
+      const kotwica = rozwin && widoczne.length ? widoczne[widoczne.length - 1] : b;
+      const y0 = kotwica.getBoundingClientRect().top;
+      if (rozwin) document.querySelectorAll('[data-zw].rozw').forEach((s) => s !== sekcja && ustawSekcje(s, false));
+      ustawSekcje(sekcja, rozwin);
+      const d = kotwica.getBoundingClientRect().top - y0;
+      if (Math.abs(d) > 0.5) window.scrollBy({ top: d, left: 0, behavior: 'instant' });
+      if (document.activeElement !== b) b.focus({ preventScroll: true, focusVisible: false } as FocusOptions);
+    })
+  );
+
+  // ---------- Wydarzenia ----------
+  // Strona przebudowuje się 2× dziennie — wydarzenia, które już się skończyły, chowamy od razu w przeglądarce. Każdy blok
+  // (komputer, telefon) liczy się potem od nowa: gdy nic nie zostało — komunikat zamiast pustej listy; na telefonie
+  // pierwsze 3 pozostałe są widoczne, N w „Zobacz więcej (N)” jest aktualne, a przy ≤ 3 przycisku nie ma.
+  const sekcjaWyd = document.querySelector<HTMLElement>('[data-wydarzenia]');
+  if (sekcjaWyd) {
     const n = now();
     const d = today();
-    const karty = Array.from(sekcja.querySelectorAll<HTMLElement>('[data-koniec]'));
-    karty.forEach((k) => {
+    sekcjaWyd.querySelectorAll<HTMLElement>('[data-koniec]').forEach((k) => {
       const koniec = k.dataset.koniec || '';
       if (koniec && (hasTime(koniec) ? koniec < n : koniec < d)) k.remove();
     });
-    // wszystkie się skończyły → komunikat zamiast pustej sekcji
-    if (!sekcja.querySelector('[data-koniec]')) sekcja.querySelector<HTMLElement>('[data-wydarzenia-pusto]')?.removeAttribute('hidden');
+    sekcjaWyd.querySelectorAll<HTMLElement>('[data-wydarzenia-blok]').forEach((blok) => {
+      const zostaly = Array.from(blok.querySelectorAll<HTMLElement>('[data-koniec]'));
+      if (!zostaly.length) blok.querySelector<HTMLElement>('[data-wydarzenia-pusto]')?.removeAttribute('hidden');
+      const b = blok.querySelector<HTMLButtonElement>('.wiecej-row');
+      if (!b) return;
+      zostaly.forEach((k, i) => k.classList.toggle('nadmiar', i >= WIDOCZNE));
+      const ukryte = Math.max(0, zostaly.length - WIDOCZNE);
+      b.hidden = ukryte === 0;
+      const ile = b.querySelector('.ile');
+      if (ile) ile.textContent = `(${ukryte})`;
+    });
+  }
+
+  // ---------- Baner B2 na telefonie (zlecenie 06; wzór: skrypt w b2.html) ----------
+  // Baner (.hero-b2) jest na telefonie przyklejony (sticky, top = pas − 100svh; telefon.css) — po przewinięciu zostaje
+  // z niego pas pod nagłówkiem, bez udziału skryptu. Skrypt:
+  //  • zapisuje postęp zwijania --p = scrollY / Z ∈ [0, 1] (raz na klatkę, requestAnimationFrame, przy scroll i resize);
+  //    od niego zależą w CSS przenikanie tytułu, przycisku, przyciemnienia i małego hasła w pasie oraz paralaksa zdjęcia
+  //    (--przes: w zwiniętym pasie widać środek zdjęcia, czyli budynek). Wymiary (baner, pas, zdjęcie) czyta tylko przy
+  //    załadowaniu i zmianie rozmiaru — w klatce przewijania tylko scrollY;
+  //  • od p > .25 chowa przycisk „Na skróty i wydarzenia” (visibility: hidden — stoi w obszarze pasa i byłby niewidocznym,
+  //    klikalnym celem w kolejności Tab), od p > .8 pokazuje nazwę Instytutu w nagłówku (.hdr-zwiniety);
+  //  • dociąga: po zakończeniu przewijania (scrollend, bez niego 140 ms ciszy), nigdy z palcem na ekranie i tylko
+  //    w strefie 0 < scrollY < Z: w dół od 8 px do Z (pas nad „Na skróty”), w górę do 0 dopiero poniżej 0,75·Z
+  //    (inaczej z powrotem do Z). Poza strefą przewijanie jest zwykłe;
+  //  • przycisk przewija dokładnie do Z i przenosi fokus na nagłówek „Na skróty” (przycisk zaraz znika).
+  // Z = wysokość banera (100svh) − pas — to samo co innerHeight − pas, ale stałe, gdy pasek adresu przeglądarki telefonu
+  // chowa się przy przewijaniu (innerHeight rośnie, a baner przykleja się zawsze po 100svh − pas).
+  // Ograniczony ruch: bez paralaksy, przewijanie i dociąganie bez animacji (wejście i podskok strzałki wyłącza CSS).
+  // Komputer (> 760 px): skrypt nic nie robi.
+  const hero = document.querySelector<HTMLElement>('#tresc > .hero-b2');
+  if (hero) {
+    const telefon = window.matchMedia('(max-width: 760px)');
+    const ruchOgr = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const hdr = document.querySelector<HTMLElement>('.hdr-glowna');
+    const img = hero.querySelector<HTMLElement>('.hero-fig img');
+    const dalej = hero.querySelector<HTMLAnchorElement>('.hero-dalej');
+    const naSkroty = document.getElementById('h2-skroty');
+    let Z = 1;
+    let raf = 0;
+    let ukryty: boolean | null = null;
+    let zwiniety: boolean | null = null;
+
+    const zmierz = () => {
+      if (!telefon.matches) return;
+      const H = hero.offsetHeight;
+      const top = parseFloat(getComputedStyle(hero).top); // pas − 100svh
+      const pas = Number.isFinite(top) && top < 0 ? H + top : (hdr?.offsetHeight ?? 61) + 36;
+      Z = Math.max(1, Math.round(H - pas));
+      const przes = ruchOgr.matches || !img ? 0 : Math.round(H - pas / 2 - img.offsetTop - img.offsetHeight / 2);
+      hero.style.setProperty('--przes', `${przes}px`);
+    };
+    const licz = () => {
+      raf = 0;
+      if (!telefon.matches) return;
+      const p = Math.min(1, Math.max(0, window.scrollY / Z));
+      hero.style.setProperty('--p', p.toFixed(3));
+      // klasy tylko przy zmianie stanu (nie zapisujemy DOM w każdej klatce)
+      if ((p > 0.25) !== ukryty) { ukryty = p > 0.25; dalej?.classList.toggle('hero-dalej-ukryty', ukryty); }
+      if ((p > 0.8) !== zwiniety) { zwiniety = p > 0.8; hdr?.classList.toggle('hdr-zwiniety', zwiniety); }
+    };
+    const plan = () => { if (!raf) raf = requestAnimationFrame(licz); };
+    const odNowa = () => { zmierz(); plan(); };
+    window.addEventListener('scroll', plan, { passive: true });
+    window.addEventListener('resize', odNowa);
+    ruchOgr.addEventListener('change', odNowa);
+    telefon.addEventListener('change', () => {
+      if (!telefon.matches) {
+        // komputer: baner zwykły — bez zmiennych i klas telefonu
+        hero.style.removeProperty('--p'); hero.style.removeProperty('--przes');
+        dalej?.classList.remove('hero-dalej-ukryty'); hdr?.classList.remove('hdr-zwiniety');
+        ukryty = zwiniety = null;
+      }
+      odNowa();
+    });
+    zmierz();
+    licz();
+
+    // dociąganie
+    const maScrollend = 'onscrollend' in window;
+    let ostatnieY = window.scrollY;
+    let kier = 0;
+    let t = 0;
+    let tAuto = 0;
+    let auto = false; // trwa przewijanie wywołane przez skrypt
+    let dotyk = false; // palec na ekranie
+    const przewin = (y: number) => {
+      auto = true;
+      clearTimeout(tAuto);
+      tAuto = window.setTimeout(() => { auto = false; }, ruchOgr.matches ? 50 : 900);
+      window.scrollTo({ top: y, behavior: ruchOgr.matches ? 'auto' : 'smooth' });
+    };
+    const dociagnij = () => {
+      if (!telefon.matches || auto || dotyk) return;
+      const y = window.scrollY;
+      if (y <= 0 || y >= Z - 1) return;
+      przewin(kier > 0 ? (y > 8 ? Z : 0) : (y < Z * 0.75 ? 0 : Z));
+    };
+    const zaplanuj = () => { clearTimeout(t); t = window.setTimeout(dociagnij, 140); };
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y !== ostatnieY) kier = y > ostatnieY ? 1 : -1;
+      ostatnieY = y;
+      if (auto) return;
+      if (maScrollend) clearTimeout(t); else zaplanuj();
+    }, { passive: true });
+    if (maScrollend) {
+      window.addEventListener('scrollend', () => {
+        if (auto) { auto = false; clearTimeout(tAuto); return; }
+        clearTimeout(t);
+        dociagnij();
+      });
+    }
+    window.addEventListener('touchstart', () => { dotyk = true; auto = false; clearTimeout(t); }, { passive: true });
+    const puszczony = () => { dotyk = false; zaplanuj(); };
+    window.addEventListener('touchend', puszczony, { passive: true });
+    window.addEventListener('touchcancel', puszczony, { passive: true });
+
+    dalej?.addEventListener('click', (e) => {
+      if (!telefon.matches) return;
+      e.preventDefault();
+      przewin(Z);
+      naSkroty?.focus({ preventScroll: true });
+    });
   }
 </script>
 
@@ -250,6 +454,9 @@ const kafelki = [
 
   /* ---------- telefon (≤ 760 px): wygląd „Portal” — ramki jedna pod drugą ---------- */
   @media (max-width: 760px) {
+    /* wydarzenia, aktualności, seminaria: widać 3 pierwsze pozycje, reszta po „Zobacz więcej” (zlecenie 06; przycisk —
+       ZobaczWiecej.astro, obsługa — skrypt wyżej). Tylko z JS: bez skryptu widać całe listy. */
+    :global(.js) [data-zw]:not(.rozw) :global(.nadmiar) { display: none; }
     .pt-stopka { padding-top: 8px; }
     .gl-tel { margin-top: 12px; }
     /* sekcje wspólne z komputerem jako ramki: 12 px odstępu, ramka na .wrap, bez kreski sekcji „linia” */

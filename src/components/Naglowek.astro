@@ -8,7 +8,9 @@ import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
-// naZdjeciu: strona główna z banerem — nagłówek leży na przyciemnionym zdjęciu, po przewinięciu robi się zwykły (biały)
+// naZdjeciu: strona główna z banerem — nagłówek leży na przyciemnionym zdjęciu, po przewinięciu robi się zwykły (biały).
+// Na telefonie (≤ 760 px, klasa .hdr-glowna) jest stale ciemny i półprzezroczysty, także nad zwiniętym banerem
+// (zlecenie 06; style: telefon.css, „Strona główna B2”).
 interface Props { lang: Lang; sciezka: string; inny: string | null; naZdjeciu?: boolean }
 const { lang, sciezka, inny, naZdjeciu = false } = Astro.props;
 
@@ -23,7 +25,7 @@ const logo = (ustawienia as any).logo as string | undefined;
 // logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
 const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
 ---
-<header class:list={['hdr', { 'hdr-foto': naZdjeciu }]}>
+<header class:list={['hdr', { 'hdr-foto': naZdjeciu, 'hdr-glowna': naZdjeciu }]}>
   <div class="wrap hdr-row">
     <div class="brand">
       <a class:list={['brand-uwr', { 'brand-uwr-logo': !logo }]} href={uwrAdres} aria-label={t(lang, 'uwrStronaGlowna')}>
@@ -156,13 +158,18 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   // a na samym dole każdej strony przyjmuje kolor stopki
   const hdr = document.querySelector<HTMLElement>('.hdr');
   const stopka = document.querySelector<HTMLElement>('.ftr');
+  // Strona główna na telefonie (zlecenie 06): baner zwija się w ciemny pas (nagłówek + 36 px), który zostaje u góry
+  // aż do stopki, a nagłówek jest przez cały czas ciemny (telefon.css) — „przewinięty” znaczy tu tylko „baner zwinięty”
+  // (dół banera najwyżej 8 px pod pasem); od tego zależy kolor stopki w nagłówku na dole strony.
+  const telefon = window.matchMedia('(max-width: 760px)');
+  const glownaTel = () => !!hdr?.classList.contains('hdr-glowna') && telefon.matches;
   const odswiezNaglowek = () => {
     if (!hdr) return;
     // na stronie ze zdjęciem nagłówek zostaje przezroczysty, dopóki nie zbliżymy się do końca zdjęcia
-    // (strona główna: cały ciemny pas .hero — na telefonie zdjęcie jest tylko w jego górnej części, niżej granat;
-    // podstrony: granatowy pas .ph na samej górze) — nagłówek bieleje dopiero, gdy pas prawie schowa się pod nim
+    // (strona główna: cały ciemny pas .hero; podstrony: granatowy pas .ph na samej górze) — nagłówek bieleje dopiero,
+    // gdy pas prawie schowa się pod nim
     const foto = hdr.classList.contains('hdr-foto') ? document.querySelector<HTMLElement>('#tresc > .hero, #tresc > .ph') : null;
-    const zapas = foto?.classList.contains('ph') ? 16 : 8;
+    const zapas = glownaTel() ? 36 + 8 : foto?.classList.contains('ph') ? 16 : 8;
     const przewiniety = foto ? foto.getBoundingClientRect().bottom <= hdr.offsetHeight + zapas : window.scrollY > 40;
     hdr.classList.toggle('przewiniety', przewiniety);
     if (stopka) {
@@ -185,6 +192,8 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   const mtlo = document.querySelector<HTMLElement>('[data-mnav-tlo]');
   const ciemnyNaglowek = () => {
     if (!hdr) return false;
+    // strona główna na telefonie: nagłówek zawsze ciemny (na zdjęciu i nad zwiniętym pasem)
+    if (glownaTel()) return true;
     if (hdr.classList.contains('hdr-stopka') || (hdr.classList.contains('hdr-foto') && !hdr.classList.contains('przewiniety'))) return true;
     // granatowy pas na górze podstrony (.ph-granat) jeszcze widoczny pod nagłówkiem
     const pas = document.querySelector<HTMLElement>('#tresc > .ph-granat:first-child');

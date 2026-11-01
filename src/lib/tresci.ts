@@ -252,7 +252,17 @@ export function poDniachRoboczych(od: string, n: number): string {
 // Strona główna: tylko wydarzenia, które trwają albo zaczynają się w ciągu najbliższych `dniRoboczych` dni roboczych
 // (Ustawienia → „Wydarzenia na stronie głównej”). Gdy żadnego nie ma, sekcja się nie pokazuje.
 export async function wydarzeniaNaGlowna(limit = 3, lang: Lang = 'pl', dniRoboczych = 5): Promise<Wydarzenie[]> {
-  const granica = poDniachRoboczych(today(), dniRoboczych);
+  return wydarzeniaDo(poDniachRoboczych(today(), dniRoboczych), limit, lang);
+}
+
+// Telefon (zlecenie 06): nadchodzące wydarzenia z najbliższych `dni` dni kalendarzowych (Ustawienia →
+// wydarzenia_dni_telefon, domyślnie 30) i przypomnienia terminów jak wyżej — chronologicznie, najwyżej `limit`.
+// Na stronie widać pierwsze 3, resztę po „Zobacz więcej”.
+export async function wydarzeniaNaTelefon(limit = 10, lang: Lang = 'pl', dni = 30): Promise<Wydarzenie[]> {
+  return wydarzeniaDo(addDays(today(), dni), limit, lang);
+}
+
+async function wydarzeniaDo(granica: string, limit: number, lang: Lang): Promise<Wydarzenie[]> {
   const blisko = (await najblizszeWydarzenia(100, lang)).filter((w) => w.poczatek.slice(0, 10) <= granica);
   const terminy = (await przypomnieniaTerminow(lang)).filter((w) => today() >= w.widoczneOd! && today() <= w.poczatek);
   // ściśle chronologicznie (obrony razem z innymi wydarzeniami, według terminu)

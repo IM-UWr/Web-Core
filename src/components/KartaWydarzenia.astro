@@ -8,8 +8,9 @@ import { wJezyku, RODZAJE } from '../lib/i18n';
 import { dayNum, monthShort, range, time, hasTime, type Lang } from '../lib/daty';
 import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
 
-interface Props { w: Wydarzenie; lang: Lang; maly?: boolean }
-const { w, lang, maly = false } = Astro.props;
+// klasa: dodatkowa klasa karty (strona główna na telefonie: .nadmiar — pozycja schowana do „Zobacz więcej”)
+interface Props { w: Wydarzenie; lang: Lang; maly?: boolean; klasa?: string }
+const { w, lang, maly = false, klasa } = Astro.props;
 const minione = !trwaLubBedzie(w); // kafelek daty: granatowy = nadchodzące, szary = minione
 const zewn = !!w.href && isExternal(w.href);
 const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
@@ -22,7 +23,7 @@ const KROPKA = '\u00a0·\u00a0';
 const kiedy = ((w.rodzaj === 'termin' ? (lang === 'en' ? 'by ' : 'do ') : '') + range(w.poczatek, w.koniec, lang)).replace(/(\d)–(?=\d)/g, '$1–\u2060');
 const meta = [kiedy, w.miejsce].filter(Boolean).join('\u00a0· ');
 ---
-<Tag class:list={['event', !adres && 'event-bez-linku']} href={adres} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
+<Tag class:list={['event', !adres && 'event-bez-linku', klasa]} href={adres} data-koniec={w.koniec || w.koniecIcs || w.poczatek}>
   <span class={`datebox${maly ? ' small' : ''}${minione ? ' minione' : ''}`} aria-hidden="true">
     <span class="d">{dayNum(w.poczatek)}</span>
     <span class="m">{monthShort(w.poczatek, lang)}</span>

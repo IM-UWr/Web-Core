@@ -312,3 +312,97 @@
 @media (max-width: 560px) {
   .brand-logo { height: 38px; }
 }
+
+/* ---------- Strona główna B2: zwijany baner ze zdjęciem (zlecenie 06; decyzja 31.10.2026, 23:36) ----------
+   Wzór kodu i wartości: .przekazanie/prototypy/strona-glowna-b2/b2.html (makieta ma nagłówek 64 px, tu --hdr-h = 61 px).
+   Baner (.hero-b2, StronaGlowna.astro) zajmuje cały pierwszy ekran (100svh): zdjęcie budynku od 107 px w dół (dół wychodzi
+   poza ekran), u dołu tytuł, bursztynowe hasło i podtytuł na ciemnej otoczce, pod nimi przycisk „Na skróty i wydarzenia”.
+   Z JS baner jest przyklejony (sticky) z top = pas − 100svh, więc po przewinięciu zostaje z niego pas o wysokości
+   nagłówka + 36 px (--pas) z samym hasłem — to robi samo CSS, aż do końca treści (przy stopce pas odjeżdża z treścią).
+   Skrypt ustawia tylko postęp zwijania --p (0 = zdjęcie, 1 = pas) i przesunięcie zdjęcia --przes (paralaksa), a przy
+   p > .25 / p > .8 klasy .hero-dalej-ukryty i .hdr-zwiniety. Bez JS: zwykły blok 100svh pod zwykłym nagłówkiem.
+   Kolejność warstw w banerze: zdjęcie (.hero-fig, z −1) z przyciemnieniem u góry (::before) i ciemnieniem przy zwijaniu
+   (::after), nad nim tekst z otoczką (.hero-txt::before), mały napis w pasie, przycisk i podpis zdjęcia. Komputer bez zmian. */
+@media (max-width: 760px) {
+  :root { --pas: calc(var(--hdr-h) + 36px); }
+  /* kotwice i fokus nie chowają się pod pasem */
+  :root.js:has(.hero-b2) { scroll-padding-top: calc(var(--pas) + 8px); }
+
+  /* --scrim: kolor otoczki tekstu, przycisku i przyciemnienia u góry; --zwin: ciemnienie całego banera przy zwijaniu */
+  .hero.hero-b2 { --scrim: 8 14 30; --zwin: rgb(14 25 52 / .9); z-index: 10; height: 100vh; height: 100svh; overflow: hidden; background: #0b1428; }
+  :root[data-theme='dark'] .hero.hero-b2 { --scrim: 5 9 20; --zwin: rgb(9 16 34 / .92); }
+  .js .hero.hero-b2 { position: sticky; top: calc(var(--pas) - 100vh); top: calc(var(--pas) - 100svh); }
+
+  /* zdjęcie telefonu (884 × 1779): 112% szerokości, 107 px od góry banera, u góry łagodne przejście z paska w zdjęcie */
+  .hero-b2 .hero-fig { inset: 0; height: auto; background: #0b1428; }
+  .hero-b2 .hero-fig img { position: absolute; left: -6%; top: 107px; width: 112%; max-width: none; height: auto; aspect-ratio: 884 / 1779; object-fit: cover;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, rgb(0 0 0 / .3) 36px, rgb(0 0 0 / .6) 72px, rgb(0 0 0 / .85) 120px, #000 176px);
+    mask-image: linear-gradient(180deg, transparent 0, rgb(0 0 0 / .3) 36px, rgb(0 0 0 / .6) 72px, rgb(0 0 0 / .85) 120px, #000 176px);
+    transform: translateY(calc(var(--p, 0) * var(--przes, 0px))); }
+  :root[data-theme='dark'] .hero-b2 .hero-fig img { filter: brightness(.9) saturate(.95); }
+  /* zamiast dzisiejszych gradientów komputera: przyciemnienie u góry (124 px, pod napisami nagłówka) i ciemnienie całego
+     banera przy zwijaniu; podpis komputera (figcaption) wyłączony — telefon ma własny (.hero-podpis, pole podpis_telefon) */
+  .hero-b2 .hero-fig::before { content: ''; inset: 0 0 auto; z-index: 1; height: 124px; background: linear-gradient(180deg, rgb(var(--scrim) / .72), rgb(var(--scrim) / 0)); }
+  .hero-b2 .hero-fig::after, .js .hdr-foto ~ main .hero-b2 .hero-fig::after { content: ''; position: absolute; inset: 0; z-index: 1; height: auto; pointer-events: none;
+    background: var(--zwin); opacity: clamp(0, calc((var(--p, 0) - .35) * 1.6), 1); }
+  .hero-b2 .hero-fig figcaption { display: none; }
+
+  /* tekst: blok u dołu po lewej, szeroki na najdłuższą linię; tytuł w dwóch liniach (szerokość najdłuższego słowa) */
+  .hero-b2 .hero-in { position: absolute; inset: 0; max-width: none; min-height: 0; margin: 0; padding: 0; display: block; }
+  #tresc > .hero.hero-b2 .hero-in { animation: none; }
+  .hero-b2 .hero-txt { position: absolute; left: 16px; bottom: 98px; display: block; width: fit-content; max-width: calc(100% - 32px); isolation: isolate;
+    opacity: clamp(0, calc(1 - var(--p, 0) * 1.6), 1); transform: translateY(calc(var(--p, 0) * -36px)); }
+  .hero-b2 :is(.hero-flag, .hero-lead, .hero-btns) { display: none; }
+  .hero.hero-b2 h1 { width: min-content; margin: 0; font-size: 40px; font-weight: 800; line-height: 1.02; letter-spacing: -.028em; color: #fff; text-wrap: balance; }
+  .hero-haslo { margin: 12px 0 0; font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--accent); white-space: nowrap; }
+  .hero-pod { margin: 6px 0 0; font-size: 14px; font-weight: 500; line-height: 1.4; color: rgb(255 255 255 / .9); }
+  /* Ciemna otoczka tekstu — dosłownie z b2.html (v29): pod tekstem krycie 97% od lewej krawędzi ekranu do końca najdłuższej
+     linii, w prawo zanik przez 310 px w 10 stopniach (smoothstep), w górę przez 224 px w 16 stopniach (smootherstep, maska),
+     w dół do dolnej krawędzi banera */
+  .hero-b2 .hero-txt::before { content: ''; position: absolute; z-index: -1; left: -16px; right: -310px; top: -224px; bottom: -240px; pointer-events: none;
+    background: linear-gradient(90deg, rgb(var(--scrim) / 0.97) 0, rgb(var(--scrim) / 0.97) calc(100% - 310px), rgb(var(--scrim) / 0.943) calc(100% - 279px), rgb(var(--scrim) / 0.869) calc(100% - 248px), rgb(var(--scrim) / 0.760) calc(100% - 217px), rgb(var(--scrim) / 0.629) calc(100% - 186px), rgb(var(--scrim) / 0.485) calc(100% - 155px), rgb(var(--scrim) / 0.341) calc(100% - 124px), rgb(var(--scrim) / 0.210) calc(100% - 93px), rgb(var(--scrim) / 0.101) calc(100% - 62px), rgb(var(--scrim) / 0.027) calc(100% - 31px), rgb(var(--scrim) / 0.000) calc(100% - 0px));
+    -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.000) 0px, rgb(0 0 0 / 0.002) 14px, rgb(0 0 0 / 0.016) 28px, rgb(0 0 0 / 0.049) 42px, rgb(0 0 0 / 0.104) 56px, rgb(0 0 0 / 0.180) 70px, rgb(0 0 0 / 0.275) 84px, rgb(0 0 0 / 0.384) 98px, rgb(0 0 0 / 0.500) 112px, rgb(0 0 0 / 0.616) 126px, rgb(0 0 0 / 0.725) 140px, rgb(0 0 0 / 0.820) 154px, rgb(0 0 0 / 0.896) 168px, rgb(0 0 0 / 0.951) 182px, rgb(0 0 0 / 0.984) 196px, rgb(0 0 0 / 0.998) 210px, rgb(0 0 0 / 1.000) 224px, #000 100%);
+    mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.000) 0px, rgb(0 0 0 / 0.002) 14px, rgb(0 0 0 / 0.016) 28px, rgb(0 0 0 / 0.049) 42px, rgb(0 0 0 / 0.104) 56px, rgb(0 0 0 / 0.180) 70px, rgb(0 0 0 / 0.275) 84px, rgb(0 0 0 / 0.384) 98px, rgb(0 0 0 / 0.500) 112px, rgb(0 0 0 / 0.616) 126px, rgb(0 0 0 / 0.725) 140px, rgb(0 0 0 / 0.820) 154px, rgb(0 0 0 / 0.896) 168px, rgb(0 0 0 / 0.951) 182px, rgb(0 0 0 / 0.984) 196px, rgb(0 0 0 / 0.998) 210px, rgb(0 0 0 / 1.000) 224px, #000 100%); }
+
+  /* mały napis w zwiniętym pasie: samo hasło (dla czytników jest już w tytule banera — aria-hidden) */
+  .hero-maly { position: absolute; left: 16px; right: 16px; bottom: 9px; z-index: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; pointer-events: none;
+    font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--accent); opacity: clamp(0, calc((var(--p, 0) - .62) * 3), 1); }
+
+  /* przycisk „Na skróty i wydarzenia”: znika przy zwijaniu, od p > .25 także dla myszy, dotyku i Tab (.hero-dalej-ukryty) */
+  .hero-dalej { position: absolute; left: 50%; bottom: 24px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px 0 20px;
+    border-radius: 999px; white-space: nowrap; font-size: 15px; font-weight: 700; line-height: 1.2; color: #fff; text-decoration: none;
+    background: rgb(var(--scrim) / .72); box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .5);
+    transform: translateX(-50%); opacity: clamp(0, calc(1 - var(--p, 0) * 4), 1); }
+  .hero-dalej:hover, .hero-dalej:focus { color: #fff; }
+  .hero-dalej.hero-dalej-ukryty { visibility: hidden; }
+
+  /* podpis zdjęcia (pole baner.podpis_telefon; puste = bez podpisu): prawy górny róg zdjęcia, znika przy zwijaniu */
+  .hero-podpis { position: absolute; right: 12px; top: calc(var(--hdr-h) + 13px); z-index: 3; max-width: 62%; margin: 0; padding: 3px 8px; border-radius: 6px;
+    text-align: right; font-size: 12px; font-weight: 600; line-height: 1.3; color: #fff; background: rgb(var(--scrim) / .62);
+    opacity: clamp(0, calc(1 - var(--p, 0) * 3), 1); }
+
+  /* ruch przy załadowaniu: wejście tytułu, hasła i podtytułu (10 px w górę) i dwa podskoki strzałki przycisku —
+     tylko gdy użytkownik nie prosi o ograniczenie ruchu */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-b2 .hero-txt > :is(h1, .hero-haslo, .hero-pod) { animation: hero-b2-wejscie .6s .15s both cubic-bezier(.2, .7, .2, 1); }
+    .hero-dalej .ico { animation: hero-b2-podskok 1.4s 1.4s 2 ease-in-out; }
+  }
+  /* .01 zamiast 0 — jak w przejscia.css (inaczej Chrome liczy LCP dopiero po końcu animacji) */
+  @keyframes hero-b2-wejscie { from { opacity: .01; transform: translateY(10px); } }
+  @keyframes hero-b2-podskok { 0%, 100% { transform: none; } 50% { transform: translateY(5px); } }
+
+  /* Nagłówek strony głównej (.hdr-glowna) — przez cały czas ciemny, półprzezroczysty i rozmyty (na zdjęciu i nad pasem);
+     dzisiejsze bielenie po przewinięciu (.przewiniety) i animacja hero-hdr wyłączone. Na zdjęciu bez dolnej linii
+     i bez nazwy Instytutu; po zwinięciu banera (.hdr-zwiniety, p > .8) — cienka linia i nazwa jak na podstronach. Logo,
+     lupa, motyw i menu białe. Przy stopce (.hdr-stopka) i z otwartym menu (.menu-otwarte, kolory .menu-ciemne) — jak dotąd. */
+  .js .hdr.hdr-glowna.hdr-foto { animation: none; }
+  .js .hdr.hdr-glowna:not(.hdr-stopka):not(.menu-otwarte) { background: rgb(10 18 38 / .58); -webkit-backdrop-filter: blur(10px) saturate(1.15); backdrop-filter: blur(10px) saturate(1.15);
+    border-bottom-color: transparent; box-shadow: none; }
+  .js .hdr.hdr-glowna.hdr-zwiniety:not(.hdr-stopka):not(.menu-otwarte) { box-shadow: 0 1px 0 rgb(255 255 255 / .06); }
+  .js .hdr.hdr-glowna:not(.menu-otwarte) :is(.brand-name, .icon-btn:not(.burger)) { color: #fff; }
+  .js .hdr.hdr-glowna:not(.menu-otwarte) .brand-sub { color: rgb(255 255 255 / .82); }
+  .js .hdr.hdr-glowna:not(.menu-otwarte) .brand-logo { background: #fff; }
+  .js .hdr.hdr-glowna:not(.menu-otwarte) .icon-btn:not(.burger):hover { background: rgb(255 255 255 / .16); color: #fff; }
+  .hdr-glowna .brand-txt { transition: opacity .25s, transform .25s, visibility 0s; }
+  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 0; transform: translateY(4px); visibility: hidden; transition: opacity .25s, transform .25s, visibility 0s linear .25s; }
+}
