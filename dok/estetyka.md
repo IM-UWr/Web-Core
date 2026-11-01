@@ -196,3 +196,6 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - Sygnet: tylko kontury.
   - Grubości w CSS (np. 1,8 px kontur i 0,9 px detale, `vector-effect: non-scaling-stroke`).
   - W plikach SVG dwie grupy: `<g id="kontur">` i `<g id="detale">`, bez `stroke-width`.
+- **Dwa typy rysunków (00:20).** O typie decyduje rozmiar.
+  - **Szkic z detalami** (od ok. 150 px, patron jako „bohater”): okładka strony głównej na komputerze i baner strony działu.
+  - **Uproszczony** (patron jako znak lub ikona): sygnet przy tytule podstrony, boczna nawigacja działu, miniatury aktualności bez zdjęcia (72×54), panel menu i menu na telefonie, prawdopodobnie też okładka na telefonie (do rozstrzygnięcia przy projekcie telefonu).
