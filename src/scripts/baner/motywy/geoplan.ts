@@ -6,11 +6,18 @@
 // wielokątem prostym o polu 2,5–16, a wierzchołek widoczny i z dala od hasła; kołki w środku i na brzegu płynnie się
 // przełączają. Klatka po przesunięciu o 0,5 px (4 kl./s), przełączanie kołków 8 kl./s, w przerwach zegar śpi.
 // Warianty (Pole.wariant, tabela WARIANTY niżej): seminarium — gumka w kształcie sześciokąta, „zaklad” (Pracownia) —
-// pięciokąt „domek”. Kolejny wariant (np. Studia podyplomowe, zlecenie 04) to nowy wpis w WARIANTY i „geoplan/<wariant>”
-// w mapie strona → motyw (src/lib/motywyBanerow.ts).
+// pięciokąt „domek”, „podyplomowe” (Studia podyplomowe, zlecenie 04 — niżej). Kolejny wariant to nowy wpis w WARIANTY
+// i „geoplan/<wariant>” w mapie strona → motyw (src/lib/motywyBanerow.ts).
 // Pole (zlecenie 07): prototypowe [fy0, fy1] (od linku + 2 px do 12 px nad liczbami) to tu [y0 + 2, y1 − 6] — dolny
 // rząd kołków najniżej ok. 14 px nad połową hasła. Przy 390 px: kratka bez zmian (18 px, skala 100%), środek 15 px wyżej
 // niż w prototypie, o jeden rząd kołków mniej (jednoliniowy tytuł: 5 zamiast 6).
+// Wariant „podyplomowe” (prototyp animacje-studia-codziennosc.html, rodzina „pick”, ustawienia telefonu): oczko 14 px,
+// kolumny do samego prawego brzegu treści (bez zaniku 10 px), słabsze krycie (kołki 0,13, brzeg 0,42, środek 0,30,
+// gumka 0,19 i 1,5 px), wierzchołek 2,2 px/s, przerwy 2–8 s. Gumka to losowy wielokąt prosty o 5–7 wierzchołkach
+// w prawych kolumnach (od granicy, za którą rysunek widać w ¾ wierszy pola; 6–14 kolumn), o polu od 7 do 0,62 obszaru;
+// z kilkudziesięciu losowych wybierany ten, którego wierzchołki najlepiej widać (prototyp brał pierwszy). Ruchy jak
+// w seminarium, najpierw wierzchołki, które widać. Pole: w prototypie dolny rząd 3 px nad dołem starego pola (8 rzędów);
+// tu kratka jak w seminarium, wyśrodkowana w [y0 + 2, y1 − 6] — przy 390 × 844 7 rzędów, środek 12 px wyżej, skala 100%.
 import type { Fabryka, Pudlo, Ustawienia } from '../typy';
 import { S } from '../wspolne';
 
@@ -20,14 +27,22 @@ const KRATKA = 18, KOLKI = 0.2, RK = 1.15, BRZEG = 0.72, SRODEK = 0.44, GUMKA = 
 const BUDOWA = 2.5, FPS_BUD = 15, FPS = 8, V = 2, KROK_PX = 0.5, TEMPO_K = 1.6, PIERWSZY = 3;
 
 type Pt = [number, number];
+/** krycie: kołki tablicy, kołki na brzegu i w środku gumki, gumka; grubość gumki; promień kołka tablicy; promień
+ *  wyróżnionego kołka r0 + krycie · r1 */
+type Krycie = { kolki: number; brzeg: number; srodek: number; gumka: number; gr: number; rk: number; r0: number; r1: number };
+const KRYCIE: Krycie = { kolki: KOLKI, brzeg: BRZEG, srodek: SRODEK, gumka: GUMKA, gr: 1.4, rk: RK, r0: 1.2, r1: 0.75 };
 type Wariant = {
   /** kształty startowe gumki w kratce (kolumna, rząd); pierwszy główny, kolejne mniejsze — gdy główny się nie mieści */
   wzory: Pt[][];
   /** o ile kołków może przeskoczyć wierzchołek */
   sasiedzi: Pt[];
-  /** przerwa między ruchami (s) i dopuszczalne pole gumki (w oczkach kratki) */
+  /** przerwa między ruchami (s) i dopuszczalne pole gumki (w oczkach kratki; przy `losowy` górna granica to część obszaru) */
   przerwa: [number, number];
   pole: [number, number];
+  /** losowy wielokąt startowy o tylu wierzchołkach (od–do) w prawych kolumnach kratki; `wzory` tylko awaryjnie */
+  losowy?: [number, number];
+  /** oczko kratki (px), prędkość wierzchołka (px/s), krycie; kolumny do samego brzegu treści, bez zaniku przy prawym brzegu */
+  oko?: number; v?: number; kr?: Krycie; doBrzegu?: boolean;
 };
 const SASIEDZI_8: Pt[] = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 const MNIEJSZE: Pt[][] = [[[0, 0], [3, 0], [4, 2], [1, 2]], [[0, 0], [3, 1], [1, 2]]];
@@ -39,6 +54,10 @@ const WARIANTY: Record<string, Wariant> = {
   zaklad: {
     wzory: [[[0, 4], [0, 2], [2, 0], [4, 2], [4, 4]], [[0, 3], [0, 1], [2, 0], [4, 1], [4, 3]], [[0, 2], [0, 0], [3, 0], [4, 2]], [[0, 0], [3, 0], [1, 2]]],
     sasiedzi: SASIEDZI_8, przerwa: [3, 9], pole: [2.5, 16],
+  },
+  podyplomowe: {
+    wzory: MNIEJSZE, sasiedzi: SASIEDZI_8, przerwa: [2, 8], pole: [7, 0.62], losowy: [5, 7], oko: 14, v: 2.2, doBrzegu: true,
+    kr: { kolki: 0.13, brzeg: 0.42, srodek: 0.3, gumka: 0.19, gr: 1.5, rk: 1.05, r0: 0.5, r1: 3.6 },
   },
 };
 
@@ -67,39 +86,74 @@ function prosty(V: Pt[], lo: number, hi: number): boolean {
 
 const motyw: Fabryka = (G, t0) => {
   const W = WARIANTY[G.wariant ?? ''] ?? WARIANTY.seminarium;
-  const f0 = G.y0 + 2, f1 = G.y1 - 6, h = f1 - f0, x1 = G.x1, g = KRATKA;
-  const alfa = (x: number, y: number) => G.widac(x, y) * S((x1 - x) / 10);
+  const K = W.kr ?? KRYCIE, Vw = W.v ?? V;
+  const f0 = G.y0 + 2, f1 = G.y1 - 6, h = f1 - f0, x1 = G.x1, g = W.oko ?? KRATKA;
+  const alfa = (x: number, y: number) => G.widac(x, y) * (W.doBrzegu ? 1 : S((x1 - x) / 10));
   const prawy = (c: CanvasRenderingContext2D, a: number) => {
+    if (W.doBrzegu) return G.rgba(a);
     const gr = c.createLinearGradient(x1 - 10, 0, x1, 0);
     for (let i = 0; i <= 4; i++) gr.addColorStop(i / 4, G.rgba(a * S(1 - i / 4)));
     return gr;
   };
   // kratka: tyle rzędów, ile się mieści w polu (wyśrodkowane), kolumny dosunięte do prawego brzegu treści
   const wier = Math.floor((h - 10) / g) + 1, ky0 = (f0 + f1) / 2 - (wier - 1) * g / 2;
-  const kol = Math.floor((x1 - 8) / g) + 1, kx0 = x1 - 2 - (kol - 1) * g;
+  // (podyplomowe: od prawego do lewego brzegu treści, jak w prototypie; seminarium: do 8 px od lewej krawędzi)
+  const kol = Math.max(1, Math.floor((x1 - (W.doBrzegu ? G.x0 : 8)) / g) + 1), kx0 = x1 - (W.doBrzegu ? 0 : 2) - (kol - 1) * g;
   const px = (c: number) => kx0 + c * g, py = (r: number) => ky0 + r * g;
-  // kołek użyteczny: w kratce, rysunek tam w pełni widoczny i gumka z dala od hasła
+  // wariant z losowym wielokątem: obszar gumki — prawe kolumny od granicy, za którą rysunek widać w ¾ wierszy pola
+  // (25. percentyl granicy pełnej widoczności), minus dwa oczka; 6–14 kolumn
+  let cMin = 0, pole = W.pole;
+  if (W.losowy) {
+    const gr: number[] = [];
+    for (let y = G.y0; y <= G.y1; y += 2) gr.push(G.granica(y) + 60);
+    gr.sort((a, b) => a - b);
+    const iMax = Math.min(kol - 1, Math.max(6, Math.min(14, Math.floor((x1 - gr[Math.floor(gr.length / 4)]) / g))));
+    cMin = kol - 1 - iMax;
+    pole = [W.pole[0], W.pole[1] * iMax * (wier - 1)];
+  }
+  // kołek użyteczny: w kratce, rysunek tam w pełni widoczny (wariant z losowym wielokątem: w obszarze gumki) i gumka
+  // z dala od hasła
   const H = G.haslo;
   const uzyteczny = (c: number, r: number) => {
     if (c < 0 || r < 0 || c >= kol || r >= wier) return false;
     const x = px(c), y = py(r);
     if (H && y > H.t - 6 && y < H.b + 6 && x < H.r + 10) return false;
-    return alfa(x, y) >= 0.9;
+    return W.losowy ? c >= cMin : alfa(x, y) >= 0.9;
   };
-  // kształt startowy: pierwszy wzór, który mieści się cały, jak najbliżej środka pola w pionie i jak najbardziej w prawo
-  let najl: Pt = [0, 0], najW = -Infinity, wzor = W.wzory[0];
-  W.wzory.forEach((wz, wi) => {
-    const szer = Math.max(...wz.map((q) => q[0])), wys = Math.max(...wz.map((q) => q[1]));
-    for (let c0 = kol - 2 - szer; c0 >= 0; c0--) for (let r0 = 0; r0 + wys < wier; r0++) {
-      const w = wz.filter((q) => uzyteczny(c0 + q[0], r0 + q[1])).length;
-      const pref = (w === wz.length ? 1000 - wi * 100 : w * 10 - 500) - Math.abs(r0 + wys / 2 - (wier - 1) / 2) * 2 + c0 * 0.1;
-      if (pref > najW) { najW = pref; najl = [c0, r0]; wzor = wz; }
+  // kształt startowy (wariant z losowym wielokątem): n wierzchołków wokół środka obszaru (jak w prototypie „pick”),
+  // wielokąt prosty o polu w granicach; z najwyżej 40 takich ten, którego wierzchołki najlepiej widać
+  let Vk0: Pt[] | null = null;
+  if (W.losowy) {
+    const iMax = kol - 1 - cMin, ny = wier - 1, ci = iMax / 2, cj = ny * 0.6;
+    let najV = -1;
+    for (let p = 0, ile = 0; p < 500 && ile < 40; p++) {
+      const n = W.losowy[0] + Math.floor(Math.random() * (W.losowy[1] - W.losowy[0] + 1)), th0 = Math.random() * 2 * Math.PI, wz: Pt[] = [];
+      for (let k = 0; k < n; k++) {
+        const th = th0 + 2 * Math.PI * (k + 0.3 * (Math.random() - 0.5)) / n, rr = losowo(0.55, 1);
+        wz.push([kol - 1 - Math.round(ci + Math.cos(th) * ci * rr), wier - 1 - Math.round(cj + Math.sin(th) * ny * 0.4 * rr)]);
+      }
+      if (!wz.every((q) => uzyteczny(q[0], q[1])) || !prosty(wz, pole[0], pole[1])) continue;
+      ile++;
+      const v = wz.reduce((s, q) => s + alfa(px(q[0]), py(q[1])), 0) / n;
+      if (v > najV) { najV = v; Vk0 = wz; }
     }
-  });
-  const Vk: Pt[] = wzor.map((q): Pt => [najl[0] + q[0], najl[1] + q[1]]);          // wierzchołki w kratce
-  const poz: Pt[] = Vk.map((q): Pt => [px(q[0]), py(q[1])]);                         // wierzchołki na banerze
+  }
+  // kształt startowy (wzory): pierwszy wzór, który mieści się cały, jak najbliżej środka pola w pionie i jak najbardziej w prawo
+  if (!Vk0) {
+    let najl: Pt = [0, 0], najW = -Infinity, wzor = W.wzory[0];
+    W.wzory.forEach((wz, wi) => {
+      const szer = Math.max(...wz.map((q) => q[0])), wys = Math.max(...wz.map((q) => q[1]));
+      for (let c0 = kol - 2 - szer; c0 >= 0; c0--) for (let r0 = 0; r0 + wys < wier; r0++) {
+        const w = wz.filter((q) => uzyteczny(c0 + q[0], r0 + q[1])).length;
+        const pref = (w === wz.length ? 1000 - wi * 100 : w * 10 - 500) - Math.abs(r0 + wys / 2 - (wier - 1) / 2) * 2 + c0 * 0.1;
+        if (pref > najW) { najW = pref; najl = [c0, r0]; wzor = wz; }
+      }
+    });
+    Vk0 = wzor.map((q): Pt => [najl[0] + q[0], najl[1] + q[1]]);                    // wierzchołki w kratce
+  }
+  const Vk: Pt[] = Vk0, poz: Pt[] = Vk.map((q): Pt => [px(q[0]), py(q[1])]);                       // wierzchołki na banerze
 
-  // kołki: krycie wyróżnienia (brzeg 0,72, środek 0,44, reszta 0) — bieżące i docelowe
+  // kołki: krycie wyróżnienia (seminarium: brzeg 0,72, środek 0,44, reszta 0) — bieżące i docelowe
   const n = kol * wier, alfaK = new Float32Array(n), celK = new Float32Array(n);
   const klasyfikuj = (odRazu: boolean) => {
     const m = poz.length;
@@ -113,7 +167,7 @@ const motyw: Fabryka = (G, t0) => {
         if (Math.hypot(x - xi - u * dx, y - yi - u * dy) < 0.6) brzeg = true;
       }
       const k = c * wier + r;
-      celK[k] = brzeg ? BRZEG : w ? SRODEK : 0;
+      celK[k] = brzeg ? K.brzeg : w ? K.srodek : 0;
       if (odRazu) alfaK[k] = celK[k];
     }
   };
@@ -125,10 +179,12 @@ const motyw: Fabryka = (G, t0) => {
   type Ruch = { i: number; z: Pt; do: Pt; nv: Pt; t: number; dl: number };
   let stoi = false, pOst = -1, tPrev = -1, akum = 0, ruch: Ruch | null = null, tNast = Math.max(t0, tB + BUDOWA) + PIERWSZY;
 
+  // ruch: najpierw wierzchołek, który widać (przed albo po przeskoku; w seminarium użyteczny kołek zawsze jest widoczny)
   const zaplanuj = (t: number) => {
-    for (const vi of tasuj(Vk.map((_, i) => i))) for (const d of tasuj(W.sasiedzi.slice())) {
+    for (const widac of [true, false]) for (const vi of tasuj(Vk.map((_, i) => i))) for (const d of tasuj(W.sasiedzi.slice())) {
       const nv: Pt = [Vk[vi][0] + d[0], Vk[vi][1] + d[1]];
-      if (!uzyteczny(nv[0], nv[1]) || !prosty(Vk.map((q, j) => (j === vi ? nv : q)), W.pole[0], W.pole[1])) continue;
+      if (!uzyteczny(nv[0], nv[1]) || !prosty(Vk.map((q, j) => (j === vi ? nv : q)), pole[0], pole[1])) continue;
+      if (widac && Math.max(alfa(px(nv[0]), py(nv[1])), alfa(px(Vk[vi][0]), py(Vk[vi][1]))) < 0.5) continue;
       ruch = { i: vi, z: [px(Vk[vi][0]), py(Vk[vi][1])], do: [px(nv[0]), py(nv[1])], nv, t, dl: Math.hypot(d[0], d[1]) * g };
       return;
     }
@@ -150,7 +206,7 @@ const motyw: Fabryka = (G, t0) => {
       if (!ruch && t >= tNast) zaplanuj(t);
       const R = ruch as Ruch | null;
       if (R) {
-        const u = Math.min(1, V * (t - R.t) / R.dl), q = poz[R.i], nx = R.z[0] + (R.do[0] - R.z[0]) * u, ny = R.z[1] + (R.do[1] - R.z[1]) * u;
+        const u = Math.min(1, Vw * (t - R.t) / R.dl), q = poz[R.i], nx = R.z[0] + (R.do[0] - R.z[0]) * u, ny = R.z[1] + (R.do[1] - R.z[1]) * u;
         akum += Math.hypot(nx - q[0], ny - q[1]);
         poz[R.i] = [nx, ny];
         if (u >= 1) { Vk[R.i] = R.nv; ruch = null; tNast = t + losowo(W.przerwa[0], W.przerwa[1]); akum = KROK_PX; }
@@ -163,18 +219,18 @@ const motyw: Fabryka = (G, t0) => {
         if (Math.abs(d) > 0.004) { alfaK[i] += Math.sign(d) * Math.min(Math.abs(d), TEMPO_K * dt); trwa = true; b = true; }
         else alfaK[i] = celK[i];
       }
-      return { a: false, b, za: trwa ? 1 / FPS : ruch ? KROK_PX / V : Math.max(0.05, tNast - t) };
+      return { a: false, b, za: trwa ? 1 / FPS : ruch ? KROK_PX / Vw : Math.max(0.05, tNast - t) };
     },
     // kołki tablicy (w budowie — kolumnami od prawej)
     rysuj(c, t) {
       const p = postep(t);
-      c.fillStyle = prawy(c, KOLKI);
+      c.fillStyle = prawy(c, K.kolki);
       for (let k = 0; k < kol; k++) {
         const a = S(p * 1.6 - (kol - 1 - k) / kol * 0.6);
         if (a <= 0.01) continue;
         c.globalAlpha = a;
         c.beginPath();
-        for (let r = 0; r < wier; r++) { const x = px(k), y = py(r); c.moveTo(x + RK, y); c.arc(x, y, RK, 0, 2 * Math.PI); }
+        for (let r = 0; r < wier; r++) { const x = px(k), y = py(r); c.moveTo(x + K.rk, y); c.arc(x, y, K.rk, 0, 2 * Math.PI); }
         c.fill();
       }
       c.globalAlpha = 1;
@@ -190,10 +246,10 @@ const motyw: Fabryka = (G, t0) => {
         if (v < 0.01) continue;
         const x = px(Math.floor(k / wier)), y = py(k % wier);
         c.fillStyle = prawy(c, v * a);
-        c.beginPath(); c.arc(x, y, 1.2 + v * 0.75, 0, 2 * Math.PI); c.fill();
+        c.beginPath(); c.arc(x, y, K.r0 + v * K.r1, 0, 2 * Math.PI); c.fill();
         dolacz(x, y);
       }
-      c.strokeStyle = prawy(c, GUMKA * a); c.lineWidth = 1.4;
+      c.strokeStyle = prawy(c, K.gumka * a); c.lineWidth = K.gr;
       c.beginPath();
       poz.forEach((q, i) => { if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); dolacz(q[0], q[1]); });
       c.closePath(); c.stroke();

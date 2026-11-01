@@ -1,5 +1,6 @@
-// Drobne narzędzia wspólne dla motywów rodziny „analiza i probabilistyka” (prototyp animacje-analiza.html; zlecenie 03):
-// rozsadnik, haar, czebyszew, wahadlo, brown, histogram. Plik zaczyna się od „_”: nie jest motywem żadnej strony
+// Drobne narzędzia wspólne dla motywów rysujących wykresy: rodzina „analiza i probabilistyka” (prototyp
+// animacje-analiza.html; zlecenie 03: rozsadnik, haar, czebyszew, wahadlo, brown, histogram) i kierunki/specjalności
+// Studiów (zlecenie 04: gradient, permutacje, kmeans, przezycie, okrag, lotka, kule). Plik zaczyna się od „_”: nie jest motywem żadnej strony
 // (mapa strona → motyw go nie wskazuje), motywy importują go statycznie.
 import { S, ogr } from '../wspolne';
 

@@ -31,6 +31,26 @@ export const MOTYWY_STRON: Record<string, string> = {
   'nauka/publikacje/*': 'wspolautorzy',
   'nauka/sukcesy': 'bernoulli',
   'nauka/sukcesy/historia': 'bernoulli/historia',
+  // zlecenie 04: Studia — kierunki i specjalności, codzienność; pozostałe strony Studiów (MOST, sprawy studenckie, skrypty,
+  // archiwalne programy i strony spoza tabeli) dziedziczą sumy Riemanna z działu (reguła „studia/*”)
+  'studia/*': 'riemann',
+  'studia/matematyka': 'riemann',
+  'studia/siad': 'gradient',
+  'studia/isim': 'permutacje',
+  'studia/matematyka/analiza-danych': 'kmeans',
+  'studia/matematyka/matematyka-aktuarialno-finansowa': 'przezycie',
+  'studia/matematyka/matematyka-nauczycielska': 'okrag',
+  'studia/matematyka/matematyka-stosowana': 'lotka',
+  'studia/matematyka/matematyka-teoretyczna': 'kule',
+  'studia/plan-zajec': 'trzy-odleglosci/rytm',
+  'studia/rok-akademicki': 'trzy-odleglosci/rytm',
+  'studia/zajecia': 'trzy-odleglosci/rytm',
+  'studia/pierwszy-rok': 'droga',
+  'studia/egzaminy-i-dyplom': 'droga',
+  'studia/procedura-dyplomowania': 'droga',
+  'studia/szkola-doktorska': 'banach/pajeczyna',
+  'studia/szkola-doktorska/*': 'banach/pajeczyna',
+  'studia/podyplomowe': 'geoplan/podyplomowe',
 };
 
 /** motyw dla ścieżki strony (np. „/nauka/”, „/en/studia”) albo undefined */
