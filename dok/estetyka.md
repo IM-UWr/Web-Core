@@ -188,3 +188,11 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - portrety w `viewBox="0 0 200 240"`, podpis bez `<text>`;
   - do tego HTML z animacją jako wzór i źródła zdjęć i podpisów.
   - Wymyślone podpisy tylko jako zastępcze. Na stronę trafiają wyłącznie przerysowane ze skanów, z podanym źródłem.
+- **Dwie grubości linii w szkicach (00:19, pomysł użytkownika):**
+  - grube kontury się rysują;
+  - cienkie detale pojawiają się płynnie (przezroczystość, ok. 0,6 s na grupę, kolejno od góry do dołu), startując ok. 0,6 s po konturach;
+  - podpis po ok. 1,4 s, całość ok. 2 s.
+  - Na okładce słaby szkic w spoczynku to tylko kontury. Po najechaniu kontury się rysują, a detale się pojawiają, w sumie ok. 1 s.
+  - Sygnet: tylko kontury.
+  - Grubości w CSS (np. 1,8 px kontur i 0,9 px detale, `vector-effect: non-scaling-stroke`).
+  - W plikach SVG dwie grupy: `<g id="kontur">` i `<g id="detale">`, bez `stroke-width`.
