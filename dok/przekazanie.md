@@ -569,7 +569,9 @@ Pełne treści zleceń (do ponownego uruchomienia 1:1) leżą w `.przekazanie/zl
 - **19:47: nowy wątek „estetyka i dusza strony” w nowej rozmowie.** Zarzut użytkownika: strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Zlecenie 09 i otwarte decyzje z sekcji 12–13 są odłożone („to później”).
 - **19:51: pytanie o niewczytujących się Pracowników.** W buildzie lista działa. To uszkodzona pamięć `node_modules\.vite` serwera dev po pomocniczym buildzie Code (dziennik 01). Naprawa: `npm run dev -- --force`, a w razie potrzeby usunięcie `node_modules\.vite`.
 
-## 14. Estetyka: kierunek „Założyciele” i nowa strona główna na komputer (1.11, 19:50–22:15)
+## 14. Estetyka: kierunek „Założyciele” i nowa strona główna na komputer (1.11, 19:50–23:35)
+- **Aktualizacja 23:35:** ustalono też wygląd strony działu (opcja 4, kolumna 1240 px, pasek menu na banerze, notka o patronie), podstron działów (pełny głęboki kolor ze zdjęciem działu, ścieżka „← Dział”, sygnet i podpis patrona, znak twierdzenia, boczna nawigacja), ciepłe tło, tryb ciemny i flagę przy EN. Prototypy: Władze, Projekty i granty, Plan zajęć. Szczegóły w `claude/estetyka.md`.
+- **Kopie na GitHubie (23:33):** `kopia/2026-11-01-agent-nauka-podglad` (dokładna kopia lokalnej gałęzi, `ae6d5d96`) i `kopia/2026-11-01-estetyka-prototypy` (pliki robocze prototypów i dokumenty, nie scalać).
 - **Pełny opis, ustawienia i linki: `claude/estetyka.md`.** W sprawach wyglądu ten plik i ta sekcja mają pierwszeństwo przed wcześniejszymi ustaleniami (m.in. „jeden bursztynowy akcent na ekran”).
 - **Nic nie wdrożone, brak „wdrażamy”.** Zlecenie 09 i otwarte sprawy z sekcji 12–13 nadal odłożone.
 - **Kierunek przyjęty: „Założyciele”** (pomysł użytkownika; 20:25 „obłęd, o coś takiego mi chodziło”; 22:14 „wygląda obłędnie”):
