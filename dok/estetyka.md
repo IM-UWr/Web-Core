@@ -158,3 +158,20 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - Pasek menu przyklejony po przewinięciu.
 - Telefon: okładka z 4 działami? Zwijany pas B2? Jak wyglądają strona działu i podstrony na telefonie?
 - Wzór prelegenta przy obronach.
+
+## Plan wdrożenia (2.11, 00:07–00:10; start w środę)
+- **Zostajemy w repo IM-UWr/Web-Core.** Warstwę wyglądu piszemy od nowa na osobnej gałęzi (np. `wyglad-zalozyciele`). Nowe repo odrzucone: przepadłyby podpięcie Pages CMS, wdrażanie, repozytoria treści Web-*, domena i historia.
+- **Podział kodu (stan z 1.11):**
+  - bez zmian: `content/`, `data/`, `lib/`, `pages/`;
+  - od nowa: `styles/`, `components/`, `layouts/`;
+  - wymieszane: `views/` (u góry przygotowanie danych, pod spodem HTML i style) oraz `scripts/` (zachowanie strony i dekoracje).
+- **Kolejność:**
+  1. Porządek w gałęziach: `agent-nauka-podglad` do `main` (po słowie „push”).
+  2. **Krok zero, na obecnym wyglądzie:** przygotowanie danych z `views/` do funkcji w `lib/`, np. `daneDzialuInstytut()`. Dowód poprawności: wygenerowane HTML przed zmianą i po niej muszą być identyczne. Do tego podział `scripts/` na zachowanie, które zostaje, i dekoracje.
+  3. Projekt telefonu dla strony działu i podstron.
+  4. Gałąź z nowym wyglądem: fundament (kolory działów, fonty na serwerze, szablon z paskiem na banerze, trzy nagłówki, boczna nawigacja), potem strony po kolei. Stary kod wyglądu usuwamy na bieżąco.
+- **Zasady przy scalaniu:**
+  - struktury danych nie zmieniamy, nowe pola tylko dodajemy;
+  - w starych widokach na czas przebudowy tylko poprawki;
+  - `main` wciągamy do gałęzi co kilka dni;
+  - podgląd online przez osobne repo przeznaczone tylko do podglądu.
