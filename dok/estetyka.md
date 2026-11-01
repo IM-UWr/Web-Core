@@ -214,3 +214,20 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - dodać do aktualności opcjonalne pole „Dział” (Instytut, Nauka, Studia, Popularyzacja) w schemacie `src/content.config.ts` i w formularzu CMS;
   - jeśli pole jest puste, dział liczy się automatycznie: `dla` studenci lub kandydaci daje Studia, `rodzaj` sukces albo wpisany zakład daje Nauka, w pozostałych przypadkach Instytut. Dzięki temu starych wpisów nie trzeba poprawiać;
   - dodać Popularyzację do pola `dzial` w „Warto wiedzieć”.
+
+## Szkice patronów od ChatGPT (2.11, 00:55): wstawione do prototypu (wersja 33)
+- **Paczka `szkice-patronow.zip`:** po 3 pliki SVG na patrona (pełny z grupami `kontur` i `detale`, sygnet, podpis z `obrys` i `prowadzaca`), skany podpisów, `demo.html` i `ZRODLA.md`. Pliki spełniają wymagania: same ścieżki, kontur i detale rozdzielone, bez `<text>` i bez `stroke-width`. Kopia jest na gałęzi kopii w `szkice/`.
+- **W prototypie:**
+  - okładka: słaby kontur w spoczynku, po najechaniu kontur się rysuje (18 kresek, odstęp 45 ms), a detale pojawiają się płynnie;
+  - baner działu: to samo, a podpis odsłania się maską z linii prowadzących i kończy razem ze szkicem;
+  - podstrony, panel podmenu i miniatury: sygnet; na podstronach podpis statyczny.
+  - Z obrysu podpisu Ślebodzińskiego usunięto kropki linii „podpis posiadacza” z dokumentu.
+- **Źródła i prawa (z `ZRODLA.md`, do sprawdzenia przed publikacją):**
+  - Twarze:
+    - Ślebodziński i Steinhaus: zdjęcia z Wikimedia Commons oznaczone jako domena publiczna (PD-Poland);
+    - **Marczewski i Knaster: zdjęcia z MacTutor, autor i prawa nieustalone.** Najlepiej oprzeć te szkice na zdjęciach z archiwum Instytutu albo UWr.
+  - Podpisy:
+    - Marczewski: Nowa Księga Szkocka, t. I, wpis z 7.07.1946 (Biblioteka WMI, zapytać o zgodę);
+    - Ślebodziński: legitymacja z 1948 w publikacji „Śląska Republika Uczonych” t. 7 (2016);
+    - Knaster (zaświadczenie z 6.08.1946) i Steinhaus (pismo WTN z 23.12.1957): książka J. Dutkiewicz o M. Warmusie (2003, BCPW).
+    - Przy każdym potrzebna zgoda wydawcy lub depozytariusza i podanie źródła.
