@@ -58,6 +58,7 @@ export const MOTYWY_STRON: Record<string, string> = {
   'instytut/struktura': 'dendrogram',
   'instytut/kontakt': 'mapa',
   'instytut/infrastruktura-informatyczna': 'motyl',
+  'instytut/infrastruktura-informatyczna/*': 'motyl', // podstrony (regulamin sieci itd.) — decyzja użytkownika 01.11.2026
   'warto-wiedziec': 'trzy-odleglosci/warto',
   'warto-wiedziec/*': 'trzy-odleglosci/warto',
   szukaj: 'banach/kratka',
