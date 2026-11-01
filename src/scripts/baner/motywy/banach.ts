@@ -17,7 +17,7 @@
 //   f(u) = p − (λ/b)·sin(b(u − p)) (p = 0,55, λ = 0,74, b = 2,4; |f′| ≤ 0,74), prosta y = x i „pajęczyna” kolejnych przybliżeń
 //   (u, u) → (u, f(u)) → (f(u), f(u)) → … zwijająca się do punktu stałego p. Twierdzenie pochodzi z rozprawy doktorskiej
 //   Banacha (Lwów 1920, Fundamenta Mathematicae 1922). Rysunek inny niż łamane Konferencji (płaszczyzna), więc ma własne
-//   funkcje kwadrat() i siec(); mapa() i orbita() zostają dla Konferencji (i ewentualnie Szukaj).
+//   funkcje kwadrat() i siec() (siec() służy też Szukaj); mapa() i orbita() zostają dla Konferencji.
 //   Pajęczyna wyłania się odcinek po odcinku (każdy przez 1,6 s, kolejny po 0,3–0,8 s), potem stoi; po 15–30 s (losowo)
 //   gaśnie (4 s), a nowa zaczyna się z innego losowego punktu. Wykres, prosta i punkt stały stoją (warstwa A), pajęczyny
 //   na warstwie B. Klatka po zmianie krycia odcinka o widoczny stopień (do 9 kl./s przy wyłanianiu), w przerwach zegar śpi.
@@ -26,9 +26,23 @@
 //   „Kolegium Doktorskie Matematyki” na stronie szkoły, dwuliniowe tytuły podstron), kwadrat zmniejsza się (krokami po 5%,
 //   najwyżej do połowy) przy dolnym albo górnym brzegu pola, aż punkt stały z otoczeniem 8 px będzie widoczny (maska > 0,7);
 //   przy 390 × 844: strona szkoły 55% (nadtytuł), podstrony z dwuliniowym tytułem 50–70%, EN 50%.
-// - na później (zlecenie 05): Szukaj — pajęczyna na kratce (funkcja siec() nadaje się wprost).
+// - „kratka” — Szukaj (zlecenie 05; prototyp animacje-ogolne.html, motyw „pajeczyna”, ustawienia telefonu): ta sama zasada
+//   Banacha w wersji prototypu stron ogólnych, na wspólnej kratce (kratka.ts, krycie 0,055). Kwadrat [0, 1]² rozciągnięty
+//   na całe pole: przekątna y = x i falisty wykres f(u) = us + A·sin(w(u − us)) (us 0,70–0,86, |A·w| 0,55–0,8, w 7–11;
+//   w 65% nachylenie ujemne — pajęczyna się zwija, inaczej schodki), pajęczyna z siec() od losowego punktu startu
+//   (60%: nad us, inaczej pod). Odcinki pojawiają się po kolei przez przenikanie (1 s, co 1,0–1,6 s; przy wejściu 0,5 s co
+//   0,35 s), na końcu kółko w punkcie stałym (1,5 s); po 8–20 s pajęczyna gaśnie (3 s) i zaczyna się od nowego losowego
+//   punktu, w 35% z nową funkcją (stary wykres gaśnie, nowy się pojawia, 3,2 s). Linie się nie przesuwają. Kratka,
+//   przekątna i wykres — warstwa A, pajęczyny — warstwa B w swoim pudle; przy zmianie funkcji oba wykresy przenikają się
+//   na warstwie B (A rysuje się wtedy tylko na początku i na końcu). Klatka po postępie przenikania, 5 kl./s (10 przy
+//   wejściu), w przerwach zegar śpi.
+//   Pole: v = 1 leży 4 px pod górą pola (w prototypie 2 px pod linkiem — przy 390 × 844 o 4 px wyżej), wysokość kwadratu
+//   1,1 × pole — przy 390 × 844 te same 113–114 px co w prototypie (skala 100%). Dolny róg kwadratu wypada pod hasłem: nic
+//   tam nie leży oprócz przekątnej, która zaczyna się 1 px nad dołem pola; pajęczyny (v ≥ 0,46), wykres (v ≥ 0,59)
+//   i kółko mieszczą się w polu.
 import type { Fabryka, Pole, Pudlo, Ustawienia } from '../typy';
 import { S, ogr } from '../wspolne';
+import { kratka } from './kratka';
 
 export const ustawienia: Ustawienia = { granica: 12, przejscie: 60 };
 
@@ -186,8 +200,8 @@ const fP = (u: number) => P - LAM / BB * Math.sin(BB * (u - P));
 type Odc = [number, number, number, number, number, number];
 
 /** pajęczyna kolejnych przybliżeń (u, u) → (u, f(u)) → (f(u), f(u)) → … od u0 w układzie X, Y (s px na jednostkę),
- *  aż krok spadnie poniżej 3 px; bez odcinków krótszych niż 2 px */
-function siec(f: (u: number) => number, u0: number, X: (u: number) => number, Y: (v: number) => number, s: number): Odc[] {
+ *  aż krok spadnie poniżej 3 px; bez odcinków krótszych niż `min` px (domyślnie 2) */
+function siec(f: (u: number) => number, u0: number, X: (u: number) => number, Y: (v: number) => number, s: number, min = 2): Odc[] {
   const o: Odc[] = [];
   let u = u0, y = u0;
   for (let k = 0; k < 60; k++) {
@@ -196,7 +210,7 @@ function siec(f: (u: number) => number, u0: number, X: (u: number) => number, Y:
     if (Math.abs(fu - u) * s < 3) break;
     u = y = fu;
   }
-  return o.filter((q) => Math.hypot(q[2] - q[0], q[3] - q[1]) > 2);
+  return o.filter((q) => Math.hypot(q[2] - q[0], q[3] - q[1]) > min);
 }
 
 /** kwadrat wykresu (bok s, dół yD) przy prawym brzegu treści: cała wysokość pola, a gdy punkt stały (z otoczeniem 8 px)
@@ -288,6 +302,151 @@ const pajeczyna: Fabryka = (G, t0) => {
   };
 };
 
-const motyw: Fabryka = (G, t0) => (G.wariant === 'pajeczyna' ? pajeczyna(G, t0) : konferencje(G, t0));
+// ---------- wariant „kratka” (Szukaj) ----------
+const K_LINIA = 0.3, K_WYKRES = 0.16, K_PROSTA = 0.11, K_START = 0.32, K_KOLO = 0.42, K_KRATKA = 0.055; // krycie
+const K_GASNIE = 3, K_ZMIANA = 3.2, K_FPS = 5, K_FPS_BUD = 10;    // gaśnięcie pajęczyny, zmiana funkcji (s); klatki/s
+
+/** f(u) = us + A·sin(w(u − us)), |f′| ≤ |A·w| = 0,55–0,8 < 1 — odwzorowanie zwężające, jedyny punkt stały us */
+type FunK = { us: number; A: number; w: number };
+const nowaF = (): FunK => { const w = los(7, 11); return { us: los(0.7, 0.86), A: (Math.random() < 0.65 ? -1 : 1) * los(0.55, 0.8) / w, w }; };
+const fK = (f: FunK) => (u: number) => f.us + f.A * Math.sin(f.w * (u - f.us));
+/** cykl: pajęczyna od u0 (odcinki `o`, w o[i][4] chwila pojawienia się), kropka startu od t0, kółko w punkcie stałym od
+ *  tKolo, gaśnięcie od tCzeka; zmiana — następny cykl ma nową funkcję; fPop, fZm — poprzednia funkcja i początek zmiany */
+type Cykl = { f: FunK; u0: number; o: Odc[]; t0: number; fade: number; tKolo: number; tCzeka: number; zmiana: boolean; fPop: FunK | null; fZm: number; box: Pudlo };
+
+const naKratce: Fabryka = (G, t0) => {
+  // kwadrat [0, 1]² rozciągnięty na pole: u = 1 przy prawym brzegu treści, v = 1 4 px pod górą pola, wysokość 1,1 × pole
+  // (przy 390 × 844 tyle co w prototypie); dolny róg kwadratu wypada pod hasłem — przekątna zaczyna się 1 px nad dołem pola
+  const span = G.x1 - G.x0, yG = G.y0 + 4, hh = 1.1 * (G.y1 - G.y0);
+  const X = (u: number) => G.x0 + u * span, Y = (v: number) => yG + (1 - v) * hh;
+  const vMin = 1 - (G.y1 - 1 - yG) / hh;
+  const nowyCykl = (od: number, bud: boolean, f: FunK, u?: number): Cykl => {
+    const u0 = u ?? (Math.random() < 0.6 ? los(Math.min(0.97, f.us + 0.1), 0.98) : los(0.46, f.us - 0.12));
+    // kroki do < 0,8 px w poziomie (próg siec(): 3 px przy skali 3,75 × szerokość), bez odcinków krótszych niż 0,5 px
+    const o = siec(fK(f), u0, X, Y, 3.75 * span, 0.5);
+    let t = od + (bud ? 0.4 : 0.6);
+    const xs = [X(u0), X(f.us) - 6, X(f.us) + 6], ys = [Y(u0), Y(f.us) - 6, Y(f.us) + 6];
+    for (const q of o) { q[4] = t; t += bud ? 0.35 : los(1, 1.6); xs.push(q[0], q[2]); ys.push(q[1], q[3]); }
+    const tKolo = t + 0.3;
+    return { f, u0, o, t0: od, fade: bud ? 0.5 : 1, tKolo, tCzeka: tKolo + 1.5 + los(8, 20), zmiana: !bud && Math.random() < 0.35,
+      fPop: null, fZm: -Infinity, box: [Math.min(...xs) - 3, Math.min(...ys) - 3, Math.max(...xs) + 3, Math.max(...ys) + 3] };
+  };
+  const cykle: Cykl[] = [nowyCykl(t0, !(t0 > 0), nowaF())];
+  // nowy układ w trakcie oglądania (t0 > 0): pajęczyna od razu gotowa, dalej czekanie 8–20 s
+  if (t0 > 0) {
+    const c = cykle[0], d = c.tKolo + 1.5 - t0;
+    c.t0 -= d; c.tKolo -= d; c.tCzeka -= d;
+    for (const q of c.o) q[4] -= d;
+  }
+  const koniecWejscia = t0 > 0 ? 0 : cykle[0].tKolo + 1.5;
+  let stoi = false, tRA = -Infinity, tRB = -Infinity;
+  const wyg = (c: Cykl, t: number) => (stoi ? 1 : 1 - S((t - c.tCzeka) / K_GASNIE));
+
+  // po czekaniu pajęczyna gaśnie (3 s), a 3,2 s później nowa zaczyna się z losowego punktu; czasem (35%) z nową funkcją —
+  // stary wykres gaśnie, a nowy pojawia się przez te same 3,2 s
+  const posun = (t: number) => {
+    for (let g = 0; g < 20; g++) {
+      const c = cykle[cykle.length - 1];
+      if (t < c.tCzeka) break;
+      const n = nowyCykl(c.tCzeka + K_ZMIANA, false, c.zmiana ? nowaF() : c.f);
+      if (c.zmiana) { n.fPop = c.f; n.fZm = c.tCzeka; }
+      cykle.push(n);
+      if (cykle.length > 3) cykle.shift();
+    }
+  };
+  const wykres = (c: CanvasRenderingContext2D, f: FunK, a: number) => {
+    if (a <= 0.003) return;
+    const fu = fK(f);
+    c.lineWidth = 1.4;
+    c.beginPath();
+    for (let x = G.x0; x <= G.x1 + 0.01; x += 2) { const y = Y(fu((x - G.x0) / span)); if (x === G.x0) c.moveTo(x, y); else c.lineTo(x, y); }
+    c.strokeStyle = G.rgba(K_WYKRES * a); c.stroke();
+  };
+  /** pudło wykresu f (cała szerokość, wysokość fali) */
+  const pudloF = (f: FunK): Pudlo => [G.x0 - 2, Y(f.us + Math.abs(f.A)) - 2, G.x1 + 2, Y(f.us - Math.abs(f.A)) + 2];
+  /** zmiana funkcji trwa — oba wykresy przenikają się na warstwie B (warstwa A jest wtedy bez wykresu), żeby w tych
+   *  3,2 s nie przerysowywać obu warstw naraz */
+  const zmiana = (cy: Cykl, t: number) => !stoi && !!cy.fPop && t >= cy.fZm && t < cy.fZm + K_ZMIANA;
+
+  return {
+    krok(t) {
+      if (stoi) return { a: false, za: 5 };
+      posun(t);
+      // klatka warstwy B, gdy któreś przenikanie posunęło się od ostatniej klatki (także ta po jego końcu); warstwy A —
+      // tylko na początku i na końcu zmiany funkcji. Zegar: 5 kl./s w przenikaniu (10 przy wejściu), inaczej śpi do
+      // następnego odcinka, kółka albo gaśnięcia
+      let a = false, b = false, trwa = false, nast = Infinity;
+      const zd = (s: number, d: number) => {
+        if (t >= s && t < s + d) trwa = true; else if (s > t) nast = Math.min(nast, s);
+        if (t > s + 0.02 && s + d > tRB) b = true;
+      };
+      for (const c of cykle) {
+        zd(c.t0, 0.6); zd(c.tKolo, 1.5); zd(c.tCzeka, K_GASNIE);
+        for (const q of c.o) zd(q[4], c.fade);
+        if (c.fPop) {
+          zd(c.fZm, K_ZMIANA);
+          for (const s of [c.fZm, c.fZm + K_ZMIANA]) if (tRA < s && s <= t) a = b = true;
+        }
+      }
+      if (a) tRA = t;
+      if (b) tRB = t;
+      const za = trwa ? Math.min(1 / (t < koniecWejscia ? K_FPS_BUD : K_FPS), nast - t) : nast - t;
+      return { a, b, za: Math.max(0.02, za) };
+    },
+    // warstwa stała: kratka, przekątna y = x i wykres f (poza zmianą funkcji)
+    rysuj(c, t) {
+      kratka(c, G, K_KRATKA);
+      c.lineWidth = 1;
+      c.beginPath(); c.moveTo(X(vMin), Y(vMin)); c.lineTo(X(1), Y(1));
+      c.strokeStyle = G.rgba(K_PROSTA); c.stroke();
+      const ost = cykle[cykle.length - 1];
+      if (!zmiana(ost, t)) wykres(c, ost.f, 1);
+    },
+    // warstwa ruchoma: pajęczyny z kropką startu i kółkiem w punkcie stałym, przy zmianie funkcji też oba wykresy;
+    // pudło — suma pudeł tego, co narysowane
+    rysujB(c, t) {
+      let box: Pudlo | null = null;
+      const ost = cykle[cykle.length - 1];
+      if (zmiana(ost, t)) {
+        const e = S((t - ost.fZm) / K_ZMIANA), p = pudloF(ost.fPop!), q = pudloF(ost.f);
+        wykres(c, ost.fPop!, 1 - e); wykres(c, ost.f, e);
+        box = [p[0], Math.min(p[1], q[1]), p[2], Math.max(p[3], q[3])];
+      }
+      for (const cy of cykle) {
+        const wg = wyg(cy, t);
+        if ((stoi && cy !== ost) || wg <= 0.003) continue;
+        c.lineWidth = 1;
+        // odcinki już w pełni widoczne — jedną ścieżką, wyłaniające się — każdy osobno
+        c.beginPath();
+        for (const q of cy.o) if (stoi || t >= q[4] + cy.fade) { c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]); }
+        c.strokeStyle = G.rgba(K_LINIA * wg); c.stroke();
+        if (!stoi) for (const q of cy.o) {
+          const a = S((t - q[4]) / cy.fade);
+          if (a <= 0.004 || a >= 1) continue;
+          c.beginPath(); c.moveTo(q[0], q[1]); c.lineTo(q[2], q[3]);
+          c.strokeStyle = G.rgba(K_LINIA * a * wg); c.stroke();
+        }
+        const as = stoi ? 1 : S((t - cy.t0) / 0.6), ak = stoi ? 1 : S((t - cy.tKolo) / 1.5);
+        if (as > 0.003) { c.beginPath(); c.arc(X(cy.u0), Y(cy.u0), 1.8, 0, 2 * Math.PI); c.fillStyle = G.rgba(K_START * as * wg); c.fill(); }
+        if (ak > 0.003) {
+          c.lineWidth = 1.2;
+          c.beginPath(); c.arc(X(cy.f.us), Y(cy.f.us), 4.5, 0, 2 * Math.PI); c.strokeStyle = G.rgba(K_KOLO * ak * wg); c.stroke();
+        }
+        const p = cy.box;
+        box = box ? [Math.min(box[0], p[0]), Math.min(box[1], p[1]), Math.max(box[2], p[2]), Math.max(box[3], p[3])] : [p[0], p[1], p[2], p[3]];
+      }
+      return box;
+    },
+    // ograniczenie ruchu: gotowa pajęczyna od punktu nieco nad punktem stałym (jak w prototypie) i kółko
+    gotowy() {
+      stoi = true;
+      const f = cykle[cykle.length - 1].f;
+      cykle.length = 0;
+      cykle.push(nowyCykl(0, true, f, Math.min(0.97, f.us + 0.16)));
+    },
+  };
+};
+
+const motyw: Fabryka = (G, t0) => (G.wariant === 'pajeczyna' ? pajeczyna(G, t0) : G.wariant === 'kratka' ? naKratce(G, t0) : konferencje(G, t0));
 
 export default motyw;

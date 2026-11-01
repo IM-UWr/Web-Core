@@ -41,11 +41,21 @@ const liczbyTel: { n: number; pl: [string, string, string]; en: [string, string]
   { n: ile(1), pl: ['doktor habilitowany', 'doktorów habilitowanych', 'doktorów habilitowanych'], en: ['habilitated researcher', 'habilitated researchers'] },
   { n: ile(2), pl: ['doktor', 'doktorów', 'doktorów'], en: ['PhD holder', 'PhD holders'] },
 ];
+// Animacja w tle banera na telefonie (motyw „dendrogram”, src/scripts/baner/motywy/dendrogram.ts): liście to członkowie
+// zakładów; zakłady łączą się w trzy obszary z tekstu strony (struktura_tekst: logika, algebra, topologia i geometria;
+// analiza i równania różniczkowe; rachunek prawdopodobieństwa i statystyka), a pracownia i zakłady spoza tej listy —
+// dopiero z całym Instytutem. { o: [[liczba osób w zakładzie, …] dla każdego obszaru], p: [liczba osób, …] } (bez pustych).
+const OBSZARY = [['algebra-i-teoria-modeli', 'teoria-mnogosci-i-topologia', 'geometria'], ['analiza-funkcjonalna', 'analiza-matematyczna', 'rownania-rozniczkowe'], ['teoria-prawdopodobienstwa', 'statystyka']];
+const czlonkowie = (id: string) => osoby.filter((o) => o.data.zaklad === id).length;
+const motywDane = {
+  o: OBSZARY.map((ob) => ob.filter((id) => lista.some((z) => z.id === id)).map(czlonkowie).filter((n) => n > 0)).filter((ob) => ob.length > 0),
+  p: lista.filter((z) => !OBSZARY.flat().includes(z.id)).map((z) => czlonkowie(z.id)).filter((n) => n > 0),
+};
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
   {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Instytut”).
        Telefon: pod hasłem kreska i trzy liczby w kolumnach (LiczbyBanera.astro, lista .tylko-telefon). */}
-  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: naglowek }]}>
+  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: naglowek }]} motywDane={motywDane}>
     <ul class="pt-liczby tylko-komputer">
       {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
     </ul>

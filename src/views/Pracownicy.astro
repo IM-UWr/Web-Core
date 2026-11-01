@@ -47,6 +47,20 @@ const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[
   { n: listaZakladow.filter((z) => /^zakład/i.test(z.data.nazwa.trim())).length, pl: ['zakład', 'zakłady', 'zakładów'], en: ['department', 'departments'] },
   { n: osoby.filter((o) => o.grupa === 'doktorant').length, pl: ['doktorant', 'doktorantów', 'doktorantów'], en: ['PhD student', 'PhD students'] },
 ];
+// Animacja w tle banera na telefonie (motyw „luki”, src/scripts/baner/motywy/luki.ts): kropki to osoby ze spisu w grupach —
+// najpierw osoby bez zakładu (administracja, doktoranci, pozostali), potem zakłady w kolejności obszarów z tekstu strony
+// „Struktura i zakłady” (ta sama kolejność co w ListaZakladow.astro; zakłady spoza listy i pracownia na końcu).
+// { g: liczby osób w grupach (bez pustych), b: ile pierwszych grup to osoby bez zakładu }.
+const OBSZARY = ['algebra-i-teoria-modeli', 'teoria-mnogosci-i-topologia', 'geometria', 'analiza-funkcjonalna', 'analiza-matematyczna', 'rownania-rozniczkowe', 'teoria-prawdopodobienstwa', 'statystyka'];
+const miejsce = (id: string) => (OBSZARY.includes(id) ? OBSZARY.indexOf(id) : OBSZARY.length);
+const zakladyMotywu = [...listaZakladow].sort((a, b) => miejsce(a.id) - miejsce(b.id));
+const bezZakladu = osoby.filter((o) => !o.zaklad || !zakladyMotywu.some((z) => z.id === o.zaklad));
+const grupyBez = [
+  bezZakladu.filter((o) => o.grupa === 'administracja').length,
+  bezZakladu.filter((o) => o.grupa === 'doktorant').length,
+  bezZakladu.filter((o) => o.grupa !== 'administracja' && o.grupa !== 'doktorant').length,
+].filter((n) => n > 0);
+const motywDane = { g: [...grupyBez, ...zakladyMotywu.map((z) => osoby.filter((o) => o.zaklad === z.id).length).filter((n) => n > 0)], b: grupyBez.length };
 const napisy = {
   szukaj: lang === 'en' ? 'Search by name, room, e-mail…' : 'Szukaj: nazwisko, pokój, e-mail…',
   grupa: lang === 'en' ? 'Group' : 'Grupa',
@@ -78,7 +92,7 @@ const lead = lang === 'en'
   : 'Dane kontaktowe pracowników, doktorantów i administracji Instytutu Matematycznego.';
 ---
 <Baza tytul={t(lang, 'pracownicy')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'pracownicy')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]}>
+  <NaglowekStrony tytul={t(lang, 'pracownicy')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]} motywDane={motywDane}>
     <LiczbyBanera lang={lang} pozycje={liczby} />
   </NaglowekStrony>
   <div class="wrap pr-wrap">

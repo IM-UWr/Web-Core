@@ -91,12 +91,16 @@ class Baner {
       this.modul ??= await wczytaj();
       // tekst banera wjeżdża przez 0,5 s (przejscia.css) — mierzymy po końcu animacji i po wczytaniu kroju
       const anim = this.ph.getAnimations?.({ subtree: true }) ?? [];
-      await Promise.race([Promise.all(anim.map((a) => a.finished.catch(() => {}))), czekaj(1500)]);
+      const koniecWejscia = Promise.all(anim.map((a) => a.finished.catch(() => {})));
+      await Promise.race([koniecWejscia, czekaj(1500)]);
       if (document.fonts) await Promise.race([document.fonts.ready, czekaj(1500)]);
       if (!this.aktywny) return;
       this.klucz = '';
       this.uklad();
       this.ph.classList.add('ph-anim-gra');
+      // wejście tekstu mogło jeszcze trwać (karta w tle wstrzymuje animacje) — po jego końcu pomiar jeszcze raz
+      // (animationend mógł przyjść, zanim powstał motyw, i wtedy nic by go nie poprawiło)
+      koniecWejscia.then(() => { if (this.aktywny) this.uklad(); });
     } catch (e) {
       this.stop();
       console.warn('[baner]', e);

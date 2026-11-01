@@ -51,6 +51,18 @@ export const MOTYWY_STRON: Record<string, string> = {
   'studia/szkola-doktorska': 'banach/pajeczyna',
   'studia/szkola-doktorska/*': 'banach/pajeczyna',
   'studia/podyplomowe': 'geoplan/podyplomowe',
+  // zlecenie 05: podstrony Instytutu (spoza tabeli — dendryt z działu; zakłady ustawia Zaklad.astro) i strony ogólne
+  'instytut/*': 'dendryt',
+  'instytut/wladze': 'kanapka',
+  pracownicy: 'luki',
+  'instytut/struktura': 'dendrogram',
+  'instytut/kontakt': 'mapa',
+  'instytut/infrastruktura-informatyczna': 'motyl',
+  'warto-wiedziec': 'trzy-odleglosci/warto',
+  'warto-wiedziec/*': 'trzy-odleglosci/warto',
+  szukaj: 'banach/kratka',
+  'deklaracja-dostepnosci': 'kratka',
+  'polityka-prywatnosci': 'kratka',
 };
 
 /** motyw dla ścieżki strony (np. „/nauka/”, „/en/studia”) albo undefined */

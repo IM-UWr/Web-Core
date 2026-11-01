@@ -23,8 +23,19 @@
 //   widać (cała pod tekstem), dzieje się od razu i bez przerwy (najwyżej 6 z rzędu), więc widoczne zmiany przychodzą
 //   regularnie. Pole: oś jak w Kalendarzu (12 px nad połową hasła, o 19–24 px wyżej niż w prototypie); Hmax 0,86 wysokości od
 //   góry pola do osi — przy 390 × 844 te same 79 px co 0,74 starego pola w prototypie (skala 100%).
-// - na później (zlecenie 05): Warto wiedzieć (okno punktów nα przesuwa się co 3–8 s) — własny wybór kolejnej zmiany
-//   w funkcji `nastepna` na tych samych profilach i przejściach.
+// - „warto” — Warto wiedzieć: lista i każdy wpis (zlecenie 05; prototyp animacje-ogolne.html, motyw „trzy”, ustawienia
+//   telefonu). Własna fabryka `warto` niżej, bo zmiany idą przez przenikanie, a nie przez przekształcanie profilu: punkty
+//   nα + β (mod 1, α jedna z czterech niewymiernych z prototypu, β losowe) na okręgu długości 1,3 × szerokość treści,
+//   rozwiniętym w oś — szew daleko z lewej, pod tekstem i za brzegiem, a łuk przez szew ucięty przy prawym brzegu treści
+//   jak w prototypie. Nad każdym łukiem półelipsa o wysokości proporcjonalnej do długości (najwyżej Hmax). Przy wejściu 11
+//   punktów dochodzi po kolei (co 0,55 s, przenikanie 0,7 s, ok. 6 s), potem okno przesuwa się o jeden co 3–8 s (losowo):
+//   na zmianę dochodzi następny punkt (stary łuk gaśnie, dwa nowe się pojawiają) albo znika najstarszy (dwa łuki gasną,
+//   złączony się pojawia); przenikanie 2,4 s, linie się nie przesuwają. Klatka po zmianie krycia o widoczny stopień
+//   (6 kl./s w przenikaniu, 12 przy wejściu), w przerwach zegar śpi.
+//   Pole (zlecenie 07): oś jak w Kalendarzu, 12 px nad połową hasła (przy 390 × 844 o 29–30 px wyżej niż w prototypie);
+//   największy łuk po zbudowaniu 0,89 wysokości od góry pola do osi — przy 390 × 844 te same 82 px co 0,72 starego pola
+//   w prototypie (skala 100%); limit łuku (tylko przy wejściu, gdy punktów jest mało) 0,93 tej wysokości — 86 px zamiast
+//   98 px w prototypie, bo wyższy łuk wyszedłby nad pole.
 import type { Fabryka, Ustawienia } from '../typy';
 import { S, ogr } from '../wspolne';
 
@@ -70,7 +81,8 @@ const WARIANTY: Record<string, Wariant> = {
   },
 };
 
-const motyw: Fabryka = (G, t0) => {
+/** Kalendarz i „rytm”: zmiany przez płynne przekształcenie profilu łuków */
+const kalendarzIRytm: Fabryka = (G, t0) => {
   const W = WARIANTY[G.wariant ?? ''] ?? WARIANTY.kalendarz;
   // M ≥ 1: baner bez szerokości (np. ukryty w chwili pomiaru) nie wywraca motywu
   const xa = G.x0, span = Math.max(1, G.x1 - G.x0), M = Math.floor(span), yb = G.y1 - NAD;
@@ -193,5 +205,144 @@ const motyw: Fabryka = (G, t0) => {
     gotowy() { stoi = true; budowa = false; pelny(); },
   };
 };
+
+// ---------- wariant „warto” (Warto wiedzieć) ----------
+const W_ALFY = [(Math.sqrt(5) - 1) / 2, Math.SQRT2 - 1, Math.E - 2, (Math.sqrt(3) - 1) / 2];
+const W_N = 11, W_OKRAG = 1.3, W_WYS = 0.89, W_HMAX = 0.93;          // punkty w oknie; okrąg (× szerokość); łuki (jak wyżej)
+const W_LUKI = 0.17, W_OS = 0.07, W_KROPKI = 0.34, W_GR = 1.15, W_R = 1.6; // krycie łuków, osi i kropek; grubość; promień
+const W_BUD = 0.55, W_BUD_T = 0.7, W_T = 2.4, W_FPS = 6, W_FPS_BUD = 12;   // wejście: odstęp i przenikanie; zmiana (s)
+
+/** przenikanie krycia od a0 do a1 w czasie [t0, t0 + T] (smoothstep) */
+type Prz = { a0: number; a1: number; t0: number; T: number };
+const wPrz = (p: Prz, t: number) => p.a0 + (p.a1 - p.a0) * S((t - p.t0) / p.T);
+/** łuk od punktu `a` (część okręgu) o długości `g` albo kropka w punkcie `a`; wR — ostatnio narysowane krycie */
+type Elem = { a: number; g: number; n: number; p: Prz; wR: number };
+const frac = (x: number) => x - Math.floor(x);
+
+const warto: Fabryka = (G, t0) => {
+  const al = W_ALFY[Math.floor(Math.random() * W_ALFY.length)], be = Math.random();
+  const xb = G.x1, span = Math.max(1, G.x1 - G.x0), L = W_OKRAG * span, xL = xb - L, yb = G.y1 - NAD, hh = Math.max(1, yb - G.y0);
+  const poz = (n: number) => frac(n * al + be);
+  // skala wysokości: największy łuk przy N punktach (każde okno N kolejnych to obrót pierwszych N — te same długości)
+  const th0 = Array.from({ length: W_N }, (_, i) => poz(i + 1)).sort((a, b) => a - b);
+  let gm = 1 - th0[W_N - 1] + th0[0];
+  for (let i = 1; i < W_N; i++) gm = Math.max(gm, th0[i] - th0[i - 1]);
+  const kap = W_WYS * hh / (gm * L), Hmax = W_HMAX * hh;
+
+  let luki: Elem[] = [], kropki: Elem[] = [], pkt: { n: number; th: number }[] = [];
+  let s = 0, nast = 1, krokOkna = 0, tNast = t0, budowa = !(t0 > 0), koniecWejscia = 0, stoi = false, ubylo = false;
+  const luk = (a: number, g: number, t: number, T: number) => luki.push({ a, g, n: 0, p: { a0: 0, a1: 1, t0: t, T }, wR: 0 });
+  const zgas = (l: Elem, t: number, T: number) => { l.p = { a0: wPrz(l.p, t), a1: 0, t0: t, T }; };
+  /** żywy łuk od a o długości g */
+  const zywy = (a: number, g: number) => luki.find((l) => l.p.a1 > 0 && Math.abs(l.a - a) < 1e-9 && Math.abs(l.g - g) < 1e-9);
+  // nowy punkt n: łuk, w który wpada, gaśnie, a dwa nowe się pojawiają
+  const dodaj = (n: number, t: number, T: number) => {
+    const th = poz(n);
+    if (!pkt.length) luk(th, 1, t, T);
+    else {
+      let k = 0;
+      while (k < pkt.length && pkt[k].th < th) k++;
+      const a = pkt[(k - 1 + pkt.length) % pkt.length].th, g = frac(pkt[k % pkt.length].th - a) || 1, d = frac(th - a);
+      const l = zywy(a, g);
+      if (l) zgas(l, t, T);
+      luk(a, d, t, T); luk(th, g - d, t, T);
+    }
+    pkt.push({ n, th }); pkt.sort((x, y) => x.th - y.th);
+    kropki.push({ a: th, g: 0, n, p: { a0: 0, a1: 1, t0: t, T }, wR: 0 });
+  };
+  // znika punkt n: dwa łuki obok gasną, złączony się pojawia
+  const usun = (n: number, t: number, T: number) => {
+    const k = pkt.findIndex((q) => q.n === n);
+    if (k < 0 || pkt.length < 3) return;
+    const th = pkt[k].th, a = pkt[(k - 1 + pkt.length) % pkt.length].th, b = pkt[(k + 1) % pkt.length].th;
+    const g1 = frac(th - a), g2 = frac(b - th), l1 = zywy(a, g1), l2 = zywy(th, g2);
+    if (l1) zgas(l1, t, T);
+    if (l2) zgas(l2, t, T);
+    luk(a, g1 + g2, t, T);
+    pkt.splice(k, 1);
+    for (const q of kropki) if (q.n === n && q.p.a1 > 0) zgas(q, t, T);
+  };
+  /** okno od razu gotowe (nowy układ w trakcie oglądania, ograniczenie ruchu) */
+  const gotoweOkno = () => {
+    luki = []; kropki = []; pkt = [];
+    for (let n = s + 1; n <= s + W_N; n++) dodaj(n, -1e9, 0.01);
+    nast = s + W_N + 1; krokOkna = 0;
+    luki = luki.filter((l) => l.p.a1 > 0);
+    for (const e of [...luki, ...kropki]) e.wR = 1;
+  };
+  if (!budowa) { gotoweOkno(); tNast = t0 + 3 + 5 * Math.random(); }
+
+  /** przesuwa oś czasu do chwili t: wejście (punkty po kolei), potem okno o jeden co 3–8 s */
+  const posun = (t: number) => {
+    for (let g = 0; g < 200 && t >= tNast; g++) {
+      const te = tNast;
+      if (budowa) {
+        dodaj(nast++, te, W_BUD_T);
+        if (nast > W_N) { budowa = false; koniecWejscia = te + W_BUD_T; tNast = te + 2.5 + 2.5 * Math.random(); } else tNast = te + W_BUD;
+      } else {
+        if (krokOkna % 2 === 0) dodaj(nast++, te, W_T); else usun(++s, te, W_T);
+        krokOkna++; tNast = te + 3 + 5 * Math.random();
+      }
+    }
+    // zgaszone do końca znikają z list; jeśli były jeszcze choć trochę widoczne na rysunku — jeszcze jedna klatka
+    const zyje = (e: Elem) => {
+      const z = !(e.p.a1 === 0 && t >= e.p.t0 + e.p.T);
+      if (!z && e.wR > 0.004) ubylo = true;
+      return z;
+    };
+    luki = luki.filter(zyje); kropki = kropki.filter(zyje);
+  };
+
+  return {
+    krok(t) {
+      if (stoi) return { a: false, za: 5 };
+      posun(t);
+      // klatka, gdy krycie łuku albo kropki zmieniło się o ≥ 1,5/255, przenikanie doszło do końca albo ubył element
+      let a = ubylo, trwa = false;
+      ubylo = false;
+      const sprawdz = (e: Elem, k: number) => {
+        const w = wPrz(e.p, t), d = Math.abs(w - e.wR);
+        if (t < e.p.t0 + e.p.T) trwa = true;
+        if (d * k * 255 >= 1.5 || (d > 0.001 && t >= e.p.t0 + e.p.T)) a = true;
+      };
+      for (const l of luki) sprawdz(l, W_LUKI);
+      for (const q of kropki) sprawdz(q, W_KROPKI);
+      if (a) for (const e of [...luki, ...kropki]) e.wR = wPrz(e.p, t);
+      return { a, za: trwa ? 1 / (budowa || t < koniecWejscia ? W_FPS_BUD : W_FPS) : Math.max(0.05, tNast - t) };
+    },
+    rysuj(c) {
+      // łuk przez szew okręgu wychodzi za prawy brzeg treści — ucięty tam jak w prototypie
+      c.save();
+      c.beginPath(); c.rect(0, G.y0 - 4, xb + 0.5, G.y1 - G.y0 + 8); c.clip();
+      c.lineWidth = 1;
+      c.beginPath(); c.moveTo(G.x0, yb); c.lineTo(xb, yb);
+      c.strokeStyle = G.rgba(W_OS); c.stroke();
+      c.lineWidth = W_GR;
+      for (const l of luki) {
+        if (l.wR <= 0.004) continue;
+        const w = l.g * L, h = Math.min(kap * w, Hmax);
+        c.beginPath();
+        // łuk przez szew (a + g > 1) jeszcze raz o okrąg w lewo
+        for (let off = 0; off >= -L; off -= L) {
+          const cx = xL + l.a * L + w / 2 + off;
+          if (cx + w / 2 < 0) break;
+          c.moveTo(cx - w / 2, yb); c.ellipse(cx, yb, w / 2, h, 0, Math.PI, 2 * Math.PI);
+          if (l.a + l.g <= 1 + 1e-9) break;
+        }
+        c.strokeStyle = G.rgba(W_LUKI * l.wR); c.stroke();
+      }
+      for (const q of kropki) {
+        if (q.wR <= 0.004) continue;
+        c.beginPath(); c.arc(xL + q.a * L, yb, W_R, 0, 2 * Math.PI);
+        c.fillStyle = G.rgba(W_KROPKI * q.wR); c.fill();
+      }
+      c.restore();
+    },
+    // ograniczenie ruchu: pełne okno N punktów, bez przejść
+    gotowy() { stoi = true; budowa = false; s = 0; gotoweOkno(); },
+  };
+};
+
+const motyw: Fabryka = (G, t0) => (G.wariant === 'warto' ? warto(G, t0) : kalendarzIRytm(G, t0));
 
 export default motyw;
