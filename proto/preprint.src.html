@@ -1,0 +1,263 @@
+<title>Preprint IM UWr</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Układ: pasek prototypu → kartka strony złożona jak preprint matematyczny (kolumna tekstu + kolumna notatek na marginesie).
+   Ta sama kartka w ramie komputera albo telefonu; układ zmienia się zapytaniami o kontener, nie o okno. */
+@font-face { font-family: 'Latin Modern Roman'; src: url({{LM10R}}) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman'; src: url({{LM10I}}) format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman'; src: url({{LM10B}}) format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman 17'; src: url({{LM17R}}) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman Caps'; src: url({{LMCAPS}}) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+:root {
+  --p-bg: #e9e7e3;
+  --p-fg: #1b1f2a;
+  --p-muted: #5d6270;
+  --p-line: #cfccc5;
+  --papier: #ffffff;
+  --tusz: #16181d;
+  --tusz-2: #4a4e58;
+  --kreska: #d3d4d8;
+  --link: #1d3f8f;
+  --odnosnik: #1f6b3a;
+  --f: 'Latin Modern Roman', 'Computer Modern', Georgia, serif;
+  --f-duzy: 'Latin Modern Roman 17', 'Latin Modern Roman', Georgia, serif;
+  --f-kap: 'Latin Modern Roman Caps', 'Latin Modern Roman', Georgia, serif;
+  --f-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --p-bg: #0d0f13; --p-fg: #e4e6eb; --p-muted: #9aa0ad; --p-line: #2a2e37; --papier: #17191e; --tusz: #e8e6e1; --tusz-2: #b2b4ba; --kreska: #33363e; --link: #9db8ff; --odnosnik: #8fd3a5; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --p-bg: #0d0f13; --p-fg: #e4e6eb; --p-muted: #9aa0ad; --p-line: #2a2e37; --papier: #17191e; --tusz: #e8e6e1; --tusz-2: #b2b4ba; --kreska: #33363e; --link: #9db8ff; --odnosnik: #8fd3a5; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--p-bg); color: var(--p-fg); font-family: var(--f-ui); font-size: 14px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.pasek { border-bottom: 1px solid var(--p-line); }
+.pasek-in { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding-block: 10px; }
+.pasek h1 { margin: 0 6px 0 0; font-family: var(--f-duzy); font-weight: 400; font-size: 24px; }
+.grupa { display: flex; align-items: center; gap: 8px; }
+.grupa > span { font-size: 12px; color: var(--p-muted); }
+.seg { display: inline-flex; border: 1px solid var(--p-line); border-radius: 7px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 11px; border: 0; background: transparent; color: var(--p-fg); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--p-line); }
+.seg button[aria-pressed="true"] { background: var(--p-fg); color: var(--p-bg); }
+.seg button:focus-visible { outline: 2px solid var(--p-fg); outline-offset: -3px; }
+.opis { font-size: 13px; color: var(--p-muted); max-width: 70ch; }
+
+.ramka { max-width: 1240px; margin: 20px auto 0; }
+.okno { position: relative; overflow: hidden; }
+.scena { width: 1200px; margin: 0 auto; transform-origin: 0 0; }
+.scena.tel { width: 390px; }
+.kartka { container-type: inline-size; background: var(--papier); color: var(--tusz); font-family: var(--f); font-size: 19px; line-height: 1.5; box-shadow: 0 1px 0 var(--p-line), 0 10px 30px rgb(0 0 0 / .08); }
+.scena.tel .kartka { border-radius: 26px; overflow: hidden; box-shadow: 0 0 0 9px #05070c; }
+.kartka a { color: var(--link); text-decoration: none; }
+.kartka a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* żywa pagina (running head) */
+.pagina { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 22px 64px 10px; border-bottom: .5px solid var(--tusz); font-size: 16px; }
+.pagina .marka { font-family: var(--f-kap); letter-spacing: .02em; color: var(--tusz); }
+.pagina nav { display: flex; gap: 20px; font-family: var(--f-kap); letter-spacing: .02em; }
+.pagina nav a { color: var(--tusz); }
+.pagina nav a.jest { border-bottom: 1px solid var(--tusz); }
+
+/* siatka: kolumna tekstu 640 + margines z notatkami */
+.uklad { display: grid; grid-template-columns: 120px minmax(0, 640px) 260px; column-gap: 44px; padding: 56px 0 70px; }
+.uklad > * { grid-column: 2; }
+.uklad > .szer { grid-column: 2 / 4; }
+.nota { grid-column: 3; font-size: 15px; line-height: 1.4; color: var(--tusz-2); }
+.uklad > .nota { align-self: end; }
+.tytul { margin: 0; font-family: var(--f-duzy); font-weight: 400; font-size: 58px; line-height: 1.04; letter-spacing: -.005em; text-wrap: balance; }
+.autor { margin: 14px 0 0; font-style: italic; font-size: 18px; color: var(--tusz-2); }
+.data { margin: 2px 0 0; font-size: 16px; color: var(--tusz-2); }
+.abstrakt { margin: 34px 0 0; padding: 0 28px; font-size: 16.5px; line-height: 1.45; }
+.abstrakt p { margin: 0; text-align: justify; hyphens: auto; }
+.abstrakt b { font-weight: 700; }
+.msc { margin: 8px 0 0; padding: 0 28px; font-size: 15px; color: var(--tusz-2); }
+.kartka h2 { margin: 42px 0 10px; font-family: var(--f); font-weight: 700; font-size: 22px; }
+.kartka h2 .nr { display: inline-block; min-width: 1.6em; }
+.kartka h3 { margin: 22px 0 6px; font-family: var(--f); font-weight: 700; font-size: 19px; }
+.kartka p { margin: 0; text-align: justify; hyphens: auto; }
+.kartka p + p { text-indent: 1.4em; }
+.kartka .autor, .kartka .data, .kartka .msc, .kartka .nota { text-indent: 0; text-align: left; }
+.rys { margin: 30px 0 0; }
+.rys img, .rys svg { display: block; width: 100%; height: auto; }
+.rys figcaption { margin-top: 8px; font-size: 16px; line-height: 1.4; }
+.rys figcaption b { font-weight: 400; font-family: var(--f-kap); }
+.spis { list-style: none; margin: 0; padding: 0; }
+.spis > li { margin-top: 10px; }
+.spis .poz { display: flex; align-items: baseline; gap: 8px; font-weight: 700; }
+.spis .poz::after { content: ''; flex: 1; border-bottom: 1.5px dotted var(--tusz-2); transform: translateY(-5px); order: 2; }
+.spis .poz .nr { min-width: 1.6em; }
+.spis .poz .str { order: 3; font-weight: 400; font-size: 16px; color: var(--tusz-2); }
+.spis .pod { margin: 2px 0 0 1.6em; padding: 0; list-style: none; font-size: 17px; display: flex; flex-wrap: wrap; gap: 0 18px; }
+.spis .pod li { white-space: nowrap; }
+.spis .pod .nr { color: var(--tusz-2); margin-right: 5px; }
+.wyd { display: contents; }
+.wyd .nota { grid-column: 1; text-align: right; padding-top: 3px; font-variant-numeric: tabular-nums; }
+.wyd .nota span { display: block; }
+.wyd .nota b { display: block; font-family: var(--f-duzy); font-weight: 400; font-size: 26px; line-height: 1; color: var(--tusz); }
+.wyd > div:not(.nota) { padding-bottom: 14px; }
+.wyd .gdzie { font-family: var(--f-kap); font-size: 16px; letter-spacing: .02em; color: var(--tusz-2); }
+.wyd .t { display: block; color: var(--tusz); }
+.lit { margin: 0; padding: 0; list-style: none; }
+.lit li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr); padding: 3px 0; font-size: 18px; }
+.lit .k { color: var(--odnosnik); }
+.lit i { color: var(--tusz-2); }
+.cyt { color: var(--odnosnik); }
+.srodowisko { margin: 18px 0 0; }
+.srodowisko .glowa { font-weight: 700; }
+.srodowisko .cialo { font-style: italic; }
+.qed { float: right; }
+.stopka { grid-column: 2 / 4; margin-top: 54px; padding-top: 10px; border-top: .5px solid var(--tusz); display: flex; justify-content: space-between; gap: 16px; font-size: 15px; color: var(--tusz-2); }
+.przypis { font-size: 15px; color: var(--tusz-2); margin-top: 26px; padding-top: 6px; border-top: .5px solid var(--kreska); width: 40%; }
+.przypis p { text-align: left; }
+sup.p { font-size: .65em; color: var(--odnosnik); }
+.wzor { margin: 18px 0; text-align: center; font-size: 20px; }
+.wzor i { font-style: italic; }
+.wzor .nrw { float: right; font-style: normal; }
+
+/* telefon: jedna kolumna, notatki z marginesu wchodzą do tekstu */
+@container (max-width: 700px) {
+  .kartka { font-size: 17.5px; }
+  .pagina { padding: 18px 18px 8px; flex-direction: column; gap: 6px; }
+  .pagina nav { flex-wrap: wrap; gap: 4px 14px; font-size: 15px; }
+  .uklad { grid-template-columns: minmax(0, 1fr); padding: 30px 18px 40px; }
+  .uklad > *, .uklad > .szer, .nota, .stopka { grid-column: 1; }
+  .tytul { font-size: 40px; }
+  .abstrakt, .msc { padding: 0; }
+  .nota { margin: 4px 0 10px; padding-left: 12px; border-left: 1px solid var(--kreska); }
+  .wyd .nota { border: 0; padding: 0; margin: 14px 0 2px; text-align: left; }
+  .wyd .nota b { display: inline; font-size: 20px; margin-right: 6px; }
+  .wyd .nota span { display: inline; }
+  .wyd .nota span + span::before { content: ' · '; }
+  .kartka p, .abstrakt p { text-align: left; }
+  .przypis { width: 60%; }
+  .stopka { flex-direction: column; }
+}
+</style>
+
+<header class="pasek gutter">
+  <div class="pasek-in">
+    <h1>Preprint</h1>
+    <div class="grupa"><span>Strona</span><div class="seg" data-ustaw="strona">
+      <button type="button" id="s-glowna" data-v="glowna" aria-pressed="true">Strona główna</button>
+      <button type="button" id="s-nauka" data-v="nauka" aria-pressed="false">Nauka</button>
+    </div></div>
+    <div class="grupa"><span>Widok</span><div class="seg" data-ustaw="widok">
+      <button type="button" id="w-pc" data-v="pc" aria-pressed="true">Komputer</button>
+      <button type="button" id="w-tel" data-v="tel" aria-pressed="false">Telefon</button>
+    </div></div>
+    <span class="opis">Strona złożona jak artykuł: krój TeX‑a, numerowane rozdziały, notatki na marginesie, rysunki z podpisami, bez kafelków i banerów.</span>
+  </div>
+</header>
+
+<div class="gutter"><div class="ramka"><div class="okno" id="okno"><div class="scena" id="scena">
+<div class="kartka" id="kartka" lang="pl"></div>
+</div></div></div></div>
+
+<div class="gutter"><div class="ramka" style="padding-block: 26px 60px; font-size: 14.5px; line-height: 1.55; max-width: 1240px;">
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 24px 44px;">
+    <section><h2 style="font-family: var(--f-duzy); font-weight: 400; font-size: 22px; margin: 0 0 6px;">Na czym polega</h2><p style="margin:0">Granatowy baner znika. Każda strona zaczyna się jak artykuł: tytuł, „afiliacja”, streszczenie, a liczby działu stoją w zdaniu. Zakładki działu to spis treści z kropkami. Animacje z banerów zostają, tylko jako „Rys. 1” z podpisem i parametrami.</p></section>
+    <section><h2 style="font-family: var(--f-duzy); font-weight: 400; font-size: 22px; margin: 0 0 6px;">Skąd różnorodność działów</h2><p style="margin:0">Jeden system składu, ale każdy dział ma swój rysunek i swój „gatunek”: Nauka fakty i twierdzenia, Studia przykłady i ćwiczenia, Popularyzacja zagadki, Instytut kalendarium. Kolor prawie nie gra roli: jeden kolor linków, jeden kolor odnośników.</p></section>
+    <section><h2 style="font-family: var(--f-duzy); font-weight: 400; font-size: 22px; margin: 0 0 6px;">Ryzyka</h2><p style="margin:0">Dla kandydata na studia może być za poważne i za gęste. Cienki krój gorzej czyta się w małych rozmiarach, więc tekst jest większy (19 px). Dobrze łączy się z koncepcją założycieli: ich znaki byłyby tu rysunkami.</p></section>
+  </div>
+</div></div>
+
+<script>
+(() => {
+  const KADR = '{{KADR}}';
+  const dzis = new Date(2026, 10, 1).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' });
+  const nav = (jest) => `<nav aria-label="Menu makiety">${['Instytut', 'Nauka', 'Studia', 'Aktualności', 'Popularyzacja', 'Szukaj', 'EN'].map((n) => `<a href="#"${n === jest ? ' class="jest"' : ''}>${n}</a>`).join('')}</nav>`;
+
+  function lorenz() {
+    // atraktor Lorenza (σ = 10, ρ = 28, β = 8/3), RK4, rzut na płaszczyznę x–z
+    const s = 10, r = 28, b = 8 / 3, h = 0.005;
+    const f = ([x, y, z]) => [s * (y - x), x * (r - z) - y, x * y - b * z];
+    let p = [1, 1, 1]; const pts = [];
+    for (let i = 0; i < 12000; i++) {
+      const k1 = f(p), k2 = f(p.map((v, j) => v + h / 2 * k1[j])), k3 = f(p.map((v, j) => v + h / 2 * k2[j])), k4 = f(p.map((v, j) => v + h * k3[j]));
+      p = p.map((v, j) => v + h / 6 * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j]));
+      if (i > 400 && i % 2 === 0) pts.push([320 + p[0] * 13.5, 392 - p[2] * 7.2]);
+    }
+    return 'M' + pts.map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L');
+  }
+
+  const GLOWNA = () => `
+    <header class="pagina"><span class="marka">Instytut Matematyczny UWr</span>${nav('')}</header>
+    <article class="uklad">
+      <h1 class="tytul">Instytut Matematyczny</h1>
+      <p class="autor">Uniwersytet Wrocławski, plac Grunwaldzki 2, 50-384 Wrocław</p>
+      <p class="data">${dzis}</p>
+      <div class="abstrakt"><p><b>Streszczenie.</b> Badania, studia i popularyzacja matematyki we Wrocławiu. Wykłady na polskim uniwersytecie ruszyły tu 15 listopada 1945 roku, a wrocławską szkołę matematyczną zbudowali od podstaw Hugo Steinhaus, Edward Marczewski, Bronisław Knaster i Władysław Ślebodziński. Dziś pracuje w Instytucie 81 nauczycieli akademickich w dziewięciu zakładach i pracowniach.</p></div>
+      <p class="msc"><i>MSC 2020:</i> 03, 05, 11, 14, 20, 35, 42, 46, 47, 53, 54, 60, 62, 97.</p>
+
+      <figure class="rys szer"><img src="${KADR}" alt="Gmach Instytutu Matematycznego przy placu Grunwaldzkim o zmierzchu"><figcaption><b>Rys. 1.</b> Gmach Instytutu przy placu Grunwaldzkim, z widokiem na Odrę i Ostrów Tumski. Fot. fotopolska.eu (zdjęcie robocze).</figcaption></figure>
+
+      <h2><span class="nr">1</span>Spis treści</h2>
+      <p class="nota"><i>Na skróty:</i> <a href="#">plan zajęć</a>, <a href="#">pracownicy</a>, <a href="#">seminaria</a>. Najbliższy dzień bez zajęć: 2 listopada, dzień niebieski.</p>
+      <ol class="spis">
+        <li><a class="poz" href="#"><span class="nr">1.1</span>Instytut<span class="str">ludzie, struktura, kontakt</span></a><ul class="pod"><li><span class="nr">a</span><a href="#">Władze</a></li><li><span class="nr">b</span><a href="#">Pracownicy</a></li><li><span class="nr">c</span><a href="#">Struktura i zakłady</a></li><li><span class="nr">d</span><a href="#">Kontakt</a></li></ul></li>
+        <li><a class="poz" href="#"><span class="nr">1.2</span>Nauka<span class="str">kategoria A+</span></a><ul class="pod"><li><span class="nr">a</span><a href="#">Seminaria</a></li><li><span class="nr">b</span><a href="#">Konferencje</a></li><li><span class="nr">c</span><a href="#">Obrony doktorskie</a></li><li><span class="nr">d</span><a href="#">Projekty i granty</a></li></ul></li>
+        <li><a class="poz" href="#"><span class="nr">1.3</span>Studia<span class="str">3 kierunki, 5 specjalności</span></a><ul class="pod"><li><span class="nr">a</span><a href="#">Kierunki</a></li><li><span class="nr">b</span><a href="#">Plan zajęć</a></li><li><span class="nr">c</span><a href="#">Rok akademicki</a></li></ul></li>
+        <li><a class="poz" href="#"><span class="nr">1.4</span>Popularyzacja<span class="str">dla uczniów i nauczycieli</span></a></li>
+      </ol>
+
+      <h2><span class="nr">2</span>Nadchodzące wydarzenia</h2>
+      <div class="wyd"><div class="nota"><b>2</b><span>listopada</span><span>pon., 18:15</span></div><div><span class="gdzie">Koło naukowe</span><a class="t" href="#">Spotkanie koła naukowego: gry kombinatoryczne, czyli dlaczego wszystko jest Nimem</a></div></div>
+      <div class="wyd"><div class="nota"><b>3</b><span>listopada</span><span>wt., 14:00</span></div><div><span class="gdzie">Obrona doktorska</span><a class="t" href="#">Regularity of free boundaries in the thin obstacle problem with variable coefficients</a></div></div>
+      <div class="wyd"><div class="nota"><b>5</b><span>listopada</span><span>czw., 9:30</span></div><div><span class="gdzie">Warsztaty dla licealistów</span><a class="t" href="#">Od spirali Ulama do szyfru RSA</a></div></div>
+      <p style="text-indent:0">Pełny kalendarz jest w rozdziale <a href="#">Kalendarz</a>; seminaria tego tygodnia w <a href="#">1.2a</a>.</p>
+
+      <h2><span class="nr">3</span>Aktualności</h2>
+      <p class="nota">Aktualności można śledzić w czytniku <a href="#">RSS</a>. Wszystkie wpisy od 2026 roku są w <a href="#">archiwum</a>.</p>
+      <ol class="lit">
+        <li><span class="k">[1]</span><span><a href="#">Wykład otwarty: co macierze losowe wiedzą o liczbach pierwszych?</a> <i>30 października 2026.</i></span></li>
+        <li><span class="k">[2]</span><span><a href="#">Dzień otwarty matematyki dla kandydatów.</a> <i>27 października 2026.</i></span></li>
+        <li><span class="k">[3]</span><span><a href="#">Otrzymaliśmy kategorię naukową A+.</a> <i>16 października 2026.</i></span></li>
+        <li><span class="k">[4]</span><span><a href="#">Witamy studentów pierwszego roku.</a> <i>1 października 2026.</i></span></li>
+      </ol>
+      <footer class="stopka"><span>Instytut Matematyczny, Uniwersytet Wrocławski · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01</span><span>∎</span></footer>
+    </article>`;
+
+  const NAUKA = () => `
+    <header class="pagina"><span class="marka">Nauka</span>${nav('Nauka')}</header>
+    <article class="uklad">
+      <p style="text-indent:0; font-size:16px"><a href="#">↑ Strona główna</a></p>
+      <h1 class="tytul">Nauka</h1>
+      <p class="autor">Poznaj nasze badania na A+</p>
+      <div class="abstrakt"><p><b>Streszczenie.</b> W Instytucie realizujemy obecnie 5 projektów badawczych, w 2026 roku organizujemy 2 konferencje, a w ostatnim roku obroniono 6 doktoratów. W ewaluacjach za lata 2017–2021 i 2022–2025 matematyka na Uniwersytecie Wrocławskim otrzymała kategorię A+.</p></div>
+      <ol class="spis" style="margin-top:22px">
+        <li><span class="poz"><span class="nr"></span>W tym dziale<span class="str"></span></span><ul class="pod"><li><span class="nr">1</span><a href="#">Seminaria</a></li><li><span class="nr">2</span><a href="#">Konferencje</a></li><li><span class="nr">3</span><a href="#">Obrony doktorskie</a></li><li><span class="nr">4</span><a href="#">Projekty i granty</a></li><li><span class="nr">5</span><a href="#">Publikacje</a></li><li><span class="nr">6</span><a href="#">Sukcesy</a></li></ul></li>
+      </ol>
+      <figure class="rys"><svg viewBox="0 0 640 400" role="img" aria-label="Atraktor Lorenza"><path d="${lorenz()}" fill="none" stroke="currentColor" stroke-width=".55" stroke-linejoin="round"/></svg>
+        <figcaption><b>Rys. 1.</b> Atraktor Lorenza dla σ = 10, ρ = 28, β = 8/3, rzut na płaszczyznę (<i>x</i>, <i>z</i>). Na stronie rysowałby się powoli, jak dziś w banerze działu.</figcaption></figure>
+
+      <h2><span class="nr">1</span>Badania w Instytucie</h2>
+      <p>Trzy zakłady pracują na styku logiki, algebry, topologii i geometrii. Zakład Algebry i Teorii Modeli zajmuje się teorią modeli, Zakład Teorii Mnogości i Topologii łączy teorię mnogości i topologię z teorią miary i teorią przestrzeni Banacha, a Zakład Geometrii bada grupy przez pryzmat przestrzeni, na których działają.</p>
+      <p>Mocną wrocławską tradycję ma analiza. Zakład Analizy Funkcjonalnej kontynuuje szkołę analizy harmonicznej, a Zakład Analizy Matematycznej rozwija teorię wielomianów ortogonalnych, dyskretną analizę harmoniczną i nieprzemienną probabilistykę.</p>
+      <p class="nota" style="grid-row: span 2">Kategorię A+ dostaje niewiele ośrodków w kraju; szczegóły w <a href="#">rozdziale 6</a>.</p>
+      <div class="srodowisko"><p style="text-indent:0"><span class="glowa">Fakt 1.1.</span> <span class="cialo">Każdy zakład prowadzi własne seminarium, a referaty wygłaszają pracownicy, doktoranci i goście z kraju i z zagranicy.</span><sup class="p">1</sup></p></div>
+
+      <h2><span class="nr">2</span>Najbliższe seminaria</h2>
+      <div class="wyd"><div class="nota"><b>2</b><span>listopada</span><span>pon., 15:15, s. 605</span></div><div><span class="gdzie">Równania różniczkowe</span><a class="t" href="#">Finite-time blow-up versus global existence in a parabolic–elliptic Keller–Segel system</a></div></div>
+      <div class="wyd"><div class="nota"><b>4</b><span>listopada</span><span>śr., 10:15, s. 601</span></div><div><span class="gdzie">Analiza harmoniczna</span><a class="t" href="#">Dimension-free estimates for Riesz transforms in the Laguerre setting</a></div></div>
+      <div class="wzor"><i>R<sub>j</sub></i> = <i>∂<sub>j</sub></i> (−<i>L</i>)<sup>−1/2</sup>,&nbsp;&nbsp; <i>j</i> = 1, …, <i>d</i><span class="nrw">(2.1)</span></div>
+      <div class="wyd"><div class="nota"><b>5</b><span>listopada</span><span>czw., 10:15, s. 604</span></div><div><span class="gdzie">Prawdopodobieństwo</span><a class="t" href="#">Boolean cumulants and the Bercovici–Pata bijection for operator-valued distributions</a></div></div>
+      <div class="przypis"><p><sup class="p">1</sup> Seminaria są otwarte dla wszystkich, także dla studentów.</p></div>
+      <footer class="stopka"><span>Nauka · Instytut Matematyczny UWr</span><span>∎</span></footer>
+    </article>`;
+
+  let strona = 'glowna', widok = 'pc';
+  const $ = (s) => document.querySelector(s);
+  function rysuj() { $('#kartka').innerHTML = strona === 'glowna' ? GLOWNA() : NAUKA(); $('#scena').classList.toggle('tel', widok === 'tel'); skaluj(); }
+  function skaluj() { const o = $('#okno'), s = $('#scena'); const k = Math.min(1, o.clientWidth / s.offsetWidth); s.style.transform = `scale(${k})`; s.style.marginLeft = k < 1 ? '0' : ''; o.style.height = Math.ceil(s.offsetHeight * k + 24) + 'px'; }
+  document.querySelectorAll('.seg').forEach((seg) => seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    if (seg.dataset.ustaw === 'strona') strona = b.dataset.v; else widok = b.dataset.v;
+    rysuj();
+  }));
+  new ResizeObserver(skaluj).observe($('#okno'));
+  window.addEventListener('load', skaluj);
+  rysuj();
+})();
+</script>

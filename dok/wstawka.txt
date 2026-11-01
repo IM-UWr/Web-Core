@@ -1,0 +1,6 @@
+- **Pod strzałką (20:44, „upakować gęściej”; brakowało seminariów, kolorów dni i rekrutacji):** gęsty układ ze wszystkim, co jest dziś na głównej:
+  - pasek „Na skróty” w jednym wierszu: Plan zajęć, „Dziś brak zajęć” z kolorem następnego dnia (kropka #0e9cbc / #e0841b jak w `KafelekKoloryDni`), Pracownicy, Seminaria;
+  - trzy kolumny: Nadchodzące wydarzenia (3) · Seminaria tygodnia (5, „1–7 listopada”) · Aktualności (6). Wpisy mają etykietę w kolorze działu, nie ma kafelków;
+  - pas Studia w tle działu (cynober): „Studiuj matematykę we Wrocławiu”, przycisk „Rekrutacja na studia”, 5 kierunków w rzędzie;
+  - Warto wiedzieć: 4 pozycje w rzędzie;
+  - na 1366×768 pasek „Na skróty” i trzy kolumny mieszczą się na drugim ekranie (pod paskiem menu).

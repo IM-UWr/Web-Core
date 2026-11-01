@@ -1,0 +1,308 @@
+<title>Plakat IM UWr</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap">
+<style>
+/* Układ: pasek prototypu → strona jak plakat: płaskie pola koloru działów, bardzo duży wąski krój, czarne znaki matematyczne
+   przycięte krawędzią pola. Ta sama strona w ramie komputera albo telefonu (zapytania o kontener). */
+:root {
+  --p-bg: #ecebe8;
+  --p-fg: #15161a;
+  --p-muted: #5c5f68;
+  --p-line: #cfcdc8;
+  --papier: #ffffff;
+  --czern: #111214;
+  --szary: #55585f;
+  --kreska: #111214;
+  --instytut: #f2a33a;
+  --nauka: #4cc3b2;
+  --studia: #f07d5e;
+  --popularyzacja: #a991f7;
+  --na-polu: #111214;
+  --f: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --p-bg: #0e0f12; --p-fg: #e7e8ec; --p-muted: #9a9ea8; --p-line: #2b2e36; --papier: #131418; --czern: #f1f1f3; --szary: #a3a7b0; --kreska: #f1f1f3; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --p-bg: #0e0f12; --p-fg: #e7e8ec; --p-muted: #9a9ea8; --p-line: #2b2e36; --papier: #131418; --czern: #f1f1f3; --szary: #a3a7b0; --kreska: #f1f1f3; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--p-bg); color: var(--p-fg); font-family: var(--f); font-size: 14px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.pasek { border-bottom: 1px solid var(--p-line); }
+.pasek-in { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding-block: 10px; }
+.pasek h1 { margin: 0 6px 0 0; font-size: 24px; font-weight: 800; font-stretch: 70%; text-transform: uppercase; letter-spacing: -.01em; }
+.grupa { display: flex; align-items: center; gap: 8px; }
+.grupa > span { font-size: 12px; color: var(--p-muted); }
+.seg { display: inline-flex; border: 1px solid var(--p-line); border-radius: 7px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 11px; border: 0; background: transparent; color: var(--p-fg); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--p-line); }
+.seg button[aria-pressed="true"] { background: var(--p-fg); color: var(--p-bg); }
+.seg button:focus-visible { outline: 2px solid var(--p-fg); outline-offset: -3px; }
+.opis { font-size: 13px; color: var(--p-muted); max-width: 70ch; }
+.ramka { max-width: 1240px; margin: 20px auto 0; }
+.okno { position: relative; overflow: hidden; }
+.scena { width: 1200px; margin: 0 auto; transform-origin: 0 0; }
+.scena.tel { width: 390px; }
+.strona { container-type: inline-size; background: var(--papier); color: var(--czern); font-family: var(--f); font-size: 17px; line-height: 1.5; overflow: hidden; }
+.scena.tel .strona { border-radius: 26px; box-shadow: 0 0 0 9px #05070c; }
+.strona a { color: inherit; text-decoration: none; }
+
+/* pasek strony */
+.gora { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 40px; border-bottom: 3px solid var(--kreska); }
+.marka { font-weight: 800; font-stretch: 68%; font-size: 26px; line-height: .9; text-transform: uppercase; letter-spacing: -.01em; }
+.marka small { display: block; font-weight: 500; font-stretch: 100%; font-size: 12px; letter-spacing: .04em; text-transform: none; margin-top: 4px; color: var(--szary); }
+.menu { display: flex; gap: 22px; font-weight: 700; font-size: 15px; }
+.menu a { display: inline-flex; align-items: center; gap: 7px; }
+.menu i { width: 10px; height: 10px; background: var(--k, transparent); }
+.menu a.jest { box-shadow: inset 0 -3px 0 var(--czern); }
+
+/* strona główna */
+.hero { display: grid; grid-template-columns: 1fr 470px; border-bottom: 3px solid var(--kreska); }
+.hero-txt { padding: 40px 40px 34px; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; }
+.hero h2 { margin: 0; font-weight: 850; font-stretch: 62%; font-size: 168px; line-height: .82; letter-spacing: -.015em; text-transform: uppercase; }
+.hero .pod { display: flex; gap: 34px; align-items: flex-end; flex-wrap: wrap; }
+.hero .rok { font-weight: 800; font-stretch: 62%; font-size: 92px; line-height: .8; }
+.hero .haslo { font-size: 20px; font-weight: 600; max-width: 22ch; line-height: 1.25; }
+.duo { position: relative; background: var(--instytut); min-height: 520px; }
+.duo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 58% 50%; filter: grayscale(1) contrast(1.25) brightness(1.08); mix-blend-mode: multiply; }
+.duo span { position: absolute; right: 12px; bottom: 10px; font-size: 11px; font-weight: 600; color: #111214; }
+.pola { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 3px solid var(--kreska); }
+.pole { position: relative; height: 470px; overflow: hidden; background: var(--k); color: var(--na-polu); padding: 22px 24px; display: flex; flex-direction: column; justify-content: flex-end; }
+.pole + .pole { border-left: 3px solid var(--kreska); }
+.pole svg { position: absolute; left: 50%; top: -30px; width: 340px; height: 408px; transform: translateX(-50%) rotate(var(--obr, 0deg)); transition: transform .9s cubic-bezier(.3,.7,.2,1); }
+.pole svg path { fill: none; stroke: #111214; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.pole:hover svg, .pole:focus-within svg { transform: translateX(-50%) rotate(calc(var(--obr, 0deg) + 8deg)) scale(1.06); }
+.pole h3 { position: relative; margin: 0; font-weight: 850; font-stretch: 62%; font-size: 64px; line-height: .86; text-transform: uppercase; letter-spacing: -.01em; }
+.pole h3.dlugi { font-size: 39px; }
+.pole p { position: relative; margin: 8px 0 0; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.pole a:focus-visible { outline: 3px solid #111214; outline-offset: 4px; }
+.kal { display: grid; grid-template-columns: 1fr 1fr; }
+.kal > section { padding: 26px 40px 40px; }
+.kal > section + section { border-left: 3px solid var(--kreska); }
+.kal h4 { margin: 0 0 14px; font-weight: 850; font-stretch: 62%; font-size: 52px; line-height: .9; text-transform: uppercase; }
+.wyd { display: grid; grid-template-columns: 92px 1fr; gap: 16px; padding: 12px 0; border-top: 2px solid var(--kreska); }
+.wyd .d { font-weight: 850; font-stretch: 62%; font-size: 78px; line-height: .8; font-variant-numeric: tabular-nums; }
+.wyd .d small { display: block; margin-top: 6px; font-weight: 700; font-stretch: 100%; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+.wyd .k { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.wyd .k i { width: 12px; height: 12px; background: var(--k); }
+.wyd .t { display: block; margin-top: 3px; font-size: 18px; font-weight: 600; line-height: 1.3; }
+.wyd.bez .d { display: none; }
+.wyd.bez { grid-template-columns: 1fr; }
+
+/* strona działu */
+.baner { position: relative; overflow: hidden; background: var(--k); color: var(--na-polu); height: 470px; border-bottom: 3px solid var(--kreska); }
+.baner svg { position: absolute; right: -70px; top: -40px; width: 760px; height: 560px; }
+.baner svg path { fill: none; stroke: #111214; stroke-width: 1.15; }
+.baner .w { position: absolute; left: 40px; top: 26px; font-weight: 700; font-size: 15px; }
+.baner h2 { position: absolute; left: 32px; top: 52px; margin: 0; font-weight: 850; font-stretch: 62%; font-size: 250px; line-height: .8; letter-spacing: -.02em; text-transform: uppercase; }
+.baner .haslo { position: absolute; left: 40px; top: 262px; font-size: 24px; font-weight: 700; }
+.baner .liczby { position: absolute; left: 40px; bottom: 26px; display: flex; gap: 40px; }
+.baner .liczby div { display: flex; align-items: flex-end; gap: 10px; font-size: 14px; font-weight: 700; line-height: 1.15; max-width: 18ch; }
+.baner .liczby b { font-weight: 850; font-stretch: 62%; font-size: 88px; line-height: .78; }
+.zakl { display: flex; flex-wrap: wrap; background: var(--czern); color: var(--papier); }
+.zakl a { padding: 14px 20px; font-weight: 700; font-size: 16px; }
+.zakl a.jest { background: var(--k); color: #111214; }
+.tresc { display: grid; grid-template-columns: minmax(0, 1fr) 360px; }
+.tresc > div { padding: 32px 40px 44px; }
+.tresc > aside { padding: 32px 32px 44px; border-left: 3px solid var(--kreska); }
+.tresc h4 { margin: 0 0 12px; font-weight: 850; font-stretch: 62%; font-size: 56px; line-height: .9; text-transform: uppercase; }
+.tresc p { margin: 0 0 12px; max-width: 62ch; font-size: 18px; line-height: 1.6; }
+.fakt { padding: 10px 0 12px; border-top: 2px solid var(--kreska); }
+.fakt b { display: block; font-weight: 850; font-stretch: 62%; font-size: 72px; line-height: .85; }
+.fakt span { font-size: 15px; font-weight: 600; }
+
+@container (max-width: 700px) {
+  .strona { font-size: 16px; }
+  .gora { padding: 14px 16px; }
+  .menu { display: none; }
+  .gora::after { content: '≡'; font-size: 30px; font-weight: 700; line-height: 1; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-txt { padding: 22px 16px 22px; gap: 18px; }
+  .hero h2 { font-size: 76px; }
+  .hero .rok { font-size: 56px; }
+  .hero .haslo { font-size: 17px; }
+  .duo { min-height: 230px; border-top: 3px solid var(--kreska); }
+  .pola { grid-template-columns: 1fr 1fr; }
+  .pole { height: 210px; padding: 14px; }
+  .pole + .pole { border-left: 0; }
+  .pole:nth-child(even) { border-left: 3px solid var(--kreska); }
+  .pole:nth-child(n+3) { border-top: 3px solid var(--kreska); }
+  .pole svg { width: 170px; height: 204px; top: -62px; }
+  .pole h3 { font-size: 34px; }
+  .pole h3.dlugi { font-size: 23px; }
+  .pole p { font-size: 13px; }
+  .kal { grid-template-columns: 1fr; }
+  .kal > section { padding: 18px 16px 24px; }
+  .kal > section + section { border-left: 0; border-top: 3px solid var(--kreska); }
+  .kal h4 { font-size: 40px; }
+  .wyd { grid-template-columns: 64px 1fr; }
+  .wyd .d { font-size: 56px; }
+  .wyd .d small { font-size: 11px; letter-spacing: .02em; }
+  .baner { height: 400px; }
+  .baner svg { right: -190px; top: -30px; width: 520px; height: 383px; opacity: .9; }
+  .baner .w { left: 16px; top: 16px; }
+  .baner h2 { left: 12px; top: 40px; font-size: 118px; }
+  .baner .haslo { left: 16px; top: 140px; font-size: 18px; max-width: 16ch; }
+  .baner .liczby { left: 16px; right: 16px; bottom: 16px; gap: 14px; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .baner .liczby div { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 12px; }
+  .baner .liczby b { font-size: 56px; }
+  .zakl { flex-wrap: nowrap; overflow-x: auto; }
+  .zakl a { padding: 12px 14px; font-size: 15px; white-space: nowrap; }
+  .tresc { grid-template-columns: 1fr; }
+  .tresc > div { padding: 22px 16px 10px; }
+  .tresc > aside { padding: 0 16px 28px; border-left: 0; }
+  .tresc h4 { font-size: 42px; }
+  .tresc p { font-size: 17px; }
+  .fakt b { font-size: 54px; }
+}
+</style>
+
+<header class="pasek gutter">
+  <div class="pasek-in">
+    <h1>Plakat</h1>
+    <div class="grupa"><span>Strona</span><div class="seg" data-ustaw="strona">
+      <button type="button" id="s-glowna" data-v="glowna" aria-pressed="true">Strona główna</button>
+      <button type="button" id="s-nauka" data-v="nauka" aria-pressed="false">Nauka</button>
+      <button type="button" id="s-studia" data-v="studia" aria-pressed="false">Studia</button>
+    </div></div>
+    <div class="grupa"><span>Widok</span><div class="seg" data-ustaw="widok">
+      <button type="button" id="w-pc" data-v="pc" aria-pressed="true">Komputer</button>
+      <button type="button" id="w-tel" data-v="tel" aria-pressed="false">Telefon</button>
+    </div></div>
+    <span class="opis">Płaskie pola koloru zamiast granatu, wąski krój w bardzo dużym stopniu, grube czarne linie. Na stronie głównej najedź na pole działu.</span>
+  </div>
+</header>
+
+<div class="gutter"><div class="ramka"><div class="okno" id="okno"><div class="scena" id="scena">
+<div class="strona" id="strona" lang="pl"></div>
+</div></div></div></div>
+
+<div class="gutter"><div class="ramka" style="padding-block: 26px 60px; font-size: 15px; line-height: 1.55;">
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 24px 44px;">
+    <section><h2 style="margin:0 0 6px; font-weight:850; font-stretch:62%; font-size:30px; text-transform:uppercase; line-height:1">Na czym polega</h2><p style="margin:0">Każdy dział to pole jednego koloru, więc zakładki różnią się od pierwszego spojrzenia. Wąski krój w bardzo dużym stopniu i grube czarne linie nawiązują do polskiej awangardy typograficznej lat 20. i 30. Znaki matematyczne założycieli są tu dużymi czarnymi rysunkami przyciętymi krawędzią pola.</p></section>
+    <section><h2 style="margin:0 0 6px; font-weight:850; font-stretch:62%; font-size:30px; text-transform:uppercase; line-height:1">Co zostaje z ustaleń</h2><p style="margin:0">Treść, liczby w banerze, hasła i animacje (jako czarne linie na kolorze). Znika granat, bursztyn jako jedyny akcent i białe kafelki. Kolory działów są te same co w prototypie „Założyciele”, tylko jako pełne pola.</p></section>
+    <section><h2 style="margin:0 0 6px; font-weight:850; font-stretch:62%; font-size:30px; text-transform:uppercase; line-height:1">Ryzyka</h2><p style="margin:0">To najgłośniejszy kierunek: dobrze wygląda na wydarzeniach i rekrutacji, gorzej przy długich regulaminach. Wymaga dyscypliny: tylko jeden kolor na stronie działu i czerń. Dla części pracowników może być za mało „uniwersytecki”.</p></section>
+  </div>
+</div></div>
+
+<script>
+(() => {
+  const KADR = '{{KADR}}';
+  const f1 = (v) => Math.round(v * 10) / 10;
+  /* znaki matematyczne założycieli (te same co w prototypie „Założyciele”) */
+  function knaster() {
+    const N = 3, kon = []; (function c(a, b, d) { if (d === 0) { kon.push(a, b); return; } const t = (b - a) / 3; c(a, a + t, d - 1); c(b - t, b, d - 1); })(0, 1, N);
+    const X = (x) => 16 + 168 * x, Y = 146, R = (r) => 168 * r, d = [];
+    kon.filter((x) => x < 0.5 - 1e-9).forEach((x) => { const r = 0.5 - x; d.push(`M${f1(X(x))},${Y} A${f1(R(r))},${f1(R(r))} 0 0 1 ${f1(X(1 - x))},${Y}`); });
+    for (let n = 1; n <= N; n++) { const s = 5 / (2 * Math.pow(3, n)); kon.filter((x) => x >= 2 / Math.pow(3, n) - 1e-9 && x < s - 1e-9).forEach((x) => { const r = s - x; d.push(`M${f1(X(x))},${Y} A${f1(R(r))},${f1(R(r))} 0 0 0 ${f1(X(2 * s - x))},${Y}`); }); }
+    return d;
+  }
+  function lie() {
+    const a = 0.09, b = 1, cx = 100, cy = 120, s = 92, out = [];
+    const fl = (p, t) => { const e = Math.exp(a * t), c = Math.cos(b * t), si = Math.sin(b * t); return [e * (c * p[0] - si * p[1]), e * (si * p[0] + c * p[1])]; };
+    const P = (p) => [cx + s * p[0], cy - s * p[1]];
+    [[0.22, 0], [-0.22, 0]].forEach((p0) => { let d = ''; for (let t = -0.2, k = 0; t <= 14; t += 0.08, k++) { const q = P(fl(p0, t)); if (q[0] < -40 || q[0] > 240 || q[1] < -20 || q[1] > 260) break; d += (k ? 'L' : 'M') + f1(q[0]) + ',' + f1(q[1]); } out.push(d); });
+    return out;
+  }
+  function szpilrajn() {
+    const W = { a: [62, 206], b: [138, 206], c: [36, 152], d: [100, 152], e: [164, 152], f: [68, 98], g: [132, 98], h: [100, 44] };
+    const out = ['ac', 'ad', 'bd', 'be', 'cf', 'df', 'dg', 'eg', 'fh', 'gh'].map((k) => `M${W[k[0]][0]},${W[k[0]][1]} L${W[k[1]][0]},${W[k[1]][1]}`);
+    Object.values(W).forEach(([x, y]) => out.push(`M${x - 6},${y} a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0`));
+    return out;
+  }
+  function kanapka() {
+    const fig = (cx, cy, r, f) => { const p = []; for (let i = 0; i < 120; i++) { const t = i / 120 * Math.PI * 2, q = r * f(t); p.push([cx + q * Math.cos(t), cy + q * Math.sin(t)]); } return p; };
+    const A = fig(78, 160, 40, (t) => 1 + 0.18 * Math.sin(3 * t) + 0.08 * Math.cos(2 * t)), B = fig(128, 86, 33, (t) => 1 + 0.2 * Math.cos(3 * t + 0.4) + 0.07 * Math.sin(5 * t));
+    const pole = (p) => { let s = 0; for (let i = 0; i < p.length; i++) { const [x1, y1] = p[i], [x2, y2] = p[(i + 1) % p.length]; s += x1 * y2 - x2 * y1; } return Math.abs(s) / 2; };
+    const tnij = (p, n, c) => { const o = []; for (let i = 0; i < p.length; i++) { const P = p[i], Q = p[(i + 1) % p.length], dp = P[0] * n[0] + P[1] * n[1] - c, dq = Q[0] * n[0] + Q[1] * n[1] - c; if (dp <= 0) o.push(P); if (dp * dq < 0) { const t = dp / (dp - dq); o.push([P[0] + t * (Q[0] - P[0]), P[1] + t * (Q[1] - P[1])]); } } return o; };
+    const pol = (p, n) => { let lo = -400, hi = 400; const cel = pole(p) / 2; for (let k = 0; k < 46; k++) { const m = (lo + hi) / 2; if (pole(tnij(p, n, m)) < cel) lo = m; else hi = m; } return (lo + hi) / 2; };
+    const roz = (phi) => { const n = [Math.cos(phi), Math.sin(phi)]; return pol(A, n) - pol(B, n); };
+    let lo = 0, hi = Math.PI; const s0 = Math.sign(roz(lo)); for (let k = 0; k < 46; k++) { const m = (lo + hi) / 2; if (Math.sign(roz(m)) === s0) lo = m; else hi = m; }
+    const phi = (lo + hi) / 2, n = [Math.cos(phi), Math.sin(phi)], c = pol(A, n), t = [-n[1], n[0]], p0 = [n[0] * c, n[1] * c];
+    const kraw = (p) => 'M' + p.map((q) => f1(q[0]) + ',' + f1(q[1])).join('L') + 'Z';
+    return [kraw(A), kraw(B), `M${f1(p0[0] - t[0] * 300)},${f1(p0[1] - t[1] * 300)} L${f1(p0[0] + t[0] * 300)},${f1(p0[1] + t[1] * 300)}`];
+  }
+  function lorenz() {
+    const s = 10, r = 28, b = 8 / 3, h = 0.005, f = ([x, y, z]) => [s * (y - x), x * (r - z) - y, x * y - b * z];
+    let p = [1, 1, 1]; const pts = [];
+    for (let i = 0; i < 9000; i++) { const k1 = f(p), k2 = f(p.map((v, j) => v + h / 2 * k1[j])), k3 = f(p.map((v, j) => v + h / 2 * k2[j])), k4 = f(p.map((v, j) => v + h * k3[j])); p = p.map((v, j) => v + h / 6 * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j])); if (i > 400 && i % 2 === 0) pts.push([380 + p[0] * 16, 520 - p[2] * 9.6]); }
+    return ['M' + pts.map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L')];
+  }
+  function riemann() {
+    // sumy Riemanna dla f(x) = 2 + sin(x) + x/3 na [0, 6]: prostokąty dla n = 6, 12, 24 i wykres
+    const fx = (x) => 2 + Math.sin(x) + x / 3, X = (x) => 40 + x * 110, Y = (y) => 520 - y * 92, out = [];
+    let d = ''; for (let i = 0; i <= 120; i++) { const x = i / 20; d += (i ? 'L' : 'M') + f1(X(x)) + ',' + f1(Y(fx(x))); } out.push(d);
+    [6, 12, 24].forEach((n) => { let q = ''; for (let i = 0; i < n; i++) { const a = i * 6 / n, b2 = (i + 1) * 6 / n, y = fx((a + b2) / 2); q += `M${f1(X(a))},${Y(0)} L${f1(X(a))},${f1(Y(y))} L${f1(X(b2))},${f1(Y(y))} L${f1(X(b2))},${Y(0)}`; } out.push(q); });
+    return out;
+  }
+  const svg = (ps, vb = '0 0 200 240') => `<svg viewBox="${vb}" aria-hidden="true">${ps.map((d) => `<path d="${d}"/>`).join('')}</svg>`;
+
+  const D = {
+    instytut: { n: 'Instytut', h: 'Wrocławska szkoła matematyczna', z: szpilrajn(), o: '-6deg' },
+    nauka: { n: 'Nauka', h: 'Poznaj nasze badania na A+', z: lie(), o: '0deg' },
+    studia: { n: 'Studia', h: 'Studiuj matematykę we Wrocławiu', z: knaster(), o: '4deg' },
+    popularyzacja: { n: 'Popularyzacja', h: 'Matematyka dla uczniów i nauczycieli', z: kanapka(), o: '-4deg' }
+  };
+  const menu = (jest) => `<nav class="menu" aria-label="Menu makiety">${['instytut', 'nauka', 'studia'].map((k) => `<a href="#" style="--k:var(--${k})"${k === jest ? ' class="jest"' : ''}><i></i>${D[k].n}</a>`).join('')}<a href="#">Aktualności</a><a href="#" style="--k:var(--popularyzacja)"><i></i>Popularyzacja</a><a href="#">Szukaj</a></nav>`;
+  const gora = (jest) => `<header class="gora"><a class="marka" href="#">Instytut Matematyczny<small>Uniwersytet Wrocławski</small></a>${menu(jest)}</header>`;
+
+  const GLOWNA = () => `${gora('')}
+    <section class="hero">
+      <div class="hero-txt">
+        <h2>Instytut Mate&shy;matyczny</h2>
+        <div class="pod"><span class="rok">1945</span><span class="haslo">Badania, studia i popularyzacja we Wrocławiu</span></div>
+      </div>
+      <div class="duo"><img src="${KADR}" alt="Gmach Instytutu Matematycznego przy placu Grunwaldzkim"><span>Fot. fotopolska.eu</span></div>
+    </section>
+    <section class="pola">${Object.entries(D).map(([k, d]) => `
+      <a class="pole" href="#" style="--k:var(--${k}); --obr:${d.o}">${svg(d.z)}<h3${d.n.length > 10 ? ' class="dlugi"' : ''}>${d.n}</h3><p>${d.h}</p></a>`).join('')}
+    </section>
+    <section class="kal">
+      <section><h4>Wkrótce</h4>
+        <div class="wyd" style="--k:var(--studia)"><span class="d">2<small>lis · pon.</small></span><div><span class="k"><i></i>Studia · koło naukowe</span><a class="t" href="#">Gry kombinatoryczne, czyli dlaczego wszystko jest Nimem</a></div></div>
+        <div class="wyd" style="--k:var(--nauka)"><span class="d">3<small>lis · wt.</small></span><div><span class="k"><i></i>Nauka · obrona doktorska</span><a class="t" href="#">Regularity of free boundaries in the thin obstacle problem</a></div></div>
+        <div class="wyd" style="--k:var(--popularyzacja)"><span class="d">5<small>lis · czw.</small></span><div><span class="k"><i></i>Popularyzacja · warsztaty</span><a class="t" href="#">Od spirali Ulama do szyfru RSA</a></div></div>
+      </section>
+      <section><h4>Aktualności</h4>
+        <div class="wyd bez" style="--k:var(--popularyzacja)"><div><span class="k"><i></i>Popularyzacja · 30.10</span><a class="t" href="#">Wykład otwarty: co macierze losowe wiedzą o liczbach pierwszych?</a></div></div>
+        <div class="wyd bez" style="--k:var(--studia)"><div><span class="k"><i></i>Studia · 27.10</span><a class="t" href="#">Dzień otwarty matematyki dla kandydatów</a></div></div>
+        <div class="wyd bez" style="--k:var(--nauka)"><div><span class="k"><i></i>Nauka · 16.10</span><a class="t" href="#">Otrzymaliśmy kategorię naukową A+</a></div></div>
+        <div class="wyd bez" style="--k:var(--instytut)"><div><span class="k"><i></i>Instytut · 1.10</span><a class="t" href="#">Witamy studentów pierwszego roku</a></div></div>
+      </section>
+    </section>`;
+
+  const DZIAL = {
+    nauka: { rys: lorenz(), vb: '0 0 760 560', liczby: [['5', 'realizowanych projektów'], ['2', 'konferencje w 2026 roku'], ['6', 'doktoratów w ostatnim roku']],
+      zakl: ['Seminaria', 'Konferencje', 'Obrony doktorskie', 'Projekty i granty', 'Publikacje', 'Sukcesy'], tytul: 'Badania',
+      tekst: ['Trzy zakłady pracują na styku logiki, algebry, topologii i geometrii. Mocną wrocławską tradycję ma analiza: analiza harmoniczna, wielomiany ortogonalne i nieprzemienna probabilistyka.', 'Codzienne życie naukowe toczy się na seminariach: każdy zakład prowadzi własne, a referaty wygłaszają pracownicy, doktoranci i goście.'],
+      fakty: [['A+', 'kategoria naukowa w dwóch ewaluacjach'], ['2000+', 'publikacji od 2003 roku'], ['90+', 'projektów od 2005 roku']] },
+    studia: { rys: riemann(), vb: '0 0 760 560', liczby: [['3', 'kierunki studiów'], ['5', 'specjalności'], ['3', 'stopnie studiów']],
+      zakl: ['Kierunki', 'Specjalności', 'Plan zajęć', 'Rok akademicki', 'Sprawy studenckie', 'MOST'], tytul: 'O studiach',
+      tekst: ['Uczymy matematyki tak, jak ją uprawiamy. Zajęcia prowadzą aktywni badacze, a program łączy solidne podstawy z dużą swobodą wyboru.', 'Studia I stopnia trwają trzy lata, a II stopnia dwa. Od pierwszego roku można dopasować poziom zajęć do swoich możliwości.'],
+      fakty: [['3 lata', 'studia I stopnia'], ['2 lata', 'studia II stopnia'], ['5', 'specjalności do wyboru']] }
+  };
+  const DZIALOWA = (k) => { const d = DZIAL[k]; return `${gora(k)}
+    <section class="baner" style="--k:var(--${k})">${svg(d.rys, d.vb)}
+      <a class="w" href="#">← Strona główna</a><h2>${D[k].n}</h2><p class="haslo">${D[k].h}</p>
+      <div class="liczby">${d.liczby.map(([n, l]) => `<div><b>${n}</b>${l}</div>`).join('')}</div>
+    </section>
+    <nav class="zakl" style="--k:var(--${k})" aria-label="W tym dziale">${d.zakl.map((z, i) => `<a href="#"${i ? '' : ' class="jest"'}>${z}</a>`).join('')}</nav>
+    <section class="tresc"><div><h4>${d.tytul}</h4>${d.tekst.map((t) => `<p>${t}</p>`).join('')}</div>
+      <aside>${d.fakty.map(([n, l]) => `<div class="fakt"><b>${n}</b><span>${l}</span></div>`).join('')}</aside></section>`; };
+
+  let strona = 'glowna', widok = 'pc';
+  const $ = (s) => document.querySelector(s);
+  function rysuj() { $('#strona').innerHTML = strona === 'glowna' ? GLOWNA() : DZIALOWA(strona); $('#scena').classList.toggle('tel', widok === 'tel'); skaluj(); }
+  function skaluj() { const o = $('#okno'), s = $('#scena'); const k = Math.min(1, o.clientWidth / s.offsetWidth); s.style.transform = `scale(${k})`; s.style.marginLeft = k < 1 ? '0' : ''; o.style.height = Math.ceil(s.offsetHeight * k + 24) + 'px'; }
+  document.querySelectorAll('.seg').forEach((seg) => seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    if (seg.dataset.ustaw === 'strona') strona = b.dataset.v; else widok = b.dataset.v;
+    rysuj();
+  }));
+  new ResizeObserver(skaluj).observe($('#okno'));
+  window.addEventListener('load', skaluj);
+  rysuj();
+})();
+</script>

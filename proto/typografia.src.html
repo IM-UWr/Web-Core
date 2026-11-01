@@ -1,0 +1,142 @@
+<title>Typografia IM UWr</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Brygada+1918:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@400..800&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+<style>
+/* Układ: krótki wstęp i rekomendacja → siatka okazów; każdy okaz to ten sam wycinek strony seminarium (baner + treść) w innym zestawie krojów. */
+@font-face { font-family: 'Latin Modern Roman'; src: url({{LM10R}}) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman'; src: url({{LM10I}}) format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman'; src: url({{LM10B}}) format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman 17'; src: url({{LM17R}}) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Latin Modern Roman Caps'; src: url({{LMCAPS}}) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+:root {
+  --bg: #f4f2ee;
+  --fg: #1b2132;
+  --muted: #5f6676;
+  --line: #d8d4cc;
+  --karta: #ffffff;
+  --karta-tekst: #2a3245;
+  --karta-ink: #131c31;
+  --karta-muted: #5d6576;
+  --karta-line: #e2e4ea;
+  --granat: #0d1830;
+  --bursztyn: #f2a33a;
+  --bursztyn-a: #8a5300;
+  --na-ciemnym-2: #c3cad8;
+  --f-opis: 'IBM Plex Sans', system-ui, sans-serif;
+  --f-opis-display: 'Brygada 1918', Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0f1218; --fg: #e6e8ee; --muted: #9aa1b0; --line: #2a2f3b; --karta: #0a1020; --karta-tekst: #d3d9e6; --karta-ink: #ecf0f7; --karta-muted: #98a3b8; --karta-line: #243049; --bursztyn-a: #f2a33a; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0f1218; --fg: #e6e8ee; --muted: #9aa1b0; --line: #2a2f3b; --karta: #0a1020; --karta-tekst: #d3d9e6; --karta-ink: #ecf0f7; --karta-muted: #98a3b8; --karta-line: #243049; --bursztyn-a: #f2a33a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-opis); font-size: 15.5px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1240px; margin: 0 auto; }
+.wstep { padding-block: 34px 10px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 56px; align-items: end; }
+@media (max-width: 860px) { .wstep { grid-template-columns: minmax(0, 1fr); } }
+.wstep h1 { margin: 0; font-family: var(--f-opis-display); font-weight: 500; font-size: clamp(34px, 5vw, 52px); line-height: 1.02; letter-spacing: -.01em; text-wrap: balance; }
+.wstep p { margin: 12px 0 0; max-width: 60ch; color: var(--muted); }
+.rada { border-top: 2px solid var(--fg); padding-top: 10px; }
+.rada h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.rada ol { margin: 0; padding-left: 20px; }
+.rada li + li { margin-top: 6px; }
+.siatka { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap: 40px 36px; padding-block: 30px 70px; }
+.okaz { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.okaz-opis { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+.okaz-opis .nr { grid-row: span 3; font-family: var(--f-opis-display); font-size: 28px; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; }
+.okaz-opis h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.okaz-opis .role { font-size: 13px; color: var(--muted); }
+.okaz-opis .ocena { font-size: 14px; }
+.okaz-opis .ocena b { font-weight: 600; }
+
+/* mini-strona: zmienne krojów ustawia każdy okaz */
+.mini { border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); background: var(--karta); color: var(--karta-tekst); font-family: var(--txt); font-size: var(--txt-size, 16px); line-height: 1.62; }
+.mini-baner { background: var(--granat); color: #fff; padding: 22px 26px 18px; }
+.mini .wstecz { font-family: var(--ui); font-size: 13px; font-weight: var(--ui-w, 600); color: var(--na-ciemnym-2); }
+.mini h3 { margin: 6px 0 0; font-family: var(--disp); font-weight: var(--disp-w, 500); font-size: var(--disp-size, 34px); line-height: 1.08; letter-spacing: var(--disp-ls, -.005em); font-stretch: var(--disp-wdth, 100%); text-transform: var(--disp-tt, none); text-wrap: balance; }
+.mini .haslo { margin: 8px 0 0; font-family: var(--ui); font-size: 15px; font-weight: 500; color: var(--bursztyn); }
+.mini .liczby { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-top: 14px; padding-top: 10px; border-top: 1px solid rgb(255 255 255 / .2); font-family: var(--ui); font-size: 13px; color: var(--na-ciemnym-2); }
+.mini .liczby b { font-family: var(--num, var(--disp)); font-weight: var(--num-w, 500); font-size: 24px; color: #fff; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.mini-tresc { padding: 4px 26px 22px; }
+.mini .zak { display: flex; gap: 18px; border-bottom: 1px solid var(--karta-line); font-family: var(--ui); font-size: 14px; font-weight: var(--ui-w, 600); color: var(--karta-muted); }
+.mini .zak span { padding: 10px 0 9px; }
+.mini .zak span:first-child { color: var(--karta-ink); box-shadow: inset 0 -2px 0 var(--karta-ink); }
+.mini h4 { margin: 16px 0 6px; font-family: var(--disp); font-weight: var(--disp-w, 500); font-size: var(--h4-size, 23px); line-height: 1.2; color: var(--karta-ink); font-stretch: var(--disp-wdth, 100%); text-transform: var(--disp-tt, none); letter-spacing: var(--h4-ls, 0); }
+.mini .meta { margin: 0; font-family: var(--ui); font-size: 13.5px; font-weight: var(--ui-w, 600); color: var(--bursztyn-a); font-variant-numeric: tabular-nums; }
+.mini .tyt { margin: 2px 0 0; font-weight: var(--tyt-w, 600); font-size: 1.06em; line-height: 1.35; color: var(--karta-ink); }
+.mini .kto { margin: 2px 0 0; font-size: .92em; color: var(--karta-muted); }
+.mini .akapit { margin: 14px 0 0; max-width: 62ch; }
+.mini .akapit i { font-family: var(--mat, inherit); }
+.mini .znaki { margin: 14px 0 0; padding-top: 10px; border-top: 1px dashed var(--karta-line); font-family: var(--disp); font-size: 20px; line-height: 1.35; color: var(--karta-ink); font-stretch: var(--disp-wdth, 100%); }
+.mini .znaki small { display: block; font-family: var(--txt); font-size: 14px; color: var(--karta-muted); }
+.zrodla { padding-block: 0 50px; font-size: 13.5px; color: var(--muted); max-width: 90ch; }
+.zrodla a { color: inherit; }
+</style>
+
+<div class="wrap">
+  <header class="wstep">
+    <div>
+      <h1>Typografia: ten sam wycinek w ośmiu zestawach krojów</h1>
+      <p>Każdy okaz to fragment strony seminarium: baner, zakładki, najbliższy referat, akapit ze wzorem i próba polskich znaków. Zmienia się tylko krój i jego grubość, kolory zostają jak dziś.</p>
+    </div>
+    <div class="rada">
+      <h2>Co bym wybrał</h2>
+      <ol>
+        <li><b>Najmniejsza zmiana, największy efekt:</b> nagłówki Brygadą 1918, tekst zostaje w Manrope, ale w grubości 400–600 zamiast 800 (okaz 2).</li>
+        <li><b>Jeśli strona ma wyglądać jak środowisko matematyczne:</b> Latin Modern, czyli krój TeX‑a (okaz 4). Pasuje do kierunku „Preprint”. Wersja z IBM Plex Sans w menu (okaz 5) jest bezpieczniejsza na ekranie.</li>
+        <li>Okaz 8 ma sens tylko razem z kierunkiem „Plakat”.</li>
+      </ol>
+    </div>
+  </header>
+
+  <div class="siatka" id="siatka"></div>
+
+  <p class="zrodla">Brygada: krój z międzywojennej Polski, którego matryce odnaleziono w 2015 r. w Muzeum Książki Artystycznej w Łodzi. Zdigitalizował go zespół Mateusza Machalskiego, a wydany jest jako Brygada 1918 (<a href="https://design.google/library/type-detectives-give-life-brygada-en">Google Design</a>). Latin Modern rozwijała polska grupa GUST (Bogusław Jackowski, Janusz M. Nowacki); licencja pozwala osadzać go na stronie. Wszystkie pozostałe kroje są wolne (OFL) i dostępne w paczkach fontsource, tak jak dzisiejszy Manrope.</p>
+</div>
+
+<script>
+(() => {
+  const OKAZY = [
+    { nazwa: 'Obecnie: Manrope', role: 'nagłówki Manrope 800, tekst Manrope 400', ocena: '<b>Za:</b> czytelny, nowoczesny. <b>Przeciw:</b> to dziś domyślny wygląd startupów i generatorów, grubość 800 wszędzie spłaszcza hierarchię.',
+      v: { '--disp': "'Manrope', sans-serif", '--disp-w': 800, '--disp-ls': '-.02em', '--txt': "'Manrope', sans-serif", '--ui': "'Manrope', sans-serif", '--ui-w': 700, '--tyt-w': 800, '--txt-size': '16px' } },
+    { nazwa: 'Brygada 1918 + Manrope', role: 'nagłówki i liczby Brygada 500, tekst Manrope 400, menu Manrope 600', ocena: '<b>Za:</b> polski krój z historią, ciepły i akademicki; tekst się nie zmienia. <b>Przeciw:</b> szeryf w drobnych etykietach byłby za ciężki, więc etykiety zostają w Manrope.',
+      v: { '--disp': "'Brygada 1918', Georgia, serif", '--disp-w': 500, '--txt': "'Manrope', sans-serif", '--ui': "'Manrope', sans-serif", '--ui-w': 600, '--tyt-w': 600, '--disp-size': '36px' } },
+    { nazwa: 'Brygada 1918 + IBM Plex Sans', role: 'nagłówki Brygada 500, tekst i menu IBM Plex Sans', ocena: '<b>Za:</b> Plex ma techniczny, „inżynierski” charakter i bardzo dobre polskie znaki. <b>Przeciw:</b> dwa wyraziste kroje naraz, trzeba pilnować umiaru.',
+      v: { '--disp': "'Brygada 1918', Georgia, serif", '--disp-w': 500, '--txt': "'IBM Plex Sans', sans-serif", '--ui': "'IBM Plex Sans', sans-serif", '--ui-w': 600, '--tyt-w': 600, '--disp-size': '36px' } },
+    { nazwa: 'Latin Modern (krój TeX‑a)', role: 'nagłówki LM Roman 17, tekst LM Roman 10, etykiety kapitalikami', ocena: '<b>Za:</b> każdy matematyk rozpozna go od razu; wzory i tekst w jednym kroju. <b>Przeciw:</b> cienkie kreski gorzej wyglądają w małych rozmiarach na ekranie, tekst trzeba składać większy.',
+      v: { '--disp': "'Latin Modern Roman 17', 'Latin Modern Roman', Georgia, serif", '--disp-w': 400, '--txt': "'Latin Modern Roman', Georgia, serif", '--ui': "'Latin Modern Roman Caps', 'Latin Modern Roman', Georgia, serif", '--ui-w': 400, '--tyt-w': 700, '--txt-size': '17.5px', '--disp-size': '36px', '--num': "'Latin Modern Roman 17', serif", '--num-w': 400 } },
+    { nazwa: 'Latin Modern + IBM Plex Sans', role: 'nagłówki i tekst Latin Modern, menu, etykiety i liczby IBM Plex Sans', ocena: '<b>Za:</b> charakter TeX‑a w tekście, a drobne elementy pozostają wyraźne na ekranie. <b>Przeciw:</b> mniej spójne niż czysty Latin Modern.',
+      v: { '--disp': "'Latin Modern Roman 17', 'Latin Modern Roman', Georgia, serif", '--disp-w': 400, '--txt': "'Latin Modern Roman', Georgia, serif", '--ui': "'IBM Plex Sans', sans-serif", '--ui-w': 500, '--tyt-w': 700, '--txt-size': '17.5px', '--disp-size': '36px', '--num': "'IBM Plex Sans', sans-serif", '--num-w': 500 } },
+    { nazwa: 'STIX Two + IBM Plex Sans', role: 'nagłówki i tekst STIX Two, menu i etykiety IBM Plex Sans', ocena: '<b>Za:</b> krój publikacji naukowych, współgra ze wzorami. <b>Przeciw:</b> bardziej „czasopismo” niż „instytut”, mniej charakteru w dużych tytułach.',
+      v: { '--disp': "'STIX Two Text', Georgia, serif", '--disp-w': 500, '--txt': "'STIX Two Text', Georgia, serif", '--ui': "'IBM Plex Sans', sans-serif", '--ui-w': 600, '--tyt-w': 600, '--txt-size': '17px', '--disp-size': '35px' } },
+    { nazwa: 'Newsreader + Manrope', role: 'nagłówki Newsreader (rozmiar optyczny), tekst Manrope 400', ocena: '<b>Za:</b> elegancki, redakcyjny, dobry do aktualności. <b>Przeciw:</b> brak własnej historii; wygląda jak dobry magazyn, nie jak wrocławska matematyka.',
+      v: { '--disp': "'Newsreader', Georgia, serif", '--disp-w': 500, '--txt': "'Manrope', sans-serif", '--ui': "'Manrope', sans-serif", '--ui-w': 600, '--tyt-w': 600, '--disp-size': '38px', '--disp-ls': '-.01em' } },
+    { nazwa: 'Archivo: szeroki i wąski', role: 'nagłówki Archivo rozszerzony 800 wersalikami, tekst Archivo 400', ocena: '<b>Za:</b> mocny, plakatowy, różne szerokości z jednej rodziny. <b>Przeciw:</b> głośny; bez odważnego układu i koloru wygląda jak krzyk.',
+      v: { '--disp': "'Archivo', sans-serif", '--disp-w': 800, '--disp-wdth': '118%', '--disp-tt': 'uppercase', '--disp-ls': '-.01em', '--disp-size': '30px', '--h4-size': '17px', '--h4-ls': '.02em', '--txt': "'Archivo', sans-serif", '--ui': "'Archivo', sans-serif", '--ui-w': 600, '--tyt-w': 600 } }
+  ];
+  const tresc = `
+    <div class="mini-baner">
+      <span class="wstecz">← Seminaria</span>
+      <h3>Analiza harmoniczna i rozwinięcia ortogonalne</h3>
+      <p class="haslo">Seminarium Zakładu Analizy Funkcjonalnej</p>
+      <div class="liczby"><span><b>4</b>zapowiedziane referaty</span><span><b>22</b>referaty w archiwum</span><span><b>3</b>koordynatorów</span></div>
+    </div>
+    <div class="mini-tresc">
+      <div class="zak"><span>Referaty</span><span>Archiwum</span><span>Koordynatorzy</span></div>
+      <h4>Najbliższy referat</h4>
+      <p class="meta">czw. 5 listopada 2026 · 10:15 · sala 604</p>
+      <p class="tyt">Dimension-free estimates for Riesz transforms in the Laguerre setting</p>
+      <p class="kto">Mister Test, Uniwersytet Wrocławski</p>
+      <p class="akapit">Omawiamy oszacowania transformat Riesza <i>R<sub>j</sub></i> = <i>∂<sub>j</sub></i>(−Δ)<sup>−1/2</sup> niezależne od wymiaru. Referaty wygłaszają pracownicy, doktoranci i goście z kraju i z zagranicy.</p>
+      <p class="znaki">Zażółć gęślą jaźń. Ślebodziński, Łoś, Źródło<small>ĄĆĘŁŃÓŚŹŻ ąćęłńóśźż 1945–2026</small></p>
+    </div>`;
+  document.getElementById('siatka').innerHTML = OKAZY.map((o, i) => `
+    <article class="okaz">
+      <header class="okaz-opis"><span class="nr">${i + 1}</span><h2>${o.nazwa}</h2><span class="role">${o.role}</span><span class="ocena">${o.ocena}</span></header>
+      <div class="mini" style="${Object.entries(o.v).map(([k, v]) => `${k}:${v}`).join(';')}">${tresc}</div>
+    </article>`).join('');
+})();
+</script>
