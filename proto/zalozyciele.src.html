@@ -716,6 +716,29 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 .pl-w .uw { font-size: 12.5px; color: var(--m-muted); }
 .pl-pusto { font-style: italic; color: var(--m-muted); }
 
+/* szeroki panel podmenu pod paskiem (po najechaniu na dział, z opóźnieniem) */
+.ok-pasek { position: relative; }
+.pasek-na-banerze .ok-pasek { position: absolute; }
+.mega { position: absolute; top: 100%; left: 0; right: 0; z-index: 30; display: grid; grid-template-columns: 290px repeat(3, minmax(0, 1fr)); gap: 0 44px;
+  padding: 30px var(--marg, 40px) 34px; background: var(--d-g); color: #fff; box-shadow: 0 24px 48px -12px rgb(0 0 0 / .35); border-top: 1px solid rgb(255 255 255 / .12);
+  opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity .16s ease, transform .16s ease; }
+.mega.otwarte { opacity: 1; transform: none; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .mega { transition: none; transform: none; } }
+.mega .glowa-d { display: grid; grid-template-columns: 58px 1fr; gap: 0 16px; align-content: start; }
+.mega .glowa-d svg { grid-row: span 3; width: 58px; height: 70px; }
+.mega .glowa-d svg path { fill: none; stroke: color-mix(in srgb, var(--d-j) 75%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.mega h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.05; }
+.mega .haslo-d { margin: 6px 0 0; font-size: 14.5px; color: var(--d-j); }
+.mega .do-dzialu { margin-top: 12px; font-size: 14px; font-weight: 600; color: #fff; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, var(--d-j) 70%, transparent); }
+.mega h6 { margin: 4px 0 8px; font-size: 12.5px; font-weight: 700; color: var(--d-j); }
+.mega ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid rgb(255 255 255 / .2); }
+.mega li a { display: block; padding: 8px 0; border-bottom: 1px solid rgb(255 255 255 / .1); font-family: var(--f-display); font-size: 18px; color: rgb(255 255 255 / .9); text-decoration: none; }
+.mega li a:hover { color: #fff; }
+.mega li a small { margin-left: 8px; font-family: var(--f-text); font-size: 12px; color: rgb(255 255 255 / .6); }
+.ok-pasek nav a.otwarty { color: inherit; }
+.ok-pasek nav a.otwarty::after { width: calc(100% - 22px); }
+.ok-pasek nav a[data-dzial]::after { transition: width .16s ease; }
+
 /* ---------- uwagi pod sceną ---------- */
 .uwagi { max-width: 1280px; margin: 0 auto; padding-block: 34px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 30px 48px; }
 .uwagi section { min-width: 0; }
@@ -1545,6 +1568,37 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     studia: 'Topolog, autor twierdzenia Knastera–Tarskiego o punkcie stałym. Wychował pokolenia wrocławskich matematyków.',
     popularyzacja: 'Współtwórca szkoły lwowskiej i wrocławskiej, mistrz matematycznego aforyzmu i popularyzacji.'
   };
+  /* panel podmenu: otwiera się po 170 ms najechania (albo kliknięciu / z klawiatury), zamyka po 260 ms od zjechania, Esc zamyka */
+  let megaT = null, megaZ = null;
+  function megaOtworz(a) {
+    const pasek = a.closest('.ok-pasek'), dz = a.dataset.dzial, g = IN_GRUPY[dz]; if (!g) return;
+    let m = pasek.querySelector('.mega');
+    if (!m) { m = document.createElement('div'); m.className = 'mega'; m.setAttribute('role', 'region'); pasek.appendChild(m); }
+    const czysta = (x) => x.replace(/ ↗$/, '').split('|');
+    m.dataset.dzial = dz; m.setAttribute('aria-label', 'Podstrony: ' + D[dz].nazwa);
+    m.innerHTML = `<div class="glowa-d"><svg viewBox="0 0 200 240" aria-hidden="true">${TWARZ_BAZA.concat(TWARZ_WARIANT[dz]).map((d) => `<path d="${d}"/>`).join('')}</svg><h3>${D[dz].nazwa}</h3><p class="haslo-d">${D[dz].haslo}</p><a class="do-dzialu" href="#">Strona działu →</a></div>`
+      + g.map(([h, l]) => `<div><h6>${h}</h6><ul>${l.map((x) => { const [n, dom] = czysta(x); return `<li><a href="#">${n}${x.endsWith('↗') ? ' ↗' : ''}${dom ? `<small>${dom}</small>` : ''}</a></li>`; }).join('')}</ul></div>`).join('');
+    pasek.querySelectorAll('nav a[data-dzial]').forEach((x) => { x.classList.toggle('otwarty', x === a); x.setAttribute('aria-expanded', String(x === a)); });
+    requestAnimationFrame(() => m.classList.add('otwarte'));
+  }
+  function megaZamknij(pasek) {
+    (pasek ? [pasek] : document.querySelectorAll('.ok-pasek')).forEach((p) => {
+      p.querySelector('.mega')?.classList.remove('otwarte');
+      p.querySelectorAll('nav a[data-dzial]').forEach((x) => { x.classList.remove('otwarty'); x.setAttribute('aria-expanded', 'false'); });
+    });
+  }
+  document.addEventListener('mouseover', (e) => {
+    const a = e.target.closest('.ok-pasek nav a[data-dzial]'), w = e.target.closest('.ok-pasek');
+    if (w) clearTimeout(megaZ);
+    if (a) { clearTimeout(megaT); megaT = setTimeout(() => megaOtworz(a), a.closest('.ok-pasek').querySelector('.mega.otwarte') ? 60 : 170); }
+    else if (e.target.closest('.ok-pasek nav a') && !e.target.closest('.mega')) { clearTimeout(megaT); megaT = setTimeout(() => megaZamknij(w), 170); }
+  });
+  document.addEventListener('mouseout', (e) => {
+    const w = e.target.closest('.ok-pasek'); if (!w || (e.relatedTarget && w.contains(e.relatedTarget))) return;
+    clearTimeout(megaT); megaZ = setTimeout(() => megaZamknij(w), 260);
+  });
+  document.addEventListener('focusin', (e) => { const a = e.target.closest('.ok-pasek nav a[data-dzial]'); if (a) megaOtworz(a); else if (!e.target.closest('.mega')) megaZamknij(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') megaZamknij(); });
   const PIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>';
   function htmlResztaInst() {
     const I = IN_INST;

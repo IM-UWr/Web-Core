@@ -207,3 +207,10 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - potrzebne oryginalne skany w najwyższej rozdzielczości i źródło każdego (dokument, gdzie leży skan, kto ma prawa), a dla Marczewskiego sprawdzić, czy podpis to „Marczewski”;
   - wykonanie: wierny obrys podpisu ze skanu (zmienna grubość pióra) odsłaniany przez niewidoczną linię środkową w kolejności pisania (maska);
   - podpis zawsze w osobnym pliku, nie w rysunku.
+
+## CMS: dział przy aktualnościach (2.11, 00:50; do zrobienia później)
+- **Stan dziś:** aktualności nie mają pola „dział”. Mają tylko `rodzaj` (ogłoszenie, wydarzenie, sukces, kariera), `dla` (studenci, doktoranci, pracownicy, kandydaci) i `zaklad`. Pole `dzial` ma tylko „Warto wiedzieć”, i to bez Popularyzacji.
+- **Do zrobienia:**
+  - dodać do aktualności opcjonalne pole „Dział” (Instytut, Nauka, Studia, Popularyzacja) w schemacie `src/content.config.ts` i w formularzu CMS;
+  - jeśli pole jest puste, dział liczy się automatycznie: `dla` studenci lub kandydaci daje Studia, `rodzaj` sukces albo wpisany zakład daje Nauka, w pozostałych przypadkach Instytut. Dzięki temu starych wpisów nie trzeba poprawiać;
+  - dodać Popularyzację do pola `dzial` w „Warto wiedzieć”.
