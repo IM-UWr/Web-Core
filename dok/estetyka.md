@@ -199,3 +199,11 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - **Dwa typy rysunków (00:20).** O typie decyduje rozmiar.
   - **Szkic z detalami** (od ok. 150 px, patron jako „bohater”): okładka strony głównej na komputerze i baner strony działu.
   - **Uproszczony** (patron jako znak lub ikona): sygnet przy tytule podstrony, boczna nawigacja działu, miniatury aktualności bez zdjęcia (72×54), panel menu i menu na telefonie, prawdopodobnie też okładka na telefonie (do rozstrzygnięcia przy projekcie telefonu).
+- **Tempo, wersja ostateczna (00:24, ustalenie użytkownika; zastępuje wcześniejsze „podpis po szkicu” i „całość ok. 2 s”):**
+  - szkic rysuje się jak w prototypie;
+  - podpis rysuje się szybciej i startuje później, tak że **wszystkie animacje kończą się w tym samym momencie**;
+  - przykład przy konturze 1,2 s: detale pojawiają się w drugiej połowie, podpis startuje ok. 0,6 s i trwa ok. 0,6 s, całość ok. 1,2 s.
+- **Podpisy są prawdziwe, odręczne (ChatGPT znalazł je 2.11):**
+  - potrzebne oryginalne skany w najwyższej rozdzielczości i źródło każdego (dokument, gdzie leży skan, kto ma prawa), a dla Marczewskiego sprawdzić, czy podpis to „Marczewski”;
+  - wykonanie: wierny obrys podpisu ze skanu (zmienna grubość pióra) odsłaniany przez niewidoczną linię środkową w kolejności pisania (maska);
+  - podpis zawsze w osobnym pliku, nie w rysunku.
