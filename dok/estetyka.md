@@ -175,3 +175,16 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - w starych widokach na czas przebudowy tylko poprawki;
   - `main` wciągamy do gałęzi co kilka dni;
   - podgląd online przez osobne repo przeznaczone tylko do podglądu.
+
+## Animacje (2.11, 00:15–00:18)
+- **Strona główna:** animacja tak. Na okładce widać słaby szkic („duch”). Po najechaniu na dział jasna kreska rysuje się po nim w kolorze działu (ok. 1–1,5 s).
+- **Strona działu:** szkic i podpis rysują się **tylko przy pierwszym wejściu w danej wizycie** (flaga w sessionStorage). Przy powrotach, np. z podstrony przez „← Dział”, są od razu gotowe. Jeśli flagi nie da się zapisać, strona działa jak przy powrocie. Treść jest widoczna od pierwszej chwili, animuje się tylko szkic z boku. Po szkicu i przerwie ok. 0,2 s podpis „pisze się” kreską.
+- **Podstrony:** bez animacji. Sygnet, podpis i znak patrona są statyczne.
+- **Technika:** SVG z liniami środkowymi w kolejności rysowania (`pathLength=1`, `stroke-dasharray`/`stroke-dashoffset`), rysowane przez przeglądarkę. Bez GIF-ów i filmów. Kolor przez `currentColor`, więc działa w kolorze działu i w obu motywach. Animacja rusza dopiero, gdy element jest widoczny na ekranie, i nie powtarza się.
+- **Wyłączony ruch (`prefers-reduced-motion`):** wszystko od razu w stanie końcowym, zostaje najwyżej krótkie rozjaśnienie (ok. 0,15 s). Dotyczy też zamiany kolumn, „Zobacz więcej”, panelu menu, powiększenia miniatur, rozwijanych sekcji i dekoracji z obecnej strony. Funkcje strony działają tak samo.
+- **Szkice od ChatGPT:** po 3 pliki SVG na patrona (pełny szkic, sygnet, podpis):
+  - same ścieżki `fill="none"` i `stroke="currentColor"`;
+  - kreski jako linie środkowe, w kolejności rysowania;
+  - portrety w `viewBox="0 0 200 240"`, podpis bez `<text>`;
+  - do tego HTML z animacją jako wzór i źródła zdjęć i podpisów.
+  - Wymyślone podpisy tylko jako zastępcze. Na stronę trafiają wyłącznie przerysowane ze skanów, z podanym źródłem.
