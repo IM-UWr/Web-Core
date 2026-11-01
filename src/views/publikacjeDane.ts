@@ -36,6 +36,35 @@ export const liczbaWspolautorskich = (w?: Wykaz) =>
 export const liczbaZrodel = (w?: Wykaz) =>
   new Set(prace(w).map((p) => (p.zrodlo ?? '').replace(/\d[\s\S]*$/, '').trim().replace(/[\s,.:;(–-]+$/, '').trim()).filter(Boolean)).size;
 
+// Dane animacji w tle banera rocznika na telefonie (motyw „wspolautorzy”, zlecenie 03): wszyscy autorzy z wykazu
+// (alfabetycznie, według nazwiska — bez inicjałów; nazwisk nie wysyłamy) i pary współautorów z prac wieloautorskich,
+// każda para raz. Autorzy z pola „autorzy” jak w liczbaWspolautorskich (bez dopisków „[i in.]”, „et al.”); ten sam autor
+// to ten sam zapis bez kropek, spacji i łączników. Wynik: { n: liczba autorów, p: [i, j, i, j, …] } — kilka setek liczb.
+const autorzyPracy = (s?: string) =>
+  (s ?? '').replace(/\[[^\]]*\]/g, ' ').replace(/\bet al\.?/gi, ' ').split(/,|;|&|\band\b|\bi\b/)
+    .map((a) => a.replace(/\s+/g, ' ').trim()).filter((a) => /\p{L}{2}/u.test(a));
+const kluczAutora = (a: string) => a.toLowerCase().replace(/[\s.\-‐‑]+/g, '');
+const nazwisko = (a: string) => a.split(' ').filter((t) => !/^(\p{Lu}\p{Ll}?\.-?)+$/u.test(t)).join(' ') || a;
+export function wspolautorzy(w?: Wykaz): { n: number; p: number[] } {
+  const zapis = new Map<string, string>(), wielo: string[][] = [];
+  for (const p of prace(w)) {
+    const a = [...new Map(autorzyPracy(p.autorzy).map((x) => [kluczAutora(x), x])).entries()];
+    a.forEach(([k, x]) => { if (!zapis.has(k)) zapis.set(k, x); });
+    if (a.length >= 2) wielo.push(a.map(([k]) => k));
+  }
+  const kolejnosc = [...zapis.keys()].sort((a, b) => nazwisko(zapis.get(a)!).localeCompare(nazwisko(zapis.get(b)!), 'pl') || a.localeCompare(b));
+  const nr = new Map(kolejnosc.map((k, i) => [k, i])), pary = new Set<number>(), n = kolejnosc.length, p: number[] = [];
+  for (const a of wielo) {
+    for (let i = 0; i < a.length; i++) {
+      for (let j = i + 1; j < a.length; j++) {
+        const x = nr.get(a[i])!, y = nr.get(a[j])!, k = Math.min(x, y) * n + Math.max(x, y);
+        if (!pary.has(k)) { pary.add(k); p.push(Math.min(x, y), Math.max(x, y)); }
+      }
+    }
+  }
+  return { n, p };
+}
+
 export interface Rok extends RokWpis { wykaz?: Wykaz; liczba: number; pdf?: string }
 // Lata z pliku CMS + lata, dla których jest tylko wykaz HTML; od najnowszego.
 export function lata(): Rok[] {

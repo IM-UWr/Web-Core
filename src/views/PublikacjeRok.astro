@@ -15,7 +15,7 @@ import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import { lata, odmiana, tekstHtml, liczbaWspolautorskich, liczbaZrodel, type Praca } from './publikacjeDane';
+import { lata, odmiana, tekstHtml, liczbaWspolautorskich, liczbaZrodel, wspolautorzy, type Praca } from './publikacjeDane';
 import dzial from '../data/dzialy/nauka.json';
 
 interface Props { rok: number; lang: Lang }
@@ -44,6 +44,8 @@ const liczbyTelefon: { n: number; pl: [string, string, string]; en: [string, str
   { n: liczbaWspolautorskich(w), pl: ['praca ze współautorami', 'prace ze współautorami', 'prac ze współautorami'], en: ['co-authored paper', 'co-authored papers'] },
   { n: liczbaZrodel(w), pl: ['czasopismo lub wydawnictwo', 'czasopisma i wydawnictwa', 'czasopism i wydawnictw'], en: ['journal or book', 'journals and books'] },
 ];
+// Animacja w tle banera na telefonie (motyw „wspolautorzy”): autorzy z wykazu i pary współautorów (bez nazwisk).
+const motywDane = wspolautorzy(w);
 
 // Grupy (np. „Artykuły problemowe”); nagłówek z innym rokiem wydania: „Rok 2017: …”.
 const slug = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -68,7 +70,7 @@ const pokazIF = (p: Praca) => p.if && !/^0([.,]0*)?$/.test(p.if.trim());
 ---
 <Baza tytul={tytul} opis={lead} uklad="zwarta portal-baner">
   {/* Telefon: przycisk PDF z banera chowa styl na końcu pliku (.page-head .pr-akcje), jego kopia stoi pod banerem (.pr-pod). */}
-  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Publikacje', 'Publications'), adres: '/nauka/publikacje' }}>
+  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Publikacje', 'Publications'), adres: '/nauka/publikacje' }} motywDane={motywDane}>
     {ten.pdf && (
       <p class="pr-akcje">
         <a class="pr-pdf" href={href(ten.pdf)}><Ikona nazwa="plik" rozmiar={18} />{T('Wykaz w PDF', 'List as PDF')}</a>

@@ -10,6 +10,27 @@ export const MOTYWY_STRON: Record<string, string> = {
   studia: 'riemann',
   aktualnosci: 'fourier',
   popularyzacja: 'zloty-podzial',
+  // zlecenie 03: podstrony Nauki, seminaria (zakłady dostają wariant „zaklad” motywu swojego seminarium — Zaklad.astro)
+  'nauka/konferencje': 'banach',
+  'obrony-doktorskie': 'genealogia',
+  'obrony-doktorskie/*': 'genealogia/obrona',
+  kalendarz: 'trzy-odleglosci',
+  seminaria: 'rozsadnik',
+  'seminaria/analiza-harmoniczna': 'haar',
+  'seminaria/dyskretna-analiza-harmoniczna': 'czebyszew',
+  'seminaria/rownania-rozniczkowe': 'wahadlo',
+  'seminaria/prawdopodobienstwo': 'brown',
+  'seminaria/statystyka': 'histogram',
+  'seminaria/geometria': 'longimetr',
+  'seminaria/topologia': 'knaster',
+  'seminaria/teoria-modeli': 'eliptyczna',
+  'seminaria/dydaktyka': 'geoplan',
+  'nauka/granty': 'wachlarz',
+  'nauka/granty/*': 'wachlarz/grant',
+  'nauka/publikacje': 'cytowania',
+  'nauka/publikacje/*': 'wspolautorzy',
+  'nauka/sukcesy': 'bernoulli',
+  'nauka/sukcesy/historia': 'bernoulli/historia',
 };
 
 /** motyw dla ścieżki strony (np. „/nauka/”, „/en/studia”) albo undefined */

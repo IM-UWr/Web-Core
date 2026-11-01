@@ -13,6 +13,7 @@ import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import { u } from '../lib/url';
+import { motywStrony } from '../lib/motywyBanerow';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { range, long, short, now, today, hasTime, type Lang } from '../lib/daty';
 import { renderMarkdown } from '../lib/markdown';
@@ -48,6 +49,10 @@ const grupySkladu = [
 
 // Seminaria z najbliższym referatem
 const sem = (await seminaria()).filter((s) => s.data.zaklad.includes(id));
+// Animacja banera na telefonie (zlecenie 03): wariant „zaklad” motywu seminarium tego zakładu (pole `zaklad` seminarium);
+// zakład bez seminarium z motywem — Lorenz z działu Nauka.
+const motywSem = sem.map((s) => motywStrony(`/seminaria/${s.id}`)).find(Boolean);
+const motyw = motywSem ? `${motywSem.split('/')[0]}/zaklad` : 'lorenz';
 const ref = await referaty();
 const n = now();
 const nastepny = (sid: string) => ref.find((r) => seminariumReferatu(r) === sid && (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today()));
@@ -89,7 +94,7 @@ const naglowki = [
 const wszystkieZaklady = await zaklady();
 ---
 <Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={nazwa} lead={opis} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
+  <NaglowekStrony tytul={nazwa} lead={opis} haslo={haslo} lang={lang} motyw={motyw} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
     {/* obszary badań w banerze tylko na komputerze (na telefonie — pod banerem, niżej; styl na końcu pliku) */}
     {obszary.length > 0 && <div class="tags">{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
     <LiczbyBanera lang={lang} pozycje={liczby} />

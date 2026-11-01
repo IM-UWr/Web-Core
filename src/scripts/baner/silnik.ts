@@ -70,6 +70,8 @@ class Baner {
     // nowy pomiar dopiero po pierwszym układzie (start() sam czeka na koniec wejścia treści i na krój)
     const odswiez = () => { if (!this.m) return; clearTimeout(this.czekaUklad); this.czekaUklad = window.setTimeout(() => this.uklad(), 120); };
     new ResizeObserver(odswiez).observe(ph);
+    // koniec wejścia tekstu (przejscia.css przesuwa go o 12 px) — gdyby pierwszy pomiar trafił w trakcie (np. karta w tle)
+    ph.addEventListener('animationend', odswiez);
     document.fonts?.ready.then(odswiez);
     document.fonts?.addEventListener?.('loadingdone', odswiez);
     new MutationObserver(odswiez).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });

@@ -52,6 +52,9 @@ const program = d.program?.trim() ? (lang === 'en' ? PROGRAMY_EN[d.program.trim(
 const zrodloHasla = ZRODLO_HASLA[d.rodzaj] ? T(...ZRODLO_HASLA[d.rodzaj]) : rodzaj;
 const skad = program ? `${zrodloHasla}${/^\p{Lu}/u.test(program) ? ' ' : ', '}${program}` : zrodloHasla;
 const haslo = [skad, okres].filter(Boolean).join(' · ');
+// Animacja w tle banera na telefonie (motyw „wachlarz/grant”): jaśniejszy promień pokazuje, jaka część okresu realizacji
+// minęła w dniu budowy strony — motyw dostaje lata od–do i ten dzień (bez obu lat — wachlarz bez wyróżnionego promienia).
+const motywDane = d.rok_od && d.rok_do ? { od: d.rok_od, do: d.rok_do, dzien: today() } : undefined;
 
 // Kierownik (albo kilku) ze spisu pracowników: imię i nazwisko z tytułem; link do strony domowej, a gdy jej brak — do zakładu.
 const osoby = await pracownicy();
@@ -70,7 +73,7 @@ const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program
 <Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   {/* Telefon: tytuł w drugim języku i plakietki z banera chowa styl na końcu pliku (.page-head .lead / .tags), a ich kopia
        stoi pod banerem (.gr-pod.tylko-telefon); komputer bez zmian. */}
-  <NaglowekStrony tytul={tytul} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }}>
+  <NaglowekStrony tytul={tytul} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }} motywDane={motywDane}>
     {tytulDrugi && <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
     <div class="tags">
       <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>

@@ -51,13 +51,15 @@ const liczbyTelefon = [
   // bez „w IM” — przy 360 px „redagowane w IM” nie mieści się w kolumnie i etykieta szłaby na trzy linijki
   { n: czasopisma.length, pl: ['czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych'], en: ['journal we edit', 'journals we edit'] },
 ] as ({ n: string; n_en?: string; pl: string; en?: string } | { n: number; pl: [string, string, string]; en: [string, string] })[];
+// Animacja w tle banera na telefonie (motyw „cytowania”): liczby prac w latach z wykazem, rosnąco — [rok, liczba, rok, …].
+const motywDane = { lata: [...zWykazem].reverse().flatMap((r) => [r.rok, r.liczba]) };
 const nagCzasopisma = wybierz(dane as any, 'czasopisma_naglowek', lang) || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
 const archiwum = wybierz(dane as any, 'archiwum', lang);
 ---
 <Baza tytul={tytul} opis={lead} uklad="zwarta portal-baner">
   {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
        Telefon: hasło zamiast opisu i trzy liczby pod kreską (LiczbyBanera, .tylko-telefon). */}
-  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }}>
+  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} motywDane={motywDane}>
     {liczby.length > 0 && (
       <ul class="pt-liczby tylko-komputer">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
