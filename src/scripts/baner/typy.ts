@@ -19,6 +19,9 @@ export interface Pole {
   menu: number;
   tytul: Linia[];
   haslo: Linia | null;
+  /** linia linku „←” nad tytułem (np. „← Strona główna”; r — prawy koniec tekstu, bez granicy zanikania), inaczej null
+   *  (zlecenie 08 — motywy nie mierzą DOM same) */
+  link: Linia | null;
   /** wariant motywu z mapy strona → motyw (np. „zaklad” — wariant zakładu dla motywu seminarium) */
   wariant?: string;
   /** dane z budowy strony (atrybut data-animacja-dane, JSON), np. pary współautorów; kształt zależy od motywu */

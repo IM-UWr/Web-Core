@@ -3,6 +3,7 @@
 // Obrót 5° (lewe skrzydło w miejscu, prawe wyżej); kometa startuje w niewidocznej części i wyjeżdża po ok. 2 s.
 // Klatki tylko komety: odstęp zależy od jej chwilowej prędkości (głowa ok. 1 px na klatkę), 10–24 kl./s; klatka pomijana,
 // gdy głowa przesunęła się o < 0,3 px. To jedyny motyw, który w spoczynku rysuje stale (wyjątek ze zlecenia 02).
+// Zlecenie 08: prawy brzeg atraktora 16 px od prawej krawędzi banera.
 import type { Fabryka, Pudlo, Ustawienia } from '../typy';
 import { ogr } from '../wspolne';
 
@@ -81,6 +82,12 @@ const motyw: Fabryka = (G, t0) => {
   const gora = G.y0;
   const fs = Math.min(1, (cy - gora) / Math.max(1e-6, cy - ymin), (G.y1 - cy) / Math.max(1e-6, ymax - cy));
   if (fs < 1) for (i = 0; i < n; i++) { X[i] = px + (X[i] - px) * fs; Y[i] = cy + (Y[i] - cy) * fs; }
+  // zlecenie 08: cały rysunek w poziomie do prawej — najdalszy punkt trajektorii (tej, po której jedzie kometa) na G.x1,
+  // 16 px od prawej krawędzi; wielkość, obrót i położenie w pionie bez zmian, lewe skrzydło gasi maska przy tytule
+  let xmax = -Infinity;
+  for (i = 0; i < n; i++) xmax = Math.max(xmax, X[i]);
+  const dx = G.x1 - xmax;
+  for (i = 0; i < n; i++) X[i] += dx;
   const sciezka = new Path2D();
   sciezka.moveTo(X[0], Y[0]);
   for (i = 1; i < n; i++) sciezka.lineTo(X[i], Y[i]);

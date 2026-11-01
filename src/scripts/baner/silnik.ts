@@ -136,7 +136,9 @@ class Baner {
     // prostokąty „zakazane” dla rysunku: każda linia tekstu z granicą zanikania na prawo od jej końca (hasło na całą
     // długość), a przerwy między kolejnymi liniami — z granicą dłuższej z dwóch sąsiednich (tekst to jedna bryła)
     const linieTekstu: Linia[] = [];
-    if (wst) linie(wst, bb).forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr + 2 }));
+    const linieLinku = wst ? linie(wst, bb) : [];
+    const link = linieLinku.length ? { t: linieLinku[0].t, b: linieLinku[linieLinku.length - 1].b, r: Math.max(...linieLinku.map((l) => l.r)) } : null;
+    linieLinku.forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr + 2 }));
     if (brw) linie(brw, bb).forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr }));
     tytul.forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr }));
     hasla.forEach((l) => linieTekstu.push({ t: l.t, b: l.b, r: l.r + gr }));
@@ -146,7 +148,7 @@ class Baner {
       const a = linieTekstu[i], b = linieTekstu[i + 1];
       if (b.t > a.b) prz.push({ t: a.b, b: b.t, r: Math.max(a.r, b.r) });
     }
-    return { W, H, y0, y1, menu, tytul, haslo: hasla.length ? { t: hasla[0].t, b: hasla[hasla.length - 1].b, r: Math.max(...hasla.map((l) => l.r)) } : null, prz };
+    return { W, H, y0, y1, menu, tytul, haslo: hasla.length ? { t: hasla[0].t, b: hasla[hasla.length - 1].b, r: Math.max(...hasla.map((l) => l.r)) } : null, link, prz };
   }
 
   private uklad() {
@@ -194,7 +196,7 @@ class Baner {
     mc.putImageData(im, 0, 0);
 
     const G: Pole = {
-      W: z.W, H: z.H, x0: 16, x1: z.W - 16, y0: z.y0, y1: z.y1, menu: z.menu, tytul: z.tytul, haslo: z.haslo,
+      W: z.W, H: z.H, x0: 16, x1: z.W - 16, y0: z.y0, y1: z.y1, menu: z.menu, tytul: z.tytul, haslo: z.haslo, link: z.link,
       wariant: ph.dataset.animacjaWariant || undefined, dane: this.dane,
       widac: (x, y) => S((x - wiersz(y)) / w) * pion(y),
       granica: (y) => wiersz(y),

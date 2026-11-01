@@ -2,7 +2,8 @@
 // Budowanie raz przy wejściu: przez 20 s płynnie dochodzą kolejne wyrazy (od samej sinusoidy do 13 wyrazów).
 // Potem fala stoi i lekko „oddycha” wagami wyższych harmonicznych (30%), a co losową przerwę (średnio 12 s, ±60%)
 // rozkłada się do losowo 4–9 wyrazów i składa w tempie budowania (16 s na zejście o 8 wyrazów). Słabe linie pod spodem
-// to sumy częściowe do 1, 3 i 7 harmonicznej. Fala wypełnia pole rysunku (do połowy hasła; zlecenie 07 — spłaszczona w pionie).
+// to sumy częściowe do 1, 3 i 7 harmonicznej. Fala wypełnia pole rysunku (do połowy hasła; zlecenie 07 — spłaszczona w pionie),
+// w poziomie od końca linku „←” do prawego brzegu treści (zlecenie 08).
 // Klatka tylko wtedy, gdy któryś punkt fali przesunął się o ≥ 0,5 px; zegar budzi się 15 razy/s w trakcie zmian
 // i 4 razy/s, gdy fala tylko oddycha.
 import type { Fabryka, Ustawienia } from '../typy';
@@ -17,7 +18,9 @@ const M_MIN = 4, M_MAX = 9, PRZERWA = 12, OSC = 0.3, OSC_T = 16, START = 1.5;
 type Rozklad = { s: number; m: number; d: number };
 
 const motyw: Fabryka = (G) => {
-  const top = G.y0, dol = G.y1, xa = G.x0, span = G.x1 - G.x0;
+  // zlecenie 08: fala zaczyna się w poziomie na końcu tekstu linku „← Strona główna” (bez linku — od G.x0), kończy na G.x1;
+  // liczba okresów z długości tego odcinka
+  const top = G.y0, dol = G.y1, xa = ogr(G.link ? G.link.r : G.x0, G.x0, G.x1 - OKRES / 2), span = G.x1 - xa;
   const P = Math.max(1, Math.round(span / OKRES)), okres = span / P, yc = (top + dol) / 2, N = Math.round(span) + 1;
   const xs = new Float64Array(N), tab = new Float64Array(N * J);
   for (let i = 0; i < N; i++) {
