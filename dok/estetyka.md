@@ -236,9 +236,9 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - **Sygnet** stoi w lewym marginesie przed tytułem, oddzielony pionową kreską. **Podpis** jest bardzo mały (ok. 56 px szerokości, węższy niż głowa) i stoi pod sygnetem, wyśrodkowany.
 - **Nagłówek z hasłem i liczbami** (np. Projekty i granty, Plan zajęć): środek sygnetu wypada na środek pierwszej litery tytułu, a podpis stoi pod sygnetem, w jednej linii z kolorowym hasłem (np. „Zawsze aktualny, prosto z USOS”).
 - **Nagłówek bez hasła i liczb** (np. Władze Instytutu): podpis leży mniej więcej na linii bazowej tytułu, a sygnet tuż nad nim.
-- **Znak patrona z opisem:**
-  - w niskim nagłówku (bez liczb): ok. 145×170 px przy prawej krawędzi kolumny, opis obok;
-  - w wyższym nagłówku (z liczbami): większy, w polu 200×200 px, przycięty do własnego rysunku, wysunięty ok. 90 px w prawy margines; opis po lewej stronie znaku, wyrównany do prawej, w kolumnie.
+- **Znak patrona z opisem (zasada ujednolicona 2.11, 09:33): grafika na zewnątrz, tekst do środka.** Znak stoi zawsze z prawej, przy zewnętrznej krawędzi i wysunięty ok. 90 px w prawy margines. Opis stoi przed nim, wyrównany do prawej, w kolumnie. Razem z sygnetem z lewej obie grafiki obramowują nagłówek z zewnątrz.
+  - w niskim nagłówku (bez liczb): znak ok. 145×170 px;
+  - w wyższym nagłówku (z liczbami): znak większy, w polu 200×200 px, przycięty do własnego rysunku.
 - **Siatka:** tekst w banerze (tytuł, hasło, liczby, opis znaku) trzyma się krawędzi kolumny 1240 px. Poza kolumnę mogą wychodzić tylko grafiki: zdjęcie i kolor (cała szerokość), sygnet z podpisem (lewy margines), znak (prawy margines). Na mniejszych ekranach wracają do kolumny.
 - **Opis znaku** to zawsze nazwa twierdzenia i jedno zdanie, niezależnie od ilości miejsca.
 - **Ciekawostki** (znak i opis) są tylko na podstronach z menu działu. Na stronach głębiej (pojedyncze seminarium, projekt, aktualność, profil) nagłówek ma tylko sygnet i tytuł. To propozycja, czeka na potwierdzenie.
