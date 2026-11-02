@@ -1,0 +1,27 @@
+---
+// Osoba w schemacie Władz (komputer): zdjęcie, rola, imię i nazwisko (link do strony domowej), zakład, zakres, kontakt.
+import { u, isExternal } from '../../lib/url';
+import { wJezyku } from '../../lib/i18n';
+import type { Lang } from '../../lib/daty';
+
+type Os = { rola: string; nazwa: string; email: string; pokoj: string; strona: string; zakres?: string; dyzur: string; zdjecie: string; zaklad?: { nazwa: string; adres: string } };
+interface Props { o: Os; lang: Lang; class?: string; zakres?: boolean }
+const { o, lang, class: klasa, zakres = true } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const mail = (e: string) => esc(e).replace('@', '<wbr>@');
+const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
+---
+<div class:list={['z-os', klasa]}>
+  {o.zdjecie && <img class="fot" src={u(o.zdjecie)} alt="" loading="lazy" decoding="async" />}
+  {o.rola && <div class="rola">{o.rola}</div>}
+  <div class="imie">{o.strona ? <a href={o.strona}>{o.nazwa}</a> : o.nazwa}</div>
+  {o.zaklad && <div class="zakl"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></div>}
+  {zakres && o.zakres && <p class="opis">{o.zakres}</p>}
+  <div class="kont">
+    {o.email && <a href={`mailto:${o.email}`} set:html={mail(o.email)} />}{o.pokoj && <>{o.email && ' · '}{pok(o.pokoj)}</>}
+    {o.dyzur && <><br />{T('Dyżur:', 'Office hours:')} {o.dyzur}</>}
+    {o.strona && <> · <a href={o.strona}>{T('strona domowa', 'website')} ↗</a></>}
+  </div>
+</div>

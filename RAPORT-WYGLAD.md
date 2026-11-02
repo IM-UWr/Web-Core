@@ -28,7 +28,7 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 ```
 
 ## Etap 2: fundament — zrobione
-**Commit:** patrz niżej („Etap 2: …”); gałąź etapu: `git branch wyglad/02-fundament <commit>`.
+**Commit:** `d98f3383` (ostatni commit etapu; gałąź etapu: `git branch wyglad/02-fundament d98f3383`).
 
 **Co zrobione (tylko komputer, wszystko za `@media (min-width: 761px)`):**
 - **Zmienne** (`src/styles/zalozyciele.css`): paleta „Atramenty” (4 odcienie na dział jako `--instytut-j/g/a/t` itd. i `--d-*` w miejscu z `data-dzial`), granat `#0d1830`, ciepłe tło `#fcfaf6` / `#f4f1ea` / `#e5e0d6` w jasnym motywie, ciemny motyw `#0a1020` (tekst w kolorze działu bierze odcień jasny). Stare zmienne (`--bg`, `--accent`…) nadpisane na komputerze, więc dotychczasowa treść podstron też dostaje nowe kolory; bursztyn tylko w Instytucie, poza działami neutralnie. Ozdobne tło („pole”) wyłączone na komputerze.

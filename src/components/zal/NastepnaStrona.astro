@@ -20,7 +20,7 @@ const nast = k >= 0 ? linki[k + 1] : undefined;
 const adresStrony = absolute(stripBase(Astro.url.pathname), Astro.site);
 const mail = `mailto:${ustawienia.kontakt.email}?subject=${encodeURIComponent(`${lang === 'en' ? 'Error on page' : 'Błąd na stronie'}: ${tytul}`)}&body=${encodeURIComponent(adresStrony)}`;
 ---
-<div class="z-nast" data-dzial={dzial} data-pagefind-ignore>
+<div class="z-nast tylko-komputer" data-dzial={dzial} data-pagefind-ignore>
   {nast
     ? <a class="z-nast-link" href={u(wJezyku(nast.adres, lang))}><small>{lang === 'en' ? 'Next page in this section →' : 'Następna strona w dziale →'}</small>{wybierz(nast, 'etykieta', lang)}</a>
     : <span></span>}

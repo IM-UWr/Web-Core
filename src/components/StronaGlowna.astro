@@ -11,6 +11,7 @@ import WartoWiedziec from './WartoWiedziec.astro';
 import ZobaczWiecej from './ZobaczWiecej.astro';
 import Okladka from './zal/Okladka.astro';
 import PasekMenu from './zal/PasekMenu.astro';
+import DrugiEkran from './zal/DrugiEkran.astro';
 import ustawienia from '../data/ustawienia.json';
 import skroty from '../data/skroty.json';
 import { u, isExternal, stripBase } from '../lib/url';
@@ -128,6 +129,7 @@ const kafelki = [
   <Okladka lang={lang} inny={drugiJezyk(sciezka)} wyrozniona={wyrozniona ? { tytul: wyrozniona.tytul, adres: wyrozniona.href } : undefined} />
   <div id="szybki-dostep" class="z-druga-start tylko-komputer"></div>
   <PasekMenu lang={lang} sciezka={sciezka} inny={drugiJezyk(sciezka)} class="z-pasek-jasny" />
+  <DrugiEkran lang={lang} />
 
   {/* Telefon (≤ 760 px) — wygląd „Portal”: pod banerem ramki jedna pod drugą, w tej samej kolejności co na komputerze
        (decyzja 30.10.2026): Na skróty (kafelki jako wiersze), Najbliższe wydarzenia, Aktualności (osobna, zwarta lista),

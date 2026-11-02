@@ -93,3 +93,38 @@ export async function daneWladz(lang: Lang) {
     sek, sekOsoby, sekTelefony, sekJest, kadencjaHtml, radaHtml, linki,
   };
 }
+
+// Komputer (kierunek „Założyciele”, src/components/zal/WladzeZ.astro): te same dane w postaci dla schematu dyrekcji,
+// Władz Wydziału, Sekretariatu, Kadencji, Rady i „Zobacz też” oraz spis „Na tej stronie”.
+export async function daneWladzKomputer(lang: Lang) {
+  const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+  const w = poleWJezyku(lang);
+  const x = await daneWladz(lang);
+  const wydzial = {
+    tytul: w(x.wyd, 'tytul') || T('Władze Wydziału', 'Faculty authorities'),
+    opis: w(x.wyd, 'opis'),
+    osoby: x.osobyWydzialu,
+    link: x.linkWydzialu ? { etykieta: w(x.linkWydzialu, 'etykieta'), adres: x.linkWydzialu.adres } : undefined,
+  };
+  const sekretariat = x.sekJest ? {
+    nazwa: w(x.sek, 'nazwa') || T('Sekretariat', 'Office'),
+    opis: w(x.sek, 'opis'),
+    email: x.sek?.email || undefined,
+    telefony: x.sekTelefony,
+    adres: w(x.sek, 'adres'),
+    pokoj: x.sek?.pokoj || undefined,
+    godziny: w(x.sek, 'godziny'),
+    osoby: x.sekOsoby,
+  } : undefined;
+  const radaTytul = w(x.d.rada, 'tytul') || T('Rada Instytutu', 'Institute Council');
+  const linki = x.linki.map((l) => ({ etykieta: w(l, 'etykieta'), adres: l.adres }));
+  const spis = [
+    x.dyrektor && { id: 'z-dyrekcja', etykieta: T('Dyrekcja', 'Management') },
+    wydzial.osoby.length > 0 && { id: 'z-wydzial', etykieta: wydzial.tytul },
+    sekretariat && { id: 'z-sekretariat', etykieta: sekretariat.nazwa },
+    x.kadencjaHtml && { id: 'z-kadencja', etykieta: T('Kadencja', 'Term of office') },
+    x.radaHtml && { id: 'z-rada', etykieta: radaTytul },
+    linki.length > 0 && { id: 'z-zobacz', etykieta: T('Zobacz też', 'See also') },
+  ].filter(Boolean) as { id: string; etykieta: string }[];
+  return { wstep: x.lead || undefined, dyrektor: x.dyrektor, zastepcy: x.zastepcy, wydzial, sekretariat, kadencjaHtml: x.kadencjaHtml || undefined, radaHtml: x.radaHtml || undefined, radaTytul, linki, spis };
+}
