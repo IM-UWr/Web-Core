@@ -142,7 +142,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   transition: stroke-dashoffset 1.5s cubic-bezier(.35,.6,.2,1) calc(var(--i, 0) * 70ms), opacity .35s; }
 .szkic .tusz path.gruba { stroke-width: 2.4; }
 .szkic .tusz path:not(.gruba) { transition-delay: calc(var(--i, 0) * 45ms), 0s; }
-.szkic .detale path { stroke: var(--d-j); stroke-width: .75; }
+.szkic .detale path { stroke: var(--d-j); stroke-width: 1.05; }
+/* po narysowaniu kontur i detale wyglądają tak samo: ten sam kolor, prawie ta sama grubość */
+.ok-dz .szkic .tusz path, .kol .szkic .tusz path { stroke-width: 1.25; }
+.in-b4 .szkic .tusz path { stroke-width: 1.3 !important; }
+.in-b4 .szkic .detale path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.1; }
 .szkic .detale { opacity: 0; transition: opacity .7s ease .55s; }
 .kol:hover .detale, .kol:focus-within .detale, .szkic.rysuj .detale, .ok-dz:hover .detale, .ok-dz:focus-visible .detale { opacity: 1; }
 .szkic.gotowe .tusz path { stroke-dashoffset: 0; opacity: 1; transition: none; }

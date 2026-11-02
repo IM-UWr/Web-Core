@@ -243,3 +243,4 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - **Opis znaku** to zawsze nazwa twierdzenia i jedno zdanie, niezależnie od ilości miejsca.
 - **Ciekawostki** (znak i opis) są tylko na podstronach z menu działu. Na stronach głębiej (pojedyncze seminarium, projekt, aktualność, profil) nagłówek ma tylko sygnet i tytuł. To propozycja, czeka na potwierdzenie.
 - **Liczby w Planie zajęć:** na razie obie. Jedną można usunąć, jeśli zabraknie miejsca.
+- **Szkic po narysowaniu jest jednolity (01:21):** kontur i detale mają ten sam kolor i prawie tę samą grubość (na banerze działu 1,3 i 1,1, na okładce 1,25 i 1,05), żeby nie było widać, która linia jest „główna”. Różnica jest tylko w sposobie pojawiania się.
