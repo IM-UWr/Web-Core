@@ -279,3 +279,8 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - Popularyzacja: ręce przy modelach i układankach, warsztaty.
 - **Źródła:** najlepiej jedna sesja w Instytucie (jeden fotograf, jeden styl), ewentualnie archiwum biura promocji UWr i zdjęcia z wydarzeń. Przy każdym zdjęciu zgoda i podpis autora.
 - **Test kandydatów:** podstawić zdjęcie do prototypu (`IN_FOTO` w `zalozyciele.src.html`) i obejrzeć w dwóch kolorach na banerze działu i podstronie.
+
+## Rekrutacja (2.11, 01:43)
+- „Rekrutacja” zdjęta z głównego paska menu. Teraz pasek ma: Instytut, Nauka, Studia, Popularyzacja, Aktualności, a za kreską Szukaj i EN.
+- Na stronie głównej nagłówek „Studiuj matematykę we Wrocławiu” jest klikalny i ma znak linku zewnętrznego ↗. Prowadzi na stronę rekrutacji (dziś https://studia-wmi.uwr.edu.pl/). Link „Rekrutacja na studia →” pod opisem na razie został; do decyzji, czy go usunąć.
+- W strukturze Studiów: „Rekrutacja ↗” jako ostatnia pozycja w grupie „Na co dzień”, za USOSweb. Uwaga: pasowałaby też do „Kierunków” (dla kandydatów).
