@@ -231,3 +231,15 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
     - Ślebodziński: legitymacja z 1948 w publikacji „Śląska Republika Uczonych” t. 7 (2016);
     - Knaster (zaświadczenie z 6.08.1946) i Steinhaus (pismo WTN z 23.12.1957): książka J. Dutkiewicz o M. Warmusie (2003, BCPW).
     - Przy każdym potrzebna zgoda wydawcy lub depozytariusza i podanie źródła.
+
+## Zasady nagłówka podstrony: sygnet, podpis i znak (2.11, 01:00–01:19)
+- **Sygnet** stoi w lewym marginesie przed tytułem, oddzielony pionową kreską. **Podpis** jest bardzo mały (ok. 56 px szerokości, węższy niż głowa) i stoi pod sygnetem, wyśrodkowany.
+- **Nagłówek z hasłem i liczbami** (np. Projekty i granty, Plan zajęć): środek sygnetu wypada na środek pierwszej litery tytułu, a podpis stoi pod sygnetem.
+- **Nagłówek bez hasła i liczb** (np. Władze Instytutu): podpis leży mniej więcej na linii bazowej tytułu, a sygnet tuż nad nim.
+- **Znak patrona z opisem:**
+  - w niskim nagłówku (bez liczb): ok. 145×170 px przy prawej krawędzi kolumny, opis obok;
+  - w wyższym nagłówku (z liczbami): większy, w polu 200×200 px, przycięty do własnego rysunku, wysunięty ok. 90 px w prawy margines; opis po lewej stronie znaku, wyrównany do prawej, w kolumnie.
+- **Siatka:** tekst w banerze (tytuł, hasło, liczby, opis znaku) trzyma się krawędzi kolumny 1240 px. Poza kolumnę mogą wychodzić tylko grafiki: zdjęcie i kolor (cała szerokość), sygnet z podpisem (lewy margines), znak (prawy margines). Na mniejszych ekranach wracają do kolumny.
+- **Opis znaku** to zawsze nazwa twierdzenia i jedno zdanie, niezależnie od ilości miejsca.
+- **Ciekawostki** (znak i opis) są tylko na podstronach z menu działu. Na stronach głębiej (pojedyncze seminarium, projekt, aktualność, profil) nagłówek ma tylko sygnet i tytuł. To propozycja, czeka na potwierdzenie.
+- **Liczby w Planie zajęć:** na razie obie. Jedną można usunąć, jeśli zabraknie miejsca.
