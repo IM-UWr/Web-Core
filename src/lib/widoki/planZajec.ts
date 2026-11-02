@@ -3,6 +3,12 @@ import { wybierzSemestr } from '../../components/wyborSemestru';
 import surowe from '../../data/plan/plan.json';
 import studia from '../../data/dzialy/studia.json';
 import { today, type Lang } from '../daty';
+import { odmiana } from '../i18n';
+
+const MIESIACE = [
+  ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'],
+  ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+];
 
 type Fragm = string | { t: string; a: string };
 interface Zajecie { kod: string; typ: string; grupa?: number | string; prowadzacy?: string[]; dzien?: number; od?: string; do?: string; czestotliwosc?: string; sala?: string; uwagi?: Fragm[] }
@@ -51,11 +57,45 @@ export async function danePlanuZajec(lang: Lang) {
     const kotwica = m ? (zimowy ? 'zimowy' : 'letni') : s.id.replace(/[^\w-]/g, '-');
     // kotwice sekcji: #zimowy-o, #letni-np … (nie kolidują z #zimowy / #letni)
     const spis = sekcje.map((k) => ({ depth: 2, slug: `${kotwica}-${k.id.toLowerCase().replace(/[^\w-]/g, '-')}`, text: k.nazwa }));
-    return { s, kotwica, krotko: (en && s.nazwa_en) || s.nazwa, tytul, sekcje, spis };
+    // Komputer (kierunek „Założyciele”): linia informacyjna nad planem, krótka etykieta przycisku semestru, data danych z USOS.
+    const krotko = (en && s.nazwa_en) || s.nazwa;
+    const przycisk = ((k: string) => k.charAt(0).toUpperCase() + k.slice(1))(krotko.replace(/^semestr\s+/i, '').replace(/\s+semester\b/i, ''));
+    const opis = m
+      ? en ? `${zimowy ? 'Winter' : 'Summer'} semester of the academic year ${rok}` : `Semestr ${zimowy ? 'zimowy' : 'letni'} roku akademickiego ${rok}`
+      : krotko;
+    const zakt = (s.zaktualizowano || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    const aktualizacja = zakt
+      ? { pelna: `${+zakt[3]} ${MIESIACE[en ? 1 : 0][+zakt[2] - 1]} ${zakt[1]}, ${zakt[4]}:${zakt[5]}`, dzien: `${zakt[3]}.${zakt[2]}`, godzina: `${zakt[4]}:${zakt[5]}` }
+      : undefined;
+    const liczbaPrzedmiotow = sekcje.reduce((a, k) => a + k.przedmioty.length, 0);
+    return { s, kotwica, krotko, tytul, sekcje, spis, zimowy: m ? zimowy : undefined, przycisk, opis, aktualizacja, liczbaPrzedmiotow };
   });
   // Przełącznik semestrów: wybór podczas budowania (w przeglądarce poprawiany wg daty i adresu).
   const wiele = semestry.length > 1;
   const aktywny = semestry[wybierzSemestr(semestry.map((x) => ({ od: x.s.od, do: x.s.do })), today())]?.kotwica ?? '';
 
-  return { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny };
+
+  // Liczby w nagłówku na komputerze (semestr wybrany podczas budowania): przedmioty w semestrze i ostatnia aktualizacja z USOS.
+  const biezacy = semestry.find((x) => x.kotwica === aktywny);
+  const liczby = biezacy
+    ? [
+        {
+          n: String(biezacy.liczbaPrzedmiotow),
+          l: en
+            ? `course${biezacy.liczbaPrzedmiotow === 1 ? '' : 's'}${biezacy.zimowy === undefined ? '' : ` in the ${biezacy.zimowy ? 'winter' : 'summer'} semester`}`
+            : `${odmiana(biezacy.liczbaPrzedmiotow, ['przedmiot', 'przedmioty', 'przedmiotów'], ['', ''], 'pl')}${biezacy.zimowy === undefined ? '' : ` w semestrze ${biezacy.zimowy ? 'zimowym' : 'letnim'}`}`,
+        },
+        ...(biezacy.aktualizacja
+          ? [{ n: biezacy.aktualizacja.dzien, l: `${en ? 'last update from USOS' : 'ostatnia aktualizacja z USOS'}, ${biezacy.aktualizacja.godzina}` }]
+          : []),
+      ]
+    : [];
+  // Spis „Na tej stronie” (komputer): kategorie przedmiotów ze wszystkich semestrów, w kolejności z danych.
+  // Kotwica bez semestru (#z-pl-o) wskazuje sekcję w pokazanym semestrze (skrypt w PlanZajec.astro przenosi id przy zmianie).
+  const idKategorii = (id: string) => `z-pl-${id.toLowerCase().replace(/[^\w-]/g, '-')}`;
+  const spisKomputer = (dane.kategorie || [])
+    .filter((k) => semestry.some((x) => x.sekcje.some((s) => s.id === k.id)))
+    .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl }));
+
+  return { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
 }

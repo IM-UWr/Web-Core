@@ -11,18 +11,23 @@
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css, plan.css i blok na końcu pliku).
 // Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): w banerze hasło zamiast opisu — pola `plan_haslo` / `plan_haslo_en`
 // w src/data/dzialy/studia.json (Pages CMS: strona działu „Studia”); bez kreski i liczb. Puste pole = opis jak dotąd.
+// Kierunek „Założyciele” (komputer): nowy układ podstrony (.z-pd: boczna nawigacja działu i treść) stoi na końcu strony;
+// dotychczasową treść ukrywa na komputerze src/styles/zal-granty-plan.css (zostaje dla telefonu i wyszukiwarki Pagefind).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import PrzelacznikSemestrow from '../components/PrzelacznikSemestrow.astro';
 import SpisTresci from '../components/SpisTresci.astro';
 import type { Lang } from '../lib/daty';
 import { danePlanuZajec } from '../lib/widoki/planZajec';
+import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
+import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 import '../styles/plan.css';
+import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny } = await danePlanuZajec(lang);
+const { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer } = await danePlanuZajec(lang);
 
 const T = en
   ? {
@@ -60,12 +65,25 @@ const dataGodzina = (iso?: string | null) => {
   return m ? `${+m[3]} ${MIESIACE[+m[2] - 1]} ${m[1]}, ${m[4]}:${m[5]}` : '';
 };
 
+// Komputer (kierunek „Założyciele”): skróty dni w kolumnie „dzień” i w filtrze dni (pon.–pt.), tekst do wyszukiwania.
+const DNI_KROTKO = en ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.'];
+const tekstUwag = (u?: (string | { t: string })[]) => (u || []).map((f) => (typeof f === 'string' ? f : f.t)).join('');
+const doSzukania = (...cz: string[]) => cz.join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
+// sekcja kategorii z kotwicą bez semestru (#z-pl-o): w semestrze wybranym podczas budowania; gdy go nie ma — w pierwszym, który ją ma
+const wlascicielKategorii = (kat: string) => (semestry.find((x) => x.kotwica === aktywny && x.sekcje.some((k) => k.id === kat)) ?? semestry.find((x) => x.sekcje.some((k) => k.id === kat)))?.kotwica;
+const L = en
+  ? { semestr: 'Semester', szukaj: 'Search for a course, teacher or room', szukajEt: 'Search the timetable', dni: 'Days', pusto: 'Nothing matches your search.', dane: 'USOS data of', uwagi: 'Click a course name to see its description in USOS. Groups 99 are intended for students repeating a course who have already passed its classes.' }
+  : { semestr: 'Semestr', szukaj: 'Szukaj przedmiotu, prowadzącego albo sali', szukajEt: 'Szukaj w planie', dni: 'Dni', pusto: 'Nic nie pasuje do wyszukiwania.', dane: 'dane z USOS z', uwagi: 'Kliknij nazwę przedmiotu, by zobaczyć opis w USOSie. Grupy 99 przeznaczone są dla powtarzających przedmiot mających zaliczenia ćwiczeń.' };
+
 // identyfikatory nagłówków przedmiotów (do aria-labelledby tabel)
 let licznik = 0;
 const idPrzedmiotu = () => `pz-p${++licznik}`;
 ---
 <Baza tytul={T.tytul} opis={T.lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={T.tytul} lead={T.lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]} />
+  {/* Komputer: liczby w nagłówku (.pt-liczby.tylko-komputer — na telefonie ukryte; telefon bez zmian). */}
+  <NaglowekStrony tytul={T.tytul} lead={T.lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]}>
+    {liczby.length > 0 && <ul class="pt-liczby tylko-komputer">{liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}</ul>}
+  </NaglowekStrony>
 
   <div class="wrap layout plan-strona">
     <div class="main">
@@ -139,7 +157,151 @@ const idPrzedmiotu = () => `pz-p${++licznik}`;
       </aside>
     )}
   </div>
+
+  {/* ---------- Komputer (≥ 761 px), kierunek „Założyciele” (dok/estetyka.md „Podstrony działów”, prototyp: trescPlan) ----------
+       Boczna nawigacja działu; przyklejony pasek: semestr, wyszukiwarka (przedmiot, prowadzący, sala, uwagi) i filtr dni;
+       przedmioty w kategoriach, zajęcia w równych kolumnach. Bez JS: pasek ukryty, wszystkie semestry jeden pod drugim.
+       Przełącznik semestrów działa jak dotychczasowy (PrzelacznikSemestrow.astro: wybór wg daty albo adresu #zimowy / #letni)
+       i jest z nim zsynchronizowany. Dotychczasowa treść (wyżej) zostaje dla telefonu i wyszukiwarki; na komputerze ukrywa ją
+       src/styles/zal-granty-plan.css. */}
+  <div class="z-pd tylko-komputer" data-dzial="studia" data-pagefind-ignore>
+    <BocznaNawigacja dzial="studia" lang={lang} spis={spisKomputer} />
+    <div class="z-pd-tresc z-pl" data-z-plan>
+      {semestry.length === 0 && <p class="pl-info">{T.brak}</p>}
+      {semestry.length > 0 && (
+        <div class="pl-narz">
+          {wiele && (
+            <div class="pl-sem" role="group" aria-label={L.semestr}>
+              {semestry.map((x) => <button type="button" aria-pressed={x.kotwica === aktywny ? 'true' : 'false'} data-z-sem={x.kotwica}>{x.przycisk}</button>)}
+            </div>
+          )}
+          <input type="search" class="pl-szukaj" placeholder={L.szukaj} aria-label={L.szukajEt} autocomplete="off" data-z-szukaj />
+          <div class="pl-dni" role="group" aria-label={L.dni}>
+            {DNI_KROTKO.slice(0, 5).map((d, i) => <button type="button" aria-pressed="false" data-z-dzien={i} title={T.dni[i]}>{d}</button>)}
+          </div>
+        </div>
+      )}
+      {semestry.map((x) => (
+        <div class="pl-semestr" data-z-panel={x.kotwica} data-z-aktywny={x.kotwica === aktywny ? '' : undefined} data-od={x.s.od ?? ''} data-do={x.s.do ?? ''}>
+          <p class="pl-info">{`${x.opis}${x.aktualizacja ? ` · ${L.dane} ${x.aktualizacja.pelna}` : ''}. ${L.uwagi}`}</p>
+          {x.sekcje.length === 0 && <p class="pl-info">{T.brakSem}</p>}
+          {x.sekcje.map((k) => (
+            <section class="pl-kat" id={wlascicielKategorii(k.id) === x.kotwica ? idKategorii(k.id) : `${idKategorii(k.id)}-${x.kotwica}`} data-z-kat={idKategorii(k.id)}>
+              <h2>{k.nazwa}</h2>
+              <div class="pl-nagl" aria-hidden="true"><span>{T.kol.typ}</span><span>{T.kol.gr}</span><span>{T.kol.prow}</span><span>{T.kol.dzien}</span><span>{T.kol.godz}</span><span>{T.kol.sala}</span><span>{T.kol.uwagi}</span></div>
+              {k.przedmioty.map((p) => (
+                <div class="pl-p">
+                  <h3><a href={p.usos}>{p.nazwaW}</a></h3>
+                  <div>
+                    {p.zajecia.map((z) => (
+                      <div class="pl-w" data-d={z.dzien ?? ''} data-t={doSzukania(p.nazwaW, p.nazwa, ...(z.prowadzacy || []), z.sala || '', tekstUwag(z.uwagi))}>
+                        <span class="typ"><abbr title={typPelny(z.typ)}>{typKrotki(z.typ)}</abbr></span>
+                        <span>{grupa(z) && <><span class="sr-only">{T.gr} </span>{grupa(z)}</>}</span>
+                        <span>{(z.prowadzacy || []).map((o, i) => <>{i > 0 && <br />}{o}</>)}</span>
+                        <span class="dz">{z.dzien != null && <abbr title={T.dni[z.dzien]}>{DNI_KROTKO[z.dzien]}</abbr>}</span>
+                        <span class="godz">{z.od && z.do ? `${z.od}–${z.do}` : ''}{z.czestotliwosc && T.czest[z.czestotliwosc] && <small>{T.czest[z.czestotliwosc]}</small>}</span>
+                        <span>{z.sala && <><span class="sr-only">{T.sala} </span>{z.sala}</>}</span>
+                        <span class="uw">{(z.uwagi || []).map((f) => (typeof f === 'string' ? f : <a href={f.a}>{f.t}</a>))}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+      ))}
+      <p class="pl-pusto" role="status" data-z-pusto hidden>{L.pusto}</p>
+    </div>
+  </div>
+  <div class="z-pd-dol tylko-komputer" data-pagefind-ignore><NastepnaStrona dzial="studia" lang={lang} tytul={T.tytul} /></div>
 </Baza>
+
+<script>
+  // Plan zajęć na komputerze (blok .z-pl): semestr, wyszukiwarka i filtr dni. Semestr wybiera się jak w PrzelacznikSemestrow.astro
+  // (adres #zimowy / #letni albo kotwica w panelu, inaczej wg dzisiejszej daty) i oba przełączniki są zsynchronizowane.
+  import { today } from '../lib/daty';
+  import { wybierzSemestr } from '../components/wyborSemestru';
+
+  const plan = document.querySelector<HTMLElement>('[data-z-plan]');
+  if (plan) {
+    const panele = Array.from(plan.querySelectorAll<HTMLElement>('[data-z-panel]'));
+    const przyciski = Array.from(plan.querySelectorAll<HTMLButtonElement>('[data-z-sem]'));
+    const dni = Array.from(plan.querySelectorAll<HTMLButtonElement>('[data-z-dzien]'));
+    const szukaj = plan.querySelector<HTMLInputElement>('[data-z-szukaj]');
+    const pusto = plan.querySelector<HTMLElement>('[data-z-pusto]');
+    const spis = Array.from(document.querySelectorAll<HTMLAnchorElement>('.z-bok-spis a[href^="#z-pl-"]'));
+    const stary = document.querySelector<HTMLElement>('[data-ps]');
+    let biezacy = Math.max(0, panele.findIndex((p) => p.hasAttribute('data-z-aktywny')));
+
+    const filtruj = () => {
+      const q = (szukaj?.value || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
+      const wybrane = new Set(dni.filter((b) => b.getAttribute('aria-pressed') === 'true').map((b) => b.dataset.zDzien));
+      const widoczne = panele.map((panel) => {
+        let wp = 0;
+        panel.querySelectorAll<HTMLElement>('.pl-kat').forEach((kat) => {
+          let wk = 0;
+          kat.querySelectorAll<HTMLElement>('.pl-p').forEach((p) => {
+            let w = 0;
+            p.querySelectorAll<HTMLElement>('.pl-w').forEach((r) => {
+              const ok = (!q || (r.dataset.t || '').includes(q)) && (!wybrane.size || wybrane.has(r.dataset.d));
+              r.hidden = !ok;
+              if (ok) w++;
+            });
+            p.hidden = !w;
+            wk += w;
+          });
+          kat.hidden = !wk;
+          wp += wk;
+        });
+        return wp;
+      });
+      if (pusto) pusto.hidden = !panele.length || widoczne[biezacy] > 0;
+    };
+
+    // pokazany semestr: panel, przyciski, kotwice spisu (#z-pl-o wskazuje sekcję w pokazanym semestrze)
+    const pokaz = (i: number) => {
+      biezacy = i;
+      panele.forEach((p, j) => {
+        p.toggleAttribute('data-z-aktywny', i === j);
+        p.querySelectorAll<HTMLElement>('[data-z-kat]').forEach((s) => { s.id = i === j ? s.dataset.zKat! : `${s.dataset.zKat}-${p.dataset.zPanel}`; });
+      });
+      przyciski.forEach((b, j) => b.setAttribute('aria-pressed', String(i === j)));
+      spis.forEach((a) => { const li = a.closest('li'); if (li) li.hidden = !panele[i]?.querySelector(`[data-z-kat="${CSS.escape(a.hash.slice(1))}"]`); });
+      filtruj();
+    };
+
+    if (panele.length > 1) {
+      // semestr z adresu (#letni, #letni-m — kotwice dotychczasowego planu — albo kotwica sekcji w panelu), inaczej wg daty
+      let h = '';
+      try { h = decodeURIComponent(location.hash.slice(1)); } catch { /* zły adres */ }
+      const zAdresu = h ? panele.findIndex((p) => h === p.dataset.zPanel || h.startsWith(`${p.dataset.zPanel}-`) || !!p.querySelector(`[id="${CSS.escape(h)}"]`)) : -1;
+      pokaz(zAdresu >= 0 ? zAdresu : wybierzSemestr(panele.map((p) => ({ od: p.dataset.od, do: p.dataset.do })), today(), biezacy));
+      przyciski.forEach((b, j) => b.addEventListener('click', () => {
+        pokaz(j);
+        // dotychczasowy przełącznik (telefon) przełącza się razem z tym i zapisuje semestr w adresie
+        const t = stary?.querySelector<HTMLButtonElement>(`[aria-controls="${CSS.escape(panele[j].dataset.zPanel || '')}"]`);
+        if (t) t.click();
+        else history.replaceState(history.state, '', `#${panele[j].dataset.zPanel}`);
+      }));
+      if (stary) {
+        new MutationObserver(() => {
+          const id = stary.querySelector('[aria-selected="true"]')?.getAttribute('aria-controls');
+          const j = panele.findIndex((p) => p.dataset.zPanel === id);
+          if (j >= 0 && j !== biezacy) pokaz(j);
+        }).observe(stary, { subtree: true, attributes: true, attributeFilter: ['aria-selected'] });
+      }
+    } else {
+      pokaz(0);
+    }
+
+    szukaj?.addEventListener('input', filtruj);
+    dni.forEach((b) => b.addEventListener('click', () => {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      filtruj();
+    }));
+  }
+</script>
 
 <style>
   /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------

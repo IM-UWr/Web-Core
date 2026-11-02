@@ -1,6 +1,7 @@
 // Dane listy projektów i grantów (src/views/ListaGrantow.astro): podział na realizowane/zakończone/bez lat, liczby, spis sekcji.
 import dzial from '../../data/dzialy/nauka.json';
 import { today, type Lang } from '../daty';
+import { wybierz } from '../i18n';
 import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, type Grant } from '../tresci';
 
 // liczebniki: 1 projekt, 2–4 (22–24…) projekty, 5+ projektów
@@ -60,5 +61,49 @@ export async function daneListyGrantow(lang: Lang) {
     { id: 'pozostale', tekst: T('Pozostałe', 'Other'), ile: bezLat.length, pokaz: bezLat.length > 0 },
   ].filter((s) => s.pokaz);
 
-  return { realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje };
+  // ---------- komputer (kierunek „Założyciele”): paski czasu na wspólnej osi lat ----------
+  // Tekst wprowadzający (te same akapity co TekstWstepny: nauka.json, granty_tekst / granty_tekst_en).
+  const wstep = wybierz(dzial as Record<string, any>, 'granty_tekst', lang)
+    .split(/\n\s*\n/)
+    .map((a) => a.trim())
+    .filter(Boolean);
+  // „Dziś” = data budowania: rok + ułamek roku (2.11.2026 → ok. 2026,84).
+  const [rD, mD, dD] = today().split('-').map(Number);
+  const dzis = rD + (Date.UTC(rD, mD - 1, dD) - Date.UTC(rD, 0, 1)) / (Date.UTC(rD + 1, 0, 1) - Date.UTC(rD, 0, 1));
+  // lata projektu [od, do] (brak jednego z końców — projekt jednoroczny); bez lat — null
+  const lataProjektu = (g: Grant): [number, number] | null => {
+    const od = g.data.rok_od ?? g.data.rok_do, d = g.data.rok_do ?? g.data.rok_od;
+    return od === undefined || d === undefined ? null : [Math.min(od, d), Math.max(od, d)];
+  };
+  // oś od początku roku `od` do początku roku `do`; podziałka co `co` lat (bez ostatniego roku — tam kończy się oś)
+  const os = (od: number, doRoku: number, co: number) => ({
+    od,
+    do: doRoku,
+    podzialka: Array.from({ length: Math.floor((doRoku - od) / co) + 1 }, (_, i) => od + i * co)
+      .filter((r) => r < doRoku)
+      .map((r) => ({ rok: r, x: (((r - od) / (doRoku - od)) * 100).toFixed(3) })),
+  });
+  type Os = ReturnType<typeof os>;
+  const poczatki = (lista: Grant[]) => lista.map((g) => lataProjektu(g)?.[0]).filter((r): r is number => r !== undefined);
+  // Realizowane: od najwcześniejszego początku (najpóźniej bieżący rok, żeby „dziś” było na osi) do roku po najpóźniejszym końcu.
+  const osRealizowanych = realizowane.length
+    ? os(Math.min(rok, ...poczatki(realizowane)), Math.max(rok, ...realizowane.map((g) => lataProjektu(g)![1])) + 1, 1)
+    : undefined;
+  // Zakończone: od najwcześniejszego początku (zaokrąglonego w dół do wielokrotności 4, jak w prototypie: 2004)
+  // do końca bieżącego roku; podziałka co 4 lata.
+  const osZakonczonych = zakonczone.length ? os(Math.floor(Math.min(rok, ...poczatki(zakonczone)) / 4) * 4, rok + 1, 4) : undefined;
+  // pasek projektu na osi (left / width w %) i położenie linii „dziś” (w %; poza osią — brak)
+  const pasek = (g: Grant, o: Os) => {
+    const l = lataProjektu(g);
+    if (!l) return undefined;
+    const od = Math.max(l[0], o.od), d = Math.min(l[1] + 1, o.do);
+    return { left: (((od - o.od) / (o.do - o.od)) * 100).toFixed(3), width: (((d - od) / (o.do - o.od)) * 100).toFixed(3) };
+  };
+  const dzisNaOsi = (o: Os) => (dzis > o.od && dzis < o.do ? (((dzis - o.od) / (o.do - o.od)) * 100).toFixed(3) : undefined);
+  const spisKomputer = sekcje.map((s) => ({ id: `z-${s.id}`, etykieta: `${s.tekst} (${s.ile})` }));
+
+  return {
+    realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje,
+    wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
+  };
 }

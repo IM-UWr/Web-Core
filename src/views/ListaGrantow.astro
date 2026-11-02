@@ -9,6 +9,8 @@
 // zamiast opisu i trzy liczby pod kreską (LiczbyBanera): realizowane · zakończone · łącznie. Dawnych kafelków .stats pod
 // banerem już nie ma (liczby są w banerze, jak na stronach działów).
 // Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola granty_tekst / granty_tekst_en; puste = brak).
+// Kierunek „Założyciele” (komputer): nowy układ podstrony (.z-pd: boczna nawigacja działu i treść) stoi na końcu strony;
+// dotychczasową treść ukrywa na komputerze src/styles/zal-granty-plan.css (zostaje dla telefonu i wyszukiwarki Pagefind).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -20,6 +22,9 @@ import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneListyGrantow, odm } from '../lib/widoki/listaGrantow';
+import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
+import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
+import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -29,7 +34,20 @@ const tytul = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 const adresGrantu = (g: Grant) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
 const klasaRodzaju = (g: Grant) => `badge${g.data.rodzaj === 'ncn' ? ' badge-wydarzenie' : g.data.rodzaj === 'ue' ? ' badge-sukces' : ''}`;
 
-const { realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje } = await daneListyGrantow(lang);
+const {
+  realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje,
+  wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
+} = await daneListyGrantow(lang);
+// Komputer (kierunek „Założyciele”): wiersz „Kierownik: … · zakład · numer” i krótka linia pod tytułem w małych wierszach.
+const rodzaj = (g: Grant) => RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '';
+const kierownicyTekst = (g: Grant) => kier(g).map((x) => x.nazwa).join(', ');
+// części linii pod tytułem (puste pomijane); na końcu numer projektu cyframi tabelarycznymi (.nr), a bez numeru — program (jak w prototypie)
+const czesciKont = (g: Grant, ...czesci: string[]) => [
+  ...czesci.filter(Boolean).map((t) => ({ t, nr: false })),
+  ...(g.data.kod ? [{ t: g.data.kod, nr: true }] : g.data.program ? [{ t: g.data.program, nr: false }] : []),
+];
+const dzisR = osRealizowanych && dzisNaOsi(osRealizowanych);
+const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
   {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
@@ -133,6 +151,90 @@ const { realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, ha
       )}
     </aside>
   </div>
+
+  {/* ---------- Komputer (≥ 761 px), kierunek „Założyciele” (dok/estetyka.md „Podstrony działów”, prototyp: trescGranty) ----------
+       Boczna nawigacja działu i treść bez kafelków: realizowane z paskami czasu na wspólnej osi lat i przerywaną linią „dziś”
+       (data budowania), zakończone według roku zakończenia z małymi paskami (oś co 4 lata), pozostałe bez pasków.
+       Dotychczasowa treść (wyżej) zostaje dla telefonu i wyszukiwarki; na komputerze ukrywa ją src/styles/zal-granty-plan.css. */}
+  <div class="z-pd tylko-komputer" data-dzial="nauka" data-pagefind-ignore>
+    <BocznaNawigacja dzial="nauka" lang={lang} spis={spisKomputer} />
+    <div class="z-pd-tresc z-gr">
+      {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+
+      <section id="z-realizowane" aria-labelledby="z-h-realizowane">
+        <h2 id="z-h-realizowane">{T('Realizowane', 'Ongoing')} ({realizowane.length})</h2>
+        {realizowane.length === 0 && <p>{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
+        {osRealizowanych && (
+          <div class="os-lat" aria-hidden="true"><span></span><span class="tor-os">{osRealizowanych.podzialka.map((p) => <b style={`left:${p.x}%`}>{p.rok}</b>)}</span></div>
+        )}
+        {osRealizowanych && realizowane.map((g) => {
+          const z = zakladProjektu(g);
+          const k = kier(g);
+          const p = pasek(g, osRealizowanych);
+          const lata = lataGrantu(g);
+          return (
+            <div class="gr-w">
+              <div>
+                <div class="rola">{[rodzaj(g), lata].filter(Boolean).join(' · ')}</div>
+                <div class="imie"><a href={adresGrantu(g)}>{tytul(g)}</a></div>
+                <div class="kont">
+                  {czesciKont(g,
+                    k.length > 0 ? `${k.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}: ${kierownicyTekst(g)}` : '',
+                    z ? wybierz(z.data, 'nazwa', lang) : '',
+                  ).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
+                </div>
+              </div>
+              <span class="tor duzy" aria-hidden="true">{p && <span class="pas" style={`left:${p.left}%;width:${p.width}%`}></span>}{dzisR && <i style={`left:${dzisR}%`}></i>}</span>
+            </div>
+          );
+        })}
+      </section>
+
+      {zakonczone.length > 0 && osZakonczonych && (
+        <section id="z-zakonczone" aria-labelledby="z-h-zakonczone">
+          <h2 id="z-h-zakonczone">{T('Zakończone', 'Completed')} ({zakonczone.length})</h2>
+          <div class="os-lat maly" aria-hidden="true"><span></span><span class="tor-os">{osZakonczonych.podzialka.map((p) => <b style={`left:${p.x}%`}>{p.rok}</b>)}</span></div>
+          {grupy.map((gr) => (
+            <>
+              <h3 class="gr-rok">{gr.rok}<span class="sr-only">, </span> <small>{ileProjektow(gr.lista.length)}</small></h3>
+              {gr.lista.map((g) => {
+                const p = pasek(g, osZakonczonych);
+                return (
+                  <div class="gr-w maly">
+                    <div>
+                      <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
+                      <div class="kont">
+                        {czesciKont(g, rodzaj(g), kierownicyTekst(g), lataGrantu(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
+                      </div>
+                    </div>
+                    <span class="tor" aria-hidden="true">{p && <span class="pas" style={`left:${p.left}%;width:${p.width}%`}></span>}{dzisZ && <i style={`left:${dzisZ}%`}></i>}</span>
+                  </div>
+                );
+              })}
+            </>
+          ))}
+        </section>
+      )}
+
+      {bezLat.length > 0 && (
+        <section id="z-pozostale" aria-labelledby="z-h-pozostale">
+          <h2 id="z-h-pozostale">{T('Pozostałe', 'Other')} ({bezLat.length})</h2>
+          {bezLat.map((g) => (
+            <div class="gr-w maly">
+              <div>
+                <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
+                <div class="kont">
+                  {czesciKont(g, rodzaj(g), kierownicyTekst(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
+                </div>
+              </div>
+              <span></span>
+            </div>
+          ))}
+        </section>
+      )}
+    </div>
+  </div>
+  <div class="z-pd-dol tylko-komputer" data-pagefind-ignore><NastepnaStrona dzial="nauka" lang={lang} tytul={naglowek} /></div>
 </Baza>
 
 <script>
