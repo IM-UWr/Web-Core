@@ -20,7 +20,6 @@ import SpisTresci from '../components/SpisTresci.astro';
 import type { Lang } from '../lib/daty';
 import { danePlanuZajec } from '../lib/widoki/planZajec';
 import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
-import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 import '../styles/plan.css';
 import '../styles/zal-granty-plan.css';
 
@@ -214,7 +213,6 @@ const idPrzedmiotu = () => `pz-p${++licznik}`;
       <p class="pl-pusto" role="status" data-z-pusto hidden>{L.pusto}</p>
     </div>
   </div>
-  <div class="z-pd-dol tylko-komputer" data-pagefind-ignore><NastepnaStrona dzial="studia" lang={lang} tytul={T.tytul} /></div>
 </Baza>
 
 <script>

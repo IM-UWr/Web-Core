@@ -21,7 +21,7 @@ import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { listaKierunkow } from '../../lib/menu';
 import { tekstDnia } from '../../lib/kolory-dni';
 import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf } from '../../lib/tresci';
-import { dzialZeSciezki, type Dzial } from '../../lib/patroni';
+import { dzialZeSciezki, skrotNazwy, type Dzial } from '../../lib/patroni';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -105,7 +105,6 @@ const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
 
 // Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi), opis i rekrutacja z Ustawień
 const st = ustawienia.studia as any;
-const SKROTY: Record<string, string> = { 'Sztuczna inteligencja w analizie danych': 'SIAD', 'Artificial Intelligence in Data Analysis': 'SIAD' };
 const kierunki = [
   ...(await listaKierunkow()).filter((k) => k.data.na_stronie_glownej).map((k) => ({
     poziom: (en && k.data.kafelek_poziom_en) || k.data.kafelek_poziom || T('Kierunek', 'Programme'),
@@ -114,7 +113,7 @@ const kierunki = [
     adres: `/studia/${k.id}`,
   })),
   ...((st.kierunki ?? []) as any[]).map((k) => ({ poziom: wybierz(k, 'poziom', lang), nazwa: wybierz(k, 'nazwa', lang), opis: wybierz(k, 'opis', lang), adres: k.adres })),
-].map((k) => ({ ...k, skrot: SKROTY[k.nazwa as string], pelna: k.nazwa }));
+].map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
 
 // Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł). Jak dotąd na stronie głównej (decyzja 30.10.2026, WartoWiedziec.astro):
 // w HTML wszystkie pozycje „na głównej”, widoczne pierwsze cztery („Zawsze pokazuj” najpierw, dalej wg kolejności — to widzą

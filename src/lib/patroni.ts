@@ -76,6 +76,15 @@ export const PATRONI: Record<Dzial, Patron> = {
   },
 };
 
+// Skróty nazw w listach (dok/estetyka.md, 01:47): „SIAD” zamiast pełnej nazwy, żeby zajmowała jedną linię; pełna nazwa
+// zostaje w tekstach i w podpowiedzi (title) po najechaniu.
+const SKROTY: Record<string, string> = {
+  'Sztuczna inteligencja w analizie danych': 'SIAD',
+  'Artificial Intelligence in Data Analysis': 'SIAD',
+  'Artificial intelligence in data analysis': 'SIAD',
+};
+export const skrotNazwy = (nazwa: string): string | undefined => SKROTY[nazwa.trim()];
+
 export const pole = (p: Patron, k: 'nazwa' | 'notka' | 'fakt' | 'haslo' | 'znakNazwa' | 'znakFakt', lang: Lang): string =>
   (lang === 'en' && (p as any)[`${k}_en`]) || p[k];
 

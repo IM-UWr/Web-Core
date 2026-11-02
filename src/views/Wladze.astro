@@ -15,7 +15,6 @@ import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneWladz, daneWladzKomputer, poleWJezyku } from '../lib/widoki/wladze';
 import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
-import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 import WladzeZ from '../components/zal/WladzeZ.astro';
 
 interface Props { lang: Lang }
@@ -196,13 +195,12 @@ const mail = (e: string) => esc(e).replace('@', '@<wbr>');
 
   </div>
 
-  {/* Komputer (≥ 761 px), kierunek „Założyciele”: układ podstrony (boczna nawigacja, treść bez kafelków, „Następna strona
-       w dziale”). Dotychczasowa treść wyżej zostaje dla telefonu (na komputerze schowana: src/styles/zalozyciele-strony.css). */}
+  {/* Komputer (≥ 761 px), kierunek „Założyciele”: układ podstrony (boczna nawigacja, treść bez kafelków; „Następna strona
+       w dziale” dodaje Baza.astro). Dotychczasowa treść wyżej zostaje dla telefonu (na komputerze schowana: src/styles/zalozyciele-strony.css). */}
   <div class="z-pd z-wladze tylko-komputer" data-dzial="instytut" data-pagefind-ignore>
     <BocznaNawigacja dzial="instytut" lang={lang} spis={kom.spis} />
     <div class="z-pd-tresc"><WladzeZ lang={lang} {...kom} /></div>
   </div>
-  <NastepnaStrona dzial="instytut" lang={lang} tytul={tytul} />
 </Baza>
 
 <style>

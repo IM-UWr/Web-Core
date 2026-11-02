@@ -5,7 +5,7 @@
 import { menuGlowne } from '../../lib/menu';
 import { u, isExternal, stripBase } from '../../lib/url';
 import { wJezyku, wybierz } from '../../lib/i18n';
-import { PATRONI, pole, type Dzial } from '../../lib/patroni';
+import { PATRONI, pole, skrotNazwy, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
 interface Props { dzial: Dzial; lang: Lang; spis?: { id: string; etykieta: string }[] }
@@ -24,9 +24,11 @@ const biezaca = (a: string) => !isExternal(a) && a.replace(/\/$/, '') === tu;
     <>
       <p class="z-bok-gr">{wybierz(g, 'nazwa', lang)}</p>
       <ul>
-        {g.linki.map((l) => (
-          <li><a href={href(l.adres)} aria-current={biezaca(l.adres) ? 'page' : undefined}>{wybierz(l, 'etykieta', lang)}{isExternal(l.adres) && ' ↗'}</a></li>
-        ))}
+        {g.linki.map((l) => {
+          const e = wybierz(l, 'etykieta', lang) as string;
+          const sk = skrotNazwy(e);
+          return <li><a href={href(l.adres)} title={sk ? e : undefined} aria-current={biezaca(l.adres) ? 'page' : undefined}>{sk ?? e}{isExternal(l.adres) && ' ↗'}</a></li>;
+        })}
       </ul>
     </>
   ))}

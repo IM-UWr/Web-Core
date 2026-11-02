@@ -99,7 +99,7 @@
   .z-sciezka { margin: 0; }
   .z-haslo { margin: 10px 0 0; font-size: 19px; font-weight: 500; color: var(--d-j); }
   /* liczby pod hasłem: lista przekazana przez widok (.pt-liczby) */
-  .z-slot .pt-liczby { display: flex !important; flex-wrap: wrap; gap: 8px 34px; max-width: none; margin: 20px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid rgb(255 255 255 / .2); }
+  .z-slot .pt-liczby { display: flex !important; flex-wrap: wrap; gap: 8px 34px; width: fit-content; max-width: 100%; margin: 20px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid rgb(255 255 255 / .2); }
   .z-slot:has(.pt-liczby:not(.tylko-telefon)) .pt-liczby.tylko-telefon { display: none !important; }
   .z-slot .pt-liczby li { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: 14px; font-weight: 500; white-space: nowrap; color: var(--na-ciemnym-2); }
   .z-slot .pt-liczby .n { font-family: var(--f-display); font-size: 30px; font-weight: 500; line-height: 1.1; color: #fff; }
@@ -291,7 +291,7 @@
 
   /* ---------- podstrona działu: boczna nawigacja i treść bez kafelków ---------- */
   .z-pd { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 64px; padding: 40px var(--marg) 30px; }
-  .z-bok { align-self: start; position: sticky; top: 20px; font-size: 15px; }
+  .z-bok { align-self: start; position: sticky; top: 20px; font-size: 15px; line-height: 1.6; }
   .z-bok ul { list-style: none; margin: 0; padding: 0; }
   .z-bok-dzial { display: block; padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
   .z-bok-gr { margin: 18px 0 4px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
@@ -304,12 +304,14 @@
   .z-pd-tresc { min-width: 0; }
   .z-pd-tresc > section { padding-bottom: 34px; margin-bottom: 30px; border-bottom: 1px solid var(--line); }
   .z-pd-tresc > section:last-of-type { border-bottom: 0; }
-  .z-pd-tresc h2 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 32px; color: var(--ink); }
+  .z-pd-tresc h2 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.6; color: var(--ink); }
   .z-pd-tresc .wst { margin: 0 0 26px; font-size: 17px; color: var(--text); }
   .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 72ch; }
   .z-pd-tresc a { color: var(--d-a); }
   .z-nast { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
-    margin: 0 var(--marg) 40px calc(var(--marg) + 304px); padding-top: 18px; border-top: 2px solid var(--ink); }
+    margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--ink); }
+  /* pod układem z boczną nawigacją — w kolumnie treści */
+  body:has(.z-bok) .z-nast { margin-top: 0; margin-left: calc(var(--marg) + 304px); }
   .z-nast-link { font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
   .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }

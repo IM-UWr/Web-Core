@@ -23,7 +23,6 @@ import type { Lang } from '../lib/daty';
 import { lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneListyGrantow, odm } from '../lib/widoki/listaGrantow';
 import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
-import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
@@ -234,7 +233,6 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
       )}
     </div>
   </div>
-  <div class="z-pd-dol tylko-komputer" data-pagefind-ignore><NastepnaStrona dzial="nauka" lang={lang} tytul={naglowek} /></div>
 </Baza>
 
 <script>
