@@ -145,6 +145,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .szkic .detale path { stroke: var(--d-j); stroke-width: .75; }
 .szkic .detale { opacity: 0; transition: opacity .7s ease .55s; }
 .kol:hover .detale, .kol:focus-within .detale, .szkic.rysuj .detale, .ok-dz:hover .detale, .ok-dz:focus-visible .detale { opacity: 1; }
+.szkic.gotowe .tusz path { stroke-dashoffset: 0; opacity: 1; transition: none; }
+.szkic.gotowe .detale { opacity: 1; transition: none; }
 .szkic.pelny .duch path { stroke: color-mix(in srgb, var(--d-j) 22%, transparent); }
 .kol:hover .tusz path, .kol:focus-within .tusz path, .szkic.rysuj .tusz path { stroke-dashoffset: 0; opacity: 1; }
 
@@ -638,7 +640,11 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 @keyframes pisz2 { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .podpis-svg.pisze mask path { animation: none !important; stroke-dashoffset: 0; } }
 .in-b4 .podpis-s { right: calc(var(--marg) + 60px); bottom: 20px; height: 46px; transform: rotate(-4deg); }
-.pd-b .podpis-s { right: calc(100% + 8px); top: calc(100% + 4px); height: 30px; }
+.pd-b .podpis-s { right: calc(100% + 47px); top: calc(100% - 9px); height: auto; filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
+.pd-b .podpis-s svg { width: 56px; height: auto; }
+.pd-b .tyt-g .sygnet { bottom: 18px; }
+.pd-b:not(.z-liczbami) .tyt-g .sygnet { bottom: 36px; }
+.pd-b:not(.z-liczbami) .podpis-s { top: calc(100% - 27px); }
 .pd-b[data-n="jasny"] .podpis-s { color: var(--d-g); filter: none; }
 .pd-b .sygnet path, .mega .glowa-d svg path { stroke-width: 1.5px; }
 /* sygnet działu (na razie obecny zastępczy szkic) wysunięty na lewo od tytułu, z pionową kreską */
@@ -816,6 +822,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
       <button type="button" id="wr-nowa" data-v="nowa" aria-pressed="true">Nowa</button>
       <button type="button" id="wr-obecna" data-v="obecna" aria-pressed="false">Obecna strona (zrzut)</button>
     </div></div>
+    <div class="grupa" id="wybor-anim" hidden><span>Animacja</span><div class="seg"><button type="button" id="anim-powtorz">pokaż pierwsze wejście jeszcze raz</button></div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
       <button type="button" id="s-pod" data-v="pod" aria-pressed="false">podstrona</button>
@@ -1545,6 +1552,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     const pu = $('.pl-pusto'); if (pu) pu.hidden = !!wid;
   }
   document.addEventListener('input', (e) => { if (e.target.id === 'pl-szukaj') filtrujPlan(); });
+  document.getElementById('anim-powtorz').addEventListener('click', (e) => { e.stopPropagation(); zapomnijWejscie(dzial); if (strona === 'pod') document.querySelector('#wybor-strony [data-v="dzial"]').click(); else rysujInstytut(); window.scrollTo(0, 0); });
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.pl-dni button'); if (!b) return;
     b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); filtrujPlan();
@@ -1554,6 +1562,13 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     const v = a.dataset.strona || (PODSTRONY[dzial] && a.textContent.trim() === PODSTRONY[dzial].nazwa ? 'pod' : null); if (!v) return;
     e.preventDefault(); document.querySelector(`#wybor-strony [data-v="${v}"]`).click();
   });
+  /* strona działu: szkic i podpis rysują się tylko przy pierwszym wejściu w wizycie (sessionStorage); gdy się nie da zapisać — jak przy powrocie */
+  const KLUCZ_WIZYTY = 'im-wizyta-dzialy';
+  function pierwszeWejscie(dz) {
+    try { const z = JSON.parse(sessionStorage.getItem(KLUCZ_WIZYTY) || '[]'); if (z.includes(dz)) return false; z.push(dz); sessionStorage.setItem(KLUCZ_WIZYTY, JSON.stringify(z)); return true; }
+    catch (e) { return false; }
+  }
+  function zapomnijWejscie(dz) { try { const z = JSON.parse(sessionStorage.getItem(KLUCZ_WIZYTY) || '[]').filter((x) => x !== dz); sessionStorage.setItem(KLUCZ_WIZYTY, JSON.stringify(z)); } catch (e) {} }
   let wariantInst = '4', dzInst = 'instytut', wersja = 'nowa';
   // Instytut: dokładnie te dane, które są dziś na stronie /instytut (src/data/dzialy/instytut.json, menu, aktualności „sukces”)
   const IN_INST = {
@@ -1667,6 +1682,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     const d = dz === 'instytut' ? { ...D.instytut, tytul: 'O Instytucie', tekst: IN_INST.tekst, skrot: IN_INST.skrot }
       : dz === 'popularyzacja' ? { ...D[dz], liczby: [], tekst: [], skrot: [] } : { ...D[dz], tekst: IN_DANE[dz].tekst, skrot: IN_DANE[dz].skrot };
     const obecna = wersja === 'obecna', pod = strona === 'pod' && !!PODSTRONY[dz];
+    const pierwsze = !pod && !obecna && w === '4' && pierwszeWejscie(dz);
     $('#wybor-strony').hidden = !PODSTRONY[dz];
     $('#wybor-nagl').hidden = !pod; $('#wybor-zdjec').hidden = !pod;
     $('#v-instytut').classList.toggle('n-jasny', pod && naglowek === 'jasny');
@@ -1684,7 +1700,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     $('#in-tresc').hidden = pod || !d.tekst.length;
     $('#in-tresc').innerHTML = `<div><h4>${d.tytul}</h4>${d.tekst.map((t, i) => `<p${i === 0 ? ' class="wst"' : ''}>${t}</p>`).join('')}</div><aside class="skrot"><h5>W skrócie</h5>${d.skrot.map(([a, b]) => `<div><b>${a}</b><span>${b}</span></div>`).join('')}</aside>`;
     $('#in-baner').innerHTML = w === '4'
-      ? `<section class="in-b4"><div class="in-foto"><img src="${f[0]}" alt="${f[1]}" style="object-position:${f[2]};${f[3] ? `filter:${f[3]}` : ``}"></div><div class="szkic rysuj">${svg(dz)}</div>${tytul}<span class="podpis-s">${svgPodpis(dz, true)}</span><div class="in-patron"><b>${d.patron}</b><span>${d.lata} · patron działu</span><p>${IN_NOTA[dz]}</p></div></section>`
+      ? `<section class="in-b4"><div class="in-foto"><img src="${f[0]}" alt="${f[1]}" style="object-position:${f[2]};${f[3] ? `filter:${f[3]}` : ``}"></div><div class="szkic">${svg(dz)}</div>${tytul}<span class="podpis-s">${svgPodpis(dz, pierwsze)}</span><div class="in-patron"><b>${d.patron}</b><span>${d.lata} · patron działu</span><p>${IN_NOTA[dz]}</p></div></section>`
       : `<section class="in-b2"><div class="szkic pelny rysuj">${svg('instytut')}</div>${tytul}</section>
          <section class="in-os"><h4>Kalendarium</h4><ol>
            <li><b>1945</b><span>15 listopada pierwsze wykłady na polskim Uniwersytecie we Wrocławiu.</span></li>
@@ -1696,6 +1712,8 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
          </ol></section>`;
     if (pod) $('#in-baner').innerHTML = htmlBanerPod(dz);
     zgrajPodpisy($('#in-baner'));
+    const szk = $('#in-baner .in-b4 .szkic');
+    if (szk) { if (pierwsze) requestAnimationFrame(() => requestAnimationFrame(() => szk.classList.add('rysuj'))); else szk.classList.add('gotowe'); }
   }
   let ekran = [1920, 950];
   function ustawEkran() {
@@ -1789,6 +1807,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     $('#wybor-baner').hidden = widok !== 'instytut';
     $('#wybor-paska').hidden = widok !== 'instytut';
     $('#wybor-strony').hidden = widok !== 'instytut';
+    $('#wybor-anim').hidden = widok !== 'instytut';
     if (widok === 'instytut') rysujInstytut();
     $('#scena').classList.toggle('telefony', widok === 'telefon');
     $('#scena').style.width = widok === 'okladka' ? ekran[0] + 'px' : widok === 'instytut' ? '1920px' : '';
