@@ -6,11 +6,9 @@
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
-import { addDays, dayNum, longWithDay, monthYear, range, type Lang } from '../lib/daty';
-import {
-  nazwaSemestru, dniSemestru, statystykiSemestru, wolneSemestru, zamianySemestru, dzienTygodnia,
-  NAZWA_KOLORU, DNI_SKROT, SKROT_PLANU, nazwaDnia, opisZamiany, type Dzien, type Semestr,
-} from '../lib/kolory-dni';
+import { dayNum, longWithDay, range, type Lang } from '../lib/daty';
+import { nazwaSemestru, NAZWA_KOLORU, SKROT_PLANU, nazwaDnia, opisZamiany, type Semestr } from '../lib/kolory-dni';
+import { daneKolorowDniSemestru, type Komorka } from '../lib/widoki/koloryDniSemestr';
 
 interface Props {
   s: Semestr;
@@ -25,26 +23,7 @@ const { s, lang, dzis, id = `sem-${s.poczatek}`, panel = false, aktywny = false,
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const wielka = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
-
-const NAGLOWKI = lang === 'en' ? ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] : ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
-
-type Komorka = { data: string; d: Dzien | null };
-// Miesiące od początku do końca zajęć; tygodnie od poniedziałku.
-const dni = new Map(dniSemestru(s).map((d) => [d.data, d]));
-const miesiace: { nazwa: string; tygodnie: (Komorka | null)[][] }[] = [];
-for (let m = s.poczatek.slice(0, 7); m <= s.koniec.slice(0, 7); ) {
-  const pierwszy = `${m}-01`;
-  let d = addDays(pierwszy, 1 - dzienTygodnia(pierwszy));
-  const tygodnie: (Komorka | null)[][] = [];
-  do {
-    const tydz: (Komorka | null)[] = [];
-    for (let i = 0; i < 7; i++, d = addDays(d, 1)) tydz.push(d.slice(0, 7) === m ? { data: d, d: dni.get(d) ?? null } : null);
-    tygodnie.push(tydz);
-  } while (d.slice(0, 7) === m);
-  miesiace.push({ nazwa: monthYear(pierwszy, lang), tygodnie });
-  const [y, mm] = m.split('-').map(Number);
-  m = mm === 12 ? `${y + 1}-01` : `${y}-${String(mm + 1).padStart(2, '0')}`;
-}
+const { NAGLOWKI, miesiace, st, liczby, wolne, zamiany, uwagi, hId } = await daneKolorowDniSemestru(s, lang, listy);
 
 function klasa(k: Komorka): string {
   if (!k.d) return 'poza';
@@ -64,16 +43,6 @@ function opis(k: Komorka): string {
   return T('bez zajęć', 'no classes');
 }
 
-const st = statystykiSemestru(s);
-const plan = st.plan.slice(1);
-const rowne = plan.every((n) => n === plan[0]);
-const liczby = rowne
-  ? T(`każdy dzień tygodnia ${plan[0]} razy`, `each weekday ${plan[0]} times`)
-  : plan.map((n, i) => `${DNI_SKROT[lang][i + 1]} ${n}`).join(', ');
-const wolne = listy ? wolneSemestru(s) : [];
-const zamiany = listy ? zamianySemestru(s) : [];
-const uwagi = (lang === 'en' && s.uwagi_en) || s.uwagi || '';
-const hId = `semestr-${s.poczatek}`;
 const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, lang);
 ---
 <section

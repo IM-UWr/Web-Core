@@ -5,17 +5,15 @@ import Wstecz from '../components/Wstecz.astro';
 // Wygląd na komputerze (≥ 761 px): jak w wariancie „Zwarta” (uklad="zwarta", style: src/styles/uklad-zwarta.css i blok niżej);
 // treść wpisu (zdjęcie, tekst, galeria, album, załączniki) w białej ramce .ak-ramka — wzór tła nie prześwituje
 // pod tekstem. Telefon (≤ 760 px) bez zmian: ramka nie ma tam żadnego stylu (zwykły blok, marginesy jak dotąd).
-import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import Ikona from '../components/Ikona.astro';
 import KartaWydarzenia from '../components/KartaWydarzenia.astro';
 import Galeria from '../components/Galeria.tsx';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, ODBIORCY } from '../lib/i18n';
-import { short, longWithDay, range, dayNum, monthShort, now, today, hasTime, plusMinutes, type Lang } from '../lib/daty';
-import { miejsce, slugOf, wydarzeniaNaGlowna, trwaLubBedzie, type Aktualnosc, type Wydarzenie } from '../lib/tresci';
-import ustawienia from '../data/ustawienia.json';
-import { renderMarkdown } from '../lib/markdown';
+import { short, longWithDay, range, dayNum, monthShort, hasTime, type Lang } from '../lib/daty';
+import { slugOf, type Aktualnosc } from '../lib/tresci';
+import { daneAktualnosci } from '../lib/widoki/aktualnosc';
 
 interface Props {
   wpis: Aktualnosc;
@@ -25,28 +23,8 @@ interface Props {
 }
 const { wpis, lang, nowszy, starszy } = Astro.props;
 const d = wpis.data;
-const slug = slugOf(wpis.id);
-const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
-const zajawka = (lang === 'en' && d.zajawka_en) || d.zajawka;
 const tytulInny = (w?: Aktualnosc) => (w ? (lang === 'en' && w.data.tytul_en) || w.data.tytul : '');
-// podpis zdjęcia i nazwy załączników: wersja angielska (pola *_en), a gdy pusta — po polsku
-const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
-
-const { Content } = await render(wpis);
-const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
-const tylkoPolski = lang === 'en' && !d.tresc_en;
-
-const wydarzenie: Wydarzenie | undefined = d.wydarzenie_poczatek
-  ? {
-      rodzaj: 'wydarzenie', tytul, poczatek: d.wydarzenie_poczatek, koniec: d.wydarzenie_koniec,
-      koniecIcs: d.wydarzenie_koniec || (hasTime(d.wydarzenie_poczatek) ? plusMinutes(d.wydarzenie_poczatek, 120) : undefined), miejsce: miejsce(d.wydarzenie_miejsce, lang),
-      href: `/aktualnosci/${slug}`, uid: `akt-${slug}`, opis: zajawka,
-    }
-  : undefined;
-const minelo = wydarzenie ? !trwaLubBedzie(wydarzenie) : false;
-const trwa = wydarzenie && !minelo && (hasTime(wydarzenie.poczatek) ? wydarzenie.poczatek <= now() : wydarzenie.poczatek <= today());
-// Najbliższe wydarzenia jak na stronie głównej (tylko gdy są blisko); gdy brak — bez prawego paska, treść szersza.
-const najblizsze = (await wydarzeniaNaGlowna(4, lang, Number((ustawienia as any).wydarzenia_dni_robocze ?? 5) || 5)).filter((w) => w.href !== `/aktualnosci/${slug}`).slice(0, 3);
+const { tytul, zajawka, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze } = await daneAktualnosci(wpis, lang);
 const href = (a: string) => (isExternal(a) ? a : u(a));
 ---
 <Baza tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta">

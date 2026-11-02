@@ -11,21 +11,15 @@ import Wstecz from '../components/Wstecz.astro';
 import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
-import { short, longWithDay, today, type Lang } from '../lib/daty';
-import { renderMarkdown } from '../lib/markdown';
-import { aktualnoscZamiany, nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
+import { short, longWithDay, type Lang } from '../lib/daty';
+import { nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
+import { daneAktualnosciZamianyDni } from '../lib/widoki/aktualnoscZamianaDni';
 
 interface Props { data: string; lang: Lang }
 const { data, lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const dzis = today();
-const a = aktualnoscZamiany(data, lang, dzis)!;
-const d = a.dzien;
-const html = await renderMarkdown(a.tresc);
-const minela = dzis > a.data;
-const dla = ['studenci', 'pracownicy'];
+const { a, d, html, minela, dla, kalendarz } = await daneAktualnosciZamianyDni(data, lang);
 const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dni', 'day-swaps')}`;
 ---
 <Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie} uklad="zwarta">
   {!a.wOknie && <meta slot="head" name="robots" content="noindex" />}
