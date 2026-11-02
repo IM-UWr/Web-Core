@@ -1827,8 +1827,8 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     $('#wybor-anim').hidden = widok !== 'instytut';
     if (widok === 'instytut') rysujInstytut();
     $('#scena').classList.toggle('telefony', widok === 'telefon');
-    $('#scena').style.width = widok === 'okladka' ? ekran[0] + 'px' : widok === 'instytut' ? '1920px' : '';
-    $('#wybor-ekranu').hidden = widok !== 'okladka';
+    $('#scena').style.width = widok === 'okladka' || widok === 'instytut' ? ekran[0] + 'px' : '';
+    $('#wybor-ekranu').hidden = widok !== 'okladka' && widok !== 'instytut';
     $('#wybor-plakietki').hidden = widok !== 'okladka';
     $('#wybor-skosu').hidden = widok !== 'okladka';
     $('#wybor-barwy').hidden = widok !== 'okladka';
