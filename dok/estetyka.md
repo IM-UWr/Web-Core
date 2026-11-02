@@ -283,5 +283,5 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 ## Rekrutacja (2.11, 01:43)
 - **„Rekrutacja” zostaje w głównym pasku menu** (01:47, cofnięcie decyzji z 01:43): Instytut, Nauka, Studia, Popularyzacja, Aktualności, za kreską Rekrutacja, potem Szukaj i EN.
 - Na stronie głównej nagłówek „Studiuj matematykę we Wrocławiu” jest klikalny i ma znak linku zewnętrznego ↗. Prowadzi na stronę rekrutacji (dziś https://studia-wmi.uwr.edu.pl/). Link „Rekrutacja na studia →” pod opisem na razie został; do decyzji, czy go usunąć.
-- W strukturze Studiów: „Rekrutacja ↗” jako ostatnia pozycja w grupie „Na co dzień”, za USOSweb. Uwaga: pasowałaby też do „Kierunków” (dla kandydatów).
+- W strukturze Studiów Rekrutacji nie ma (01:48: usunięta z „Na co dzień”). Prowadzą do niej pasek menu i nagłówek „Studiuj matematykę we Wrocławiu”.
 - **Skrót SIAD (01:47):** w listach i na stronie głównej kierunek „Sztuczna inteligencja w analizie danych” występuje jako „SIAD”, żeby zajmował jedną linię. Pełna nazwa zostaje w tekstach i w podpowiedzi po najechaniu.
