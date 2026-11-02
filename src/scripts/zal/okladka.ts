@@ -21,7 +21,10 @@ function uloz() {
   const o = ok.getBoundingClientRect();
   const b = (el: HTMLElement) => { const r = el.getBoundingClientRect(); return { x2: r.right - o.left, yc: (r.top + r.bottom) / 2 - o.top }; };
   const lewa = tyt.getBoundingClientRect().left - o.left;
-  for (let i = 0; i < 4; i++) {
+  // Po angielsku („Mathematical / Institute”) drugie słowo jest krótsze od pierwszego — dociągnięte do skosu byłoby
+  // większe od pierwszego, a logo ogromne. Wtedy zostają stopnie z CSS, a skos liczymy od końca pierwszej linii.
+  const wyrownaj = (w2.textContent ?? '').trim().length >= (w1.textContent ?? '').trim().length;
+  for (let i = 0; wyrownaj && i < 4; i++) {
     const L = b(logo), A = b(w1), M = b(w2);
     const f2 = parseFloat(getComputedStyle(w2).fontSize);
     const celM = A.x2 + S * (M.yc - A.yc);

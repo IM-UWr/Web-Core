@@ -59,6 +59,19 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - Pasek po przewinięciu się nie przykleja (w `dok/estetyka.md` „do zrobienia”, otwarte).
 - Treść pod nagłówkami (poza stronami z etapu 3) jest jeszcze stara, tylko w nowych kolorach i krojach.
 
+## Etap 3: strony z prototypu — w trakcie
+**Commity:** `4796664a`, `95f76d6b` (drugi ekran strony głównej i Władze; reszta niżej).
+
+**Strona główna, drugi ekran** (`src/components/zal/DrugiEkran.astro`, `src/scripts/zal/drugi-ekran.ts`): pasek „Szybki dostęp” (Plan zajęć z nazwą bieżącego semestru z planu USOS, kolor dnia z tą samą logiką i odświeżaniem w przeglądarce co kafelek na telefonie, Pracownicy z liczbą osób, Seminaria z liczbą referatów w tygodniu), trzy kolumny (Nadchodzące wydarzenia — te same co na telefonie: 30 dni i przypomnienia terminów; Seminaria — 7 dni od dziś, prelegent po tytule; Aktualności — miniatury 72×54, bez zdjęcia sygnet działu), długa trzecia kolumna z „i jeszcze N · Wszystkie …”, zamiana FLIP 0,52 s (bez ruchu: tylko rozjaśnienie 0,15 s; fokus na nagłówek rozwiniętej kolumny), jeden wzór daty, Studia z klikalnym „Studiuj matematykę we Wrocławiu ↗” (adres rekrutacji z Ustawień) i SIAD jako skrót z pełną nazwą w podpowiedzi, Warto wiedzieć (losowanie jak dotąd). Stopka odchudzona.
+
+**Władze** (`src/components/zal/WladzeZ.astro`, `OsobaZ.astro`, dane `daneWladzKomputer()` w `src/lib/widoki/wladze.ts`): schemat dyrekcji (dyrektor 120×150, zastępcy 96×120 połączeni liniami), Władze Wydziału w dwóch kolumnach (76×95), Sekretariat jako blok kontaktu bez zdjęć, Kadencja, Rada Instytutu, Zobacz też; boczna nawigacja działu z „Na tej stronie”; „Następna strona w dziale” i „Zgłoś błąd na tej stronie”.
+
+**Różnice względem prototypu (etap 3, moja część):**
+- Wstęp sekcji „Dyrekcja” to pole `wstep` z danych Władz (w prototypie zdanie przykładowe).
+- „Ostatnia aktualizacja: data z historii zmian” — pominięta, bo historia zmian treści jest w repozytoriach Web-* i nie ma jej przy budowaniu; zostaje „Zgłoś błąd na tej stronie” (e-mail z tytułem i adresem strony).
+- Wydarzenia nie mają w danych rodzaju typu „koło naukowe” / „warsztaty” — w wierszu jest dział, godzina i miejsce (skrócone do „s. HS”).
+- Warto wiedzieć losowane (PYTANIA.md, 9); drugi ekran na całą szerokość jak w prototypie (PYTANIA.md, 7).
+
 ## Podział `src/scripts/` i skryptów w komponentach
 `src/scripts/` zawiera tylko silnik animacji banerów (`src/scripts/baner/`). Pozostałe zachowanie strony siedzi w `<script>` w komponentach i widokach.
 

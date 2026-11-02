@@ -47,3 +47,24 @@ Każde pytanie: co było niejasne, jaką odpowiedź przyjąłem (najbezpieczniej
 **Przyjęta odpowiedź.** Nowy nagłówek podstrony (głęboki kolor działu ze zdjęciem, „← Dział”, sygnet, podpis, znak) wchodzi w etapie 2 na wszystkie podstrony komputerowe przez `NaglowekStrony.astro`. Treść pod nagłówkiem zostaje stara (z nowymi kolorami i krojami) aż do etapów 3–4. Strony bez banera (np. pojedyncza aktualność) mają pasek na granacie.
 
 **Commit.** Etap 2. **Jak cofnąć.** W `NaglowekStrony.astro` usunąć wstawkę `<NaglowekZ …>` i klasę `ph-z`.
+
+## 7. Drugi ekran strony głównej: kolumna 1240 px czy cała szerokość?
+**Pytanie.** Kolumna 1240 px jest ustalona dla stron działów i podstron. Prototyp drugiego ekranu strony głównej idzie na całą szerokość (marginesy 48 px, pasek 40 px).
+
+**Przyjęta odpowiedź.** Jak w prototypie: drugi ekran, jego pasek i stopka na całą szerokość z marginesem 48/40 px; pozostałe strony w kolumnie 1240 px.
+
+**Commit.** Etap 3 (`4796664a`). **Jak cofnąć.** W `src/styles/zalozyciele-strony.css` zmienić `--marg: 48px` w `.z-druga` na `max(48px, calc((100% - var(--kol)) / 2))` i usunąć dwie reguły „strona główna: drugi ekran na całą szerokość”.
+
+## 8. Kolor działu przy wpisach na stronie głównej
+**Pytanie.** Wpisy w kolumnach mają nazwę działu w jego kolorze, a miniatura bez zdjęcia — sygnet działu. Aktualności nie mają jeszcze pola „Dział” (zmiana CMS „na później”).
+
+**Przyjęta odpowiedź.** Reguła z `dok/estetyka.md` („jeśli pole jest puste, dział liczy się automatycznie”): `dla` studenci lub kandydaci → Studia; sukces, obrona albo wpisany zakład → Nauka; reszta → Instytut. Wydarzenia biorą dział ze swojego wpisu, obrony i konferencje — Nauka, terminy kierunków — Studia. Popularyzacji automatycznie nie przypisujemy (potrzebne pole CMS).
+
+**Commit.** Etap 3 (`4796664a`). **Jak cofnąć / zmienić.** Funkcja `dzialWpisu` w `src/components/zal/DrugiEkran.astro`; po dodaniu pola CMS wystarczy, żeby brała `dzial` z wpisu, gdy jest.
+
+## 9. „Warto wiedzieć” na drugim ekranie
+**Pytanie.** Prototyp pokazuje cztery stałe pozycje; obecna strona losuje je przy każdym wejściu (decyzja 30.10.2026).
+
+**Przyjęta odpowiedź.** Zachowane losowanie (ten sam skrypt co dotąd): „Zawsze pokazuj” na początku, reszta losowo, bez JS — pierwsze cztery według kolejności.
+
+**Commit.** Etap 3 (`95f76d6b`). **Jak cofnąć.** Usunąć `data-losuj` i skrypt `LOSUJ` w `DrugiEkran.astro`.
