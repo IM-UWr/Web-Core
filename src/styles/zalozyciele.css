@@ -140,13 +140,12 @@
   .z-szkic .detale { transition: opacity .7s ease .55s; }
   /* Stan banera ustawia skrypt w linii na końcu banera — zanim strona się narysuje (bez skoku przy wejściu i w przejściu
      między stronami): .z-czeka — pierwsze wejście, szkic czeka niewidoczny i rysuje się po dodaniu .z-rysuj;
-     .z-tylko-podpis — wejście z okładki (szkic już narysowany po najechaniu), dopisuje się tylko podpis;
      .z-gotowe — powrót, ograniczony ruch albo telefon. Bez JS — od razu gotowy. */
   [data-z-baner-dzialu].z-czeka .z-szkic .tusz path { stroke-dashoffset: 1; opacity: 0; }
   [data-z-baner-dzialu].z-czeka .z-szkic .detale { opacity: 0; }
   [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
   /* podpis: obrys odsłaniany liniami prowadzącymi (maska); tempo ustawia src/scripts/zal/szkice.ts */
-  [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj, .z-tylko-podpis) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
   @keyframes z-pisz { to { stroke-dashoffset: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .z-szkic .tusz path, .z-szkic .detale { transition: none !important; }

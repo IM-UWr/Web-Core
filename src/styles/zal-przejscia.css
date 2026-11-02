@@ -22,6 +22,9 @@
   .z-okl-dz[data-dzial="nauka"] .z-okl-szkic, [data-z-baner-dzialu="nauka"] .z-szkic-ramka, .z-nagl-pod[data-dzial="nauka"] .z-sygnet-nagl { view-transition-name: z-twarz-nauka; }
   .z-okl-dz[data-dzial="studia"] .z-okl-szkic, [data-z-baner-dzialu="studia"] .z-szkic-ramka, .z-nagl-pod[data-dzial="studia"] .z-sygnet-nagl { view-transition-name: z-twarz-studia; }
   .z-okl-dz[data-dzial="popularyzacja"] .z-okl-szkic, [data-z-baner-dzialu="popularyzacja"] .z-szkic-ramka, .z-nagl-pod[data-dzial="popularyzacja"] .z-sygnet-nagl { view-transition-name: z-twarz-popularyzacja; }
+  /* pierwsze wejście na stronę działu: szkic i podpis rysują się od zera, więc nie przelatują (przelot kończyłby się
+     na pustym banerze) — tylko przenikanie strony */
+  [data-z-baner-dzialu].z-czeka :is(.z-szkic-ramka, .z-podpis-ramka) { view-transition-name: none; }
   /* podpis leci razem ze szkicem (baner działu ↔ mały podpis pod sygnetem) */
   .z-baner-dzialu .z-podpis-ramka, .z-nagl-pod .z-podpis-maly { view-transition-name: z-podpis; }
   /* nazwa działu na okładce → tytuł banera działu */

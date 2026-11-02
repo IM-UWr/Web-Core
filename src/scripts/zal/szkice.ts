@@ -2,8 +2,6 @@
 // Stan banera ustawia już skrypt w linii na końcu banera (NaglowekZ.astro), zanim strona się narysuje:
 // - .z-czeka — pierwsze wejście w tej wizycie: szkic rysuje się, gdy jest widoczny (kontur 1,5 s z odstępem 45 ms,
 //   detale się pojawiają), a podpis „pisze się” szybciej i później, tak żeby skończył się razem ze szkicem;
-// - .z-tylko-podpis — pierwsze wejście z okładki: szkic przyleciał już narysowany (przejście między stronami),
-//   dopisuje się tylko podpis („dokończenie gestu”);
 // - .z-gotowe — powrót w tej wizycie, ograniczony ruch, telefon albo brak zapisu w sessionStorage: od razu gotowe.
 // Tu tylko tempo podpisu i start rysowania.
 function zgrajPodpis(podpis: SVGSVGElement, od: number, czas: number) {
@@ -21,11 +19,6 @@ function zgrajPodpis(podpis: SVGSVGElement, od: number, czas: number) {
 document.querySelectorAll<HTMLElement>('[data-z-baner-dzialu]').forEach((baner) => {
   const szkic = baner.querySelector<SVGSVGElement>('.z-szkic');
   const podpis = baner.querySelector<SVGSVGElement>('.z-podpis.pisze');
-  if (baner.classList.contains('z-tylko-podpis')) {
-    // po przejściu ze strony głównej (ok. 0,3 s) podpis dopisuje się w 0,8 s
-    if (podpis) zgrajPodpis(podpis, 0.3, 0.8);
-    return;
-  }
   if (!baner.classList.contains('z-czeka') || !szkic) return;
   const koniec = 1.5 + ((szkic.querySelectorAll('.tusz path').length || 18) - 1) * 0.045;
   const start = () => {

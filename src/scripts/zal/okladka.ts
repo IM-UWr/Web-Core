@@ -69,11 +69,6 @@ if (ok) {
     if (menu?.classList.contains('otwarte') && !cel.closest('#z-menu, #z-burger')) ustaw(false);
   });
 
-  // wejście w dział z okładki: na stronie działu szkic jest już narysowany (przylatuje w przejściu), dopisuje się podpis
-  ok.querySelectorAll<HTMLAnchorElement>('.z-okl-dz').forEach((a) => a.addEventListener('click', () => {
-    try { sessionStorage.setItem('im-z-okladki', a.dataset.dzial || ''); } catch {}
-  }));
-
   const strzalka = ok.querySelector<HTMLAnchorElement>('.z-strzalka');
   strzalka?.addEventListener('click', (e) => {
     const cel = document.querySelector<HTMLElement>(strzalka.getAttribute('href') || '');
