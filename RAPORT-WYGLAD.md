@@ -60,7 +60,7 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - Treść pod nagłówkami (poza stronami z etapu 3) jest jeszcze stara, tylko w nowych kolorach i krojach.
 
 ## Etap 3: strony z prototypu — zrobione
-**Commity:** `4796664a`, `95f76d6b`, `363125c6` (strona główna, Władze), `0bcfcc2e` (Projekty i granty, Plan zajęć), `94b13c48` („Następna strona w dziale” w szablonie, SIAD, poprawki ramy), `756a82d1` po przeniesieniu na gałąź jako commit stron działów i ostatni commit poprawek (hash w sekcji „Stan gałęzi” na końcu). Projekty i granty, Plan zajęć oraz strony działów robili podagenci w osobnych kopiach roboczych (rozłączne pliki); ich commity przeniosłem na gałąź.
+**Commity:** `4796664a`, `95f76d6b`, `363125c6` (strona główna, Władze), `0bcfcc2e` (Projekty i granty, Plan zajęć), `94b13c48` („Następna strona w dziale” w szablonie, SIAD, poprawki ramy), `658fd48d` (strony działów), `5ef8d511` (poprawki; ostatni commit etapu: `git branch wyglad/03-strony 5ef8d511`). Projekty i granty, Plan zajęć oraz strony działów robili podagenci w osobnych kopiach roboczych (rozłączne pliki); ich commity przeniosłem na gałąź.
 
 **Strona główna, drugi ekran** (`src/components/zal/DrugiEkran.astro`, `src/scripts/zal/drugi-ekran.ts`): pasek „Szybki dostęp” (Plan zajęć z nazwą bieżącego semestru z planu USOS, kolor dnia z tą samą logiką i odświeżaniem w przeglądarce co kafelek na telefonie, Pracownicy z liczbą osób, Seminaria z liczbą referatów w tygodniu), trzy kolumny (Nadchodzące wydarzenia — te same co na telefonie: 30 dni i przypomnienia terminów; Seminaria — 7 dni od dziś, prelegent po tytule; Aktualności — miniatury 72×54, bez zdjęcia sygnet działu), długa trzecia kolumna z „i jeszcze N · Wszystkie …”, zamiana FLIP 0,52 s (bez ruchu: tylko rozjaśnienie 0,15 s; fokus na nagłówek rozwiniętej kolumny), jeden wzór daty, Studia z klikalnym „Studiuj matematykę we Wrocławiu ↗” (adres rekrutacji z Ustawień) i SIAD jako skrót z pełną nazwą w podpowiedzi, Warto wiedzieć (losowanie jak dotąd). Stopka odchudzona.
 
@@ -88,6 +88,15 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - Wydarzenia nie mają w danych rodzaju typu „koło naukowe” / „warsztaty” — w wierszu jest dział, godzina i miejsce (skrócone do „s. HS”).
 - Warto wiedzieć losowane (PYTANIA.md, 9); drugi ekran na całą szerokość jak w prototypie (PYTANIA.md, 7).
 
+## Etap 4 (częściowo): przejścia, wspólny szablon stron treści
+**Commit:** patrz „Stan gałęzi” na końcu.
+- **Przejścia między stronami** (`src/styles/zal-przejscia.css`): wspólne elementy z `view-transition-name`, tylko komputer i tylko bez „ogranicz ruch”: okładka → dział (szkic i nazwa działu przelatują na miejsce w banerze, pasek się pojawia, zdjęcie przenika), dział → podstrona (pasek stoi, szkic maleje do sygnetu, podpis leci z nim, tytuł przenika), podstrona → podstrona (nagłówek stoi, znak przenika, boczna nawigacja stoi, zaznaczenie się przesuwa), inny dział — przenikanie. Czas 0,3 s. Na każdej stronie nazwy są unikalne (sprawdzone w Chromium, bez błędów w konsoli). Działa w Chrome/Edge 126+ i Safari 18.2+.
+- **Strony treści** (`src/views/Strona.astro` — wszystkie strony z `src/content/strony`, np. Kontakt, Pierwszy rok, Sprawy studenckie): boczna nawigacja działu z lewej ze spisem „Na tej stronie” z nagłówków, treść bez pasów i kafelków, „Następna strona w dziale” (z etapu 3). Dotychczasowy pasek boczny i spis u góry schowane na komputerze.
+- **Nie przeniesione na wspólny szablon** (mają nowy nagłówek, kolory, kroje i „Następną stronę w dziale”, ale dotychczasowy układ treści): Pracownicy, Struktura i zakłady, zakład, Seminaria i seminarium, Konferencje, Obrony i obrona, Publikacje i rocznik, Sukcesy, grant, Rok akademicki, kierunek, specjalność, Warto wiedzieć, Aktualności, Kalendarz. Każda ma własny blok treści; przeniesienie to osobna praca na stronę (wzór: Władze, Projekty i granty, Plan zajęć).
+- **Stary kod wyglądu komputerowego — nie usuwałem.** Kandydaci (już niewidoczni na komputerze, ale część reguł jest wspólna z telefonem, więc usuwanie wymaga osobnego sprawdzenia na prawdziwych treściach): style `.hdr .nav`/`.dropdown` dla komputera w `global.css`, desktopowe reguły `.hero` (`global.css`, `tlo.css`), `src/styles/uklad-portal.css` i część `uklad-zwarta.css` (używane jeszcze przez nieprzeniesione strony), fala Fouriera i skrypt `naPasie` w `NaglowekStrony.astro`, warianty `ustawienia.naglowki_podstron` i `tlo_strony` na komputerze.
+
+**Sprawdzenie:** build bez błędów; telefon na 31 stronach bez różnic (poza znanym szumem); komputer — zrzuty stron treści w obu motywach.
+
 ## Podział `src/scripts/` i skryptów w komponentach
 `src/scripts/` zawiera tylko silnik animacji banerów (`src/scripts/baner/`). Pozostałe zachowanie strony siedzi w `<script>` w komponentach i widokach.
 
@@ -102,6 +111,8 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - `FiltrISzukaj.astro` (podpowiedź w polu szukania), `ListaAktualnosci.astro` (filtry i szukanie), `Kalendarz.astro` (widok, filtr rodzaju, szukanie), `ListaGrantow.astro` (podświetlanie spisu), `SpisTresci.astro` (podświetlanie bieżącej sekcji), `Szukaj.astro` (Pagefind), `Seminarium.astro` (zapis na listę), `Kierunek.astro` (zakładki programów i wybór roku), `PrzelacznikSemestrow.astro` + `wyborSemestru.ts`, `RokAkademicki.astro` i `KafelekKoloryDni.astro` (kolor dnia liczony w przeglądarce), `DzialInstytut.astro` (mapa ładowana po kliknięciu), `powiadomienia.astro`, `Przekierowanie.astro`.
 - `StronaGlowna.astro`: „Zobacz więcej” i odliczanie wydarzeń (telefon i komputer).
 - Telefon: `WTymDziale.astro` (akordeon), `WierszAktualnosci.astro` (zwijanie plakietek do „+N”).
+
+**Nowe skrypty komputera (`src/scripts/zal/`):** `okladka.ts` — układ bloku tytułu i skosu (dekoracja) oraz hamburger i strzałka (zachowanie); `szkice.ts` — animacja szkicu i podpisu na banerze działu (dekoracja, z flagą wizyty); `drugi-ekran.ts` — długa kolumna i zamiana kolumn (zachowanie). Filtr planu zajęć jest w `PlanZajec.astro`.
 
 ## Potrzebne zmiany w CMS (nie wprowadzałem ich — tylko lista)
 - **Aktualności: opcjonalne pole „Dział”** (Instytut, Nauka, Studia, Popularyzacja) w `src/content.config.ts` i w formularzu Pages CMS (już w `dok/estetyka.md`). Dziś dział wpisu liczy się z reguły (PYTANIA.md, 8); Popularyzacji nie da się wykryć automatycznie.

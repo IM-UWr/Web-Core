@@ -10,10 +10,11 @@ import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneStrony } from '../lib/widoki/strona';
+import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
 
 interface Props { strona: CollectionEntry<'strony'>; lang: Lang }
 const { strona, lang } = Astro.props;
-const { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta } = await daneStrony(strona, lang);
+const { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ } = await daneStrony(strona, lang);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 ---
 <Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}>
@@ -45,6 +46,9 @@ const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
       )}
     </aside>
     )}
+    {/* komputer (kierunek „Założyciele”): boczna nawigacja działu z lewej (siatka .layout w zal-podstrony.css), stary pasek
+         boczny schowany; na telefonie ten element nie istnieje (.tylko-komputer) */}
+    {dzialZ && <BocznaNawigacja dzial={dzialZ} lang={lang} spis={spisZ} class="tylko-komputer" />}
   </div>
 </Baza>
 

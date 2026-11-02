@@ -1,4 +1,5 @@
 // Dane strony stałej: tytuł, opis, hasło i liczby banera, treść ze spisem nagłówków, dział menu, strona nadrzędna, prawy pasek.
+import { dzialZeSciezki } from '../patroni';
 import { render, type CollectionEntry } from 'astro:content';
 import { menuGlowne } from '../menu';
 import { isExternal } from '../url';
@@ -41,5 +42,8 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
   const pasek = d.pasek_boczny ?? 'spis';
   const wygladPortalZwarta = DZIALY_PORTAL_ZWARTA.some((p) => adres.startsWith(p));
 
-  return { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta };
+  // komputer (kierunek „Założyciele”): dział strony (boczna nawigacja) i spis „Na tej stronie” z nagłówków drugiego stopnia
+  const dzialZ = dzialZeSciezki('/' + strona.id.replace(/\.md$/, ''));
+  const spisZ = naglowki.filter((h: { depth: number }) => h.depth === 2).map((h: { slug: string; text: string }) => ({ id: h.slug, etykieta: h.text }));
+  return { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ };
 }

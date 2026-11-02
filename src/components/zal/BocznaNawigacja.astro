@@ -8,8 +8,8 @@ import { wJezyku, wybierz } from '../../lib/i18n';
 import { PATRONI, pole, skrotNazwy, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-interface Props { dzial: Dzial; lang: Lang; spis?: { id: string; etykieta: string }[] }
-const { dzial, lang, spis = [] } = Astro.props;
+interface Props { dzial: Dzial; lang: Lang; spis?: { id: string; etykieta: string }[]; class?: string }
+const { dzial, lang, spis = [], class: klasa } = Astro.props;
 const P = PATRONI[dzial];
 const pozycja = (await menuGlowne()).find((m) => m.adres === P.adres);
 const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
@@ -18,7 +18,7 @@ const tu = (stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const biezaca = (a: string) => !isExternal(a) && a.replace(/\/$/, '') === tu;
 ---
-<nav class="z-bok" aria-label={nazwa} data-dzial={dzial}>
+<nav class:list={['z-bok', klasa]} aria-label={nazwa} data-dzial={dzial} data-pagefind-ignore>
   <a class="z-bok-dzial" href={href(P.adres)}>{nazwa}</a>
   {grupy.map((g) => (
     <>
