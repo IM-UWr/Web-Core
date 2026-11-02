@@ -629,8 +629,10 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 .pd-b .podpis-r { right: calc(100% + 6px); top: calc(100% - 2px); font-size: 34px; transform-origin: right center; }
 .pd-b.z-liczbami { height: calc(268px + var(--gora)); }
 .pd-b.z-liczbami .tyt { top: calc(30px + var(--gora)); }
-.pd-b.z-liczbami .znak { top: calc(var(--gora) + 40px); }
-.pd-b.z-liczbami .znak-podpis { top: calc(var(--gora) + 78px); }
+/* wyższy baner (z liczbami): większy znak, wysunięty w prawy margines; opis zostaje w kolumnie, obok znaku */
+.pd-b.z-liczbami { --znak-p: max(16px, calc(var(--marg) - 90px)); }
+.pd-b.z-liczbami .znak { width: 200px; height: 200px; top: calc(var(--gora) + 34px); right: var(--znak-p); }
+.pd-b.z-liczbami .znak-podpis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + 216px); width: 210px; text-align: right; }
 .pd-b .haslo { margin: 10px 0 0; }
 .pd-b[data-n="jasny"] .podpis-r { color: var(--d-g); text-shadow: none; }
 /* podpis patrona: obrys ze skanu, na banerze działu odsłaniany liniami prowadzącymi (maska) */
@@ -640,9 +642,9 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 @keyframes pisz2 { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .podpis-svg.pisze mask path { animation: none !important; stroke-dashoffset: 0; } }
 .in-b4 .podpis-s { right: calc(var(--marg) + 60px); bottom: 20px; height: 46px; transform: rotate(-4deg); }
-.pd-b .podpis-s { right: calc(100% + 47px); top: calc(100% - 9px); height: auto; filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
+.pd-b .podpis-s { right: calc(100% + 47px); top: calc(100% + 5px); height: auto; filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
 .pd-b .podpis-s svg { width: 56px; height: auto; }
-.pd-b .tyt-g .sygnet { bottom: 18px; }
+.pd-b .tyt-g .sygnet { bottom: 4px; }
 .pd-b:not(.z-liczbami) .tyt-g .sygnet { bottom: 36px; }
 .pd-b:not(.z-liczbami) .podpis-s { top: calc(100% - 27px); }
 .pd-b[data-n="jasny"] .podpis-s { color: var(--d-g); filter: none; }
@@ -1712,6 +1714,9 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
          </ol></section>`;
     if (pod) $('#in-baner').innerHTML = htmlBanerPod(dz);
     zgrajPodpisy($('#in-baner'));
+    // wyższy baner podstrony: znak przycięty do własnego obrysu, żeby naprawdę był większy
+    const zn = $('#in-baner .pd-b.z-liczbami .znak');
+    if (zn) { const b = zn.getBBox(), m = Math.max(b.width, b.height) * 0.04; zn.setAttribute('viewBox', `${(b.x - m).toFixed(1)} ${(b.y - m).toFixed(1)} ${(b.width + 2 * m).toFixed(1)} ${(b.height + 2 * m).toFixed(1)}`); }
     const szk = $('#in-baner .in-b4 .szkic');
     if (szk) { if (pierwsze) requestAnimationFrame(() => requestAnimationFrame(() => szk.classList.add('rysuj'))); else szk.classList.add('gotowe'); }
   }
