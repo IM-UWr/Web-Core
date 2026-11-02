@@ -289,3 +289,8 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - **Podgląd przy 125% i 1366 px (01:48):** przełącznik „Ekran” działa też na stronach działów i podstronach. Przy 125% (1536 px) sygnet z podpisem i wysunięty znak mieszczą się w marginesach.
 - **Wąskie okna (01:50):** przy szerokości poniżej ok. 1500 px (np. laptop 1366) margines jest za mały na sygnet. Wtedy cały blok tytułu przesuwa się o ok. 120 px w prawo, a sygnet z podpisem stoi w kolumnie przed tytułem (w prototypie przez zapytanie kontenerowe; na stronie przez media query). Przy 125% na FHD (1536 px) układ zostaje jak na 100%, tylko marginesy są węższe.
 - **Zamiana kolumn w szybkim dostępie przy wyłączonym ruchu (01:53):** kolumny zamieniają się od razu, bez przesuwania, a pozycje pojawiają się wszystkie naraz. Do tego krótkie rozjaśnienie (ok. 0,15 s) kolumn, które zmieniły miejsce, oraz przeniesienie fokusu na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu). Fokus przenosimy także przy włączonym ruchu.
+
+## Zlecenie 10: praca nocna w chmurze (2.11, 01:58)
+- Plik `zlecenia/10-wyglad-zalozyciele-noc.md` na gałęzi `kopia/2026-11-01-estetyka-prototypy` (kopia w `.przekazanie\zlecenia\` na komputerze).
+- Sesja Claude Code w chmurze (kredyt do 5.11, 8:59), gałąź bazowa `kopia/2026-11-01-agent-nauka-podglad`, wyniki na gałęziach `wyglad/01-krok-zero`, `wyglad/02-fundament`, `wyglad/03-strony` i `wyglad/04-reszta`, raport w `RAPORT-WYGLAD.md`.
+- Zakres: tylko komputer (telefon bez zmian, z porównaniem zrzutów przed i po), bez CMS i bez podmenu.
