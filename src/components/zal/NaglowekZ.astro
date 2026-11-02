@@ -35,7 +35,8 @@ const maLiczbyKomputer = /<ul class="pt-liczby(?![^"]*tylko-telefon)/.test(slot)
 const maLiczbyTelefon = /<ul class="pt-liczby[^"]*tylko-telefon/.test(slot);
 // Popularyzacja: liczby „TBA” na komputerze ukryte (decyzja 22:46); strona działu pokazuje liczby tylko z listy na komputer
 const zLiczbami = rodzaj === 'dzial' ? maLiczbyKomputer : (maLiczbyKomputer || maLiczbyTelefon);
-const haslo = zLiczbami ? Astro.props.haslo?.trim() || undefined : undefined;
+// hasło działu z danych (to samo co na telefonie); gdy w CMS puste — hasło z prototypu (jak na okładce strony głównej)
+const haslo = zLiczbami ? Astro.props.haslo?.trim() || (rodzaj === 'dzial' && P ? pole(P, 'haslo', lang) : undefined) : undefined;
 
 // Zdjęcia działów (na razie z public/pliki/naglowki): kadr i jasność dobrane w prototypie.
 const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string }> = {
