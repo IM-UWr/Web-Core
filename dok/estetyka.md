@@ -302,4 +302,4 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - ciekawostka w „Warto wiedzieć”: „Nasze sale wykładowe noszą imiona założycieli wrocławskiej matematyki”. To nowy wpis treści, dodawany przez CMS, a nie przez kod.
 - **Odrzucone:** oznaczanie sal w planie zajęć.
 - **Na później:** sekcja „Sale wykładowe” na podstronie Infrastruktura (sygnet patrona, piętro, liczba miejsc, zdanie o patronie).
-- **Do decyzji:** jedna pozycja o salach w „W skrócie” Instytutu (np. „4 sale: imiona założycieli”). W „W skrócie” pozostałych działów nie, bo dopisek na banerze już to mówi.
+- **„W skrócie”: bez informacji o salach (09:39).** Pasowałaby tylko w Instytucie, a skoro nie we wszystkich działach, to nigdzie.
