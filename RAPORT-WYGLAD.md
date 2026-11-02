@@ -59,14 +59,30 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - Pasek po przewinięciu się nie przykleja (w `dok/estetyka.md` „do zrobienia”, otwarte).
 - Treść pod nagłówkami (poza stronami z etapu 3) jest jeszcze stara, tylko w nowych kolorach i krojach.
 
-## Etap 3: strony z prototypu — w trakcie
-**Commity:** `4796664a`, `95f76d6b` (drugi ekran strony głównej i Władze; reszta niżej).
+## Etap 3: strony z prototypu — zrobione
+**Commity:** `4796664a`, `95f76d6b`, `363125c6` (strona główna, Władze), `0bcfcc2e` (Projekty i granty, Plan zajęć), `94b13c48` („Następna strona w dziale” w szablonie, SIAD, poprawki ramy), `756a82d1` po przeniesieniu na gałąź jako commit stron działów i ostatni commit poprawek (hash w sekcji „Stan gałęzi” na końcu). Projekty i granty, Plan zajęć oraz strony działów robili podagenci w osobnych kopiach roboczych (rozłączne pliki); ich commity przeniosłem na gałąź.
 
 **Strona główna, drugi ekran** (`src/components/zal/DrugiEkran.astro`, `src/scripts/zal/drugi-ekran.ts`): pasek „Szybki dostęp” (Plan zajęć z nazwą bieżącego semestru z planu USOS, kolor dnia z tą samą logiką i odświeżaniem w przeglądarce co kafelek na telefonie, Pracownicy z liczbą osób, Seminaria z liczbą referatów w tygodniu), trzy kolumny (Nadchodzące wydarzenia — te same co na telefonie: 30 dni i przypomnienia terminów; Seminaria — 7 dni od dziś, prelegent po tytule; Aktualności — miniatury 72×54, bez zdjęcia sygnet działu), długa trzecia kolumna z „i jeszcze N · Wszystkie …”, zamiana FLIP 0,52 s (bez ruchu: tylko rozjaśnienie 0,15 s; fokus na nagłówek rozwiniętej kolumny), jeden wzór daty, Studia z klikalnym „Studiuj matematykę we Wrocławiu ↗” (adres rekrutacji z Ustawień) i SIAD jako skrót z pełną nazwą w podpowiedzi, Warto wiedzieć (losowanie jak dotąd). Stopka odchudzona.
 
 **Władze** (`src/components/zal/WladzeZ.astro`, `OsobaZ.astro`, dane `daneWladzKomputer()` w `src/lib/widoki/wladze.ts`): schemat dyrekcji (dyrektor 120×150, zastępcy 96×120 połączeni liniami), Władze Wydziału w dwóch kolumnach (76×95), Sekretariat jako blok kontaktu bez zdjęć, Kadencja, Rada Instytutu, Zobacz też; boczna nawigacja działu z „Na tej stronie”; „Następna strona w dziale” i „Zgłoś błąd na tej stronie”.
 
-**Różnice względem prototypu (etap 3, moja część):**
+
+**Strony działów** (`src/components/zal/TrescDzialu.astro`, `src/components/zal/dzial/*`, `src/styles/zal-dzialy.css`): pod banerem podstrony w trzech grupach jak w menu (linie, Brygada, strzałki, ↗ przy zewnętrznych; SIAD skrótem), tekst działu z większym pierwszym akapitem i „W skrócie” (wartości Brygadą w kolorze działu), sekcje: Instytut — Ostatnie sukcesy (miniatury; bez zdjęcia sygnet na tle działu) i Kontakt i dojazd (podpisy zamiast ikon, mapa Google dopiero po kliknięciu, zapamiętana zgoda jak dotąd); Nauka — Realizowane projekty (karty) i Konferencje (nadchodzące, a bez nich „Ostatnio odbyły się”); Studia — Aktualności dla studentów; Popularyzacja — sekcje strony i partnerzy z domenami.
+**Liczba konferencji w banerze Nauki** liczona automatycznie z kolekcji `konferencje` (bez odwołanych, początek w ostatnich 365 dniach): „2 konferencje w ostatnim roku” na danych testowych (17.05 i 7.09.2026). Osobna lista tylko dla komputera, bo lista telefonu się nie zmienia.
+
+**Projekty i granty** (`src/views/ListaGrantow.astro`, dane w `src/lib/widoki/listaGrantow.ts`, `src/styles/zal-granty-plan.css`): wstęp, Realizowane z paskami czasu na wspólnej osi lat i przerywaną linią „dziś” (data budowania), Zakończone według roku zakończenia z małymi paskami na osi od 2004, Pozostałe; boczna nawigacja ze spisem.
+**Plan zajęć** (`src/views/PlanZajec.astro`, `src/lib/widoki/planZajec.ts`): wszystkie przedmioty w kategoriach, zajęcia w równych kolumnach (typ, gr., prowadzący, dzień, godziny, sala, uwagi), przyklejony pasek z przełącznikiem semestrów (zsynchronizowanym z dotychczasowym), wyszukiwarką (przedmiot, prowadzący, sala, uwagi; także bez polskich znaków) i filtrem dni (kilka naraz, klawiatura), komunikat „Nic nie pasuje do wyszukiwania.”, w nagłówku liczby: przedmioty w semestrze i ostatnia aktualizacja z USOS; bez JS pasek schowany, plan pełny.
+
+**Sprawdzenie etapu 3:** build bez błędów (738 stron), linki wewnętrzne bez nowych zepsutych; telefon 390 px na 29 stronach identyczny ze wzorcem (poza znanym szumem tła i pojedynczymi pikselami wygładzania rogów kart na `/studia` i `/popularyzacja`, ≤ 56 px, kanał ±1–2 — zmienia się nawet od zmian samego CSS komputera, nie od treści); telefon w ciemnym motywie dla grantów i planu bez różnic; komputer: zrzuty 1920/1536/1366 w obu motywach i EN, porównanie z prototypem w 1920 (okładka, drugi ekran, 4 działy, Władze, granty, plan — zgodne, poza różnicami niżej). Działanie sprawdzone w Playwright (zamiana kolumn, menu, mapa, filtr planu, animacja szkicu); bez błędów JS.
+
+**Różnice względem prototypu (strony działów, granty, plan):**
+- Treści z danych zamiast przykładowych z prototypu (inne wpisy sukcesów, 6 realizowanych projektów zamiast 5, zapowiedziana konferencja 2027 → „Najbliższe konferencje”, w menu dodatkowo Kalendarz i Warto wiedzieć, w kontakcie wiersz „Godziny”).
+- Popularyzacja: w danych trzy grupy mają inicjatywy, więc są pokazane jako lista (nazwa, opis, „Dla kogo · domena”); „To be announced” tylko przy grupie bez inicjatyw. Same „TBA” schowałyby na komputerze treść widoczną na telefonie.
+- Tytuł banera z danych „Popularyzacja matematyki” jest dłuższy niż w prototypie — łamie się i jest mniejszy, żeby nie wchodził pod notkę o patronie.
+- Oś zakończonych projektów od najwcześniejszego roku zaokrąglonego w dół do wielokrotności 4 (wychodzi 2004, jak w prototypie). Projekt bez numeru — na końcu nazwa programu.
+- Okładka po angielsku: „Mathematical / Institute” — drugie słowo jest krótsze od pierwszego, więc końce nie są dociągane do skosu (zostają stopnie z CSS); skos liczony od końca pierwszej linii.
+
+**Różnice względem prototypu (strona główna, Władze):**
 - Wstęp sekcji „Dyrekcja” to pole `wstep` z danych Władz (w prototypie zdanie przykładowe).
 - „Ostatnia aktualizacja: data z historii zmian” — pominięta, bo historia zmian treści jest w repozytoriach Web-* i nie ma jej przy budowaniu; zostaje „Zgłoś błąd na tej stronie” (e-mail z tytułem i adresem strony).
 - Wydarzenia nie mają w danych rodzaju typu „koło naukowe” / „warsztaty” — w wierszu jest dział, godzina i miejsce (skrócone do „s. HS”).
@@ -86,3 +102,19 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - `FiltrISzukaj.astro` (podpowiedź w polu szukania), `ListaAktualnosci.astro` (filtry i szukanie), `Kalendarz.astro` (widok, filtr rodzaju, szukanie), `ListaGrantow.astro` (podświetlanie spisu), `SpisTresci.astro` (podświetlanie bieżącej sekcji), `Szukaj.astro` (Pagefind), `Seminarium.astro` (zapis na listę), `Kierunek.astro` (zakładki programów i wybór roku), `PrzelacznikSemestrow.astro` + `wyborSemestru.ts`, `RokAkademicki.astro` i `KafelekKoloryDni.astro` (kolor dnia liczony w przeglądarce), `DzialInstytut.astro` (mapa ładowana po kliknięciu), `powiadomienia.astro`, `Przekierowanie.astro`.
 - `StronaGlowna.astro`: „Zobacz więcej” i odliczanie wydarzeń (telefon i komputer).
 - Telefon: `WTymDziale.astro` (akordeon), `WierszAktualnosci.astro` (zwijanie plakietek do „+N”).
+
+## Potrzebne zmiany w CMS (nie wprowadzałem ich — tylko lista)
+- **Aktualności: opcjonalne pole „Dział”** (Instytut, Nauka, Studia, Popularyzacja) w `src/content.config.ts` i w formularzu Pages CMS (już w `dok/estetyka.md`). Dziś dział wpisu liczy się z reguły (PYTANIA.md, 8); Popularyzacji nie da się wykryć automatycznie.
+- **„Warto wiedzieć”: Popularyzacja w polu `dzial`** (już w `dok/estetyka.md`).
+- **Patroni działów:** notki, lata, sale, nazwy i opisy znaków są w kodzie (`src/lib/patroni.ts`, oznaczone „do sprawdzenia”). Gdy teksty zostaną sprawdzone, można je przenieść do Ustawień (np. `ustawienia.patroni.<dział>.notka`, `notka_en`, `znak_nazwa`, `znak_opis` — pola opcjonalne; kod brałby je, gdy są).
+- **Zdjęcia nagłówków działów** dalej z `public/pliki/naglowki/*.jpg` (Web-Ustawienia); docelowe zdjęcia według „Zdjęcia na tła” w `dok/estetyka.md`. Kadry i jasność są w `src/components/zal/NaglowekZ.astro` (stała `FOTO`).
+- **Hasła i liczby nagłówków** podstron bez liczb w danych (np. Plan zajęć) — tekst w kodzie z wersją angielską; jeśli redaktorzy mają je zmieniać, potrzebne pola `haslo`/`haslo_en` w danych tej strony.
+
+## Czego nie zrobiono i dlaczego
+- **Prawdziwe treści:** wszystko budowane i sprawdzane na danych testowych (PYTANIA.md, 1). Na prawdziwych treściach mogą wyjść inne długości tekstów (np. łamanie liczb w banerze).
+- **Gałęzie etapów** (`wyglad/01-krok-zero` itd.) — nie zakładałem (polecenie w czacie: tylko `wyglad/zalozyciele`); hashe ostatnich commitów etapów są wyżej.
+- **„Ostatnia aktualizacja: data z historii zmian”** na dole podstron — brak danych o historii zmian treści przy budowaniu (repozytoria Web-*); jest tylko „Zgłoś błąd na tej stronie”.
+- **Pasek przyklejony po przewinięciu** — w specyfikacji „do zrobienia”/otwarte; nie robiłem.
+- **Podmenu w pasku** — wyłączone 2.11 (zgodnie ze zleceniem).
+- **Telefon** — bez zmian (sprawdzone zrzutami).
+

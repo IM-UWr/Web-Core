@@ -124,7 +124,8 @@ const warto = (await getCollection('warto_wiedziec'))
   .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
   .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze))
   .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: w.body?.trim() ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
-const LOSUJ = `(function(box){if(!box||!box.dataset.losuj)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
+// (tylko na komputerze — na telefonie ten blok jest schowany i losuje własna lista w StronaGlowna.astro)
+const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-width: 761px)').matches)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
   `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
   `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
   `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;

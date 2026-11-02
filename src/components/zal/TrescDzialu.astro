@@ -7,6 +7,7 @@
 import '../../styles/zal-dzialy.css';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz } from '../../lib/i18n';
+import { skrotNazwy } from '../../lib/patroni';
 import type { Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
@@ -39,10 +40,12 @@ const fakty = tekst?.fakty ?? [];
           <ul>
             {g.linki.map((l) => {
               const zew = isExternal(l.adres);
+              const e = wybierz(l, 'etykieta', lang) as string;
+              const sk = skrotNazwy(e);
               return (
                 <li>
-                  <a class:list={[zew && 'zew']} href={href(l.adres)}>
-                    <span>{wybierz(l, 'etykieta', lang)}{zew && <span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span>}</span>
+                  <a class:list={[zew && 'zew']} href={href(l.adres)} title={sk ? e : undefined}>
+                    <span>{sk ?? e}{zew && <span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span>}</span>
                     {l.podpis && <small>{l.podpis}</small>}
                   </a>
                 </li>
