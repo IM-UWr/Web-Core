@@ -264,3 +264,18 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
   - każde przejście trwa ok. 0,25–0,35 s;
   - długi tekst nigdy się nie przesuwa, tylko przenika;
   - przy wyłączonym ruchu strony zmieniają się od razu.
+
+## Zdjęcia na tła: do zrobienia później (2.11, 01:41)
+- **Okładka:** gmach IM, poziomo, co najmniej 2400 px. Główny motyw w prawych 2/3 kadru, bo lewą część zakrywa ciemne pole. Dobre światło (złota godzina albo zmierzch z oknami). Na okładce zdjęcie nie jest przebarwiane.
+- **Banery działów (dwa kolory):**
+  - wyraźny kontrast jasne/ciemne i czytelne kształty; nie za ciemne, obecne zdjęcie Nauki jest przykładem, jak nie;
+  - spokojne miejsce w ok. 70–85% szerokości, tam stoi szkic;
+  - kadr musi przeżyć przycięcie do paska ok. 5:1 i węższego;
+  - bez wyraźnych twarzy i napisów.
+- **Tematy:**
+  - Instytut: gmach (obecne zdjęcie dobre);
+  - Nauka: tablica z wzorami, kreda, biblioteka, seminarium od tyłu sali;
+  - Studia: sala wykładowa od tyłu, Aula Leopoldina;
+  - Popularyzacja: ręce przy modelach i układankach, warsztaty.
+- **Źródła:** najlepiej jedna sesja w Instytucie (jeden fotograf, jeden styl), ewentualnie archiwum biura promocji UWr i zdjęcia z wydarzeń. Przy każdym zdjęciu zgoda i podpis autora.
+- **Test kandydatów:** podstawić zdjęcie do prototypu (`IN_FOTO` w `zalozyciele.src.html`) i obejrzeć w dwóch kolorach na banerze działu i podstronie.
