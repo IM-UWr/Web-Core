@@ -294,3 +294,12 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - Plik `zlecenia/10-wyglad-zalozyciele-noc.md` na gałęzi `kopia/2026-11-01-estetyka-prototypy` (kopia w `.przekazanie\zlecenia\` na komputerze).
 - Sesja Claude Code w chmurze (kredyt do 5.11, 8:59), gałąź bazowa `kopia/2026-11-01-agent-nauka-podglad`, wyniki na gałęziach `wyglad/01-krok-zero`, `wyglad/02-fundament`, `wyglad/03-strony` i `wyglad/04-reszta`, raport w `RAPORT-WYGLAD.md`.
 - Zakres: tylko komputer (telefon bez zmian, z porównaniem zrzutów przed i po), bez CMS i bez podmenu.
+
+## Sale wykładowe od patronów (2.11, 09:34–09:37)
+- W IM są sale **HS** (Hugo Steinhaus), **WS** (Władysław Ślebodziński), **EM** (Edward Marczewski) i **B** (przyjęto: Bronisław Knaster; **do sprawdzenia**, bo jest też zwykła sala A).
+- **Przyjęte:**
+  - w notce o patronie na banerze działu dopisek „· sala EM” (Instytut), „· sala WS” (Nauka), „· sala B” (Studia), „· sala HS” (Popularyzacja);
+  - ciekawostka w „Warto wiedzieć”: „Nasze sale wykładowe noszą imiona założycieli wrocławskiej matematyki”. To nowy wpis treści, dodawany przez CMS, a nie przez kod.
+- **Odrzucone:** oznaczanie sal w planie zajęć.
+- **Na później:** sekcja „Sale wykładowe” na podstronie Infrastruktura (sygnet patrona, piętro, liczba miejsc, zdanie o patronie).
+- **Do decyzji:** jedna pozycja o salach w „W skrócie” Instytutu (np. „4 sale: imiona założycieli”). W „W skrócie” pozostałych działów nie, bo dopisek na banerze już to mówi.

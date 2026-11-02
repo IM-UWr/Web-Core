@@ -1633,6 +1633,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
       ].map(([d, m, r, t, z]) => `<div class="in-wiersz">${dzien(d, m)}<div><div class="rodz">${r}</div><h3>${t}</h3><p>${z}</p></div></div>`).join('')}</div></section>`;
     return `<section class="in-sek" style="border-top:0;padding-top:10px"><div class="in-tba">${['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy'].map((h) => `<section><h4>${h}</h4><p>To be announced</p></section>`).join('')}</div></section>`;
   }
+  const SALE = { instytut: 'EM', nauka: 'WS', studia: 'B', popularyzacja: 'HS' }; // sale wykładowe nazwane od patronów; B = Knaster do sprawdzenia
   const PODPISY = { instytut: 'E. Marczewski', nauka: 'W. Ślebodziński', studia: 'B. Knaster', popularyzacja: 'H. Steinhaus' };
   const IN_NOTA = {
     instytut: 'Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1957–1962. Zabiegał o budowę gmachu Instytutu.',
@@ -1719,7 +1720,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     $('#in-tresc').hidden = pod || !d.tekst.length;
     $('#in-tresc').innerHTML = `<div><h4>${d.tytul}</h4>${d.tekst.map((t, i) => `<p${i === 0 ? ' class="wst"' : ''}>${t}</p>`).join('')}</div><aside class="skrot"><h5>W skrócie</h5>${d.skrot.map(([a, b]) => `<div><b>${a}</b><span>${b}</span></div>`).join('')}</aside>`;
     $('#in-baner').innerHTML = w === '4'
-      ? `<section class="in-b4"><div class="in-foto"><img src="${f[0]}" alt="${f[1]}" style="object-position:${f[2]};${f[3] ? `filter:${f[3]}` : ``}"></div><div class="szkic">${svg(dz)}</div>${tytul}<span class="podpis-s">${svgPodpis(dz, pierwsze)}</span><div class="in-patron"><b>${d.patron}</b><span>${d.lata} · patron działu</span><p>${IN_NOTA[dz]}</p></div></section>`
+      ? `<section class="in-b4"><div class="in-foto"><img src="${f[0]}" alt="${f[1]}" style="object-position:${f[2]};${f[3] ? `filter:${f[3]}` : ``}"></div><div class="szkic">${svg(dz)}</div>${tytul}<span class="podpis-s">${svgPodpis(dz, pierwsze)}</span><div class="in-patron"><b>${d.patron}</b><span>${d.lata} · patron działu · sala ${SALE[dz]}</span><p>${IN_NOTA[dz]}</p></div></section>`
       : `<section class="in-b2"><div class="szkic pelny rysuj">${svg('instytut')}</div>${tytul}</section>
          <section class="in-os"><h4>Kalendarium</h4><ol>
            <li><b>1945</b><span>15 listopada pierwsze wykłady na polskim Uniwersytecie we Wrocławiu.</span></li>
