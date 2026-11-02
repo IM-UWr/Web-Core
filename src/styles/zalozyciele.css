@@ -138,14 +138,15 @@
     transition: stroke-dashoffset 1.5s cubic-bezier(.35,.6,.2,1) calc(var(--i, 0) * 45ms), opacity .35s; }
   .z-szkic .detale path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.1; }
   .z-szkic .detale { transition: opacity .7s ease .55s; }
-  /* z JS: do decyzji skryptu (pierwsze wejście czy powrót) szkic czeka niewidoczny; bez JS — od razu gotowy */
-  .js [data-z-baner-dzialu]:not(.z-gotowe) .z-szkic .tusz path { stroke-dashoffset: 1; opacity: 0; }
-  .js [data-z-baner-dzialu]:not(.z-gotowe) .z-szkic .detale { opacity: 0; }
-  .js [data-z-baner-dzialu].z-rysuj .z-szkic .tusz path { stroke-dashoffset: 0; opacity: 1; }
-  .js [data-z-baner-dzialu].z-rysuj .z-szkic .detale { opacity: 1; }
-  .js [data-z-baner-dzialu].z-gotowe .z-szkic :is(.tusz path, .detale) { transition: none; }
-  /* podpis: obrys odsłaniany liniami prowadzącymi (maska); tempo ustawia skrypt */
-  .js [data-z-baner-dzialu]:not(.z-gotowe) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  /* Stan banera ustawia skrypt w linii na końcu banera — zanim strona się narysuje (bez skoku przy wejściu i w przejściu
+     między stronami): .z-czeka — pierwsze wejście, szkic czeka niewidoczny i rysuje się po dodaniu .z-rysuj;
+     .z-tylko-podpis — wejście z okładki (szkic już narysowany po najechaniu), dopisuje się tylko podpis;
+     .z-gotowe — powrót, ograniczony ruch albo telefon. Bez JS — od razu gotowy. */
+  [data-z-baner-dzialu].z-czeka .z-szkic .tusz path { stroke-dashoffset: 1; opacity: 0; }
+  [data-z-baner-dzialu].z-czeka .z-szkic .detale { opacity: 0; }
+  [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
+  /* podpis: obrys odsłaniany liniami prowadzącymi (maska); tempo ustawia src/scripts/zal/szkice.ts */
+  [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj, .z-tylko-podpis) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
   @keyframes z-pisz { to { stroke-dashoffset: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .z-szkic .tusz path, .z-szkic .detale { transition: none !important; }

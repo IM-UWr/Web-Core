@@ -11,7 +11,8 @@
 //   Strony bez działu (Aktualności, Kalendarz, strony ogólne) — granat, bez sygnetu i znaku.
 import Szkic from './Szkic.astro';
 import { u } from '../../lib/url';
-import { t, wJezyku } from '../../lib/i18n';
+import { t, wJezyku, wybierz } from '../../lib/i18n';
+import { menuGlowne } from '../../lib/menu';
 import { PATRONI, pole, znakDzialu, ramkaZnaku, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
@@ -52,15 +53,26 @@ const styl = `object-position:${rodzaj === 'podstrona' ? '50% 40%' : f.kadr}${f.
 const kreski = P && znak ? znakDzialu(P.dzial, true) : [];
 const ramka = kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
 const patronDzialu = lang === 'en' ? 'patron of the section' : 'patron działu';
+// Baner działu: tytułem jest nazwa działu z menu (np. „Popularyzacja”), a nie tytuł strony z danych („Popularyzacja
+// matematyki” zostaje w <title> i na telefonie).
+const zMenu = rodzaj === 'dzial' && P ? (await menuGlowne()).find((m) => m.adres === P.adres) : undefined;
+const tytulBanera = rodzaj === 'dzial' && P ? ((zMenu && (wybierz(zMenu, 'etykieta', lang) as string)) || pole(P, 'nazwa', lang)) : tytul;
+// Stan szkicu ustawiany od razu, zanim strona się narysuje (opis w zalozyciele.css i src/scripts/zal/szkice.ts).
+const STAN = `(function(b){var s='z-gotowe',k='im-wizyta-dzialy',dz=b.getAttribute('data-z-baner-dzialu');try{` +
+  `var zo=sessionStorage.getItem('im-z-okladki');sessionStorage.removeItem('im-z-okladki');` +
+  `if(matchMedia('(min-width: 761px)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches){` +
+  `var z=JSON.parse(sessionStorage.getItem(k)||'[]');if(z.indexOf(dz)<0){z.push(dz);sessionStorage.setItem(k,JSON.stringify(z));` +
+  `if(JSON.parse(sessionStorage.getItem(k)||'[]').indexOf(dz)>=0)s=zo===dz?'z-tylko-podpis':'z-czeka';}}}catch(e){}` +
+  `b.classList.add(s);})(document.currentScript.parentElement);`;
 const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
 ---
 {rodzaj === 'dzial' && P && (
   <div class="z-nagl z-baner-dzialu tylko-komputer" data-dzial={P.dzial} data-z-baner-dzialu={P.dzial} data-pagefind-ignore>
-    <div class="z-foto"><img src={u(f.zdjecie)} alt="" decoding="async" style={styl} /></div>
+    <div class="z-foto"><img src={u(f.zdjecie)} alt="" fetchpriority="high" style={styl} /></div>
     <div class="z-szkic-ramka"><Szkic dzial={P.dzial} rodzaj="pelny" /></div>
     <div class="z-tytul">
       <a class="z-wstecz" href={u(wJezyku('/', lang))}>← {t(lang, 'stronaGlowna')}</a>
-      <h1>{tytul}</h1>
+      <h1>{tytulBanera}</h1>
       {haslo && <p class="z-haslo">{haslo}</p>}
       {zLiczbami && <div class="z-slot" set:html={slot} />}
     </div>
@@ -70,11 +82,12 @@ const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
       <span>{`${P.lata} · ${patronDzialu} · ${salaNapis} ${P.sala}`}</span>
       <p>{pole(P, 'notka', lang)}</p>
     </div>
+    <script is:inline set:html={STAN} />
   </div>
 )}
 {rodzaj === 'podstrona' && (
   <div class:list={['z-nagl', 'z-nagl-pod', 'tylko-komputer', zLiczbami && 'z-liczbami', !P && 'z-granat']} data-dzial={P?.dzial} data-pagefind-ignore>
-    <div class="z-foto"><img src={u(f.zdjecie)} alt="" decoding="async" style={styl} /></div>
+    <div class="z-foto"><img src={u(f.zdjecie)} alt="" fetchpriority="high" style={styl} /></div>
     <div class="z-tyt">
       <div class="z-tyt-g">
         {P && <Szkic dzial={P.dzial} rodzaj="sygnet" class="z-sygnet-nagl" />}
