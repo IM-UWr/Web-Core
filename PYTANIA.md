@@ -82,3 +82,10 @@ Każde pytanie: co było niejasne, jaką odpowiedź przyjąłem (najbezpieczniej
 **Przyjęta odpowiedź.** Nic nie usunąłem; kandydaci są wypisani w raporcie (etap 4). Bezpieczniej usuwać po przeniesieniu wszystkich podstron i ze sprawdzeniem na prawdziwych treściach.
 
 **Commit.** Nie dotyczy. **Jak zmienić.** Osobne zadanie po przeniesieniu pozostałych podstron.
+
+## 12. Gdzie trzymać próbną wersję na telefon (prośba z 2.11.2026)?
+**Pytanie.** Właściciel poprosił o **testową** wersję „Założycieli” na telefon, wyraźnie oznaczoną, żeby inni agenci się na niej nie wzorowali. Push wolno robić tylko na `wyglad/zalozyciele`, a na tę gałąź test trafić nie powinien.
+
+**Przyjęta odpowiedź.** Test nie trafia do Web-Core w ogóle: to łatka `testy/telefon-TEST.patch` w repozytorium `IM-UWr/Web-Podglad`, nakładana na `wyglad/zalozyciele` tylko przy budowaniu podglądu https://im-uwr.github.io/Web-Podglad/test-telefon/ (plakietka „TEST · wersja na telefon” na każdej stronie). **Agenci: to nie jest ustalony projekt telefonu — nie wzorować się, nie nakładać łatki.** Obowiązujący telefon na tej gałęzi to dotychczasowy wygląd (`.tylko-komputer` / `.tylko-telefon` bez zmian).
+
+**Commit.** Web-Podglad `1965ae5`; na tej gałęzi tylko ten wpis. **Jak cofnąć.** Usunąć `testy/telefon-TEST.patch` i krok „TEST telefonu” z `.github/workflows/podglad.yml` w Web-Podglad.
