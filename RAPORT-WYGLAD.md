@@ -146,3 +146,8 @@ npm install
 npm run dev   # http://localhost:4321/Web-Core/ — okno ≥ 761 px: nowy wygląd, ≤ 760 px: telefon jak dotąd
 ```
 
+## Podgląd online z prawdziwymi treściami (od 2.11, po pracy nocnej)
+- **Adres:** https://im-uwr.github.io/Web-Podglad/ — osobne repozytorium `IM-UWr/Web-Podglad` tylko na podgląd. Obecna strona `im-uwr.github.io/Web-Core/` bez zmian.
+- Workflow `Web-Podglad/.github/workflows/podglad.yml` buduje gałąź `wyglad/zalozyciele` z treściami z CMS: co godzinę, po zmianie workflow i ręcznie (Actions → „Podgląd nowego wyglądu” → Run workflow).
+- Pierwsze budowanie na prawdziwych treściach (748 stron) przeszło bez błędów. Jedyna różnica względem danych testowych, która wymagała poprawki: puste hasła działów w CMS — baner bierze wtedy hasło z prototypu (`b8b685d9`).
+
