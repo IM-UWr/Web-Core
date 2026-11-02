@@ -244,3 +244,9 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - **Ciekawostki** (znak i opis) są tylko na podstronach z menu działu. Na stronach głębiej (pojedyncze seminarium, projekt, aktualność, profil) nagłówek ma tylko sygnet i tytuł. To propozycja, czeka na potwierdzenie.
 - **Liczby w Planie zajęć:** na razie obie. Jedną można usunąć, jeśli zabraknie miejsca.
 - **Szkic po narysowaniu jest jednolity (01:21):** kontur i detale mają ten sam kolor i prawie tę samą grubość (na banerze działu 1,3 i 1,1, na okładce 1,25 i 1,05), żeby nie było widać, która linia jest „główna”. Różnica jest tylko w sposobie pojawiania się.
+
+## Podmenu w pasku menu (2.11, 00:38–01:37): wyłączone
+- Prototyp miał szeroki panel pod paskiem: po najechaniu na dział, z opóźnieniem ok. 170 ms, w głębokim kolorze działu, z trzema grupami podstron.
+- Rozważany był też lżejszy wariant: podmenu przyczepione pod nazwą działu, grupy w 2–3 kolumnach, bez bloku ze szkicem.
+- **Decyzja 01:37:** podmenu wyłączone, bo w tej wersji użytkownikowi się nie podoba. Może wrócić w przyszłości w innej formie. W prototypie kod zostaje, wyłączony flagą `MEGA_WLACZONE`.
+- Nawigację w dziale zapewniają: strona działu (podstrony w grupach), boczny panel na podstronach i hamburger na okładce.

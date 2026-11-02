@@ -1631,7 +1631,9 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
   };
   /* panel podmenu: otwiera się po 170 ms najechania (albo kliknięciu / z klawiatury), zamyka po 260 ms od zjechania, Esc zamyka */
   let megaT = null, megaZ = null;
+  const MEGA_WLACZONE = false; // 2.11, 01:37: podmenu w pasku wyłączone, może wróci w innej formie
   function megaOtworz(a) {
+    if (!MEGA_WLACZONE) return;
     const pasek = a.closest('.ok-pasek'), dz = a.dataset.dzial, g = IN_GRUPY[dz]; if (!g) return;
     let m = pasek.querySelector('.mega');
     if (!m) { m = document.createElement('div'); m.className = 'mega'; m.setAttribute('role', 'region'); pasek.appendChild(m); }
