@@ -285,3 +285,5 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - Na stronie głównej nagłówek „Studiuj matematykę we Wrocławiu” jest klikalny i ma znak linku zewnętrznego ↗. Prowadzi na stronę rekrutacji (dziś https://studia-wmi.uwr.edu.pl/). Link „Rekrutacja na studia →” pod opisem na razie został; do decyzji, czy go usunąć.
 - W strukturze Studiów Rekrutacji nie ma (01:48: usunięta z „Na co dzień”). Prowadzą do niej pasek menu i nagłówek „Studiuj matematykę we Wrocławiu”.
 - **Skrót SIAD (01:47):** w listach i na stronie głównej kierunek „Sztuczna inteligencja w analizie danych” występuje jako „SIAD”, żeby zajmował jedną linię. Pełna nazwa zostaje w tekstach i w podpowiedzi po najechaniu.
+- **Liczby w banerze Nauki (01:49):** zamiast „2 konferencje w 2026 roku” jest „4 konferencje w zeszłym roku”. W danych są 4 konferencje z datą początku w 2025. Przy wdrożeniu liczba ma się liczyć sama z kolekcji `konferencje` (rok poprzedni względem bieżącego).
+- **Podgląd przy 125% i 1366 px (01:48):** przełącznik „Ekran” działa też na stronach działów i podstronach. Przy 125% (1536 px) sygnet z podpisem i wysunięty znak mieszczą się w marginesach.
