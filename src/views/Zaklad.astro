@@ -5,7 +5,6 @@
 // Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner we wspólnym układzie — tytuł, bursztynowe hasło (pola haslo /
 // haslo_en zakładu; puste = opis jak dotąd), kreska i liczby (pracownicy · projekty · konferencje); obszary badań pod banerem.
 import { zTytulem } from '../lib/osoby';
-import { render } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -13,85 +12,24 @@ import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import { u } from '../lib/url';
-import { motywStrony } from '../lib/motywyBanerow';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
-import { range, long, short, now, today, hasTime, type Lang } from '../lib/daty';
-import { renderMarkdown } from '../lib/markdown';
-import {
-  zaklady, pracownicy, seminaria, referaty, granty, konferencje, obrony, aktualnosci,
-  seminariumReferatu, slugOf, sala, miejsce, zakladGrantu, rangaStopnia, trwaLubBedzie, type Zaklad, type Pracownik,
-} from '../lib/tresci';
+import { range, long, short, type Lang } from '../lib/daty';
+import { slugOf, sala, miejsce, trwaLubBedzie, type Zaklad } from '../lib/tresci';
+import { daneZakladu } from '../lib/widoki/zaklad';
 
 interface Props { zaklad: Zaklad; lang: Lang }
 const { zaklad, lang } = Astro.props;
-const d = zaklad.data;
-const id = zaklad.id;
-const nazwa = wybierz(d, 'nazwa', lang);
-const opis = wybierz(d, 'opis', lang);
-const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
-const obszary = lang === 'en' && d.obszary_en.length ? d.obszary_en : d.obszary;
-const { Content } = await render(zaklad);
-const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
-
-// Skład. Osoba ze stroną domową to jedno klikalne pole (klasy .os-link / .os-a w global.css).
-// Telefonów pracowników naukowych nie podajemy (pole „telefon” zakładu — tylko numer ogólny, jeśli jest).
-const osoby = await pracownicy();
-const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
-const sortuj = (a: Pracownik, b: Pracownik) =>
-  rangaStopnia(a.data.stopien) - rangaStopnia(b.data.stopien) || nazwisko(a.data.imie_nazwisko).localeCompare(nazwisko(b.data.imie_nazwisko), 'pl');
-const czlonkowie = osoby.filter((o) => o.data.zaklad === id);
-const kierownik = czlonkowie.find((o) => o.data.imie_nazwisko === d.kierownik);
-const grupySkladu = [
-  { tytul: lang === 'en' ? 'Staff' : 'Pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'nauczyciel' && o !== kierownik).sort(sortuj) },
-  { tytul: lang === 'en' ? 'PhD students' : 'Doktoranci', osoby: czlonkowie.filter((o) => o.data.grupa === 'doktorant').sort(sortuj) },
-  { tytul: lang === 'en' ? 'Retired staff' : 'Emerytowani pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'emeryt').sort(sortuj) },
-].filter((g) => g.osoby.length);
-
-// Seminaria z najbliższym referatem
-const sem = (await seminaria()).filter((s) => s.data.zaklad.includes(id));
-// Animacja banera na telefonie (zlecenie 03): wariant „zaklad” motywu seminarium tego zakładu (pole `zaklad` seminarium);
-// zakład bez seminarium z motywem — Lorenz z działu Nauka.
-const motywSem = sem.map((s) => motywStrony(`/seminaria/${s.id}`)).find(Boolean);
-const motyw = motywSem ? `${motywSem.split('/')[0]}/zaklad` : 'lorenz';
-const ref = await referaty();
-const n = now();
-const nastepny = (sid: string) => ref.find((r) => seminariumReferatu(r) === sid && (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today()));
-
-// Granty (pole „zakład” albo zakład kierownika)
-const rok = Number(today().slice(0, 4));
-const gr = (await granty()).filter((g) => zakladGrantu(g, osoby) === id);
-const grTrwa = gr.filter((g) => (g.data.rok_do ?? 0) >= rok);
-const grKon = gr.filter((g) => (g.data.rok_do ?? 0) < rok);
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const {
+  d, id, nazwa, opis, opisZdjecia, obszary, Content, htmlEn,
+  czlonkowie, kierownik, grupySkladu,
+  sem, motyw, nastepny,
+  gr, grTrwa, grKon, konf, obr, akt,
+  haslo, liczby, wszystkieZaklady,
+} = await daneZakladu(zaklad, lang);
 const lata = (g: (typeof gr)[number]) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
 const tytulGrantu = (g: (typeof gr)[number]) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 const adresGrantu = (g: (typeof gr)[number]) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
-
-const konf = (await konferencje()).filter((k) => k.data.zaklad === id);
-const obr = (await obrony()).filter((o) => o.data.zaklad === id);
-const akt = (await aktualnosci()).filter((a) => a.data.zaklad === id).slice(0, 5);
-
-// Baner na telefonie: hasło (po angielsku tylko haslo_en — bez polskich resztek) i liczby z danych strony:
-// nauczyciele akademiccy zakładu (z kierownikiem) · projekty (realizowane i zakończone) · konferencje z polem „zakład”.
-// Zera pomijamy (LiczbyBanera.astro) — np. pracownia bez projektów i konferencji ma jedną liczbę. „Pracownik” jest
-// męskoosobowy — przy 2–4 też dopełniacz („czterech pracowników”, „22 pracowników”).
-const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
-const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
-  { n: czlonkowie.filter((o) => o.data.grupa === 'nauczyciel').length, pl: ['pracownik', 'pracowników', 'pracowników'], en: ['staff member', 'staff members'] },
-  { n: gr.length, pl: ['projekt badawczy', 'projekty badawcze', 'projektów badawczych'], en: ['research project', 'research projects'] },
-  { n: konf.length, pl: ['konferencja', 'konferencje', 'konferencji'], en: ['conference', 'conferences'] },
-];
-
-const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const naglowki = [
-  { depth: 2, slug: 'o-zakladzie', text: T('O zakładzie', 'About') },
-  { depth: 2, slug: 'sklad', text: T('Skład', 'People') },
-  ...(sem.length ? [{ depth: 2, slug: 'seminaria', text: sem.length > 1 ? T('Seminaria', 'Seminars') : T('Seminarium', 'Seminar') }] : []),
-  ...(gr.length ? [{ depth: 2, slug: 'granty', text: T('Projekty i granty', 'Grants') }] : []),
-  ...(konf.length ? [{ depth: 2, slug: 'konferencje', text: T('Konferencje', 'Conferences') }] : []),
-  ...(obr.length ? [{ depth: 2, slug: 'obrony', text: T('Obrony doktorskie', 'PhD defences') }] : []),
-  ...(akt.length ? [{ depth: 2, slug: 'aktualnosci', text: T('Aktualności', 'News') }] : []),
-];
-const wszystkieZaklady = await zaklady();
 ---
 <Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={nazwa} lead={opis} haslo={haslo} lang={lang} motyw={motyw} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>

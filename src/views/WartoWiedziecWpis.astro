@@ -3,39 +3,22 @@
 // Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tytuł i bursztynowe hasło składane z pól wpisu —
 // „rok · dział” (np. „2017 · Nauka”; bez roku sam dział); rok i link do działu znikają z banera, a zajawka i link do działu
 // stoją pod banerem. Bez kreski i liczb. Komputer bez zmian.
-import { render, type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz } from '../lib/i18n';
-import { renderMarkdown } from '../lib/markdown';
+import { t, wJezyku } from '../lib/i18n';
 import { slugOf } from '../lib/tresci';
 import type { Lang } from '../lib/daty';
+import { daneWpisuWartoWiedziec } from '../lib/widoki/wartoWiedziecWpis';
 
 interface Props { wpis: CollectionEntry<'warto_wiedziec'>; lang: Lang }
 const { wpis, lang } = Astro.props;
-const d = wpis.data;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
-const tytul = wybierz(d, 'tytul', lang);
-const zajawka = wybierz(d, 'zajawka', lang);
-const { Content } = await render(wpis);
-const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
-const tylkoPolski = lang === 'en' && !d.tresc_en;
-const DZIALY = {
-  nauka: { pl: 'Nauka', en: 'Research', adres: '/nauka' },
-  studia: { pl: 'Studia', en: 'Study', adres: '/studia' },
-  instytut: { pl: 'Instytut', en: 'Institute', adres: '/instytut' },
-} as const;
-const dzial = DZIALY[d.dzial];
-// hasło na telefonie: „rok · dział” (EN: „2017 · Research”), bez roku — sam dział
-const haslo = [d.rok?.trim(), dzial[lang]].filter(Boolean).join(' · ');
-const zewnetrzny = !!d.link && isExternal(d.link);
-const etykietaLinku = wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More'));
-const opisObrazu = wybierz(d, 'obraz_opis', lang);
-const wszystkie = T('Warto wiedzieć', 'Highlights');
+const { d, tytul, zajawka, Content, htmlEn, tylkoPolski, dzial, haslo, zewnetrzny, etykietaLinku, opisObrazu, wszystkie } = await daneWpisuWartoWiedziec(wpis, lang);
 ---
 <Baza tytul={tytul} opis={zajawka || undefined} obraz={d.obraz} opublikowany={d.opublikowany} typ="article">
   <NaglowekStrony tytul={tytul} lead={zajawka || undefined} haslo={haslo} lang={lang} wstecz={{ etykieta: wszystkie, adres: '/warto-wiedziec' }}>

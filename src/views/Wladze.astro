@@ -11,52 +11,18 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
-import { wJezyku, wybierz } from '../lib/i18n';
-import { zTytulem } from '../lib/osoby';
-import { renderMarkdown } from '../lib/markdown';
-import { pracownicy, zaklady, type Pracownik } from '../lib/tresci';
+import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import wladze from '../data/wladze.json';
-
-type Tekst = string | null | undefined;
-type Osoba = {
-  rola?: Tekst; rola_en?: Tekst; imie_nazwisko: string; zakres?: Tekst; zakres_en?: Tekst;
-  dyzur?: Tekst; dyzur_en?: Tekst; zdjecie?: Tekst;
-  // tylko gdy osoby nie ma w Pracownikach:
-  stopien?: Tekst; email?: Tekst; pokoj?: Tekst; strona?: Tekst;
-};
-type Link = { etykieta: string; etykieta_en?: Tekst; adres: string };
-type Dane = {
-  tytul?: Tekst; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; haslo?: Tekst; haslo_en?: Tekst;
-  osoby?: Osoba[] | null;
-  sekretariat?: {
-    nazwa?: Tekst; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; email?: Tekst; telefony?: string[] | null;
-    adres?: Tekst; adres_en?: Tekst; pokoj?: Tekst; godziny?: Tekst; godziny_en?: Tekst; osoby?: string[] | null;
-  } | null;
-  wydzial?: { tytul?: Tekst; tytul_en?: Tekst; opis?: Tekst; opis_en?: Tekst; osoby?: Osoba[] | null; link?: Link | null } | null;
-  kadencja?: Tekst; kadencja_en?: Tekst;
-  rada?: { tytul?: Tekst; tytul_en?: Tekst; opis?: Tekst; opis_en?: Tekst } | null;
-  linki?: Link[] | null;
-};
+import { daneWladz, poleWJezyku } from '../lib/widoki/wladze';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const w = (o: any, pole: string) => (o ? wybierz(o, pole, lang) : '');
-const d = wladze as Dane;
-const tytul = w(d, 'tytul') || T('Władze Instytutu', 'Institute management');
-const lead = w(d, 'wstep');
-// hasło w banerze na telefonie — po angielsku tylko haslo_en (bez polskich resztek)
-const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
-
-// Dane osób z kolekcji pracowników
-const kadra = await pracownicy();
-const listaZakladow = await zaklady();
-const znajdz = (imie: string): Pracownik | undefined => kadra.find((p) => p.data.imie_nazwisko.trim() === imie.trim());
-const inicjaly = (imie: string) => {
-  const s = imie.trim().split(/\s+/);
-  return ((s[0]?.[0] ?? '') + (s.length > 1 ? s[s.length - 1][0] : '')).toUpperCase();
-};
+const w = poleWJezyku(lang);
+const {
+  d, tytul, lead, haslo, dyrektor, zastepcy, wyd, osobyWydzialu, linkWydzialu,
+  sek, sekOsoby, sekTelefony, sekJest, kadencjaHtml, radaHtml, linki,
+} = await daneWladz(lang);
 const tel = (n: string) => {
   const cyfry = n.replace(/[^\d+]/g, '');
   return `tel:${cyfry.startsWith('+') ? cyfry : `+48${cyfry}`}`;
@@ -65,46 +31,6 @@ const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a :
 // Długi adres e-mail łamiemy najpierw po „@” (<wbr>), a dopiero w ostateczności w środku.
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const mail = (e: string) => esc(e).replace('@', '@<wbr>');
-
-// Dane wpisane przy osobie (e-mail, pokój, strona) mają pierwszeństwo przed spisem pracowników.
-// zeSpisuPokoj = false: pokój tylko z wpisu (np. dziekan — pokój w IM to nie biuro dziekana).
-const osobaZ = (o: Osoba, zeSpisuPokoj = true) => {
-  const p = znajdz(o.imie_nazwisko);
-  const z = p?.data.zaklad ? listaZakladow.find((x) => x.id === p.data.zaklad) : undefined;
-  return {
-    rola: w(o, 'rola'),
-    nazwa: zTytulem(o.stopien || p?.data.stopien, o.imie_nazwisko),
-    inicjaly: inicjaly(o.imie_nazwisko),
-    email: o.email || p?.data.email || '',
-    pokoj: o.pokoj || (zeSpisuPokoj ? p?.data.pokoj : '') || '',
-    strona: o.strona || p?.data.strona || '',
-    zakres: w(o, 'zakres'),
-    dyzur: w(o, 'dyzur'),
-    zdjecie: o.zdjecie || '',
-    zaklad: z ? { nazwa: w(z.data, 'nazwa'), adres: `/instytut/zaklady/${z.id}` } : undefined,
-  };
-};
-const osoby = (d.osoby ?? []).filter((o) => o && o.imie_nazwisko?.trim()).map((o) => osobaZ(o));
-// Władze Wydziału Matematyki i Informatyki (dziekan i prodziekan ds. matematyki)
-const wyd = d.wydzial ?? undefined;
-const osobyWydzialu = (wyd?.osoby ?? []).filter((o) => o && o.imie_nazwisko?.trim()).map((o) => osobaZ(o, false));
-const linkWydzialu = wyd?.link?.adres && wyd.link.etykieta ? wyd.link : undefined;
-const [dyrektor, ...zastepcy] = osoby;
-
-// Sekretariat
-const sek = d.sekretariat ?? undefined;
-const sekOsoby = (sek?.osoby ?? []).filter(Boolean).map((imie) => {
-  const p = znajdz(imie);
-  return { nazwa: imie, email: p?.data.email ?? '', telefon: p?.data.grupa === 'administracja' ? p.data.telefon ?? '' : '' };
-});
-const sekTelefony = (sek?.telefony ?? []).filter(Boolean);
-const sekJest = !!sek && !!(sek.email || sekTelefony.length || sekOsoby.length);
-
-// Teksty w Markdownie
-const kadencjaHtml = await renderMarkdown(w(d, 'kadencja') || undefined);
-const radaHtml = await renderMarkdown(w(d.rada, 'opis') || undefined);
-const linki = (d.linki ?? []).filter((l) => l && l.adres && l.etykieta);
-
 ---
 <Baza tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }} />
