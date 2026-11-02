@@ -250,3 +250,17 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - Rozważany był też lżejszy wariant: podmenu przyczepione pod nazwą działu, grupy w 2–3 kolumnach, bez bloku ze szkicem.
 - **Decyzja 01:37:** podmenu wyłączone, bo w tej wersji użytkownikowi się nie podoba. Może wrócić w przyszłości w innej formie. W prototypie kod zostaje, wyłączony flagą `MEGA_WLACZONE`.
 - Nawigację w dziale zapewniają: strona działu (podstrony w grupach), boczny panel na podstronach i hamburger na okładce.
+
+## Przejścia między stronami (2.11, 01:39–01:41, przyjęte: „Zajebiste”)
+- **Zostaje z obecnej strony:**
+  - przejścia między dokumentami (View Transitions API, `@view-transition { navigation: auto; }` w `src/styles/przejscia.css`; Chrome/Edge 126+, Safari 18.2+; Firefox przechodzi zwyczajnie);
+  - wczytywanie z wyprzedzeniem po najechaniu (`speculationrules` w `Baza.astro`).
+- **Dochodzą wspólne elementy, które płynnie się przekształcają:**
+  - **Okładka → strona działu:** narysowany po najechaniu szkic przelatuje na miejsce w banerze i rośnie; na miejscu dopisuje się tylko podpis („dokończenie gestu”), bez ponownego rysowania szkicu. Nazwa działu przesuwa się i rośnie do tytułu banera. Zdjęcie kampusu przenika w zdjęcie działu. Pasek menu się pojawia.
+  - **Strona działu → podstrona:** pasek menu stoi. Baner obniża się, granat przechodzi w głęboki kolor działu. Szkic leci w lewy margines i maleje do sygnetu, podpis leci razem z nim. Tytuł przenika.
+  - **Podstrona → podstrona w dziale:** nagłówek stoi (pasek, zdjęcie, kolor, sygnet). Przenikają tylko tytuł i znak. Zaznaczenie w bocznej nawigacji przesuwa się na nową pozycję. Treść krótko gaśnie i się pojawia.
+  - **Do innego działu:** kolor, zdjęcie i twarz się przenikają.
+- **Zasady:**
+  - każde przejście trwa ok. 0,25–0,35 s;
+  - długi tekst nigdy się nie przesuwa, tylko przenika;
+  - przy wyłączonym ruchu strony zmieniają się od razu.
