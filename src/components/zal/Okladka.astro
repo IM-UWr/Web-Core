@@ -1,0 +1,83 @@
+---
+// Okładka strony głównej na komputer (≥ 761 px; kierunek „Założyciele”, dok/estetyka.md „Okładka”): pierwszy ekran.
+// - bez napisu w lewym górnym rogu i bez paska menu; w prawym górnym rogu Szukaj, EN z flagą, tryb ciemny i hamburger
+//   (panel z prawej na granacie: 4 działy z podstronami i duże „Aktualności”);
+// - blok tytułu z równymi końcami: logo UWr, „Instytut” i „Matematyczny”; prawe końce na jednej prostej o nachyleniu 0,32,
+//   która jest granicą ciemnego pola po skosie (układ liczy src/scripts/zal/okladka.ts; bez JS — zwykły gradient);
+// - zdjęcie gmachu przesunięte w prawo i w górę; rząd 4 działów nisko: szkic („duch” w spoczynku, po najechaniu kontur się
+//   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron); strzałka „Szybki dostęp” do drugiego ekranu.
+// Telefon: dotychczasowy baner B2 (StronaGlowna.astro) — okładka schowana (.tylko-komputer).
+import Szkic from './Szkic.astro';
+import Flaga from './Flaga.astro';
+import ustawienia from '../../data/ustawienia.json';
+import dzInstytut from '../../data/dzialy/instytut.json';
+import dzNauka from '../../data/dzialy/nauka.json';
+import dzStudia from '../../data/dzialy/studia.json';
+import dzPopularyzacja from '../../data/popularyzacja.json';
+import { menuGlowne } from '../../lib/menu';
+import { u, isExternal } from '../../lib/url';
+import { t, wJezyku, wybierz } from '../../lib/i18n';
+import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
+import type { Lang } from '../../lib/daty';
+
+// wyrozniona: wpis z polem „Wyróżnij do…” (dotychczas żółty pasek nad nazwą Instytutu) — plakietka nad logo
+interface Props { lang: Lang; inny: string | null; cel?: string; licznik?: string; wyrozniona?: { tytul: string; adres: string } }
+const { lang, inny, cel = '#szybki-dostep', licznik, wyrozniona } = Astro.props;
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const menu = await menuGlowne();
+const DANE: Record<Dzial, any> = { instytut: dzInstytut, nauka: dzNauka, studia: dzStudia, popularyzacja: dzPopularyzacja };
+const dzialy = DZIALY.map((dz) => {
+  const P = PATRONI[dz];
+  const m = menu.find((p) => p.adres === P.adres);
+  return {
+    dz, P,
+    nazwa: (m && (wybierz(m, 'etykieta', lang) as string)) || pole(P, 'nazwa', lang),
+    // hasło z danych działu (to samo co w banerze na telefonie), a gdy puste — z prototypu
+    haslo: (wybierz(DANE[dz], 'haslo', lang) as string) || pole(P, 'haslo', lang),
+    linki: (m?.grupy ?? []).flatMap((g) => g.linki),
+  };
+});
+const akt = menu.find((p) => p.adres === '/aktualnosci');
+const baner = ustawienia.baner;
+const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');
+const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
+---
+<section class="z-okladka tylko-komputer" id="okladka" data-pagefind-ignore>
+  {baner.zdjecie && <img class="z-okl-foto" src={u(baner.zdjecie)} alt={wybierz(baner, 'opis', lang) || ''} decoding="async" fetchpriority="high" />}
+  <div class="z-skos" aria-hidden="true"></div>
+  <nav class="z-narz" aria-label={lang === 'en' ? 'Tools' : 'Narzędzia'}>
+    <a href={href('/szukaj')}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>{t(lang, 'szukaj')}</a>
+    {inny && <a class="z-jezyk" href={u(inny)} hreflang={lang === 'pl' ? 'en' : 'pl'} lang={lang === 'pl' ? 'en' : 'pl'} aria-label={t(lang, 'innyJezyk')}>{lang === 'pl' && <Flaga />}{t(lang, 'innyJezykKrotko')}</a>}
+    <button type="button" data-motyw aria-label={t(lang, 'motyw')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg></button>
+    <button type="button" id="z-burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls="z-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+  </nav>
+  <nav class="z-menu" id="z-menu" aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
+    <span class="z-narz z-zamknij"><button type="button" id="z-zamknij" aria-label={t(lang, 'zamknijMenu')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></span>
+    {dzialy.map((d) => (
+      <section data-dzial={d.dz}>
+        <h2><a href={href(d.P.adres)}>{d.nazwa}</a></h2>
+        <ul>{d.linki.map((l) => <li><a href={href(l.adres)}>{wybierz(l, 'etykieta', lang)}{isExternal(l.adres) && ' ↗'}</a></li>)}</ul>
+      </section>
+    ))}
+    <section class="duza"><h2><a href={href('/aktualnosci')}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
+  </nav>
+  <div class="z-okl-tytul">
+    {wyrozniona && <a class="z-okl-flaga" href={href(wyrozniona.adres)}>{wyrozniona.tytul}</a>}
+    <a class="z-okl-uwr" href={uwrAdres} aria-label={t(lang, 'uwrStronaGlowna')}><span class="z-okl-logo" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span></a>
+    <h1><span class="w1">{slowo1}</span> <span class="w2">{reszta.join(' ')}</span></h1>
+  </div>
+  <div class="z-okl-dzialy">
+    {dzialy.map((d) => (
+      <a class="z-okl-dz" href={href(d.P.adres)} data-dzial={d.dz}>
+        <span class="z-okl-szkic"><Szkic dzial={d.dz} rodzaj="pelny" duch /></span>
+        <span class="z-okl-nazwa"><span>{d.nazwa}</span></span>
+        <span class="slot">
+          <span class="haslo-dz">{d.haslo}</span>
+          <span class="patron"><b>{d.P.patron}</b>{d.P.lata}. {pole(d.P, 'fakt', lang)}</span>
+        </span>
+      </a>
+    ))}
+  </div>
+  <a class="z-strzalka" href={cel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>{lang === 'en' ? 'Quick access' : 'Szybki dostęp'}{licznik && ` · ${licznik}`}</a>
+</section>
+<script>import '../../scripts/zal/okladka';</script>

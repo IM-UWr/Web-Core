@@ -1,0 +1,25 @@
+---
+// Odchudzona stopka na komputer (≥ 761 px; kierunek „Założyciele”): jedna linia na granacie, w kolumnie 1240 px —
+// nazwa, adres, telefon i e-mail; deklaracja dostępności, polityka prywatności, archiwum i „© … · Created by Szymon Cygan”.
+// Telefon: dotychczasowa stopka (Stopka.astro) — ta jest schowana (.tylko-komputer).
+import ustawienia from '../../data/ustawienia.json';
+import { u } from '../../lib/url';
+import { t, wJezyku } from '../../lib/i18n';
+import type { Lang } from '../../lib/daty';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const k = ustawienia.kontakt;
+const rok = new Date().getFullYear();
+---
+<footer class="z-stopka tylko-komputer">
+  <div class="z-stopka-in">
+    <div><b>{t(lang, 'instytut')} UWr</b> · {k.adres} · <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a> · <a href={`mailto:${k.email}`}>{k.email}</a></div>
+    <nav aria-label={lang === 'en' ? 'Legal' : 'Informacje prawne'}>
+      <a href={u(wJezyku('/deklaracja-dostepnosci', lang))}>{t(lang, 'deklaracja')}</a>
+      <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{t(lang, 'prywatnosc')}</a>
+      <a href={ustawienia.archiwum}>{t(lang, 'archiwum')}</a>
+      <span class="z-autor">© {rok} {t(lang, 'uwr')} · <span lang="en">Created by</span> Szymon Cygan</span>
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,31 @@
+---
+// Dół podstrony działu (komputer; kierunek „Założyciele”): „Następna strona w dziale” (kolejna podstrona z menu działu,
+// bez linków zewnętrznych) oraz „Ostatnia aktualizacja: … · Zgłoś błąd na tej stronie”.
+// Data aktualizacji — gdy widok ją poda (prop `aktualizacja`, RRRR-MM-DD); na razie żaden widok jej nie zna
+// (historia zmian treści jest w repozytoriach Web-*), więc pokazujemy tylko link zgłoszenia błędu.
+import ustawienia from '../../data/ustawienia.json';
+import { menuGlowne } from '../../lib/menu';
+import { u, isExternal, stripBase, absolute } from '../../lib/url';
+import { wJezyku, wybierz } from '../../lib/i18n';
+import { long, type Lang } from '../../lib/daty';
+import { PATRONI, type Dzial } from '../../lib/patroni';
+
+interface Props { dzial: Dzial; lang: Lang; tytul: string; aktualizacja?: string }
+const { dzial, lang, tytul, aktualizacja } = Astro.props;
+const pozycja = (await menuGlowne()).find((m) => m.adres === PATRONI[dzial].adres);
+const linki = (pozycja?.grupy ?? []).flatMap((g) => g.linki).filter((l) => !isExternal(l.adres));
+const tu = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
+const k = linki.findIndex((l) => l.adres.replace(/\/$/, '') === tu);
+const nast = k >= 0 ? linki[k + 1] : undefined;
+const adresStrony = absolute(stripBase(Astro.url.pathname), Astro.site);
+const mail = `mailto:${ustawienia.kontakt.email}?subject=${encodeURIComponent(`${lang === 'en' ? 'Error on page' : 'Błąd na stronie'}: ${tytul}`)}&body=${encodeURIComponent(adresStrony)}`;
+---
+<div class="z-nast" data-dzial={dzial} data-pagefind-ignore>
+  {nast
+    ? <a class="z-nast-link" href={u(wJezyku(nast.adres, lang))}><small>{lang === 'en' ? 'Next page in this section →' : 'Następna strona w dziale →'}</small>{wybierz(nast, 'etykieta', lang)}</a>
+    : <span></span>}
+  <p class="z-nast-meta">
+    {aktualizacja && <>{lang === 'en' ? 'Last updated' : 'Ostatnia aktualizacja'}: {long(aktualizacja, lang)} · </>}
+    <a href={mail}>{lang === 'en' ? 'Report an error on this page' : 'Zgłoś błąd na tej stronie'}</a>
+  </p>
+</div>

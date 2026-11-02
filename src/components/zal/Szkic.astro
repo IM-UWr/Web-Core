@@ -1,0 +1,41 @@
+---
+// Szkic patrona działu jako SVG w linii (kolor przez currentColor / zmienne CSS, oba motywy).
+// rodzaj: „pelny” — kontur (kreski w kolejności rysowania, pathLength=1) i detale; „sygnet” — uproszczony, same kontury;
+// „podpis” — obrys podpisu ze skanu, przy `pisze` odsłaniany maską z linii prowadzących (src/scripts/zal/szkice.ts zgrywa tempo).
+// duch: słaby kontur w spoczynku (okładka strony głównej). Wszystkie rysunki są ozdobne: aria-hidden, bez fokusu.
+// Dane: src/assets/szkice/szkice.json (wyciąg z plików SVG z tego folderu, jak w prototypie „Założyciele”).
+import { SZKICE, type Dzial } from '../../lib/patroni';
+
+interface Props { dzial: Dzial; rodzaj: 'pelny' | 'sygnet' | 'podpis'; duch?: boolean; pisze?: boolean; id?: string; class?: string }
+const { dzial, rodzaj, duch = false, pisze = false, id, class: klasa } = Astro.props;
+const S = SZKICE[dzial];
+const P = S.p;
+const maska = `${id ?? 'z'}-maska-${dzial}`;
+const grubosc = (P.vb[1] * 0.16).toFixed(1);
+---
+{rodzaj === 'pelny' && (
+  <svg class:list={['z-szkic', klasa]} viewBox="0 0 200 240" aria-hidden="true" focusable="false" data-dzial-szkic={dzial}>
+    {duch && <g class="duch">{S.k.map((d) => <path d={d} />)}</g>}
+    <g class="tusz">{S.k.map((d, i) => <path pathLength="1" d={d} style={`--i:${i}`} />)}</g>
+    <g class="detale">{S.dt.map((d) => <path d={d} />)}</g>
+  </svg>
+)}
+{rodzaj === 'sygnet' && (
+  <svg class:list={['z-sygnet', klasa]} viewBox="0 0 200 240" aria-hidden="true" focusable="false">
+    {S.s.map((d) => <path d={d} />)}
+  </svg>
+)}
+{rodzaj === 'podpis' && (pisze ? (
+  <svg class:list={['z-podpis', 'pisze', klasa]} viewBox={`0 0 ${P.vb[0]} ${P.vb[1]}`} aria-hidden="true" focusable="false">
+    <defs>
+      <mask id={maska} maskUnits="userSpaceOnUse" x="-10" y="-10" width={P.vb[0] + 20} height={P.vb[1] + 20}>
+        {P.pr.map((d) => <path pathLength="1" d={d} fill="none" stroke="#fff" stroke-width={grubosc} stroke-linecap="round" stroke-linejoin="round" />)}
+      </mask>
+    </defs>
+    <path mask={`url(#${maska})`} d={P.o} fill="currentColor" />
+  </svg>
+) : (
+  <svg class:list={['z-podpis', klasa]} viewBox={`0 0 ${P.vb[0]} ${P.vb[1]}`} aria-hidden="true" focusable="false">
+    <path d={P.o} fill="currentColor" />
+  </svg>
+))}

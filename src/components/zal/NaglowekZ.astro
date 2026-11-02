@@ -1,0 +1,97 @@
+---
+// Nagłówki na komputer (≥ 761 px; kierunek „Założyciele”, dok/estetyka.md): wstawiane przez NaglowekStrony.astro na końcu
+// dotychczasowego banera .ph (który na komputerze znika — style w src/styles/zalozyciele.css). Telefon bez zmian (.tylko-komputer).
+//
+// rodzaj „dzial” — baner strony działu („opcja 4”): granat przechodzi w zdjęcie działu w dwóch kolorach (cienie granatowe,
+//   światła w jasnym kolorze działu), szkic patrona jasną kreską z poświatą, notka o patronie i podpis. Szkic i podpis rysują
+//   się tylko przy pierwszym wejściu w wizycie (src/scripts/zal/szkice.ts). Pod tytułem hasło i liczby — tylko gdy są liczby.
+// rodzaj „podstrona” — nagłówek podstrony: głęboki kolor działu na zdjęciu działu (mocniej z lewej, słabiej w prawo),
+//   „← Dział”, sygnet z małym podpisem w lewym marginesie i znak patrona z opisem przy prawej krawędzi. Bez animacji.
+//   Znak i opis (ciekawostka) tylko na podstronach z menu działu; strony głębiej mają sygnet i tytuł. Hasło i liczby — gdy są.
+//   Strony bez działu (Aktualności, Kalendarz, strony ogólne) — granat, bez sygnetu i znaku.
+import Szkic from './Szkic.astro';
+import { u } from '../../lib/url';
+import { t, wJezyku } from '../../lib/i18n';
+import { PATRONI, pole, znakDzialu, ramkaZnaku, type Dzial } from '../../lib/patroni';
+import type { Lang } from '../../lib/daty';
+
+interface Props {
+  rodzaj: 'dzial' | 'podstrona';
+  dzial?: Dzial;
+  tytul: string;
+  haslo?: string;
+  lang: Lang;
+  // HTML przekazany do banera przez widok (liczby .pt-liczby, plakietki, linki) — pokazywany pod tytułem
+  slot?: string;
+  // link „← …” (podstrona: dział albo poziom wyżej)
+  wstecz: { etykieta: string; adres: string };
+  // ciekawostka: znak patrona z opisem (podstrony z menu działu)
+  znak?: boolean;
+}
+const { rodzaj, dzial, tytul, lang, slot = '', wstecz, znak = false } = Astro.props;
+const P = dzial ? PATRONI[dzial] : undefined;
+// liczby w banerze: lista .pt-liczby przeznaczona na komputer (bez .tylko-telefon) albo — gdy takiej nie ma — telefoniczna
+const maLiczbyKomputer = /<ul class="pt-liczby(?![^"]*tylko-telefon)/.test(slot);
+const maLiczbyTelefon = /<ul class="pt-liczby[^"]*tylko-telefon/.test(slot);
+// Popularyzacja: liczby „TBA” na komputerze ukryte (decyzja 22:46); strona działu pokazuje liczby tylko z listy na komputer
+const zLiczbami = rodzaj === 'dzial' ? maLiczbyKomputer : (maLiczbyKomputer || maLiczbyTelefon);
+const haslo = zLiczbami ? Astro.props.haslo?.trim() || undefined : undefined;
+
+// Zdjęcia działów (na razie z public/pliki/naglowki): kadr i jasność dobrane w prototypie.
+const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string }> = {
+  instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: '50% 42%' },
+  nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: '50% 30%', filtr: 'grayscale(1) contrast(1.15) brightness(1.45)' },
+  studia: { zdjecie: '/pliki/naglowki/studia.jpg', kadr: '50% 40%', filtr: 'grayscale(1) contrast(1.15) brightness(1.25)' },
+  popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: '50% 40%' },
+  granat: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: '50% 40%' },
+};
+const f = FOTO[dzial ?? 'granat'];
+const styl = `object-position:${rodzaj === 'podstrona' ? '50% 40%' : f.kadr}${f.filtr ? `;filter:${f.filtr}` : ''}`;
+
+const kreski = P && znak ? znakDzialu(P.dzial, true) : [];
+const ramka = kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
+const patronDzialu = lang === 'en' ? 'patron of the section' : 'patron działu';
+const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
+---
+{rodzaj === 'dzial' && P && (
+  <div class="z-nagl z-baner-dzialu tylko-komputer" data-dzial={P.dzial} data-z-baner-dzialu={P.dzial} data-pagefind-ignore>
+    <div class="z-foto"><img src={u(f.zdjecie)} alt="" decoding="async" style={styl} /></div>
+    <div class="z-szkic-ramka"><Szkic dzial={P.dzial} rodzaj="pelny" /></div>
+    <div class="z-tytul">
+      <a class="z-wstecz" href={u(wJezyku('/', lang))}>← {t(lang, 'stronaGlowna')}</a>
+      <h1>{tytul}</h1>
+      {haslo && <p class="z-haslo">{haslo}</p>}
+      {zLiczbami && <div class="z-slot" set:html={slot} />}
+    </div>
+    <span class="z-podpis-ramka"><Szkic dzial={P.dzial} rodzaj="podpis" pisze id="baner" /></span>
+    <div class="z-patron">
+      <b>{P.patron}</b>
+      <span>{`${P.lata} · ${patronDzialu} · ${salaNapis} ${P.sala}`}</span>
+      <p>{pole(P, 'notka', lang)}</p>
+    </div>
+  </div>
+)}
+{rodzaj === 'podstrona' && (
+  <div class:list={['z-nagl', 'z-nagl-pod', 'tylko-komputer', zLiczbami && 'z-liczbami', !P && 'z-granat']} data-dzial={P?.dzial} data-pagefind-ignore>
+    <div class="z-foto"><img src={u(f.zdjecie)} alt="" decoding="async" style={styl} /></div>
+    <div class="z-tyt">
+      <div class="z-tyt-g">
+        {P && <Szkic dzial={P.dzial} rodzaj="sygnet" class="z-sygnet-nagl" />}
+        <p class="z-sciezka"><a href={u(wJezyku(wstecz.adres, lang))}>← {wstecz.etykieta}</a></p>
+        <h1>{tytul}</h1>
+        {P && <span class="z-podpis-maly"><Szkic dzial={P.dzial} rodzaj="podpis" /></span>}
+      </div>
+      {haslo && <p class="z-haslo">{haslo}</p>}
+      {slot && <div class="z-slot" set:html={slot} />}
+    </div>
+    {P && kreski.length > 0 && (
+      <>
+        <svg class="z-znak" viewBox={ramka} aria-hidden="true" focusable="false">
+          {kreski.map((k) => <path d={k.d} class={k.gruba ? 'gruba' : undefined} />)}
+        </svg>
+        <p class="z-znak-opis"><b>{pole(P, 'znakNazwa', lang)}</b>{pole(P, 'znakFakt', lang)}</p>
+      </>
+    )}
+  </div>
+)}
+{rodzaj === 'dzial' && P && <script>import '../../scripts/zal/szkice';</script>}

@@ -2,6 +2,8 @@
 // Pasek tytułu podstrony: link „← poziom wyżej”, tytuł, opis i motyw graficzny działu.
 // Wygląd: Ustawienia → „Nagłówki podstron” (ustawienia.naglowki_podstron) — style w src/styles/tlo.css.
 import Wstecz from './Wstecz.astro';
+import NaglowekZ from './zal/NaglowekZ.astro';
+import { PATRONI, dzialZeSciezki, pole } from '../lib/patroni';
 import { t } from '../lib/i18n';
 import { u, stripBase } from '../lib/url';
 import { motywStrony } from '../lib/motywyBanerow';
@@ -84,8 +86,21 @@ const fala = dzial === 'aktualnosci' && ozdobny ? (() => {
 const motywPelny = ozdobny ? (Astro.props.motyw ?? motywStrony(stripBase(Astro.url.pathname))) : undefined;
 const [motyw, motywWariant] = motywPelny ? motywPelny.split('/') : [];
 const motywDane = motyw && Astro.props.motywDane !== undefined ? JSON.stringify(Astro.props.motywDane) : undefined;
+
+// Komputer (≥ 761 px), kierunek „Założyciele”: nowy nagłówek (src/components/zal/NaglowekZ.astro) na końcu tego banera;
+// dotychczasowa zawartość banera na komputerze znika (.ph-z, src/styles/zalozyciele.css), telefon bez zmian.
+// Strona działu (/instytut, /nauka, /studia, /popularyzacja) — baner działu; pozostałe — nagłówek podstrony.
+// Podstrona z menu działu (link „wstecz” prowadzi do strony działu) dostaje „← Dział” i znak patrona z opisem.
+const sciezkaZ = stripBase(Astro.url.pathname);
+const bezJezykaZ = sciezkaZ.replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
+const dzialZ = dzialZeSciezki(sciezkaZ);
+const patronZ = dzialZ ? PATRONI[dzialZ] : undefined;
+const stronaDzialuZ = !!patronZ && bezJezykaZ === patronZ.adres;
+const zMenuDzialuZ = !!patronZ && !stronaDzialuZ && cel.adres.replace(/\/$/, '') === patronZ.adres;
+const slotZ = Astro.slots.has('default') ? await Astro.slots.render('default') : '';
+const wsteczZ = zMenuDzialuZ ? { etykieta: pole(patronZ!, 'nazwa', lang), adres: patronZ!.adres } : cel;
 ---
-<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi']} data-dzial={ozdobny ? dzial : undefined} data-animacja={motyw} data-animacja-wariant={motywWariant} data-animacja-dane={motywDane}>
+<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi', 'ph-z']} data-dzial={ozdobny ? dzial : undefined} data-animacja={motyw} data-animacja-wariant={motywWariant} data-animacja-dane={motywDane}>
   {naPasie && <script is:inline set:html={naPasie} />}
   <div class="wrap">
     {ozdobny && (
@@ -110,4 +125,7 @@ const motywDane = motyw && Astro.props.motywDane !== undefined ? JSON.stringify(
   </div>
   {/* w środku pasa, nie za nim — za pasem rozbiłby regułę „main > .ph + .wrap” (odstęp pod banerem, telefon.css) */}
   {motyw && <script>import '../scripts/baner/silnik';</script>}
+  {stronaDzialuZ
+    ? <NaglowekZ rodzaj="dzial" dzial={dzialZ} tytul={tytul} haslo={haslo} lang={lang} slot={slotZ} wstecz={cel} />
+    : <NaglowekZ rodzaj="podstrona" dzial={dzialZ} tytul={tytul} haslo={haslo} lang={lang} slot={slotZ} wstecz={wsteczZ} znak={zMenuDzialuZ} />}
 </div>

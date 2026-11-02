@@ -9,16 +9,19 @@ import ListaReferatow from './ListaReferatow.astro';
 import KafelekKoloryDni from './KafelekKoloryDni.astro';
 import WartoWiedziec from './WartoWiedziec.astro';
 import ZobaczWiecej from './ZobaczWiecej.astro';
+import Okladka from './zal/Okladka.astro';
+import PasekMenu from './zal/PasekMenu.astro';
 import ustawienia from '../data/ustawienia.json';
 import skroty from '../data/skroty.json';
-import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { u, isExternal, stripBase } from '../lib/url';
+import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, drugiJezyk } from '../lib/i18n';
 import { range, short, type Lang } from '../lib/daty';
 import { listaKierunkow } from '../lib/menu';
 import { wydarzeniaNaGlowna, wydarzeniaNaTelefon, aktualnosciNaGlowna, wyroznionaAktualnosc, referatyWTygodniu, tydzienSeminariow } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
+const sciezka = stripBase(Astro.url.pathname);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 // Kafelek „Na skróty” z tym adresem pokazuje dzisiejszy kolor dnia (KafelekKoloryDni).
 const KOLORY_DNI = '/studia/rok-akademicki';
@@ -119,6 +122,12 @@ const kafelki = [
       </>
     )}
   </section>
+
+  {/* Komputer (≥ 761 px), kierunek „Założyciele”: okładka na pierwszy ekran i pasek menu na górze drugiego ekranu
+       (src/components/zal/); dotychczasowy baner .hero na komputerze schowany (src/styles/zalozyciele.css). */}
+  <Okladka lang={lang} inny={drugiJezyk(sciezka)} wyrozniona={wyrozniona ? { tytul: wyrozniona.tytul, adres: wyrozniona.href } : undefined} />
+  <div id="szybki-dostep" class="z-druga-start tylko-komputer"></div>
+  <PasekMenu lang={lang} sciezka={sciezka} inny={drugiJezyk(sciezka)} class="z-pasek-jasny" />
 
   {/* Telefon (≤ 760 px) — wygląd „Portal”: pod banerem ramki jedna pod drugą, w tej samej kolejności co na komputerze
        (decyzja 30.10.2026): Na skróty (kafelki jako wiersze), Najbliższe wydarzenia, Aktualności (osobna, zwarta lista),

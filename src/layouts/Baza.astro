@@ -12,6 +12,14 @@ import '../styles/portal.css';
 import '../styles/telefon.css';
 // Cała strona (telefon i komputer, na próbę): przejścia między stronami i łagodne wejście treści.
 import '../styles/przejscia.css';
+// Komputer (≥ 761 px): kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource),
+// paleta „Atramenty”, pasek menu na banerze, nowe nagłówki i odchudzona stopka (src/styles/zalozyciele.css, src/components/zal/).
+import '@fontsource-variable/brygada-1918/wght.css';
+import '@fontsource-variable/brygada-1918/wght-italic.css';
+import '../styles/zalozyciele.css';
+import PasekMenu from '../components/zal/PasekMenu.astro';
+import StopkaZ from '../components/zal/StopkaZ.astro';
+import { dzialZeSciezki } from '../lib/patroni';
 import Naglowek from '../components/Naglowek.astro';
 import Stopka from '../components/Stopka.astro';
 import { u, absolute, stripBase } from '../lib/url';
@@ -60,6 +68,8 @@ const tlo = tloUst === true ? 'pole' : ['pole', 'kratka', 'penrose', 'zmierzch',
 // sekcje: pasy | linia | karty | brak (bez pola w ustawieniach — pasy).
 const sekcjeUst = (ustawienia as any).sekcje ?? 'pasy';
 const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : undefined;
+// dział strony (kolory działu na komputerze); strona główna, Aktualności i strony ogólne — bez działu (granat)
+const dzialStrony = dzialZeSciezki(sciezka);
 ---
 <!doctype html>
 <html lang={lang}>
@@ -106,8 +116,10 @@ const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : unde
     })} />
     <slot name="head" />
   </head>
-  <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined}>
+  <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
     <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
+    {/* komputer: pasek menu na banerze (przed starym nagłówkiem — ten zostaje dla telefonu; strona główna ma pasek pod okładką) */}
+    {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} />}
     <Naglowek lang={lang} sciezka={sciezka} inny={inny} naZdjeciu={stronaGlowna && !!ustawienia.baner?.zdjecie} />
     {!opublikowany && (
       <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>
@@ -116,5 +128,6 @@ const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : unde
       <slot />
     </main>
     <Stopka lang={lang} />
+    <StopkaZ lang={lang} />
   </body>
 </html>
