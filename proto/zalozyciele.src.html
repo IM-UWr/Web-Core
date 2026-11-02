@@ -421,7 +421,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (prefers-reduced-motion: reduce) { .ok-ramka { scroll-behavior: auto; } .ok-strzalka svg { animation: none; } .ok-dz::before, .ok-dz .slot > span, .ok-dz h3 span, .ok-okladka .barwa { transition: none; } }
 
 /* ---------- widok „Instytut”: dwa warianty strony działu (2 kalendarium, 4 zdjęcie w kolorze działu) ---------- */
-.in-strona { --kol: 1240px; --marg: max(64px, calc((100% - var(--kol)) / 2)); background: var(--m-bg); }
+.in-strona { container-type: inline-size; --kol: 1240px; --marg: max(64px, calc((100% - var(--kol)) / 2)); background: var(--m-bg); }
 .in-strona .ok-pasek { position: relative; }
 .in-tytul { position: absolute; left: var(--marg); z-index: 3; }
 .in-tytul .wstecz { font-size: 14px; font-weight: 600; color: var(--na-ciemnym-2); text-decoration: none; }
@@ -771,6 +771,11 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 .ok-pasek nav a.otwarty { color: inherit; }
 .ok-pasek nav a.otwarty::after { width: calc(100% - 22px); }
 .ok-pasek nav a[data-dzial]::after { transition: width .16s ease; }
+
+/* wąskie okno (np. laptop 1366 px): margines za mały na sygnet — sygnet z podpisem wchodzi do kolumny, tytuł przesuwa się w prawo */
+@container (max-width: 1499px) {
+  .pd-b .tyt { padding-left: 122px; }
+}
 
 /* ---------- uwagi pod sceną ---------- */
 .uwagi { max-width: 1280px; margin: 0 auto; padding-block: 34px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 30px 48px; }
