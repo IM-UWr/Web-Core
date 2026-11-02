@@ -8,11 +8,17 @@
 // Telefon (≤ 760 px): wygląd „Portal” (bloki .tylko-telefon i style w @media (max-width: 760px)).
 // „W tym dziale” (wspólny komponent WTymDziale.astro) i „O studiach” — ten sam układ co na stronach „Instytut” i „Nauka”
 // (DzialInstytut.astro, DzialNauka.astro).
+// Komputer, kierunek „Założyciele” (etap 3): pod banerem nowy blok TrescDzialu (na końcu <main>; podstrony w grupach,
+// „O studiach” z „W skrócie”, aktualności dla studentów w wierszach w dwóch kolumnach); dotychczasowa treść na komputerze
+// znika (src/styles/zal-dzialy.css). Telefon bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import KartaAktualnosci from '../components/KartaAktualnosci.astro';
 import WTymDziale from '../components/WTymDziale.astro';
+import TrescDzialu from '../components/zal/TrescDzialu.astro';
+import Sekcja from '../components/zal/dzial/Sekcja.astro';
+import Wiersz from '../components/zal/dzial/Wiersz.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE, bezSierotek } from '../lib/i18n';
 import { short, type Lang } from '../lib/daty';
@@ -101,6 +107,20 @@ const { liczby, grupy, oStudiach, fakty, aktualnosci, aktualnosciTel, tytul, wst
     </div>
 
   </div>
+
+  <TrescDzialu dzial="studia" lang={lang} grupy={grupy} tekst={{ tytul: T('O studiach', 'About our programmes'), akapity: oStudiach, fakty }}>
+    <Sekcja id="z-dz-aktualnosci" tytul={T('Aktualności dla studentów', 'News for students')} lang={lang}
+      linki={[{ etykieta: T('Wszystkie', 'All'), adres: '/aktualnosci?dla=studenci' }]}
+      opis={aktualnosci.length ? undefined : T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}>
+      {aktualnosci.length > 0 && (
+        <div class="z-dz-wiersze">
+          {aktualnosci.map((p) => (
+            <Wiersz data={p.data} lang={lang} etykieta={RODZAJE[p.rodzaj]?.[lang]} tytul={p.tytul} adres={p.href} zajawka={p.zajawka} />
+          ))}
+        </div>
+      )}
+    </Sekcja>
+  </TrescDzialu>
 </Baza>
 
 <style>

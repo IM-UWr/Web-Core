@@ -15,6 +15,9 @@ import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulZewn from '../components/TytulZewn.astro';
 import WTymDziale from '../components/WTymDziale.astro';
+import TrescDzialu from '../components/zal/TrescDzialu.astro';
+import Sekcja from '../components/zal/dzial/Sekcja.astro';
+import Wiersz from '../components/zal/dzial/Wiersz.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW, bezSierotek } from '../lib/i18n';
 import { range, dayNum, monthShort, type Lang } from '../lib/daty';
@@ -28,7 +31,7 @@ const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const lata = (g: Grant) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
 const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 
-const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, grupy, naglowek, lead, haslo, badania, fakty } = await daneDzialuNauka(lang);
+const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty } = await daneDzialuNauka(lang);
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
   {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
@@ -36,6 +39,12 @@ const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, grupy, naglo
        „Badania w Instytucie” (bez ramki „W skrócie”), projekty w ramce, na końcu konferencje (osobny blok
        .tylko-telefon tuż za sekcją .tylko-komputer). */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
+    {/* baner na komputerze (zal/NaglowekZ.astro bierze pierwszą listę bez .tylko-telefon): konferencje w ostatnim roku */}
+    {liczbyKomputer.length > 0 && (
+      <ul class="pt-liczby tylko-komputer" data-pagefind-ignore>
+        {liczbyKomputer.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
+      </ul>
+    )}
     {liczby.length > 0 && (
       <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
@@ -155,6 +164,38 @@ const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, grupy, naglo
       </section>
     </div>
   </div>
+
+  <TrescDzialu dzial="nauka" lang={lang} grupy={grupy} tekst={{ tytul: T('Badania w Instytucie', 'Research at the Institute'), akapity: badania, fakty }}>
+    <Sekcja id="z-dz-projekty" tytul={`${T('Realizowane projekty', 'Ongoing projects')} (${realizowane.length})`} lang={lang}
+      linki={[{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }]}
+      opis={realizowane.length === 0 ? T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')
+        : realizowane.length > przyklady.length ? T(`Wybrane spośród ${realizowane.length} realizowanych projektów.`, `A selection of ${realizowane.length} ongoing projects.`) : undefined}>
+      {przyklady.length > 0 && (
+        <div class="z-dz-kart">
+          {przyklady.map((g) => (
+            <article class="z-dz-klik">
+              <div class="gora">{[RODZAJE_GRANTOW[g.data.rodzaj][lang], lata(g)].filter(Boolean).join(' · ')}</div>
+              <h3><a href={href(`/nauka/granty/${slugOf(g.id)}`)}>{tytulGrantu(g)}</a></h3>
+              {g.data.kierownik && <p>{T('Kierownik', 'Principal investigator')}: {g.data.kierownik}</p>}
+              {g.data.kod && <p class="nr">{g.data.kod}</p>}
+            </article>
+          ))}
+        </div>
+      )}
+    </Sekcja>
+    <Sekcja id="z-dz-konferencje" tytul={nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')} lang={lang}
+      linki={[{ etykieta: T('Wszystkie konferencje', 'All conferences'), adres: '/nauka/konferencje' }]}
+      opis={nadchodzaceKonf.length ? undefined : `${T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}${pokazKonf.length ? ` ${T('Ostatnio odbyły się:', 'Most recent:')}` : ''}`}>
+      {pokazKonf.length > 0 && (
+        <div class="z-dz-wiersze jedna">
+          {pokazKonf.map((k) => (
+            <Wiersz data={k.data.poczatek} lang={lang} tytul={wybierz(k.data, 'tytul', lang)} adres={k.data.strona || undefined} odwolana={k.data.odwolana}
+              etykieta={[range(k.data.poczatek, k.data.koniec, lang), miejsce(k.data.miejsce, lang)].filter(Boolean).join(' · ')} />
+          ))}
+        </div>
+      )}
+    </Sekcja>
+  </TrescDzialu>
 </Baza>
 
 <style>

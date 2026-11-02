@@ -2,6 +2,7 @@
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import popularyzacja from '../../data/popularyzacja.json';
+import { menuGlowne } from '../menu';
 
 type Tekst = string | null | undefined;
 type Pozycja = {
@@ -14,6 +15,11 @@ type Dane = { tytul: string; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; 
 
 // Pole obiektu w wybranym języku; używane też w szablonie widoku.
 export const poleWJezyku = (lang: Lang) => (o: any, pole: string) => wybierz(o, pole, lang);
+
+// Domena strony bez „www.” (podpis linku do partnera, np. „fmw.math.uni.wroc.pl”).
+const domena = (a: string) => {
+  try { return new URL(a).hostname.replace(/^www\./, ''); } catch { return ''; }
+};
 
 // Kotwica sekcji z polskiej nazwy grupy (ta sama w obu wersjach językowych).
 const slug = (s: string) =>
@@ -37,5 +43,12 @@ export async function danePopularyzacji(lang: Lang) {
   // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
   const haslo = w(d, 'haslo');
 
-  return { linki, grupy, sekcje, tytul, lead, haslo };
+  // Komputer (strona działu, TrescDzialu.astro): grupy z menu „Popularyzacja” (np. „Partnerzy”) — linki zewnętrzne
+  // z domeną jako podpisem; nowy link w menu sam pojawi się na stronie.
+  const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Popularyzacja' || m.etykieta_en === 'Outreach');
+  const grupyMenu = (pozycja?.grupy ?? [])
+    .filter((g) => g.linki.length > 0)
+    .map((g) => ({ ...g, linki: g.linki.map((l) => ({ ...l, podpis: domena(l.adres) || undefined })) }));
+
+  return { linki, grupy, sekcje, tytul, lead, haslo, grupyMenu };
 }

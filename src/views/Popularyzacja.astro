@@ -5,10 +5,15 @@
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian, poza paskiem
 // liczb w banerze (na razie „TBA”, niżej).
+// Komputer, kierunek „Założyciele” (etap 3): pod banerem nowy blok TrescDzialu (na końcu <main>): „Na tej stronie”
+// (sekcje strony) i grupy z menu „Popularyzacja” (partnerzy z domeną), potem sekcje w dwóch kolumnach — grupa bez
+// inicjatyw jako „To be announced”, z inicjatywami jako lista. Dotychczasowa treść na komputerze znika
+// (src/styles/zal-dzialy.css); liczby TBA w banerze komputera ukryte. Telefon bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import SpisTresci from '../components/SpisTresci.astro';
+import TrescDzialu from '../components/zal/TrescDzialu.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -18,13 +23,18 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const w = poleWJezyku(lang);
-const { linki, grupy, sekcje, tytul, lead, haslo } = await danePopularyzacji(lang);
+const { linki, grupy, sekcje, tytul, lead, haslo, grupyMenu } = await danePopularyzacji(lang);
 
 // Pliki (/pliki/...) nie mają wersji językowych — bez prefiksu /en.
 const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
 const host = (a: string) => {
   try { return new URL(a).hostname.replace(/^www\./, ''); } catch { return ''; }
 };
+// Komputer: podstrony jak w menu — sekcje tej strony (kotwice w nowym bloku) i grupy z menu „Popularyzacja”.
+const grupyPod = [
+  { nazwa: 'Na tej stronie', nazwa_en: 'On this page', linki: grupy.map((g) => ({ etykieta: g.nazwa, etykieta_en: g.nazwa_en || undefined, adres: `#z-pop-${g.slug}` })) },
+  ...grupyMenu,
+];
 ---
 <Baza tytul={tytul} opis={lead || undefined} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
@@ -94,6 +104,43 @@ const host = (a: string) => {
       <SpisTresci naglowki={sekcje} lang={lang} wariant="bok" />
     </aside>
   </div>
+
+  <TrescDzialu dzial="popularyzacja" lang={lang} grupy={grupyPod}>
+    {grupy.length > 0 && (
+      <div class="z-dz-sek z-dz-bez-kreski">
+        <div class="z-dz-tba">
+          {grupy.map((g) => (
+            <section id={`z-pop-${g.slug}`} aria-labelledby={`z-pop-${g.slug}-h`}>
+              <h2 id={`z-pop-${g.slug}-h`}>{w(g, 'nazwa')}</h2>
+              {g.opis && <p class="opis">{w(g, 'opis')}</p>}
+              {g.pozycje.length === 0 ? (
+                <p class="tba" lang={lang === 'pl' ? 'en' : undefined}>To be announced</p>
+              ) : (
+                <ul class="z-dz-inic">
+                  {g.pozycje.map((p) => {
+                    const adres = (p.adres ?? '').trim();
+                    const zew = isExternal(adres);
+                    const meta = [p.archiwalne && T('archiwum', 'archive'), p.dla && `${T('Dla kogo', 'For whom')}: ${w(p, 'dla')}`, zew && host(adres)].filter(Boolean).join(' · ');
+                    return (
+                      <li class:list={[adres && 'z-dz-klik']}>
+                        <h3>
+                          {adres ? (
+                            <a href={href(adres)}>{w(p, 'nazwa')}{zew && <> <span class="z-dz-zew" aria-hidden="true">↗</span><span class="sr-only">{T('(strona zewnętrzna)', '(external website)')}</span></>}</a>
+                          ) : w(p, 'nazwa')}
+                        </h3>
+                        {p.opis && <p>{w(p, 'opis')}</p>}
+                        {meta && <p class="meta">{meta}</p>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+      </div>
+    )}
+  </TrescDzialu>
 </Baza>
 
 <style>

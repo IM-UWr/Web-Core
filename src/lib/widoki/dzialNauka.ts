@@ -1,4 +1,4 @@
-// Dane strony działu „Nauka” (src/views/DzialNauka.astro): liczby w banerze, kafelki z menu, projekty, konferencje, teksty z CMS.
+// Dane strony działu „Nauka” (src/views/DzialNauka.astro): liczby w banerze (telefon i komputer), kafelki z menu, projekty, konferencje, teksty z CMS.
 import dzial from '../../data/dzialy/nauka.json';
 import { wybierz } from '../i18n';
 import { today, addDays, type Lang } from '../daty';
@@ -42,11 +42,26 @@ export async function daneDzialuNauka(lang: Lang) {
   const rokTemu = addDays(dzis, -365);
   const obronyRok = odbyteObrony.filter((o) => o.data.termin.slice(0, 10) >= rokTemu);
 
-  // Pasek liczb (pozycje z zerem pomijamy).
+  // Konferencje w ostatnim roku (baner na komputerze; dok/estetyka.md, „Liczby w banerze Nauki”): bez odwołanych,
+  // z datą początku od dziś 365 dni wstecz — ta sama forma co „doktoraty w ostatnim roku”.
+  const konfOstatniRok = listaKonferencji.filter((k) => {
+    const d = k.data.poczatek.slice(0, 10);
+    return !k.data.odwolana && d >= rokTemu && d <= dzis;
+  });
+
+  // Pasek liczb (pozycje z zerem pomijamy). `liczby` — telefon (bez zmian: konferencje w bieżącym roku);
+  // `liczbyKomputer` — baner działu na komputerze (konferencje w ostatnim roku).
+  const lProjekty = { n: realizowane.length, l: odm(realizowane.length, ['realizowany projekt', 'realizowane projekty', 'realizowanych projektów'], ['ongoing project', 'ongoing projects']) };
+  const lObrony = { n: obronyRok.length, l: `${odm(obronyRok.length, ['doktorat', 'doktoraty', 'doktoratów'], ['PhD', 'PhDs'])} ${T('w ostatnim roku', 'in the past year')}` };
   const liczby = [
-    { n: realizowane.length, l: odm(realizowane.length, ['realizowany projekt', 'realizowane projekty', 'realizowanych projektów'], ['ongoing project', 'ongoing projects']) },
+    lProjekty,
     { n: konfWRoku.length, l: `${odm(konfWRoku.length, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'])} ${T(`w ${rok} roku`, `in ${rok}`)}` },
-    { n: obronyRok.length, l: `${odm(obronyRok.length, ['doktorat', 'doktoraty', 'doktoratów'], ['PhD', 'PhDs'])} ${T('w ostatnim roku', 'in the past year')}` },
+    lObrony,
+  ].filter((x) => x.n > 0);
+  const liczbyKomputer = [
+    lProjekty,
+    { n: konfOstatniRok.length, l: `${odm(konfOstatniRok.length, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'])} ${T('w ostatnim roku', 'in the last year')}` },
+    lObrony,
   ].filter((x) => x.n > 0);
 
   // Kafelki: grupy i linki z menu „Nauka” (nowy link w menu sam pojawi się tutaj).
@@ -66,5 +81,5 @@ export async function daneDzialuNauka(lang: Lang) {
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((lang === 'en' && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
 
-  return { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, grupy, naglowek, lead, haslo, badania, fakty };
+  return { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty };
 }

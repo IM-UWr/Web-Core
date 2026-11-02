@@ -4,10 +4,17 @@
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
 // reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
 // Telefon (≤ 760 px): wygląd „Portal” (bloki .tylko-telefon i style w @media (max-width: 760px)).
+// Komputer, kierunek „Założyciele” (etap 3): pod banerem nowy blok TrescDzialu (na końcu <main>; podstrony w grupach,
+// „O Instytucie” z „W skrócie”, ostatnie sukcesy z miniaturami, kontakt i dojazd); dotychczasowa treść na komputerze znika
+// (src/styles/zal-dzialy.css). Telefon bez zmian.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
 import WTymDziale from '../components/WTymDziale.astro';
+import TrescDzialu from '../components/zal/TrescDzialu.astro';
+import Sekcja from '../components/zal/dzial/Sekcja.astro';
+import Kontakt from '../components/zal/dzial/Kontakt.astro';
+import Szkic from '../components/zal/Szkic.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, RODZAJE, bezSierotek } from '../lib/i18n';
 import { long, type Lang } from '../lib/daty';
@@ -125,6 +132,30 @@ const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukce
       </div>
     </section>
   </div>
+
+  <TrescDzialu dzial="instytut" lang={lang} grupy={grupy} tekst={{ tytul: T('O Instytucie', 'About the Institute'), akapity: oInstytucie, fakty }}>
+    {sukcesy.length > 0 && (
+      <Sekcja id="z-dz-sukcesy" tytul={T('Ostatnie sukcesy', 'Recent achievements')} lang={lang} opis={sukcesyOpis || undefined}
+        linki={[{ etykieta: T('Wszystkie sukcesy', 'All achievements'), adres: '/nauka/sukcesy' }]}>
+        <div class="z-dz-suk">
+          {sukcesy.map((a) => {
+            const zajawka = (lang === 'en' && a.data.zajawka_en) || a.data.zajawka;
+            return (
+              <article class="z-dz-klik">
+                <div class="z-dz-fot">
+                  {a.data.zdjecie ? <img src={u(a.data.zdjecie)} alt="" loading="lazy" decoding="async" /> : <Szkic dzial="instytut" rodzaj="sygnet" />}
+                </div>
+                <time datetime={a.data.data.slice(0, 10)}>{long(a.data.data, lang, false)}</time>
+                <h3><a href={href(`/aktualnosci/${slugOf(a.id)}`)}>{(lang === 'en' && a.data.tytul_en) || a.data.tytul}</a></h3>
+                {zajawka && <p>{zajawka}</p>}
+              </article>
+            );
+          })}
+        </div>
+      </Sekcja>
+    )}
+    <Kontakt lang={lang} k={k} godziny={godziny || undefined} mapa={mapa} mapaEmbed={mapaEmbed} />
+  </TrescDzialu>
 </Baza>
 
 <style>
@@ -236,7 +267,8 @@ const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukce
   document.querySelectorAll<HTMLElement>('[data-mapa]').forEach((box) => {
     let zgoda = false;
     try { zgoda = localStorage.getItem('mapa-google') === '1'; } catch (e) {}
-    if (zgoda) pokaz(box);
+    // po zgodzie mapa wczytuje się sama tylko w widocznym bloku (na komputerze ten blok jest ukryty — mapa w TrescDzialu)
+    if (zgoda && box.getClientRects().length) pokaz(box);
     box.querySelector('[data-mapa-pokaz]')?.addEventListener('click', () => {
       try { localStorage.setItem('mapa-google', '1'); } catch (e) {}
       pokaz(box);

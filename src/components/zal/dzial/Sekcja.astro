@@ -1,0 +1,37 @@
+---
+// Sekcja strony działu na komputerze (TrescDzialu.astro): kreska na całą szerokość, tytuł Brygadą 34 px, linki do pełnych
+// podstron po prawej („Wszystkie … →”, zewnętrzne z ↗), pod tytułem opcjonalny opis; treść w slocie. Style: zal-dzialy.css.
+import { u, isExternal } from '../../../lib/url';
+import { wJezyku } from '../../../lib/i18n';
+import type { Lang } from '../../../lib/daty';
+
+interface Props {
+  id: string;
+  tytul: string;
+  lang: Lang;
+  linki?: { etykieta: string; adres: string }[];
+  opis?: string;
+  class?: string;
+}
+const { id, tytul, lang, linki = [], opis, class: klasa } = Astro.props;
+const en = lang === 'en';
+---
+<section class:list={['z-dz-sek', klasa]} aria-labelledby={id}>
+  <div class="z-dz-glowa">
+    <h2 id={id}>{tytul}</h2>
+    {linki.length > 0 && (
+      <div class="z-dz-linki">
+        {linki.map((l) => {
+          const zew = isExternal(l.adres);
+          return (
+            <a href={zew ? l.adres : u(wJezyku(l.adres, lang))}>
+              {l.etykieta} <span aria-hidden="true">{zew ? '↗' : '→'}</span>{zew && <span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span>}
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </div>
+  {opis && <p class="z-dz-opis">{opis}</p>}
+  <slot />
+</section>
