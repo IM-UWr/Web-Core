@@ -13,51 +13,17 @@ import TabelaReferatow from '../components/TabelaReferatow.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import dzial from '../data/dzialy/nauka.json';
-import { wPrzyszlosci, ETYKIETY } from '../lib/liczbyTerminow';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
-import { long, now, today, hasTime, type Lang } from '../lib/daty';
-import { seminaria, referaty, zaklady, seminariumReferatu, referatyWTygodniu, tydzienSeminariow, sala } from '../lib/tresci';
+import { long, type Lang } from '../lib/daty';
+import { sala, type Seminarium } from '../lib/tresci';
+import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const sem = await seminaria();
-const ref = await referaty();
-const zak = await zaklady();
-const n = now();
-const nastepny = (id: string) =>
-  ref.find((r) => seminariumReferatu(r) === id && (hasTime(r.data.termin) ? r.data.termin >= n : r.data.termin >= today()));
-// zakłady seminarium (tylko te, które są na stronie), w kolejności zakładów
-const zakladySem = (s: (typeof sem)[number]) => zak.filter((z) => s.data.zaklad.includes(z.id));
-const kolejnosc = (s: (typeof sem)[number]) => zakladySem(s)[0]?.data.kolejnosc ?? Infinity;
-const aktywne = sem.filter((s) => s.data.aktywne);
-const nieaktywne = sem.filter((s) => !s.data.aktywne);
-const zakladowe = aktywne.filter((s) => zakladySem(s).length > 0).sort((a, b) => kolejnosc(a) - kolejnosc(b));
-const niezalezne = aktywne.filter((s) => zakladySem(s).length === 0);
-const grupy = [
-  { id: 'h-zakladow', tytul: T('Seminaria zakładów', 'Department seminars'), lista: zakladowe },
-  { id: 'h-niezalezne', tytul: T('Seminaria niezależne', 'Independent seminars'), lista: niezalezne },
-].filter((g) => g.lista.length > 0);
-const tydzien = tydzienSeminariow();
-const wTygodniu = await referatyWTygodniu(lang);
-const nazwa = (s: (typeof sem)[number]) => (lang === 'en' && s.data.nazwa_en) || s.data.nazwa;
-const lead = lang === 'en'
-  ? 'Research seminars of the Mathematical Institute. Everyone is welcome.'
-  : 'Seminaria naukowe Instytutu Matematycznego. Zapraszamy wszystkich zainteresowanych.';
-// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json, seminaria_haslo / _en)
-// i trzy liczby pod kreską: seminaria (aktywne, jak karty niżej) · zapowiedziane referaty (wszystkich seminariów, definicja
-// wspólna z Kalendarzem — src/lib/liczbyTerminow.ts) · referaty w archiwum (minione referaty opublikowanych seminariów).
-const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'seminaria_haslo_en' : 'seminaria_haslo'] as string | undefined) || undefined;
-const idSem = new Set(sem.map((s) => s.id));
-const refSem = ref.filter((r) => idSem.has(seminariumReferatu(r)));
-const zapowiedziane = refSem.filter((r) => wPrzyszlosci(r.data.termin)).length;
-const liczby = [
-  { n: aktywne.length, pl: ['seminarium', 'seminaria', 'seminariów'] as [string, string, string], en: ['seminar', 'seminars'] as [string, string] },
-  { n: zapowiedziane, ...ETYKIETY.referaty },
-  { n: refSem.length - zapowiedziane, ...ETYKIETY.archiwum },
-];
+const nazwa = (s: Seminarium) => (lang === 'en' && s.data.nazwa_en) || s.data.nazwa;
+const { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, lead, haslo, liczby } = await daneListySeminariow(lang);
 ---
 <Baza tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>

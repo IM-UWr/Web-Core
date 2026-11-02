@@ -3,7 +3,10 @@
 // - src/data/publikacje/RRRR.json — wykaz prac danego roku w HTML (podstrona /nauka/publikacje/RRRR).
 // Liczby prac liczą się z wykazów — nie wpisuje się ich ręcznie.
 import katex from 'katex';
-import glowny from '../data/publikacje.json';
+import glowny from '../../data/publikacje.json';
+import dzial from '../../data/dzialy/nauka.json';
+import { wybierz } from '../i18n';
+import type { Lang } from '../daty';
 
 export interface Praca { autorzy?: string; tytul?: string; zrodlo?: string; opis?: string; doi?: string; if?: string; uwagi?: string }
 export interface Grupa { naglowek?: string; naglowek_en?: string; rok_wydania?: number; prace: Praca[] }
@@ -20,7 +23,7 @@ export interface DanePublikacji {
 
 export const dane = glowny as DanePublikacji;
 
-const pliki = import.meta.glob<{ default: Wykaz }>('../data/publikacje/*.json', { eager: true });
+const pliki = import.meta.glob<{ default: Wykaz }>('../../data/publikacje/*.json', { eager: true });
 export const wykazy: Record<number, Wykaz> = {};
 for (const m of Object.values(pliki)) if (m.default?.rok) wykazy[Number(m.default.rok)] = m.default;
 
@@ -120,4 +123,41 @@ export function tekstHtml(s: string | undefined, linki = false): string {
     last = i + url.length;
   }
   return out + zWzorami(s.slice(last));
+}
+
+// Dane widoku src/views/Publikacje.astro: lata z wykazami, czasopisma, liczby i motyw banera.
+export async function danePublikacji(lang: Lang) {
+  const en = lang === 'en';
+  const T = (pl: string, en_: string) => (en ? en_ : pl);
+
+  const tytul = T('Publikacje', 'Publications');
+  const lead = wybierz(dane as any, 'wstep', lang) || undefined;
+  const wszystkie = lata();
+  const zWykazem = wszystkie.filter((r) => r.wykaz);
+  const suma = zWykazem.reduce((s, r) => s + r.liczba, 0);
+  const najnowszy = wszystkie[0]?.rok;
+  const najstarszy = wszystkie[wszystkie.length - 1]?.rok;
+  const czasopisma = dane.czasopisma ?? [];
+  const liczby = [
+    ...(suma ? [{ n: suma.toLocaleString(en ? 'en-GB' : 'pl-PL'), l: T(`${odmiana(suma, 'pozycja', 'pozycje', 'pozycji')} w wykazach prac`, 'entries in the lists of publications') }] : []),
+    ...(najnowszy ? [{ n: najnowszy === najstarszy ? String(najnowszy) : `${najstarszy}–${najnowszy}`, l: T('lata objęte wykazami', 'years covered') }] : []),
+    ...(czasopisma.length ? [{ n: String(czasopisma.length), l: T(`${odmiana(czasopisma.length, 'czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych')} w Instytucie`, czasopisma.length === 1 ? 'journal edited at the Institute' : 'journals edited at the Institute') }] : []),
+  ];
+  // Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i trzy liczby w banerze.
+  // Roczniki = lata z wykazem prac (HTML), zakres — od najstarszego do najnowszego z nich; suma jak na komputerze
+  // (z separatorem tysięcy wg języka), dlatego jako gotowy napis z odmianą.
+  const haslo = ((dzial as any)[en ? 'publikacje_haslo_en' : 'publikacje_haslo'] as string | undefined) || undefined;
+  const lataWykazow = zWykazem.length ? (zWykazem.length === 1 ? String(zWykazem[0].rok) : `${zWykazem[zWykazem.length - 1].rok}–${zWykazem[0].rok}`) : '';
+  const liczbyTelefon = [
+    { n: suma ? suma.toLocaleString('pl-PL') : '', n_en: suma.toLocaleString('en-GB'), pl: `${odmiana(suma, 'pozycja', 'pozycje', 'pozycji')} w wykazach`, en: suma === 1 ? 'entry in the lists' : 'entries in the lists' },
+    { n: zWykazem.length, pl: [`rocznik, ${lataWykazow}`, `roczniki, ${lataWykazow}`, `roczników, ${lataWykazow}`], en: [`year, ${lataWykazow}`, `years, ${lataWykazow}`] },
+    // bez „w IM” — przy 360 px „redagowane w IM” nie mieści się w kolumnie i etykieta szłaby na trzy linijki
+    { n: czasopisma.length, pl: ['czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych'], en: ['journal we edit', 'journals we edit'] },
+  ] as ({ n: string; n_en?: string; pl: string; en?: string } | { n: number; pl: [string, string, string]; en: [string, string] })[];
+  // Animacja w tle banera na telefonie (motyw „cytowania”): liczby prac w latach z wykazem, rosnąco — [rok, liczba, rok, …].
+  const motywDane = { lata: [...zWykazem].reverse().flatMap((r) => [r.rok, r.liczba]) };
+  const nagCzasopisma = wybierz(dane as any, 'czasopisma_naglowek', lang) || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
+  const archiwum = wybierz(dane as any, 'archiwum', lang);
+
+  return { tytul, lead, wszystkie, najnowszy, czasopisma, liczby, haslo, liczbyTelefon, motywDane, nagCzasopisma, archiwum };
 }

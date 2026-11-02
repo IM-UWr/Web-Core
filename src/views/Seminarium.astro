@@ -3,8 +3,7 @@
 // działów (kreska sekcji, tytuł h2).
 // Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (koordynatorzy i kontakt bez zmian), reszta strony jak w wariancie „Zwarta”
 // (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px; zlecenie 01): w banerze hasło i liczby, koordynatorzy pod banerem — opis przy `haslo` niżej.
-import { render } from 'astro:content';
+// Telefon (≤ 760 px; zlecenie 01): w banerze hasło i liczby, koordynatorzy pod banerem — opis przy `haslo` w src/lib/widoki/seminarium.ts.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import Ikona from '../components/Ikona.astro';
@@ -13,49 +12,15 @@ import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { longWithDay, short, time, hasTime, type Lang } from '../lib/daty';
-import { referaty, seminariumReferatu, slugOf, sala, zaklady, pracownicy, type Seminarium } from '../lib/tresci';
-import { wPrzyszlosci, ETYKIETY } from '../lib/liczbyTerminow';
-import { zTytulem } from '../lib/osoby';
-import { renderMarkdown } from '../lib/markdown';
-import ustawienia from '../data/ustawienia.json';
+import { slugOf, sala, type Seminarium } from '../lib/tresci';
+import { daneSeminarium } from '../lib/widoki/seminarium';
 
 interface Props { seminarium: Seminarium; lang: Lang }
 const { seminarium, lang } = Astro.props;
 const d = seminarium.data;
-const nazwa = (lang === 'en' && d.nazwa_en) || d.nazwa;
-const { Content } = await render(seminarium);
-// opis seminarium po angielsku (pole tresc_en); puste = wersja angielska pokazuje opis po polsku
-const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
-const wszystkie = (await referaty()).filter((r) => seminariumReferatu(r) === seminarium.id);
-// „Nadchodzące” = referaty z terminem w przyszłości — ta sama definicja co „zapowiedziane referaty” w banerach (liczbyTerminow.ts)
-const przyszle = (r: (typeof wszystkie)[number]) => wPrzyszlosci(r.data.termin);
-const nadchodzace = await Promise.all(wszystkie.filter(przyszle).map(async (r) => ({ r, C: (await render(r)).Content })));
-const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(async (r) => ({ r, C: (await render(r)).Content })));
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-// zakład(y), do których należy seminarium — link zamiast listy uczestników (skład jest na stronie zakładu)
-const zakladySem = (await zaklady()).filter((z) => d.zaklad.includes(z.id));
-// Koordynator(zy) = pole „prowadzący”: nazwisko z tytułem ze spisu pracowników, link do strony domowej, jeśli jest.
-// Termin i sala nie są stałe — każdy referat ma własne.
-const osoby = await pracownicy();
-const koordynatorzy = d.prowadzacy.map((imie) => {
-  const kand = osoby.filter((p) => p.data.imie_nazwisko === imie.trim());
-  const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
-  return { nazwa: zTytulem(o?.data.stopien, imie), strona: o?.data.strona as string | undefined };
-});
-// Adres automatu listy mailingowej (Google Apps Script, patrz README → „Powiadomienia e-mail”); pusty = zapisy wyłączone.
-const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
-// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Seminaria”, tytuł, hasło o tematyce
-// seminarium, kreska i liczby. Hasło: pole `haslo` / `haslo_en` seminarium (CMS); puste — nazwa zakładu w języku strony
-// (bez zakładu — bez hasła, jak dotąd). Koordynatorzy, e-mail i zakład — w zwartym bloku pod banerem (.sm-koord);
-// w banerze zostają tylko na komputerze (.sem-koord.tylko-komputer).
-const haslo = (lang === 'en' ? d.haslo_en : d.haslo)?.trim() || (zakladySem[0] ? wybierz(zakladySem[0].data, 'nazwa', lang) : undefined);
-const liczby = [
-  { n: nadchodzace.length, ...ETYKIETY.referaty },
-  { n: minione.length, ...ETYKIETY.archiwum },
-  { n: koordynatorzy.length, pl: ['koordynator', 'koordynatorów', 'koordynatorów'] as [string, string, string], en: ['coordinator', 'coordinators'] as [string, string] },
-];
-const maKoord = koordynatorzy.length > 0 || zakladySem.length > 0 || !!d.kontakt;
+const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, adresListy, haslo, liczby, maKoord } = await daneSeminarium(seminarium, lang);
 ---
 <Baza tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={nazwa} haslo={haslo} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}>

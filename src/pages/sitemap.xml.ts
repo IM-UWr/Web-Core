@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import { aktualnosci, obrony, seminaria, granty, slugOf } from '../lib/tresci';
 import { absolute } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
-import { wykazy } from '../views/publikacjeDane';
+import { wykazy } from '../lib/widoki/publikacje';
 
 export async function GET(context: APIContext) {
   const sciezki: string[] = ['/', '/instytut', '/nauka', '/studia', '/popularyzacja', '/aktualnosci', '/kalendarz', '/seminaria', '/pracownicy', '/obrony-doktorskie', '/nauka/konferencje', '/nauka/granty', '/nauka/sukcesy', '/studia/rok-akademicki'];

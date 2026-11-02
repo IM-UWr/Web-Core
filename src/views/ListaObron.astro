@@ -8,31 +8,16 @@ import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TekstWstepny from '../components/TekstWstepny.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import ustawienia from '../data/ustawienia.json';
-import dzial from '../data/dzialy/nauka.json';
-import { ETYKIETY } from '../lib/liczbyTerminow';
 import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
 import { t, wJezyku } from '../lib/i18n';
-import { dayNum, monthShort, longWithDay, short, type Lang } from '../lib/daty';
-import { miejsce, obrony, slugOf, trwaLubBedzie, type Obrona } from '../lib/tresci';
+import { dayNum, monthShort, longWithDay, type Lang } from '../lib/daty';
+import { miejsce, slugOf, trwaLubBedzie, type Obrona } from '../lib/tresci';
+import { daneListyObron } from '../lib/widoki/listaObron';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const wszystkie = await obrony();
-const przyszle = wszystkie.filter((o) => trwaLubBedzie({ poczatek: o.data.termin })).reverse();
-const odbyte = wszystkie.filter((o) => !trwaLubBedzie({ poczatek: o.data.termin }));
-const lead = lang === 'en'
-  ? 'Public defences of doctoral theses in mathematics: notices, theses, abstracts and reviews.'
-  : 'Publiczne obrony rozpraw doktorskich z matematyki: zawiadomienia, rozprawy, streszczenia i recenzje.';
-// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json, obrony_haslo / _en)
-// i dwie liczby pod kreską: nadchodzące · odbyte obrony — te same listy co sekcje niżej (termin w przyszłości, jak
-// „nadchodzące obrony” w Kalendarzu — src/lib/liczbyTerminow.ts).
-const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'obrony_haslo_en' : 'obrony_haslo'] as string | undefined) || undefined;
-const liczby = [
-  { n: przyszle.length, ...ETYKIETY.obrony },
-  { n: odbyte.length, pl: ['odbyta obrona', 'odbyte obrony', 'odbytych obron'] as [string, string, string], en: ['past defence', 'past defences'] as [string, string] },
-];
+const { przyszle, odbyte, lead, haslo, liczby, ustawienia } = await daneListyObron(lang);
 ---
 <Baza tytul={t(lang, 'obrony')} opis={lead} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={t(lang, 'obrony')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]}>

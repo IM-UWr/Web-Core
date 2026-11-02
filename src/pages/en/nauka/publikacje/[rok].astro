@@ -1,6 +1,6 @@
 ---
 import PublikacjeRok from '../../../../views/PublikacjeRok.astro';
-import { wykazy } from '../../../../views/publikacjeDane';
+import { wykazy } from '../../../../lib/widoki/publikacje';
 export function getStaticPaths() {
   return Object.keys(wykazy).map((rok) => ({ params: { rok }, props: { rok: Number(rok) } }));
 }
