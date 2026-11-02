@@ -89,7 +89,7 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - Warto wiedzieć losowane (PYTANIA.md, 9); drugi ekran na całą szerokość jak w prototypie (PYTANIA.md, 7).
 
 ## Etap 4 (częściowo): przejścia, wspólny szablon stron treści
-**Commit:** patrz „Stan gałęzi” na końcu.
+**Commit:** `aefc17a6` (gałąź etapu: `git branch wyglad/04-reszta aefc17a6`).
 - **Przejścia między stronami** (`src/styles/zal-przejscia.css`): wspólne elementy z `view-transition-name`, tylko komputer i tylko bez „ogranicz ruch”: okładka → dział (szkic i nazwa działu przelatują na miejsce w banerze, pasek się pojawia, zdjęcie przenika), dział → podstrona (pasek stoi, szkic maleje do sygnetu, podpis leci z nim, tytuł przenika), podstrona → podstrona (nagłówek stoi, znak przenika, boczna nawigacja stoi, zaznaczenie się przesuwa), inny dział — przenikanie. Czas 0,3 s. Na każdej stronie nazwy są unikalne (sprawdzone w Chromium, bez błędów w konsoli). Działa w Chrome/Edge 126+ i Safari 18.2+.
 - **Strony treści** (`src/views/Strona.astro` — wszystkie strony z `src/content/strony`, np. Kontakt, Pierwszy rok, Sprawy studenckie): boczna nawigacja działu z lewej ze spisem „Na tej stronie” z nagłówków, treść bez pasów i kafelków, „Następna strona w dziale” (z etapu 3). Dotychczasowy pasek boczny i spis u góry schowane na komputerze.
 - **Nie przeniesione na wspólny szablon** (mają nowy nagłówek, kolory, kroje i „Następną stronę w dziale”, ale dotychczasowy układ treści): Pracownicy, Struktura i zakłady, zakład, Seminaria i seminarium, Konferencje, Obrony i obrona, Publikacje i rocznik, Sukcesy, grant, Rok akademicki, kierunek, specjalność, Warto wiedzieć, Aktualności, Kalendarz. Każda ma własny blok treści; przeniesienie to osobna praca na stronę (wzór: Władze, Projekty i granty, Plan zajęć).
@@ -128,4 +128,21 @@ diff -r ../wzorzec/dist ../etap1/dist && echo IDENTYCZNE
 - **Pasek przyklejony po przewinięciu** — w specyfikacji „do zrobienia”/otwarte; nie robiłem.
 - **Podmenu w pasku** — wyłączone 2.11 (zgodnie ze zleceniem).
 - **Telefon** — bez zmian (sprawdzone zrzutami).
+
+## Stan gałęzi `wyglad/zalozyciele` (od `ae6d5d96`)
+| Etap | Commity (od najstarszego) | Ostatni |
+|---|---|---|
+| 1 — krok zero | `aa293c48`, `10e8ebf6`, `d38f749c`, `fa5d0cbb` (raport) | `fa5d0cbb` |
+| 2 — fundament | `d98f3383` | `d98f3383` |
+| 3 — strony z prototypu | `4796664a`, `95f76d6b`, `363125c6`, `0bcfcc2e`, `94b13c48`, `658fd48d`, `5ef8d511` | `5ef8d511` |
+| 4 — reszta (częściowo) | `aefc17a6` | `aefc17a6` |
+
+Zależności: nowa paczka `@fontsource-variable/brygada-1918` w `package.json` (po pobraniu gałęzi: `npm install`). `package-lock.json` nie jest w repozytorium (jak dotąd).
+
+## Jak obejrzeć u siebie
+```bash
+git fetch origin wyglad/zalozyciele && git switch wyglad/zalozyciele
+npm install
+npm run dev   # http://localhost:4321/Web-Core/ — okno ≥ 761 px: nowy wygląd, ≤ 760 px: telefon jak dotąd
+```
 

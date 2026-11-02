@@ -68,3 +68,17 @@ Każde pytanie: co było niejasne, jaką odpowiedź przyjąłem (najbezpieczniej
 **Przyjęta odpowiedź.** Zachowane losowanie (ten sam skrypt co dotąd): „Zawsze pokazuj” na początku, reszta losowo, bez JS — pierwsze cztery według kolejności.
 
 **Commit.** Etap 3 (`95f76d6b`). **Jak cofnąć.** Usunąć `data-losuj` i skrypt `LOSUJ` w `DrugiEkran.astro`.
+
+## 10. Popularyzacja: „To be announced” czy inicjatywy z danych?
+**Pytanie.** Prototyp pokazuje cztery sekcje „To be announced”. W danych (`src/data/popularyzacja.json`) trzy grupy mają już opisane inicjatywy, widoczne dziś na telefonie.
+
+**Przyjęta odpowiedź.** Pokazuję inicjatywy z danych (nazwa, opis, „Dla kogo · domena”); „To be announced” tylko przy grupie bez inicjatyw. Liczby TBA w banerze ukryte jak w prototypie.
+
+**Commit.** Etap 3 (`658fd48d`). **Jak cofnąć.** W `src/views/Popularyzacja.astro` (blok `TrescDzialu`) pokazywać dla każdej grupy tylko „To be announced”.
+
+## 11. Usuwanie starego kodu wyglądu komputerowego (etap 4)
+**Pytanie.** Zlecenie każe usunąć stary kod komputera, którego nic już nie używa, bez ruszania telefonu. Część starych reguł (nagłówek, baner strony głównej, układy „zwarta”/„portal”) jest wspólna z telefonem albo potrzebna stronom, których jeszcze nie przeniesiono.
+
+**Przyjęta odpowiedź.** Nic nie usunąłem; kandydaci są wypisani w raporcie (etap 4). Bezpieczniej usuwać po przeniesieniu wszystkich podstron i ze sprawdzeniem na prawdziwych treściach.
+
+**Commit.** Nie dotyczy. **Jak zmienić.** Osobne zadanie po przeniesieniu pozostałych podstron.
