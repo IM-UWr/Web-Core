@@ -234,7 +234,7 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 
 ## Zasady nagłówka podstrony: sygnet, podpis i znak (2.11, 01:00–01:19)
 - **Sygnet** stoi w lewym marginesie przed tytułem, oddzielony pionową kreską. **Podpis** jest bardzo mały (ok. 56 px szerokości, węższy niż głowa) i stoi pod sygnetem, wyśrodkowany.
-- **Nagłówek z hasłem i liczbami** (np. Projekty i granty, Plan zajęć): środek sygnetu wypada na środek pierwszej litery tytułu, a podpis stoi pod sygnetem.
+- **Nagłówek z hasłem i liczbami** (np. Projekty i granty, Plan zajęć): środek sygnetu wypada na środek pierwszej litery tytułu, a podpis stoi pod sygnetem, w jednej linii z kolorowym hasłem (np. „Zawsze aktualny, prosto z USOS”).
 - **Nagłówek bez hasła i liczb** (np. Władze Instytutu): podpis leży mniej więcej na linii bazowej tytułu, a sygnet tuż nad nim.
 - **Znak patrona z opisem:**
   - w niskim nagłówku (bez liczb): ok. 145×170 px przy prawej krawędzi kolumny, opis obok;
