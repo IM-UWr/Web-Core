@@ -8,10 +8,11 @@ Pracujesz sam, bez nadzoru. Nikt nie odpowie na pytania. Jeśli coś jest niejas
 - Wzorzec wyglądu: prototyp `proto/zalozyciele.src.html` z tej samej gałęzi. Zawiera dokładne wartości CSS, kolory, rozmiary i logikę JS (układ bloku tytułu, długa kolumna z FLIP, znaki patronów, paski czasu, filtr planu, maski podpisów). Gotowy plik `proto/zalozyciele.html` otwiera się w przeglądarce. **Panel przełączników i skalowanie podglądu to tylko narzędzia prototypu, ich nie przenosisz.** Obowiązują ustawienia domyślne prototypu.
 - Szkice patronów: `szkice/*.svg` z tej samej gałęzi (pełny z grupami `kontur` i `detale`, sygnet, podpis z grupami `obrys` i `prowadzaca`). Źródła: `szkice/ZRODLA.md`.
 - Pliki z tamtej gałęzi czytaj przez `git fetch origin kopia/2026-11-01-estetyka-prototypy` i `git show origin/kopia/2026-11-01-estetyka-prototypy:ŚCIEŻKA`, albo przez osobny `git worktree`. Nie scalaj tej gałęzi z kodem.
-- **Gałąź bazowa: `kopia/2026-11-01-agent-nauka-podglad`** (commit `ae6d5d96`, stan z komputera właściciela).
+- **Gałąź robocza sesji: `wyglad/zalozyciele`.** Założona 2.11 z `kopia/2026-11-01-agent-nauka-podglad` (commit `ae6d5d96`, stan z komputera właściciela). Na niej pracujesz i na nią pushujesz.
+- **Etapy oznaczaj w commitach** („Etap 1: …”, „Etap 2: …”). Jeśli push na dodatkowe gałęzie jest możliwy, po każdym etapie wypchnij też jego stan jako `wyglad/01-krok-zero`, `wyglad/02-fundament` itd. Jeśli jest zablokowany, wystarczy sama `wyglad/zalozyciele`.
 
 ## 1. Twarde zasady
-1. **Push wyłącznie na nowe gałęzie z prefiksem `wyglad/`.** Nigdy na `main`, `agent-nauka-podglad` ani gałęzie `kopia/*`. Bez force-push i bez scalania do `main`.
+1. **Push wyłącznie na `wyglad/zalozyciele` (i ewentualnie gałęzie etapów `wyglad/*`).** Nigdy na `main`, `agent-nauka-podglad` ani gałęzie `kopia/*`. Bez force-push i bez scalania do `main`.
 2. **Nie uruchamiaj `skrypty/pobierz_tresci.py`.** Budujesz na treściach, które są w repozytorium.
 3. **Struktury danych nie zmieniasz.** Nowe pola w `src/data` i schemacie treści tylko dodajesz, opcjonalnie. Istniejących treści nie przepisujesz. Konfiguracji CMS nie ruszasz, a potrzebne zmiany wypisujesz w raporcie.
 4. **Telefon (≤ 760 px) zostaje bez zmian.** Nowy wygląd dotyczy tylko komputera: style nowego wyglądu za `@media (min-width: 761px)`, a style i bloki telefonu (`telefon.css`, `.tylko-telefon`, silnik banerów `src/scripts/baner/`) zostawiasz. Weryfikacja w punkcie 4.
