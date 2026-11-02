@@ -81,6 +81,7 @@
   .z-warto { grid-column: 1 / span 2; grid-row: 3; }
   .z-warto .rzad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 28px; }
   .z-warto .rzad a { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .z-warto .rzad a[hidden] { display: none; }
   .z-warto .rzad span { font-family: var(--f-display); font-size: 18px; color: var(--d-a); }
   .z-warto .rzad .t { font-weight: 600; color: var(--ink); }
 

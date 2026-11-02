@@ -116,12 +116,19 @@ const kierunki = [
   ...((st.kierunki ?? []) as any[]).map((k) => ({ poziom: wybierz(k, 'poziom', lang), nazwa: wybierz(k, 'nazwa', lang), opis: wybierz(k, 'opis', lang), adres: k.adres })),
 ].map((k) => ({ ...k, skrot: SKROTY[k.nazwa as string], pelna: k.nazwa }));
 
-// Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł); „Zawsze pokazuj” najpierw, dalej wg kolejności
+// Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł). Jak dotąd na stronie głównej (decyzja 30.10.2026, WartoWiedziec.astro):
+// w HTML wszystkie pozycje „na głównej”, widoczne pierwsze cztery („Zawsze pokazuj” najpierw, dalej wg kolejności — to widzą
+// przeglądarki bez JS), a skrypt w linii zaraz pod listą losuje pozostałe miejsca przed narysowaniem strony.
+const WARTO_ILE = 4;
 const warto = (await getCollection('warto_wiedziec'))
   .filter((w) => w.data.opublikowany !== false && w.data.na_glownej)
-  .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze) || a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? ''))
-  .slice(0, 4)
-  .map((w) => ({ rok: w.data.rok ?? '', tytul: wybierz(w.data, 'tytul', lang) as string, adres: w.body?.trim() ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
+  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
+  .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze))
+  .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: w.body?.trim() ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
+const LOSUJ = `(function(box){if(!box||!box.dataset.losuj)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
+  `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
+  `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
+  `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
 ---
 <section class="z-druga tylko-komputer" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
   <nav class="z-skr" aria-label={T('Szybki dostęp', 'Quick access')}>
@@ -178,7 +185,8 @@ const warto = (await getCollection('warto_wiedziec'))
     {warto.length > 0 && (
       <section class="z-warto" data-dzial="instytut" aria-labelledby="z-h-warto">
         <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Did you know')}</h2><a href={href('/warto-wiedziec')}>{T('Wszystkie →', 'All →')}</a></div>
-        <div class="rzad">{warto.map((w) => <a href={href(w.adres)}><span>{w.rok}</span><b class="t">{w.tytul}</b></a>)}</div>
+        <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((w, i) => <a href={href(w.adres)} data-zawsze={w.zawsze ? '' : undefined} hidden={i >= WARTO_ILE}><span>{w.rok}</span><b class="t">{w.tytul}</b></a>)}</div>
+        <script is:inline set:html={LOSUJ} />
       </section>
     )}
   </div>
