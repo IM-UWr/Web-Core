@@ -109,3 +109,39 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - długie paski na wąskim ekranie mogą przejść do drugiego rzędu, ramki i kreski mają zostać spójne;
   - na Aktualnościach i Kalendarzu na telefonie zostaje lista wyboru zamiast paska (jak dziś), w nowym stylu pola.
 - **Nie dotyczy** (to nie przyciski): kropki kolorów dni, liczniki przy latach, etykiety rodzaju przy aktualnościach. Do osobnej decyzji.
+
+### 5. Strona działu: menu podstron „wiersze na pasie” (decyzja 4.11, 23:13; wariant E w prototypie)
+- Zamiast dotychczasowych trzech kolumn z pięcioma wierszami każda (Instytut, Nauka, Studia; Popularyzacja bez zmian): **pas w jasnym kolorze działu (`--d-t`) tuż pod banerem, na całą szerokość**.
+- W kolumnie treści trzy wiersze, po jednym na grupę z menu:
+  - z lewej nazwa grupy (13,5 px, pogrubiona, kolor działu, kolumna 140 px);
+  - z prawej strony grupy jako zwykłe linki Brygadą 21 px, odstęp 24 px; zewnętrzne z „↗”.
+- Wiersze oddzielone kreską `1px` w kolorze działu z przezroczystością ok. 20%. Pas ma padding 12 px góra i dół. Pod pasem treść działu z odstępem ok. 34 px.
+- Nic się nie rozwija ani nie przełącza: wszystkie strony widać od razu. Bez JS. Grupy i linki z menu (`nawigacja.json`), jak dziś.
+- Opis strony (np. „przedmioty, terminy i sale z USOS”) jest tylko w `title` linku, jeśli istnieje w danych. Nie wymyślaj opisów.
+- Szerokości tak dobrane, żeby na Studiach każdy wiersz mieścił się w jednej linii przy kolumnie 1240 px. Jeśli się nie mieści, wiersz zawija się pod sobą (linki nie są ucinane).
+- Telefon: nazwa grupy nad linkami, linki zawijane.
+
+### 6. Pasek menu i hamburger (decyzje 4.11, 22:56–23:21)
+- **Pasek:** Instytut · Nauka · Studia · Popularyzacja · Aktualności, za cienką kreską: **przełącznik trybu ciemnego, EN, hamburger** (w tej kolejności). Rekrutacja i Szukaj znikają z paska.
+- **Hamburger na każdej stronie**, ten sam panel co na okładce (z prawej, wysuwany):
+  - na górze pole „Szukaj na stronie”;
+  - cztery działy z podstronami, **przed każdym działem mała twarz patrona** (uproszczony sygnet, ok. 52×62 px, kreska w kolorze działu, bez podpisu);
+  - na dole duże „Aktualności” i „Rekrutacja ↗”, z większym oddechem (ok. 20 px góra/dół, Brygada 28 px), wyrównane do tekstu działów. Rekrutacja nie dubluje się w liście Studiów.
+- **Okładka:** w rogu ten sam zestaw: tryb ciemny, EN, hamburger. Szukaj jest w panelu.
+- **Pasek przyklejony u góry na stronach działów i podstronach, zmienia kolor:**
+  - nad banerem ciemny (przezroczysty, biały tekst, jak dziś);
+  - nad treścią jasny: tło strony z lekką przezroczystością i rozmyciem, tekst w kolorze tekstu, logo UWr w kolorze tekstu, kreski działów w kolorze głębokim (w ciemnym motywie jasnym), cienka linia u dołu;
+  - nad stopką znowu ciemny;
+  - przejście kolorów ok. 0,25 s, bez przejścia przy `prefers-reduced-motion`.
+  
+  Kolor wybiera skrypt według tego, co jest pod paskiem (IntersectionObserver na banerze i stopce).
+- **Panel hamburgera w kolorze paska:** gdy pasek ciemny, panel granatowy jak dziś; gdy jasny, panel jasny (tło strony, tekst w kolorze tekstu, linki przygaszone, sygnety i kreski w kolorze działu, ramka pola szukania `--line`).
+- **Fokus przy otwieraniu panelu** przenosić z `focus({ preventScroll: true })`, bo w prototypie zwykłe `focus()` na wysuwającym się panelu przesuwało całą okładkę w bok.
+
+### 7. Okładka: logo i wydział w górnej linii (decyzja 4.11, 23:16)
+- Logo UWr (z napisem „Uniwersytet Wrocławski”) przechodzi z bloku tytułu do górnej linii okładki, z lewej, na wysokości narzędzi z prawej. Obok, za pionową kreską: „Wydział Matematyki / i Informatyki” w dwóch liniach (14 px, biały 85%). Logo i wydział to link do strony wydziału.
+- W bloku tytułu zostaje samo „Instytut Matematyczny”, trochę niżej niż dziś.
+- **Do decyzji (prototyp, przełączniki na okładce):** wielkość liter tytułu („równe końce”: dziś, różne wielkości, końce na skosie; „równa wielkość”) i zakręt ciemnego pola („jak dotąd” albo „płynny”: skos przechodzi łukiem w pas pod działami).
+
+### 8. Wersja angielska: flaga przy „PL” (decyzja 4.11, 23:19)
+- Przełącznik języka zawsze z flagą języka docelowego: na stronach polskich flaga UK i „EN” (jak dziś), na stronach angielskich **flaga Polski i „PL”**. Ten sam wygląd i rozmiar co flaga UK, także w panelu i na telefonie.

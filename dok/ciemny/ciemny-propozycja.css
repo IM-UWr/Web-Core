@@ -1,0 +1,274 @@
+/* ==========================================================================================================
+   CIEMNY MOTYW: trzy warianty (propozycja 4.11.2026)
+   A „Nocny granat”, B „Ciepły grafit”, C „Łupek”. Wkleić na koniec <style>.
+   Włączanie: <html data-ciemny="A|B|C">. Działa tylko w ciemnym motywie: przy data-theme="dark" albo bez data-theme
+   przy systemowym ciemnym. Bez data-ciemny zostaje dotychczasowy ciemny motyw.
+   Zasada: nadpisane są zmienne; sztywne kolory tylko tam, gdzie w ciemnym wychodziły źle (z komentarzem).
+   Paleta działów zostaje (JS wpisuje --*-j/g/a/t na :root); ciemny liczy --d-a i --d-t z --d-j, więc działa dla obu palet.
+   ========================================================================================================== */
+
+/* ---------- A: Nocny granat — głęboki granat zamiast czerni; banery i stopka w granacie strony głównej są o ton ciemniejsze od treści ---------- */
+:root[data-theme="dark"][data-ciemny="A"] {
+  --m-bg: #18243b; /* oklch(0.262 0.047 263) */
+  --m-surface: #222e46; /* oklch(0.302 0.047 264), pół tonu nad tłem */
+  --m-ink: #e4eaf5; /* nagłówki */
+  --m-text: #ced5e3; /* tekst */
+  --m-muted: #a5afc1; /* przygaszony */
+  --m-line: #3a465c; /* linie podziału */
+  --m-line-ui: #727c8f; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #7d8697; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #24324f; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #0f1a30; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #a5afc1;
+  --p-line: #323d53;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-ciemny="A"] {
+  --m-bg: #18243b; /* oklch(0.262 0.047 263) */
+  --m-surface: #222e46; /* oklch(0.302 0.047 264), pół tonu nad tłem */
+  --m-ink: #e4eaf5; /* nagłówki */
+  --m-text: #ced5e3; /* tekst */
+  --m-muted: #a5afc1; /* przygaszony */
+  --m-line: #3a465c; /* linie podziału */
+  --m-line-ui: #727c8f; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #7d8697; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #24324f; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #0f1a30; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #a5afc1;
+  --p-line: #323d53;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+} }
+
+/* ---------- B: Ciepły grafit — ciepła szarość w parze z ciepłym jasnym tłem #fcfaf6; granat zostaje w banerach, stopce, okładce i panelu menu ---------- */
+:root[data-theme="dark"][data-ciemny="B"] {
+  --m-bg: #272420; /* oklch(0.262 0.009 75) */
+  --m-surface: #312e2a; /* oklch(0.303 0.008 75), pół tonu nad tłem */
+  --m-ink: #efece7; /* nagłówki */
+  --m-text: #dbd7d0; /* tekst */
+  --m-muted: #b4afa6; /* przygaszony */
+  --m-line: #484541; /* linie podziału */
+  --m-line-ui: #7e7b78; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #888683; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #232f47; /* NOWY: panel menu z hamburgera */
+  --c-a: 80%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 12%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #1e1a17; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b4afa6;
+  --p-line: #403c39;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-ciemny="B"] {
+  --m-bg: #272420; /* oklch(0.262 0.009 75) */
+  --m-surface: #312e2a; /* oklch(0.303 0.008 75), pół tonu nad tłem */
+  --m-ink: #efece7; /* nagłówki */
+  --m-text: #dbd7d0; /* tekst */
+  --m-muted: #b4afa6; /* przygaszony */
+  --m-line: #484541; /* linie podziału */
+  --m-line-ui: #7e7b78; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #888683; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #232f47; /* NOWY: panel menu z hamburgera */
+  --c-a: 80%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 12%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #1e1a17; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b4afa6;
+  --p-line: #403c39;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+} }
+
+/* ---------- C: Łupek — przygaszony, mało nasycony granat (łupek): najspokojniejsze tło do długiego czytania, kolory działów najczystsze ---------- */
+:root[data-theme="dark"][data-ciemny="C"] {
+  --m-bg: #242b36; /* oklch(0.287 0.023 259) */
+  --m-surface: #2d3640; /* oklch(0.329 0.022 251), pół tonu nad tłem */
+  --m-ink: #e9edf2; /* nagłówki */
+  --m-text: #d5d9e0; /* tekst */
+  --m-muted: #b0b6be; /* przygaszony */
+  --m-line: #454c57; /* linie podziału */
+  --m-line-ui: #7c828b; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #878d94; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #2d3848; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 52%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.86; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #19212b; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b0b6be;
+  --p-line: #3b434d;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-ciemny="C"] {
+  --m-bg: #242b36; /* oklch(0.287 0.023 259) */
+  --m-surface: #2d3640; /* oklch(0.329 0.022 251), pół tonu nad tłem */
+  --m-ink: #e9edf2; /* nagłówki */
+  --m-text: #d5d9e0; /* tekst */
+  --m-muted: #b0b6be; /* przygaszony */
+  --m-line: #454c57; /* linie podziału */
+  --m-line-ui: #7c828b; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #878d94; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #2d3848; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 52%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.86; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #19212b; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b0b6be;
+  --p-line: #3b434d;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+} }
+
+/* ---------- reguły wspólne wariantów: wybrany ciemny motyw ---------- */
+/* kolory działu. Tekst: jasny kolor działu z domieszką --m-ink (pastel zamiast neonu, ≥ 4,5:1 na tle, powierzchni i --d-t,
+   a tło strony na nim jako tekst wypełnionego przycisku też ≥ 4,5:1). Tło działu: odrobina jasnego koloru w powierzchni,
+   zamiast przyciemnionego głębokiego (dawało brudny brąz). :where() trzyma wagę 0,3,0, jak obecna reguła ciemna,
+   więc .pasek-na-banerze … a[data-dzial] dalej bierze --d-j. Liczone z --d-j, więc działa też dla palety Stonowanej. */
+:root[data-theme="dark"][data-ciemny] :where([data-dzial]) {
+  --d-a: color-mix(in oklab, var(--d-j) var(--c-a), var(--m-ink));
+  --d-t: color-mix(in oklab, var(--d-j) var(--c-t), var(--c-t-baza));
+}
+/* „Przyciski”, stan dziś: tekst wybranej pigułki brał sztywne #0a1020 */
+:root[data-theme="dark"][data-ciemny] .pk { --pk-stary: var(--m-text); --pk-stary-ink: var(--m-bg); }
+
+/* Dalej prefiks w :where(): waga jak w regule bazowej, wygrywa kolejność, a stany (:hover, wybrany) nadal działają. */
+
+/* grube kreski 2 px nad sekcjami: w jasnym --m-ink, w ciemnym prawie biała kreska świeci; łagodniejsza --m-rule */
+:where(:root[data-theme="dark"][data-ciemny]) .skrot, :where(:root[data-theme="dark"][data-ciemny]) .ok-skr, :where(:root[data-theme="dark"][data-ciemny]) .ok-studia, :where(:root[data-theme="dark"][data-ciemny]) .pd-stopka,
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="obecne"] section, :where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="B"] .mz-link, :where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="C"] .mz-pola { border-top-color: var(--m-rule); }
+:where(:root[data-theme="dark"][data-ciemny]) .ok-h, :where(:root[data-theme="dark"][data-ciemny]) .pl-narz, :where(:root[data-theme="dark"][data-ciemny]) .pd-nav > a { border-bottom-color: var(--m-rule); }
+
+/* ramki przycisków i pól: --m-line (dekoracyjna, ~1,6:1) była za słaba na element interfejsu; --m-line-ui ≥ 3:1 */
+:where(:root[data-theme="dark"][data-ciemny]) .pk-seg, :where(:root[data-theme="dark"][data-ciemny]) .pk-btn, :where(:root[data-theme="dark"][data-ciemny]) .pk-pole, :where(:root[data-theme="dark"][data-ciemny]) .pk-s-btn, :where(:root[data-theme="dark"][data-ciemny]) .pk-s-pole, :where(:root[data-theme="dark"][data-ciemny]) .pl-sem, :where(:root[data-theme="dark"][data-ciemny]) .pl-dni, :where(:root[data-theme="dark"][data-ciemny]) #pl-szukaj,
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="B"] .mz-taby { border-color: var(--m-line-ui); }
+:where(:root[data-theme="dark"][data-ciemny]) .pk-s-chips button { border-color: var(--m-line-ui); }
+:where(:root[data-theme="dark"][data-ciemny]) .pk-seg button + button, :where(:root[data-theme="dark"][data-ciemny]) .pl-sem button + button, :where(:root[data-theme="dark"][data-ciemny]) .pl-dni button + button,
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="B"] .mz-tab + .mz-tab { border-left-color: var(--m-line-ui); }
+
+/* powierzchnie pół tonu nad tłem */
+:where(:root[data-theme="dark"][data-ciemny]) .skrot { align-self: start; padding: 10px 20px 6px; background: var(--m-surface); }
+:where(:root[data-theme="dark"][data-ciemny]) .skrot div:last-child { border-bottom: 0; }
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="D"] .mz-tab { background: var(--m-surface); border-color: var(--m-surface); }
+/* --d-t w ciemnym jest tylko lekko podbarwione (mocniejszy kolor dawał brąz), więc wybrana karta dostaje kreskę działu */
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="D"] .mz-tab[aria-selected="true"] { box-shadow: inset 0 2px 0 var(--d-a); }
+/* panel hamburgera: sztywne rgb(9 16 34 / .96) to kolor tła starego ciemnego, panel ginął na stronie */
+:where(:root[data-theme="dark"][data-ciemny]) .ok-menu { background: color-mix(in srgb, var(--m-panel) 97%, transparent); box-shadow: -18px 0 44px rgb(4 8 18 / .38); }
+:where(:root[data-theme="dark"][data-ciemny]) .ok-menu section { border-bottom-color: rgb(255 255 255 / .14); }
+/* pole szukania w panelu: sztywne białe 30% dawało < 3:1 na jaśniejszym panelu */
+:where(:root[data-theme="dark"][data-ciemny]) .menu-szukaj { border-color: rgb(255 255 255 / .45); color: rgb(255 255 255 / .8); }
+
+/* zdjęcia w dwóch kolorach: światła w pełnym jasnym kolorze działu świeciły najjaśniej na stronie; ciemny motyw
+   bierze kolor działu przygaszony granatem (cienie bez zmian, więc nie ma szwu z granatem z lewej) */
+:where(:root[data-theme="dark"][data-ciemny]) .in-foto { background: color-mix(in oklab, var(--d-j) var(--c-foto), var(--granat)); }
+/* nagłówek podstrony ze zdjęciem: nakładka w pełnym głębokim kolorze działu dawała jaskrawą cegłę / ochrę;
+   w ciemnym głęboki kolor z domieszką granatu (te same gradienty co w bazie, tylko kolor --c-g) */
+:where(:root[data-theme="dark"][data-ciemny]) .pd-b.pd-foto { --c-g: color-mix(in oklab, var(--d-g) 72%, var(--granat)); background: var(--c-g); }
+:where(:root[data-theme="dark"][data-ciemny]) .pd-b.pd-foto .in-foto::after { background: color-mix(in srgb, var(--c-g) 70%, var(--granat)); }
+:where(:root[data-theme="dark"][data-ciemny]) .pd-b.pd-foto::before { background:
+  linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
+  radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--c-g) 70%, transparent), transparent 100%),
+  linear-gradient(90deg, color-mix(in srgb, var(--c-g) 92%, transparent) 0, color-mix(in srgb, var(--c-g) 76%, transparent) 45%, color-mix(in srgb, var(--c-g) 62%, transparent) 100%); }
+/* zwykłe zdjęcia: lekko przygaszone (białe tła portretów, kolorowe miniatury) */
+:where(:root[data-theme="dark"][data-ciemny]) .ok-okladka > img { filter: brightness(calc(var(--c-zdj) + .04)) saturate(.92); }
+:where(:root[data-theme="dark"][data-ciemny]) .in-suk img, :where(:root[data-theme="dark"][data-ciemny]) .ok-w .min img, :where(:root[data-theme="dark"][data-ciemny]) .os .fot { filter: brightness(var(--c-zdj)) saturate(.94); }
+
+/* przejście banera w treść: przez granat działu prosto w tło (bez brązowego pasa ze starego --d-t) */
+:where(:root[data-theme="dark"][data-ciemny]) .t-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g), color-mix(in oklab, var(--d-g) 30%, var(--m-bg)) 55%, var(--m-bg)); }
+:where(:root[data-theme="dark"][data-ciemny]) .d-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g) 0, color-mix(in oklab, var(--d-g) 35%, var(--m-bg)) 45%, var(--m-bg) 100%); }
+
+/* telefon: czarna ramka #05070c znikała na ciemnym tle prototypu; obwódka */
+:where(:root[data-theme="dark"][data-ciemny]) .tel { box-shadow: 0 0 0 10px #05070c, 0 0 0 11px var(--p-line), 0 18px 40px rgb(0 0 0 / .3); }
+
+/* ---------- to samo przy ciemnym motywie systemu ---------- */
+@media (prefers-color-scheme: dark) {
+/* kolory działu. Tekst: jasny kolor działu z domieszką --m-ink (pastel zamiast neonu, ≥ 4,5:1 na tle, powierzchni i --d-t,
+   a tło strony na nim jako tekst wypełnionego przycisku też ≥ 4,5:1). Tło działu: odrobina jasnego koloru w powierzchni,
+   zamiast przyciemnionego głębokiego (dawało brudny brąz). :where() trzyma wagę 0,3,0, jak obecna reguła ciemna,
+   więc .pasek-na-banerze … a[data-dzial] dalej bierze --d-j. Liczone z --d-j, więc działa też dla palety Stonowanej. */
+:root:not([data-theme="light"])[data-ciemny] :where([data-dzial]) {
+  --d-a: color-mix(in oklab, var(--d-j) var(--c-a), var(--m-ink));
+  --d-t: color-mix(in oklab, var(--d-j) var(--c-t), var(--c-t-baza));
+}
+/* „Przyciski”, stan dziś: tekst wybranej pigułki brał sztywne #0a1020 */
+:root:not([data-theme="light"])[data-ciemny] .pk { --pk-stary: var(--m-text); --pk-stary-ink: var(--m-bg); }
+
+/* Dalej prefiks w :where(): waga jak w regule bazowej, wygrywa kolejność, a stany (:hover, wybrany) nadal działają. */
+
+/* grube kreski 2 px nad sekcjami: w jasnym --m-ink, w ciemnym prawie biała kreska świeci; łagodniejsza --m-rule */
+:where(:root:not([data-theme="light"])[data-ciemny]) .skrot, :where(:root:not([data-theme="light"])[data-ciemny]) .ok-skr, :where(:root:not([data-theme="light"])[data-ciemny]) .ok-studia, :where(:root:not([data-theme="light"])[data-ciemny]) .pd-stopka,
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="obecne"] section, :where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="B"] .mz-link, :where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="C"] .mz-pola { border-top-color: var(--m-rule); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-h, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-narz, :where(:root:not([data-theme="light"])[data-ciemny]) .pd-nav > a { border-bottom-color: var(--m-rule); }
+
+/* ramki przycisków i pól: --m-line (dekoracyjna, ~1,6:1) była za słaba na element interfejsu; --m-line-ui ≥ 3:1 */
+:where(:root:not([data-theme="light"])[data-ciemny]) .pk-seg, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-btn, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-pole, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-s-btn, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-s-pole, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-sem, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-dni, :where(:root:not([data-theme="light"])[data-ciemny]) #pl-szukaj,
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="B"] .mz-taby { border-color: var(--m-line-ui); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pk-s-chips button { border-color: var(--m-line-ui); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pk-seg button + button, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-sem button + button, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-dni button + button,
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="B"] .mz-tab + .mz-tab { border-left-color: var(--m-line-ui); }
+
+/* powierzchnie pół tonu nad tłem */
+:where(:root:not([data-theme="light"])[data-ciemny]) .skrot { align-self: start; padding: 10px 20px 6px; background: var(--m-surface); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .skrot div:last-child { border-bottom: 0; }
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="D"] .mz-tab { background: var(--m-surface); border-color: var(--m-surface); }
+/* --d-t w ciemnym jest tylko lekko podbarwione (mocniejszy kolor dawał brąz), więc wybrana karta dostaje kreskę działu */
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="D"] .mz-tab[aria-selected="true"] { box-shadow: inset 0 2px 0 var(--d-a); }
+/* panel hamburgera: sztywne rgb(9 16 34 / .96) to kolor tła starego ciemnego, panel ginął na stronie */
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-menu { background: color-mix(in srgb, var(--m-panel) 97%, transparent); box-shadow: -18px 0 44px rgb(4 8 18 / .38); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-menu section { border-bottom-color: rgb(255 255 255 / .14); }
+/* pole szukania w panelu: sztywne białe 30% dawało < 3:1 na jaśniejszym panelu */
+:where(:root:not([data-theme="light"])[data-ciemny]) .menu-szukaj { border-color: rgb(255 255 255 / .45); color: rgb(255 255 255 / .8); }
+
+/* zdjęcia w dwóch kolorach: światła w pełnym jasnym kolorze działu świeciły najjaśniej na stronie; ciemny motyw
+   bierze kolor działu przygaszony granatem (cienie bez zmian, więc nie ma szwu z granatem z lewej) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-foto { background: color-mix(in oklab, var(--d-j) var(--c-foto), var(--granat)); }
+/* nagłówek podstrony ze zdjęciem: nakładka w pełnym głębokim kolorze działu dawała jaskrawą cegłę / ochrę;
+   w ciemnym głęboki kolor z domieszką granatu (te same gradienty co w bazie, tylko kolor --c-g) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .pd-b.pd-foto { --c-g: color-mix(in oklab, var(--d-g) 72%, var(--granat)); background: var(--c-g); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pd-b.pd-foto .in-foto::after { background: color-mix(in srgb, var(--c-g) 70%, var(--granat)); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pd-b.pd-foto::before { background:
+  linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
+  radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--c-g) 70%, transparent), transparent 100%),
+  linear-gradient(90deg, color-mix(in srgb, var(--c-g) 92%, transparent) 0, color-mix(in srgb, var(--c-g) 76%, transparent) 45%, color-mix(in srgb, var(--c-g) 62%, transparent) 100%); }
+/* zwykłe zdjęcia: lekko przygaszone (białe tła portretów, kolorowe miniatury) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-okladka > img { filter: brightness(calc(var(--c-zdj) + .04)) saturate(.92); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-suk img, :where(:root:not([data-theme="light"])[data-ciemny]) .ok-w .min img, :where(:root:not([data-theme="light"])[data-ciemny]) .os .fot { filter: brightness(var(--c-zdj)) saturate(.94); }
+
+/* przejście banera w treść: przez granat działu prosto w tło (bez brązowego pasa ze starego --d-t) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .t-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g), color-mix(in oklab, var(--d-g) 30%, var(--m-bg)) 55%, var(--m-bg)); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .d-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g) 0, color-mix(in oklab, var(--d-g) 35%, var(--m-bg)) 45%, var(--m-bg) 100%); }
+
+/* telefon: czarna ramka #05070c znikała na ciemnym tle prototypu; obwódka */
+:where(:root:not([data-theme="light"])[data-ciemny]) .tel { box-shadow: 0 0 0 10px #05070c, 0 0 0 11px var(--p-line), 0 18px 40px rgb(0 0 0 / .3); }
+}

@@ -260,6 +260,32 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-narz button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 6px; color: #fff; background: rgb(9 16 34 / .42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer; }
 .ok-narz button:hover { background: rgb(9 16 34 / .7); }
 .ok-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* pasek przyklejony (4.11, 23:18): ciemny nad banerem i stopką, jasny nad treścią; panel hamburgera w kolorze paska */
+.in-strona .ok-pasek { transition: background-color .25s, color .25s, box-shadow .25s, border-color .25s; will-change: transform; }
+.pasek-na-banerze .ok-pasek.jasny { background: color-mix(in srgb, var(--m-bg) 95%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--m-ink); border-bottom-color: var(--m-line); box-shadow: 0 6px 18px rgb(13 24 48 / .06); }
+.pasek-na-banerze .ok-pasek.jasny .marka .logo-uwr { background: var(--m-ink); }
+.pasek-na-banerze .ok-pasek.jasny .marka > span:last-child { border-left-color: var(--m-line); }
+.pasek-na-banerze .ok-pasek.jasny .marka small { color: var(--m-muted); }
+.pasek-na-banerze .ok-pasek.jasny nav a, .pasek-na-banerze .ok-pasek.jasny nav .pasek-narz button { color: color-mix(in srgb, var(--m-ink) 76%, transparent); }
+.pasek-na-banerze .ok-pasek.jasny nav a:hover, .pasek-na-banerze .ok-pasek.jasny nav a[aria-current], .pasek-na-banerze .ok-pasek.jasny nav .pasek-narz button:hover { color: var(--m-ink); }
+.pasek-na-banerze .ok-pasek.jasny nav a[data-dzial] { --d-a: var(--d-g); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pasek-na-banerze .ok-pasek.jasny nav a[data-dzial] { --d-a: var(--d-j); } }
+:root[data-theme="dark"] .pasek-na-banerze .ok-pasek.jasny nav a[data-dzial] { --d-a: var(--d-j); }
+.pasek-na-banerze .ok-pasek.jasny nav .pasek-narz::before { background: var(--m-line); }
+.ok-pasek .pasek-menu { transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s .35s, background-color .25s, color .25s; }
+.ok-pasek .pasek-menu.otwarte { transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s, background-color .25s, color .25s; }
+.ok-pasek.jasny .pasek-menu, .in-strona:not(.pasek-na-banerze) .ok-pasek .pasek-menu { background: color-mix(in srgb, var(--m-bg) 97%, transparent); color: var(--m-ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--m-line); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu :is(h3 a) { color: var(--m-ink); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu h3 a::after { background: var(--d-a, var(--m-line)); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu ul a { color: var(--m-muted); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu ul a:hover { color: var(--m-ink); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu section { border-bottom-color: var(--m-line); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .menu-sygnet path { stroke: var(--d-a); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .menu-szukaj { border-color: var(--m-line); color: var(--m-muted); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .menu-szukaj:focus-within { border-color: var(--m-ink); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .menu-szukaj input { color: var(--m-ink); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .menu-szukaj input::placeholder { color: var(--m-muted); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .zamknij button { background: var(--m-surface, #f4f1ea); color: var(--m-ink); }
 /* pasek menu (4.11, 22:56): po Aktualnościach za kreską tryb ciemny, EN i hamburger; Rekrutacja i Szukaj w panelu hamburgera */
 .ok-pasek nav .pasek-narz { position: relative; display: flex; align-items: center; gap: 0; margin-left: 12px; }
 .ok-pasek nav .pasek-narz::before { content: ''; position: absolute; left: -6px; top: 13px; bottom: 13px; width: 1px; background: var(--m-line); }
@@ -275,7 +301,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-pasek nav .pasek-narz .pasek-burger svg { width: 21px; height: 21px; }
 .ok-pasek nav .pasek-narz :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
 /* panel hamburgera przy pasku: ten sam co na okładce, wysuwa się spod paska z prawej */
-.ok-pasek .pasek-menu { top: 0; right: 0; bottom: auto; height: 760px; max-height: 100vh; text-align: left; }
+.ok-pasek .pasek-menu { top: 0; right: 0; bottom: auto; height: 900px; text-align: left; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .menu-szukaj { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 9px 12px; border: 1px solid rgb(255 255 255 / .3); color: rgb(255 255 255 / .75); }
 .menu-szukaj svg { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; }
@@ -283,6 +309,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .menu-szukaj input::placeholder { color: rgb(255 255 255 / .6); }
 .menu-szukaj:focus-within { border-color: #fff; }
 .ok-menu .zew-ikona { font-family: var(--f-text); font-size: 18px; opacity: .7; }
+.ok-menu section[data-dzial] { display: grid; grid-template-columns: 52px minmax(0, 1fr); column-gap: 18px; align-items: start; }
+.ok-menu section[data-dzial] > :not(.menu-sygnet) { grid-column: 2; }
+.ok-menu .menu-sygnet { grid-row: 1 / span 2; padding-top: 2px; }
+.ok-menu .menu-sygnet svg { display: block; width: 52px; height: 62px; }
+.ok-menu .menu-sygnet path { fill: none; stroke: var(--d-j); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.ok-menu section.duza { padding-left: 70px; }
 /* menu z hamburgera: panel z prawej, na granacie; kolory działów jako krótkie kreski */
 .ok-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 4; width: min(460px, 40%); padding: 76px 36px 28px; overflow-y: auto; background: rgb(9 16 34 / .96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
   transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s linear .35s; }
@@ -297,10 +329,25 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-menu ul a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 /* Aktualności: tak jak działy, oddzielone kreską; bez kolorowej kreski pod nazwą */
 .ok-menu section.duza h3 { margin: 0; }
+/* Aktualności i Rekrutacja: więcej powietrza (4.11, 23:21) */
+.ok-menu section.duza { padding-top: 20px; padding-bottom: 20px; }
+.ok-menu section[data-dzial] + section.duza { margin-top: 10px; }
+.ok-menu section.duza h3 { font-size: 28px; }
 .ok-menu section.duza h3 a::after { content: none; }
 .ok-menu section.duza h3 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
 @media (prefers-reduced-motion: reduce) { .ok-menu, .ok-menu.otwarte { transition: none; } }
-.ok-tytul { position: absolute; left: 48px; top: clamp(64px, 15cqh, 170px); }
+.ok-tytul { position: absolute; left: 48px; top: clamp(84px, 20cqh, 220px); }
+/* logo UWr i wydział w górnej linii okładki (4.11, 23:16); w tytule zostaje sam „Instytut Matematyczny” */
+.ok-marka { position: absolute; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
+.ok-marka .logo-uwr { height: 40px; }
+.ok-marka > span:last-child { padding-left: 14px; border-left: 1px solid rgb(255 255 255 / .35); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
+.ok-marka:hover > span:last-child { color: #fff; }
+.ok-marka:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.tytul-rowny .ok-tytul .w1, .tytul-rowny .ok-tytul .w2 { font-size: clamp(48px, 9.4cqh, 100px); }
+.tytul-rowny .ok-tytul .w2 { margin-top: 0; }
+/* płynny zakręt ciemnego pola: kształt (skos przechodzący łukiem w pas pod działami) rozmyty; liczy JS */
+.ok-cien { position: absolute; left: -160px; top: -160px; z-index: -1; pointer-events: none; overflow: visible; }
+.ok-cien path { fill: rgb(9 16 34 / .97); }
 .ok-flaga { display: inline-flex; align-items: center; gap: 10px; margin-bottom: clamp(12px, 2.4cqh, 24px); padding: 6px 14px 6px 12px; border-radius: 6px; background: rgb(9 16 34 / .6); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 14px; font-weight: 600; color: #fff; text-decoration: none; }
 .ok-flaga::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--studia-j); }
 .ok-uwr { display: block; width: fit-content; }
@@ -334,6 +381,17 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-dz:focus-visible h3 span { outline: 2px solid var(--d-j); outline-offset: 6px; }
 .ok-strzalka { position: absolute; left: 50%; bottom: clamp(10px, 2.2cqh, 24px); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px; border: 0; background: none; font: inherit; font-size: 14px; color: rgb(255 255 255 / .74); cursor: pointer; white-space: nowrap; }
 .ok-strzalka:hover { color: #fff; }
+/* liczby nad strzałką (4.11, 23:04, wariant 2): jak liczby na banerach działów */
+.ok-szybko { position: absolute; left: 50%; bottom: calc(clamp(10px, 2.2cqh, 24px) + 36px); transform: translateX(-50%); display: flex; align-items: baseline; white-space: nowrap; }
+.ok-szybko a { position: relative; display: inline-flex; align-items: baseline; gap: 7px; padding: 4px 20px; color: rgb(255 255 255 / .74); font-size: 13.5px; text-decoration: none; transition: color .15s; }
+.ok-szybko a + a::before { content: ''; position: absolute; left: 0; top: 9px; bottom: 6px; width: 1px; background: rgb(255 255 255 / .25); }
+.ok-szybko a b { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1; color: #fff; }
+.ok-szybko a:hover { color: #fff; }
+.ok-szybko a:hover b { color: var(--d-j); }
+.ok-szybko a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ok-kolumna.podswietl { animation: ok-podswietl 1.6s ease; }
+@keyframes ok-podswietl { 0%, 35% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--d-j, #c9d0de) 22%, transparent); background: color-mix(in srgb, var(--d-j, #c9d0de) 12%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .ok-kolumna.podswietl { animation: none; outline: 2px solid var(--d-a); outline-offset: 8px; } }
 .ok-strzalka:focus-visible { outline: 2px solid #fff; border-radius: 6px; }
 .ok-strzalka svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; animation: ok-bob 2.6s ease-in-out infinite; }
 @keyframes ok-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
@@ -501,49 +559,51 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .mz-panel.akt > * { animation: mz-wejscie .25s ease both; }
 .mz-panel.akt > :nth-child(2) { animation-delay: .03s; } .mz-panel.akt > :nth-child(3) { animation-delay: .06s; } .mz-panel.akt > :nth-child(4) { animation-delay: .09s; } .mz-panel.akt > :nth-child(5) { animation-delay: .12s; }
 @media (prefers-reduced-motion: reduce) { .mz-panel.akt > * { animation: none; } }
-/* A: zakładki z kreską */
-.in-pod[data-menu="A"] .mz-taby { display: flex; gap: 40px; border-bottom: 1px solid var(--m-line); }
-.in-pod[data-menu="A"] .mz-tab { margin-bottom: -1px; padding: 0 0 10px; border-bottom: 3px solid transparent; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.2; color: var(--m-muted); transition: color .15s, border-color .15s; }
-.in-pod[data-menu="A"] .mz-tab sup { margin-left: 5px; font-family: var(--f-text); font-size: 12px; font-weight: 700; color: var(--d-a); }
+/* zwarte warianty (4.11, 23:04: „odchudzić, uzwarcić”): bez opisów, pozycje w linii */
+.mz-pola { position: relative; }
+.mz-lnk { color: var(--m-ink); text-decoration: none; white-space: nowrap; transition: color .15s; }
+.mz-lnk:hover { color: var(--d-a); }
+.mz-lnk.zew::after { content: ' ↗'; font-family: var(--f-text); font-size: .8em; color: var(--m-muted); }
+/* A: jedna linia — sekcje z lewej, za kreską pozycje wybranej */
+.in-pod[data-menu="A"] { display: flex; align-items: stretch; gap: 0; padding-bottom: 0; }
+.in-pod[data-menu="A"] .mz-taby { display: flex; gap: 28px; padding-right: 28px; border-bottom: 1px solid var(--m-line); }
+.in-pod[data-menu="A"] .mz-tab { margin-bottom: -1px; padding: 12px 0 10px; border-bottom: 3px solid transparent; font-family: var(--f-display); font-weight: 500; font-size: 25px; line-height: 1.3; color: var(--m-muted); white-space: nowrap; }
 .in-pod[data-menu="A"] .mz-tab:hover { color: var(--m-ink); }
 .in-pod[data-menu="A"] .mz-tab[aria-selected="true"] { color: var(--m-ink); border-color: var(--d-a); }
-.in-pod[data-menu="A"] .mz-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 36px; align-content: start; }
-.in-pod[data-menu="A"] .mz-link { padding: 14px 0; border-bottom: 1px solid var(--m-line); }
-/* B: pasek przycisków (jak przyciski z Planu zajęć) */
+.in-pod[data-menu="A"] .mz-pola { flex: 1; border-bottom: 1px solid var(--m-line); }
+.in-pod[data-menu="A"] .mz-panel { display: flex; flex-wrap: wrap; align-items: center; align-content: center; gap: 4px 24px; height: 100%; padding: 8px 0 8px 28px; border-left: 1px solid var(--m-line); font-size: 16.5px; font-weight: 600; }
+/* B: dwie linie — pasek przycisków, pod nim pozycje Brygadą */
 .in-pod[data-menu="B"] .mz-taby { display: inline-flex; border: 1px solid var(--m-line); }
-.in-pod[data-menu="B"] .mz-tab { padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--m-text); }
+.in-pod[data-menu="B"] .mz-tab { padding: 8px 18px; font-size: 15.5px; font-weight: 600; line-height: 1.6; color: var(--m-text); }
 .in-pod[data-menu="B"] .mz-tab + .mz-tab { border-left: 1px solid var(--m-line); }
-.in-pod[data-menu="B"] .mz-tab sup { margin-left: 6px; font-size: 12px; opacity: .7; }
 .in-pod[data-menu="B"] .mz-tab:hover { color: var(--d-a); }
 .in-pod[data-menu="B"] .mz-tab[aria-selected="true"] { background: var(--d-a); color: var(--m-bg); }
-.in-pod[data-menu="B"] .mz-pola { margin-top: 20px; }
-.in-pod[data-menu="B"] .mz-panel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; align-content: start; }
-.in-pod[data-menu="B"] .mz-link { padding-top: 10px; border-top: 2px solid var(--m-ink); }
-.in-pod[data-menu="B"] .mz-link b { font-size: 19px; }
-/* C: sekcje z lewej, pozycje z prawej */
-.in-pod[data-menu="C"] { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 0 56px; }
-.in-pod[data-menu="C"] .mz-taby { display: flex; flex-direction: column; border-left: 1px solid var(--m-line); }
-.in-pod[data-menu="C"] .mz-tab { position: relative; padding: 12px 0 12px 22px; color: var(--m-muted); transition: color .15s; }
-.in-pod[data-menu="C"] .mz-tab b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.2; }
-.in-pod[data-menu="C"] .mz-tab small { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; }
-.in-pod[data-menu="C"] .mz-tab::before { content: ''; position: absolute; left: -2px; top: 12px; bottom: 12px; width: 3px; background: var(--d-a); opacity: 0; transition: opacity .15s; }
+.in-pod[data-menu="B"] .mz-pola { margin-top: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--m-line); }
+.in-pod[data-menu="B"] .mz-panel { display: flex; flex-wrap: wrap; gap: 4px 32px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.35; }
+.in-pod[data-menu="B"] .mz-lnk::after { content: ' →'; font-family: var(--f-text); font-size: 14px; color: var(--m-muted); }
+.in-pod[data-menu="B"] .mz-lnk.zew::after { content: ' ↗'; }
+/* C: pasek działu — pas w kolorze tła działu pod banerem, mniejsze litery */
+.in-pod[data-menu="C"] { display: flex; align-items: stretch; padding-top: 0; padding-bottom: 0; background: var(--d-t); }
+.in-pod[data-menu="C"] .mz-taby { display: flex; gap: 26px; padding-right: 26px; }
+.in-pod[data-menu="C"] .mz-tab { padding: 17px 0 14px; border-bottom: 3px solid transparent; font-size: 16px; font-weight: 700; color: color-mix(in srgb, var(--m-ink) 62%, transparent); white-space: nowrap; }
 .in-pod[data-menu="C"] .mz-tab:hover { color: var(--m-ink); }
-.in-pod[data-menu="C"] .mz-tab[aria-selected="true"] { color: var(--m-ink); }
-.in-pod[data-menu="C"] .mz-tab[aria-selected="true"]::before { opacity: 1; }
-.in-pod[data-menu="C"] .mz-tab[aria-selected="true"] small { color: var(--m-muted); }
-.in-pod[data-menu="C"] .mz-pola { align-content: start; border-top: 2px solid var(--m-ink); }
-.in-pod[data-menu="C"] .mz-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 36px; align-content: start; }
-.in-pod[data-menu="C"] .mz-link { padding: 14px 0; border-bottom: 1px solid var(--m-line); }
-/* D: karty sekcji, wybrana łączy się z polem pozycji */
-.in-pod[data-menu="D"] .mz-taby { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
-.in-pod[data-menu="D"] .mz-tab { padding: 18px 22px 20px; border: 1px solid var(--m-line); color: var(--m-ink); transition: background-color .15s, border-color .15s; }
-.in-pod[data-menu="D"] .mz-tab i { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-.in-pod[data-menu="D"] .mz-tab b { display: block; margin: 4px 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 28px; line-height: 1.15; }
-.in-pod[data-menu="D"] .mz-tab small { display: block; font-size: 13.5px; line-height: 1.4; color: var(--m-muted); }
-.in-pod[data-menu="D"] .mz-tab:hover { border-color: var(--d-a); }
-.in-pod[data-menu="D"] .mz-tab[aria-selected="true"] { margin-bottom: -17px; padding-bottom: 37px; background: var(--d-t); border-color: var(--d-t); }
-.in-pod[data-menu="D"] .mz-pola { margin-top: 16px; padding: 22px 24px 24px; background: var(--d-t); }
-.in-pod[data-menu="D"] .mz-panel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; align-content: start; }
+.in-pod[data-menu="C"] .mz-tab[aria-selected="true"] { color: var(--d-a); border-color: var(--d-a); }
+.in-pod[data-menu="C"] .mz-pola { flex: 1; }
+.in-pod[data-menu="C"] .mz-panel { display: flex; flex-wrap: wrap; align-items: center; align-content: center; gap: 4px 24px; height: 100%; padding: 10px 0 10px 26px; border-left: 1px solid color-mix(in srgb, var(--d-a) 25%, transparent); font-family: var(--f-display); font-size: 19px; font-weight: 500; }
+.in-pod[data-menu="C"] + .in-tresc { padding-top: 34px; }
+/* E: wiersze z D na pasie w kolorze tła działu (C) — widać od razu i nic nie trzeba klikać (4.11, 23:10) */
+.in-pod[data-menu="E"] { padding-top: 12px; padding-bottom: 12px; background: var(--d-t); }
+.in-pod[data-menu="E"] .mz-wiersz { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 8px 0; }
+.in-pod[data-menu="E"] .mz-wiersz + .mz-wiersz { border-top: 1px solid color-mix(in srgb, var(--d-a) 20%, transparent); }
+.in-pod[data-menu="E"] .mz-wiersz h5 { margin: 0; font-size: 13.5px; font-weight: 700; color: var(--d-a); }
+.in-pod[data-menu="E"] .mz-wiersz div { display: flex; flex-wrap: wrap; gap: 2px 24px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; }
+.in-pod[data-menu="E"] + .in-tresc { padding-top: 34px; }
+/* D: bez klikania — trzy krótkie wiersze, wszystko widać od razu */
+.in-pod[data-menu="D"] { padding-bottom: 0; }
+.in-pod[data-menu="D"] .mz-wiersz { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--m-line); }
+.in-pod[data-menu="D"] .mz-wiersz:first-child { border-top: 2px solid var(--m-ink); }
+.in-pod[data-menu="D"] .mz-wiersz h5 { margin: 0; font-size: 13.5px; font-weight: 700; color: var(--d-a); }
+.in-pod[data-menu="D"] .mz-wiersz div { display: flex; flex-wrap: wrap; gap: 2px 24px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; }
 .in-pod[data-menu="obecne"] section { border-top: 2px solid var(--m-ink); padding-top: 8px; }
 .in-pod[data-menu="obecne"] h5 { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
 .in-pod[data-menu="obecne"] a { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--m-line); font-family: var(--f-display); font-weight: 500; font-size: 21px; color: var(--m-ink); text-decoration: none; }
@@ -978,6 +1038,282 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
 @media (prefers-reduced-motion: reduce) {
   .szkic .tusz path, .kol::before, .kol .podpis, .kol h3 a, .g-hero .barwa, .m-menu a::after { transition: none !important; }
 }
+/* >>> ciemny-propozycja (agent, 4.11, 23:22): warianty ciemnego motywu A/B/C */
+/* ==========================================================================================================
+   CIEMNY MOTYW: trzy warianty (propozycja 4.11.2026)
+   A „Nocny granat”, B „Ciepły grafit”, C „Łupek”. Wkleić na koniec <style>.
+   Włączanie: <html data-ciemny="A|B|C">. Działa tylko w ciemnym motywie: przy data-theme="dark" albo bez data-theme
+   przy systemowym ciemnym. Bez data-ciemny zostaje dotychczasowy ciemny motyw.
+   Zasada: nadpisane są zmienne; sztywne kolory tylko tam, gdzie w ciemnym wychodziły źle (z komentarzem).
+   Paleta działów zostaje (JS wpisuje --*-j/g/a/t na :root); ciemny liczy --d-a i --d-t z --d-j, więc działa dla obu palet.
+   ========================================================================================================== */
+
+/* ---------- A: Nocny granat — głęboki granat zamiast czerni; banery i stopka w granacie strony głównej są o ton ciemniejsze od treści ---------- */
+:root[data-theme="dark"][data-ciemny="A"] {
+  --m-bg: #18243b; /* oklch(0.262 0.047 263) */
+  --m-surface: #222e46; /* oklch(0.302 0.047 264), pół tonu nad tłem */
+  --m-ink: #e4eaf5; /* nagłówki */
+  --m-text: #ced5e3; /* tekst */
+  --m-muted: #a5afc1; /* przygaszony */
+  --m-line: #3a465c; /* linie podziału */
+  --m-line-ui: #727c8f; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #7d8697; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #24324f; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #0f1a30; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #a5afc1;
+  --p-line: #323d53;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-ciemny="A"] {
+  --m-bg: #18243b; /* oklch(0.262 0.047 263) */
+  --m-surface: #222e46; /* oklch(0.302 0.047 264), pół tonu nad tłem */
+  --m-ink: #e4eaf5; /* nagłówki */
+  --m-text: #ced5e3; /* tekst */
+  --m-muted: #a5afc1; /* przygaszony */
+  --m-line: #3a465c; /* linie podziału */
+  --m-line-ui: #727c8f; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #7d8697; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #24324f; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #0f1a30; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #a5afc1;
+  --p-line: #323d53;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+} }
+
+/* ---------- B: Ciepły grafit — ciepła szarość w parze z ciepłym jasnym tłem #fcfaf6; granat zostaje w banerach, stopce, okładce i panelu menu ---------- */
+:root[data-theme="dark"][data-ciemny="B"] {
+  --m-bg: #272420; /* oklch(0.262 0.009 75) */
+  --m-surface: #312e2a; /* oklch(0.303 0.008 75), pół tonu nad tłem */
+  --m-ink: #efece7; /* nagłówki */
+  --m-text: #dbd7d0; /* tekst */
+  --m-muted: #b4afa6; /* przygaszony */
+  --m-line: #484541; /* linie podziału */
+  --m-line-ui: #7e7b78; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #888683; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #232f47; /* NOWY: panel menu z hamburgera */
+  --c-a: 80%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 12%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #1e1a17; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b4afa6;
+  --p-line: #403c39;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-ciemny="B"] {
+  --m-bg: #272420; /* oklch(0.262 0.009 75) */
+  --m-surface: #312e2a; /* oklch(0.303 0.008 75), pół tonu nad tłem */
+  --m-ink: #efece7; /* nagłówki */
+  --m-text: #dbd7d0; /* tekst */
+  --m-muted: #b4afa6; /* przygaszony */
+  --m-line: #484541; /* linie podziału */
+  --m-line-ui: #7e7b78; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #888683; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #232f47; /* NOWY: panel menu z hamburgera */
+  --c-a: 80%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 12%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 55%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.88; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #1e1a17; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b4afa6;
+  --p-line: #403c39;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+} }
+
+/* ---------- C: Łupek — przygaszony, mało nasycony granat (łupek): najspokojniejsze tło do długiego czytania, kolory działów najczystsze ---------- */
+:root[data-theme="dark"][data-ciemny="C"] {
+  --m-bg: #242b36; /* oklch(0.287 0.023 259) */
+  --m-surface: #2d3640; /* oklch(0.329 0.022 251), pół tonu nad tłem */
+  --m-ink: #e9edf2; /* nagłówki */
+  --m-text: #d5d9e0; /* tekst */
+  --m-muted: #b0b6be; /* przygaszony */
+  --m-line: #454c57; /* linie podziału */
+  --m-line-ui: #7c828b; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #878d94; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #2d3848; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 52%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.86; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #19212b; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b0b6be;
+  --p-line: #3b434d;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"])[data-ciemny="C"] {
+  --m-bg: #242b36; /* oklch(0.287 0.023 259) */
+  --m-surface: #2d3640; /* oklch(0.329 0.022 251), pół tonu nad tłem */
+  --m-ink: #e9edf2; /* nagłówki */
+  --m-text: #d5d9e0; /* tekst */
+  --m-muted: #b0b6be; /* przygaszony */
+  --m-line: #454c57; /* linie podziału */
+  --m-line-ui: #7c828b; /* NOWY: ramki przycisków i pól, ≥ 3:1 */
+  --m-rule: #878d94; /* NOWY: grube kreski 2 px nad sekcjami (zamiast --m-ink) */
+  --m-panel: #2d3848; /* NOWY: panel menu z hamburgera */
+  --c-a: 78%; /* udział jasnego koloru działu w --d-a (reszta: --m-ink) */
+  --c-t: 11%; /* udział jasnego koloru działu w --d-t */
+  --c-t-baza: var(--m-surface); /* baza --d-t */
+  --c-foto: 52%; /* światła zdjęć dwubarwnych: tyle koloru działu, reszta granat */
+  --c-zdj: 0.86; /* jasność zwykłych zdjęć */
+  --uwr: var(--m-ink);
+  --p-bg: #19212b; /* pasek i tło prototypu */
+  --p-fg: var(--m-ink);
+  --p-muted: #b0b6be;
+  --p-line: #3b434d;
+  --p-on: var(--m-ink);
+  --p-on-ink: var(--p-bg);
+} }
+
+/* ---------- reguły wspólne wariantów: wybrany ciemny motyw ---------- */
+/* kolory działu. Tekst: jasny kolor działu z domieszką --m-ink (pastel zamiast neonu, ≥ 4,5:1 na tle, powierzchni i --d-t,
+   a tło strony na nim jako tekst wypełnionego przycisku też ≥ 4,5:1). Tło działu: odrobina jasnego koloru w powierzchni,
+   zamiast przyciemnionego głębokiego (dawało brudny brąz). :where() trzyma wagę 0,3,0, jak obecna reguła ciemna,
+   więc .pasek-na-banerze … a[data-dzial] dalej bierze --d-j. Liczone z --d-j, więc działa też dla palety Stonowanej. */
+:root[data-theme="dark"][data-ciemny] :where([data-dzial]) {
+  --d-a: color-mix(in oklab, var(--d-j) var(--c-a), var(--m-ink));
+  --d-t: color-mix(in oklab, var(--d-j) var(--c-t), var(--c-t-baza));
+}
+/* „Przyciski”, stan dziś: tekst wybranej pigułki brał sztywne #0a1020 */
+:root[data-theme="dark"][data-ciemny] .pk { --pk-stary: var(--m-text); --pk-stary-ink: var(--m-bg); }
+
+/* Dalej prefiks w :where(): waga jak w regule bazowej, wygrywa kolejność, a stany (:hover, wybrany) nadal działają. */
+
+/* grube kreski 2 px nad sekcjami: w jasnym --m-ink, w ciemnym prawie biała kreska świeci; łagodniejsza --m-rule */
+:where(:root[data-theme="dark"][data-ciemny]) .skrot, :where(:root[data-theme="dark"][data-ciemny]) .ok-skr, :where(:root[data-theme="dark"][data-ciemny]) .ok-studia, :where(:root[data-theme="dark"][data-ciemny]) .pd-stopka,
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="obecne"] section, :where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="B"] .mz-link, :where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="C"] .mz-pola { border-top-color: var(--m-rule); }
+:where(:root[data-theme="dark"][data-ciemny]) .ok-h, :where(:root[data-theme="dark"][data-ciemny]) .pl-narz, :where(:root[data-theme="dark"][data-ciemny]) .pd-nav > a { border-bottom-color: var(--m-rule); }
+
+/* ramki przycisków i pól: --m-line (dekoracyjna, ~1,6:1) była za słaba na element interfejsu; --m-line-ui ≥ 3:1 */
+:where(:root[data-theme="dark"][data-ciemny]) .pk-seg, :where(:root[data-theme="dark"][data-ciemny]) .pk-btn, :where(:root[data-theme="dark"][data-ciemny]) .pk-pole, :where(:root[data-theme="dark"][data-ciemny]) .pk-s-btn, :where(:root[data-theme="dark"][data-ciemny]) .pk-s-pole, :where(:root[data-theme="dark"][data-ciemny]) .pl-sem, :where(:root[data-theme="dark"][data-ciemny]) .pl-dni, :where(:root[data-theme="dark"][data-ciemny]) #pl-szukaj,
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="B"] .mz-taby { border-color: var(--m-line-ui); }
+:where(:root[data-theme="dark"][data-ciemny]) .pk-s-chips button { border-color: var(--m-line-ui); }
+:where(:root[data-theme="dark"][data-ciemny]) .pk-seg button + button, :where(:root[data-theme="dark"][data-ciemny]) .pl-sem button + button, :where(:root[data-theme="dark"][data-ciemny]) .pl-dni button + button,
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="B"] .mz-tab + .mz-tab { border-left-color: var(--m-line-ui); }
+
+/* powierzchnie pół tonu nad tłem */
+:where(:root[data-theme="dark"][data-ciemny]) .skrot { align-self: start; padding: 10px 20px 6px; background: var(--m-surface); }
+:where(:root[data-theme="dark"][data-ciemny]) .skrot div:last-child { border-bottom: 0; }
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="D"] .mz-tab { background: var(--m-surface); border-color: var(--m-surface); }
+/* --d-t w ciemnym jest tylko lekko podbarwione (mocniejszy kolor dawał brąz), więc wybrana karta dostaje kreskę działu */
+:where(:root[data-theme="dark"][data-ciemny]) .in-pod[data-menu="D"] .mz-tab[aria-selected="true"] { box-shadow: inset 0 2px 0 var(--d-a); }
+/* panel hamburgera: sztywne rgb(9 16 34 / .96) to kolor tła starego ciemnego, panel ginął na stronie */
+:where(:root[data-theme="dark"][data-ciemny]) .ok-menu { background: color-mix(in srgb, var(--m-panel) 97%, transparent); box-shadow: -18px 0 44px rgb(4 8 18 / .38); }
+:where(:root[data-theme="dark"][data-ciemny]) .ok-menu section { border-bottom-color: rgb(255 255 255 / .14); }
+/* pole szukania w panelu: sztywne białe 30% dawało < 3:1 na jaśniejszym panelu */
+:where(:root[data-theme="dark"][data-ciemny]) .menu-szukaj { border-color: rgb(255 255 255 / .45); color: rgb(255 255 255 / .8); }
+
+/* zdjęcia w dwóch kolorach: światła w pełnym jasnym kolorze działu świeciły najjaśniej na stronie; ciemny motyw
+   bierze kolor działu przygaszony granatem (cienie bez zmian, więc nie ma szwu z granatem z lewej) */
+:where(:root[data-theme="dark"][data-ciemny]) .in-foto { background: color-mix(in oklab, var(--d-j) var(--c-foto), var(--granat)); }
+/* nagłówek podstrony ze zdjęciem: nakładka w pełnym głębokim kolorze działu dawała jaskrawą cegłę / ochrę;
+   w ciemnym głęboki kolor z domieszką granatu (te same gradienty co w bazie, tylko kolor --c-g) */
+:where(:root[data-theme="dark"][data-ciemny]) .pd-b.pd-foto { --c-g: color-mix(in oklab, var(--d-g) 72%, var(--granat)); background: var(--c-g); }
+:where(:root[data-theme="dark"][data-ciemny]) .pd-b.pd-foto .in-foto::after { background: color-mix(in srgb, var(--c-g) 70%, var(--granat)); }
+:where(:root[data-theme="dark"][data-ciemny]) .pd-b.pd-foto::before { background:
+  linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
+  radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--c-g) 70%, transparent), transparent 100%),
+  linear-gradient(90deg, color-mix(in srgb, var(--c-g) 92%, transparent) 0, color-mix(in srgb, var(--c-g) 76%, transparent) 45%, color-mix(in srgb, var(--c-g) 62%, transparent) 100%); }
+/* zwykłe zdjęcia: lekko przygaszone (białe tła portretów, kolorowe miniatury) */
+:where(:root[data-theme="dark"][data-ciemny]) .ok-okladka > img { filter: brightness(calc(var(--c-zdj) + .04)) saturate(.92); }
+:where(:root[data-theme="dark"][data-ciemny]) .in-suk img, :where(:root[data-theme="dark"][data-ciemny]) .ok-w .min img, :where(:root[data-theme="dark"][data-ciemny]) .os .fot { filter: brightness(var(--c-zdj)) saturate(.94); }
+
+/* przejście banera w treść: przez granat działu prosto w tło (bez brązowego pasa ze starego --d-t) */
+:where(:root[data-theme="dark"][data-ciemny]) .t-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g), color-mix(in oklab, var(--d-g) 30%, var(--m-bg)) 55%, var(--m-bg)); }
+:where(:root[data-theme="dark"][data-ciemny]) .d-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g) 0, color-mix(in oklab, var(--d-g) 35%, var(--m-bg)) 45%, var(--m-bg) 100%); }
+
+/* telefon: czarna ramka #05070c znikała na ciemnym tle prototypu; obwódka */
+:where(:root[data-theme="dark"][data-ciemny]) .tel { box-shadow: 0 0 0 10px #05070c, 0 0 0 11px var(--p-line), 0 18px 40px rgb(0 0 0 / .3); }
+
+/* ---------- to samo przy ciemnym motywie systemu ---------- */
+@media (prefers-color-scheme: dark) {
+/* kolory działu. Tekst: jasny kolor działu z domieszką --m-ink (pastel zamiast neonu, ≥ 4,5:1 na tle, powierzchni i --d-t,
+   a tło strony na nim jako tekst wypełnionego przycisku też ≥ 4,5:1). Tło działu: odrobina jasnego koloru w powierzchni,
+   zamiast przyciemnionego głębokiego (dawało brudny brąz). :where() trzyma wagę 0,3,0, jak obecna reguła ciemna,
+   więc .pasek-na-banerze … a[data-dzial] dalej bierze --d-j. Liczone z --d-j, więc działa też dla palety Stonowanej. */
+:root:not([data-theme="light"])[data-ciemny] :where([data-dzial]) {
+  --d-a: color-mix(in oklab, var(--d-j) var(--c-a), var(--m-ink));
+  --d-t: color-mix(in oklab, var(--d-j) var(--c-t), var(--c-t-baza));
+}
+/* „Przyciski”, stan dziś: tekst wybranej pigułki brał sztywne #0a1020 */
+:root:not([data-theme="light"])[data-ciemny] .pk { --pk-stary: var(--m-text); --pk-stary-ink: var(--m-bg); }
+
+/* Dalej prefiks w :where(): waga jak w regule bazowej, wygrywa kolejność, a stany (:hover, wybrany) nadal działają. */
+
+/* grube kreski 2 px nad sekcjami: w jasnym --m-ink, w ciemnym prawie biała kreska świeci; łagodniejsza --m-rule */
+:where(:root:not([data-theme="light"])[data-ciemny]) .skrot, :where(:root:not([data-theme="light"])[data-ciemny]) .ok-skr, :where(:root:not([data-theme="light"])[data-ciemny]) .ok-studia, :where(:root:not([data-theme="light"])[data-ciemny]) .pd-stopka,
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="obecne"] section, :where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="B"] .mz-link, :where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="C"] .mz-pola { border-top-color: var(--m-rule); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-h, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-narz, :where(:root:not([data-theme="light"])[data-ciemny]) .pd-nav > a { border-bottom-color: var(--m-rule); }
+
+/* ramki przycisków i pól: --m-line (dekoracyjna, ~1,6:1) była za słaba na element interfejsu; --m-line-ui ≥ 3:1 */
+:where(:root:not([data-theme="light"])[data-ciemny]) .pk-seg, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-btn, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-pole, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-s-btn, :where(:root:not([data-theme="light"])[data-ciemny]) .pk-s-pole, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-sem, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-dni, :where(:root:not([data-theme="light"])[data-ciemny]) #pl-szukaj,
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="B"] .mz-taby { border-color: var(--m-line-ui); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pk-s-chips button { border-color: var(--m-line-ui); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pk-seg button + button, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-sem button + button, :where(:root:not([data-theme="light"])[data-ciemny]) .pl-dni button + button,
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="B"] .mz-tab + .mz-tab { border-left-color: var(--m-line-ui); }
+
+/* powierzchnie pół tonu nad tłem */
+:where(:root:not([data-theme="light"])[data-ciemny]) .skrot { align-self: start; padding: 10px 20px 6px; background: var(--m-surface); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .skrot div:last-child { border-bottom: 0; }
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="D"] .mz-tab { background: var(--m-surface); border-color: var(--m-surface); }
+/* --d-t w ciemnym jest tylko lekko podbarwione (mocniejszy kolor dawał brąz), więc wybrana karta dostaje kreskę działu */
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-pod[data-menu="D"] .mz-tab[aria-selected="true"] { box-shadow: inset 0 2px 0 var(--d-a); }
+/* panel hamburgera: sztywne rgb(9 16 34 / .96) to kolor tła starego ciemnego, panel ginął na stronie */
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-menu { background: color-mix(in srgb, var(--m-panel) 97%, transparent); box-shadow: -18px 0 44px rgb(4 8 18 / .38); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-menu section { border-bottom-color: rgb(255 255 255 / .14); }
+/* pole szukania w panelu: sztywne białe 30% dawało < 3:1 na jaśniejszym panelu */
+:where(:root:not([data-theme="light"])[data-ciemny]) .menu-szukaj { border-color: rgb(255 255 255 / .45); color: rgb(255 255 255 / .8); }
+
+/* zdjęcia w dwóch kolorach: światła w pełnym jasnym kolorze działu świeciły najjaśniej na stronie; ciemny motyw
+   bierze kolor działu przygaszony granatem (cienie bez zmian, więc nie ma szwu z granatem z lewej) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-foto { background: color-mix(in oklab, var(--d-j) var(--c-foto), var(--granat)); }
+/* nagłówek podstrony ze zdjęciem: nakładka w pełnym głębokim kolorze działu dawała jaskrawą cegłę / ochrę;
+   w ciemnym głęboki kolor z domieszką granatu (te same gradienty co w bazie, tylko kolor --c-g) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .pd-b.pd-foto { --c-g: color-mix(in oklab, var(--d-g) 72%, var(--granat)); background: var(--c-g); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pd-b.pd-foto .in-foto::after { background: color-mix(in srgb, var(--c-g) 70%, var(--granat)); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .pd-b.pd-foto::before { background:
+  linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
+  radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--c-g) 70%, transparent), transparent 100%),
+  linear-gradient(90deg, color-mix(in srgb, var(--c-g) 92%, transparent) 0, color-mix(in srgb, var(--c-g) 76%, transparent) 45%, color-mix(in srgb, var(--c-g) 62%, transparent) 100%); }
+/* zwykłe zdjęcia: lekko przygaszone (białe tła portretów, kolorowe miniatury) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .ok-okladka > img { filter: brightness(calc(var(--c-zdj) + .04)) saturate(.92); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .in-suk img, :where(:root:not([data-theme="light"])[data-ciemny]) .ok-w .min img, :where(:root:not([data-theme="light"])[data-ciemny]) .os .fot { filter: brightness(var(--c-zdj)) saturate(.94); }
+
+/* przejście banera w treść: przez granat działu prosto w tło (bez brązowego pasa ze starego --d-t) */
+:where(:root:not([data-theme="light"])[data-ciemny]) .t-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g), color-mix(in oklab, var(--d-g) 30%, var(--m-bg)) 55%, var(--m-bg)); }
+:where(:root:not([data-theme="light"])[data-ciemny]) .d-przejscie { background: linear-gradient(in oklab 180deg, var(--d-g) 0, color-mix(in oklab, var(--d-g) 35%, var(--m-bg)) 45%, var(--m-bg) 100%); }
+
+/* telefon: czarna ramka #05070c znikała na ciemnym tle prototypu; obwódka */
+:where(:root:not([data-theme="light"])[data-ciemny]) .tel { box-shadow: 0 0 0 10px #05070c, 0 0 0 11px var(--p-line), 0 18px 40px rgb(0 0 0 / .3); }
+}
+/* <<< ciemny-propozycja */
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><clipPath id="uk-klip"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath><symbol id="flaga-uk" viewBox="0 0 60 30"><path d="M0 0v30h60V0z" fill="#012169"/><path d="M0 0l60 30m0-30L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30m0-30L0 30" clip-path="url(#uk-klip)" stroke="#c8102e" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6"/></symbol></defs></svg>
@@ -1009,6 +1345,12 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="t-cieple" data-v="cieple" aria-pressed="true">ciepłe</button>
       <button type="button" id="t-biale" data-v="biale" aria-pressed="false">białe</button>
     </div></div>
+    <div class="grupa" id="wybor-ciemnego"><span>Ciemny</span><div class="seg" data-ustaw="ciemny">
+      <button type="button" data-v="obecny" aria-pressed="false">obecny</button>
+      <button type="button" data-v="A" aria-pressed="true">A nocny granat</button>
+      <button type="button" data-v="B" aria-pressed="false">B ciepły grafit</button>
+      <button type="button" data-v="C" aria-pressed="false">C łupek</button>
+    </div></div>
     <div class="grupa" id="wybor-dzialu"><span>Dział</span><div class="seg" data-ustaw="dzial">
       <button type="button" id="d-instytut" data-v="instytut" aria-pressed="false">Instytut</button>
       <button type="button" id="d-nauka" data-v="nauka" aria-pressed="false">Nauka</button>
@@ -1022,10 +1364,11 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     <div class="grupa" id="wybor-anim" hidden><span>Animacja</span><div class="seg"><button type="button" id="anim-powtorz">pokaż pierwsze wejście jeszcze raz</button></div></div>
     <div class="grupa" id="wybor-menu" hidden><span>Menu działu</span><div class="seg" data-ustaw="menuDz">
       <button type="button" data-v="obecne" aria-pressed="false">obecne</button>
-      <button type="button" data-v="A" aria-pressed="true">A zakładki</button>
-      <button type="button" data-v="B" aria-pressed="false">B pasek</button>
-      <button type="button" data-v="C" aria-pressed="false">C spis</button>
-      <button type="button" data-v="D" aria-pressed="false">D karty</button>
+      <button type="button" data-v="A" aria-pressed="true">A jedna linia</button>
+      <button type="button" data-v="B" aria-pressed="false">B dwie linie</button>
+      <button type="button" data-v="C" aria-pressed="false">C pas działu</button>
+      <button type="button" data-v="D" aria-pressed="false">D bez klikania</button>
+      <button type="button" data-v="E" aria-pressed="false">E wiersze na pasie</button>
     </div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
@@ -1063,6 +1406,14 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="e-1920" data-v="1920x950" aria-pressed="true">1920×1080</button>
       <button type="button" id="e-1536" data-v="1536x740" aria-pressed="false">1920×1080 przy 125%</button>
       <button type="button" id="e-1366" data-v="1366x640" aria-pressed="false">1366×768</button>
+    </div></div>
+    <div class="grupa" id="wybor-tytulu"><span>Tytuł</span><div class="seg" data-ustaw="tytul">
+      <button type="button" data-v="konce" aria-pressed="true">równe końce</button>
+      <button type="button" data-v="rowne" aria-pressed="false">równa wielkość</button>
+    </div></div>
+    <div class="grupa" id="wybor-zakretu"><span>Zakręt cienia</span><div class="seg" data-ustaw="zakret">
+      <button type="button" data-v="ostry" aria-pressed="false">jak dotąd</button>
+      <button type="button" data-v="plynny" aria-pressed="true">płynny</button>
     </div></div>
     <div class="grupa" id="wybor-skosu"><span>Krawędź</span><div class="seg" data-ustaw="skos">
       <button type="button" id="k-pion" data-v="0" aria-pressed="false">Pion</button>
@@ -1108,6 +1459,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
             <img src="{{KAMPUS}}" alt="Gmach Instytutu Matematycznego przy placu Grunwaldzkim o zmierzchu">
             <div class="barwa"></div>
             <div class="ok-skos" id="ok-skos"></div>
+            <svg class="ok-cien" id="ok-cien" aria-hidden="true"><path/></svg>
+            <a class="ok-marka" href="#"><span class="logo-uwr" role="img" aria-label="Uniwersytet Wrocławski"></span><span>Wydział Matematyki<br>i Informatyki</span></a>
             <nav class="ok-narz" aria-label="Narzędzia"><a href="#" data-motyw-przelacz aria-label="Tryb ciemny"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></a><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a><button type="button" id="ok-burger" aria-label="Menu" aria-expanded="false" aria-controls="ok-menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></nav>
             <nav class="ok-menu" id="ok-menu" aria-label="Menu">
               <span class="ok-narz zamknij"><button type="button" id="ok-zamknij" aria-label="Zamknij menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span>
@@ -1121,11 +1474,11 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
             </nav>
             <div class="ok-tytul">
               <a class="ok-flaga" id="ok-flaga" href="#" hidden>Rekrutacja na rok 2027/28 ruszyła</a>
-              <a class="ok-uwr" href="#" aria-label="Uniwersytet Wrocławski"><span class="logo-uwr"></span></a>
               <h2><span class="w1">Instytut</span><span class="w2">Matematyczny</span></h2>
             </div>
             <div class="ok-dzialy" id="ok-dzialy"></div>
-            <button type="button" class="ok-strzalka" id="ok-strzalka"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>Szybki dostęp · 3 wydarzenia w tym tygodniu</button>
+            <div class="ok-szybko" id="ok-szybko" aria-label="W najbliższych dniach"></div>
+            <button type="button" class="ok-strzalka" id="ok-strzalka"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>Szybki dostęp</button>
           </section>
           <div class="ok-druga">
           <header class="ok-pasek">
@@ -1576,6 +1929,20 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     wiersze.forEach((w) => { if (ukryte || w.offsetTop - box.offsetTop + w.offsetHeight > limit + 1) { w.hidden = true; ukryte++; } });
     link.textContent = ukryte ? `i jeszcze ${ukryte} · ${KOL[c.dataset.key].wsz}` : KOL[c.dataset.key].wsz;
   }
+  // liczby nad strzałką: najbliższe 7 dni (wydarzenia, seminaria) i ostatnie 7 dni (aktualności); zero się nie pokazuje
+  const odm = (n, f) => `${n} ${n === 1 ? f[0] : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? f[1] : f[2]}`;
+  function rysujSzybko() {
+    const nowe = AKT.filter((o) => o[2].startsWith('lis') || +o[1] >= 26).length;
+    const poz = [['wyd', WYD.length, ['wydarzenie', 'wydarzenia', 'wydarzeń'], 'wydarzyń w najbliższych 7 dniach'], ['sem', liczbaSem, ['seminarium', 'seminaria', 'seminariów'], ''], ['akt', nowe, ['nowa aktualność', 'nowe aktualności', 'nowych aktualności'], '']];
+    $('#ok-szybko').innerHTML = poz.filter(([, n]) => n > 0).map(([k, n, f]) => { const t = odm(n, f).split(' '); return `<a href="#" data-kol="${k}"><b>${t[0]}</b>${t.slice(1).join(' ')}</a>`; }).join('');
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('#ok-szybko a'); if (!a) return; e.preventDefault();
+    const r = $('#ok-ramka'), ruch = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    r.scrollTo({ top: $('#ok-okladka').offsetHeight, behavior: ruch ? 'smooth' : 'auto' });
+    const kol = document.querySelector(`.ok-kolumna[data-key="${a.dataset.kol}"]`); if (!kol) return;
+    setTimeout(() => { kol.classList.remove('podswietl'); void kol.offsetWidth; kol.classList.add('podswietl'); }, ruch ? 450 : 0);
+  });
   function rysujKolumny(kliknieta) {
     const siatka = $('#ok-siatka');
     const stare = {}, sc = $('#scena'), skala = sc.getBoundingClientRect().width / sc.offsetWidth || 1;
@@ -1583,6 +1950,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     siatka.insertAdjacentHTML('afterbegin', sloty.map((key, i) => htmlKolumny(key, i)).join(''));
     wypelnijZastepcze(siatka);
     $('#skr-sem').textContent = `${liczbaSem} referatów w tym tygodniu`;
+    rysujSzybko();
     dopasujDluga();
     siatka.querySelectorAll('.ok-wiecej').forEach((b) => b.addEventListener('click', () => {
       const key = b.dataset.key, i = sloty.indexOf(key); [sloty[i], sloty[2]] = [sloty[2], sloty[i]];
@@ -1621,33 +1989,44 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
      o nachyleniu s (px w prawo na px w dół; 0 = pion). Dobieramy wysokość logo i stopień „Matematyczny” do „Instytut”.
      Ta prosta (plus odstęp) to granica ciemnego pola; za nią krótki gradient w zdjęcie. */
   let nachylenie = 0.32;
+  let zakret = 'plynny';
   function ulozTytul() {
-    const ok = $('#ok-okladka'), tyt = ok.querySelector('.ok-tytul'), w1 = tyt.querySelector('.w1'), w2 = tyt.querySelector('.w2'), logo = tyt.querySelector('.logo-uwr');
+    const ok = $('#ok-okladka'), tyt = ok.querySelector('.ok-tytul'), w1 = tyt.querySelector('.w1'), w2 = tyt.querySelector('.w2'), logo = tyt.querySelector('.logo-uwr'), rowny = ok.classList.contains('tytul-rowny');
     if (!ok.offsetHeight) return;
     const H = ok.clientHeight, W = ok.clientWidth;
     tyt.style.removeProperty('--f2'); tyt.style.removeProperty('--logo-h');
     const f1 = parseFloat(getComputedStyle(w1).fontSize);
     const b = (el) => { const r = el.getBoundingClientRect(), o = ok.getBoundingClientRect(), k = o.width / W; return { x2: (r.right - o.left) / k, yc: ((r.top + r.bottom) / 2 - o.top) / k, h: r.height / k }; };
-    for (let i = 0; i < 4; i++) {
-      const L = b(logo), A = b(w1), M = b(w2);
+    for (let i = 0; i < 4 && !rowny; i++) {
+      const A = b(w1), M = b(w2);
       const f2 = parseFloat(getComputedStyle(w2).fontSize);
       const celM = A.x2 + nachylenie * (M.yc - A.yc);
       const szerM = M.x2 - tyt.offsetLeft;
       tyt.style.setProperty('--f2', Math.max(24, f2 * (celM - tyt.offsetLeft) / szerM) + 'px');
-      const celL = A.x2 - nachylenie * (A.yc - L.yc);
-      tyt.style.setProperty('--logo-h', Math.max(34, (celL - tyt.offsetLeft) / 3.125) + 'px');
+      if (logo) { const L = b(logo), celL = A.x2 - nachylenie * (A.yc - L.yc); tyt.style.setProperty('--logo-h', Math.max(34, (celL - tyt.offsetLeft) / 3.125) + 'px'); }
     }
     // prosta przez końce „Instytut” i „Matematyczny”: x(y) = x0 + s·y
     const A = b(w1), M = b(w2), s = nachylenie;
     const odstep = Math.max(24, f1 * 0.34), zanik = Math.max(90, W * 0.06);
-    const x0 = A.x2 - s * A.yc + odstep * Math.sqrt(1 + s * s);
+    // prosta przez dalszy z końców (przy równej wielkości liter „Matematyczny” wystaje dalej)
+    const x0 = Math.max(A.x2 - s * A.yc, M.x2 - s * M.yc) + odstep * Math.sqrt(1 + s * s);
     // gradient prostopadły do prostej: n = (1, -s)/|·|, kąt CSS = atan2(n.x, -n.y)
     const nl = Math.hypot(1, s), n = [1 / nl, -s / nl], kat = Math.atan2(n[0], -n[1]) * 180 / Math.PI;
     const dl = W * Math.abs(n[0]) + H * Math.abs(n[1]);
     const start = [W / 2 - n[0] * dl / 2, H / 2 - n[1] * dl / 2];
     const t1 = (x0 - start[0]) * n[0] + (0 - start[1]) * n[1];
     const g = 'rgb(9 16 34', st = [[0, .97], [.2, .86], [.42, .6], [.64, .32], [.84, .1], [1, 0]];
-    ok.style.setProperty('--skos', `linear-gradient(${kat.toFixed(2)}deg, ${g} / .97) 0px, ${st.map(([u, a]) => `${g} / ${a}) ${(t1 + u * zanik).toFixed(1)}px`).join(', ')})`);
+    const cien = $('#ok-cien');
+    if (zakret === 'plynny') {
+      // kształt: lewe pole do prostej x = x1 + s·y, łuk w pas pod działami (y = yb), rozmyty o ok. 0,4 zaniku
+      const m = 160, x1 = x0 + zanik * 0.42, yb = H * 0.6, R = Math.min(H * 0.26, 260), P = (x, y) => `${(x + m).toFixed(1)} ${(y + m).toFixed(1)}`;
+      const xl = (y) => x1 + s * y;
+      cien.setAttribute('width', W + 2 * m); cien.setAttribute('height', H + 2 * m);
+      cien.querySelector('path').setAttribute('d', `M${P(-m, -m)} L${P(xl(-m), -m)} L${P(xl(yb - R), yb - R)} Q${P(xl(yb), yb)} ${P(xl(yb) + R, yb)} L${P(W + m, yb)} L${P(W + m, H + m)} L${P(-m, H + m)} Z`);
+      cien.style.filter = `blur(${(zanik * 0.4).toFixed(0)}px)`; cien.style.display = '';
+      ok.style.setProperty('--skos', 'none');
+    } else { cien.style.display = 'none'; }
+    if (zakret !== 'plynny') ok.style.setProperty('--skos', `linear-gradient(${kat.toFixed(2)}deg, ${g} / .97) 0px, ${st.map(([u, a]) => `${g} / ${a}) ${(t1 + u * zanik).toFixed(1)}px`).join(', ')})`);
     // zdjęcie zaczyna się tak, żeby jego lewa krawędź (z krótką maską) była schowana w pełnym ciemnym polu
     ok.style.setProperty('--foto-x', Math.max(0, x0 - 150) + 'px');
   }
@@ -1661,6 +2040,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     document.querySelector(`#wybor-motywu [data-v="${v}"]`).click();
   });
   document.documentElement.dataset.tlo = 'cieple';
+  document.documentElement.dataset.ciemny = 'A';
   let pasekIn = 'baner', strona = 'dzial', naglowek = 'zdjecie', zdjeciaWl = true;
   const wbr = (e) => e.replace('@', '<wbr>@');
   const osoba = (o) => `<div class="os">${o.f && zdjeciaWl ? `<img class="fot" src="${o.f}" alt="">` : ''}<div class="rola">${o.r}</div><div class="imie"><a href="#">${o.n}</a></div><div class="zakl">${o.z}</div>${o.o ? `<p class="opis">${o.o}</p>` : ''}<div class="kont">${o.e ? `<a href="#">${wbr(o.e)}</a>` : ''}${o.p ? ` · ${o.p}` : ''}${o.d ? `<br>${o.d}` : ''}${o.www ? ` · <a href="#">strona domowa ↗</a>` : ''}</div></div>`;
@@ -1763,6 +2143,23 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const post = Math.min(1, Math.max(0, (prog - r.top) / Math.max(1, r.height - h * 0.5)));
     nav.style.setProperty('--postep', post.toFixed(3));
   }
+  // pasek strony działu: przyklejony u góry; ciemny nad banerem i stopką, jasny nad treścią (4.11, 23:18)
+  function odswiezPasek() {
+    const v = $('#v-instytut'); if (!v || v.hidden) return;
+    const h = $('#in-nowa .ok-pasek'), nowa = $('#in-nowa'); if (!h || !nowa || nowa.hidden) return;
+    const sc = $('#scena'), k = sc.getBoundingClientRect().width / sc.offsetWidth || 1, panel = document.querySelector('.pasek')?.offsetHeight || 0;
+    h.style.transform = '';
+    const r0 = h.getBoundingClientRect(), nr = nowa.getBoundingClientRect();
+    const dy = Math.min(Math.max(0, (panel - r0.top) / k), (nr.bottom - r0.bottom) / k);
+    h.style.transform = dy > 0 ? `translateY(${dy.toFixed(1)}px)` : '';
+    const y = Math.max(panel, r0.top + dy * k) + h.offsetHeight * k * 0.5;
+    const baner = $('#in-baner').getBoundingClientRect(), stopka = nowa.querySelector('.ok-stopka')?.getBoundingClientRect();
+    const ciemny = (y >= baner.top && y <= baner.bottom) || (stopka && y >= stopka.top);
+    h.classList.toggle('jasny', !ciemny);
+  }
+  let pasekRaf = 0;
+  window.addEventListener('scroll', () => { cancelAnimationFrame(pasekRaf); pasekRaf = requestAnimationFrame(odswiezPasek); }, { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(odswiezPasek));
   let spisRaf = 0;
   window.addEventListener('scroll', () => { cancelAnimationFrame(spisRaf); spisRaf = requestAnimationFrame(odswiezSpis); }, { passive: true });
   window.addEventListener('resize', () => requestAnimationFrame(odswiezSpis));
@@ -1980,18 +2377,15 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   function htmlMenuDzialu(dz) {
     const G = IN_GRUPY[dz], w = dz === 'popularyzacja' ? 'obecne' : menuDz;
     if (w === 'obecne') return G.map(([h, l]) => `<section><h5>${h}</h5>${l.map((x) => { const z = x.endsWith(' ↗'), [a, b] = (z ? x.slice(0, -2) : x).split('|'); return `<a href="#" data-n="${a}"${z ? ' class="zew"' : ''}>${a}${b ? `<small>${b}</small>` : ''}</a>`; }).join('')}</section>`).join('');
-    const k = Math.min(mzSekcja, G.length - 1);
     const nazwa = (x) => (x.endsWith(' ↗') ? x.slice(0, -2) : x).split('|')[0];
-    const tab = ([h, l], i) => {
-      const sel = i === k ? 'true' : 'false', wsp = `type="button" role="tab" class="mz-tab" id="mz-t${i}" aria-selected="${sel}" aria-controls="mz-p${i}" tabindex="${i === k ? 0 : -1}" data-mz="${i}"`;
-      if (w === 'A' || w === 'B') return `<button ${wsp}>${h}<sup>${l.length}</sup></button>`;
-      if (w === 'C') return `<button ${wsp}><b>${h}</b><small>${l.map(nazwa).join(' · ')}</small></button>`;
-      return `<button ${wsp}><i>${mzStron(l.length)}</i><b>${h}</b><small>${MZ_SEKCJA[h] || ''}</small></button>`;
-    };
-    const link = (x) => { const z = x.endsWith(' ↗'), n = nazwa(x); return `<a class="mz-link${z ? ' zew' : ''}" href="#" data-n="${n}"><b>${n}</b><small>${MZ_OPIS[n] || ''}</small></a>`; };
+    const lnk = (x) => { const z = x.endsWith(' ↗'), n = nazwa(x); return `<a class="mz-lnk${z ? ' zew' : ''}" href="#" data-n="${n}" title="${MZ_OPIS[n] || ''}">${n}</a>`; };
+    // D: bez zakładek, wszystkie sekcje naraz
+    if (w === 'D' || w === 'E') return G.map(([h, l]) => `<div class="mz-wiersz"><h5>${h}</h5><div>${l.map(lnk).join('')}</div></div>`).join('');
+    const k = Math.min(mzSekcja, G.length - 1);
+    const tab = ([h], i) => `<button type="button" role="tab" class="mz-tab" id="mz-t${i}" aria-selected="${i === k}" aria-controls="mz-p${i}" tabindex="${i === k ? 0 : -1}" data-mz="${i}">${h}</button>`;
     // wszystkie pola są w HTML jedno na drugim (ta sama komórka siatki): wysokość = najwyższe, więc treść pod spodem nie skacze
     return `<div class="mz-taby" role="tablist" aria-label="Strony działu">${G.map(tab).join('')}</div>
-      <div class="mz-pola">${G.map(([, l], i) => `<div class="mz-panel${i === k ? ' akt' : ''}" id="mz-p${i}" role="tabpanel" aria-labelledby="mz-t${i}"${i === k ? '' : ' inert'}>${l.map(link).join('')}</div>`).join('')}</div>`;
+      <div class="mz-pola">${G.map(([, l], i) => `<div class="mz-panel${i === k ? ' akt' : ''}" id="mz-p${i}" role="tabpanel" aria-labelledby="mz-t${i}"${i === k ? '' : ' inert'}>${l.map(lnk).join('')}</div>`).join('')}</div>`;
   }
   function mzWybierz(i) {
     mzSekcja = i;
@@ -2025,6 +2419,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     document.querySelectorAll('#v-instytut .ok-pasek a[data-dzial]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.dzial === dz));
     $('#in-reszta').innerHTML = pod ? htmlPod(dz) : htmlReszta(dz);
     if (pod) requestAnimationFrame(zbudujSpis);
+    requestAnimationFrame(odswiezPasek);
     $('#in-pod').hidden = pod;
     $('#v-instytut').dataset.dzial = dz;
     $('#wybor-inst').hidden = dz !== 'instytut';
@@ -2058,6 +2453,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     r.style.width = ekran[0] + 'px'; r.style.height = ekran[1] + 'px';
   }
   // hamburger w pasku menu (4.11): ten sam panel co na okładce, dołączony do każdego paska
+  // sygnet patrona (twarz, uproszczona, bez podpisu) przed każdym działem w panelu hamburgera (4.11, 23:11)
+  document.querySelectorAll('#ok-menu section[data-dzial]').forEach((sec) => sec.insertAdjacentHTML('afterbegin', `<span class="menu-sygnet" aria-hidden="true">${svgSygnet(sec.dataset.dzial)}</span>`));
   document.querySelectorAll('.ok-pasek').forEach((h, i) => {
     const m = document.createElement('div'); m.className = 'ok-menu pasek-menu'; m.id = 'pasek-menu-' + i; m.setAttribute('role', 'navigation'); m.setAttribute('aria-label', 'Menu');
     m.innerHTML = $('#ok-menu').innerHTML.replace(' id="ok-zamknij"', '');
@@ -2066,7 +2463,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   const menuPasek = (h, otw) => {
     const m = h.querySelector('.pasek-menu'), b = h.querySelector('.pasek-burger');
     m.classList.toggle('otwarte', otw); b.setAttribute('aria-expanded', String(otw));
-    (otw ? m.querySelector('.zamknij button') : b).focus();
+    (otw ? m.querySelector('.zamknij button') : b).focus({ preventScroll: true });
   };
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.pasek-burger'); if (b) { menuPasek(b.closest('.ok-pasek'), true); return; }
@@ -2074,7 +2471,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     document.querySelectorAll('.pasek-menu.otwarte').forEach((m) => { if (!m.contains(e.target)) menuPasek(m.closest('.ok-pasek'), false); });
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.pasek-menu.otwarte').forEach((m) => menuPasek(m.closest('.ok-pasek'), false)); });
-  const menuOk = (otw) => { $('#ok-menu').classList.toggle('otwarte', otw); $('#ok-burger').setAttribute('aria-expanded', String(otw)); if (otw) $('#ok-zamknij').focus(); else $('#ok-burger').focus(); };
+  const menuOk = (otw) => { $('#ok-menu').classList.toggle('otwarte', otw); $('#ok-burger').setAttribute('aria-expanded', String(otw)); if (otw) $('#ok-zamknij').focus({ preventScroll: true }); else $('#ok-burger').focus({ preventScroll: true }); };
   $('#ok-burger').addEventListener('click', () => menuOk(true));
   $('#ok-zamknij').addEventListener('click', () => menuOk(false));
   $('#ok-okladka').addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#ok-menu').classList.contains('otwarte')) menuOk(false); });
@@ -2233,6 +2630,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#wybor-ekranu').hidden = widok !== 'okladka' && widok !== 'instytut';
     $('#wybor-plakietki').hidden = widok !== 'okladka';
     $('#wybor-skosu').hidden = widok !== 'okladka';
+    $('#wybor-tytulu').hidden = widok !== 'okladka';
+    $('#wybor-zakretu').hidden = widok !== 'okladka';
     $('#wybor-barwy').hidden = widok !== 'okladka';
     $('#wybor-proby').hidden = widok !== 'okladka';
     $('#wybor-prel').hidden = widok !== 'okladka';
@@ -2253,6 +2652,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'ekran') { ekran = v.split('x').map(Number); ustawEkran(); pokaz(); ulozTytul(); }
     if (co === 'plakietka') { $('#ok-flaga').hidden = v !== 'jest'; ulozTytul(); }
     if (co === 'skos') { nachylenie = Number(v); ulozTytul(); }
+    if (co === 'tytul') { $('#ok-okladka').classList.toggle('tytul-rowny', v === 'rowne'); ulozTytul(); }
+    if (co === 'zakret') { zakret = v; ulozTytul(); }
     if (co === 'proba') { liczbaSem = Number(v); rysujKolumny(); }
     if (co === 'prel') { wariantPrel = v; rysujKolumny(); }
     if (co === 'bok') { bok = v; rysujInstytut(); skaluj(); }
@@ -2261,6 +2662,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'strona') { strona = v; rysujInstytut(); skaluj(); window.scrollTo(0, 0); }
     if (co === 'menuDz') { menuDz = v; mzSekcja = 0; rysujInstytut(); skaluj(); }
     if (co === 'tlo') document.documentElement.dataset.tlo = v;
+    if (co === 'ciemny') { if (v === 'obecny') delete document.documentElement.dataset.ciemny; else document.documentElement.dataset.ciemny = v; }
     if (co === 'pasek') { pasekIn = v; rysujInstytut(); skaluj(); }
     if (co === 'motyw') { if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v; }
     if (co === 'baner') { baner = v; rysujInstytut(); skaluj(); }
