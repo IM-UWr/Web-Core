@@ -602,6 +602,14 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-pod[data-menu="E"] .mz-wiersz h5 { margin: 0; font-size: 13.5px; font-weight: 700; color: var(--d-a); }
 .in-pod[data-menu="E"] .mz-wiersz div { display: flex; flex-wrap: wrap; gap: 2px 24px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; }
 .in-pod[data-menu="E"] + .in-tresc { padding-top: 34px; }
+/* Rekrutacja na Studiach, widoczna od razu (4.11, 23:48): przycisk w banerze w rzędzie liczb albo w pasie menu z prawej */
+.in-liczby .in-cta { align-self: center; display: inline-flex; align-items: center; gap: 10px; margin-left: 6px; padding: 10px 18px; background: var(--d-j); color: var(--granat); font-size: 15px; font-weight: 700; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: filter .15s; }
+.in-liczby .in-cta:hover { filter: brightness(1.08); }
+.in-liczby .in-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.in-pod[data-menu="E"]:has(.mz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 36px; align-items: center; }
+.in-pod .mz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display); font-size: 22px; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: filter .15s; }
+.mz-rekr small { font-family: var(--f-text); font-size: 12.5px; font-weight: 700; opacity: .85; }
+.mz-rekr:hover { filter: brightness(1.1); }
 /* D: bez klikania — trzy krótkie wiersze, wszystko widać od razu */
 .in-pod[data-menu="D"] { padding-bottom: 0; }
 .in-pod[data-menu="D"] .mz-wiersz { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--m-line); }
@@ -784,6 +792,64 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 @keyframes pisz { to { clip-path: inset(-40% -5% -40% -5%); } }
 @media (prefers-reduced-motion: reduce) { .podpis-r { animation: none; clip-path: none; } }
 .in-b4 .podpis-r { right: calc(var(--marg) + 90px); bottom: 24px; font-size: 46px; }
+/* ---------- wzorzec treści (4.11, 23:44): sekcja / podsekcja / etykieta i elementy; bez kafelków, cieni, zaokrągleń i teł sekcji ---------- */
+.pd-tresc.tresc { font-size: 17px; line-height: 1.68; color: var(--m-text); }
+.pd-tresc.tresc > section { padding: 0 0 44px; margin: 0 0 40px; border-bottom: 1px solid var(--m-line); }
+.pd-tresc.tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+.tresc h3 { margin: 0 0 16px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; color: var(--m-ink); }
+.tresc h4 { margin: 30px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.3; color: var(--d-a); }
+.tresc h3 + p + h4, .tresc h3 + h4 { margin-top: 10px; }
+.tresc .etyk { display: block; margin: 0 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+.tresc p { margin: 0 0 14px; max-width: 70ch; }
+.tresc p.wst { color: var(--m-ink); }
+.tresc a { color: var(--m-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); transition: color .15s; }
+.tresc a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
+.tresc p a.zew::after, .tresc li > a.zew::after { content: ' ↗'; font-size: .8em; }
+.tresc ul.kreski { list-style: none; margin: 0 0 16px; padding: 0; max-width: 70ch; }
+.tresc ul.kreski li { position: relative; margin: 6px 0; padding-left: 24px; }
+.tresc ul.kreski li::before { content: ''; position: absolute; left: 0; top: .84em; width: 12px; height: 2px; background: var(--d-a); }
+.tresc .uwaga { max-width: 70ch; margin: 12px 0 0; padding: 16px 20px 6px; border-left: 3px solid var(--d-a); background: var(--d-t); }
+.tresc ul.dwa, .tresc ul.linki { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; margin: 0; padding: 0; list-style: none; }
+.tresc ul.dwa li { padding: 14px 0 16px; border-top: 1px solid var(--m-line); }
+.tresc ul.dwa b { display: block; margin-bottom: 4px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--m-ink); }
+.tresc ul.dwa span { display: block; font-size: 15.5px; line-height: 1.55; }
+.tresc ul.linki a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--m-line); font-family: var(--f-display); font-size: 21px; line-height: 1.3; text-decoration: none; }
+.tresc ul.linki a::after { content: '→'; font-family: var(--f-text); font-size: 15px; color: var(--m-muted); }
+.tresc ul.linki a.zew::after { content: '↗'; }
+.tresc ol.etapy { margin: 0; padding: 0; list-style: none; counter-reset: etap; }
+.tresc ol.etapy li { position: relative; padding: 18px 0 18px 64px; border-top: 1px solid var(--m-line); }
+.tresc ol.etapy li::before { counter-increment: etap; content: counter(etap); position: absolute; left: 0; top: 16px; font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+.tresc ol.etapy .t { margin: 0 0 4px; font-family: var(--f-display); font-size: 21px; line-height: 1.3; color: var(--m-ink); }
+.tresc ol.etapy p { font-size: 15.5px; line-height: 1.55; margin-bottom: 8px; }
+.tresc ol.etapy .akcja { margin: 10px 0 0; }
+.tresc dl.para { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 12px; margin: 0; font-size: 14.5px; line-height: 1.5; }
+.tresc dl.para dt { font-weight: 700; color: var(--m-muted); }
+.tresc dl.para dd { margin: 0; }
+.tresc table.tab { width: 100%; border-collapse: collapse; font-size: 15.5px; line-height: 1.5; }
+.tresc table.tab th { padding: 0 18px 8px 0; border-bottom: 2px solid var(--m-ink); text-align: left; font-size: 13px; font-weight: 700; color: var(--m-muted); }
+.tresc table.tab td { padding: 11px 18px 11px 0; border-bottom: 1px solid var(--m-line); vertical-align: top; }
+.tresc table.tab td:first-child { color: var(--m-ink); }
+.tresc table.tab td:last-child { white-space: normal; min-width: 14em; }
+.tresc .tresc-taby { margin: 4px 0 16px; }
+.tresc .prog .dotyczy { font-size: 15.5px; color: var(--m-muted); }
+.tresc ul.pliki { margin: 0; padding: 0; list-style: none; }
+.tresc :is(ul.pliki, ol.etapy, ul.dwa, ul.linki) li { max-width: none; font-size: inherit; }
+.tresc ul.pliki li { border-top: 1px solid var(--m-line); }
+.tresc ul.pliki li:last-child { border-bottom: 1px solid var(--m-line); }
+.tresc ul.pliki a { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 14px; align-items: baseline; padding: 11px 0; font-size: 15.5px; line-height: 1.45; text-decoration: none; }
+.tresc ul.pliki a svg { width: 18px; height: 18px; align-self: start; margin-top: 2px; fill: none; stroke: var(--d-a); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tresc ul.pliki .typ { font-size: 12.5px; font-weight: 700; color: var(--m-muted); white-space: nowrap; }
+.tresc .faq details { border-top: 1px solid var(--m-line); }
+.tresc .faq details:last-child { border-bottom: 1px solid var(--m-line); }
+.tresc .faq summary { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; list-style: none; cursor: pointer; font-family: var(--f-display); font-size: 20px; line-height: 1.35; color: var(--m-ink); }
+.tresc .faq summary::-webkit-details-marker { display: none; }
+.tresc .faq summary::after { content: '+'; flex: none; font-family: var(--f-text); font-size: 24px; line-height: 1; color: var(--d-a); }
+.tresc .faq details[open] summary::after { content: '−'; }
+.tresc .faq summary:hover { color: var(--d-a); }
+.tresc .faq details p { margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; }
+.tresc .kontakty { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; }
+.tresc .kontakty > div { padding-top: 12px; border-top: 2px solid var(--m-ink); }
+.tresc .kontakty b { display: block; margin: 2px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--m-ink); }
 /* sygnet (pomniejszona twarz patrona) graficznie na środku bloku tekstu nagłówka, podpis pod nim (4.11, 23:33) */
 .pd-b .tyt-g { position: static; }
 .pd-b .podpis-r { right: calc(100% + 6px); top: calc(100% - 2px); font-size: 34px; transform-origin: right center; }
@@ -1375,9 +1441,14 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="D" aria-pressed="false">D bez klikania</button>
       <button type="button" data-v="E" aria-pressed="true">E wiersze na pasie</button>
     </div></div>
+    <div class="grupa" id="wybor-rekr" hidden><span>Rekrutacja na Studiach</span><div class="seg" data-ustaw="rekr">
+      <button type="button" data-v="baner" aria-pressed="true">przycisk w banerze</button>
+      <button type="button" data-v="pas" aria-pressed="false">przycisk w pasie menu</button>
+    </div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
       <button type="button" id="s-pod" data-v="pod" aria-pressed="false">podstrona</button>
+      <button type="button" id="s-wzor" data-v="wzor" aria-pressed="false">wzorzec treści (Szkoła doktorska)</button>
     </div></div>
     <div class="grupa ustalone" id="wybor-nagl" hidden><span>Nagłówek podstrony</span><div class="seg" data-ustaw="naglowek">
       <button type="button" id="n-zdjecie" data-v="zdjecie" aria-pressed="true">głęboki + zdjęcie</button>
@@ -2091,20 +2162,51 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   const znakPod = (dz) => dz === 'instytut'
     ? { ps: znakSzpilrajn('badecgfh'), n: 'Twierdzenie Szpilrajna, 1930', f: 'Każdy porządek częściowy rozszerza się do liniowego. Szpilrajn to nazwisko, pod którym publikował Marczewski.' }
     : { ps: ZNAKI[dz], n: D[dz].znakNazwa, f: D[dz].znakFakt };
+  /* wzorzec treści (4.11, 23:44): jeden system sekcji, podsekcji i elementów dla wszystkich stron; treść: Szkoła doktorska z CMS */
+  const WZOR = {"tytul": "Szkoła doktorska", "haslo": "Doktorat wśród badaczy", "podtytul": "Kolegium Doktorskie Matematyki · Szkoła Doktorska Uniwersytetu Wrocławskiego", "tekst": [["p", "<b>Kolegium Doktorskie Matematyki</b> działa w ramach Szkoły Doktorskiej Uniwersytetu Wrocławskiego, na Wydziale Matematyki i Informatyki. Jego celem jest przygotowanie doktorantów do napisania rozprawy doktorskiej i prowadzenia samodzielnej pracy naukowo-dydaktycznej w zakresie matematyki."], ["p", "Kształcenie trwa 8 semestrów i odbywa się według indywidualnego planu badawczego oraz indywidualnych planów zajęć, ustalanych z promotorem i akceptowanych przez kierownika Kolegium. Prowadzi do efektów uczenia się na poziomie 8 Polskiej Ramy Kwalifikacji i kończy się złożeniem rozprawy doktorskiej."], ["h", "Zajęcia"], ["p", "Wymiar zajęć obowiązkowych wynosi 270 godzin. W ramach zajęć prowadzonych przez Kolegium trzeba zaliczyć co najmniej 4 wykłady (po co najmniej 30 godzin, zakończone egzaminem) i co najmniej 2 seminaria semestralne po 30 godzin. Można też zaliczać zajęcia ogólnouniwersyteckie (dla wszystkich kolegiów Szkoły Doktorskiej), przedmioty z oferty Wydziału (w tym seminaria naukowe), indywidualne zajęcia spoza oferty, przedmioty na innych wydziałach i uczelniach oraz praktyki zawodowe. Za zgodą kierownika Kolegium można także zaliczać przedmioty z oferty Kolegium Doktorskiego Informatyki. Zajęcia odbywają się po polsku lub po angielsku. Sylabusy ostatnio prowadzonych zajęć są na stronie <a href=\"#\">Dokumenty i wzory</a>."], ["h", "Czego oczekuje program"], ["ul", ["aktywnego uczestnictwa w konferencjach naukowych i innych wydarzeniach naukowych,", "wykazania się umiejętnością przygotowania wniosku o finansowanie projektu badawczego,", "konsultacji w wymiarze 1 godziny tygodniowo,", "do 10 godzin rocznie prac organizacyjnych na rzecz Wydziału Matematyki i Informatyki, np. pomocy w organizacji konferencji naukowych, Dni Otwartych i imprez popularnonaukowych, udziału w Dolnośląskim Festiwalu Nauki czy pomocy przy egzaminach."]], ["h", "Konta, które należy założyć na początku"], ["p", "W ciągu 14 dni od rozpoczęcia kształcenia w szkole doktorskiej doktorant jest zobowiązany do:"], ["ul", ["założenia indywidualnego konta w systemie Polskiej Bibliografii Naukowej (PBN),", "połączenia konta w PBN z identyfikatorem ORCID,", "połączenia konta w PBN z identyfikatorem w systemie POLON."]], ["h", "Ludzie i obrony"], ["p", "Doktoranci Instytutu są w <a href=\"#\">spisie pracowników</a>. Zawiadomienia o obronach, rozprawy i recenzje publikujemy na stronie <a href=\"#\">Obrony doktorskie</a>. Wszyscy doktoranci Uniwersytetu tworzą <a href=\"#\" class=\"zew\">Samorząd Doktorantów Uniwersytetu Wrocławskiego</a>."]], "przyciski": [["Rekrutacja", false], ["Stypendia i granty", false], ["Dokumenty i wzory", false], ["Rozprawa i stopień doktora", false], ["Szkoła Doktorska UWr", true]], "dlaczego": [["Kategoria A+", "Matematyka na Uniwersytecie Wrocławskim ma kategorię naukową A+ — doktorat przygotowujesz wśród aktywnych badaczy."], ["Opieka promotora", "Promotor (doktor habilitowany lub profesor) wspiera Cię przez cały okres kształcenia; z nim ustalasz plan badawczy i indywidualny plan zajęć."], ["Stypendium doktoranckie", "Doktorant bez stopnia doktora otrzymuje stypendium — co najmniej 37% wynagrodzenia profesora, a po ocenie śródokresowej co najmniej 57%."], ["Doświadczenie dydaktyczne", "Praktyki zawodowe (do 60 godzin rocznie) przygotowują do pracy nauczyciela akademickiego — prowadzisz zajęcia ze studentami lub uczestniczysz w ich prowadzeniu."], ["Staże i wyjazdy", "Za zgodą kierownika Kolegium możesz odbywać staże w innych ośrodkach, także za granicą — pobyt za granicą wlicza się do okresu kształcenia."], ["Miejsce w Instytucie", "Doktoranci mają w Instytucie Matematycznym miejsce do pracy i dostęp do infrastruktury badawczej; mogą otrzymywać delegacje służbowe i granty naukowe."]], "etapy": [["Przed rozpoczęciem", "Rekrutacja", "Znajdź przyszłego promotora, zarejestruj się w systemie IRKa i napisz egzamin kwalifikacyjny (12 zadań, ocenianych jest 6 najlepiej rozwiązanych).", "W ostatnich latach w czerwcu (2026 — egzamin 17 czerwca)", "IRKa"], ["Pierwszy miesiąc", "Ślubowanie, promotor i konta naukowe", "Składasz ślubowanie (elektronicznie, w USOS), wniosek o wyznaczenie promotora oraz zakładasz konto w Polskiej Bibliografii Naukowej (PBN) i łączysz je z ORCID i POLON. Rada dyscypliny wyznacza promotora najpóźniej w ciągu 3 miesięcy.", "Konta PBN/ORCID/POLON: 14 dni; wniosek o promotora: 1 miesiąc; ślubowanie: 30 dni", ""], ["Pierwszy rok", "Indywidualny plan badawczy (IPB)", "Razem z promotorem przygotowujesz IPB — temat i cel badań, hipotezy, metody, harmonogram prac oraz formę i termin złożenia rozprawy. Plan zatwierdza kierownik Kolegium.", "Do 12 miesięcy od rozpoczęcia kształcenia", ""], ["Co semestr i co rok", "Zajęcia, praktyki i zaliczenie roku", "Na każdy semestr przedstawiasz plan zajęć do akceptacji kierownika Kolegium (łącznie 270 godzin, w tym co najmniej 4 wykłady z egzaminem i 2 seminaria). Prowadzisz zajęcia w ramach praktyk, masz konsultacje (1 godzina tygodniowo) i pomagasz przy pracach organizacyjnych Wydziału (do 10 godzin rocznie).", "Plan zajęć: 2 tygodnie od początku semestru; dokumenty do zaliczenia roku: do 15 września", ""], ["Połowa okresu kształcenia", "Ocena śródokresowa", "Trzyosobowa komisja (w tym co najmniej jedna osoba spoza UWr) ocenia realizację IPB na podstawie Twojego sprawozdania, opinii promotora oraz prezentacji i dyskusji. Wynik jest pozytywny albo negatywny; negatywny oznacza skreślenie z listy doktorantów.", "Posiedzenia komisji: 1–30 września; sprawozdanie najpóźniej 30 dni wcześniej", ""], ["Termin z IPB", "Złożenie rozprawy doktorskiej", "Kształcenie kończy się złożeniem rozprawy z pozytywną opinią promotora razem z wnioskiem o wszczęcie postępowania w sprawie nadania stopnia doktora. W uzasadnionych przypadkach termin można przedłużyć łącznie o 2 lata.", "", ""], ["Po złożeniu rozprawy", "Recenzje i publiczna obrona", "Rada Dyscypliny Matematyka powołuje recenzentów. Po co najmniej dwóch pozytywnych recenzjach — publiczna obrona i uchwała o nadaniu stopnia doktora. Zawiadomienia o obronach publikujemy na stronie Obrony doktorskie.", "", ""]], "programy": [["Od 2026/27", "Dla osób, które rozpoczęły kształcenie w roku akademickim 2026/27 lub później.", [["Program kształcenia w Kolegium Doktorskim Matematyki (cykle od 2026/27)", false], ["Uchwała Senatu UWr nr 127/2025 zmieniająca uchwałę w sprawie programów kształcenia w Szkole Doktorskiej", true]]], ["2025/26", "Dla osób, które rozpoczęły kształcenie w roku akademickim 2025/26.", [["Uchwała Senatu UWr nr 161/2024 — programy kształcenia dla cykli od 2025/26", false], ["Uchwała nr 28/2024 w sprawie programu kształcenia w Kolegium Doktorskim Matematyki od roku akademickiego 2025/26 (BIP)", true]]], ["2024/25", "Dla osób, które rozpoczęły kształcenie w roku akademickim 2024/25.", [["Program kształcenia w Kolegium Doktorskim Matematyki (od 2024/25)", false], ["Uchwała Senatu UWr nr 224/2023 — programy kształcenia dla cykli od 2024/25", false]]], ["2023/24", "Dla osób, które rozpoczęły kształcenie w roku akademickim 2023/24.", [["Uchwała Senatu UWr nr 145/2022 — programy kształcenia dla cykli od 2023/24", false], ["Uchwała Senatu UWr nr 145/2022 — wersja angielska", false]]], ["2021/22–2022/23", "Dla osób, które rozpoczęły kształcenie w latach 2021/22–2022/23.", [["Uchwała Senatu UWr nr 161/2020 — programy kształcenia dla cykli od 2021/22", false]]], ["2019/20–2020/21", "Dla osób, które rozpoczęły kształcenie w latach 2019/20–2020/21.", [["Uchwała Senatu UWr nr 100/2019 w sprawie programów kształcenia w Szkole Doktorskiej", false]]]], "terminy": [["Konto w Polskiej Bibliografii Naukowej (PBN) połączone z ORCID i POLON", "nowi doktoranci", "14 dni od rozpoczęcia kształcenia"], ["Ślubowanie (elektronicznie, w USOS)", "nowi doktoranci", "30 dni od rozpoczęcia kształcenia"], ["Wniosek o wyznaczenie promotora", "nowi doktoranci", "1 miesiąc od rozpoczęcia kształcenia"], ["Indywidualny plan badawczy (IPB) zaakceptowany przez promotora", "1. rok", "12 miesięcy od rozpoczęcia kształcenia"], ["Semestralny plan zajęć do akceptacji kierownika Kolegium", "wszyscy doktoranci", "2 tygodnie od rozpoczęcia semestru"], ["Dokumenty do zaliczenia roku (sprawozdanie roczne z opinią promotora)", "wszyscy doktoranci", "do 15 września (na wniosek najpóźniej do 30 września)"], ["Sprawozdanie z realizacji IPB z opinią promotora (ocena śródokresowa)", "doktoranci w połowie kształcenia", "najpóźniej 30 dni przed posiedzeniem komisji"], ["Odwołanie od negatywnej oceny śródokresowej", "doktorant lub promotor", "14 dni od udostępnienia wyniku"]], "faq": [["Czy przed rejestracją muszę mieć promotora?", "Tak. Aby skutecznie się zarejestrować, kandydat musi mieć przyszłego promotora. Promotor główny musi mieć stopień doktora habilitowanego lub tytuł profesora. Dane kontaktowe matematyków znajdziesz w <a href=\"#\">spisie pracowników</a>. Szczegóły — na stronie <a href=\"#\">Rekrutacja</a>."], ["Jak wygląda egzamin kwalifikacyjny?", "Jest to egzamin pisemny. Kandydat otrzymuje 12 zadań (w języku polskim albo angielskim — do wyboru), z których komisja ocenia 6 najlepiej rozwiązanych, każde w skali 0–6 punktów. Zakres obejmuje przedmioty wykładane na studiach matematycznych, w szczególności analizę I–III, algebrę liniową i algebrę I, równania różniczkowe, elementy topologii metrycznej i teorii mnogości oraz rachunek prawdopodobieństwa i statystykę. <a href=\"#\">Zadania z poprzednich lat</a>."], ["Czy mogę kandydować bez tytułu magistra?", "W przypadku uzasadnionym najwyższą jakością osiągnięć naukowych — tak, jeśli jesteś absolwentem studiów pierwszego stopnia albo studentem, który ukończył trzeci rok jednolitych studiów magisterskich. Potrzebna jest opinia samodzielnego pracownika naukowego uzasadniająca wysoki poziom Twojego dorobku; o dopuszczeniu do egzaminu decyduje komisja rekrutacyjna."], ["Czy można kształcić się po angielsku?", "Postępowanie rekrutacyjne prowadzi się po polsku lub po angielsku, a zadania egzaminacyjne są przygotowane w obu językach. Zajęcia w Kolegium odbywają się po polsku lub po angielsku, a ocena śródokresowa — po polsku albo po angielsku."], ["Ile wynosi stypendium doktoranckie?", "Co najmniej 37% wynagrodzenia profesora do miesiąca, w którym przeprowadzono ocenę śródokresową, i co najmniej 57% po tym miesiącu. Wysokość stypendium na dany rok akademicki ustala Rektor. Stypendium można otrzymywać łącznie najwyżej przez 4 lata. Więcej — <a href=\"#\">Stypendia i granty</a>."], ["Czy w trakcie kształcenia mogę pracować na uczelni?", "Doktorant nie może być zatrudniony jako nauczyciel akademicki ani pracownik naukowy (z wyjątkami określonymi w art. 209 ust. 10 ustawy — Prawo o szkolnictwie wyższym i nauce). O podjęciu takiego zatrudnienia trzeba niezwłocznie powiadomić kierownika Kolegium."], ["Co jeśli nie zdążę złożyć rozprawy w terminie?", "Kierownik Kolegium może przedłużyć termin złożenia rozprawy łącznie najwyżej o 2 lata — m.in. z powodu choroby, opieki nad dzieckiem do 4. roku życia lub chorym członkiem rodziny, niepełnosprawności albo konieczności prowadzenia długotrwałych badań. Wniosek składa się po ocenie śródokresowej, przed końcem okresu kształcenia. W okresie przedłużenia, jeśli od rozpoczęcia kształcenia minęły 4 lata, stypendium nie przysługuje."], ["Gdzie znajdę listę doktorantów i ogłoszenia o obronach?", "Doktoranci Instytutu są w <a href=\"#\">spisie pracowników</a> (grupa „Doktoranci”). Zawiadomienia o obronach, rozprawy i recenzje publikujemy na stronie <a href=\"#\">Obrony doktorskie</a>."]], "kontakt": [["Kierownik Kolegium Doktorskiego Matematyki", "prof. dr hab. Piotr Kowalski", "piotr.kowalski@math.uni.wroc.pl", "", "502"], ["Sekretarz Szkoły Doktorskiej w Instytucie", "mgr Ewa Lamch", "ewa.lamch@math.uni.wroc.pl", "71 375 7494", "303"], ["Sekretariat Szkoły Doktorskiej UWr", "ul. Kuźnicza 46/47, 50-138 Wrocław", "szkoladoktorska@uwr.edu.pl", "", ""]], "akty": [["Regulamin Szkoły Doktorskiej UWr (tekst jednolity, obwieszczenie Rektora z 5 lipca 2023 r.)", true], ["Regulamin Szkoły Doktorskiej UWr — wersja angielska", true], ["Uchwała Senatu UWr nr 131/2019 w sprawie trybu postępowania o nadanie stopni doktora i doktora habilitowanego (tekst jednolity z 16 lutego 2024 r.)", false], ["Zarządzenie Rektora nr 25/2021 — harmonogram i wzory dokumentów oceny śródokresowej (stan na 12 kwietnia 2024 r.)", true], ["Zarządzenie Rektora nr 25/2021 (ocena śródokresowa) — wersja angielska", true], ["Zarządzenie Rektora nr 182/2023 w sprawie dokumentacji przebiegu kształcenia w Szkole Doktorskiej", true], ["Zarządzenie Rektora nr 182/2023 — wersja angielska", true], ["Zarządzenie Rektora nr 161/2023 — sprawdzanie rozpraw w JSA i system APD", false], ["Zarządzenie Rektora nr 167/2021 — umowy co-tutelle", true], ["Zarządzenie Rektora nr 7/2020 — Regulamin zgłaszania doktorantów do ubezpieczeń społecznych i zdrowotnego", false], ["Zarządzenie Rektora nr 230/2023 — zmiana Zasad organizacji procesu dydaktycznego", false], ["Regulamin Samorządu Doktorantów UWr (zarządzenie Rektora nr 153/2019)", false]]};
+  const WZOR_POD = { klucz: 'wzor', spis: [], nazwa: 'Szkoła doktorska', tytul: 'Szkoła doktorska', haslo: 'Doktorat wśród badaczy', liczby: [['8', 'semestrów kształcenia'], ['270', 'godzin zajęć obowiązkowych']] };
+  const podstrona = (dz) => (strona === 'wzor' && dz === 'studia' ? WZOR_POD : PODSTRONY[dz]);
+  const IKONA_PLIK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg>';
+  function trescWzor() {
+    const W = WZOR;
+    const tekst = W.tekst.map(([t, x], i) => t === 'h' ? `<h4>${x}</h4>` : t === 'ul' ? `<ul class="kreski">${x.map((li) => `<li>${li}</li>`).join('')}</ul>` : `<p${i === 0 ? ' class="wst"' : ''}>${x}</p>`).join('')
+      // ramka uwagi: akapit o kontach (14 dni) z listą
+      .replace(/<h4>Konta, które należy założyć na początku<\/h4><p>(.*?)<\/p>(<ul class="kreski">.*?<\/ul>)/, '<h4>Konta, które należy założyć na początku</h4><div class="uwaga"><span class="etyk">W ciągu 14 dni</span><p>$1</p>$2</div>');
+    const plik = ([n, zew]) => `<li><a href="#">${IKONA_PLIK}<span>${n}</span><span class="typ">${zew ? 'strona ↗' : 'PDF'}</span></a></li>`;
+    return `<div class="pd-tresc tresc">
+      <section data-krotko="O Kolegium"><h3>O Kolegium Doktorskim</h3>${tekst}</section>
+      <section><h3>Strony szkoły doktorskiej</h3><ul class="linki">${W.przyciski.map(([n, zew]) => `<li><a href="#"${zew ? ' class="zew"' : ''}>${n}</a></li>`).join('')}</ul></section>
+      <section><h3>Dlaczego warto</h3><ul class="dwa">${W.dlaczego.map(([t, o]) => `<li><b>${t}</b><span>${o}</span></li>`).join('')}</ul></section>
+      <section data-krotko="Od rekrutacji do obrony"><h3>Od rekrutacji do obrony</h3><ol class="etapy">${W.etapy.map(([k, t, o, ter, form]) => `<li><span class="etyk">${k}</span><p class="t">${t}</p><p>${o}</p>${ter ? `<dl class="para"><dt>Termin</dt><dd>${ter}</dd></dl>` : ''}${form ? `<p class="akcja"><a class="pk-btn" href="#">Rejestracja w ${form} ↗</a></p>` : ''}</li>`).join('')}</ol></section>
+      <section><h3>Terminy</h3><table class="tab"><thead><tr><th>Co</th><th>Kogo dotyczy</th><th>Termin</th></tr></thead><tbody>${W.terminy.map(([c, k, t]) => `<tr><td>${c}</td><td>${k}</td><td>${t}</td></tr>`).join('')}</tbody></table></section>
+      <section data-krotko="Program kształcenia"><h3>Program kształcenia</h3><p>Program zależy od roku rozpoczęcia kształcenia. Wybierz swój rocznik:</p>
+        <div class="pk-seg tresc-taby" role="tablist">${W.programy.map(([n], i) => `<button type="button" role="tab" aria-pressed="${i === 0}" data-prog="${i}">${n}</button>`).join('')}</div>
+        ${W.programy.map(([n, dot, dok], i) => `<div class="prog" data-prog-panel="${i}"${i ? ' hidden' : ''}><p class="dotyczy">${dot}</p><ul class="pliki">${dok.map(plik).join('')}</ul></div>`).join('')}</section>
+      <section data-krotko="Pytania"><h3>Najczęstsze pytania</h3><div class="faq">${W.faq.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')}</div></section>
+      <section><h3>Kontakt</h3><div class="kontakty">${W.kontakt.map(([r, o, e, t, pk]) => `<div><span class="etyk">${r}</span><b>${o}</b><dl class="para">${e ? `<dt>e-mail</dt><dd><a href="#">${e}</a></dd>` : ''}${t ? `<dt>tel.</dt><dd>${t}</dd>` : ''}${pk ? `<dt>pokój</dt><dd>${pk}</dd>` : ''}</dl></div>`).join('')}</div></section>
+      <section data-krotko="Akty prawne"><h3>Akty prawne i regulaminy</h3><ul class="pliki">${W.akty.map(plik).join('')}</ul></section>
+    </div>`;
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.tresc-taby button'); if (!b) return;
+    const box = b.closest('section');
+    box.querySelectorAll('.tresc-taby button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    box.querySelectorAll('[data-prog-panel]').forEach((x) => { x.hidden = x.dataset.progPanel !== b.dataset.prog; });
+  });
   function htmlBanerPod(dz) {
-    const P = PODSTRONY[dz], f = IN_FOTO[dz], z = znakPod(dz), L = !!(P.liczby && P.liczby.length);
+    const P = podstrona(dz), f = IN_FOTO[dz], z = znakPod(dz), L = !!(P.liczby && P.liczby.length);
     return `<section class="pd-b${naglowek === 'zdjecie' ? ' pd-foto' : ''}${L ? ' z-liczbami' : ''}" data-n="${naglowek}">${naglowek === 'zdjecie' ? `<div class="in-foto"><img src="${f[0]}" alt="" style="object-position:50% 40%;${f[3] ? `filter:${f[3]}` : ''}"></div>` : ''}
       <div class="tyt"><div class="tyt-g">${svgSygnet(dz).replace('<svg ', '<svg class="sygnet" ')}<p class="sciezka"><a href="#" data-strona="dzial">← ${D[dz].nazwa}</a></p><h2>${P.tytul}</h2><span class="podpis-s">${svgPodpis(dz, false)}</span></div>${L ? `<p class="haslo">${P.haslo}</p><div class="in-liczby">${P.liczby.map(([a, b]) => `<div><b>${a}</b>${b}</div>`).join('')}</div>` : ''}</div>
       <svg class="znak" viewBox="0 0 200 240" aria-hidden="true">${z.ps.map((p) => `<path d="${p.d}"${p.gruba ? ' class="gruba"' : ''}/>`).join('')}</svg>
       <p class="znak-podpis"><b>${z.n}</b>${z.f}</p></section>`;
   }
   function htmlPod(dz) {
-    const P = PODSTRONY[dz], g = IN_GRUPY[dz];
+    const P = podstrona(dz), g = IN_GRUPY[dz];
     const czysta = (x) => x.replace(/ ↗$/, '').split('|')[0];
     const wszystkie = g.flatMap(([, l]) => l.map(czysta)), k = wszystkie.indexOf(P.nazwa), nast = wszystkie[k + 1];
     const nav = `<nav class="pd-nav" aria-label="${D[dz].nazwa}"><a href="#" data-strona="dzial">${D[dz].nazwa}</a>${g.map(([h, l]) => `<h6>${h}</h6><ul>${l.map((x) => `<li><a href="#"${czysta(x) === P.nazwa ? ' aria-current="page"' : ''}>${czysta(x)}${x.endsWith('↗') ? ' ↗' : ''}</a></li>`).join('')}</ul>`).join('')}
       <div class="spis"><h6>Na tej stronie</h6><ul>${P.spis.map((x) => `<li><a href="#">${x}</a></li>`).join('')}</ul></div></nav>`;
-    const tresc = P.klucz === 'wladze' ? trescWladze() : P.klucz === 'granty' ? trescGranty() : trescPlan();
+    const tresc = P.klucz === 'wzor' ? trescWzor() : P.klucz === 'wladze' ? trescWladze() : P.klucz === 'granty' ? trescGranty() : trescPlan();
     if (bok !== 'lewy') return `<div class="pd bok-prawy" data-bok="${bok}">${tresc}<nav class="spis-p" aria-label="Na tej stronie"><h6>Na tej stronie</h6><div class="spis-pasek"><i></i></div><ul></ul><span class="wskaznik"></span></nav></div>
       <div class="pd-stopka bok-prawy">${nast ? `<a class="nast" href="#"><small>Następna strona w dziale →</small>${nast}</a>` : '<span></span>'}<p class="meta">Ostatnia aktualizacja: data z historii zmian · <a href="#">Zgłoś błąd na tej stronie</a></p></div>`;
     return `<div class="pd">${nav}${tresc}</div>
@@ -2362,7 +2464,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     popularyzacja: [['Na tej stronie', ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy']], ['Partnerzy', ['Fundacja Matematyków Wrocławskich|fmw.math.uni.wroc.pl ↗', 'Wrocławski Portal Matematyczny|matematyka.wroc.pl ↗', 'Wrocławski Oddział PTM|ptm.math.uni.wroc.pl ↗']]]
   };
   /* menu działu: trzy sekcje, pole z pozycjami wybranej (4 projekty, 4.11) */
-  let menuDz = 'E', mzSekcja = 0;
+  let menuDz = 'E', mzSekcja = 0, rekrNaStudiach = 'baner';
   const MZ_OPIS = {
     'Matematyka': 'studia I i II stopnia, pięć specjalności', 'SIAD': 'sztuczna inteligencja w analizie danych', 'ISIM': 'Indywidualne Studia Informatyczno-Matematyczne',
     'Szkoła doktorska': 'Kolegium Doktorskie Matematyki', 'Studia podyplomowe': 'kwalifikacje do nauczania matematyki',
@@ -2387,7 +2489,10 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const nazwa = (x) => (x.endsWith(' ↗') ? x.slice(0, -2) : x).split('|')[0];
     const lnk = (x) => { const z = x.endsWith(' ↗'), n = nazwa(x); return `<a class="mz-lnk${z ? ' zew' : ''}" href="#" data-n="${n}" title="${MZ_OPIS[n] || ''}">${n}</a>`; };
     // D: bez zakładek, wszystkie sekcje naraz
-    if (w === 'D' || w === 'E') return G.map(([h, l]) => `<div class="mz-wiersz"><h5>${h}</h5><div>${l.map(lnk).join('')}</div></div>`).join('');
+    if (w === 'D' || w === 'E') {
+      const wiersze = G.map(([h, l]) => `<div class="mz-wiersz"><h5>${h}</h5><div>${l.map(lnk).join('')}</div></div>`).join('');
+      return dz === 'studia' && rekrNaStudiach === 'pas' ? `<div class="mz-wiersze">${wiersze}</div><a class="mz-rekr" href="#"><small>Dla kandydatów</small><span>Rekrutacja 2027/28 ↗</span></a>` : wiersze;
+    }
     const k = Math.min(mzSekcja, G.length - 1);
     const tab = ([h], i) => `<button type="button" role="tab" class="mz-tab" id="mz-t${i}" aria-selected="${i === k}" aria-controls="mz-p${i}" tabindex="${i === k ? 0 : -1}" data-mz="${i}">${h}</button>`;
     // wszystkie pola są w HTML jedno na drugim (ta sama komórka siatki): wysokość = najwyższe, więc treść pod spodem nie skacze
@@ -2413,10 +2518,11 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const dz = dzial, f = IN_FOTO[dz], w = dz === 'instytut' ? wariantInst : '4';
     const d = dz === 'instytut' ? { ...D.instytut, tytul: 'O Instytucie', tekst: IN_INST.tekst, skrot: IN_INST.skrot }
       : dz === 'popularyzacja' ? { ...D[dz], liczby: [], tekst: [], skrot: [] } : { ...D[dz], tekst: IN_DANE[dz].tekst, skrot: IN_DANE[dz].skrot };
-    const obecna = wersja === 'obecna', pod = strona === 'pod' && !!PODSTRONY[dz];
+    const obecna = wersja === 'obecna', pod = (strona === 'pod' || (strona === 'wzor' && dz === 'studia')) && !!PODSTRONY[dz];
     const pierwsze = !pod && !obecna && w === '4' && pierwszeWejscie(dz);
     $('#wybor-strony').hidden = !PODSTRONY[dz];
     $('#wybor-menu').hidden = pod || dz === 'popularyzacja';
+    $('#wybor-rekr').hidden = pod || dz !== 'studia';
     $('#wybor-nagl').hidden = !pod; $('#wybor-zdjec').hidden = !pod; $('#wybor-boku').hidden = !pod;
     $('#v-instytut').classList.toggle('n-jasny', pod && naglowek === 'jasny');
     $('#in-nowa').hidden = obecna; $('#in-obecna').hidden = !obecna;
@@ -2430,7 +2536,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#in-pod').hidden = pod;
     $('#v-instytut').dataset.dzial = dz;
     $('#wybor-inst').hidden = dz !== 'instytut';
-    const tytul = `<div class="in-tytul"><a class="wstecz" href="#">← Strona główna</a><h2>${d.nazwa}</h2><p class="haslo">${d.haslo}</p><p class="lead">${IN_DANE[dz].lead}</p>${d.liczby.length ? '' : '<!--'}<div class="in-liczby">${d.liczby.map(([a, b]) => `<div><b>${a}</b>${b}</div>`).join('')}</div>${d.liczby.length ? '' : '-->'}</div>`;
+    const tytul = `<div class="in-tytul"><a class="wstecz" href="#">← Strona główna</a><h2>${d.nazwa}</h2><p class="haslo">${d.haslo}</p><p class="lead">${IN_DANE[dz].lead}</p>${d.liczby.length ? '' : '<!--'}<div class="in-liczby">${d.liczby.map(([a, b]) => `<div><b>${a}</b>${b}</div>`).join('')}${dz === 'studia' && rekrNaStudiach === 'baner' ? '<a class="in-cta" href="#">Rekrutacja 2027/28 <span aria-hidden="true">↗</span></a>' : ''}</div>${d.liczby.length ? '' : '-->'}</div>`;
     $('#in-pod').dataset.menu = dz === 'popularyzacja' ? 'obecne' : menuDz;
     $('#in-pod').innerHTML = htmlMenuDzialu(dz);
     $('#in-tresc').hidden = pod || !d.tekst.length;
@@ -2630,6 +2736,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#wybor-paska').hidden = widok !== 'instytut';
     $('#wybor-strony').hidden = widok !== 'instytut';
     $('#wybor-menu').hidden = widok !== 'instytut';
+    $('#wybor-rekr').hidden = widok !== 'instytut' || dzial !== 'studia';
     $('#wybor-anim').hidden = widok !== 'instytut';
     if (widok === 'instytut') rysujInstytut();
     $('#scena').classList.toggle('telefony', widok === 'telefon');
@@ -2666,7 +2773,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'bok') { bok = v; rysujInstytut(); skaluj(); }
     if (co === 'naglowek') { naglowek = v; rysujInstytut(); skaluj(); }
     if (co === 'zdjeciaWl') { zdjeciaWl = v === 'tak'; rysujInstytut(); skaluj(); }
-    if (co === 'strona') { strona = v; rysujInstytut(); skaluj(); window.scrollTo(0, 0); }
+    if (co === 'strona') { strona = v; if (v === 'wzor' && dzial !== 'studia') { document.querySelector('#d-studia').click(); } else { rysujInstytut(); skaluj(); } window.scrollTo(0, 0); }
+    if (co === 'rekr') { rekrNaStudiach = v; rysujInstytut(); skaluj(); }
     if (co === 'menuDz') { menuDz = v; mzSekcja = 0; rysujInstytut(); skaluj(); }
     if (co === 'tlo') document.documentElement.dataset.tlo = v;
     if (co === 'ciemny') { if (v === 'obecny') delete document.documentElement.dataset.ciemny; else document.documentElement.dataset.ciemny = v; }
