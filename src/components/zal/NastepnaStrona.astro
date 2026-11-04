@@ -1,5 +1,5 @@
 ---
-// Dół podstrony działu (komputer; kierunek „Założyciele”): „Następna strona w dziale” (kolejna podstrona z menu działu,
+// Dół podstrony działu (kierunek „Założyciele”; komputer i telefon): „Następna strona w dziale” (kolejna podstrona z menu działu,
 // bez linków zewnętrznych) oraz „Ostatnia aktualizacja: … · Zgłoś błąd na tej stronie”.
 // Data aktualizacji — gdy widok ją poda (prop `aktualizacja`, RRRR-MM-DD); na razie żaden widok jej nie zna
 // (historia zmian treści jest w repozytoriach Web-*), więc pokazujemy tylko link zgłoszenia błędu.
@@ -22,7 +22,7 @@ const wMenu = k >= 0;
 const adresStrony = absolute(stripBase(Astro.url.pathname), Astro.site);
 const mail = `mailto:${ustawienia.kontakt.email}?subject=${encodeURIComponent(`${lang === 'en' ? 'Error on page' : 'Błąd na stronie'}: ${tytul}`)}&body=${encodeURIComponent(adresStrony)}`;
 ---
-{wMenu && <div class="z-nast tylko-komputer" data-dzial={dzial} data-pagefind-ignore>
+{wMenu && <div class="z-nast" data-dzial={dzial} data-pagefind-ignore>
   {nast
     ? <a class="z-nast-link" href={u(wJezyku(nast.adres, lang))}><small>{lang === 'en' ? 'Next page in this section →' : 'Następna strona w dziale →'}</small>{wybierz(nast, 'etykieta', lang)}</a>
     : <span></span>}

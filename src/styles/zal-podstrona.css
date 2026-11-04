@@ -1,16 +1,42 @@
 /* ==========================================================================
-   Kierunek „Założyciele” — szablon podstrony: spis „Na tej stronie” (zal/SpisStrony.astro) i rama podstrony (.z-pd)
-   na telefonie. Rama na komputerze: zalozyciele.css (.z-pd, .z-bok, .z-pd-tresc).
+   Kierunek „Założyciele” — wspólny szablon podstrony (zal/Podstrona.astro): treść i spis „Na tej stronie”
+   (zal/SpisStrony.astro). Zlecenie 11, zalecenie 3; wzór: prototyp, „Nawigacja na podstronie: A” (.pd.bok-prawy, .spis-p).
+   Komputer (≥ 761 px): treść i kolumna spisu 236 px z prawej, odstęp 56 px; spis przyklejony, wariant „kreska”.
+   Strona bez spisu (mniej niż 2 sekcje) ma tę samą szerokość treści, a miejsce po prawej puste.
+   Telefon (≤ 760 px): jedna kolumna, spis zwijany nad treścią.
    ========================================================================== */
 @media (min-width: 761px) {
-  /* komputer: spis jeszcze w bocznej nawigacji działu (BocznaNawigacja.astro) */
-  .z-spis { display: none; }
+  .z-pd { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px;
+    padding: 40px var(--marg) 30px; }
+  .z-pd > .z-pd-tresc { grid-column: 1; grid-row: 1; min-width: 0; }
+  .z-pd > .z-spis { grid-column: 2; grid-row: 1; }
+  /* sekcje przewijane spisem: 20 px zapasu nad nagłówkiem */
+  .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: 20px; }
+
+  /* „Na tej stronie”: przyklejony, nie wychodzi poza kolumnę treści (sticky w komórce siatki); dłuższy niż okno — przewija się */
+  .z-spis { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow-y: auto; overscroll-behavior: contain;
+    font-size: 14px; line-height: 1.35; }
+  .z-spis-h { margin: 0 0 10px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-spis-przelacz { display: none !important; }
+  .z-spis-lista { position: relative; list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+  .z-spis-lista li { margin: 0; }
+  .z-spis-lista li[hidden] { display: none; }
+  .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; transition: color .2s; }
+  .z-spis-lista a:hover { color: var(--ink); }
+  .z-spis-lista a[aria-current] { color: var(--ink); font-weight: 700; }
+  .z-spis-lista a:focus-visible { outline: 2px solid var(--d-a); outline-offset: -2px; }
+  /* znacznik bieżącej sekcji: odcinek 3 px na linii, przesuwa się między pozycjami */
+  .z-spis-znacznik { position: absolute; left: 0; width: 3px; margin-left: -2px; background: var(--d-a); pointer-events: none;
+    transition: top .25s ease, height .25s ease; }
+  .z-spis-znacznik[hidden] { display: none; }
+
+  /* dół podstrony („Następna strona w dziale”, „Zgłoś błąd”) wyrównany do kolumny treści */
+  body:has(.z-pd) .z-nast { margin-top: 0; margin-left: var(--marg); margin-right: calc(var(--marg) + 292px); }
 }
 
 @media (max-width: 760px) {
-  /* rama podstrony: jedna kolumna, bez bocznej nawigacji działu */
+  /* rama podstrony: jedna kolumna */
   .z-pd { display: block; padding: 18px 16px 24px; }
-  .z-bok { display: none; }
 
   /* spis „Na tej stronie”: zwijany nad treścią, lista z cienką kreską po lewej */
   .z-spis { margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
@@ -23,14 +49,30 @@
   .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
   .z-spis-lista { list-style: none; margin: 0 0 14px; padding: 0; border-left: 1px solid var(--line); }
   .z-spis-js:not(.z-spis-otwarty) .z-spis-lista { display: none; }
-  .z-spis-lista li[hidden] { display: none; }
+  .z-spis-lista li[hidden], .z-spis-znacznik { display: none; }
   .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; }
-  .z-spis-lista a:hover { color: var(--d-a); }
+  .z-spis-lista a:hover, .z-spis-lista a[aria-current] { color: var(--ink); }
+  .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: calc(var(--hdr-h) + 16px); }
+  /* treść bez kafelków (jak Władze z łatki telefonu): sekcje rozdzielone cienką linią, nagłówki Brygadą */
+  .z-pd-tresc > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .z-pd-tresc > section:last-of-type { border-bottom: 0; }
+  .z-pd-tresc h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
+  .z-pd-tresc :is(p, li) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-pd-tresc a { color: var(--d-a); }
+  /* strony treści (Markdown): nagłówki sekcji bez pasów i kafelków */
+  body[data-sekcje] .z-pd .prose h2 { margin: 1.5em 0 .45em; padding: 0; border-radius: 0; background: none; box-shadow: none;
+    font-size: 25px; line-height: 1.25; color: var(--ink); }
+  body[data-sekcje] .z-pd .prose > h2:first-child { margin-top: 0; }
+  .z-pd .prose h3 { font-family: var(--f-display); font-weight: 500; }
+
+  /* „Następna strona w dziale” i „Zgłoś błąd” pod treścią */
+  .z-nast { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0 16px 28px; padding-top: 14px; border-top: 2px solid var(--ink); }
+  .z-nast-link { font-family: var(--f-display); font-size: 20px; line-height: 1.25; color: var(--ink); text-decoration: none; }
+  .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .z-nast-meta a { color: var(--d-a); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .z-spis-przelacz svg { transition: none; }
-}
-@media (max-width: 760px) {
-  /* strony tekstowe (Strona.astro): spis nad treścią na całą szerokość */
-  .layout > .z-spis { flex: 1 1 100%; margin-bottom: 0; }
+  .z-spis-lista a, .z-spis-znacznik, .z-spis-przelacz svg { transition: none; }
 }

@@ -1,9 +1,14 @@
 ---
-// „Na tej stronie” — spis sekcji podstrony (kierunek „Założyciele”, zlecenie 11, zalecenie 3: wariant „kreska”).
-// Jedna wersja HTML: na telefonie (≤ 760 px) zwijany blok nad treścią (przycisk „Na tej stronie”, bez JS lista rozwinięta),
-// na komputerze kolumna spisu w szablonie podstrony (src/styles/zal-podstrona.css). Zwykłe linki #kotwica — działają bez JS.
+// „Na tej stronie” — spis sekcji podstrony (kierunek „Założyciele”; zlecenie 11, zalecenie 3: wariant „kreska”, wzór
+// w prototypie: zbudujSpis / odswiezSpis, .spis-p, [data-bok="A"]). Jedna wersja HTML (style: src/styles/zal-podstrona.css):
+// - komputer: kolumna z prawej (236 px), przyklejona; nad listą „Na tej stronie” w kolorze działu, lista z cienką linią
+//   po lewej, bieżąca sekcja pogrubiona, a na linii odcinek 3 px w kolorze działu, który przesuwa się między pozycjami;
+// - telefon (≤ 760 px): zwijany blok nad treścią (przycisk „Na tej stronie”; bez JS lista rozwinięta).
+// Bieżąca sekcja: ostatnia, której początek minął ok. 30% wysokości okna (aria-current="location"). Kliknięcie — płynne
+// przewinięcie (20 px zapasu; przy „ogranicz ruch” od razu). Zwykłe linki #kotwica, więc działają też bez JS.
+// Sekcje schowane (filtr planu, inny semestr) znikają ze spisu; widok może poprosić o odświeżenie zdarzeniem `z-spis`.
 // spis: { id, etykieta, krotka? } — w spisie krótka etykieta (np. kategorie planu), w nagłówku sekcji pełna.
-// Strony z mniej niż 2 sekcjami nie mają spisu (komponent nic nie wstawia).
+// Strony z mniej niż 2 sekcjami nie mają spisu (komponent nic nie wstawia; kolumna treści zostaje tej samej szerokości).
 import type { Lang } from '../../lib/daty';
 
 interface Props { spis: { id: string; etykieta: string; krotka?: string }[]; lang: Lang }
@@ -18,22 +23,72 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
     </button>
     <ul class="z-spis-lista" id="z-spis-lista">
       {spis.map((s) => <li><a href={`#${s.id}`} title={s.krotka && s.krotka !== s.etykieta ? s.etykieta : undefined}>{s.krotka ?? s.etykieta}</a></li>)}
+      <li class="z-spis-znacznik" aria-hidden="true"></li>
     </ul>
   </nav>
 )}
 
 <script>
-  // Telefon: spis zwinięty pod przyciskiem „Na tej stronie”; po kliknięciu linku zwija się z powrotem.
   const spis = document.querySelector<HTMLElement>('[data-z-spis]');
   const przycisk = spis?.querySelector<HTMLButtonElement>('.z-spis-przelacz');
-  if (spis && przycisk) {
+  const lista = spis?.querySelector<HTMLElement>('.z-spis-lista');
+  const znacznik = spis?.querySelector<HTMLElement>('.z-spis-znacznik');
+  if (spis && przycisk && lista && znacznik) {
+    const telefon = matchMedia('(max-width: 760px)');
+    const bezRuchu = matchMedia('(prefers-reduced-motion: reduce)');
+
+    // telefon: lista zwinięta pod przyciskiem, po kliknięciu linku zwija się z powrotem
     przycisk.hidden = false;
     spis.classList.add('z-spis-js');
-    const ustaw = (otwarty: boolean) => {
+    const ustawOtwarty = (otwarty: boolean) => {
       przycisk.setAttribute('aria-expanded', String(otwarty));
       spis.classList.toggle('z-spis-otwarty', otwarty);
     };
-    przycisk.addEventListener('click', () => ustaw(przycisk.getAttribute('aria-expanded') !== 'true'));
-    spis.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => ustaw(false)));
+    przycisk.addEventListener('click', () => ustawOtwarty(przycisk.getAttribute('aria-expanded') !== 'true'));
+
+    const pozycje = Array.from(lista.querySelectorAll<HTMLAnchorElement>('li > a')).map((a) => ({ a, li: a.parentElement as HTMLElement }));
+    const cel = (a: HTMLAnchorElement) => {
+      try { return document.getElementById(decodeURIComponent(a.hash.slice(1))); } catch { return null; }
+    };
+    const widoczny = (el: HTMLElement | null): el is HTMLElement => !!el && el.getClientRects().length > 0;
+
+    const odswiez = () => {
+      // pozycje, których sekcja jest schowana (filtr, inny semestr), znikają ze spisu
+      pozycje.forEach((p) => { p.li.hidden = !widoczny(cel(p.a)); });
+      const widoczne = pozycje.filter((p) => !p.li.hidden);
+      const dol = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      const prog = window.innerHeight * 0.3;
+      let biezaca = widoczne[0];
+      for (const p of widoczne) if ((cel(p.a)?.getBoundingClientRect().top ?? Infinity) <= prog) biezaca = p;
+      // na samym dole strony krótka ostatnia sekcja nie dojdzie do linii — wtedy ostatnia
+      if (dol && widoczne.length) biezaca = widoczne[widoczne.length - 1];
+      pozycje.forEach((p) => (p === biezaca ? p.a.setAttribute('aria-current', 'location') : p.a.removeAttribute('aria-current')));
+      if (biezaca && !telefon.matches) {
+        znacznik.style.top = `${biezaca.li.offsetTop}px`;
+        znacznik.style.height = `${biezaca.li.offsetHeight}px`;
+        znacznik.hidden = false;
+      } else znacznik.hidden = true;
+    };
+
+    // kliknięcie: płynne przewinięcie do sekcji (20 px zapasu), przy „ogranicz ruch” od razu
+    pozycje.forEach(({ a }) => a.addEventListener('click', (e) => {
+      const el = cel(a);
+      if (!el) return;
+      e.preventDefault();
+      ustawOtwarty(false);
+      const zapas = parseFloat(getComputedStyle(el).scrollMarginTop) || 20;
+      window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - zapas, behavior: bezRuchu.matches ? 'auto' : 'smooth' });
+      history.replaceState(history.state, '', a.hash);
+      el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
+    }));
+
+    let ramka = 0;
+    const zaplanuj = () => { cancelAnimationFrame(ramka); ramka = requestAnimationFrame(odswiez); };
+    window.addEventListener('scroll', zaplanuj, { passive: true });
+    window.addEventListener('resize', zaplanuj);
+    document.addEventListener('z-spis', zaplanuj);
+    document.fonts?.ready.then(zaplanuj);
+    odswiez();
   }
 </script>

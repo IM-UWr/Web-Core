@@ -291,18 +291,7 @@
   .z-pasek-jasny nav a:focus-visible { outline-color: var(--ink); }
 
 
-  /* ---------- podstrona działu: boczna nawigacja i treść bez kafelków ---------- */
-  .z-pd { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 64px; padding: 40px var(--marg) 30px; }
-  .z-bok { align-self: start; position: sticky; top: 20px; font-size: 15px; line-height: 1.6; }
-  .z-bok ul { list-style: none; margin: 0; padding: 0; }
-  .z-bok-dzial { display: block; padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
-  .z-bok-gr { margin: 18px 0 4px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-  .z-bok li a { display: block; padding: 5px 0 5px 14px; margin-left: -14px; border-left: 3px solid transparent; color: var(--text); text-decoration: none; }
-  .z-bok li a:hover { color: var(--d-a); }
-  .z-bok li a[aria-current] { border-left-color: var(--d-a); color: var(--ink); font-weight: 700; }
-  .z-bok-spis { margin-top: 26px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .z-bok-spis .z-bok-gr { margin-top: 0; color: var(--muted); }
-  .z-bok-spis a { font-size: 14px; }
+  /* ---------- podstrona działu: treść bez kafelków (układ ze spisem z prawej — zal-podstrona.css) ---------- */
   .z-pd-tresc { min-width: 0; }
   .z-pd-tresc > section { padding-bottom: 34px; margin-bottom: 30px; border-bottom: 1px solid var(--line); }
   .z-pd-tresc > section:last-of-type { border-bottom: 0; }
@@ -312,29 +301,21 @@
   .z-pd-tresc a { color: var(--d-a); }
   .z-nast { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
     margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--ink); }
-  /* pod układem z boczną nawigacją — w kolumnie treści */
-  body:has(.z-bok) .z-nast { margin-top: 0; margin-left: calc(var(--marg) + 304px); }
   .z-nast-link { font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
   .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
   .z-nast-meta a { color: var(--d-a); }
 
-
-
-  /* ---------- pozostałe podstrony (np. strony treści, Strona.astro): boczna nawigacja z lewej w dotychczasowym .layout ---------- */
-  .layout:has(> .z-bok) { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 64px;
-    max-width: none; padding: 40px var(--marg) 30px; }
-  .layout:has(> .z-bok) > .z-bok { grid-column: 1; grid-row: 1; }
-  .layout:has(> .z-bok) > .main { grid-column: 2; grid-row: 1; max-width: 860px; }
-  .layout:has(> .z-bok) > .side { display: none; }
-  /* treść bez kafelków: spis „na górze” zastępuje „Na tej stronie” w bocznej nawigacji */
-  .layout:has(> .z-bok) .main > .toc-top { display: none; }
-  /* nagłówki sekcji bez pasów i kafelków (Ustawienia → „Sekcje: pasy” zostaje dla telefonu) */
-  body[data-sekcje] .layout:has(> .z-bok) .prose h2 { margin: 1.6em 0 .5em; padding: 0; border-radius: 0; background: none; box-shadow: none;
-    font-size: 30px; line-height: 1.3; color: var(--ink); }
-  body[data-sekcje] .layout:has(> .z-bok) .prose > h2:first-child { margin-top: 0; }
-  .layout:has(> .z-bok) .prose :is(p, li) { font-size: 16.5px; line-height: 1.65; }
-  .layout:has(> .z-bok) .prose a { color: var(--d-a); }
+  /* ---------- strony treści (Strona.astro) w szablonie podstrony: Markdown bez pasów i kafelków ---------- */
+  .z-pd .prose { max-width: 800px; }
+  /* strony Instytutu i Studiów (wygląd „Zwarta”): odstęp nad treścią 24 px, jak na stronach działów */
+  .z-pd.z-pd-zwarta { padding-top: 24px; }
+  /* nagłówki sekcji bez pasów i kafelków (Ustawienia → „Sekcje”) */
+  body[data-sekcje] .z-pd .prose h2 { margin: 1.6em 0 .5em; padding: 0; border-radius: 0; background: none; box-shadow: none;
+    font-size: 30px; font-weight: 800; line-height: 1.3; color: var(--ink); }
+  body[data-sekcje] .z-pd .prose > h2:first-child { margin-top: 0; }
+  .z-pd .prose :is(p, li) { max-width: none; font-size: 16.5px; line-height: 1.65; }
+  .z-pd .prose a { color: var(--d-a); }
 
   /* ---------- odchudzona stopka w jednej linii ---------- */
   .z-stopka { --marg: max(64px, calc((100% - var(--kol)) / 2)); padding: 13px var(--marg); background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.4; }

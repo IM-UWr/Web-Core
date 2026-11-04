@@ -3,16 +3,13 @@
 // Realizowane z paskami czasu na wspólnej osi lat i przerywaną linią „dziś” (data budowania), Zakończone według roku
 // zakończenia z małymi paskami (oś co 4 lata), Pozostałe (bez lat). Liczby w banerze wyliczone z kolekcji.
 // Jedna wersja HTML: komputer — wiersz z paskiem z prawej; telefon (≤ 760 px) — wiersz w jednej kolumnie, pasek pod tytułem
-// na całą szerokość, oś lat nad listą, spis sekcji zwijany nad treścią (src/styles/zal-granty-plan.css).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+// na całą szerokość, oś lat nad listą (src/styles/zal-granty-plan.css). Szablon podstrony: zal/Podstrona.astro.
+import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneListyGrantow, odm } from '../lib/widoki/listaGrantow';
-import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
-import SpisStrony from '../components/zal/SpisStrony.astro';
 import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
@@ -38,90 +35,84 @@ const czesciKont = (g: Grant, ...czesci: string[]) => [
 const dzisR = osRealizowanych && dzisNaOsi(osRealizowanych);
 const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
 ---
-<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
-    <ul class="pt-liczby">
-      {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
-    </ul>
-  </NaglowekStrony>
+<Podstrona lang={lang} tytul={naglowek} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} dzial="nauka" spis={spisKomputer} klasa="z-gr">
+  <Fragment slot="baner">
+      <ul class="pt-liczby">
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+      </ul>
+  </Fragment>
+    {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
 
-  <div class="z-pd" data-dzial="nauka">
-    <SpisStrony spis={spisKomputer} lang={lang} />
-    <BocznaNawigacja dzial="nauka" lang={lang} spis={spisKomputer} />
-    <div class="z-pd-tresc z-gr">
-      {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
-
-      <section id="z-realizowane" aria-labelledby="z-h-realizowane">
-        <h2 id="z-h-realizowane">{T('Realizowane', 'Ongoing')} ({realizowane.length})</h2>
-        {realizowane.length === 0 && <p>{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
-        {osRealizowanych && (
-          <div class="os-lat" aria-hidden="true"><span></span><span class="tor-os">{osRealizowanych.podzialka.map((p) => <b style={`left:${p.x}%`}>{p.rok}</b>)}</span></div>
-        )}
-        {osRealizowanych && realizowane.map((g) => {
-          const z = zakladProjektu(g);
-          const k = kier(g);
-          const p = pasek(g, osRealizowanych);
-          const lata = lataGrantu(g);
-          return (
-            <div class="gr-w">
-              <div>
-                <div class="rola">{[rodzaj(g), lata].filter(Boolean).join(' · ')}</div>
-                <div class="imie"><a href={adresGrantu(g)}>{tytul(g)}</a></div>
-                <div class="kont">
-                  {czesciKont(g,
-                    k.length > 0 ? `${k.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}: ${kierownicyTekst(g)}` : '',
-                    z ? wybierz(z.data, 'nazwa', lang) : '',
-                  ).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
-                </div>
+    <section id="z-realizowane" aria-labelledby="z-h-realizowane">
+      <h2 id="z-h-realizowane">{T('Realizowane', 'Ongoing')} ({realizowane.length})</h2>
+      {realizowane.length === 0 && <p>{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
+      {osRealizowanych && (
+        <div class="os-lat" aria-hidden="true"><span></span><span class="tor-os">{osRealizowanych.podzialka.map((p) => <b style={`left:${p.x}%`}>{p.rok}</b>)}</span></div>
+      )}
+      {osRealizowanych && realizowane.map((g) => {
+        const z = zakladProjektu(g);
+        const k = kier(g);
+        const p = pasek(g, osRealizowanych);
+        const lata = lataGrantu(g);
+        return (
+          <div class="gr-w">
+            <div>
+              <div class="rola">{[rodzaj(g), lata].filter(Boolean).join(' · ')}</div>
+              <div class="imie"><a href={adresGrantu(g)}>{tytul(g)}</a></div>
+              <div class="kont">
+                {czesciKont(g,
+                  k.length > 0 ? `${k.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}: ${kierownicyTekst(g)}` : '',
+                  z ? wybierz(z.data, 'nazwa', lang) : '',
+                ).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
               </div>
-              <span class="tor duzy" aria-hidden="true">{p && <span class="pas" style={`left:${p.left}%;width:${p.width}%`}></span>}{dzisR && <i style={`left:${dzisR}%`}></i>}</span>
             </div>
-          );
-        })}
-      </section>
+            <span class="tor duzy" aria-hidden="true">{p && <span class="pas" style={`left:${p.left}%;width:${p.width}%`}></span>}{dzisR && <i style={`left:${dzisR}%`}></i>}</span>
+          </div>
+        );
+      })}
+    </section>
 
-      {zakonczone.length > 0 && osZakonczonych && (
-        <section id="z-zakonczone" aria-labelledby="z-h-zakonczone">
-          <h2 id="z-h-zakonczone">{T('Zakończone', 'Completed')} ({zakonczone.length})</h2>
-          <div class="os-lat maly" aria-hidden="true"><span></span><span class="tor-os">{osZakonczonych.podzialka.map((p) => <b style={`left:${p.x}%`}>{p.rok}</b>)}</span></div>
-          {grupy.map((gr) => (
-            <>
-              <h3 class="gr-rok">{gr.rok}<span class="sr-only">, </span> <small>{ileProjektow(gr.lista.length)}</small></h3>
-              {gr.lista.map((g) => {
-                const p = pasek(g, osZakonczonych);
-                return (
-                  <div class="gr-w maly">
-                    <div>
-                      <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
-                      <div class="kont">
-                        {czesciKont(g, rodzaj(g), kierownicyTekst(g), lataGrantu(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
-                      </div>
+    {zakonczone.length > 0 && osZakonczonych && (
+      <section id="z-zakonczone" aria-labelledby="z-h-zakonczone">
+        <h2 id="z-h-zakonczone">{T('Zakończone', 'Completed')} ({zakonczone.length})</h2>
+        <div class="os-lat maly" aria-hidden="true"><span></span><span class="tor-os">{osZakonczonych.podzialka.map((p) => <b style={`left:${p.x}%`}>{p.rok}</b>)}</span></div>
+        {grupy.map((gr) => (
+          <>
+            <h3 class="gr-rok">{gr.rok}<span class="sr-only">, </span> <small>{ileProjektow(gr.lista.length)}</small></h3>
+            {gr.lista.map((g) => {
+              const p = pasek(g, osZakonczonych);
+              return (
+                <div class="gr-w maly">
+                  <div>
+                    <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
+                    <div class="kont">
+                      {czesciKont(g, rodzaj(g), kierownicyTekst(g), lataGrantu(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
                     </div>
-                    <span class="tor" aria-hidden="true">{p && <span class="pas" style={`left:${p.left}%;width:${p.width}%`}></span>}{dzisZ && <i style={`left:${dzisZ}%`}></i>}</span>
                   </div>
-                );
-              })}
-            </>
-          ))}
-        </section>
-      )}
-
-      {bezLat.length > 0 && (
-        <section id="z-pozostale" aria-labelledby="z-h-pozostale">
-          <h2 id="z-h-pozostale">{T('Pozostałe', 'Other')} ({bezLat.length})</h2>
-          {bezLat.map((g) => (
-            <div class="gr-w maly">
-              <div>
-                <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
-                <div class="kont">
-                  {czesciKont(g, rodzaj(g), kierownicyTekst(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
+                  <span class="tor" aria-hidden="true">{p && <span class="pas" style={`left:${p.left}%;width:${p.width}%`}></span>}{dzisZ && <i style={`left:${dzisZ}%`}></i>}</span>
                 </div>
+              );
+            })}
+          </>
+        ))}
+      </section>
+    )}
+
+    {bezLat.length > 0 && (
+      <section id="z-pozostale" aria-labelledby="z-h-pozostale">
+        <h2 id="z-h-pozostale">{T('Pozostałe', 'Other')} ({bezLat.length})</h2>
+        {bezLat.map((g) => (
+          <div class="gr-w maly">
+            <div>
+              <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
+              <div class="kont">
+                {czesciKont(g, rodzaj(g), kierownicyTekst(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
               </div>
-              <span></span>
             </div>
-          ))}
-        </section>
-      )}
-    </div>
-  </div>
-</Baza>
+            <span></span>
+          </div>
+        ))}
+      </section>
+    )}
+</Podstrona>

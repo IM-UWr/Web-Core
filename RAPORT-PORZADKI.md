@@ -97,3 +97,51 @@ Gałąź etapu: `wyglad/porzadki-01-telefon`.
   (`raport-zrzuty/etap1-miganie-plan-przed-i-po.png`: u góry `wyglad/zalozyciele`, niżej po porządkach).
 - Na komputerze zostało `uklad="zwarta portal-baner"` na przeniesionych stronach: reguła `uklad-portal.css` ustawia w banerze
   interlinię 1,55 (bez niej hasło i liczby w banerach działów przesuwają się o ułamek piksela) — do przeniesienia w etapie 4.
+
+## Etap 2: wspólny szablon podstrony z nową nawigacją — zrobione
+Gałąź etapu: `wyglad/porzadki-02-szablon`.
+
+**Co zrobione (zalecenie 3 ze zlecenia 11, w całości)**
+- **Jeden komponent szablonu podstrony** `src/components/zal/Podstrona.astro`: `Baza` + nagłówek (`NaglowekStrony` →
+  `NaglowekZ`; slot `baner` na liczby i plakietki) + rama `.z-pd` z treścią i spisem z prawej; „Następna strona w dziale”
+  i „Zgłoś błąd” wstawia jak dotąd `Baza.astro` pod `<main>` (wyrównane do kolumny treści). Używają go: Władze,
+  Projekty i granty, Plan zajęć, wszystkie strony tekstowe (`Strona.astro`).
+- **Na komputerze bez listy podstron działu z lewej:** `BocznaNawigacja.astro` usunięta (razem z sygnetem w bocznej
+  nawigacji — pytanie z `PYTANIA.md` odpada) i jej style oraz przejście `view-transition` zaznaczenia.
+- **„Na tej stronie” z prawej, wariant „kreska”** (`zal/SpisStrony.astro`, `src/styles/zal-podstrona.css`, wartości
+  z prototypu `.spis-p` / `[data-bok="A"]`): treść i kolumna 236 px, odstęp 56 px; napis 12,5 px pogrubiony w kolorze
+  działu; lista z linią 1 px, pozycje 14 px przygaszone, wcięcie 16 px; bieżąca pogrubiona w kolorze tekstu, a na linii
+  odcinek 3 px w kolorze działu przesuwany `transition: top .25s, height .25s`; bez numerów, kropek i paska postępu.
+  - przyklejony `position: sticky; top: 24px` w komórce siatki (nie wychodzi poza kolumnę treści); dłuższy niż okno —
+    `max-height: calc(100vh - 48px)` i przewijanie we własnej kolumnie;
+  - scrollspy: ostatnia sekcja, której początek minął 30% wysokości okna (na samym dole — ostatnia), `aria-current="location"`;
+  - kliknięcie: płynne przewinięcie z 20 px zapasu (`scroll-margin-top`; na Planie zajęć 76 px — pod przyklejonym paskiem
+    narzędzi), przy `prefers-reduced-motion` od razu; adres dostaje `#kotwica`, fokus przechodzi na sekcję; bez JS zwykłe linki;
+  - krótkie etykiety kategorii planu (mapa w `src/lib/widoki/planZajec.ts`, z angielskimi): Obowiązkowe (O), Do wyboru (L),
+    Zaawansowane do wyboru (M), Niestandardowe (E), Seminaria przeglądowe (S), Humanistyczne i społeczne (H),
+    Specjalność nauczycielska (N), Przyrodnicze (NP), Pozostałe; pełna nazwa w podpowiedzi (`title`) i w nagłówku sekcji;
+  - kategorie ukryte wyszukiwarką albo filtrem dni i kategorie spoza pokazanego semestru znikają ze spisu (plan wysyła
+    zdarzenie `z-spis`, spis sprawdza, czy sekcja jest widoczna), znacznik je pomija;
+  - strony z mniej niż 2 sekcjami bez spisu, kolumna treści tej samej szerokości (miejsce po prawej puste);
+  - na telefonie ten sam spis zwijany nad treścią (z etapu 1).
+- **Strony tekstowe** w szablonie: typografia treści bez zmian (szerokość 800 px, nagłówki sekcji jak dotąd, odstęp 24 px
+  na stronach Instytutu i Studiów). Pole CMS „Prawy pasek”: `spis` i `oba` — ze spisem, `menu` i `brak` — bez spisu
+  (menu działu na podstronie już nie ma).
+- „Następna strona w dziale” pokazuje się też na telefonie (pod treścią, w jednej kolumnie).
+
+**Sprawdzenie etapu 2**
+- `npm run build` bez błędów (748 stron, Pagefind: 734 strony w indeksie).
+- Komputer (216 zrzutów): bez zmian wszystkie strony poza szablonem (162 identyczne). Różnią się tylko strony w szablonie:
+  Władze, Projekty i granty, Plan zajęć (PL i EN), Kontakt, Sprawy studenckie, Pierwszy rok, Deklaracja dostępności:
+  - nagłówki identyczne z etapem 0 (Władze, Sprawy studenckie: 0 różnic w nagłówku; Projekty i Plan — 4 px na styku
+    nagłówka z kolumną spisu; Kontakt — szum kilku pikseli na fladze EN w pasku menu przy innej wysokości strony);
+  - treść stron tekstowych przesunięta z kolumny za boczną nawigacją do lewego marginesu: po przesunięciu kolumna
+    treści identyczna (Sprawy studenckie: 3 piksele różnicy na całej długości);
+  - **wyjątek:** Deklaracja dostępności i Polityka prywatności (strony bez działu) miały dotąd stary układ ze spisem
+    w kafelku — w szablonie dostały typografię stron tekstowych (nagłówki Brygadą 30 px, treść 16,5 px) i spis „kreska”.
+- Porównanie z prototypem w 1920 i 1366 px (Władze, Projekty i granty, Plan zajęć; prototyp z „Nawigacja na podstronie:
+  A”): układ kolumn, spis i jego wygląd zgodne (`raport-zrzuty/etap2-wladze-prototyp-i-strona-1920.png`,
+  `etap2-plan-zajec-1366.png`, `etap2-strona-tekstowa-1920.png`).
+- Zachowanie (Playwright, 1366×640): scrollspy przesuwa znacznik przy przewijaniu; wyszukiwanie „algebra” zostawia
+  w spisie 2 z 9 kategorii; przełączenie na semestr letni — 8 kategorii i `#letni` w adresie; spis mieści się w oknie
+  1366×640; Enter na pozycji spisu z klawiatury przewija do sekcji (20 px od góry); bez błędów JS.

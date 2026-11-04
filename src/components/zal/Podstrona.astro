@@ -1,0 +1,47 @@
+---
+// Wspólny szablon podstrony (kierunek „Założyciele”; zlecenie 12, etap 2; zlecenie 11, zalecenie 3):
+// nagłówek (NaglowekStrony → zal/NaglowekZ), treść bez kafelków i pasów, spis „Na tej stronie” z prawej (zal/SpisStrony),
+// „Następna strona w dziale” i „Zgłoś błąd” (wstawia Baza.astro pod <main> na podstronach z menu działu).
+// Jedna wersja HTML: komputer — treść i kolumna spisu 236 px; telefon — jedna kolumna, spis zwijany nad treścią
+// (src/styles/zal-podstrona.css). Strona z mniej niż 2 sekcjami nie ma spisu, treść ma tę samą szerokość.
+// Sloty: domyślny — treść; „baner” — to, co ma stać w nagłówku pod tytułem (liczby .pt-liczby, plakietki, linki).
+// Właściwości: jak Baza (tytul, opis, obraz, uklad…) i NaglowekStrony (lead, haslo, okruszki, wstecz) oraz
+// dzial (kolory działu treści), spis ({ id, etykieta, krotka? }), klasa i atrybuty elementu treści.
+import Baza from '../../layouts/Baza.astro';
+import NaglowekStrony from '../NaglowekStrony.astro';
+import SpisStrony from './SpisStrony.astro';
+import type { Lang } from '../../lib/daty';
+import type { Dzial } from '../../lib/patroni';
+
+interface Props {
+  lang: Lang;
+  tytul: string;
+  opis?: string;
+  obraz?: string;
+  opublikowany?: boolean;
+  alternatywa?: string | null;
+  typ?: 'website' | 'article';
+  uklad?: string;
+  lead?: string;
+  haslo?: string;
+  okruszki?: { etykieta: string; adres?: string }[];
+  wstecz?: { etykieta: string; adres: string; telefon?: string };
+  dzial?: Dzial;
+  spis?: { id: string; etykieta: string; krotka?: string }[];
+  klasa?: string;
+  // dodatkowa klasa ramy .z-pd (np. z-wladze)
+  klasaRamy?: string;
+  atrybuty?: Record<string, string>;
+}
+const { lang, tytul, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
+const naglowek = { tytul, lead, haslo, lang, okruszki, wstecz };
+---
+<Baza tytul={tytul} opis={opis} obraz={obraz} opublikowany={opublikowany} alternatywa={alternatywa} typ={typ} uklad={uklad}>
+  {Astro.slots.has('baner')
+    ? <NaglowekStrony {...naglowek}><slot name="baner" /></NaglowekStrony>
+    : <NaglowekStrony {...naglowek} />}
+  <div class:list={['z-pd', klasaRamy]} data-dzial={dzial}>
+    <SpisStrony spis={spis} lang={lang} />
+    <div class:list={['z-pd-tresc', klasa]} {...atrybuty}><slot /></div>
+  </div>
+</Baza>

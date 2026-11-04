@@ -164,7 +164,6 @@
 
   /* ---------- podstrona z nowym układem (Władze): bez bocznej nawigacji, schemat dyrekcji w dwóch kolumnach ---------- */
   .z-pd.z-wladze { padding: 18px 16px 24px; }
-  .z-pd.z-wladze .z-bok { display: none; }
   .z-pd.z-wladze .z-pd-tresc > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
   .z-pd.z-wladze .z-pd-tresc > section:last-of-type { border-bottom: 0; }
   .z-pd.z-wladze .z-pd-tresc h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }

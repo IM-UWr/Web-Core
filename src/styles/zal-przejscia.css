@@ -6,8 +6,8 @@
      i rośnie do tytułu banera, pasek menu się pojawia, reszta (zdjęcie kampusu → zdjęcie działu) przenika;
    - strona działu → podstrona: pasek stoi, szkic leci w lewy margines i maleje do sygnetu, podpis leci razem z nim,
      zdjęcie działu zostaje, kolor przenika, tytuł przenika (nie przesuwa się);
-   - podstrona → podstrona w dziale: nagłówek stoi (pasek, zdjęcie, sygnet), przenikają tytuł i znak, zaznaczenie
-     w bocznej nawigacji przesuwa się na nową pozycję, treść krótko gaśnie i się pojawia;
+   - podstrona → podstrona w dziale: nagłówek stoi (pasek, zdjęcie, sygnet), przenikają tytuł i znak, treść krótko gaśnie
+     i się pojawia (boczna nawigacja podstron odpadła w zleceniu 12);
    - do innego działu: kolor, zdjęcie i twarz przenikają.
    Każde przejście ok. 0,25–0,35 s; długi tekst tylko przenika. Przy „ogranicz ruch” — nic (strony zmieniają się od razu).
    Telefon bez zmian (nazwy tylko w @media (min-width: 761px)).
@@ -32,11 +32,8 @@
   .z-okl-dz[data-dzial="nauka"] .z-okl-nazwa, [data-z-baner-dzialu="nauka"] h1 { view-transition-name: z-nazwa-nauka; }
   .z-okl-dz[data-dzial="studia"] .z-okl-nazwa, [data-z-baner-dzialu="studia"] h1 { view-transition-name: z-nazwa-studia; }
   .z-okl-dz[data-dzial="popularyzacja"] .z-okl-nazwa, [data-z-baner-dzialu="popularyzacja"] h1 { view-transition-name: z-nazwa-popularyzacja; }
-  /* podstrona → podstrona: tytuł i opis znaku są w zwykłym przenikaniu strony (nie przesuwają się), znak przenika w miejscu,
-     boczna nawigacja stoi, a zaznaczenie bieżącej podstrony przesuwa się na nową pozycję */
+  /* podstrona → podstrona: tytuł i opis znaku są w zwykłym przenikaniu strony (nie przesuwają się), znak przenika w miejscu */
   .z-nagl-pod .z-znak { view-transition-name: z-znak; }
-  .z-bok { view-transition-name: z-bok; }
-  .z-bok li a[aria-current] { view-transition-name: z-bok-biezaca; }
 
   ::view-transition-group(*) { animation-duration: .3s; animation-timing-function: cubic-bezier(.22, .8, .2, 1); }
   /* długi tekst nigdy się nie przesuwa, tylko przenika: na komputerze bez wjazdu treści o 12 px (przejscia.css) */

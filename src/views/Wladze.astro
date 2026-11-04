@@ -2,12 +2,11 @@
 // Władze Instytutu (kierunek „Założyciele”): schemat dyrekcji ze zdjęciami (dyrektor i zastępcy połączeni liniami),
 // Władze Wydziału, Sekretariat, Kadencja, Rada Instytutu, Zobacz też (zal/WladzeZ.astro, dane: daneWladzKomputer()).
 // Dane: src/data/wladze.json (Pages CMS: Ustawienia strony → Władze Instytutu); tytuł, e-mail, pokój i zakład z kolekcji pracowników.
+// Szablon podstrony: zal/Podstrona.astro (spis „Na tej stronie” z prawej, na telefonie zwijany nad treścią).
 // Jedna wersja HTML: komputer i telefon (≤ 760 px, schemat w dwóch kolumnach) — src/styles/zalozyciele-strony.css.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Podstrona from '../components/zal/Podstrona.astro';
 import type { Lang } from '../lib/daty';
 import { daneWladz, daneWladzKomputer } from '../lib/widoki/wladze';
-import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
 import WladzeZ from '../components/zal/WladzeZ.astro';
 
 interface Props { lang: Lang }
@@ -16,11 +15,8 @@ const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const { tytul, lead, haslo, dyrektor } = await daneWladz(lang);
 const kom = await daneWladzKomputer(lang);
 ---
-<Baza tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }} />
-
-  <div class="z-pd z-wladze" data-dzial="instytut">
-    <BocznaNawigacja dzial="instytut" lang={lang} spis={kom.spis} />
-    <div class="z-pd-tresc"><WladzeZ lang={lang} {...kom} /></div>
-  </div>
-</Baza>
+<Podstrona lang={lang} tytul={tytul} opis={lead || undefined} obraz={dyrektor?.zdjecie || undefined} uklad="zwarta portal-baner"
+  lead={lead || undefined} haslo={haslo} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }}
+  dzial="instytut" spis={kom.spis} klasaRamy="z-wladze">
+  <WladzeZ lang={lang} {...kom} />
+</Podstrona>

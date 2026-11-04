@@ -1,7 +1,7 @@
 /* ==========================================================================
    Kierunek „Założyciele” — podstrony „Projekty i granty” (ListaGrantow.astro, blok .z-gr) i „Plan zajęć” (PlanZajec.astro,
    blok .z-pl) na komputerze (≥ 761 px). Wzorzec: prototyp proto/zalozyciele.src.html (trescGranty, trescPlan, filtrujPlan),
-   specyfikacja: dok/estetyka.md „Podstrony działów”. Wspólna rama podstrony (.z-pd, .z-bok, .z-pd-tresc, .z-nast) — zalozyciele.css.
+   specyfikacja: dok/estetyka.md „Podstrony działów”. Wspólny szablon podstrony (.z-pd, spis, .z-pd-tresc, .z-nast) — zal-podstrona.css i zalozyciele.css.
    Komputer: @media (min-width: 761px); telefon (≤ 760 px): bloki na końcu pliku.
    ========================================================================== */
 @media (min-width: 761px) {
@@ -155,4 +155,9 @@
   .z-gr .gr-w > span:empty { display: none; }
   .z-gr .gr-rok { margin: 20px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.4; color: var(--d-a); }
   .z-gr .gr-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+}
+
+/* spis „Na tej stronie” (komputer): nagłówek kategorii planu nie chowa się pod przyklejonym paskiem narzędzi */
+@media (min-width: 761px) {
+  .z-pd-tresc.z-pl .pl-kat[id] { scroll-margin-top: 76px; }
 }

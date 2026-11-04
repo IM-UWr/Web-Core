@@ -90,12 +90,24 @@ export async function danePlanuZajec(lang: Lang) {
           : []),
       ]
     : [];
-  // Spis „Na tej stronie” (komputer): kategorie przedmiotów ze wszystkich semestrów, w kolejności z danych.
+  // Spis „Na tej stronie”: kategorie przedmiotów ze wszystkich semestrów, w kolejności z danych.
   // Kotwica bez semestru (#z-pl-o) wskazuje sekcję w pokazanym semestrze (skrypt w PlanZajec.astro przenosi id przy zmianie).
   const idKategorii = (id: string) => `z-pl-${id.toLowerCase().replace(/[^\w-]/g, '-')}`;
+  // W spisie krótkie etykiety kategorii (zlecenie 11, zalecenie 3); w nagłówku sekcji zostaje pełna nazwa z danych.
+  const KROTKIE: Record<string, [string, string]> = {
+    O: ['Obowiązkowe (O)', 'Compulsory (O)'],
+    L: ['Do wyboru (L)', 'Electives (L)'],
+    M: ['Zaawansowane do wyboru (M)', 'Advanced electives (M)'],
+    E: ['Niestandardowe (E)', 'Non-standard (E)'],
+    S: ['Seminaria przeglądowe (S)', 'Survey seminars (S)'],
+    H: ['Humanistyczne i społeczne (H)', 'Humanities and social (H)'],
+    N: ['Specjalność nauczycielska (N)', 'Teacher training (N)'],
+    NP: ['Przyrodnicze (NP)', 'Natural sciences (NP)'],
+    inne: ['Pozostałe', 'Other'],
+  };
   const spisKomputer = (dane.kategorie || [])
     .filter((k) => semestry.some((x) => x.sekcje.some((s) => s.id === k.id)))
-    .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl }));
+    .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl, krotka: KROTKIE[k.id]?.[en ? 1 : 0] }));
 
   return { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
 }
