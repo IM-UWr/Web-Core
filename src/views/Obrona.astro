@@ -1,15 +1,16 @@
 ---
-// Pojedyncza obrona doktorska z dokumentami.
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (tytuł rozprawy bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px): baner w układzie działów (zlecenie 01) — opis przy `haslo` w src/lib/widoki/obrona.ts.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+// Pojedyncza obrona doktorska (/obrony-doktorskie/<slug>), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro.
+// Baner: imię i nazwisko, hasło, liczby (data, godzina, recenzje) i tytuł rozprawy (na każdej szerokości).
+// Treść: termin jednym wzorem daty (jak zal/dzial/Wiersz.astro: dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”)
+// z parami Kiedy / Gdzie / Promotor (dl.para), po terminie — „Wydarzenie się odbyło”; zdjęcie, opis, dokumenty (ul.pliki),
+// ogłoszenie w BIP i data publikacji. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc).
+// Bez spisu „Na tej stronie” (mniej niż 2 sekcje z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
 import { t } from '../lib/i18n';
-import { longWithDay, short, dayNum, monthShort, type Lang } from '../lib/daty';
+import { longWithDay, short, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { miejsce, type Obrona } from '../lib/tresci';
 import { daneObrony } from '../lib/widoki/obrona';
 
@@ -17,55 +18,82 @@ interface Props { obrona: Obrona; lang: Lang }
 const { obrona, lang } = Astro.props;
 const d = obrona.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
-const { Content, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+// `tytul` („Obrona doktoratu: …”) był dotąd tytułem karty (<title>), a baner pokazywał samo imię i nazwisko; szablon
+// Podstrona.astro ma jeden tytuł — zostaje imię i nazwisko (baner bez zmian), patrz raport (potrzebny osobny tytuł karty).
+const { Content, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
+// typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
+const typPliku = (a: string) => {
+  const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
+  return m ? m[1].toUpperCase() : isExternal(a) ? T('strona ↗', 'website ↗') : '';
+};
 ---
-<Baza tytul={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={d.kandydat} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'All PhD defences' : 'Wszystkie obrony doktorskie', telefon: t(lang, 'obrony'), adres: '/obrony-doktorskie' }}>
+<Podstrona lang={lang} tytul={d.kandydat} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner"
+  haslo={haslo} wstecz={{ etykieta: T('Wszystkie obrony doktorskie', 'All PhD defences'), telefon: t(lang, 'obrony'), adres: '/obrony-doktorskie' }}
+  dzial="nauka" klasa="tresc z-obr">
+  <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczby} />
-    <p class="lead tylko-komputer" lang="en" style="font-weight:600;color:var(--ink)">{d.tytul_rozprawy}</p>
-  </NaglowekStrony>
-  <div class="wrap layout">
-    <div class="main">
-      {/* telefon: tytuł rozprawy zaraz pod banerem (kopia z banera, bez indeksowania) */}
-      <p class="ob-rozprawa tylko-telefon" lang="en" data-pagefind-ignore>{d.tytul_rozprawy}</p>
-      <section class="event-box" aria-label={lang === 'en' ? 'Defence details' : 'Szczegóły obrony'}>
-        <span class:list={['datebox', { minione: !przyszla }]} aria-hidden="true"><span class="d">{dayNum(d.termin)}</span><span class="m">{monthShort(d.termin, lang)}</span></span>
-        <dl>
+    <p class="lead rozprawa" lang="en">{d.tytul_rozprawy}</p>
+  </Fragment>
+
+  <section aria-label={T('Szczegóły obrony', 'Defence details')}>
+    <div class="termin">
+      <time class="dz" datetime={d.termin.slice(0, 10)}>{dayNum(d.termin)}<small> {monthShort(d.termin, lang)} {parse(d.termin).y}</small></time>
+      <div>
+        {/* bez przycisku „Dodaj do kalendarza” (decyzja: nigdzie na stronie); po terminie — informacja, że obrona się odbyła */}
+        {!przyszla && <p class="etyk">{t(lang, 'odbylo')}</p>}
+        <dl class="para">
           <dt>{t(lang, 'kiedy')}</dt><dd>{longWithDay(d.termin, lang)}</dd>
           {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{miejsce(d.miejsce, lang)}</dd></>}
           {d.promotorzy.length > 0 && <><dt>{t(lang, 'promotorzy')}</dt><dd>{d.promotorzy.join(', ')}</dd></>}
         </dl>
-        {/* bez przycisku „Dodaj do kalendarza” (decyzja: nigdzie na stronie); po terminie — informacja, że obrona się odbyła */}
-        {!przyszla && <div class="actions"><span class="status">{t(lang, 'odbylo')}</span></div>}
-      </section>
-
-      {d.zdjecie && (
-        <figure class="article-figure" style="margin-top:24px">
-          <img src={u(d.zdjecie)} alt={opisZdjecia} />
-          {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
-        </figure>
-      )}
-      <div class="prose" style="margin-top:24px"><Content /></div>
-
-      {dokumenty.length > 0 && (
-        <section class="article-block" aria-labelledby="h-dok">
-          <h2 id="h-dok">{t(lang, 'dokumenty')}</h2>
-          <ul class="files">{dokumenty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" />{x.nazwa}</a></li>)}</ul>
-        </section>
-      )}
-      {d.bip && <p class="article-block"><a class="link-arrow" href={d.bip}>{t(lang, 'bip')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
-      {d.data_ogloszenia && <p class="muted" style="font-size:14px;margin-top:24px">{t(lang, 'opublikowano')} {short(d.data_ogloszenia)}</p>}
+      </div>
     </div>
-    <div class="side" aria-hidden="true"></div>
-  </div>
-</Baza>
+    {d.zdjecie && (
+      <figure class="foto">
+        <img src={u(d.zdjecie)} alt={opisZdjecia} />
+        {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
+      </figure>
+    )}
+    <div class="prose opis"><Content /></div>
+  </section>
+
+  {(dokumenty.length > 0 || d.bip || d.data_ogloszenia) && (
+    <section id="z-dokumenty" aria-labelledby={dokumenty.length > 0 ? 'h-dok' : undefined}>
+      {dokumenty.length > 0 && (
+        <>
+          <h2 id="h-dok">{t(lang, 'dokumenty')}</h2>
+          <ul class="pliki">{dokumenty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{x.nazwa}</span><span class="typ">{typPliku(x.plik)}</span></a></li>)}</ul>
+        </>
+      )}
+      {d.bip && <p class="bip"><a href={d.bip}>{t(lang, 'bip')} <span aria-hidden="true">↗</span></a></p>}
+      {d.data_ogloszenia && <p class="data">{t(lang, 'opublikowano')} {short(d.data_ogloszenia)}</p>}
+    </section>
+  )}
+</Podstrona>
 
 <style>
-  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
-     do banera (reszta odstępów .layout — uklad-zwarta.css) */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
-  /* telefon (≤ 760 px; zlecenie 01): tytuł rozprawy pod banerem — jak dawniej w banerze (półgruby, w kolorze tytułów) */
+  /* Termin obrony: dzień | pary etykieta–wartość (dl.para ze wzorca). Reszta — wzorzec treści .tresc (src/styles/zal-tresc.css). */
+  .termin { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; align-items: start; }
+  .termin .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .termin .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .termin dl { padding-top: 2px; font-size: 15.5px; }
+  .foto { margin: 28px 0 0; max-width: 720px; }
+  .foto img { display: block; width: 100%; height: auto; }
+  .foto figcaption { margin-top: 6px; font-size: 13.5px; color: var(--muted); }
+  .opis { margin-top: 24px; }
+  .opis > :global(:last-child) { margin-bottom: 0; }
+  .bip { margin: 18px 0 0; font-weight: 600; }
+  .data { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+  /* tytuł rozprawy w banerze (jak dotąd: półgruby, biały) */
+  .rozprawa { font-weight: 600; color: #fff; }
+
+  /* ---------- telefon (≤ 760 px) ---------- */
   @media (max-width: 760px) {
-    .ob-rozprawa { margin: 0 0 18px; font-size: 17px; font-weight: 600; line-height: 1.4; color: var(--ink); text-wrap: pretty; }
+    .termin { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; }
+    .termin .dz { font-size: 28px; }
+    .termin .dz small { font-size: 12.5px; white-space: nowrap; }
+    .termin dl { font-size: 15px; }
+    .rozprawa { margin-top: 12px; font-size: 16px; line-height: 1.4; color: #fff; text-wrap: pretty; }
   }
 </style>

@@ -1,55 +1,88 @@
 ---
-// Obrony doktorskie: nadchodzące i odbyte — sekcje .zsec jak na stronach działów (kreska sekcji, tytuł h2);
-// na komputerze obrony jako osobne białe karty, jak w kalendarzu (.karty-lista w global.css; telefon — wiersze jak dotąd).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola obrony_tekst / obrony_tekst_en; puste = brak).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import TekstWstepny from '../components/TekstWstepny.astro';
+// Obrony doktorskie (/obrony-doktorskie), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: tekst wprowadzający
+// (src/data/dzialy/nauka.json, pola obrony_tekst / _en; puste = brak), nadchodzące i odbyte obrony, link do archiwum.
+// Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”;
+// obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy.
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
+// etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wierszy z datą.
+// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import Ikona from '../components/Ikona.astro';
+import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
-import { dayNum, monthShort, longWithDay, type Lang } from '../lib/daty';
-import { miejsce, slugOf, trwaLubBedzie, type Obrona } from '../lib/tresci';
+import { t, wJezyku, wybierz } from '../lib/i18n';
+import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
+import { miejsce, slugOf, type Obrona } from '../lib/tresci';
 import { daneListyObron } from '../lib/widoki/listaObron';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const { przyszle, odbyte, lead, haslo, liczby, ustawienia } = await daneListyObron(lang);
+// tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
+const wstep = ((wybierz(dzialNauka as Record<string, any>, 'obrony_tekst', lang) as string) || '')
+  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+// etykieta nad kandydatem: dzień tygodnia · godzina · miejsce (puste pomijane)
+const etykieta = (o: Obrona) => [longWithDay(o.data.termin, lang).split(', ')[0], time(o.data.termin), miejsce(o.data.miejsce, lang) ?? ''].filter(Boolean).join(' · ');
+const sekcje = [
+  { id: 'z-nadchodzace', h: t(lang, 'nadchodzaceObrony'), lista: przyszle },
+  { id: 'z-odbyte', h: t(lang, 'odbyteObrony'), lista: odbyte },
+].filter((s) => s.lista.length > 0);
+const spis = sekcje.map((s) => ({ id: s.id, etykieta: s.h }));
+const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`;
 ---
-<Baza tytul={t(lang, 'obrony')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'obrony')} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]}>
-    <LiczbyBanera lang={lang} pozycje={liczby} />
-  </NaglowekStrony>
-  <div class="wrap layout">
-    <div class="main">
-    <TekstWstepny pole="obrony_tekst" lang={lang} />
-    {[{ h: t(lang, 'nadchodzaceObrony'), lista: przyszle }, { h: t(lang, 'odbyteObrony'), lista: odbyte }].map(({ h, lista }) => lista.length > 0 && (
-      <section class="zsec">
-        <h2>{h}</h2>
-        <div class="karty-lista">
-        {lista.map((o: Obrona) => (
-          <a class="row-item" href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>
-            <span class:list={['datebox small', { minione: !trwaLubBedzie({ poczatek: o.data.termin }) }]} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
-            <span class="body">
-              <span class="news-meta kropki"><span>{longWithDay(o.data.termin, lang)}</span>{o.data.miejsce && <span class="kropka">{miejsce(o.data.miejsce, lang)}</span>}</span>
-              <span class="t" style="font-size:19px">{o.data.kandydat}</span>
-              <span class="x" lang="en">{o.data.tytul_rozprawy}</span>
-            </span>
-          </a>
+<Podstrona lang={lang} tytul={t(lang, 'obrony')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} dzial="nauka" spis={spis} klasa="tresc z-ob">
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
+
+  {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+
+  {sekcje.map((s, i) => (
+    <section id={s.id} aria-labelledby={`h-${s.id}`}>
+      <h2 id={`h-${s.id}`}>{s.h}</h2>
+      <ul class="wiersze">
+        {s.lista.map((o) => (
+          <li class="wiersz klik">
+            <time class="dz" datetime={o.data.termin.slice(0, 10)}>{dayNum(o.data.termin)}<small> {monthShort(o.data.termin, lang)} {parse(o.data.termin).y}</small></time>
+            <div>
+              <p class="etyk">{etykieta(o)}</p>
+              <h3><a href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>{o.data.kandydat}</a></h3>
+              <p class="rozprawa" lang="en">{o.data.tytul_rozprawy}</p>
+            </div>
+          </li>
         ))}
-        </div>
-      </section>
-    ))}
-    <p class="muted">{t(lang, 'archiwumObron')} <a href={`${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`}>{t(lang, 'archiwum')}</a>.</p>
-    </div>
-  </div>
-</Baza>
+      </ul>
+      {i === sekcje.length - 1 && <p class="archiwum">{t(lang, 'archiwumObron')} <a href={archiwum}>{t(lang, 'archiwum')}</a>.</p>}
+    </section>
+  ))}
+  {sekcje.length === 0 && <section><p class="archiwum">{t(lang, 'archiwumObron')} <a href={archiwum}>{t(lang, 'archiwum')}</a>.</p></section>}
+</Podstrona>
 
 <style>
-  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
-     do banera (reszta odstępów .layout — uklad-zwarta.css) */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+  /* Wiersze z datą (jak zal/dzial/Wiersz.astro): dzień | etykieta, kandydat, tytuł rozprawy. Reszta (sekcje, etykieta
+     .etyk, akapity, linki) — wzorzec treści .tresc (src/styles/zal-tresc.css). */
+  .wiersze { list-style: none; margin: 0; padding: 0; }
+  .wiersze > li { max-width: none; margin: 0; font-size: inherit; }
+  .wiersz { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .wiersz .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .wiersz .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .wiersz p { margin: 0; max-width: none; }
+  .wiersz h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .wiersz h3 a { color: inherit; text-decoration: none; }
+  .wiersz .rozprawa { font-size: 15.5px; line-height: 1.55; color: var(--text); }
+  /* cały wiersz klikalny (link w nazwisku), fokus na całym wierszu */
+  .klik { position: relative; }
+  .klik h3 a::after { content: ''; position: absolute; inset: 0; }
+  .klik:hover h3 a { color: var(--d-a); }
+  .klik h3 a:focus-visible { outline: none; }
+  .klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
+  .archiwum { margin: 22px 0 0; font-size: 15.5px; color: var(--muted); }
+
+  /* ---------- telefon (≤ 760 px): mniejszy dzień ---------- */
+  @media (max-width: 760px) {
+    .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .wiersz .dz { font-size: 28px; }
+    .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
+    .wiersz h3 { font-size: 18.5px; }
+    .wiersz .rozprawa { font-size: 15px; }
+  }
 </style>
