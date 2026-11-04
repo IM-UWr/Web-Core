@@ -606,7 +606,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-liczby .in-cta { align-self: center; display: inline-flex; align-items: center; gap: 10px; margin-left: 6px; padding: 10px 18px; background: var(--d-j); color: var(--granat); font-size: 15px; font-weight: 700; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: filter .15s; }
 .in-liczby .in-cta:hover { filter: brightness(1.08); }
 .in-liczby .in-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-.in-pod[data-menu="E"]:has(.mz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 36px; align-items: center; }
+/* przycisk obok dwóch pierwszych wierszy, trzeci (najdłuższy) wiersz na całą szerokość pod nim — nic się nie łamie (4.11, 23:54) */
+.in-pod[data-menu="E"]:has(.mz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 36px; }
+.in-pod[data-menu="E"] .mz-wiersze { display: contents; }
+.in-pod[data-menu="E"]:has(.mz-rekr) .mz-wiersz { grid-column: 1; }
+.in-pod[data-menu="E"]:has(.mz-rekr) .mz-wiersz:nth-child(n+3) { grid-column: 1 / -1; }
+.in-pod[data-menu="E"] .mz-rekr { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
 .in-pod .mz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display); font-size: 22px; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: filter .15s; }
 .mz-rekr small { font-family: var(--f-text); font-size: 12.5px; font-weight: 700; opacity: .85; }
 .mz-rekr:hover { filter: brightness(1.1); }
@@ -817,8 +822,12 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 .tresc ul.linki a::after { content: '→'; font-family: var(--f-text); font-size: 15px; color: var(--m-muted); }
 .tresc ul.linki a.zew::after { content: '↗'; }
 .tresc ol.etapy { margin: 0; padding: 0; list-style: none; counter-reset: etap; }
-.tresc ol.etapy li { position: relative; padding: 18px 0 18px 64px; border-top: 1px solid var(--m-line); }
-.tresc ol.etapy li::before { counter-increment: etap; content: counter(etap); position: absolute; left: 0; top: 16px; font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+/* ścieżka (jak dotąd na stronie kierunku): cienka pionowa linia, na każdym etapie kółko w kolorze działu (4.11, 23:55) */
+.tresc ol.etapy li { position: relative; padding: 0 0 26px 40px; }
+.tresc ol.etapy li::after { content: ''; position: absolute; left: 7px; top: 8px; bottom: -8px; width: 1.5px; background: color-mix(in srgb, var(--d-a) 35%, var(--m-line)); }
+.tresc ol.etapy li:last-child::after { display: none; }
+.tresc ol.etapy li::before { content: ''; position: absolute; z-index: 1; left: 0; top: 3px; width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%; border: 3px solid var(--d-a); background: var(--m-bg); }
+.tresc ol.etapy li:last-child::before { background: var(--d-a); }
 .tresc ol.etapy .t { margin: 0 0 4px; font-family: var(--f-display); font-size: 21px; line-height: 1.3; color: var(--m-ink); }
 .tresc ol.etapy p { font-size: 15.5px; line-height: 1.55; margin-bottom: 8px; }
 .tresc ol.etapy .akcja { margin: 10px 0 0; }
@@ -1441,9 +1450,10 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="D" aria-pressed="false">D bez klikania</button>
       <button type="button" data-v="E" aria-pressed="true">E wiersze na pasie</button>
     </div></div>
-    <div class="grupa" id="wybor-rekr" hidden><span>Rekrutacja na Studiach</span><div class="seg" data-ustaw="rekr">
-      <button type="button" data-v="baner" aria-pressed="true">przycisk w banerze</button>
-      <button type="button" data-v="pas" aria-pressed="false">przycisk w pasie menu</button>
+    <div class="grupa ustalone" id="wybor-rekr" hidden><span>Rekrutacja na Studiach</span><div class="seg" data-ustaw="rekr">
+      <button type="button" data-v="wiersz" aria-pressed="false">4. wiersz w pasie</button>
+      <button type="button" data-v="baner" aria-pressed="false">przycisk w banerze</button>
+      <button type="button" data-v="pas" aria-pressed="true">przycisk w pasie menu</button>
     </div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
@@ -2460,11 +2470,11 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   const IN_GRUPY = {
     instytut: [['Ludzie', ['Władze', 'Pracownicy']], ['Organizacja', ['Struktura i zakłady', 'Kontakt']], ['Więcej', ['Infrastruktura informatyczna', 'Biblioteka']]],
     nauka: [['Wydarzenia naukowe', ['Seminaria', 'Konferencje', 'Obrony doktorskie']], ['Badania', ['Projekty i granty', 'Publikacje', 'Sukcesy']], ['Stopnie naukowe', ['Szkoła doktorska', 'Rada Dyscypliny Matematyka']]],
-    studia: [['Kierunki', ['Matematyka', 'SIAD', 'ISIM', 'Szkoła doktorska', 'Studia podyplomowe']], ['Na co dzień', ['Plan zajęć', 'Rok akademicki', 'Zajęcia i konsultacje', 'Pierwszy rok', 'USOSweb ↗']], ['Dyplom i sprawy', ['Egzaminy i dyplom', 'Procedura dyplomowania', 'Sprawy studenckie', 'Program MOST', 'Skrypty i materiały']]],
+    studia: [['Kierunki', ['Matematyka', 'SIAD', 'ISIM', 'Szkoła doktorska', 'Studia podyplomowe']], ['Na co dzień', ['Plan zajęć', 'Rok akademicki', 'Zajęcia i konsultacje', 'Pierwszy rok']], ['Dyplom i sprawy', ['Egzaminy i dyplom', 'Procedura dyplomowania', 'Sprawy studenckie', 'Program MOST', 'Skrypty i materiały']]],
     popularyzacja: [['Na tej stronie', ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy']], ['Partnerzy', ['Fundacja Matematyków Wrocławskich|fmw.math.uni.wroc.pl ↗', 'Wrocławski Portal Matematyczny|matematyka.wroc.pl ↗', 'Wrocławski Oddział PTM|ptm.math.uni.wroc.pl ↗']]]
   };
   /* menu działu: trzy sekcje, pole z pozycjami wybranej (4 projekty, 4.11) */
-  let menuDz = 'E', mzSekcja = 0, rekrNaStudiach = 'baner';
+  let menuDz = 'E', mzSekcja = 0, rekrNaStudiach = 'pas';
   const MZ_OPIS = {
     'Matematyka': 'studia I i II stopnia, pięć specjalności', 'SIAD': 'sztuczna inteligencja w analizie danych', 'ISIM': 'Indywidualne Studia Informatyczno-Matematyczne',
     'Szkoła doktorska': 'Kolegium Doktorskie Matematyki', 'Studia podyplomowe': 'kwalifikacje do nauczania matematyki',
@@ -2490,7 +2500,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const lnk = (x) => { const z = x.endsWith(' ↗'), n = nazwa(x); return `<a class="mz-lnk${z ? ' zew' : ''}" href="#" data-n="${n}" title="${MZ_OPIS[n] || ''}">${n}</a>`; };
     // D: bez zakładek, wszystkie sekcje naraz
     if (w === 'D' || w === 'E') {
-      const wiersze = G.map(([h, l]) => `<div class="mz-wiersz"><h5>${h}</h5><div>${l.map(lnk).join('')}</div></div>`).join('');
+      const rekrWiersz = dz === 'studia' && rekrNaStudiach === 'wiersz' ? '<div class="mz-wiersz"><h5>Rekrutacja</h5><div><a class="mz-lnk zew" href="#" title="studia-wmi.uwr.edu.pl">Rekrutacja na matematykę</a><a class="mz-lnk zew" href="#" title="system IRK UWr (adres do sprawdzenia)">Rejestracja w systemie IRK</a><a class="mz-lnk zew" href="#" title="strona UWr (adres do sprawdzenia)">Zasady rekrutacji UWr</a></div></div>' : '';
+      const wiersze = G.map(([h, l]) => `<div class="mz-wiersz"><h5>${h}</h5><div>${l.map(lnk).join('')}</div></div>`).join('') + rekrWiersz;
       return dz === 'studia' && rekrNaStudiach === 'pas' ? `<div class="mz-wiersze">${wiersze}</div><a class="mz-rekr" href="#"><small>Dla kandydatów</small><span>Rekrutacja 2027/28 ↗</span></a>` : wiersze;
     }
     const k = Math.min(mzSekcja, G.length - 1);
