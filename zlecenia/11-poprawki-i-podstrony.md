@@ -201,3 +201,34 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
 - Układ (poprawka 23:56): przycisk stoi z prawej **obok wszystkich wierszy** (pionowo wyśrodkowany), a wiersze zostają w kolumnie obok niego. **Najdłuższy wiersz (Dyplom i sprawy) łamie się na dwie linie**, co jest zamierzone; nie rozciągaj go na całą szerokość pod przyciskiem. Wzór: prototyp.
 - **USOSweb usunięty z menu Studiów** (grupa „Na co dzień”), żeby wiersze były krótsze. To zmiana w danych menu (`nawigacja.json`, Web-Ustawienia), czyli w CMS: wypisz ją w raporcie dla redakcji. Do czasu zmiany w CMS możesz pominąć zewnętrzny link USOS w tym pasie w kodzie.
 - Rekrutacja zostaje też w panelu hamburgera (zalecenie 6).
+
+### 14. Wzorzec treści: jeden styl sekcji i elementów na wszystkich podstronach (decyzja 4.11, 23:58)
+- **Wzór:** prototyp, Strona działu → Strona: „wzorzec treści (Szkoła doktorska)”. To cała treść Szkoły doktorskiej z CMS ułożona w tym systemie. Wartości CSS: blok „wzorzec treści” w `proto/zalozyciele.src.html` (klasy `.tresc …`).
+- **Dotyczy wszystkich podstron**, czyli widoków (kierunek, specjalność, szkoła doktorska, seminaria, zakład, pracownicy, rok akademicki, konferencje, obrony, publikacje, sukcesy, grant, warto wiedzieć, aktualność, kalendarz) i stron z Markdown (`src/content/strony`), na komputerze i na telefonie.
+- **Hierarchia:**
+  - **Sekcja** (Markdown `##`, w widokach sekcja strony): Brygada 32 px, kolor tekstu, odstęp pod 16 px. **Między sekcjami zawsze kreska** `1px var(--line)`, 44 px nad nią i 40 px pod nią. Nad pierwszą i pod ostatnią sekcją kreski nie ma. Markdown dziel na `<section>` po `##`, żeby działały kreski i spis „Na tej stronie”.
+  - **Podsekcja** (Markdown `###`): Brygada 23 px w kolorze działu, 30 px nad, 8 px pod, bez kreski.
+  - **Etykieta**: 13 px, pogrubiona, w kolorze działu (np. „Przed rozpoczęciem”, „W ciągu 14 dni”, rola osoby w kontakcie).
+- **Tekst:**
+  - tekst ciągły 17 px / 1,68, najwyżej 70 znaków szerokości, kolor `--text`;
+  - pierwszy akapit tylko w kolorze nagłówków (zalecenie 11);
+  - tekst w elementach z danymi (opisy, odpowiedzi, tabele) 15,5 px / 1,55.
+- **Linki w tekście:** kolor tekstu, podkreślenie 1 px w kolorze działu (ok. 55%), odsunięte o 3 px. Po najechaniu cały link w kolorze działu. Zewnętrzne z „↗”.
+- **Elementy** (każdy ma swój odpowiednik w prototypie):
+  - **lista:** zamiast kropki krótka kreska 12×2 px w kolorze działu, wcięcie 24 px;
+  - **ramka uwagi:** kreska 3 px w kolorze działu z lewej, tło `--d-t`, `padding: 16px 20px`. W Markdown z `>` (cytat blokowy);
+  - **lista linków do stron powiązanych:** dwie kolumny, Brygada 21 px, kreski pod pozycjami, „→” albo „↗”;
+  - **cechy / „dlaczego”** (dawne kafelki z ikonami): dwie kolumny, tytuł Brygadą 20 px, pod nim tekst, kreska nad każdą pozycją, bez ikon;
+  - **ścieżka etapów** (dawne „kroki”): pionowa linia 1,5 px w tonie działu, na każdym etapie kółko 16 px z obwódką 3 px w kolorze działu, ostatnie wypełnione. Nad tytułem etykieta „kiedy”, tytuł Brygadą 21 px, tekst, „Termin” jako para etykieta–wartość. Przycisk formularza jako przycisk-link (zalecenie 4);
+  - **tabela:** nagłówki 13 px pogrubione przygaszone, pod nimi kreska 2 px w kolorze tekstu, wiersze oddzielone 1 px;
+  - **pary etykieta–wartość:** etykieta pogrubiona przygaszona, wartość obok;
+  - **przełącznik wariantów** (np. roczniki programu): pasek przycisków (zalecenie 4), pod nim panel;
+  - **pliki do pobrania:** lista z ikoną dokumentu w kolorze działu, nazwą i typem z prawej („PDF”, „strona ↗”), kreski między pozycjami;
+  - **pytania (FAQ):** `details`/`summary`, pytanie Brygadą 20 px, z prawej „+” / „−” w kolorze działu, kreski między pytaniami;
+  - **kontakt:** kolumny po 3, nad każdą kreska 2 px w kolorze tekstu, etykieta roli, nazwisko Brygadą 20 px, pod nim e-mail, telefon i pokój jako pary.
+- **Nigdy:** kafelki, cienie, zaokrąglenia, tła sekcji (wyjątek: ramka uwagi), ikony ozdobne (wyjątek: ikona pliku).
+- **Telefon:** te same elementy. Sekcja 26 px, podsekcja 20 px, tekst 16 px. Dwie kolumny przechodzą w jedną, kontakt w jedną kolumnę, tabela w bloki (każdy wiersz osobno: pierwsza kolumna pogrubiona, reszta pod nią).
+- **Szkoła doktorska** (kierunek „szkola-doktorska”) według wzoru 1:1:
+  - O Kolegium, potem strony szkoły doktorskiej (pole `przyciski` jako lista linków);
+  - Dlaczego warto, Od rekrutacji do obrony, Terminy, Program kształcenia, Najczęstsze pytania, Kontakt, Akty prawne;
+  - w banerze tylko liczby (8 semestrów, 270 godzin, zalecenie 9).
