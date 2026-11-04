@@ -1,28 +1,18 @@
 ---
-// Strona działu „Nauka” (/nauka, /en/nauka): wstęp, liczby, kafelki z menu „Nauka”, tekst „Badania w Instytucie”
-// (z ramką „W skrócie” na komputerze), realizowane projekty i konferencje
-// („Warto wiedzieć” tylko na stronie głównej i na /warto-wiedziec — decyzja 30.10.2026)
-// (seminaria tygodnia i obrony są na swoich stronach; liczby w banerze zostają).
-// Liczby w banerze: projekty, konferencje w roku, doktoraty w ostatnim roku — bez liczby seminariów (decyzja 31.10.2026:
-// po trzy liczby w każdym dziale, na telefonie w trzech kolumnach; krótkie etykiety, żeby mieściły się w dwóch linijkach).
+// Strona działu „Nauka” (/nauka, /en/nauka): baner działu z liczbami (konferencje w ostatnim roku), pod nim blok TrescDzialu —
+// podstrony w grupach jak w menu, „Badania w Instytucie” z „W skrócie”, realizowane projekty i konferencje.
 // Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
-// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
-// Telefon (≤ 760 px): wygląd „Portal” (bloki .tylko-telefon i style w @media (max-width: 760px)), sekcje w tej samej
-// kolejności co na komputerze (decyzja 30.10.2026): W tym dziale, Badania w Instytucie, Realizowane projekty, Konferencje.
+// Jedna wersja HTML: komputer i telefon (≤ 760 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
-import Ikona from '../components/Ikona.astro';
-import TytulZewn from '../components/TytulZewn.astro';
-import WTymDziale from '../components/WTymDziale.astro';
 import TrescDzialu from '../components/zal/TrescDzialu.astro';
 import Sekcja from '../components/zal/dzial/Sekcja.astro';
 import Wiersz from '../components/zal/dzial/Wiersz.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW, bezSierotek } from '../lib/i18n';
-import { range, dayNum, monthShort, type Lang } from '../lib/daty';
+import { range, type Lang } from '../lib/daty';
 import { slugOf, miejsce, type Grant } from '../lib/tresci';
-import { daneDzialuNauka, konfTrwa } from '../lib/widoki/dzialNauka';
+import { daneDzialuNauka } from '../lib/widoki/dzialNauka';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -34,137 +24,14 @@ const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.t
 const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty } = await daneDzialuNauka(lang);
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
-  {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
-       Telefon (≤ 760 px) — wygląd „Portal”, kolejność jak na komputerze: „W tym dziale” jako rozwijane grupy (WTymDziale.astro), tekst
-       „Badania w Instytucie” (bez ramki „W skrócie”), projekty w ramce, na końcu konferencje (osobny blok
-       .tylko-telefon tuż za sekcją .tylko-komputer). */}
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
-    {/* baner na komputerze (zal/NaglowekZ.astro bierze pierwszą listę bez .tylko-telefon): konferencje w ostatnim roku */}
-    {liczbyKomputer.length > 0 && (
-      <ul class="pt-liczby tylko-komputer" data-pagefind-ignore>
-        {liczbyKomputer.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
-      </ul>
-    )}
-    {liczby.length > 0 && (
+    {/* liczby w banerze: konferencje w ostatnim roku (gdy są), inaczej liczby działu z danych */}
+    {(liczbyKomputer.length > 0 ? liczbyKomputer : liczby).length > 0 && (
       <ul class="pt-liczby">
-        {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
+        {(liczbyKomputer.length > 0 ? liczbyKomputer : liczby).map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
       </ul>
     )}
   </NaglowekStrony>
-  <div class="wrap dz-wrap">
-    <WTymDziale grupy={grupy} lang={lang} />
-
-    {/* „Badania w Instytucie” — kilka akapitów z CMS (Ustawienia → Strona działu „Nauka”, pole „Badania w Instytucie”;
-         akapity oddzielone pustą linią; puste = brak sekcji) i ramka „W skrócie” (tylko komputer).
-         Pełna lista zakładów jest na /instytut/struktura (dział „Instytut”). Wygląd jak „O Instytucie” na /instytut. */}
-    {badania.length > 0 && (
-      <section class="zsec dz-o" aria-labelledby="badania">
-        <h2 id="badania">{T('Badania w Instytucie', 'Research at the Institute')}</h2>
-        <div class="dz-o-uklad">
-          <div class="dz-o-tekst">{badania.map((a) => <p>{a}</p>)}</div>
-          {fakty.length > 0 && (
-            <aside class="dz-o-fakty tylko-komputer" aria-labelledby="w-skrocie">
-              <p class="dz-o-fakty-h" id="w-skrocie">{T('W skrócie', 'At a glance')}</p>
-              <dl>
-                {fakty.map((f) => <div><dt>{f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
-              </dl>
-            </aside>
-          )}
-        </div>
-      </section>
-    )}
-
-    <section class="zsec dz-ramka-sek" aria-labelledby="granty">
-      <div class="zsec-head">
-        <h2 id="granty">{T('Realizowane projekty', 'Ongoing projects')} <span class="muted dz-ile">({realizowane.length})</span></h2>
-        <a class="link-arrow" href={href('/nauka/granty')}>{T('Wszystkie projekty i granty', 'All projects and grants')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      {realizowane.length === 0 && <p class="dz-intro">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
-      {realizowane.length > przyklady.length && <p class="dz-intro">{T(`Wybrane spośród ${realizowane.length} realizowanych projektów.`, `A selection of ${realizowane.length} ongoing projects.`)}</p>}
-      {przyklady.length > 0 && (
-        <div class="dz-granty">
-          {przyklady.map((g) => (
-            <article class="spec spec-link">
-              <div class="news-meta">
-                <span class={`badge${g.data.rodzaj === 'ncn' ? ' badge-wydarzenie' : g.data.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span>
-                {g.data.program && <span class="badge">{g.data.program}</span>}
-                {lata(g) && <span>{lata(g)}</span>}
-              </div>
-              <h3><a href={href(`/nauka/granty/${slugOf(g.id)}`)}>{tytulGrantu(g)}</a></h3>
-              {g.data.kierownik && <p><span class="lbl">{T('Kierownik', 'Principal investigator')}</span>{g.data.kierownik}</p>}
-              {(g.data.kod || g.data.strona) && (
-                <p class="foot">
-                  {g.data.kod && <span class="dz-kod">{g.data.kod}</span>}
-                  {g.data.strona && <a href={g.data.strona}>{T('Strona projektu', 'Project website')} <Ikona nazwa="zewnetrzny" rozmiar={13} /></a>}
-                </p>
-              )}
-            </article>
-          ))}
-        </div>
-      )}
-    </section>
-
-    <section class="zsec tylko-komputer" aria-labelledby="konferencje">
-      <div class="zsec-head">
-        <h2 id="konferencje">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2>
-        <a class="link-arrow" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      {nadchodzaceKonf.length === 0 && (
-        <p class="dz-intro">
-          {T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}
-          {pokazKonf.length > 0 && ` ${T('Ostatnio odbyły się:', 'Most recent:')}`}
-        </p>
-      )}
-      {pokazKonf.length > 0 && (
-        <div class="event-grid">
-          {pokazKonf.map((k) => { const Tag = k.data.strona ? 'a' : 'div'; return (
-            <Tag class:list={['event dz-event', !k.data.strona && 'dz-bez-linku']} href={k.data.strona || undefined}>
-              <span class={`datebox${konfTrwa(k) ? '' : ' minione'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
-              <span class="event-body">
-                <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                <span class="t"><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} zewn={!!k.data.strona} rozmiar={13} /></span>
-                {k.data.miejsce && <span class="s">{miejsce(k.data.miejsce, lang)}</span>}
-                {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
-              </span>
-            </Tag>
-          ); })}
-        </div>
-      )}
-    </section>
-
-    <div class="zsec dz-tel tylko-telefon" data-pagefind-ignore>
-      <section class="pt-box" aria-labelledby="konferencje-tel">
-        <div class="pt-h">
-          <h2 id="konferencje-tel">{nadchodzaceKonf.length ? T('Najbliższe konferencje', 'Upcoming conferences') : T('Konferencje', 'Conferences')}</h2>
-          <a class="pt-all" href={href('/nauka/konferencje')}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
-        </div>
-        {nadchodzaceKonf.length === 0 && (
-          <p class="pt-opis">
-            {T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences have been announced yet.')}
-            {pokazKonf.length > 0 && ` ${T('Ostatnio odbyły się:', 'Most recent:')}`}
-          </p>
-        )}
-        {pokazKonf.length > 0 && (
-          <ul class="pt-list">
-            {pokazKonf.map((k) => { const Tag = k.data.strona ? 'a' : 'div'; return (
-              <li>
-                <Tag class:list={['pt-item', !k.data.strona && 'dz-bez-linku']} href={k.data.strona || undefined}>
-                  <span class={`pt-dbox${konfTrwa(k) ? '' : ' minione'}`} aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
-                  <span class="pt-b">
-                    <span class="pt-k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                    <span class="pt-t"><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} zewn={!!k.data.strona} rozmiar={13} /></span>
-                    {k.data.miejsce && <span class="pt-s">{miejsce(k.data.miejsce, lang)}</span>}
-                    {k.data.odwolana && <span><span class="badge">{T('odwołana', 'cancelled')}</span></span>}
-                  </span>
-                </Tag>
-              </li>
-            ); })}
-          </ul>
-        )}
-      </section>
-    </div>
-  </div>
-
   <TrescDzialu dzial="nauka" lang={lang} grupy={grupy} tekst={{ tytul: T('Badania w Instytucie', 'Research at the Institute'), akapity: badania, fakty }}>
     <Sekcja id="z-dz-projekty" tytul={`${T('Realizowane projekty', 'Ongoing projects')} (${realizowane.length})`} lang={lang}
       linki={[{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }]}
@@ -197,89 +64,3 @@ const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomput
     </Sekcja>
   </TrescDzialu>
 </Baza>
-
-<style>
-  /* Układ wspólny ze stroną działu „Instytut” (DzialInstytut.astro). */
-  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
-  .dz-intro { margin: -4px 0 16px; max-width: 760px; color: var(--muted); font-size: 16px; line-height: 1.6; }
-  /* „W tym dziale” — komponent WTymDziale.astro (wspólny dla trzech działów).
-     Linki do pełnych podstron („Wszystkie projekty i granty”, „Wszystkie konferencje”) — w nagłówku sekcji, z prawej
-     (.zsec-head w global.css; na telefonie w nagłówku ramki), nie pod kartami. */
-  /* „Badania w Instytucie”: zwykłe akapity w wygodnej szerokości do czytania (jak „O Instytucie” na stronie „Instytut”) */
-  .dz-o-tekst p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
-  .dz-o-tekst p:last-child { margin-bottom: 0; }
-  /* ramka „W skrócie” (tylko komputer): duże wartości z bursztynową kreską, opis pod spodem */
-  .dz-o-fakty { padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-  .dz-o-fakty-h { margin: 0 0 12px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-o-fakty dl { display: grid; gap: 14px; margin: 0; }
-  .dz-o-fakty dl > div { padding-left: 12px; border-left: 3px solid var(--accent); }
-  .dz-o-fakty dt { font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--ink); }
-  .dz-o-fakty dd { margin: 3px 0 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
-  /* komputer: tekst i ramka obok siebie (ramka 300 px po prawej) */
-  @media (min-width: 761px) {
-    .dz-o-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
-  }
-  /* Tylko na stronie „Nauka”. */
-  .dz-ile { font-size: 16px; font-weight: 600; }
-  .dz-ramka { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  /* konferencje w takich samych kartach jak projekty (.spec): tło strony i cienka ramka */
-  .dz-event { background: var(--bg); border: 1px solid var(--line); }
-  /* konferencje nie mają naszych podstron: link na stronę konferencji (ikona przy tytule); bez strony — bez linku
-     i bez podświetlenia po najechaniu */
-  .dz-event.dz-bez-linku:hover { box-shadow: none; }
-  .pt-item.dz-bez-linku:hover { background: none; }
-  .pt-item.dz-bez-linku:hover .pt-t { text-decoration: none; }
-  .dz-granty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
-  .dz-granty h3 { font-size: 17px; line-height: 1.3; }
-  .dz-kod { color: var(--muted); font-variant-numeric: tabular-nums; }
-
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki i ramki (jak na „Instytucie”) ----------
-     Odstęp nad pierwszą sekcją stały (24 px): bursztynowy początek kreski sekcji nie przylega do dolnej krawędzi banera. */
-  @media (min-width: 761px) {
-    .dz-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
-    .dz-intro { margin: -4px 0 10px; max-width: 820px; font-size: 15px; line-height: 1.5; }
-    .dz-ile { font-size: 15px; }
-    .dz-granty { gap: 10px; }
-    .dz-granty h3 { font-size: 16px; }
-  }
-
-  /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stroną „Instytut”) ---------- */
-  @media (max-width: 760px) {
-    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
-    .dz-ramka-sek .zsec-head > h2 { margin: 0 0 4px; padding-bottom: 7px; border-bottom: 2px solid var(--ink); font-size: 18px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; text-transform: none; color: var(--ink); }
-    .dz-ramka-sek .zsec-head > h2::before { content: ''; display: inline-block; width: 4px; height: .85em; margin-right: 9px; border-radius: 2px; background: var(--accent); vertical-align: -.05em; }
-    /* konferencje (blok tylko na telefon) — ostatnia ramka strony: 12 px do dolnego odstępu .dz-wrap (jak dotąd projekty) */
-    .dz-tel { display: flex; flex-direction: column; gap: 12px; }
-    .zsec.dz-tel { margin-bottom: 12px; }
-    .dz-o-tekst p { font-size: 15px; line-height: 1.55; }
-    .dz-intro { margin: -2px 0 10px; max-width: 860px; font-size: 15px; line-height: 1.5; }
-    .dz-ramka-sek .spec-link:hover, .dz-ramka-sek .spec-link:focus-within { box-shadow: none; transform: none; }
-    .dz-ramka-sek .spec .foot { margin-top: auto; padding-top: 6px; border-top: 0; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
-    /* projekty: sekcja w ramce (kreska sekcji nad nią zostaje); ramka narysowana pod treścią (::after).
-       Pod ramką 20 px do kreski sekcji „Konferencje” — jak nad każdą kreską sekcji na tej stronie. */
-    .zsec.dz-ramka-sek { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 14px; margin-bottom: 20px; padding: 27px 15px 9px; }
-    .zsec.dz-ramka-sek::after { content: ''; position: absolute; inset: 16px 0 0; z-index: -1; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); pointer-events: none; }
-    .dz-ramka-sek > * { flex: 1 1 100%; min-width: 0; }
-    /* nagłówek ramki jak .pt-h (portal.css): tytuł z lewej, link „Wszystkie projekty i granty” z prawej (gdy się nie
-       mieści — pod tytułem), gruba kreska pod spodem; link wygląda jak .pt-all */
-    .dz-ramka-sek .zsec-head { gap: 0 14px; margin: 0 0 4px; padding-bottom: 7px; border-bottom: 2px solid var(--ink); }
-    :global(:root[data-theme='dark']) .dz-ramka-sek .zsec-head { border-bottom-color: var(--line); }
-    .dz-ramka-sek .zsec-head > h2 { margin: 0; padding-bottom: 0; border-bottom: 0; }
-    .dz-ramka-sek .zsec-head .link-arrow { gap: 5px; min-height: 40px; margin-block: 0; font-size: 14px; white-space: nowrap; }
-    .dz-ramka-sek .zsec-head .link-arrow:hover { text-decoration: underline; text-underline-offset: 3px; }
-    .dz-ramka-sek .zsec-head .link-arrow :global(svg) { width: 14px !important; height: 14px !important; }
-    .dz-ramka-sek .dz-ile { margin-left: 4px; font-size: 13px; font-weight: 700; }
-    .dz-ramka-sek .dz-intro { margin: 6px 0 4px; font-size: 14px; line-height: 1.45; }
-    .dz-granty { margin-top: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .dz-granty .spec { gap: 3px; padding: 11px 14px 12px; border-radius: var(--radius-s); line-height: 1.45; }
-    .dz-granty h3 { font-size: 16px; }
-    .dz-granty .news-meta { font-size: 13px; gap: 4px 8px; }
-    .dz-granty .lbl { display: inline; margin-right: .3em; font-size: inherit; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
-    .dz-granty .lbl::after { content: ':'; }
-    .dz-granty .spec > p:not(.foot) { margin: 1em 0; font-size: 14px; }
-    .dz-granty .foot { flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; margin-bottom: 1em; }
-  }
-  @media (max-width: 560px) {
-    .dz-granty { grid-template-columns: minmax(0, 1fr); }
-  }
-</style>

@@ -1,7 +1,7 @@
 ---
 // Odchudzona stopka na komputer (≥ 761 px; kierunek „Założyciele”): jedna linia na granacie, w kolumnie 1240 px —
 // nazwa, adres, telefon i e-mail; deklaracja dostępności, polityka prywatności, archiwum i „© … · Created by Szymon Cygan”.
-// Telefon: dotychczasowa stopka (Stopka.astro) — ta jest schowana (.tylko-komputer).
+// Telefon (≤ 760 px): ta sama stopka w kilku wierszach (zal-telefon.css).
 import ustawienia from '../../data/ustawienia.json';
 import { u } from '../../lib/url';
 import { t, wJezyku } from '../../lib/i18n';
@@ -12,7 +12,7 @@ const { lang } = Astro.props;
 const k = ustawienia.kontakt;
 const rok = new Date().getFullYear();
 ---
-<footer class="z-stopka tylko-komputer">
+<footer class="z-stopka">
   <div class="z-stopka-in">
     <div><b>{t(lang, 'instytut')} UWr</b> · {k.adres} · <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a> · <a href={`mailto:${k.email}`}>{k.email}</a></div>
     <nav aria-label={lang === 'en' ? 'Legal' : 'Informacje prawne'}>

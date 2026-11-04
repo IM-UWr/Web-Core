@@ -2,9 +2,9 @@
    Kierunek „Założyciele” — strony z prototypu na komputer (≥ 761 px): drugi ekran strony głównej, strony działów,
    Władze, Projekty i granty, Plan zajęć. Zmienne i elementy wspólne: zalozyciele.css. Telefon bez zmian.
    ========================================================================== */
-@media (min-width: 761px) {
+/* reguły na każdej szerokości; telefon (≤ 760 px) nadpisuje src/styles/zal-telefon.css */
+@media all {
   /* ---------- drugi ekran strony głównej ---------- */
-  body:has(.z-druga) :is(.gl-skroty, .gl-wyd, .gl-sem, .gl-studia, main > .section.tylko-komputer, main > .warto, .ww-pas) { display: none !important; }
   .z-druga { --marg: 48px; display: flex; flex-direction: column; min-height: calc(100svh - var(--gora) - 47px); padding: 22px var(--marg); font-size: 14.5px; line-height: 1.4; color: var(--text); }
   .z-druga a { color: inherit; text-decoration: none; }
   /* strona główna: drugi ekran na całą szerokość (jak w prototypie), pasek i stopka z marginesem 40/48 px */
@@ -87,8 +87,6 @@
 
 
   /* ---------- osoby (Władze): schemat dyrekcji, dwie kolumny, kontakt ---------- */
-  /* stara treść Władz (karty) — tylko telefon */
-  body:has(.z-wladze) main > .wrap.layout { display: none !important; }
   .z-os .rola { font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .z-os .imie { margin: 4px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.25; color: var(--ink); }
   .z-os .imie a { color: inherit; text-decoration: none; }
@@ -137,4 +135,54 @@
   .z-zob a.zew::after { content: '↗'; }
   .z-zob a:hover { color: var(--d-a) !important; }
 
+}
+
+/* ---------- telefon (≤ 760 px): drugi ekran strony głównej i Władze ---------- */
+@media (max-width: 760px) {
+  /* ---------- drugi ekran: kolumny jedna pod drugą, po 3 pozycje i „Zobacz więcej” ---------- */
+  .z-druga { display: block !important; min-height: 0; padding: 18px 16px 26px !important; font-size: 14.5px; line-height: 1.4; }
+  body:has(.z-druga) .z-stopka { padding-inline: 16px !important; }
+  .z-druga h2 { font-size: 22px; }
+  .z-druga .z-skr { grid-template-columns: 1fr 1fr; }
+  .z-druga .z-skr h2 { grid-column: 1 / -1; padding: 10px 0 6px; }
+  .z-druga .z-skr a { border-left: 0; border-top: 1px solid var(--line); padding: 9px 2px; }
+  .z-druga .z-skr a:nth-of-type(even) { border-left: 1px solid var(--line); padding-left: 12px; }
+  .z-druga .z-siatka { display: block; margin-top: 20px; }
+  .z-druga .z-kolumna { display: block !important; margin-bottom: 24px; }
+  .z-druga .z-kolumna :is(.lista, .lista-in, .pozycje) { position: static; display: block; min-height: 0; overflow: visible; }
+  .z-druga .z-kolumna .z-w:nth-child(n+4) { display: none; }
+  .z-druga .z-kolumna.z-rozwin .z-w { display: grid; }
+  .z-druga .z-kolumna .z-w[hidden] { display: none !important; }
+  .z-druga .z-kolumna .reszta { display: none; }
+  .z-druga .z-kolumna .z-wiecej { display: flex; }
+  .z-druga .z-kolumna.z-rozwin .z-wiecej { display: none; }
+  .z-druga .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 0 10px; }
+  .z-druga .z-w .min { width: 64px; height: 48px; }
+  .z-druga .z-studia { display: block; padding-top: 10px; margin-bottom: 24px; }
+  .z-druga .z-kier { grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 12px; }
+  .z-druga .z-warto .rzad { grid-template-columns: 1fr; }
+
+  /* ---------- podstrona z nowym układem (Władze): bez bocznej nawigacji, schemat dyrekcji w dwóch kolumnach ---------- */
+  .z-pd.z-wladze { padding: 18px 16px 24px; }
+  .z-pd.z-wladze .z-bok { display: none; }
+  .z-pd.z-wladze .z-pd-tresc > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .z-pd.z-wladze .z-pd-tresc > section:last-of-type { border-bottom: 0; }
+  .z-pd.z-wladze .z-pd-tresc h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  .z-pd.z-wladze .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
+  .z-pd.z-wladze .z-pd-tresc :is(p, li) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-pd.z-wladze .z-pd-tresc a { color: var(--d-a); }
+  .z-pd.z-wladze .z-drzewo .z-dyr { width: 100%; margin-bottom: 30px; padding: 14px; }
+  .z-pd.z-wladze .z-drzewo .z-dyr:has(.fot) { grid-template-columns: 84px minmax(0, 1fr); column-gap: 14px; width: 100%; }
+  .z-pd.z-wladze .z-drzewo .z-dyr .fot { width: 84px; height: 105px; }
+  .z-pd.z-wladze .z-drzewo .z-dyr .imie { font-size: 22px; }
+  .z-pd.z-wladze .z-drzewo .z-dyr::after { bottom: -30px; height: 30px; }
+  .z-pd.z-wladze .z-zast { grid-template-columns: 1fr 1fr; gap: 22px 14px; }
+  .z-pd.z-wladze .z-zast::before { left: 25%; right: 25%; }
+  .z-pd.z-wladze .z-zast .z-os:nth-child(n+3)::before, .z-pd.z-wladze .z-zast .z-os:nth-child(n+3)::after { display: none; }
+  .z-pd.z-wladze .z-zast .z-os .fot { width: 76px; height: 95px; }
+  .z-pd.z-wladze .z-os .imie { font-size: 18px; }
+  .z-pd.z-wladze .z-dwie, .z-pd.z-wladze .z-kont { grid-template-columns: 1fr; gap: 0; }
+  .z-pd.z-wladze .z-kont dl > div { grid-template-columns: 76px 1fr; }
+  .z-pd.z-wladze .z-zob { columns: 1; }
+  .z-pd.z-wladze .z-pd-tresc .z-zob a { font-size: 17px; }
 }

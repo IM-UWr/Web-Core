@@ -4,9 +4,11 @@
 //   listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
 //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
 const siatka = document.querySelector<HTMLElement>('[data-z-siatka]');
+// Telefon (≤ 760 px): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
+const TELEFON = matchMedia('(max-width: 760px)');
 
 function dopasujDluga() {
-  if (!siatka || !siatka.offsetHeight) return; // telefon: blok schowany
+  if (!siatka || !siatka.offsetHeight || TELEFON.matches) return;
   const kol = siatka.querySelector<HTMLElement>('.z-kolumna[data-slot="2"]');
   if (!kol) return;
   const box = kol.querySelector<HTMLElement>('.pozycje');
@@ -24,6 +26,12 @@ function dopasujDluga() {
 
 function zamien(key: string) {
   if (!siatka) return;
+  if (TELEFON.matches) {
+    const kol = siatka.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`);
+    kol?.classList.add('z-rozwin');
+    kol?.querySelector<HTMLElement>('.z-h h2')?.focus({ preventScroll: true });
+    return;
+  }
   const kliknieta = siatka.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`);
   const dluga = siatka.querySelector<HTMLElement>('.z-kolumna[data-slot="2"]');
   if (!kliknieta || !dluga || kliknieta === dluga) return;

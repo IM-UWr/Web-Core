@@ -1,0 +1,169 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — wygląd na telefon (≤ 760 px). Podstawa: próbna wersja z Web-Podglad (testy/telefon-TEST.patch),
+   przyjęta jako docelowa 4.11.2026 (zlecenie 12).
+   Tu: kolory i kroje jak na komputerze (paleta „Atramenty”, Brygada 1918 + Manrope, ciepłe tło), nagłówek i menu,
+   stopka, okładka, banery działów i nagłówki podstron. Układ bloków treści na wąski ekran jest na końcu plików tych bloków
+   (zal-dzialy.css, zalozyciele-strony.css, zal-granty-plan.css), żeby nadpisywał wspólne reguły kolejnością w pliku.
+   ========================================================================== */
+.z-okl-sygnet { display: none; }
+
+@media (max-width: 760px) {
+
+  /* ---------- kolory i kroje (jak na komputerze) ---------- */
+  :root {
+    --bg: #fcfaf6; --surface: #f4f1ea; --line: #e5e0d6;
+    --ink: #131c31; --text: #2b3245; --muted: #5b6375;
+    --tint: #efeae0; --tint-ink: #131c31;
+    --primary: var(--granat); --accent: var(--d-a); --accent-ink: #ffffff;
+    --znacznik: var(--granat); --znacznik-ink: #fff;
+    --font: var(--f-text);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a1020; --surface: #111a2e; --line: #243049;
+    --ink: #ecf0f7; --text: #d3d9e6; --muted: #98a3b8;
+    --tint: #16213a; --tint-ink: #ecf0f7;
+    --primary: #c9d0de; --accent: var(--d-a); --accent-ink: #0a1020;
+  }
+  [data-dzial] { --accent: var(--d-a); }
+  body { font-family: var(--f-text); }
+  main :is(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; letter-spacing: -.005em; }
+  body[data-tlo] { background: var(--bg); }
+  body[data-tlo]::before, body[data-tlo]::after { content: none !important; }
+
+  /* ---------- nagłówek strony: granat, nazwa Brygadą (pasek menu komputera schowany) ---------- */
+  .z-pasek { display: none !important; }
+  .hdr, .js .hdr.hdr-glowna:not(.hdr-stopka):not(.menu-otwarte), .js .hdr-foto:not(.przewiniety):not(.menu-otwarte), .hdr.menu-otwarte {
+    background: var(--granat) !important; border-bottom-color: rgb(255 255 255 / .12) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; }
+  .hdr .brand-name { font-family: var(--f-display); font-weight: 600; letter-spacing: 0; color: #fff !important; }
+  .hdr .brand-sub { color: var(--na-ciemnym-2) !important; }
+  .hdr .brand-logo { background: #fff !important; }
+  .hdr .icon-btn { color: #fff !important; background: transparent; }
+  .hdr .icon-btn.burger { background: rgb(255 255 255 / .14) !important; color: #fff !important; }
+  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 1; transform: none; visibility: visible; }
+  /* stary układ podciągał baner pod przezroczysty nagłówek (.hdr-foto) — nowy nagłówek stoi pod paskiem */
+  .js .hdr-foto { margin-bottom: 0 !important; }
+
+  /* ---------- menu na telefonie: granat, działy Brygadą z sygnetem i kreską w kolorze działu ---------- */
+  .mnav { background: var(--granat) !important; color: #fff; }
+  .mnav a, .mnav .mrow-link, .mnav .mgroup a { color: #fff !important; }
+  .mnav .mgroup a { color: var(--na-ciemnym-2) !important; font-weight: 500; }
+  .mnav .mgroup h3 { color: var(--d-j, var(--na-ciemnym-2)) !important; letter-spacing: .02em; text-transform: none; font-size: 12.5px; }
+  .mnav .mitem, .mnav > a { border-color: rgb(255 255 255 / .12) !important; }
+  .mnav .mrow-btn { color: #fff !important; }
+  .mnav .mitem[data-dzial] .mrow { align-items: center; gap: 12px; }
+  .mnav .mitem[data-dzial] .mrow-link { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; flex-direction: column; align-items: flex-start; }
+  .mnav .mitem[data-dzial] .mrow-link::after { content: ''; display: block; width: 26px; height: 2px; margin-top: 5px; background: var(--d-j); }
+  .z-mnav-sygnet { flex: none; width: 34px; height: 41px; }
+  .z-mnav-sygnet path { fill: none; stroke: color-mix(in srgb, var(--d-j) 80%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- stopka ---------- */
+  .z-stopka { padding: 18px 16px 44px !important; background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.55; }
+  .z-stopka-in { display: flex; flex-direction: column; gap: 10px; }
+  .z-stopka b { color: #fff; font-family: var(--f-display); font-weight: 500; font-size: 15.5px; }
+  .z-stopka a { color: inherit; text-decoration: none; }
+  .z-stopka nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .z-autor { flex-basis: 100%; color: rgb(201 208 222 / .75); }
+
+  /* ---------- dotychczasowy baner .ph: zostaje tylko nowy nagłówek ---------- */
+  .ph.ph-z:has(> .z-nagl), .page-head.ph-z:has(> .z-nagl) { display: contents; }
+  .ph.ph-z:has(> .z-nagl)::before, .ph.ph-z:has(> .z-nagl)::after { content: none !important; display: none !important; }
+  .ph.ph-z:has(> .z-nagl) > :not(.z-nagl) { display: none !important; }
+
+  /* ---------- szkice: kontur, detale, podpis (stany jak na komputerze) ---------- */
+  .z-szkic { display: block; width: 100%; height: 100%; overflow: visible; }
+  .z-szkic path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .z-szkic .tusz path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.2; stroke-dasharray: 1 1; stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.5s cubic-bezier(.35,.6,.2,1) calc(var(--i, 0) * 45ms), opacity .35s; }
+  .z-szkic .detale path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1; }
+  .z-szkic .detale { transition: opacity .7s ease .55s; }
+  [data-z-baner-dzialu].z-czeka .z-szkic .tusz path { stroke-dashoffset: 1; opacity: 0; }
+  [data-z-baner-dzialu].z-czeka .z-szkic .detale { opacity: 0; }
+  [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
+  [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  @keyframes z-pisz { to { stroke-dashoffset: 0; } }
+
+  /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
+  .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h));
+    padding: 0 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
+  .z-okl-foto { position: absolute; inset: 0 0 auto 0; width: 100%; height: 52%; object-fit: cover; object-position: 62% 50%; z-index: -2; }
+  .z-okladka::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg, rgb(9 16 34 / .1) 0, rgb(9 16 34 / .35) 26%, var(--granat) 50%, var(--granat) 100%); }
+  .z-skos, .z-narz, .z-menu { display: none !important; }
+  .z-okl-tytul { position: relative; margin: 0 0 14px; }
+  .z-okl-flaga { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-radius: 6px; background: rgb(9 16 34 / .6);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 12.5px; font-weight: 600; color: #fff; text-decoration: none; }
+  .z-okl-flaga::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--studia-j); }
+  .z-okl-uwr { display: block; width: fit-content; }
+  .z-okl-logo { display: block; height: 42px; aspect-ratio: 500 / 160; background: #fff; -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
+  .z-okl-tytul h1 { margin: 10px 0 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; color: #fff; }
+  .z-okl-tytul h1 > span { display: block; }
+  .z-okl-tytul .w1 { font-size: 56px; }
+  .z-okl-tytul .w2 { font-size: 34px; margin-top: .06em; }
+  .z-okl-dzialy { display: block; border-top: 1px solid rgb(255 255 255 / .14); }
+  .z-okl-dz { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 0 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgb(255 255 255 / .12);
+    color: #fff; text-decoration: none; }
+  /* na telefonie zamiast pełnego szkicu uproszczony sygnet (dok/estetyka.md: małe rozmiary — sygnet) */
+  .z-okl-szkic { display: none; }
+  .z-okl-sygnet { display: block; grid-row: 1 / span 2; width: 40px; height: 48px; }
+  .z-okl-sygnet path { fill: none; stroke: color-mix(in srgb, var(--d-j) 85%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+  .z-okl-nazwa { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; }
+  .z-okl-nazwa span::after { content: ''; display: block; width: 24px; height: 2px; margin-top: 4px; background: var(--d-j); }
+  .z-okl-dz .slot { grid-column: 2; margin-top: 3px; font-size: 13px; line-height: 1.35; color: var(--na-ciemnym-2); }
+  .z-okl-dz .slot .patron { display: none; }
+  .z-okl-dz:focus-visible { outline: 2px solid var(--d-j); outline-offset: 2px; }
+  .z-strzalka { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;
+    color: rgb(255 255 255 / .78); text-decoration: none; white-space: nowrap; }
+  .z-strzalka svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+  /* ---------- baner strony działu ---------- */
+  .z-nagl.z-baner-dzialu { position: relative; overflow: hidden; isolation: isolate; height: auto; padding: 18px 16px 16px; color: #fff; background: var(--granat); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-foto { position: absolute; inset: 0; z-index: -2; background: var(--d-j); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-foto img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.2) brightness(1.04); mix-blend-mode: multiply; }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-foto::after { content: ''; position: absolute; inset: 0; background: var(--granat); mix-blend-mode: lighten; }
+  .z-nagl.z-baner-dzialu::before { content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(165deg, var(--granat) 0, rgb(13 24 48 / .9) 34%, rgb(13 24 48 / .55) 68%, rgb(13 24 48 / .35) 100%); }
+  .z-nagl.z-baner-dzialu .z-szkic-ramka { position: absolute; right: 2px; top: 12px; width: 138px; height: 166px; z-index: 0;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--d-j) 55%, transparent)); }
+  .z-nagl.z-baner-dzialu .z-tytul { position: relative; z-index: 1; }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) :is(.z-wstecz, .z-sciezka a) { font-size: 13px; font-weight: 600; color: var(--na-ciemnym-2); text-decoration: none; }
+  .z-nagl.z-baner-dzialu h1 { max-width: 64%; margin: 26px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 44px; line-height: 1; letter-spacing: -.01em; color: #fff; }
+  /* długa nazwa działu (Popularyzacja) nie łamie się — mniejszy stopień, żeby nie wchodziła na szkic */
+  .z-nagl.z-baner-dzialu[data-dzial="popularyzacja"] h1 { font-size: 35px; max-width: none; padding-right: 96px; }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-haslo { max-width: 64%; margin: 8px 0 0; font-size: 15px; font-weight: 500; color: var(--d-j); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 10px; margin: 18px 0 0; padding: 10px 0 0;
+    list-style: none; border-top: 1px solid rgb(255 255 255 / .22); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot:has(.pt-liczby:not(.tylko-telefon)) .pt-liczby.tylko-telefon { display: none !important; }
+  /* gdy widok podał osobną listę na komputer (np. Nauka: „w ostatnim roku”) — tylko pierwsza lista */
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby ~ .pt-liczby { display: none !important; }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby li { margin: 0; font-size: 12px; line-height: 1.3; color: var(--na-ciemnym-2); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby .n { display: block; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.1; color: #fff; }
+  .z-nagl.z-baner-dzialu .z-podpis-ramka { position: absolute; z-index: 1; right: 14px; top: 156px; height: 28px; line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
+    transform: rotate(-4deg); filter: drop-shadow(0 1px 4px rgb(13 24 48 / .8)); }
+  .z-nagl.z-baner-dzialu .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
+  .z-nagl.z-baner-dzialu .z-patron { position: relative; z-index: 1; margin-top: 14px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 40%, transparent); }
+  .z-nagl.z-baner-dzialu .z-patron b { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 17px; color: #fff; }
+  .z-nagl.z-baner-dzialu .z-patron span { display: block; font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
+  .z-nagl.z-baner-dzialu .z-patron p { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: rgb(255 255 255 / .82); }
+
+  /* ---------- nagłówek podstrony: głęboki kolor działu na zdjęciu, sygnet przy tytule, znak w tle ---------- */
+  .z-nagl.z-nagl-pod { position: relative; overflow: hidden; isolation: isolate; min-height: 0; padding: 16px 16px 18px; color: #fff; background: var(--d-g); }
+  .z-nagl.z-nagl-pod.z-granat { --d-g: var(--granat); --d-j: #c9d0de; }
+  .z-nagl.z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--d-g) 70%, var(--granat)); }
+  .z-nagl.z-nagl-pod::before { content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--d-g) 92%, transparent) 0, color-mix(in srgb, var(--d-g) 70%, transparent) 60%, color-mix(in srgb, var(--d-g) 55%, transparent) 100%); }
+  .z-nagl.z-nagl-pod .z-tyt { position: relative; z-index: 1; margin: 0; max-width: none; padding: 0; }
+  .z-nagl.z-nagl-pod .z-tyt-g { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: end; max-width: none; }
+  .z-nagl.z-nagl-pod:not(:has(.z-sygnet-nagl)) .z-tyt-g { display: block; }
+  .z-nagl.z-nagl-pod .z-sygnet-nagl { grid-row: 1 / span 2; width: 40px; height: 48px; padding-right: 10px; border-right: 1px solid rgb(255 255 255 / .28); box-sizing: content-box; }
+  .z-nagl.z-nagl-pod .z-sygnet-nagl path { fill: none; stroke: color-mix(in srgb, var(--d-j) 75%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+  .z-nagl.z-nagl-pod .z-sciezka { margin: 0; }
+  .z-nagl.z-nagl-pod h1 { margin: 4px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.08; letter-spacing: -.005em; color: #fff; text-wrap: balance; }
+  .z-nagl.z-nagl-pod .z-podpis-maly, .z-nagl.z-nagl-pod .z-znak-opis { display: none; }
+  .z-nagl.z-nagl-pod .z-znak { position: absolute; right: -14px; top: 4px; width: 112px; height: 130px; z-index: 0; opacity: .4; pointer-events: none; }
+  .z-nagl.z-nagl-pod .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.3; stroke-linecap: round; }
+  .z-nagl.z-nagl-pod .z-haslo { max-width: none; }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .lead { margin: 8px 0 0; font-size: 14px; color: var(--na-ciemnym-2); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }
+  .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot a { color: #fff; }
+
+}

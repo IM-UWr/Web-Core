@@ -56,7 +56,7 @@
   body[data-tlo] { background: var(--bg); }
   body[data-tlo]::before, body[data-tlo]::after { content: none !important; }
   /* stary nagłówek, menu na telefon i stara stopka — tylko na telefonie */
-  .hdr, .mnav, .mnav-tlo, .ftr { display: none !important; }
+  .hdr, .mnav, .mnav-tlo { display: none !important; }
 
   /* dotychczasowy baner: na komputerze zostaje tylko nowy nagłówek wstawiony na jego końcu (NaglowekZ.astro) */
   .ph.ph-z, .page-head.ph-z { display: contents; }
@@ -236,7 +236,6 @@
     background: rgb(9 16 34 / .6); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 14px; font-weight: 600; color: #fff; text-decoration: none; }
   .z-okl-flaga::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--studia-j); }
   .z-okl-uwr { display: block; width: fit-content; }
-  body:has(.z-okladka) .hero { display: none !important; }
   .z-okl-uwr:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
   .z-okl-logo { display: block; height: var(--logo-h, clamp(42px, calc(var(--h) * .074), 70px)); aspect-ratio: 500 / 160; background: #fff;
     -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }

@@ -3,7 +3,7 @@
 // zwężony do kolumny 1240 px. Instytut, Nauka, Studia, Popularyzacja, Aktualności, za kreską Rekrutacja, Szukaj i EN z flagą.
 // Bieżący dział pogrubiony, pod działami krótkie kreski w ich kolorach. Bez podmenu (wyłączone 2.11).
 // Strony bez banera (np. pojedyncza aktualność) — pasek na granacie (style w src/styles/zalozyciele.css).
-// Na telefonie schowany (.tylko-komputer) — tam zostaje dotychczasowy nagłówek (Naglowek.astro).
+// Na telefonie (≤ 760 px) schowany (zal-telefon.css) — tam jest nagłówek z menu (Naglowek.astro).
 import { menuGlowne } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
@@ -30,7 +30,7 @@ const rek = menu.find((p) => !p.grupy && p.adres && /rekrutac|admission/i.test(`
 const rekrutacja = { adres: rek?.adres ?? 'https://studia-wmi.uwr.edu.pl/', etykieta: (rek && (wybierz(rek, 'etykieta', lang) as string)) || (lang === 'en' ? 'Admission' : 'Rekrutacja') };
 const naAktualnosciach = bezJezyka === '/aktualnosci' || bezJezyka.startsWith('/aktualnosci/');
 ---
-<header class:list={['z-pasek', 'tylko-komputer', klasa]}>
+<header class:list={['z-pasek', klasa]}>
   <div class="z-pasek-in">
     <a class="z-marka" href={u(wJezyku('/', lang))}>
       <span class="z-logo" aria-hidden="true" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>

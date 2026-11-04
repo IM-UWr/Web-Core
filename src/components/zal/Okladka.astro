@@ -6,7 +6,7 @@
 //   która jest granicą ciemnego pola po skosie (układ liczy src/scripts/zal/okladka.ts; bez JS — zwykły gradient);
 // - zdjęcie gmachu przesunięte w prawo i w górę; rząd 4 działów nisko: szkic („duch” w spoczynku, po najechaniu kontur się
 //   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron); strzałka „Szybki dostęp” do drugiego ekranu.
-// Telefon: dotychczasowy baner B2 (StronaGlowna.astro) — okładka schowana (.tylko-komputer).
+// Telefon (≤ 760 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez skosu.
 import Szkic from './Szkic.astro';
 import Flaga from './Flaga.astro';
 import ustawienia from '../../data/ustawienia.json';
@@ -42,7 +42,7 @@ const baner = ustawienia.baner;
 const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');
 const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
 ---
-<section class="z-okladka tylko-komputer" id="okladka" data-pagefind-ignore>
+<section class="z-okladka" id="okladka" data-pagefind-ignore>
   {baner.zdjecie && <img class="z-okl-foto" src={u(baner.zdjecie)} alt={wybierz(baner, 'opis', lang) || ''} decoding="async" fetchpriority="high" />}
   <div class="z-skos" aria-hidden="true"></div>
   <nav class="z-narz" aria-label={lang === 'en' ? 'Tools' : 'Narzędzia'}>
@@ -70,6 +70,8 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
     {dzialy.map((d) => (
       <a class="z-okl-dz" href={href(d.P.adres)} data-dzial={d.dz}>
         <span class="z-okl-szkic"><Szkic dzial={d.dz} rodzaj="pelny" duch /></span>
+        {/* telefon: zamiast pełnego szkicu uproszczony sygnet */}
+        <Szkic dzial={d.dz} rodzaj="sygnet" class="z-okl-sygnet" />
         <span class="z-okl-nazwa"><span>{d.nazwa}</span></span>
         <span class="slot">
           <span class="haslo-dz">{d.haslo}</span>

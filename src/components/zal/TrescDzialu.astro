@@ -3,7 +3,7 @@
 // Kolejność jak w prototypie: podstrony w trzech grupach jak w menu (linie, Brygada, strzałki, bez kafelków), tekst działu
 // z „W skrócie” (wartości Brygadą w kolorze działu, pierwszy akapit większy) i sekcje działu (slot; src/components/zal/dzial/).
 // Wstawiany na końcu <main> (za dotychczasową treścią, która na komputerze znika — src/styles/zal-dzialy.css).
-// Telefon bez zmian (.tylko-komputer); treść jest już w indeksie wyszukiwarki z dotychczasowego bloku (data-pagefind-ignore).
+// Jedna wersja na każdą szerokość; telefon (≤ 760 px) — jedna kolumna (koniec zal-dzialy.css). Lista podstron poza indeksem wyszukiwarki.
 import '../../styles/zal-dzialy.css';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz } from '../../lib/i18n';
@@ -30,9 +30,9 @@ const href = (a: string) => (isExternal(a) || a.startsWith('#') ? a : u(wJezyku(
 const zGrupami = grupy.filter((g) => g.linki.length > 0);
 const fakty = tekst?.fakty ?? [];
 ---
-<div class="z-dz tylko-komputer" data-dzial={dzial} data-pagefind-ignore>
+<div class="z-dz" data-dzial={dzial}>
   {zGrupami.length > 0 && (
-    <nav class="z-dz-pod" aria-labelledby="z-dz-pod-h">
+    <nav class="z-dz-pod" aria-labelledby="z-dz-pod-h" data-pagefind-ignore>
       <h2 class="sr-only" id="z-dz-pod-h">{en ? 'In this section' : 'W tym dziale'}</h2>
       {zGrupami.map((g) => (
         <section>

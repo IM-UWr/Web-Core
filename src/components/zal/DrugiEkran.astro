@@ -8,7 +8,7 @@
 //   (półpauza, nazwisko kursywą Brygady, bez łamania, bez afiliacji); miniatury aktualności 72×54 (bez zdjęcia — sygnet działu);
 // - Studia: klikalne „Studiuj matematykę we Wrocławiu ↗” (strona rekrutacji), kierunki (SIAD jako skrót); Warto wiedzieć;
 // - pod spodem odchudzona stopka (StopkaZ w Baza.astro).
-// Telefon: dotychczasowe sekcje StronaGlowna.astro (ten blok jest .tylko-komputer).
+// Telefon (≤ 760 px): kolumny jedna pod drugą, po 3 pozycje, „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
 import '../../styles/zalozyciele-strony.css';
 import Szkic from './Szkic.astro';
 import ustawienia from '../../data/ustawienia.json';
@@ -130,8 +130,8 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
   `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
   `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
 ---
-<section class="z-druga tylko-komputer" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
-  <nav class="z-skr" aria-label={T('Szybki dostęp', 'Quick access')}>
+<section class="z-druga" aria-label={T('Szybki dostęp', 'Quick access')}>
+  <nav class="z-skr" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
     <h2>{T('Szybki dostęp', 'Quick access')}</h2>
     {skr.map((k) => k.kd ? (
       <a class="z-skr-kd" href={href(k.adres)} data-kd-kafelek data-etykieta={k.tytul} data-kolor={dzis.kolor ?? 'brak'} data-zamiana={dzis.zamiana ?? ''} data-nastepny={dzis.nastepnyKolor ?? ''}>
@@ -192,3 +192,4 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
   </div>
 </section>
 <script>import '../../scripts/zal/drugi-ekran';</script>
+<script>import '../../scripts/zal/kolor-dnia';</script>

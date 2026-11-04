@@ -1,7 +1,9 @@
 ---
-// Nagłówek: logo, menu z rozwijanymi grupami (dane w src/data/nawigacja.json),
-// wyszukiwarka, przełącznik języka i trybu ciemnego, menu na telefon.
+// Nagłówek na telefon (≤ 760 px; na komputerze schowany — tam jest pasek menu zal/PasekMenu.astro): logo, szukaj,
+// przełącznik trybu ciemnego i menu wysuwane z prawej (grupy z src/data/nawigacja.json, działy z sygnetem patrona).
 import Ikona from './Ikona.astro';
+import Szkic from './zal/Szkic.astro';
+import { dzialZeSciezki, PATRONI } from '../lib/patroni';
 import { menuGlowne, type Pozycja } from '../lib/menu';
 import ustawienia from '../data/ustawienia.json';
 import { u, isExternal } from '../lib/url';
@@ -18,7 +20,6 @@ const menu: Pozycja[] = await menuGlowne();
 
 const bezJezyka = sciezka.replace(/^\/en(?=\/|$)/, '') || '/';
 const pasuje = (adres: string) => !isExternal(adres) && adres !== '/' && (bezJezyka === adres || bezJezyka.startsWith(adres.replace(/#.*$/, '') + '/'));
-const aktywna = (p: Pozycja) => (p.adres ? pasuje(p.adres) : false) || (p.grupy ?? []).some((g) => g.linki.some((l) => pasuje(l.adres)));
 const tuJestem = (adres?: string) => !!adres && !isExternal(adres) && bezJezyka.replace(/\/$/, '') === adres.replace(/\/$/, '');
 const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
 const logo = (ustawienia as any).logo as string | undefined;
@@ -39,57 +40,8 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
       </a>
     </div>
 
-    <nav class="nav" aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
-      {menu.map((p, i) =>
-        p.grupy ? (
-          <div class:list={['nav-item', { 'is-current': aktywna(p) }]}>
-            <span class="nav-pill">
-              {p.adres
-                ? <a class="nav-top" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
-                : <button type="button" class="nav-top" data-rozwin aria-expanded="false" aria-controls={`menu-${i}`}>{wybierz(p, 'etykieta', lang)}</button>}
-              <button type="button" class="nav-arrow" data-rozwin aria-expanded="false" aria-controls={`menu-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={14} /></button>
-            </span>
-            <div class="dropdown" id={`menu-${i}`}>
-              {p.grupy.map((g) => (
-                <div class="dropdown-group">
-                  <h3>{wybierz(g, 'nazwa', lang)}</h3>
-                  {g.linki.map((l) => {
-                    // Ikonka linku zewnętrznego stoi tuż za ostatnim słowem (sklejona z nim, żeby nie spadła sama
-                    // do nowej linii) — także gdy długi napis się zawija.
-                    const tekst = wybierz(l, 'etykieta', lang) as string;
-                    const s = tekst.lastIndexOf(' ');
-                    return isExternal(l.adres) ? (
-                      <a class="zew" href={href(l.adres)}>
-                        {s > 0 && tekst.slice(0, s + 1)}<span class="nw">{tekst.slice(s + 1)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></span>
-                      </a>
-                    ) : (
-                      <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>{tekst}</a>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <a href={href(p.adres!)} aria-current={aktywna(p) ? 'page' : undefined}>
-            {wybierz(p, 'etykieta', lang)}
-            {isExternal(p.adres!) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-          </a>
-        )
-      )}
-    </nav>
-
     <div class="hdr-tools">
-      <form class="hdr-search" role="search" action={u(wJezyku('/szukaj', lang))} method="get">
-        <Ikona nazwa="szukaj" rozmiar={18} />
-        <label class="sr-only" for="szukaj-naglowek">{t(lang, 'szukaj')}</label>
-        <input id="szukaj-naglowek" type="search" name="q" placeholder={t(lang, 'szukaj')} />
-        <button type="submit" class="sr-only">{t(lang, 'szukaj')}</button>
-      </form>
       <a class="icon-btn search-narrow" href={u(wJezyku('/szukaj', lang))} aria-label={t(lang, 'szukaj')}><Ikona nazwa="szukaj" /></a>
-      {inny && (
-        <a class="icon-btn hide-narrow" href={u(inny)} hreflang={lang === 'pl' ? 'en' : 'pl'} lang={lang === 'pl' ? 'en' : 'pl'} aria-label={t(lang, 'innyJezyk')}>{t(lang, 'innyJezykKrotko')}</a>
-      )}
       <button type="button" class="icon-btn" data-motyw aria-label={t(lang, 'motyw')}>
         <Ikona nazwa="ksiezyc" class="when-light" />
         <Ikona nazwa="slonce" class="when-dark" />
@@ -113,8 +65,10 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   {bezJezyka !== '/' && <a href={u(wJezyku('/', lang))}>{t(lang, 'stronaGlowna')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
   {menu.map((p, i) =>
     p.grupy ? (
-      <div class="mitem">
+      <div class="mitem" data-dzial={p.adres && dzialZeSciezki(p.adres) && PATRONI[dzialZeSciezki(p.adres)!].adres === p.adres ? dzialZeSciezki(p.adres) : undefined}>
         <div class="mrow">
+          {/* sygnet patrona przy dziale (telefon) */}
+          {p.adres && dzialZeSciezki(p.adres) && PATRONI[dzialZeSciezki(p.adres)!].adres === p.adres && <Szkic dzial={dzialZeSciezki(p.adres)!} rodzaj="sygnet" class="z-mnav-sygnet" />}
           {p.adres ? (
             <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
           ) : (
@@ -227,7 +181,7 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   // powrót przyciskiem „wstecz” na stronę zapamiętaną z otwartym menu (bfcache): menu zamknięte, strona się przewija
   window.addEventListener('pageshow', (e) => { if (e.persisted && menuOtwarte()) ustawMenu(false); });
   // po przejściu do szerokiego ekranu (menu komputerowe) panel się zamyka, żeby strona znów się przewijała
-  window.matchMedia('(min-width: 1181px)').addEventListener('change', (m) => { if (m.matches && menuOtwarte()) ustawMenu(false); });
+  window.matchMedia('(min-width: 761px)').addEventListener('change', (m) => { if (m.matches && menuOtwarte()) ustawMenu(false); });
 
   // Menu na telefonie: strzałka rozwija listę działu, otwarcie jednej zamyka poprzednią
   const mpozycje = Array.from(document.querySelectorAll<HTMLElement>('.mnav .mitem'));
@@ -245,55 +199,4 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
       })
     )
   );
-
-  // Menu działów: klik w napis otwiera stronę działu, lista rozwija się po najechaniu myszką
-  // albo strzałką (klawiatura, ekrany dotykowe). Tylko jedna otwarta; Esc i klik obok zamykają.
-  const pozycje = Array.from(document.querySelectorAll<HTMLElement>('.nav-item'));
-  const ustaw = (p: HTMLElement, otwarta: boolean) => {
-    p.classList.toggle('open', otwarta);
-    p.querySelectorAll('[data-rozwin]').forEach((b) => b.setAttribute('aria-expanded', String(otwarta)));
-  };
-  const zamknijMenu = (poza?: HTMLElement) => pozycje.forEach((p) => p !== poza && ustaw(p, false));
-  pozycje.forEach((p) =>
-    p.querySelectorAll<HTMLButtonElement>('[data-rozwin]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const otworz = !p.classList.contains('open');
-        zamknijMenu(p);
-        ustaw(p, otworz);
-      })
-    )
-  );
-  document.addEventListener('click', (e) => {
-    if (!(e.target as Element).closest('.nav-item')) zamknijMenu();
-  });
-  // Lista pod pozycją menu: wyśrodkowana pod nią, ale nie wychodzi poza ekran (margines 16 px)
-  const dopasuj = (p: HTMLElement) => {
-    const lista = p.querySelector<HTMLElement>('.dropdown');
-    if (!lista) return;
-    lista.style.setProperty('--dx', '0px');
-    const r = lista.getBoundingClientRect();
-    if (!r.width) return;
-    const m = 16;
-    const dx = r.left < m ? m - r.left : r.right > window.innerWidth - m ? window.innerWidth - m - r.right : 0;
-    lista.style.setProperty('--dx', `${Math.round(dx)}px`);
-  };
-  const dopasujListy = () => pozycje.forEach(dopasuj);
-  pozycje.forEach((p) => {
-    p.addEventListener('pointerenter', () => dopasuj(p));
-    p.addEventListener('focusin', () => dopasuj(p));
-  });
-  dopasujListy();
-  window.addEventListener('resize', dopasujListy, { passive: true });
-  document.fonts?.ready.then(dopasujListy);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    const otwarta = pozycje.find((p) => p.classList.contains('open') || p.contains(document.activeElement));
-    if (otwarta) {
-      ustaw(otwarta, false);
-      otwarta.querySelector<HTMLElement>('.nav-arrow')?.focus();
-      otwarta.classList.add('bez-hover');
-      otwarta.addEventListener('mouseleave', () => otwarta.classList.remove('bez-hover'), { once: true });
-    }
-  });
 </script>

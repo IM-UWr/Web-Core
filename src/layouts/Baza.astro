@@ -18,12 +18,13 @@ import '@fontsource-variable/brygada-1918/wght.css';
 import '@fontsource-variable/brygada-1918/wght-italic.css';
 import '../styles/zalozyciele.css';
 import '../styles/zal-przejscia.css';
+// Telefon (≤ 760 px): wygląd „Założycieli” na wąski ekran (src/styles/zal-telefon.css)
+import '../styles/zal-telefon.css';
 import PasekMenu from '../components/zal/PasekMenu.astro';
 import StopkaZ from '../components/zal/StopkaZ.astro';
 import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 import { dzialZeSciezki } from '../lib/patroni';
 import Naglowek from '../components/Naglowek.astro';
-import Stopka from '../components/Stopka.astro';
 import { u, absolute, stripBase } from '../lib/url';
 import { t, jezykZeSciezki, drugiJezyk } from '../lib/i18n';
 import ustawienia from '../data/ustawienia.json';
@@ -120,7 +121,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
   </head>
   <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
     <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
-    {/* komputer: pasek menu na banerze (przed starym nagłówkiem — ten zostaje dla telefonu; strona główna ma pasek pod okładką) */}
+    {/* komputer: pasek menu na banerze (strona główna ma go pod okładką); telefon: nagłówek z menu (Naglowek.astro) */}
     {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} />}
     <Naglowek lang={lang} sciezka={sciezka} inny={inny} naZdjeciu={stronaGlowna && !!ustawienia.baner?.zdjecie} />
     {!opublikowany && (
@@ -131,7 +132,6 @@ const dzialStrony = dzialZeSciezki(sciezka);
     </main>
     {/* komputer: „Następna strona w dziale” i „Zgłoś błąd” pod treścią podstron z menu działu */}
     {dzialStrony && <NastepnaStrona dzial={dzialStrony} lang={lang} tytul={tytul} />}
-    <Stopka lang={lang} />
     <StopkaZ lang={lang} />
   </body>
 </html>

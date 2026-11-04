@@ -5,9 +5,8 @@
    (proto/zalozyciele.src.html: .in-pod, .in-tresc, .in-sek, .in-suk, .in-kont, .in-mapa, .in-kart, .in-wiersz, .in-tba).
    Telefon (≤ 760 px) bez zmian: blok ma klasę .tylko-komputer, a wszystkie reguły siedzą w @media (min-width: 761px).
    ========================================================================== */
-@media (min-width: 761px) {
-  /* dotychczasowa treść pod banerem znika — zostaje baner (.ph-z → nowy nagłówek) i nowy blok */
-  body:has(.z-dz) main > :not(.ph-z, .z-dz) { display: none !important; }
+/* reguły na każdej szerokości; telefon (≤ 760 px) nadpisuje src/styles/zal-telefon.css */
+@media all {
 
   .z-dz { --marg: max(64px, calc((100% - var(--kol)) / 2)); font-size: 16px; line-height: 1.6; color: var(--text); }
   .z-dz :is(h2, h3) { line-height: 1.6; letter-spacing: normal; }
@@ -132,4 +131,34 @@
     .z-dz-fot img { transition: none; }
     .z-dz-suk article:hover .z-dz-fot img { transform: none; }
   }
+}
+
+/* ---------- telefon (≤ 760 px): strona działu w jednej kolumnie ---------- */
+@media (max-width: 760px) {
+  /* ---------- treść strony działu ---------- */
+  .z-dz { --marg: 16px; font-size: 15.5px; }
+  .z-dz .z-dz-pod { grid-template-columns: 1fr; gap: 16px; padding: 18px 16px 6px; }
+  .z-dz .z-dz-pod a { font-size: 19px; padding: 9px 0; }
+  .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
+  .z-dz .z-dz-tresc h2 { font-size: 28px; }
+  .z-dz .z-dz-tresc p { font-size: 15.5px; line-height: 1.62; }
+  .z-dz .z-dz-tresc p.wst { font-size: 17px; }
+  .z-dz .z-dz-skrot dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .z-dz .z-dz-skrot dt { font-size: 26px; }
+  .z-dz .z-dz-skrot dd { font-size: 13px; }
+  .z-dz .z-dz-sek { padding: 22px 16px 24px; }
+  .z-dz .z-dz-glowa { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .z-dz .z-dz-sek h2 { font-size: 26px; }
+  .z-dz .z-dz-linki { justify-content: flex-start; gap: 2px 18px; }
+  .z-dz .z-dz-linki a { font-size: 14px; }
+  .z-dz .z-dz-suk, .z-dz .z-dz-kart, .z-dz .z-dz-wiersze, .z-dz .z-dz-tba, .z-dz .z-dz-kont { grid-template-columns: 1fr; gap: 20px; }
+  .z-dz .z-dz-suk h3 { font-size: 20px; }
+  .z-dz .z-dz-kont dl > div { grid-template-columns: 76px 1fr; }
+  .z-dz .z-dz-kont dd { font-size: 15.5px; }
+  .z-dz .z-dz-mapa { min-height: 200px; }
+  .z-dz .z-dz-wiersze { gap: 0; }
+  .z-dz .z-dz-wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+  .z-dz .z-dz-wiersz .dz { font-size: 28px; }
+  .z-dz :is(.z-dz-wiersz, .z-dz-kart, .z-dz-inic) h3 { font-size: 18.5px; }
+  .z-dz .z-dz-tba h2 { font-size: 22px; }
 }

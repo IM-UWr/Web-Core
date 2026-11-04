@@ -8,7 +8,7 @@ const ok = document.querySelector<HTMLElement>('.z-okladka');
 const S = 0.32;
 
 function uloz() {
-  if (!ok || !ok.offsetHeight) return; // telefon: okładka schowana
+  if (!ok || !ok.offsetHeight || matchMedia('(max-width: 760px)').matches) return; // telefon: bez skosu
   const tyt = ok.querySelector<HTMLElement>('.z-okl-tytul');
   const w1 = ok.querySelector<HTMLElement>('.w1');
   const w2 = ok.querySelector<HTMLElement>('.w2');

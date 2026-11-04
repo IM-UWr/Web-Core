@@ -1,33 +1,27 @@
 ---
-// Pasek tytułu podstrony: link „← poziom wyżej”, tytuł, opis i motyw graficzny działu.
-// Wygląd: Ustawienia → „Nagłówki podstron” (ustawienia.naglowki_podstron) — style w src/styles/tlo.css.
-import Wstecz from './Wstecz.astro';
+// Nagłówek podstrony (kierunek „Założyciele”): NaglowekZ.astro — na stronie działu (/instytut, /nauka, /studia, /popularyzacja)
+// baner działu, na pozostałych nagłówek podstrony. Jedna wersja HTML na każdą szerokość (komputer: zalozyciele.css,
+// telefon: zal-telefon.css). Treść przekazana w slocie (liczby .pt-liczby, plakietki, linki) trafia pod tytuł.
+// Link „← poziom wyżej”: `wstecz` albo ostatni z `okruszki`, który ma adres, albo strona główna; podstrona z menu działu
+// (link prowadzi do strony działu) dostaje „← Dział” i znak patrona z opisem.
+// haslo: krótkie hasło działu (pola `haslo` / `haslo_en` w danych) — pokazywane razem z liczbami.
+// Pola lead, nadtytul, nadtytulTelefon, motyw i motywDane zostają w Props dla zgodności widoków; nowy nagłówek ich nie pokazuje
+// (opis strony trafia do meta description). Silnik animacji banerów (src/scripts/baner/) jest odłączony — README tamże.
 import NaglowekZ from './zal/NaglowekZ.astro';
 import { PATRONI, dzialZeSciezki, pole } from '../lib/patroni';
 import { t } from '../lib/i18n';
-import { u, stripBase } from '../lib/url';
-import { motywStrony } from '../lib/motywyBanerow';
+import { stripBase } from '../lib/url';
 import type { Lang } from '../lib/daty';
 import ustawienia from '../data/ustawienia.json';
 
-// Nad tytułem: link „← poziom wyżej”. Cel: `wstecz` albo ostatni z `okruszki`, który ma adres, albo strona główna.
-// wstecz.telefon: krótsza etykieta tylko na telefonie (np. „Seminaria” zamiast „Wszystkie seminaria”; Wstecz.astro).
-// nadtytul: mała etykieta nad tytułem (np. „Studia I i II stopnia” na stronie kierunku).
-// nadtytulTelefon: inny (krótszy) nadtytuł tylko na telefonie (np. „Specjalność · AD”; zlecenie 01) — pełny zostaje na komputerze.
-// haslo: krótkie hasło działu — na telefonie (≤ 760 px) zamiast opisu `lead`, wyróżnione (bursztyn na granatowym pasie);
-// na komputerze niewidoczne, tam zostaje pełny opis (decyzja 31.10.2026). Puste/brak = telefon pokazuje opis jak dotąd.
-// Działy: pola `haslo` / `haslo_en` w src/data/dzialy/*.json i src/data/popularyzacja.json; Aktualności — w kodzie widoku.
-// motyw: animacja w tle banera na telefonie — „nazwa” albo „nazwa/wariant” (nazwa pliku w src/scripts/baner/motywy/);
-// domyślnie z mapy strona → motyw. motywDane: dane z budowy strony dla motywu (JSON w data-animacja-dane), np. pary
-// współautorów rocznika publikacji.
-// w src/lib/motywyBanerow.ts. Bez motywu — statyczny rysunek działu (.ph-m), tak jak na komputerze.
 interface Props { tytul: string; lead?: string; haslo?: string; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown }
-const { tytul, lead, lang, okruszki = [], wstecz, nadtytul, nadtytulTelefon } = Astro.props;
+const { tytul, lang, okruszki = [], wstecz } = Astro.props;
 const haslo = Astro.props.haslo?.trim() || undefined;
 const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
 const cel: { etykieta: string; adres: string; telefon?: string } = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
 
-// Dział strony (po pierwszym członie adresu, bez /en) — od niego zależy motyw graficzny i zdjęcie.
+// Klasy i atrybuty opakowania jak w dotychczasowym banerze (.page-head.ph-z — na każdej szerokości display: contents),
+// bo od nich zależą odstępy treści na stronach jeszcze nieprzeniesionych na wspólny szablon.
 const DZIALY: Record<string, string> = {
   instytut: 'instytut', pracownicy: 'instytut', 'warto-wiedziec': 'instytut',
   nauka: 'nauka', seminaria: 'nauka', 'obrony-doktorskie': 'nauka', kalendarz: 'nauka',
@@ -35,62 +29,13 @@ const DZIALY: Record<string, string> = {
 };
 const czlon = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';
 const dzial = DZIALY[czlon] ?? 'inne';
-
-// Wariant: motyw (rysunek działu) | zdjecie (zdjęcie działu, bez zdjęcia — rysunek) | granat (ciemny pas) | prosty (jak dawniej).
-// Zdjęcia działów: naglowki_podstron.zdjecia.<dział> = { zdjecie, kadr }. Bez pola w ustawieniach — wartości domyślne poniżej.
-type Zdjecie = { zdjecie?: string; kadr?: string };
-const DOMYSLNE: { wariant: string; zdjecia: Record<string, Zdjecie> } = {
-  wariant: 'granat',
-  zdjecia: {
-    instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: 'center 45%' },
-    nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: 'center 40%' },
-    studia: { zdjecie: '/pliki/naglowki/studia.jpg', kadr: 'center 35%' },
-    aktualnosci: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: 'center 40%' },
-    popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: 'center 50%' },
-  },
-};
-const ust = ((ustawienia as any).naglowki_podstron ?? {}) as Partial<typeof DOMYSLNE>;
-const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : DOMYSLNE.wariant;
-const foto = wariant === 'zdjecie' || wariant === 'granat' ? (ust.zdjecia ?? DOMYSLNE.zdjecia)[dzial] : undefined;
-const zdjecie = foto?.zdjecie ? u(foto.zdjecie) : undefined;
+const ust = ((ustawienia as any).naglowki_podstron ?? {}) as { wariant?: string; zdjecia?: Record<string, { zdjecie?: string }> };
+const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : 'granat';
+const domyslneZdjecia = Object.fromEntries(['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].map((d) => [d, { zdjecie: `/pliki/naglowki/${d}.jpg` }]));
+const zdjecie = (wariant === 'zdjecie' || wariant === 'granat') && !!(ust.zdjecia ?? domyslneZdjecia)[dzial]?.zdjecie;
 const ozdobny = wariant !== 'prosty';
-// Długi tytuł (> 20 znaków, np. „Analiza harmoniczna i rozwinięcia ortogonalne”): klasa .ph-dlugi — na telefonie tytuł
-// 27 px zamiast 28 px (telefon.css); rysunek działu bez zmian. Komputer bez zmian (decyzja 31.10.2026).
 const dlugi = ozdobny && tytul.trim().length > 20;
-// Granatowy pas na samej górze strony: nagłówek strony (menu) jest u góry przezroczysty i leży na pasie,
-// jak na stronie głównej na zdjęciu (klasa .hdr-foto, style w global.css). Skrypt działa od razu przy wczytywaniu,
-// zanim pas się narysuje, żeby nic nie przeskakiwało; bez JS — zwykły biały nagłówek nad pasem.
-// Między nagłówkiem a <main> mogą stać tylko skrypty/style i menu na telefon (.mnav, .mnav-tlo).
-const naPasie = wariant === 'granat'
-  ? "(function(s){var p=s.parentElement,h=document.querySelector('.hdr');if(h&&p&&!p.previousElementSibling&&p.parentElement&&p.parentElement.id==='tresc'&&(function(n){while(n&&(/^(SCRIPT|TEMPLATE|STYLE|LINK)$/.test(n.tagName)||/(^| )mnav/.test(n.className)))n=n.nextElementSibling;return n===p.parentElement;})(h.nextElementSibling))h.classList.add('hdr-foto');})(document.currentScript)"
-  : '';
 
-// Aktualności: bursztynowa fala to suma częściowa szeregu Fouriera fali prostokątnej (harmoniczne 1, 3, …, 27; szare
-// linie motywu to sumy do 1, 3 i 7). Rysowana jako SVG w tych samych proporcjach co maska (src/assets/naglowki/aktualnosci-b.svg).
-// Fala stoi w pełnej postaci (komputer, telefon bez JS); na telefonie zastępuje ją animacja motywu „fourier”
-// (src/scripts/baner/motywy/fourier.ts; dawny skrypt na requestAnimationFrame usunięty — zlecenie 02, 31.10.2026).
-const FALA = { x0: 150, x1: 641, okres: 248, y0: 168, amp: 92, harmoniczne: 14 };
-const fala = dzial === 'aktualnosci' && ozdobny ? (() => {
-  let d = '';
-  for (let x = FALA.x0; x <= FALA.x1; x++) {
-    const th = ((x - FALA.x0) / FALA.okres) * 2 * Math.PI;
-    let v = 0;
-    for (let j = 0; j < FALA.harmoniczne; j++) v += Math.sin((2 * j + 1) * th) / (2 * j + 1);
-    d += `${x === FALA.x0 ? 'M' : 'L'}${x} ${(FALA.y0 - (FALA.amp * 4 / Math.PI) * v).toFixed(1)}`;
-  }
-  return d;
-})() : '';
-
-// Animacja w tle banera (tylko telefon): baner deklaruje motyw w data-animacja, skrypt silnika wczytuje tylko kod tego motywu.
-// (Nie data-motyw — tym atrybutem Naglowek.astro oznacza przycisk trybu jasny/ciemny i podpina pod niego kliknięcie.)
-const motywPelny = ozdobny ? (Astro.props.motyw ?? motywStrony(stripBase(Astro.url.pathname))) : undefined;
-const [motyw, motywWariant] = motywPelny ? motywPelny.split('/') : [];
-const motywDane = motyw && Astro.props.motywDane !== undefined ? JSON.stringify(Astro.props.motywDane) : undefined;
-
-// Komputer (≥ 761 px), kierunek „Założyciele”: nowy nagłówek (src/components/zal/NaglowekZ.astro) na końcu tego banera;
-// dotychczasowa zawartość banera na komputerze znika (.ph-z, src/styles/zalozyciele.css), telefon bez zmian.
-// Strona działu (/instytut, /nauka, /studia, /popularyzacja) — baner działu; pozostałe — nagłówek podstrony.
-// Podstrona z menu działu (link „wstecz” prowadzi do strony działu) dostaje „← Dział” i znak patrona z opisem.
 const sciezkaZ = stripBase(Astro.url.pathname);
 const bezJezykaZ = sciezkaZ.replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
 const dzialZ = dzialZeSciezki(sciezkaZ);
@@ -100,31 +45,7 @@ const zMenuDzialuZ = !!patronZ && !stronaDzialuZ && cel.adres.replace(/\/$/, '')
 const slotZ = Astro.slots.has('default') ? await Astro.slots.render('default') : '';
 const wsteczZ = zMenuDzialuZ ? { etykieta: pole(patronZ!, 'nazwa', lang), adres: patronZ!.adres } : cel;
 ---
-<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi', 'ph-z']} data-dzial={ozdobny ? dzial : undefined} data-animacja={motyw} data-animacja-wariant={motywWariant} data-animacja-dane={motywDane}>
-  {naPasie && <script is:inline set:html={naPasie} />}
-  <div class="wrap">
-    {ozdobny && (
-      <span class="ph-m" aria-hidden="true">
-        {fala && <svg class="ph-fala" viewBox="0 0 640 320" preserveAspectRatio="xMaxYMid meet" focusable="false"><path d={fala} /></svg>}
-      </span>
-    )}
-    {zdjecie && (
-      <figure class="ph-foto" aria-hidden="true">
-        <img src={zdjecie} alt="" decoding="async" style={foto?.kadr ? `object-position:${foto.kadr}` : undefined} />
-      </figure>
-    )}
-    <Wstecz etykieta={cel.etykieta} telefon={cel.telefon} adres={cel.adres} lang={lang} />
-    {nadtytul && <p class:list={['eyebrow', nadtytulTelefon !== undefined && 'tylko-komputer']}>{nadtytul}</p>}
-    {nadtytulTelefon && <p class="eyebrow tylko-telefon" data-pagefind-ignore>{nadtytulTelefon}</p>}
-    <h1>{tytul}</h1>
-    {/* Hasło i opis jako dwa rodzeństwa w .wrap (wchodzą z tą samą animacją co tytuł — przejscia.css);
-         przełączanie klasami .tylko-telefon / .tylko-komputer (telefon.css), style hasła w telefon.css. */}
-    {haslo && <p class="ph-haslo tylko-telefon" data-pagefind-ignore>{haslo}</p>}
-    {lead && <p class:list={['lead', haslo && 'tylko-komputer']}>{lead}</p>}
-    <slot />
-  </div>
-  {/* w środku pasa, nie za nim — za pasem rozbiłby regułę „main > .ph + .wrap” (odstęp pod banerem, telefon.css) */}
-  {motyw && <script>import '../scripts/baner/silnik';</script>}
+<div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi', 'ph-z']} data-dzial={ozdobny ? dzial : undefined}>
   {stronaDzialuZ
     ? <NaglowekZ rodzaj="dzial" dzial={dzialZ} tytul={tytul} haslo={haslo} lang={lang} slot={slotZ} wstecz={cel} />
     : <NaglowekZ rodzaj="podstrona" dzial={dzialZ} tytul={tytul} haslo={haslo} lang={lang} slot={slotZ} wstecz={wsteczZ} znak={zMenuDzialuZ} />}
