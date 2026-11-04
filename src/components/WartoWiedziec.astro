@@ -1,18 +1,15 @@
 ---
-// „Warto wiedzieć” — karty z kolekcji src/content/warto_wiedziec (jedno miejsce edycji w CMS).
-// uklad: 'glowna' = pasek na stronie głównej (tylko pozycje „Pokaż na stronie głównej”),
-//        'dzial'  = sekcja na stronie działu (/nauka, /studia) albo „Zobacz też” na podstronie pozycji,
-//        'lista'  = sama siatka kart (strona /warto-wiedziec),
-//        'portal' = wariant „Portal” na telefonie: ramka .pt-box ze zwartą listą (rok lub miniatura, tytuł, zajawka);
-//                   stoi w bloku .tylko-telefon, więc id ma przyrostek „-tel” i nie trafia do wyszukiwarki;
-//                   glowna = tylko pozycje „Pokaż na stronie głównej”.
-// klasa: dodatkowe klasy sekcji (np. tylko-komputer, gdy na telefonie stoi obok wersja 'portal').
-// Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
-// Strona główna (uklad 'glowna' i 'portal' z glowna) — LOSOWANIE przy każdym wejściu (decyzja 30.10.2026): w HTML są
-// wszystkie pozycje „na głównej”, widoczne pierwsze `limit` (najpierw „Zawsze pokazuj”, potem wg kolejności — to widzą
-// wyszukiwarki i przeglądarki bez JS), a skrypt inline zaraz pod listą przed narysowaniem strony losuje pozostałe miejsca.
+// „Warto wiedzieć” — pozycje z kolekcji src/content/warto_wiedziec (jedno miejsce edycji w CMS) we wzorcu treści podstron
+// (klasa .tresc na elemencie treści — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). Używają go tylko strony
+// „Warto wiedzieć”: lista (ListaWartoWiedziec.astro) i pozycja (WartoWiedziecWpis.astro, „Zobacz też”).
+// uklad: 'lista' = wiersze: rok dużą Brygadą w kolorze działu (jak dzień w jednym wzorze daty), tytuł Brygadą (link do
+//                  podstrony pozycji albo zewnętrzny z ↗), zajawka, przy pozycji bez podstrony etykieta linku; z prawej
+//                  miniatura zdjęcia (jeśli jest);
+//        'linki' = lista linków do stron powiązanych (ul.linki wzorca: dwie kolumny, Brygada, → albo ↗).
+// pomin: identyfikator pozycji do pominięcia (bieżąca podstrona). Kolejność: pole „kolejność”, potem rok (od najnowszego)
+// i tytuł. Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
+// Jedna wersja HTML: komputer i telefon (≤ 760 px — węższa kolumna roku i mniejsza miniatura).
 import { getCollection } from 'astro:content';
-import Ikona from './Ikona.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import { slugOf } from '../lib/tresci';
@@ -20,168 +17,81 @@ import type { Lang } from '../lib/daty';
 
 interface Props {
   lang: Lang;
-  dzial?: 'nauka' | 'studia' | 'instytut';
-  limit?: number;
-  naglowek?: string;
-  uklad?: 'glowna' | 'dzial' | 'lista' | 'portal';
-  // tylko dla układu 'portal'
-  glowna?: boolean;
-  klasa?: string;
+  uklad?: 'lista' | 'linki';
   // identyfikator pozycji do pominięcia (np. bieżąca podstrona)
   pomin?: string;
 }
-const { lang, dzial, limit, naglowek, uklad = 'dzial', pomin, glowna = false, klasa } = Astro.props;
+const { lang, uklad = 'lista', pomin } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 
-const wszystkie = (await getCollection('warto_wiedziec'))
+const pozycje = (await getCollection('warto_wiedziec'))
   .filter((w) => w.data.opublikowany !== false)
-  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'));
-const wybrane = wszystkie
-  .filter((w) => (uklad !== 'glowna' && !glowna) || w.data.na_glownej)
-  .filter((w) => !dzial || w.data.dzial === dzial)
-  .filter((w) => slugOf(w.id) !== pomin);
-// losowanie tylko na stronie głównej; „Zawsze pokazuj” na początku (sort stabilny — dalej wg kolejności)
-const losuj = (uklad === 'glowna' || glowna) && !!limit;
-const pula = losuj ? [...wybrane].sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze)) : wybrane;
-const pokaz = losuj ? pula : limit ? wybrane.slice(0, limit) : wybrane;
-const ileWidac = losuj ? Math.min(limit!, pula.length) : pokaz.length;
-// Link do pełnej listy tylko wtedy, gdy są pozycje, których tu nie widać.
-const wiecej = uklad !== 'lista' && ileWidac < wszystkie.filter((w) => slugOf(w.id) !== pomin).length;
-
-const karty = pokaz.map((w) => {
-  const d = w.data;
-  const maStrone = !!w.body?.trim();
-  const cel = maStrone ? `/warto-wiedziec/${slugOf(w.id)}` : d.link;
-  const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
-  return {
-    id: slugOf(w.id),
-    zawsze: d.zawsze,
-    tytul: wybierz(d, 'tytul', lang),
-    zajawka: wybierz(d, 'zajawka', lang),
-    rok: d.rok,
-    obraz: d.obraz,
-    cel,
-    zewnetrzny,
-    dalej: maStrone ? T('Czytaj więcej', 'Read more') : wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More')),
-  };
-});
-
-// Skrypt losowania (inline, zaraz pod listą — działa, zanim strona się narysuje, więc nie ma mignięcia):
-// „Zawsze pokazuj” zostają na początku, pozostałe miejsca losowo z reszty (tasowanie Fishera–Yatesa).
-const LOSUJ = `(function(box){if(!box||!box.dataset.losuj)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
-  `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
-  `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
-  `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
-const tytulSekcji = naglowek ?? T('Warto wiedzieć', 'Highlights');
-const idSekcji = (uklad === 'glowna' || glowna ? 'h2-warto' : `warto-wiedziec${pomin ? '-inne' : dzial ? `-${dzial}` : ''}`) + (uklad === 'portal' ? '-tel' : '');
-const H = uklad === 'lista' ? 'h2' : 'h3';
-// Opakowanie: pasek strony głównej (.section-alt), sekcja działu (.zsec) albo sama siatka.
-const Zewn = uklad === 'lista' ? 'div' : 'section';
-const klasaZewn = [uklad === 'glowna' ? 'section section-alt' : uklad === 'dzial' ? 'zsec' : '', klasa].filter(Boolean).join(' ') || undefined;
+  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
+  .filter((w) => slugOf(w.id) !== pomin)
+  .map((w) => {
+    const d = w.data;
+    const maStrone = !!w.body?.trim();
+    const cel = maStrone ? `/warto-wiedziec/${slugOf(w.id)}` : d.link;
+    const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
+    return {
+      tytul: wybierz(d, 'tytul', lang),
+      zajawka: wybierz(d, 'zajawka', lang),
+      rok: d.rok,
+      obraz: d.obraz,
+      cel,
+      zewnetrzny,
+      // etykieta linku tylko przy pozycji bez własnej podstrony (np. „Strona czasopisma”); z podstroną wystarcza tytuł
+      etykieta: !maStrone && d.link ? wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More')) : '',
+    };
+  });
+const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
 ---
-{karty.length > 0 && uklad === 'portal' && (
-  <section class="pt-box" aria-labelledby={idSekcji} data-pagefind-ignore>
-    <div class="pt-h">
-      <h2 id={idSekcji}>{tytulSekcji}</h2>
-      {wiecej && <a class="pt-all" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={14} /></a>}
-    </div>
-    <ul class="pt-list" data-losuj={losuj ? limit : undefined}>
-      {karty.map((k, i) => {
-        const Tag = k.cel ? 'a' : 'div';
-        return (
-          <li hidden={losuj && i >= limit!} data-zawsze={k.zawsze || undefined}>
-            <Tag class="pt-item" href={k.cel ? href(k.cel) : undefined}>
-              {k.obraz ? <span class="pt-min"><img src={u(k.obraz)} alt="" loading="lazy" decoding="async" /></span> : k.rok && <span class="pt-d">{k.rok}</span>}
-              <span class="pt-b">
-                {k.obraz && k.rok && <span class="pt-k">{k.rok}</span>}
-                <span class="pt-t">{k.tytul}{k.zewnetrzny && <span class="sr-only"> {T('(strona zewnętrzna)', '(external site)')}</span>}</span>
-                {k.zajawka && <span class="pt-s">{k.zajawka}</span>}
-              </span>
-            </Tag>
-          </li>
-        );
-      })}
-    </ul>
-    {losuj && <script is:inline set:html={LOSUJ} />}
-  </section>
+{pozycje.length > 0 && uklad === 'linki' && (
+  <ul class="linki">
+    {pozycje.map((k) => (
+      <li>{k.cel ? <a href={href(k.cel)} class:list={[k.zewnetrzny && 'zew']}>{k.tytul}{k.zewnetrzny && <span class="sr-only">{zewTekst}</span>}</a> : <span class="ww-bez">{k.tytul}</span>}</li>
+    ))}
+  </ul>
 )}
-{karty.length > 0 && uklad !== 'portal' && (
-  <Zewn class={klasaZewn} aria-labelledby={uklad === 'lista' ? undefined : idSekcji}>
-    <div class={uklad === 'glowna' ? 'wrap' : undefined}>
-      {uklad !== 'lista' && (
-        <div class={uklad === 'glowna' ? 'section-head' : 'zsec-head'}>
-          <h2 id={idSekcji}>{tytulSekcji}</h2>
-          {wiecej && <a class="link-arrow" href={href('/warto-wiedziec')}>{T('Wszystkie', 'All highlights')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
+{pozycje.length > 0 && uklad === 'lista' && (
+  <ul class="ww-lista">
+    {pozycje.map((k) => (
+      <li class:list={['ww-w', k.obraz && 'ww-z-min']}>
+        <span class="ww-rok">{k.rok}</span>
+        <div class="ww-tr">
+          <p class="t">{k.cel ? <a href={href(k.cel)} class:list={[k.zewnetrzny && 'zew']}>{k.tytul}{k.zewnetrzny && <span class="sr-only">{zewTekst}</span>}</a> : k.tytul}</p>
+          {k.zajawka && <p class="x">{k.zajawka}</p>}
+          {k.etykieta && <p class="ww-dalej" aria-hidden="true">{k.etykieta}{k.zewnetrzny ? ' ↗' : ' →'}</p>}
         </div>
-      )}
-      <div class={`ww-grid${ileWidac === 1 ? ' ww-jedna' : ''}`} data-losuj={losuj ? limit : undefined}>
-        {karty.map((k, i) => (
-          <article class={`ww-card${k.cel ? ' ww-link' : ''}`} hidden={losuj && i >= limit!} data-zawsze={k.zawsze || undefined}>
-            {(k.obraz || k.rok) && (
-              <div class={`ww-media${k.obraz ? ' ww-foto' : ''}`}>
-                {k.obraz && <img src={u(k.obraz)} alt="" loading="lazy" decoding="async" />}
-                {k.rok && <span class="ww-rok">{k.rok}</span>}
-              </div>
-            )}
-            <div class="ww-body">
-              <H class="ww-t">
-                {k.cel ? (
-                  <a href={href(k.cel)}>{k.tytul}{k.zewnetrzny && <span class="sr-only"> {T('(strona zewnętrzna)', '(external site)')}</span>}</a>
-                ) : k.tytul}
-              </H>
-              {k.zajawka && <p class="ww-x">{k.zajawka}</p>}
-              {k.cel && (
-                <span class="ww-go" aria-hidden="true">{k.dalej}<Ikona nazwa={k.zewnetrzny ? 'zewnetrzny' : 'strzalka'} rozmiar={15} /></span>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-      {losuj && <script is:inline set:html={LOSUJ} />}
-    </div>
-  </Zewn>
+        {k.obraz && <span class="ww-min"><img src={u(k.obraz)} alt="" loading="lazy" decoding="async" /></span>}
+      </li>
+    ))}
+  </ul>
 )}
 
 <style>
-  /* nagłówek sekcji działu: tytuł i link „Wszystkie” z prawej — wspólny .zsec-head (global.css), jak w innych sekcjach .zsec */
-  .ww-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px; }
-  .ww-jedna { max-width: 560px; }
-  /* pozycje niewylosowane (atrybut hidden) — display z .ww-card / list nie może ich pokazać */
-  .ww-grid > [hidden], .pt-list > li[hidden] { display: none !important; }
-  .ww-card {
-    position: relative; display: flex; flex-direction: column; overflow: hidden;
-    border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); color: var(--text);
-  }
-  /* Górne pole: zdjęcie z rokiem na plakietce albo duży rok na jasnym tle */
-  .ww-media {
-    position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;
-    min-height: 140px; padding: 18px 20px; background: var(--tint); color: var(--tint-ink);
-  }
-  .ww-media:not(.ww-foto)::after { content: ''; display: block; width: 44px; height: 4px; border-radius: 2px; background: var(--accent); }
-  .ww-media:not(.ww-foto) .ww-rok { font-size: clamp(36px, 4.4vw, 50px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-  .ww-foto { height: 160px; padding: 0; background: var(--photo); }
-  .ww-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
-  .ww-foto .ww-rok {
-    position: absolute; left: 14px; bottom: 14px; padding: 4px 12px; border-radius: 999px;
-    background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
-  }
-  .ww-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; }
-  .ww-t { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; color: var(--ink); }
-  .ww-t a { color: inherit; text-decoration: none; }
-  .ww-x { margin: 0; font-size: 15px; line-height: 1.55; }
-  .ww-go { margin-top: auto; padding-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
-  .ww-go :global(svg) { transition: transform .15s; }
-  /* Karta klikalna w całości (link w tytule rozciągnięty na kartę), podświetlenie po najechaniu — jak .spec-link */
-  .ww-link { transition: border-color .15s, box-shadow .15s, transform .15s; }
-  .ww-link .ww-t a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
-  .ww-link:hover, .ww-link:focus-within { border-color: var(--ink); box-shadow: 0 6px 20px rgb(0 0 0 / .1); transform: translateY(-2px); }
-  .ww-link:hover .ww-t a { text-decoration: underline; text-underline-offset: 4px; }
-  .ww-link:hover .ww-go :global(svg) { transform: translateX(3px); }
-  .ww-link:hover .ww-foto img { transform: scale(1.03); }
-  .ww-link .ww-t a:focus-visible { outline: none; }
-  .ww-link:has(.ww-t a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) {
-    .ww-link, .ww-go :global(svg), .ww-foto img { transition: none; transform: none !important; }
+  /* lista linków (ul.linki wzorca): pozycja bez celu — sam tytuł w tym samym kroju */
+  .ww-bez { display: block; padding: 11px 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-size: 21px; line-height: 1.3; color: var(--ink); }
+  /* wiersze: rok | tytuł, zajawka | miniatura; kreski między pozycjami */
+  .ww-lista { list-style: none; margin: 0; padding: 0; }
+  .ww-w { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; max-width: none; margin: 0; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .ww-w:first-child { border-top: 1px solid var(--line); }
+  .ww-w.ww-z-min { grid-template-columns: 76px minmax(0, 1fr) 120px; }
+  .ww-rok { font-family: var(--f-display); font-size: 30px; line-height: 1.05; color: var(--d-a); font-variant-numeric: lining-nums; }
+  .ww-tr .t { margin: 0 0 4px; max-width: none; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .ww-tr .t a { text-decoration: none; }
+  .ww-tr .x { margin: 0; max-width: 70ch; font-size: 15.5px; line-height: 1.55; color: var(--text); }
+  .ww-dalej { margin: 6px 0 0; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+  .ww-min { display: block; width: 120px; height: 90px; overflow: hidden; background: var(--surface); }
+  .ww-min img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 760px) {
+    .ww-bez { font-size: 19px; }
+    .ww-w { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .ww-w.ww-z-min { grid-template-columns: 54px minmax(0, 1fr) 72px; }
+    .ww-rok { font-size: 22px; line-height: 1.2; }
+    .ww-tr .t { font-size: 18.5px; }
+    .ww-tr .x { font-size: 15px; }
+    .ww-min { width: 72px; height: 54px; }
   }
 </style>

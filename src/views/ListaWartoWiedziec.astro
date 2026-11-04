@@ -1,11 +1,12 @@
 ---
 // Lista „Warto wiedzieć” (/warto-wiedziec, /en/warto-wiedziec): wszystkie opublikowane pozycje kolekcji warto_wiedziec.
-// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tytuł i bursztynowe hasło (pole warto_wiedziec_haslo /
-// warto_wiedziec_haslo_en w src/data/dzialy/instytut.json; puste = opis jak dotąd) zamiast opisu; bez kreski i liczb.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+// Kierunek „Założyciele”, szablon podstrony (zal/Podstrona.astro) i wzorzec treści (klasa .tresc — src/styles/zal-tresc.css;
+// zlecenie 11, zalecenie 14). W nagłówku tytuł i hasło (pole warto_wiedziec_haslo / warto_wiedziec_haslo_en
+// w src/data/dzialy/instytut.json). Treść: wiersze pozycji (WartoWiedziec.astro, uklad „lista”: rok, tytuł, zajawka,
+// miniatura), pod nimi link do „Sukcesów”. Bez sekcji z nagłówkami — bez spisu „Na tej stronie”.
+// Jedna wersja HTML: komputer i telefon (≤ 760 px).
+import Podstrona from '../components/zal/Podstrona.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
-import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -16,12 +17,15 @@ const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const { ile, tytul, lead, haslo } = await daneListyWartoWiedziec(lang);
 ---
-<Baza tytul={tytul} opis={lead}>
-  <NaglowekStrony tytul={tytul} lead={lead} haslo={haslo} lang={lang} />
-  <div class="wrap" style="padding-top:32px;padding-bottom:64px">
-    {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="muted">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
-    <p style="margin:24px 0 0">
-      <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+<Podstrona lang={lang} tytul={tytul} opis={lead} lead={lead} haslo={haslo} dzial="instytut" klasa="tresc">
+  <section>
+    {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p>{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
+    <p class="ww-sukcesy">
+      <a href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}</a> →
     </p>
-  </div>
-</Baza>
+  </section>
+</Podstrona>
+
+<style>
+  .ww-sukcesy { margin: 24px 0 0; font-size: 15.5px; }
+</style>
