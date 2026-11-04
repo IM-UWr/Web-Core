@@ -1,18 +1,16 @@
 ---
-// Strona projektu (powstaje dla każdego projektu): pod tytułem plakietki (źródło, program, stan), karta danych projektu,
-// opis (jeśli jest) i inne projekty tego samego zakładu. Jeden link wstecz — nad tytułem; prawy pasek pusty (jak konferencje).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (plakietki pod tytułem bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): w banerze tylko „←”, tytuł i hasło złożone z pól projektu
-// (źródło, program, lata — np. „NCN · 2025–2028”), bez liczb i kreski; plakietki i tytuł w drugim języku — pod banerem.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import WierszGrantu from '../components/WierszGrantu.astro';
-import Ikona from '../components/Ikona.astro';
+// Strona projektu (/nauka/granty/<slug>), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro.
+// Baner (na każdej szerokości): „← Wszystkie projekty i granty”, tytuł, tytuł w drugim języku i plakietki (źródło, program,
+// stan). Treść: dane projektu jako pary etykieta–wartość (dl.para: finansowanie, numer, realizacja, kwota, zakład,
+// kierownik, wykonawcy), „Strona projektu ↗” (przycisk-link), opis (jeśli jest) i inne projekty tego samego zakładu
+// (najwyżej 5, wiersze jak zakończone projekty w Projektach i grantach; link do wszystkich projektów zakładu).
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); bez spisu „Na tej stronie”
+// (jedna sekcja z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
-import { wJezyku, wybierz } from '../lib/i18n';
+import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import { kierownicyGrantu, type Grant } from '../lib/tresci';
+import { kierownicyGrantu, lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneGrantu } from '../lib/widoki/grant';
 
 interface Props { grant: Grant; lang: Lang }
@@ -22,122 +20,107 @@ const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const adresZakladu = (id: string) => u(wJezyku(`/instytut/zaklady/${id}`, lang));
 
 const {
-  tytul, tytulDrugi, maOpis, Content, okres, trwa, rodzaj, finansowanie, program, haslo, motywDane,
+  tytul, tytulDrugi, maOpis, Content, okres, trwa, rodzaj, finansowanie, haslo,
   osoby, kierownicy, zaklad, zakladOsoby, inne, opis,
 } = await daneGrantu(grant, lang);
+// wiersz innego projektu: tytuł i linia „rodzaj · kierownik · lata · numer” (puste pomijane)
+const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
+const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kierownicyGrantu(g.data.kierownik, osoby).map((k) => k.nazwa).join(', '), lataGrantu(g)]
+  .filter(Boolean);
 ---
-<Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  {/* Telefon: tytuł w drugim języku i plakietki z banera chowa styl na końcu pliku (.page-head .lead / .tags), a ich kopia
-       stoi pod banerem (.gr-pod.tylko-telefon); komputer bez zmian. */}
-  <NaglowekStrony tytul={tytul} haslo={haslo} lang={lang} wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }} motywDane={motywDane}>
+<Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner" haslo={haslo}
+  wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }} dzial="nauka" klasa="tresc z-grant">
+  <Fragment slot="baner">
     {tytulDrugi && <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
     <div class="tags">
       <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>
       {d.program && <span class="badge">{d.program}</span>}
       {d.rok_do !== undefined && <span class={`badge gr-stan${trwa ? ' gr-trwa' : ''}`}>{trwa ? T('realizowany', 'ongoing') : T('zakończony', 'completed')}</span>}
     </div>
-  </NaglowekStrony>
-  <div class="wrap layout">
-    <div class="main">
-      <div class="gr-pod tylko-telefon" data-pagefind-ignore>
-        <div class="news-meta">
-          <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>
-          {program && <span class="badge">{program}</span>}
-          {d.rok_do !== undefined && <span class="badge">{trwa ? T('realizowany', 'ongoing') : T('zakończony', 'completed')}</span>}
-        </div>
-        {tytulDrugi && <p class="gr-pod-tytul" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
-      </div>
-      <section class="gr-karta" aria-label={T('Informacje o projekcie', 'Project details')}>
-        <dl class="gr-fakty">
-          <div><dt>{T('Finansowanie', 'Funding')}</dt><dd>{finansowanie}{d.program ? ` — ${d.program}` : ''}</dd></div>
-          {d.kod && <div><dt>{T('Numer', 'Number')}</dt><dd class="gr-kod">{d.kod}</dd></div>}
-          {okres && <div><dt>{T('Realizacja', 'Duration')}</dt><dd>{okres}</dd></div>}
-          {d.kwota && <div><dt>{T('Kwota', 'Budget')}</dt><dd>{d.kwota}</dd></div>}
-          {zaklad && <div><dt>{T('Zakład', 'Department')}</dt><dd><a href={adresZakladu(zaklad.id)}>{wybierz(zaklad.data, 'nazwa', lang)}</a></dd></div>}
-          {kierownicy.length > 0 && (
-            <div class="gr-szeroki">
-              <dt>{kierownicy.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}</dt>
-              <dd>
-                {kierownicy.map((k, i) => {
-                  const z = zakladOsoby(k.osoba?.data.zaklad);
-                  return (
-                    <>
-                      {i > 0 && ', '}
-                      {k.osoba?.data.strona
-                        ? <a href={k.osoba.data.strona}>{k.nazwa}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>
-                        : z ? <a href={adresZakladu(z)}>{k.nazwa}</a> : k.nazwa}
-                    </>
-                  );
-                })}
-              </dd>
-            </div>
-          )}
-          {d.wykonawcy && <div class="gr-szeroki"><dt>{T('Wykonawcy', 'Team')}</dt><dd>{d.wykonawcy}</dd></div>}
-        </dl>
-        {d.strona && <p class="gr-akcje"><a class="btn btn-primary" href={d.strona}>{T('Strona projektu', 'Project website')}<Ikona nazwa="zewnetrzny" rozmiar={16} /></a></p>}
-      </section>
+  </Fragment>
 
-      {maOpis && <div class="prose gr-opis"><Content /></div>}
-
-      {zaklad && inne.length > 0 && (
-        <section class="gr-inne" aria-labelledby="inne-projekty">
-          <div class="zsec-head gr-inne-head">
-            <h2 id="inne-projekty">{T('Inne projekty zakładu', 'Other projects of the department')}</h2>
-            {inne.length > 5 && (
-              <a class="link-arrow" href={`${adresZakladu(zaklad.id)}#granty`}>
-                {T(`Wszystkie projekty zakładu (${inne.length + 1})`, `All department projects (${inne.length + 1})`)}<Ikona nazwa="strzalka" rozmiar={16} />
-              </a>
-            )}
-          </div>
-          <ul class="gw-lista">
-            {inne.slice(0, 5).map((g) => <WierszGrantu grant={g} kierownicy={kierownicyGrantu(g.data.kierownik, osoby)} lang={lang} />)}
-          </ul>
-        </section>
+  <section aria-label={T('Informacje o projekcie', 'Project details')}>
+    <dl class="para fakty">
+      <dt>{T('Finansowanie', 'Funding')}</dt><dd>{finansowanie}{d.program ? ` — ${d.program}` : ''}</dd>
+      {d.kod && <><dt>{T('Numer', 'Number')}</dt><dd class="nr">{d.kod}</dd></>}
+      {okres && <><dt>{T('Realizacja', 'Duration')}</dt><dd>{okres}</dd></>}
+      {d.kwota && <><dt>{T('Kwota', 'Budget')}</dt><dd>{d.kwota}</dd></>}
+      {zaklad && <><dt>{T('Zakład', 'Department')}</dt><dd><a href={adresZakladu(zaklad.id)}>{wybierz(zaklad.data, 'nazwa', lang)}</a></dd></>}
+      {kierownicy.length > 0 && (
+        <>
+          <dt>{kierownicy.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}</dt>
+          <dd>
+            {kierownicy.map((k, i) => {
+              const z = zakladOsoby(k.osoba?.data.zaklad);
+              return (
+                <>
+                  {i > 0 && ', '}
+                  {k.osoba?.data.strona
+                    ? <a href={k.osoba.data.strona}>{k.nazwa}<span aria-hidden="true">{' '}↗</span></a>
+                    : z ? <a href={adresZakladu(z)}>{k.nazwa}</a> : k.nazwa}
+                </>
+              );
+            })}
+          </dd>
+        </>
       )}
-    </div>
-    <div class="side" aria-hidden="true"></div>
-  </div>
-</Baza>
+      {d.wykonawcy && <><dt>{T('Wykonawcy', 'Team')}</dt><dd>{d.wykonawcy}</dd></>}
+    </dl>
+    {d.strona && <p class="akcja"><a href={d.strona}>{T('Strona projektu', 'Project website')} <span aria-hidden="true">↗</span></a></p>}
+    {maOpis && <div class="prose opis"><Content /></div>}
+  </section>
+
+  {zaklad && inne.length > 0 && (
+    <section id="z-inne" aria-labelledby="h-inne">
+      <h2 id="h-inne">{T('Inne projekty zakładu', 'Other projects of the department')}</h2>
+      <ul class="inne">
+        {inne.slice(0, 5).map((g) => (
+          <li class="klik">
+            <a class="t" href={u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang))}>{tytulGrantu(g)}</a>
+            <span class="kont">
+              {linia(g).map((c, i) => <>{i > 0 && ' · '}{c}</>)}
+              {g.data.kod && <>{linia(g).length > 0 && ' · '}<span class="nr">{g.data.kod}</span></>}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {inne.length > 5 && (
+        <p class="wszystkie"><a href={`${adresZakladu(zaklad.id)}#granty`}>{T(`Wszystkie projekty zakładu (${inne.length + 1})`, `All department projects (${inne.length + 1})`)} <span aria-hidden="true">→</span></a></p>
+      )}
+    </section>
+  )}
+</Podstrona>
 
 <style>
+  /* plakietka stanu w banerze (jak dotąd): „realizowany” z kropką w kolorze działu */
   .gr-stan { background: var(--bg); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
   .gr-trwa { box-shadow: inset 0 0 0 1.5px var(--ink); }
   .gr-trwa::before { content: ''; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--accent); }
 
-  .gr-karta { padding: 24px; border-radius: var(--radius-l); background: var(--surface); border: 1px solid var(--line); }
-  /* komputer: białe karty (jak w global.css, „Karty na komputerze”); telefon bez zmian */
-  @media (min-width: 761px) { .gr-karta { background: var(--bg); } }
-  .gr-fakty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 18px 28px; margin: 0; }
-  .gr-fakty > div { min-width: 0; }
-  .gr-szeroki { grid-column: 1 / -1; }
-  .gr-fakty dt { margin-bottom: 4px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .gr-fakty dd { margin: 0; font-size: 16px; line-height: 1.5; color: var(--ink); overflow-wrap: anywhere; }
-  .gr-fakty dd a { display: inline-flex; align-items: center; gap: 4px; }
-  .gr-kod { font-variant-numeric: tabular-nums; }
-  .gr-akcje { margin: 22px 0 0; }
-  .gr-opis { margin-top: 28px; }
+  /* dane projektu: pary etykieta–wartość (wzorzec dl.para) w stopniu tekstu z danymi */
+  :global(.z-grant) dl.fakty { gap: 6px 18px; font-size: 15.5px; line-height: 1.55; }
+  .fakty dd { overflow-wrap: anywhere; }
+  .nr { font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+  .akcja { margin: 22px 0 0; }
+  .opis { margin-top: 28px; }
+  .opis > :global(:last-child) { margin-bottom: 0; }
 
-  .gr-inne { margin-top: 40px; }
-  /* tytuł z linkiem „Wszystkie projekty zakładu” z prawej — wspólny nagłówek .zsec-head (global.css), link na górze,
-     nie pod listą; tytuł i odstęp pod nim jak dotąd (22 px, 10 px) */
-  .gr-inne-head { margin-bottom: 10px; }
-  .gr-inne h2 { margin: 0; font-size: 22px; font-weight: 800; }
-  @media (max-width: 520px) {
-    .gr-karta { padding: 18px 16px; }
-    .gr-inne .gw-lista { margin: 0 -14px; }
-  }
+  /* inne projekty zakładu: wiersze jak zakończone projekty w Projektach i grantach (tytuł Brygadą, linia pod nim) */
+  .inne { list-style: none; margin: 0; padding: 0; }
+  .inne li { max-width: none; margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: inherit; line-height: 1.3; }
+  .inne li:first-child { border-top: 1px solid var(--line); }
+  .inne .t { font-family: var(--f-display); font-size: 17.5px; line-height: 1.3; color: var(--ink); text-decoration: none; }
+  .inne .kont { display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+  .klik { position: relative; }
+  .klik .t::after { content: ''; position: absolute; inset: 0; }
+  .klik:hover .t { color: var(--d-a); }
+  .klik .t:focus-visible { outline: none; }
+  .klik:has(.t:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
+  .wszystkie { margin: 16px 0 0; font-weight: 600; }
 
-  /* ---------- telefon (≤ 760 px; zlecenie 01): w banerze tylko „←”, tytuł i hasło ----------
-     Tytuł w drugim języku i plakietki z banera (elementy tego widoku w gnieździe NaglowekStrony) znikają; ich kopia
-     stoi nad kartą danych (.gr-pod): plakietki w jednej rodzinie etykiet list (.news-meta .badge, telefon.css),
-     pod nimi tytuł w drugim języku szarym tekstem. */
+  /* ---------- telefon (≤ 760 px) ---------- */
   @media (max-width: 760px) {
-    :global(.page-head) .lead, :global(.page-head) .tags { display: none; }
-    .gr-pod { margin: 0 0 18px; }
-    .gr-pod-tytul { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+    .tags { margin-top: 12px; }
+    .inne .t { font-size: 17px; }
   }
-
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
-     Odstęp nad kartą projektu stały (24 px), jak na stronie działu „Nauka” — treść nie przylega do banera. */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
 </style>
