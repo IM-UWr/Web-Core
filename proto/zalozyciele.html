@@ -262,6 +262,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 /* pasek przyklejony (4.11, 23:18): ciemny nad banerem i stopką, jasny nad treścią; panel hamburgera w kolorze paska */
 .in-strona .ok-pasek { transition: background-color .25s, color .25s, box-shadow .25s, border-color .25s; will-change: transform; }
+/* przewinięty nad banerem lub stopką: ciemne tło z mocnym rozmyciem, żeby treść banera nie prześwitywała (4.11, 23:27) */
+.pasek-na-banerze .ok-pasek.przewiniety:not(.jasny) { background: rgb(9 16 34 / .62); -webkit-backdrop-filter: blur(22px) saturate(1.3); backdrop-filter: blur(22px) saturate(1.3); border-bottom-color: rgb(255 255 255 / .1); box-shadow: 0 8px 24px rgb(0 0 0 / .18); }
 .pasek-na-banerze .ok-pasek.jasny { background: color-mix(in srgb, var(--m-bg) 95%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--m-ink); border-bottom-color: var(--m-line); box-shadow: 0 6px 18px rgb(13 24 48 / .06); }
 .pasek-na-banerze .ok-pasek.jasny .marka .logo-uwr { background: var(--m-ink); }
 .pasek-na-banerze .ok-pasek.jasny .marka > span:last-child { border-left-color: var(--m-line); }
@@ -1364,11 +1366,11 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     <div class="grupa" id="wybor-anim" hidden><span>Animacja</span><div class="seg"><button type="button" id="anim-powtorz">pokaż pierwsze wejście jeszcze raz</button></div></div>
     <div class="grupa" id="wybor-menu" hidden><span>Menu działu</span><div class="seg" data-ustaw="menuDz">
       <button type="button" data-v="obecne" aria-pressed="false">obecne</button>
-      <button type="button" data-v="A" aria-pressed="true">A jedna linia</button>
+      <button type="button" data-v="A" aria-pressed="false">A jedna linia</button>
       <button type="button" data-v="B" aria-pressed="false">B dwie linie</button>
       <button type="button" data-v="C" aria-pressed="false">C pas działu</button>
       <button type="button" data-v="D" aria-pressed="false">D bez klikania</button>
-      <button type="button" data-v="E" aria-pressed="false">E wiersze na pasie</button>
+      <button type="button" data-v="E" aria-pressed="true">E wiersze na pasie</button>
     </div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
@@ -2156,6 +2158,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const baner = $('#in-baner').getBoundingClientRect(), stopka = nowa.querySelector('.ok-stopka')?.getBoundingClientRect();
     const ciemny = (y >= baner.top && y <= baner.bottom) || (stopka && y >= stopka.top);
     h.classList.toggle('jasny', !ciemny);
+    h.classList.toggle('przewiniety', dy > 0);
   }
   let pasekRaf = 0;
   window.addEventListener('scroll', () => { cancelAnimationFrame(pasekRaf); pasekRaf = requestAnimationFrame(odswiezPasek); }, { passive: true });
@@ -2355,7 +2358,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     popularyzacja: [['Na tej stronie', ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy']], ['Partnerzy', ['Fundacja Matematyków Wrocławskich|fmw.math.uni.wroc.pl ↗', 'Wrocławski Portal Matematyczny|matematyka.wroc.pl ↗', 'Wrocławski Oddział PTM|ptm.math.uni.wroc.pl ↗']]]
   };
   /* menu działu: trzy sekcje, pole z pozycjami wybranej (4 projekty, 4.11) */
-  let menuDz = 'A', mzSekcja = 0;
+  let menuDz = 'E', mzSekcja = 0;
   const MZ_OPIS = {
     'Matematyka': 'studia I i II stopnia, pięć specjalności', 'SIAD': 'sztuczna inteligencja w analizie danych', 'ISIM': 'Indywidualne Studia Informatyczno-Matematyczne',
     'Szkoła doktorska': 'Kolegium Doktorskie Matematyki', 'Studia podyplomowe': 'kwalifikacje do nauczania matematyki',

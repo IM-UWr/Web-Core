@@ -129,9 +129,10 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - na dole duże „Aktualności” i „Rekrutacja ↗”, z większym oddechem (ok. 20 px góra/dół, Brygada 28 px), wyrównane do tekstu działów. Rekrutacja nie dubluje się w liście Studiów.
 - **Okładka:** w rogu ten sam zestaw: tryb ciemny, EN, hamburger. Szukaj jest w panelu.
 - **Pasek przyklejony u góry na stronach działów i podstronach, zmienia kolor:**
-  - nad banerem ciemny (przezroczysty, biały tekst, jak dziś);
+  - na samej górze strony, nad banerem: przezroczysty, biały tekst, jak dziś;
+  - **po przewinięciu, dopóki jest nad banerem: ciemne półprzezroczyste tło (granat ok. 60%) z mocnym rozmyciem tła** (`backdrop-filter: blur(22px) saturate(1.3)`), żeby tekst banera pod paskiem nie prześwitywał (decyzja 23:27);
   - nad treścią jasny: tło strony z lekką przezroczystością i rozmyciem, tekst w kolorze tekstu, logo UWr w kolorze tekstu, kreski działów w kolorze głębokim (w ciemnym motywie jasnym), cienka linia u dołu;
-  - nad stopką znowu ciemny;
+  - nad stopką znowu ciemny (z tym samym rozmyciem);
   - przejście kolorów ok. 0,25 s, bez przejścia przy `prefers-reduced-motion`.
   
   Kolor wybiera skrypt według tego, co jest pod paskiem (IntersectionObserver na banerze i stopce).
