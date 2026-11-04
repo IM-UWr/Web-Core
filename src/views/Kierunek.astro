@@ -1,17 +1,20 @@
 ---
-// Strona kierunku studiów (np. Matematyka). Treść: src/content/kierunki/<kierunek>.md (edycja w Pages CMS).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (opis → przyciski z pola `przyciski` → liczby z pola
-// `fakty` w jednym wierszu, jak na stronie działu „Studia”), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku); spis „Na tej stronie” z prawej.
-// Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — hasło z pól `haslo` / `haslo_en` zamiast opisu
-// i trzy liczby z faktów (LiczbyBanera.astro); bez przycisków i bez kafelków faktów — pod banerem od razu
-// „Na tej stronie” i „O kierunku”.
+// Strona kierunku studiów (np. Matematyka) i szkoły doktorskiej (kierunek „szkola-doktorska”). Treść:
+// src/content/kierunki/<kierunek>.md (edycja w Pages CMS). Wspólny szablon podstrony (zal/Podstrona.astro; zlecenie 12,
+// etap 3) i wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc; wzór: prototyp
+// „wzorzec treści (Szkoła doktorska)”, trescWzor). Sekcje w kolejności wzoru, kreski między sekcjami, spis „Na tej stronie”
+// z prawej (na telefonie zwijany nad treścią):
+//   O kierunku (Markdown) → strony powiązane (pole `przyciski`, ul.linki) → Dlaczego warto (ul.dwa) → przebieg studiów
+//   (ol.etapy; na kierunkach I i II stopnia w podsekcjach) → Specjalności → Terminy (table.tab) → Program (przełącznik
+//   roczników .tresc-taby i wybór roku rozpoczęcia, pliki ul.pliki) → Praktyki → Po studiach → Pytania (.faq) → Kontakt
+//   (.kontakty) → Akty prawne (ul.pliki).
+// Nagłówki sekcji szkoły doktorskiej jak we wzorze („O Kolegium Doktorskim”, „Od rekrutacji do obrony” …).
+// Liczby w banerze bez zmian (telefon: LiczbyBanera, komputer: fakty w wierszu). Jedna wersja HTML: komputer (≥ 761 px)
+// i telefon (≤ 760 px, jedna kolumna, tabela w bloki — zal-tresc.css).
 import type { CollectionEntry } from 'astro:content';
-import Baza from '../layouts/Baza.astro';
+import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import SpisTresci from '../components/SpisTresci.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -20,241 +23,274 @@ import { daneKierunku } from '../lib/widoki/kierunek';
 interface Props { kierunek: CollectionEntry<'kierunki'>; lang: Lang }
 const { kierunek, lang } = Astro.props;
 const d = kierunek.data;
-const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const en = lang === 'en';
+const T = (pl: string, plEn: string) => (en ? plEn : pl);
 const w = (o: any, pole: string) => wybierz(o, pole, lang);
 // Pliki (/pliki/...) nie mają wersji językowych — bez prefiksu /en.
 const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
 const {
   Content, htmlEn, kariera, praktyki, faq, nazwyZakladow, specjalnosci, nazwa, etapyI, etapyII, etapyIII, doktorat, N, lata,
-  wieleProgramow, linkDyplom, haslo, liczbyTel, nadtytul, nadtytulTel, sekcje,
+  wieleProgramow, linkDyplom, haslo, liczbyTel, nadtytul, nadtytulTel,
 } = await daneKierunku(kierunek, lang);
+
+// typ pozycji na liście plików (wzorzec: „PDF”, „strona ↗”): rozszerzenie pliku, strona zewnętrzna albo nasza podstrona
+const typPliku = (a: string) => {
+  const roz = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i)?.[1];
+  if (roz) return roz.toUpperCase();
+  return isExternal(a) ? T('strona ↗', 'website ↗') : T('strona', 'page');
+};
+// Nagłówki sekcji: szkoła doktorska jak we wzorze z prototypu, kierunki studiów jak dotąd (N z danych kierunku).
+const H = {
+  o: doktorat ? T('O Kolegium Doktorskim', 'About the Doctoral College') : N.o,
+  strony: doktorat ? T('Strony szkoły doktorskiej', 'Doctoral school pages') : T('Przydatne strony', 'Useful pages'),
+  dlaczego: T('Dlaczego warto', 'Why join'),
+  przebieg: doktorat ? T('Od rekrutacji do obrony', 'From admission to defence') : N.przebieg,
+  specjalnosci: T('Specjalności', 'Specialisations'),
+  terminy: doktorat ? T('Terminy', 'Deadlines') : T('Terminy i formularze', 'Deadlines and forms'),
+  program: N.program,
+  praktyki: T('Praktyki pedagogiczne', 'Teaching placements'),
+  kariera: T('Po studiach', 'After graduation'),
+  faq: doktorat ? T('Najczęstsze pytania', 'Frequently asked questions') : T('Pytania i odpowiedzi', 'FAQ'),
+  kontakt: T('Kontakt', 'Contact'),
+  akty: doktorat ? T('Akty prawne i regulaminy', 'Regulations') : T('Akty prawne', 'Regulations'),
+};
+// krótsze etykiety w spisie „Na tej stronie” (jak data-krotko we wzorze)
+const K: Partial<Record<keyof typeof H, string>> = doktorat
+  ? { o: T('O Kolegium', 'About'), faq: T('Pytania', 'FAQ'), akty: T('Akty prawne', 'Regulations') }
+  : {};
+const formularze = d.terminy.some((x) => x.formularz);
+const sekcje: [keyof typeof H, string, boolean][] = [
+  ['o', 'o-kierunku', true],
+  ['strony', 'strony', d.przyciski.length > 0],
+  ['dlaczego', 'dlaczego', d.dlaczego.length > 0],
+  ['przebieg', 'przebieg', d.etapy.length > 0],
+  ['specjalnosci', 'specjalnosci', specjalnosci.length > 0],
+  ['terminy', 'terminy', d.terminy.length > 0],
+  ['program', 'program', d.programy.length > 0],
+  ['praktyki', 'praktyki', !!praktyki],
+  ['kariera', 'po-studiach', !!kariera],
+  ['faq', 'pytania', faq.length > 0],
+  ['kontakt', 'kontakt', d.kontakt.length > 0],
+  ['akty', 'akty', d.akty.length > 0],
+];
+const spis = sekcje.filter(([, , jest]) => jest).map(([k, id]) => ({ id, etykieta: H[k], krotka: K[k] }));
+// przebieg: kierunki I i II stopnia — podsekcje według stopnia; szkoła doktorska — jedna ścieżka bez podsekcji
+const sciezki = [
+  { h: T('Studia I stopnia (licencjackie)', "Bachelor's studies"), lista: etapyI },
+  { h: T('Studia II stopnia (magisterskie)', "Master's studies"), lista: etapyII },
+  { h: T('Kształcenie w szkole doktorskiej', 'Doctoral training'), lista: etapyIII },
+].filter((s) => s.lista.length > 0);
+const jednaSciezka = sciezki.length === 1 && doktorat;
 ---
-<Baza tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  {/* Telefon (≤ 760 px) — wygląd „Portal”: zwartsze sekcje (style na dole). */}
-  {/* Baner jak na stronie Studia (zdjęcie działu z NaglowekStrony).
-       Komputer: w banerze liczby kierunku w jednym wierszu (.pt-liczby, jak na stronie działu „Studia”); przyciski
-       (pierwszy wyróżniony) POD banerem, na początku treści — na banerze nie pasowały (decyzja 30.10.2026).
-       Telefon (zlecenie 01): krótszy nadtytuł (nadtytulTelefon), hasło i trzy liczby w kolumnach (LiczbyBanera, .tylko-telefon);
-       przyciski i kafelki faktów znikają z telefonu (dawne bloki .kh-btns i .kh-fakty usunięte) — linki są w treści strony. */}
-  <NaglowekStrony tytul={nazwa} lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo} lang={lang} nadtytul={nadtytul} nadtytulTelefon={nadtytulTel || undefined} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}>
+<Podstrona lang={lang} tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
+  lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}
+  dzial="studia" spis={spis} klasa="tresc" atrybuty={{ 'data-kierunek': '' }}>
+  {/* Baner bez zmian: na telefonie hasło i trzy liczby z faktów (LiczbyBanera), na komputerze fakty w jednym wierszu. */}
+  <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczbyTel} />
     {d.fakty.length > 0 && (
       <ul class="pt-liczby kh-liczby tylko-komputer">
         {d.fakty.map((f) => <li><span class="n">{w(f, 'wartosc')}</span>{w(f, 'etykieta')}</li>)}
       </ul>
     )}
-  </NaglowekStrony>
+  </Fragment>
 
-  <div class="wrap layout kier">
-    <div class="main">
-      {d.przyciski.length > 0 && (
-        <div class="btn-row kh-btns-pod tylko-komputer">
-          {/* pierwszy przycisk granatowy (jak wybrany filtr w Aktualnościach), nie złoty — decyzja 30.10.2026 */}
-          {d.przyciski.map((p, i) => (
-            <a class={`btn${i === 0 ? ' btn-primary' : ''}`} href={href(p.adres)}>{w(p, 'etykieta')}{isExternal(p.adres) && <Ikona nazwa="zewnetrzny" rozmiar={14} />}</a>
-          ))}
-        </div>
-      )}
-      <SpisTresci naglowki={sekcje} lang={lang} wariant="gora" />
+  <section id="o-kierunku" aria-labelledby="o-kierunku-h">
+    <h2 id="o-kierunku-h">{H.o}</h2>
+    <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+  </section>
 
-      <section class="zsec kier-o" aria-labelledby="o-kierunku">
-        <h2 id="o-kierunku">{N.o}</h2>
-        <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
-        {d.dlaczego.length > 0 && (
-          <div class="why-grid">
-            {d.dlaczego.map((x) => (
-              <div class="why">
-                <Ikona nazwa={x.ikona || 'flaga'} rozmiar={24} />
-                <strong>{w(x, 'tytul')}</strong>
-                <span>{w(x, 'opis')}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+  {d.przyciski.length > 0 && (
+    <section id="strony" aria-labelledby="strony-h">
+      <h2 id="strony-h">{H.strony}</h2>
+      <ul class="linki">
+        {d.przyciski.map((p) => <li><a href={href(p.adres)} class={isExternal(p.adres) ? 'zew' : undefined}>{w(p, 'etykieta')}</a></li>)}
+      </ul>
+    </section>
+  )}
 
-      {d.etapy.length > 0 && (
-        <section class="zsec" aria-labelledby="przebieg">
-          <h2 id="przebieg">{N.przebieg}</h2>
-          <div class="tracks">
-            {[{ h: T('Studia I stopnia (licencjackie)', "Bachelor's studies"), lista: etapyI }, { h: T('Studia II stopnia (magisterskie)', "Master's studies"), lista: etapyII }, { h: T('Kształcenie w szkole doktorskiej', 'Doctoral training'), lista: etapyIII }].map((tr) => tr.lista.length > 0 && (
-              <div class="track">
-                <h3>{tr.h}</h3>
-                <ol class="steps">
-                  {tr.lista.map((e) => (
-                    <li class="step">
-                      <span class="when">{w(e, 'kiedy')}</span>
-                      <strong>{w(e, 'tytul')}</strong>
-                      {e.opis && <span class="desc">{w(e, 'opis')}</span>}
-                      {e.termin && (
-                        <span class="deadline">
-                          {/* formularz bez linku: „·” na końcu terminu, z niełamliwą spacją — trzyma się poprzedniego słowa
-                              i nigdy nie zaczyna linii (decyzja 31.10.2026; .kropki z global.css nie pasuje — ramka ma wypełnienie) */}
-                          <Ikona nazwa="zegar" rozmiar={14} />{e.formularz && !e.formularz_adres ? <span>{w(e, 'termin')}<span class="muted">{'\u00a0·'}</span></span> : w(e, 'termin')}
-                          {e.formularz && (e.formularz_adres ? <a href={e.formularz_adres}>{e.formularz}</a> : <span class="muted">{e.formularz}</span>)}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            ))}
-          </div>
-          {linkDyplom && <p class="muted" style="font-size:15px">{T('Szczegóły egzaminów i prac dyplomowych:', 'Exams and theses in detail:')} <a href={u(wJezyku('/studia/egzaminy-i-dyplom', lang))}>{T('Egzaminy i dyplom', 'Exams and diploma')}</a>.</p>}
-        </section>
-      )}
+  {d.dlaczego.length > 0 && (
+    <section id="dlaczego" aria-labelledby="dlaczego-h">
+      <h2 id="dlaczego-h">{H.dlaczego}</h2>
+      <ul class="dwa">
+        {d.dlaczego.map((x) => <li><b>{w(x, 'tytul')}</b><span>{w(x, 'opis')}</span></li>)}
+      </ul>
+    </section>
+  )}
 
-      {specjalnosci.length > 0 && (
-        <section class="zsec" aria-labelledby="specjalnosci">
-          <h2 id="specjalnosci">{T('Specjalności', 'Specialisations')}</h2>
-          <div class="spec-grid">
-            {specjalnosci.map((s) => (
-              <article class={`spec${s.wygaszana ? ' spec-off' : ''}${s.strona ? ' spec-link' : ''}`}>
-                <div class="news-meta">
-                  {s.skrot && <span class="badge">{s.skrot}</span>}
-                  {s.wygaszana && <span class="badge">{T('wygaszana', 'phased out')}</span>}
-                </div>
-                <h3>{s.strona ? <a href={u(wJezyku(`/studia/${kierunek.id}/${s.strona}`, lang))}>{w(s, 'nazwa')}</a> : w(s, 'nazwa')}</h3>
-                {s.opis && <p>{w(s, 'opis')}</p>}
-                {s.dla_kogo && <p><span class="lbl">{T('Dla kogo', 'For whom')}</span>{w(s, 'dla_kogo')}</p>}
-                {s.kariera && <p><span class="lbl">{T('Po studiach', 'Careers')}</span>{w(s, 'kariera')}</p>}
-                {s.strona && <span class="link-arrow" aria-hidden="true" style="min-height:32px">{T('Więcej o specjalności', 'More about this specialisation')}<Ikona nazwa="strzalka" rozmiar={15} /></span>}
-                {(s.opiekunowie || (s.zaklad && nazwyZakladow[s.zaklad])) && (
-                  <p class="foot">
-                    {s.opiekunowie && <span><span class="muted">{T('Opiekun', 'Coordinator')}:</span> {s.opiekunowie}</span>}
-                    {s.zaklad && nazwyZakladow[s.zaklad] && <a href={u(wJezyku(`/instytut/zaklady/${s.zaklad}`, lang))}>{wybierz(nazwyZakladow[s.zaklad].data, 'nazwa', lang)}</a>}
-                  </p>
+  {d.etapy.length > 0 && (
+    <section id="przebieg" aria-labelledby="przebieg-h">
+      <h2 id="przebieg-h">{H.przebieg}</h2>
+      {sciezki.map((s) => (
+        <>
+          {!jednaSciezka && <h3>{s.h}</h3>}
+          <ol class="etapy">
+            {s.lista.map((e) => (
+              <li>
+                <span class="etyk">{w(e, 'kiedy')}</span>
+                <p class="t">{w(e, 'tytul')}</p>
+                {e.opis && <p>{w(e, 'opis')}</p>}
+                {(e.termin || (e.formularz && !e.formularz_adres)) && (
+                  <dl class="para">
+                    {e.termin && <><dt>{T('Termin', 'Deadline')}</dt><dd>{w(e, 'termin')}</dd></>}
+                    {e.formularz && !e.formularz_adres && <><dt>{T('Formularz', 'Form')}</dt><dd>{e.formularz}</dd></>}
+                  </dl>
                 )}
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {d.programy.length > 0 && (
-        <section class="zsec" aria-labelledby="program">
-          <h2 id="program">{N.program}</h2>
-          {wieleProgramow && (
-            <label class="year-pick">
-              <span>{doktorat ? T('Rozpocząłem / rozpoczęłam kształcenie w roku', 'I started my doctoral training in') : T('Rozpocząłem / rozpoczęłam studia w roku', 'I started my studies in')}</span>
-              <select data-rok>
-                <option value="">—</option>
-                {lata.map((r) => <option value={r}>{r}/{String(r + 1).slice(2)}</option>)}
-              </select>
-            </label>
-          )}
-          {wieleProgramow && (
-            <div class="tabs" role="tablist" aria-label={N.program}>
-              {d.programy.map((p, i) => (
-                <button type="button" role="tab" class="chip" id={`tab-${i}`} aria-controls={`prog-${i}`} aria-selected={i === 0 ? 'true' : 'false'} data-od={p.od_roku} data-do={p.do_roku}>{w(p, 'nazwa')}</button>
-              ))}
-            </div>
-          )}
-          {d.programy.map((p, i) => (
-            <div class="tabpanel" role={wieleProgramow ? 'tabpanel' : undefined} id={`prog-${i}`} aria-labelledby={wieleProgramow ? `tab-${i}` : undefined} data-panel>              {p.dotyczy && <p class="notice" style="margin:0 0 12px">{w(p, 'dotyczy')}</p>}
-              <ul class="files">
-                {p.dokumenty.map((x) => (
-                  <li><a href={href(x.plik)}><Ikona nazwa="plik" /><span>{w(x, 'nazwa')}{x.opis && <small class="muted" style="display:block;font-weight:500">{w(x, 'opis')}</small>}</span></a></li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {d.terminy.length > 0 && (
-        <section class="zsec" aria-labelledby="terminy">
-          <h2 id="terminy">{T('Terminy i formularze', 'Deadlines and forms')}</h2>
-          <div class="table-wrap">
-            <table class="staff">
-              <thead><tr><th>{T('Sprawa', 'What')}</th><th>{T('Kogo dotyczy', 'Who')}</th><th>{T('Termin', 'Deadline')}</th><th>{T('Formularz', 'Form')}</th></tr></thead>
-              <tbody>
-                {d.terminy.map((x) => (
-                  <tr>
-                    <td class="n" data-l={T('Sprawa', 'What')}>{w(x, 'co')}</td>
-                    <td data-l={T('Kogo dotyczy', 'Who')}>{w(x, 'kogo')}</td>
-                    <td data-l={T('Termin', 'Deadline')}><strong>{w(x, 'termin')}</strong></td>
-                    <td data-l={T('Formularz', 'Form')}>{x.formularz && (x.formularz_adres ? <a class="btn btn-small" href={x.formularz_adres}>{x.formularz}</a> : x.formularz)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {!doktorat && <p class="muted" style="font-size:15px">{T('Wszystkie formularze i zasady rejestracji:', 'All forms and registration rules:')} <a href={u(wJezyku('/studia/zajecia', lang))}>{T('Zajęcia i konsultacje', 'Classes and office hours')}</a>.</p>}
-        </section>
-      )}
-
-      {praktyki && (
-        <section class="zsec" aria-labelledby="praktyki">
-          <h2 id="praktyki">{T('Praktyki pedagogiczne', 'Teaching placements')}</h2>
-          <div class="prose"><Fragment set:html={praktyki} /></div>
-          {d.praktyki_dokumenty.length > 0 && (
-            <ul class="files">{d.praktyki_dokumenty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" />{w(x, 'nazwa')}</a></li>)}</ul>
-          )}
-        </section>
-      )}
-
-      {kariera && (
-        <section class="zsec" aria-labelledby="po-studiach">
-          <h2 id="po-studiach">{T('Po studiach', 'After graduation')}</h2>
-          <div class="prose"><Fragment set:html={kariera} /></div>
-        </section>
-      )}
-
-      {faq.length > 0 && (
-        <section class="zsec" aria-labelledby="pytania">
-          <h2 id="pytania">{T('Pytania i odpowiedzi', 'FAQ')}</h2>
-          <div class="faq">
-            {faq.map((f) => (
-              <details>
-                <summary>{f.q}<Ikona nazwa="dol" class="chev" rozmiar={18} /></summary>
-                <div class="prose" style="font-size:16px"><Fragment set:html={f.a} /></div>
-              </details>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {d.kontakt.length > 0 && (
-        <section class="zsec" aria-labelledby="kontakt">
-          <h2 id="kontakt">{T('Kontakt', 'Contact')}</h2>
-          <ul class="people">
-            {d.kontakt.map((k) => (
-              <li class="person">
-                <span class="role" style="font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">{w(k, 'rola')}</span>
-                <span class="os-n">{k.osoba}</span>
-                <span class="os-c">
-                  {k.email && <a href={`mailto:${k.email}`}>{k.email}</a>}
-                  {k.telefon && <span>{T('tel.', 'phone')} {k.telefon}</span>}
-                  {k.pokoj && <span>{T('pok.', 'room')} {k.pokoj}</span>}
-                </span>
+                {e.formularz && e.formularz_adres && <p class="akcja"><a href={e.formularz_adres}>{e.formularz}{isExternal(e.formularz_adres) ? ' ↗' : ''}</a></p>}
               </li>
             ))}
+          </ol>
+        </>
+      ))}
+      {linkDyplom && <p class="kier-dalej">{T('Szczegóły egzaminów i prac dyplomowych:', 'Exams and theses in detail:')} <a href={u(wJezyku('/studia/egzaminy-i-dyplom', lang))}>{T('Egzaminy i dyplom', 'Exams and diploma')}</a>.</p>}
+    </section>
+  )}
+
+  {specjalnosci.length > 0 && (
+    <section id="specjalnosci" aria-labelledby="specjalnosci-h">
+      <h2 id="specjalnosci-h">{H.specjalnosci}</h2>
+      <ul class="dwa kier-spec">
+        {specjalnosci.map((s) => (
+          <li>
+            {(s.skrot || s.wygaszana) && <span class="etyk">{[s.skrot, s.wygaszana ? T('wygaszana', 'phased out') : ''].filter(Boolean).join(' · ')}</span>}
+            <b>{s.strona ? <a href={u(wJezyku(`/studia/${kierunek.id}/${s.strona}`, lang))}>{w(s, 'nazwa')}</a> : w(s, 'nazwa')}</b>
+            {s.opis && <span>{w(s, 'opis')}</span>}
+            {(s.dla_kogo || s.kariera || s.opiekunowie || (s.zaklad && nazwyZakladow[s.zaklad])) && (
+              <dl class="para">
+                {s.dla_kogo && <><dt>{T('Dla kogo', 'For whom')}</dt><dd>{w(s, 'dla_kogo')}</dd></>}
+                {s.kariera && <><dt>{T('Po studiach', 'Careers')}</dt><dd>{w(s, 'kariera')}</dd></>}
+                {s.opiekunowie && <><dt>{T('Opiekun', 'Coordinator')}</dt><dd>{s.opiekunowie}</dd></>}
+                {s.zaklad && nazwyZakladow[s.zaklad] && <><dt>{T('Zakład', 'Department')}</dt><dd><a href={u(wJezyku(`/instytut/zaklady/${s.zaklad}`, lang))}>{wybierz(nazwyZakladow[s.zaklad].data, 'nazwa', lang)}</a></dd></>}
+              </dl>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {d.terminy.length > 0 && (
+    <section id="terminy" aria-labelledby="terminy-h">
+      <h2 id="terminy-h">{H.terminy}</h2>
+      <table class="tab">
+        <thead><tr><th>{T('Sprawa', 'What')}</th><th>{T('Kogo dotyczy', 'Who')}</th><th>{T('Termin', 'Deadline')}</th>{formularze && <th>{T('Formularz', 'Form')}</th>}</tr></thead>
+        <tbody>
+          {d.terminy.map((x) => (
+            <tr>
+              <td>{w(x, 'co')}</td>
+              <td>{w(x, 'kogo')}</td>
+              <td>{w(x, 'termin')}</td>
+              {formularze && <td>{x.formularz && (x.formularz_adres ? <a href={x.formularz_adres}>{x.formularz}</a> : x.formularz)}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {!doktorat && <p class="kier-dalej">{T('Wszystkie formularze i zasady rejestracji:', 'All forms and registration rules:')} <a href={u(wJezyku('/studia/zajecia', lang))}>{T('Zajęcia i konsultacje', 'Classes and office hours')}</a>.</p>}
+    </section>
+  )}
+
+  {d.programy.length > 0 && (
+    <section id="program" aria-labelledby="program-h">
+      <h2 id="program-h">{H.program}</h2>
+      {wieleProgramow && (
+        <>
+          <p>{doktorat
+            ? T('Program zależy od roku rozpoczęcia kształcenia. Wybierz swój rocznik:', 'The programme depends on the year you started. Choose your cohort:')
+            : T('Program zależy od roku rozpoczęcia studiów. Wybierz swój rocznik:', 'The curriculum depends on the year you started. Choose your cohort:')}</p>
+          <label class="kier-rok">
+            <span>{doktorat ? T('Rozpocząłem / rozpoczęłam kształcenie w roku', 'I started my doctoral training in') : T('Rozpocząłem / rozpoczęłam studia w roku', 'I started my studies in')}</span>
+            <select data-rok>
+              <option value="">—</option>
+              {lata.map((r) => <option value={r}>{r}/{String(r + 1).slice(2)}</option>)}
+            </select>
+          </label>
+          <div class="tresc-taby" role="tablist" aria-label={H.program}>
+            {d.programy.map((p, i) => (
+              <button type="button" role="tab" id={`tab-${i}`} aria-controls={`prog-${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-od={p.od_roku} data-do={p.do_roku}>{w(p, 'nazwa')}</button>
+            ))}
+          </div>
+        </>
+      )}
+      {d.programy.map((p, i) => (
+        <div class="kier-prog" role={wieleProgramow ? 'tabpanel' : undefined} id={`prog-${i}`} aria-labelledby={wieleProgramow ? `tab-${i}` : undefined} data-panel>
+          {wieleProgramow && <p class="kier-podpis">{w(p, 'nazwa')}</p>}
+          {p.dotyczy && <p class="dotyczy">{w(p, 'dotyczy')}</p>}
+          <ul class="pliki">
+            {p.dokumenty.map((x) => (
+              <li><a href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{w(x, 'nazwa')}{x.opis && <small>{w(x, 'opis')}</small>}</span><span class="typ">{typPliku(x.plik)}</span></a></li>
+            ))}
           </ul>
-        </section>
-      )}
+        </div>
+      ))}
+    </section>
+  )}
 
-      {d.akty.length > 0 && (
-        <section class="zsec" aria-labelledby="akty">
-          <h2 id="akty">{T('Akty prawne', 'Regulations')}</h2>
-          <details class="more">
-            <summary>{T('Pokaż dokumenty', 'Show documents')} ({d.akty.length})</summary>
-            <ul class="files" style="margin-top:10px">{d.akty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" />{w(x, 'nazwa')}</a></li>)}</ul>
+  {praktyki && (
+    <section id="praktyki" aria-labelledby="praktyki-h">
+      <h2 id="praktyki-h">{H.praktyki}</h2>
+      <div class="prose"><Fragment set:html={praktyki} /></div>
+      {d.praktyki_dokumenty.length > 0 && (
+        <ul class="pliki">{d.praktyki_dokumenty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{w(x, 'nazwa')}</span><span class="typ">{typPliku(x.plik)}</span></a></li>)}</ul>
+      )}
+    </section>
+  )}
+
+  {kariera && (
+    <section id="po-studiach" aria-labelledby="po-studiach-h">
+      <h2 id="po-studiach-h">{H.kariera}</h2>
+      <div class="prose"><Fragment set:html={kariera} /></div>
+    </section>
+  )}
+
+  {faq.length > 0 && (
+    <section id="pytania" aria-labelledby="pytania-h">
+      <h2 id="pytania-h">{H.faq}</h2>
+      <div class="faq">
+        {faq.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <div set:html={f.a} />
           </details>
-        </section>
-      )}
-    </div>
+        ))}
+      </div>
+    </section>
+  )}
 
-    <aside class="side tylko-komputer" data-pagefind-ignore>
-      <SpisTresci naglowki={sekcje} lang={lang} wariant="bok" />
-    </aside>
-  </div>
-</Baza>
+  {d.kontakt.length > 0 && (
+    <section id="kontakt" aria-labelledby="kontakt-h">
+      <h2 id="kontakt-h">{H.kontakt}</h2>
+      <div class="kontakty">
+        {d.kontakt.map((k) => (
+          <div>
+            <span class="etyk">{w(k, 'rola')}</span>
+            <b>{k.osoba}</b>
+            {(k.email || k.telefon || k.pokoj) && (
+              <dl class="para">
+                {k.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${k.email}`}>{k.email}</a></dd></>}
+                {k.telefon && <><dt>{T('tel.', 'phone')}</dt><dd>{k.telefon}</dd></>}
+                {k.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{k.pokoj}</dd></>}
+              </dl>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {d.akty.length > 0 && (
+    <section id="akty" aria-labelledby="akty-h">
+      <h2 id="akty-h">{H.akty}</h2>
+      <ul class="pliki">{d.akty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{w(x, 'nazwa')}</span><span class="typ">{typPliku(x.plik)}</span></a></li>)}</ul>
+    </section>
+  )}
+</Podstrona>
 
 <script>
-  // Zakładki programów studiów + wybór roku rozpoczęcia studiów.
-  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.tabs [role="tab"]'));
-  const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-panel]'));
+  // Program studiów: przełącznik roczników (.tresc-taby, role="tablist") i wybór roku rozpoczęcia studiów.
+  // Bez JS: przełącznik i wybór roku schowane, wszystkie programy jeden pod drugim (z podpisami).
+  const box = document.querySelector<HTMLElement>('[data-kierunek]');
+  const tabs = Array.from(box?.querySelectorAll<HTMLButtonElement>('.tresc-taby [role="tab"]') ?? []);
+  const panels = Array.from(box?.querySelectorAll<HTMLElement>('[data-panel]') ?? []);
   const pokaz = (i: number) => {
     tabs.forEach((t, j) => {
       t.setAttribute('aria-selected', String(i === j));
@@ -274,7 +310,7 @@ const {
         }
       });
     });
-    document.querySelector<HTMLSelectElement>('[data-rok]')?.addEventListener('change', (e) => {
+    box?.querySelector<HTMLSelectElement>('[data-rok]')?.addEventListener('change', (e) => {
       const r = Number((e.target as HTMLSelectElement).value);
       if (!r) return;
       const i = tabs.findIndex((t) => Number(t.dataset.od) <= r && r <= Number(t.dataset.do));
@@ -284,42 +320,31 @@ const {
 </script>
 
 <style>
-  /* „O kierunku” — pierwsza sekcja: bez kreski sekcji nad nagłówkiem (komputer i telefon; jak „W tym dziale” na stronach
-     działów i „Najbliższe seminaria”; decyzja 30.10.2026) */
-  .zsec.kier-o { border-top: 0; padding-top: 0; }
-  .zsec.kier-o::before, .zsec.kier-o > h2::before { display: none; }
+  [hidden] { display: none !important; }
+  /* bez JS: bez przełącznika i wyboru roku, wszystkie programy z podpisami; z JS podpis tylko dla czytników ekranu */
+  :global(html:not(.js)) :is(.tresc-taby, .kier-rok) { display: none; }
+  :global(html.js) .kier-podpis { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .kier-podpis { margin: 18px 0 4px; font-size: 13px; font-weight: 700; color: var(--d-a); }
+  .kier-dalej { margin: 14px 0 0; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
 
-  /* ---------- komputer (≥ 761 px): baner „Portal”, treść „Zwarta” (reszta odstępów .layout — uklad-zwarta.css) ----------
-     Przyciski w banerze trochę mniejsze (jak .btn-small, nieco szersze), liczby kierunku w wierszu pod nimi.
-     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Studia” — kreska sekcji nie przylega do banera. */
+  /* wybór roku rozpoczęcia studiów: etykieta i lista rozwijana jak przyciski przełącznika (obwódka, bez zaokrągleń) */
+  .kier-rok { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 12px; font-size: 15.5px; line-height: 1.55; }
+  .kier-rok select { margin: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 0; background: var(--bg); color: var(--ink);
+    font: inherit; font-size: 14px; font-weight: 600; }
+  .kier-rok select:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+
+  /* specjalności (ul.dwa): etykieta skrótu, nazwa, opis i pary; nazwa-link jak tytuł, bez podkreślenia */
+  .kier-spec li > b a { color: inherit; text-decoration: none; }
+  .kier-spec li > b a:hover { color: var(--d-a); }
+  .kier-spec li > b a::after { content: ' →'; font-family: var(--f-text); font-size: 15px; color: var(--muted); }
+  .kier-spec dl { margin-top: 8px; }
+  /* opis dokumentu programu pod nazwą */
+  .kier-prog small { display: block; font-size: 13.5px; color: var(--muted); }
+
+  /* pytania: stary styl .faq z global.css (pogrubienie, wysokość 52 px) nie przecieka do wzorca */
+  .faq summary { min-height: 0; align-items: flex-start; font-weight: 400; }
+
   @media (min-width: 761px) {
-    /* przyciski pod banerem (tylko komputer), nad pierwszą sekcją */
-    .kh-btns-pod { gap: 8px; margin: 0 0 24px; }
-    .kh-btns-pod .btn { min-height: 42px; padding: 0 18px; font-size: 14.5px; }
     .kh-liczby { margin-top: 6px; max-width: none; }
-    .kier { padding-top: 24px; }
-  }
-
-  /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
-  @media (max-width: 760px) {
-    /* treść na pełną szerokość (spis sekcji jest i tak rozwijaną listą nad treścią) */
-    .kier { display: block; padding-top: clamp(14px, 2vw, 22px); padding-bottom: clamp(28px, 4vw, 44px); }
-    /* „O kierunku”: „Dlaczego warto” pod tekstem, dwie w rzędzie (na wąskim telefonie jedna) */
-    .kier-o .prose { display: flow-root; }
-    .kier-o .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
-    /* przebieg studiów: „kiedy” w jednym wierszu z nazwą etapu */
-    .step { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; }
-    .step > .desc, .step > .deadline { flex-basis: 100%; }
-    .step > .deadline { flex-basis: auto; }
-    /* specjalności: etykiety („Dla kogo”, „Po studiach”) w wierszu z treścią */
-    .spec .lbl { display: inline; margin-right: 6px; }
-    .spec-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
-    /* dokumenty programu, praktyk i akty prawne: siatka (na szerszym telefonie dwie kolumny) */
-    .tabpanel .files, .zsec > .files, .more .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
-    /* krótkie sekcje (praktyki, po studiach, kontakt, akty prawne): odstęp akapitu na końcu zostaje w sekcji, jak w wariancie */
-    .zsec:is([aria-labelledby='praktyki'], [aria-labelledby='po-studiach'], [aria-labelledby='kontakt'], [aria-labelledby='akty']) { display: flow-root; }
-  }
-  @media (max-width: 480px) {
-    .kier-o .why-grid { grid-template-columns: minmax(0, 1fr); }
   }
 </style>
