@@ -777,6 +777,39 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
   .pd-b .tyt { padding-left: 122px; }
 }
 
+/* overflow: clip zamiast hidden na ramce podglądu, żeby przyklejone elementy (spis, boczna nawigacja) działały */
+#okno { overflow: clip; }
+/* „Na tej stronie” z prawej (propozycje 4.11): bez listy podstron działu, tylko spis sekcji ze znacznikiem bieżącej */
+.pd.bok-prawy { grid-template-columns: minmax(0, 1fr) 236px; gap: 56px; }
+.pd-stopka.bok-prawy { margin-left: var(--marg); margin-right: calc(var(--marg) + 292px); }
+.spis-p { position: sticky; top: 24px; align-self: start; font-size: 14px; line-height: 1.35; }
+.spis-p h6 { margin: 0 0 10px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+.spis-p ul { position: relative; list-style: none; margin: 0; padding: 0; }
+.spis-p li a { display: grid; grid-template-columns: auto 1fr; gap: 0 8px; padding: 6px 0 6px 16px; color: var(--m-muted); text-decoration: none; transition: color .2s; }
+.spis-p li a b { display: none; }
+.spis-p li a:hover { color: var(--m-ink); }
+.spis-p li a[aria-current] { color: var(--m-ink); font-weight: 700; }
+.spis-p .spis-pasek { display: none; }
+.spis-p .wskaznik { display: none; }
+/* A: cienka linia, a przy bieżącej sekcji przesuwający się odcinek w kolorze działu */
+.spis-p[data-x], [data-bok="A"] .spis-p ul { border-left: 1px solid var(--m-line); }
+[data-bok="A"] .spis-p .wskaznik { display: block; position: absolute; left: 0; width: 3px; margin-left: -1px; background: var(--d-a); transition: top .25s ease, height .25s ease; }
+/* B: oś z kropkami; minione sekcje i odcinek osi wypełnione kolorem działu */
+[data-bok="B"] .spis-p ul::before { content: ''; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 1px; background: var(--m-line); }
+[data-bok="B"] .spis-p ul::after { content: ''; position: absolute; left: 4px; top: 12px; width: 1px; height: calc(var(--os, 12px) - 12px); background: var(--d-a); transition: height .25s ease; }
+[data-bok="B"] .spis-p li a { position: relative; padding-left: 22px; }
+[data-bok="B"] .spis-p li a::before { content: ''; position: absolute; z-index: 1; left: 0; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--m-bg); box-shadow: inset 0 0 0 1.5px var(--m-line); transition: background .2s, box-shadow .2s, transform .2s; }
+[data-bok="B"] .spis-p li a.minione::before { background: var(--d-a); box-shadow: none; }
+[data-bok="B"] .spis-p li a[aria-current]::before { background: var(--d-a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--d-a) 25%, transparent); transform: scale(1.15); }
+/* C: spis numerowany jak w książce; pasek postępu czytania nad listą */
+[data-bok="C"] .spis-p .spis-pasek { display: block; height: 2px; margin: 0 0 8px; background: var(--m-line); }
+[data-bok="C"] .spis-p .spis-pasek i { display: block; height: 100%; width: calc(var(--postep, 0) * 100%); background: var(--d-a); }
+[data-bok="C"] .spis-p li a { padding-left: 0; border-bottom: 1px solid var(--m-line); }
+[data-bok="C"] .spis-p li a b { display: block; min-width: 22px; font-family: var(--f-display); font-weight: 500; font-size: 15px; color: var(--m-muted); }
+[data-bok="C"] .spis-p li a[aria-current] b, [data-bok="C"] .spis-p li a.minione b { color: var(--d-a); }
+[data-bok="C"] .spis-p li a[aria-current] { font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .spis-p .wskaznik, [data-bok="B"] .spis-p ul::after { transition: none; } }
+
 /* ---------- uwagi pod sceną ---------- */
 .uwagi { max-width: 1280px; margin: 0 auto; padding-block: 34px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 30px 48px; }
 .uwagi section { min-width: 0; }
@@ -849,6 +882,12 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
       <button type="button" id="n-przejscie" data-v="przejscie" aria-pressed="false">przejście</button>
       <button type="button" id="n-gleboki" data-v="gleboki" aria-pressed="false">pełny głęboki</button>
       <button type="button" id="n-jasny" data-v="jasny" aria-pressed="false">pełny jasny</button>
+    </div></div>
+    <div class="grupa" id="wybor-boku" hidden><span>Nawigacja na podstronie</span><div class="seg" data-ustaw="bok">
+      <button type="button" id="bok-A" data-v="A" aria-pressed="true">A: kreska</button>
+      <button type="button" id="bok-B" data-v="B" aria-pressed="false">B: oś z kropkami</button>
+      <button type="button" id="bok-C" data-v="C" aria-pressed="false">C: spis numerowany</button>
+      <button type="button" id="bok-lewy" data-v="lewy" aria-pressed="false">dotychczasowa z lewej</button>
     </div></div>
     <div class="grupa" id="wybor-zdjec" hidden><span>Zdjęcia osób</span><div class="seg" data-ustaw="zdjeciaWl">
       <button type="button" id="z-tak" data-v="tak" aria-pressed="true">tak</button>
@@ -1515,10 +1554,51 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     const nav = `<nav class="pd-nav" aria-label="${D[dz].nazwa}"><a href="#" data-strona="dzial">${D[dz].nazwa}</a>${g.map(([h, l]) => `<h6>${h}</h6><ul>${l.map((x) => `<li><a href="#"${czysta(x) === P.nazwa ? ' aria-current="page"' : ''}>${czysta(x)}${x.endsWith('↗') ? ' ↗' : ''}</a></li>`).join('')}</ul>`).join('')}
       <div class="spis"><h6>Na tej stronie</h6><ul>${P.spis.map((x) => `<li><a href="#">${x}</a></li>`).join('')}</ul></div></nav>`;
     const tresc = P.klucz === 'wladze' ? trescWladze() : P.klucz === 'granty' ? trescGranty() : trescPlan();
+    if (bok !== 'lewy') return `<div class="pd bok-prawy" data-bok="${bok}">${tresc}<nav class="spis-p" aria-label="Na tej stronie"><h6>Na tej stronie</h6><div class="spis-pasek"><i></i></div><ul></ul><span class="wskaznik"></span></nav></div>
+      <div class="pd-stopka bok-prawy">${nast ? `<a class="nast" href="#"><small>Następna strona w dziale →</small>${nast}</a>` : '<span></span>'}<p class="meta">Ostatnia aktualizacja: data z historii zmian · <a href="#">Zgłoś błąd na tej stronie</a></p></div>`;
     return `<div class="pd">${nav}${tresc}</div>
       <div class="pd-stopka">${nast ? `<a class="nast" href="#"><small>Następna strona w dziale →</small>${nast}</a>` : '<span></span>'}<p class="meta">Ostatnia aktualizacja: data z historii zmian · <a href="#">Zgłoś błąd na tej stronie</a></p></div>`;
   }
   /* Projekty i granty: paski czasu na wspólnej osi lat */
+  let bok = 'A';
+  /* „Na tej stronie” z prawej: spis z nagłówków sekcji, znacznik bieżącej sekcji (scrollspy) */
+  function zbudujSpis() {
+    const nav = document.querySelector('#in-reszta .spis-p'); if (!nav) return;
+    const sekcje = [...document.querySelectorAll('#in-reszta .pd-tresc > section, #in-reszta .pd-tresc .pl-kat')].filter((x) => x.querySelector('h3'));
+    const ul = nav.querySelector('ul');
+    ul.innerHTML = sekcje.map((x, i) => { x.id = 'sek-' + i; const t = x.querySelector('h3').textContent.replace(/\s*\((\d+)\)$/, ' ($1)'); return `<li><a href="#sek-${i}" data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b><span>${t}</span></a></li>`; }).join('');
+    nav._sekcje = sekcje;
+    ul.addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); const cel = sekcje[+a.dataset.i]; window.scrollTo({ top: window.scrollY + cel.getBoundingClientRect().top - 20, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
+    odswiezSpis();
+  }
+  function odswiezSpis() {
+    const nav = document.querySelector('#in-reszta .spis-p'); if (!nav || !nav._sekcje) return;
+    // w prototypie nad stroną wisi panel przełączników: przyklejony spis zaczyna się pod nim (scena jest skalowana)
+    const sc = document.querySelector('#scena'), k = sc.getBoundingClientRect().width / sc.offsetWidth || 1, panel = document.querySelector('.pasek')?.offsetHeight || 0;
+    nav.style.top = (panel / k + 24).toFixed(0) + 'px';
+    // tylko w prototypie: skalowana scena (transform) wyłącza position: sticky, więc przyklejenie robi skrypt; na stronie wystarczy sticky
+    if (Math.abs(k - 1) > 0.001) {
+      nav.style.position = 'relative'; nav.style.top = '0';
+      nav.style.transform = 'none';
+      const pr = nav.parentElement.getBoundingClientRect(), naturalnie = nav.getBoundingClientRect().top, chce = panel + 24 * k;
+      const dy = Math.min(Math.max(0, (chce - naturalnie) / k), (pr.bottom - naturalnie) / k - nav.offsetHeight - 30);
+      nav.style.transform = `translateY(${dy.toFixed(1)}px)`;
+    }
+    const progi = nav._sekcje.map((x) => x.getBoundingClientRect().top), h = window.innerHeight, prog = panel + (h - panel) * 0.3;
+    let akt = 0; progi.forEach((t, i) => { if (t < prog) akt = i; });
+    const linki = [...nav.querySelectorAll('li a')];
+    linki.forEach((a, i) => { a.toggleAttribute('aria-current', i === akt); a.classList.toggle('minione', i < akt); });
+    const a = linki[akt]; if (!a) return;
+    const w = nav.querySelector('.wskaznik'), ul = nav.querySelector('ul');
+    w.style.top = (a.offsetTop + ul.offsetTop) + 'px'; w.style.height = a.offsetHeight + 'px';
+    nav.style.setProperty('--os', (a.offsetTop + a.offsetHeight / 2) + 'px');
+    const tr = document.querySelector('#in-reszta .pd-tresc'), r = tr.getBoundingClientRect();
+    const post = Math.min(1, Math.max(0, (prog - r.top) / Math.max(1, r.height - h * 0.5)));
+    nav.style.setProperty('--postep', post.toFixed(3));
+  }
+  let spisRaf = 0;
+  window.addEventListener('scroll', () => { cancelAnimationFrame(spisRaf); spisRaf = requestAnimationFrame(odswiezSpis); }, { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(odswiezSpis));
   const lataZ = (t) => { const m = String(t || '').match(/(\d{4})\D+(\d{4})/); return m ? [+m[1], +m[2]] : null; };
   const DZIS = 2026 + 10 / 12;
   const tor = (l, min, max, kl = '') => `<span class="tor ${kl}">${l ? `<span class="pas" style="left:${(l[0] - min) / (max - min) * 100}%;width:${(l[1] + 1 - l[0]) / (max - min) * 100}%"></span>` : ''}${DZIS < max ? `<i style="left:${(DZIS - min) / (max - min) * 100}%"></i>` : ''}</span>`;
@@ -1704,7 +1784,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     const obecna = wersja === 'obecna', pod = strona === 'pod' && !!PODSTRONY[dz];
     const pierwsze = !pod && !obecna && w === '4' && pierwszeWejscie(dz);
     $('#wybor-strony').hidden = !PODSTRONY[dz];
-    $('#wybor-nagl').hidden = !pod; $('#wybor-zdjec').hidden = !pod;
+    $('#wybor-nagl').hidden = !pod; $('#wybor-zdjec').hidden = !pod; $('#wybor-boku').hidden = !pod;
     $('#v-instytut').classList.toggle('n-jasny', pod && naglowek === 'jasny');
     $('#in-nowa').hidden = obecna; $('#in-obecna').hidden = !obecna;
     if (obecna) $('#in-obecna').src = pod ? OBECNA[PODSTRONY[dz].klucz] : OBECNA[dz];
@@ -1712,6 +1792,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     $('#v-instytut').classList.toggle('pasek-na-banerze', pasekIn === 'baner');
     document.querySelectorAll('#v-instytut .ok-pasek a[data-dzial]').forEach((a) => a.toggleAttribute('aria-current', a.dataset.dzial === dz));
     $('#in-reszta').innerHTML = pod ? htmlPod(dz) : htmlReszta(dz);
+    if (pod) requestAnimationFrame(zbudujSpis);
     $('#in-pod').hidden = pod;
     $('#v-instytut').dataset.dzial = dz;
     $('#wybor-inst').hidden = dz !== 'instytut';
@@ -1858,6 +1939,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     if (co === 'skos') { nachylenie = Number(v); ulozTytul(); }
     if (co === 'proba') { liczbaSem = Number(v); rysujKolumny(); }
     if (co === 'prel') { wariantPrel = v; rysujKolumny(); }
+    if (co === 'bok') { bok = v; rysujInstytut(); skaluj(); }
     if (co === 'naglowek') { naglowek = v; rysujInstytut(); skaluj(); }
     if (co === 'zdjeciaWl') { zdjeciaWl = v === 'tak'; rysujInstytut(); skaluj(); }
     if (co === 'strona') { strona = v; rysujInstytut(); skaluj(); window.scrollTo(0, 0); }
