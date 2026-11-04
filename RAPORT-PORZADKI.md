@@ -145,3 +145,61 @@ Gałąź etapu: `wyglad/porzadki-02-szablon`.
 - Zachowanie (Playwright, 1366×640): scrollspy przesuwa znacznik przy przewijaniu; wyszukiwanie „algebra” zostawia
   w spisie 2 z 9 kategorii; przełączenie na semestr letni — 8 kategorii i `#letni` w adresie; spis mieści się w oknie
   1366×640; Enter na pozycji spisu z klawiatury przewija do sekcji (20 px od góry); bez błędów JS.
+
+## Etap 3: pozostałe podstrony na wspólnym szablonie, według wzorca treści — zrobione
+Gałąź etapu: `wyglad/porzadki-03-podstrony`.
+
+**Wzorzec treści (decyzja właściciela 4.11, 23:58: zalecenie 14 ze zlecenia 11).** Strony etapu 3 przeniesione według
+zalecenia 14 zamiast pierwotnego opisu etapu 3; pozostałe nowe zalecenia zlecenia 11 nie były robione.
+- Wspólny plik `src/styles/zal-tresc.css` (importowany w `Baza.astro`): wartości z bloku „wzorzec treści” prototypu
+  (klasy `.tresc …`; w prototypie sekcja to `h3`, u nas `h2`, podsekcja `h3`). Elementy: sekcja z kreską między sekcjami
+  (44/40 px), podsekcja w kolorze działu, etykieta `.etyk`, pierwszy akapit `p.wst`, linki z podkreśleniem w kolorze działu,
+  `ul.kreski`, ramka `.uwaga`, `ul.dwa`, `ul.linki`, `ol.etapy` (z przyciskiem-linkiem `.akcja a`), `dl.para`, `table.tab`,
+  przełącznik `.tresc-taby`, `ul.pliki`, `.faq`, `.kontakty`; telefon: sekcja 26 px, podsekcja 20 px, tekst 16 px, jedna
+  kolumna, tabela w bloki. Szablon `Podstrona.astro` dostał `tytulKarty` (inny `<title>` niż tytuł banera, np. obrona,
+  specjalność).
+- **Strony z Markdown** (`Strona.astro`, `src/content/strony`): `.tresc .prose` — `##` jako sekcja z kreską nad każdą
+  poza pierwszą (bez dzielenia na `<section>`: kreska jest na nagłówku, spis działa po `id` nagłówków — prostsze niż
+  przetwarzanie Markdown, efekt ten sam), `###` podsekcja, listy z kreskami, cytat blokowy `>` jako ramka uwagi, tabele
+  jak `table.tab` (na telefonie bloki), linki według wzorca. Ozdoby nagłówków z Ustawień („Sekcje”: pasy, linia, karty)
+  na tych stronach już nie działają. To zmienia wygląd treści stron tekstowych względem etapu 2 (celowo).
+- **Szczególne bloki** Władz, Projektów i grantów i Planu zajęć — bez zmian (nie mają klasy `.tresc`; ich nagłówki sekcji
+  i kreski zostały takie jak były: Brygada 32 px, kreska z odstępami 34/30 px zamiast 44/40 px wzorca — różnica
+  „drobiazg”, zostawiona, bo zalecenie każe tych stron nie ruszać).
+
+**Przeniesione strony** (po jednej na commit; pracę podzieliłem między 3 podagentów w osobnych kopiach roboczych,
+rozłączne pliki; ich commity przeniosłem cherry-pickiem):
+
+| Strona | Commity | Najważniejsze decyzje |
+|---|---|---|
+| Strony tekstowe (Markdown) | `6936c9f` | wzorzec przez `.tresc .prose` (wyżej) |
+| Pracownicy | `de29f27`, `ef652df` | filtry w jednej wersji na każdej szerokości: szukanie + lista „Grupa” + lista „Zakład” (dotąd komputer: przyciski grup; telefon: jedna lista „Wszyscy ▾”) — działają łącznie, także na telefonie; licznik „Znaleziono N osób”; spis z grup osób (grupy ukryte filtrem znikają ze spisu); bez JS pełna lista (129 osób) |
+| Struktura i zakłady | `bc691ca` | zakłady w dwóch kolumnach (opis, obszary, kierownik i skład jako pary); jedna sekcja — bez spisu; poprawiona odmiana „1 osoba / 2 osoby” |
+| Zakład | `5b66817` | obszary badań przeniesione z banera do sekcji „O zakładzie” (telefon ich w banerze nie pokazywał); dawna boczna ramka „Zakłady” jako ostatnia sekcja „Zakłady Instytutu”; skład: kierownik jako kontakt, reszta w tabeli; zakończone projekty zwinięte jak FAQ |
+| Warto wiedzieć (lista i wpis) | `6b7d09c` | `WartoWiedziec.astro` przepisany (używają go już tylko te dwie strony; usunięte układy strony głównej i „portal” oraz losowanie); wpis: Markdown dzielony na sekcje po `##` (`renderMarkdown`), „Zobacz też” jako lista linków (bez kart z zajawką i zdjęciem) |
+| Aktualności (lista) | `05fc2fa`, `aeaacf4` | wiersze z datą jak w `zal/dzial/Wiersz`, miesiące jako podsekcje; pasek rodzajów i szukania przyklejony jak w Planie; bez spisu (ok. 110 miesięcy); na telefonie przyciski rodzajów po trzy w rzędzie; usunięte zwijanie odbiorców do „+N” i ikonka biretu |
+| Aktualność, zamiana dni | `29d6c85` | granatowy nagłówek z tytułem i „← Wszystkie aktualności” (dotąd sam pasek); wpis, galeria, załączniki (`ul.pliki`), wydarzenie z parami Kiedy/Gdzie, „Nowszy / Starszy wpis”; nowy `WierszWydarzenia.astro` zamiast kart wydarzeń; zamiana dni — rama szablonu złożona w widoku (potrzebuje `szukaj` i noindex) |
+| Kalendarz | `f01f266` | wiersze `WierszWydarzenia`, miesiące jako nagłówki, przyklejony pasek: widok, rodzaje, szukanie — szukanie działa teraz także na komputerze (dotąd tylko telefon); bez JS oba widoki; ICS bez zmian |
+| Kierunek, Szkoła doktorska | `9538840` | kolejność sekcji jak we wzorze (O kierunku, strony powiązane, Dlaczego warto, przebieg `ol.etapy`, specjalności, terminy, program z przełącznikiem roczników, praktyki, po studiach, pytania, kontakt, akty); Szkoła doktorska 1:1 z prototypem (nagłówki i krótkie etykiety spisu z prototypu); baner bez zmian (zalecenie 9 niewykonane) |
+| Specjalność | `1705c82` | „Dla kogo” i „Wybór specjalności” (dotąd prawy pasek) w ramkach uwagi; przedmioty w podsekcjach z `ul.dwa`; opiekunowie jako `.kontakty`; `tytulKarty` |
+| Rok akademicki | `d99bee9` | „Dziś” bez karty (kółko w kolorze dnia, liczone w przeglądarce); przełącznik semestrów jako `.tresc-taby`; terminy w `table.tab`, zakończone semestry rozwijane |
+| Seminaria, seminarium | `37c0a7c`, `36e1fb0` | najbliższe referaty w wierszach z datą; seminaria zakładów i niezależne w dwóch kolumnach; seminarium: opis, nadchodzące (pełne streszczenie), powiadomienia e-mail (zapis sprawdzony), minione (streszczenie zwijane), pliki `ul.pliki`; koordynatorzy w banerze na każdej szerokości |
+| Konferencje | `e64108f` | nadchodzące; minione z latami jako podsekcjami (kotwice `#rok-RRRR` bez zmian); spis z lat |
+| Obrony, obrona | `e29874d`, `36810d9` | lista w wierszach z datą; obrona: Kiedy/Gdzie/Promotor jako pary, dokumenty, BIP; tytuł rozprawy w banerze na każdej szerokości; `<title>` „Obrona doktoratu: …” przez `tytulKarty` |
+| Publikacje, rocznik | `9098854`, `a1ed9ea` | lata jako siatka z cienkimi liniami; czasopisma jako podsekcje; rocznik: nota w ramce uwagi, grupy jako sekcje (spis zamiast `SpisTresci`), numerowana lista prac, „Wykaz w PDF” w banerze jako przycisk z obwódką |
+| Sukcesy | `16d7dd0` | lata jako podsekcje, wiersze z datą i miniaturą; „Wcześniejsze sukcesy” jako lista linków |
+| Grant | `1997a4a` | dane projektu jako pary zamiast karty, „Strona projektu ↗” jako przycisk-link, inne projekty zakładu w wierszach jak zakończone w Projektach i grantach; tytuł w drugim języku i plakietki w banerze na każdej szerokości |
+
+Wspólne poprawki wzorca: `41d29cc` (pytania bez stylu starego `.faq`, opis w `ul.dwa` tylko dla bezpośredniego `span`).
+Usunięte przy przenoszeniu: `TabelaReferatow.astro`, `WierszGrantu.astro`. Nowy: `src/components/WierszWydarzenia.astro`.
+Strony nieprzeniesione: **brak** (wszystkie 16 z listy, w tym Kalendarz i zamiana dni). Poza listą zostały: Szukaj
+(`Szukaj.astro`, wyszukiwarka Pagefind) i strona powiadomień — mają nowy nagłówek, treść jak dotąd.
+
+**Sprawdzenie etapu 3**
+- `npm run build` bez błędów i ostrzeżeń (748 stron, 734 w indeksie Pagefind); każda strona sprawdzona przez podagenta
+  w Playwright (PL i EN, 1366 i 390 px): bez błędów JS, bez poziomego przewijania, spis „Na tej stronie” z działającymi
+  celami, filtry/szukanie/przełączniki/zapis na powiadomienia działają, strony czytelne bez JS.
+- Zrzuty wszystkich 36 stron w 6 wariantach komputera i 2 telefonu, porównane ze stanem po etapie 2: bez zmian strona
+  główna, 4 działy, Władze, Projekty i granty, Plan zajęć (komputer: identyczne co do piksela; telefon Planu zajęć —
+  jeden rząd pikseli dolnej krawędzi wciśniętego przycisku semestru, ok. 0,5 px różnicy wysokości przycisku).
+  Zmienione — strony z etapu 3 i strony tekstowe (zamierzone). Przykłady: `raport-zrzuty/etap3-*.png`.

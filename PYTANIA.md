@@ -89,3 +89,38 @@ Każde pytanie: co było niejasne, jaką odpowiedź przyjąłem (najbezpieczniej
 **Przyjęta odpowiedź.** Test nie trafia do Web-Core w ogóle: to łatka `testy/telefon-TEST.patch` w repozytorium `IM-UWr/Web-Podglad`, nakładana na `wyglad/zalozyciele` tylko przy budowaniu podglądu https://im-uwr.github.io/Web-Podglad/test-telefon/ (plakietka „TEST · wersja na telefon” na każdej stronie). **Agenci: to nie jest ustalony projekt telefonu — nie wzorować się, nie nakładać łatki.** Obowiązujący telefon na tej gałęzi to dotychczasowy wygląd (`.tylko-komputer` / `.tylko-telefon` bez zmian).
 
 **Commit.** Web-Podglad `1965ae5`; na tej gałęzi tylko ten wpis. **Jak cofnąć.** Usunąć `testy/telefon-TEST.patch` i krok „TEST telefonu” z `.github/workflows/podglad.yml` w Web-Podglad.
+
+# Zlecenie 12: przebudowa i porządki (noc 4–5.11.2026)
+
+Odpowiedzi przyjęte samodzielnie (najbezpieczniejsze zgodne z ustaleniami); szczegóły i zrzuty: `RAPORT-PORZADKI.md`.
+
+## 12.1. Menu: pasek na komputerze, nagłówek z hamburgerem na telefonie
+**Pytanie.** „Jedna wersja HTML” — czy menu też ma być jednym elementem? Łatka telefonu zostawiła na telefonie dotychczasowy
+nagłówek (`Naglowek.astro`, przemalowany na granat, z sygnetami działów w menu), a komputer ma pasek `PasekMenu.astro`.
+**Przyjęta odpowiedź.** Dwa elementy nawigacji, każdy tylko na swoją szerokość (pasek ≥ 761 px, nagłówek z menu ≤ 760 px),
+bez powtarzania treści strony. Z `Naglowek.astro` usunąłem stare menu komputera (rozwijane listy, pole szukania). Połączenie
+w jeden komponent to osobna praca projektowa (zalecenie 6 zlecenia 11 dotyczy paska i hamburgera).
+**Jak zmienić.** Nowy komponent menu dla obu szerokości zamiast `PasekMenu` + `Naglowek`.
+
+## 12.2. Strony bez działu (Deklaracja dostępności, Polityka prywatności)
+**Pytanie.** Te strony miały dotąd stary układ ze spisem w kafelku. **Przyjęta odpowiedź.** Dostały wspólny szablon
+podstrony i wzorzec treści, z granatowym nagłówkiem (jak Aktualności).
+
+## 12.3. „Warto wiedzieć” na stronie głównej na telefonie
+**Pytanie.** Łatka losuje cztery pozycje tylko na komputerze; na telefonie pokazuje je w stałej kolejności.
+**Przyjęta odpowiedź.** Jak w łatce (telefon identyczny z łatką). **Jak zmienić.** W `DrugiEkran.astro` (stała `LOSUJ`)
+usunąć warunek `matchMedia('(min-width: 761px)')`.
+
+## 12.4. Pole CMS „Prawy pasek” (`pasek_boczny`) na stronach tekstowych
+**Pytanie.** Wartości `menu` i `oba` pokazywały dotąd menu działu w prawym pasku; w nowym szablonie menu działu na
+podstronie nie ma. **Przyjęta odpowiedź.** `spis` i `oba` — spis „Na tej stronie”; `menu` i `brak` — bez spisu.
+**Potrzebna zmiana w CMS (do decyzji):** uprościć pole do „Spis na tej stronie: tak / nie”.
+
+## 12.5. Ustawienia wyglądu w CMS, które już nic nie zmieniają
+**Pytanie.** „Tło strony” (`tlo_strony`), „Sekcje” (`sekcje`: pasy / linia / karty) i „Nagłówki podstron”
+(`naglowki_podstron.wariant`) dotyczyły starego wyglądu. **Przyjęta odpowiedź.** Pola zostają w CMS i w danych (nie zmieniam
+konfiguracji CMS), ale nowy wygląd ich nie używa (stare style usunięte w etapie 4). **Do decyzji:** usunąć te pola z Pages CMS.
+
+## 12.6. Liczby w banerze Projektów i grantów na telefonie
+**Pytanie.** Cztery liczby w trzech kolumnach — ostatnia wychodzi poza ekran (tak było w łatce). **Przyjęta odpowiedź.**
+Bez zmian (telefon identyczny z łatką); rozwiązuje to zalecenie 2 zlecenia 11 (liczby w jednym rzędzie, nadmiarowe chowane).
