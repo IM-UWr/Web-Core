@@ -3,11 +3,11 @@ import json, os, re, sys
 SRC = sys.argv[1] if len(sys.argv) > 1 else 'proto/zalozyciele.src.html'  # uruchamiać z katalogu głównego gałęzi kopii
 CK = sys.argv[2] if len(sys.argv) > 2 else 'ciekawostki'
 s = open(SRC, encoding='utf-8').read()
-POLA = ['id', 'nazwa', 'rok', 'zdanie', 'notka', 'rodzaj', 'pewnosc', 'zrodla', 'podstrona', 'dlaczego_tu', 'sciezki']
+POLA = ['id', 'nazwa', 'rok', 'zdanie', 'notka', 'rodzaj', 'pewnosc', 'zrodla', 'podstrona', 'dlaczego_tu', 'przypiecie', 'sciezki']
 dane = {}
 for dz, kat in [('instytut', 'marczewski'), ('nauka', 'slebodzinski'), ('studia', 'knaster'), ('popularyzacja', 'steinhaus')]:
     p = f'{CK}/{kat}/ciekawostki.json'
-    dane[dz] = [{k: x.get(k) for k in POLA} for x in json.load(open(p, encoding='utf-8'))] if os.path.exists(p) else []
+    dane[dz] = [{k: x[k] for k in POLA if k in x} for x in json.load(open(p, encoding='utf-8'))] if os.path.exists(p) else []
 js = json.dumps(dane, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 blok = f'/* CIEK-DANE-START */ const CIEK = {js}; /* CIEK-DANE-KONIEC */'
 if 'CIEK-DANE-START' in s:
