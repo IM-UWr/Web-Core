@@ -227,6 +227,12 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - **pytania (FAQ):** `details`/`summary`, pytanie Brygadą 20 px, z prawej „+” / „−” w kolorze działu, kreski między pytaniami;
   - **kontakt:** kolumny po 3, nad każdą kreska 2 px w kolorze tekstu, etykieta roli, nazwisko Brygadą 20 px, pod nim e-mail, telefon i pokój jako pary.
 - **Nigdy:** kafelki, cienie, zaokrąglenia, tła sekcji (wyjątek: ramka uwagi), ikony ozdobne (wyjątek: ikona pliku).
+- **Szczególne bloki stron zostają bez zmian** (zasada z 1.11: każdy typ strony ma własny blok i jeden wyróżniający detal):
+  - schemat dyrekcji ze zdjęciami i osoby Władz Wydziału na Władzach;
+  - paski czasu i oś lat w Projektach i grantach;
+  - kolumny zajęć, przyklejony pasek i filtr w Planie zajęć.
+  
+  Wzorzec obejmuje je tylko w zakresie nagłówków sekcji, podsekcji i kresek między sekcjami, a te są już zgodne, bo wzorzec z nich wyrósł. Zrzuty tych trzech stron przed i po mają się różnić najwyżej drobiazgami (np. odstępem), a każdą różnicę opisz w raporcie.
 - **Telefon:** te same elementy. Sekcja 26 px, podsekcja 20 px, tekst 16 px. Dwie kolumny przechodzą w jedną, kontakt w jedną kolumnę, tabela w bloki (każdy wiersz osobno: pierwsza kolumna pogrubiona, reszta pod nią).
 - **Szkoła doktorska** (kierunek „szkola-doktorska”) według wzoru 1:1:
   - O Kolegium, potem strony szkoły doktorskiej (pole `przyciski` jako lista linków);
