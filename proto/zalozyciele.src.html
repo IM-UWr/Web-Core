@@ -728,7 +728,7 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 .pd-b .znak { position: absolute; right: var(--znak-p); top: calc(var(--gora) + 10px); width: 145px; height: 170px; }
 .pd-b .znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 55%, transparent); stroke-width: 1.3; stroke-linecap: round; }
 .pd-b .znak path.gruba { stroke: var(--d-j); stroke-width: 2; }
-.pd-b .znak-podpis { position: absolute; right: calc(var(--znak-p) + 160px); top: calc(var(--gora) + 62px); width: 205px; text-align: right; font-size: 12.5px; line-height: 1.45; color: var(--na-ciemnym-2); }
+.pd-b .znak-podpis { position: absolute; right: calc(var(--znak-p) + 160px); top: calc(var(--gora) + 62px); width: 300px; text-align: right; font-size: 12.5px; line-height: 1.45; color: var(--na-ciemnym-2); }
 .pd-b .znak-podpis b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 15px; color: #fff; }
 .pd { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 64px; padding: 40px var(--marg) 30px; }
 .pd-nav { align-self: start; position: sticky; top: 20px; font-size: 15px; }
@@ -865,7 +865,7 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 .pd-b.z-liczbami .tyt { top: calc(30px + var(--gora)); }
 /* wyższy baner (z liczbami): większy znak, wysunięty w prawy margines; opis zostaje w kolumnie, obok znaku */
 .pd-b.z-liczbami .znak { width: 200px; height: 200px; top: calc(var(--gora) + 34px); right: var(--znak-p); }
-.pd-b.z-liczbami .znak-podpis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + 216px); width: 210px; text-align: right; }
+.pd-b.z-liczbami .znak-podpis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + 216px); width: 300px; text-align: right; }
 .pd-b .haslo { margin: 10px 0 0; }
 .pd-b[data-n="jasny"] .podpis-r { color: var(--d-g); text-shadow: none; }
 /* podpis patrona: obrys ze skanu, na banerze działu odsłaniany liniami prowadzącymi (maska) */
@@ -1027,7 +1027,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 .ck-k details a { color: var(--d-a); word-break: break-all; }
 .ck-brak { padding: 30px var(--marg); font-size: 17px; color: var(--m-muted); }
 /* tytuł ciekawostki (znaku) w nagłówku podstrony zawsze w jednej linii; wychodzi w lewo poza kolumnę opisu (5.11, 00:25) */
-.pd-b .znak-podpis b { white-space: nowrap; margin-left: -240px; }
+.pd-b .znak-podpis b { white-space: nowrap; margin-left: -160px; }
 
 /* overflow: clip zamiast hidden na ramce podglądu, żeby przyklejone elementy (spis, boczna nawigacja) działały */
 #okno { overflow: clip; }
