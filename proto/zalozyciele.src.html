@@ -260,6 +260,29 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-narz button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 6px; color: #fff; background: rgb(9 16 34 / .42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer; }
 .ok-narz button:hover { background: rgb(9 16 34 / .7); }
 .ok-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* pasek menu (4.11, 22:56): po Aktualnościach za kreską tryb ciemny, EN i hamburger; Rekrutacja i Szukaj w panelu hamburgera */
+.ok-pasek nav .pasek-narz { position: relative; display: flex; align-items: center; gap: 0; margin-left: 12px; }
+.ok-pasek nav .pasek-narz::before { content: ''; position: absolute; left: -6px; top: 13px; bottom: 13px; width: 1px; background: var(--m-line); }
+.pasek-na-banerze .ok-pasek nav .pasek-narz::before { background: rgb(255 255 255 / .25); }
+.n-jasny.pasek-na-banerze .ok-pasek nav .pasek-narz::before { background: color-mix(in srgb, var(--granat) 30%, transparent); }
+.ok-pasek nav .pasek-narz button { display: grid; place-items: center; width: 38px; height: 38px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; color: inherit; cursor: pointer; }
+.pasek-na-banerze .ok-pasek nav .pasek-narz button { color: rgb(255 255 255 / .8); }
+.n-jasny.pasek-na-banerze .ok-pasek nav .pasek-narz button { color: color-mix(in srgb, var(--granat) 82%, transparent); }
+.ok-pasek nav .pasek-narz button:hover { color: var(--m-ink); }
+.pasek-na-banerze .ok-pasek nav .pasek-narz button:hover { color: #fff; }
+.ok-pasek nav .pasek-narz button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.ok-pasek nav .pasek-narz button[data-motyw-przelacz] svg { width: 17px; height: 17px; }
+.ok-pasek nav .pasek-narz .pasek-burger svg { width: 21px; height: 21px; }
+.ok-pasek nav .pasek-narz :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+/* panel hamburgera przy pasku: ten sam co na okładce, wysuwa się spod paska z prawej */
+.ok-pasek .pasek-menu { top: 0; right: 0; bottom: auto; height: 760px; max-height: 100vh; text-align: left; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.menu-szukaj { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 9px 12px; border: 1px solid rgb(255 255 255 / .3); color: rgb(255 255 255 / .75); }
+.menu-szukaj svg { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; }
+.menu-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 0; border: 0; background: none; font: inherit; font-size: 15px; color: #fff; outline: none; }
+.menu-szukaj input::placeholder { color: rgb(255 255 255 / .6); }
+.menu-szukaj:focus-within { border-color: #fff; }
+.ok-menu .zew-ikona { font-family: var(--f-text); font-size: 18px; opacity: .7; }
 /* menu z hamburgera: panel z prawej, na granacie; kolory działów jako krótkie kreski */
 .ok-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 4; width: min(460px, 40%); padding: 76px 36px 28px; overflow-y: auto; background: rgb(9 16 34 / .96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
   transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s linear .35s; }
@@ -460,12 +483,72 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-os b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1; color: var(--d-a); }
 .in-os span { display: block; margin-top: 6px; font-size: 14px; line-height: 1.45; color: var(--m-text); }
 /* wspólne: podstrony w trzech grupach od razu pod banerem, potem treść */
-.in-pod { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 36px; padding: 26px var(--marg) 8px; }
-.in-pod section { border-top: 2px solid var(--m-ink); padding-top: 8px; }
-.in-pod h5 { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-.in-pod a { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--m-line); font-family: var(--f-display); font-weight: 500; font-size: 21px; color: var(--m-ink); text-decoration: none; }
-.in-pod a::after { content: '→'; font-family: var(--f-text); font-size: 15px; color: var(--m-muted); }
-.in-pod a:hover { color: var(--d-a); }
+.in-pod { padding: 26px var(--marg) 8px; }
+.in-pod[data-menu="obecne"] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 36px; }
+/* ---------- menu działu: 4 projekty (4.11, 22:53): trzy sekcje i pole z pozycjami wybranej ---------- */
+.mz-tab { margin: 0; padding: 0; font: inherit; color: inherit; text-align: left; background: none; border: 0; border-radius: 0; cursor: pointer; }
+.mz-tab:focus-visible, .mz-link:focus-visible { outline: 2px solid var(--d-a); outline-offset: 3px; }
+.mz-link { display: block; color: var(--m-ink); text-decoration: none; }
+.mz-link b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.25; transition: color .15s; }
+.mz-link b::after { content: ' →'; font-family: var(--f-text); font-size: 14px; font-weight: 500; color: var(--m-muted); }
+.mz-link.zew b::after { content: ' ↗'; }
+.mz-link small { display: block; margin-top: 3px; font-size: 13px; line-height: 1.4; color: var(--m-muted); }
+.mz-link:hover b { color: var(--d-a); }
+@keyframes mz-wejscie { from { opacity: 0; transform: translateY(4px); } }
+.mz-pola { display: grid; }
+.mz-pola > .mz-panel { grid-area: 1 / 1; }
+.mz-panel:not(.akt) { visibility: hidden; }
+.mz-panel.akt > * { animation: mz-wejscie .25s ease both; }
+.mz-panel.akt > :nth-child(2) { animation-delay: .03s; } .mz-panel.akt > :nth-child(3) { animation-delay: .06s; } .mz-panel.akt > :nth-child(4) { animation-delay: .09s; } .mz-panel.akt > :nth-child(5) { animation-delay: .12s; }
+@media (prefers-reduced-motion: reduce) { .mz-panel.akt > * { animation: none; } }
+/* A: zakładki z kreską */
+.in-pod[data-menu="A"] .mz-taby { display: flex; gap: 40px; border-bottom: 1px solid var(--m-line); }
+.in-pod[data-menu="A"] .mz-tab { margin-bottom: -1px; padding: 0 0 10px; border-bottom: 3px solid transparent; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.2; color: var(--m-muted); transition: color .15s, border-color .15s; }
+.in-pod[data-menu="A"] .mz-tab sup { margin-left: 5px; font-family: var(--f-text); font-size: 12px; font-weight: 700; color: var(--d-a); }
+.in-pod[data-menu="A"] .mz-tab:hover { color: var(--m-ink); }
+.in-pod[data-menu="A"] .mz-tab[aria-selected="true"] { color: var(--m-ink); border-color: var(--d-a); }
+.in-pod[data-menu="A"] .mz-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 36px; align-content: start; }
+.in-pod[data-menu="A"] .mz-link { padding: 14px 0; border-bottom: 1px solid var(--m-line); }
+/* B: pasek przycisków (jak przyciski z Planu zajęć) */
+.in-pod[data-menu="B"] .mz-taby { display: inline-flex; border: 1px solid var(--m-line); }
+.in-pod[data-menu="B"] .mz-tab { padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--m-text); }
+.in-pod[data-menu="B"] .mz-tab + .mz-tab { border-left: 1px solid var(--m-line); }
+.in-pod[data-menu="B"] .mz-tab sup { margin-left: 6px; font-size: 12px; opacity: .7; }
+.in-pod[data-menu="B"] .mz-tab:hover { color: var(--d-a); }
+.in-pod[data-menu="B"] .mz-tab[aria-selected="true"] { background: var(--d-a); color: var(--m-bg); }
+.in-pod[data-menu="B"] .mz-pola { margin-top: 20px; }
+.in-pod[data-menu="B"] .mz-panel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; align-content: start; }
+.in-pod[data-menu="B"] .mz-link { padding-top: 10px; border-top: 2px solid var(--m-ink); }
+.in-pod[data-menu="B"] .mz-link b { font-size: 19px; }
+/* C: sekcje z lewej, pozycje z prawej */
+.in-pod[data-menu="C"] { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 0 56px; }
+.in-pod[data-menu="C"] .mz-taby { display: flex; flex-direction: column; border-left: 1px solid var(--m-line); }
+.in-pod[data-menu="C"] .mz-tab { position: relative; padding: 12px 0 12px 22px; color: var(--m-muted); transition: color .15s; }
+.in-pod[data-menu="C"] .mz-tab b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.2; }
+.in-pod[data-menu="C"] .mz-tab small { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; }
+.in-pod[data-menu="C"] .mz-tab::before { content: ''; position: absolute; left: -2px; top: 12px; bottom: 12px; width: 3px; background: var(--d-a); opacity: 0; transition: opacity .15s; }
+.in-pod[data-menu="C"] .mz-tab:hover { color: var(--m-ink); }
+.in-pod[data-menu="C"] .mz-tab[aria-selected="true"] { color: var(--m-ink); }
+.in-pod[data-menu="C"] .mz-tab[aria-selected="true"]::before { opacity: 1; }
+.in-pod[data-menu="C"] .mz-tab[aria-selected="true"] small { color: var(--m-muted); }
+.in-pod[data-menu="C"] .mz-pola { align-content: start; border-top: 2px solid var(--m-ink); }
+.in-pod[data-menu="C"] .mz-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 36px; align-content: start; }
+.in-pod[data-menu="C"] .mz-link { padding: 14px 0; border-bottom: 1px solid var(--m-line); }
+/* D: karty sekcji, wybrana łączy się z polem pozycji */
+.in-pod[data-menu="D"] .mz-taby { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.in-pod[data-menu="D"] .mz-tab { padding: 18px 22px 20px; border: 1px solid var(--m-line); color: var(--m-ink); transition: background-color .15s, border-color .15s; }
+.in-pod[data-menu="D"] .mz-tab i { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+.in-pod[data-menu="D"] .mz-tab b { display: block; margin: 4px 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 28px; line-height: 1.15; }
+.in-pod[data-menu="D"] .mz-tab small { display: block; font-size: 13.5px; line-height: 1.4; color: var(--m-muted); }
+.in-pod[data-menu="D"] .mz-tab:hover { border-color: var(--d-a); }
+.in-pod[data-menu="D"] .mz-tab[aria-selected="true"] { margin-bottom: -17px; padding-bottom: 37px; background: var(--d-t); border-color: var(--d-t); }
+.in-pod[data-menu="D"] .mz-pola { margin-top: 16px; padding: 22px 24px 24px; background: var(--d-t); }
+.in-pod[data-menu="D"] .mz-panel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; align-content: start; }
+.in-pod[data-menu="obecne"] section { border-top: 2px solid var(--m-ink); padding-top: 8px; }
+.in-pod[data-menu="obecne"] h5 { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+.in-pod[data-menu="obecne"] a { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--m-line); font-family: var(--f-display); font-weight: 500; font-size: 21px; color: var(--m-ink); text-decoration: none; }
+.in-pod[data-menu="obecne"] a::after { content: '→'; font-family: var(--f-text); font-size: 15px; color: var(--m-muted); }
+.in-pod[data-menu="obecne"] a:hover { color: var(--d-a); }
 .in-tresc { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 72px; padding: 30px var(--marg) 50px; }
 .in-tresc h4 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 34px; color: var(--m-ink); }
 .in-tresc p { margin: 0 0 14px; max-width: 70ch; font-size: 17px; line-height: 1.68; color: var(--m-text); }
@@ -531,8 +614,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-patron span { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
 .in-patron p { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 45%, transparent); font-size: 14px; line-height: 1.5; color: rgb(255 255 255 / .86); }
 .in-obecna { display: block; width: 100%; height: auto; }
-.in-pod a.zew::after { content: '↗'; }
-.in-pod a small { margin-left: auto; padding-right: 12px; font-family: var(--f-text); font-size: 13px; font-weight: 500; color: var(--m-muted); }
+.in-pod[data-menu="obecne"] a.zew::after { content: '↗'; }
+.in-pod[data-menu="obecne"] a small { margin-left: auto; padding-right: 12px; font-family: var(--f-text); font-size: 13px; font-weight: 500; color: var(--m-muted); }
 .in-kart { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px; margin-top: 4px; }
 .in-kart article { border-top: 2px solid var(--d-a); padding-top: 12px; }
 .in-kart .gora { font-size: 13px; font-weight: 700; color: var(--d-a); }
@@ -937,6 +1020,13 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="wr-obecna" data-v="obecna" aria-pressed="false">Obecna strona (zrzut)</button>
     </div></div>
     <div class="grupa" id="wybor-anim" hidden><span>Animacja</span><div class="seg"><button type="button" id="anim-powtorz">pokaż pierwsze wejście jeszcze raz</button></div></div>
+    <div class="grupa" id="wybor-menu" hidden><span>Menu działu</span><div class="seg" data-ustaw="menuDz">
+      <button type="button" data-v="obecne" aria-pressed="false">obecne</button>
+      <button type="button" data-v="A" aria-pressed="true">A zakładki</button>
+      <button type="button" data-v="B" aria-pressed="false">B pasek</button>
+      <button type="button" data-v="C" aria-pressed="false">C spis</button>
+      <button type="button" data-v="D" aria-pressed="false">D karty</button>
+    </div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
       <button type="button" id="s-pod" data-v="pod" aria-pressed="false">podstrona</button>
@@ -1018,14 +1108,16 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
             <img src="{{KAMPUS}}" alt="Gmach Instytutu Matematycznego przy placu Grunwaldzkim o zmierzchu">
             <div class="barwa"></div>
             <div class="ok-skos" id="ok-skos"></div>
-            <nav class="ok-narz" aria-label="Narzędzia"><a href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Szukaj</a><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a><a href="#" data-motyw-przelacz aria-label="Tryb ciemny"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></a><button type="button" id="ok-burger" aria-label="Menu" aria-expanded="false" aria-controls="ok-menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></nav>
+            <nav class="ok-narz" aria-label="Narzędzia"><a href="#" data-motyw-przelacz aria-label="Tryb ciemny"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></a><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a><button type="button" id="ok-burger" aria-label="Menu" aria-expanded="false" aria-controls="ok-menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></nav>
             <nav class="ok-menu" id="ok-menu" aria-label="Menu">
               <span class="ok-narz zamknij"><button type="button" id="ok-zamknij" aria-label="Zamknij menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span>
+              <label class="menu-szukaj"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Szukaj</span><input type="search" placeholder="Szukaj na stronie"></label>
               <section data-dzial="instytut"><h3><a href="#">Instytut</a></h3><ul><li><a href="#">Władze</a></li><li><a href="#">Pracownicy</a></li><li><a href="#">Struktura i zakłady</a></li><li><a href="#">Kontakt</a></li><li><a href="#">Infrastruktura</a></li><li><a href="#">Biblioteka</a></li><li><a href="#">Warto wiedzieć</a></li></ul></section>
               <section data-dzial="nauka"><h3><a href="#">Nauka</a></h3><ul><li><a href="#">Seminaria</a></li><li><a href="#">Konferencje</a></li><li><a href="#">Obrony doktorskie</a></li><li><a href="#">Projekty i granty</a></li><li><a href="#">Publikacje</a></li><li><a href="#">Sukcesy</a></li><li><a href="#">Szkoła doktorska</a></li></ul></section>
-              <section data-dzial="studia"><h3><a href="#">Studia</a></h3><ul><li><a href="#">Kierunki</a></li><li><a href="#">Specjalności</a></li><li><a href="#">Plan zajęć</a></li><li><a href="#">Rok akademicki</a></li><li><a href="#">Sprawy studenckie</a></li><li><a href="#">MOST</a></li><li><a href="#">Rekrutacja</a></li></ul></section>
+              <section data-dzial="studia"><h3><a href="#">Studia</a></h3><ul><li><a href="#">Kierunki</a></li><li><a href="#">Specjalności</a></li><li><a href="#">Plan zajęć</a></li><li><a href="#">Rok akademicki</a></li><li><a href="#">Sprawy studenckie</a></li><li><a href="#">MOST</a></li></ul></section>
               <section data-dzial="popularyzacja"><h3><a href="#">Popularyzacja</a></h3><ul><li><a href="#">Dla uczniów</a></li><li><a href="#">Dla nauczycieli</a></li><li><a href="#">Dla wszystkich</a></li></ul></section>
               <section class="duza"><h3><a href="#">Aktualności</a></h3></section>
+              <section class="duza"><h3><a href="#">Rekrutacja <span class="zew-ikona" aria-hidden="true">↗</span></a></h3></section>
             </nav>
             <div class="ok-tytul">
               <a class="ok-flaga" id="ok-flaga" href="#" hidden>Rekrutacja na rok 2027/28 ruszyła</a>
@@ -1038,7 +1130,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
           <div class="ok-druga">
           <header class="ok-pasek">
             <a class="marka" href="#"><span class="logo-uwr" aria-hidden="true"></span><span><b>Instytut Matematyczny</b><small>Wydział Matematyki i Informatyki</small></span></a>
-            <nav aria-label="Menu makiety"><a href="#" data-dzial="instytut">Instytut</a><a href="#" data-dzial="nauka">Nauka</a><a href="#" data-dzial="studia">Studia</a><a href="#" data-dzial="popularyzacja">Popularyzacja</a><a href="#">Aktualności</a><a href="#" class="rekr">Rekrutacja</a><a href="#">Szukaj</a><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a></nav>
+            <nav aria-label="Menu makiety"><a href="#" data-dzial="instytut">Instytut</a><a href="#" data-dzial="nauka">Nauka</a><a href="#" data-dzial="studia">Studia</a><a href="#" data-dzial="popularyzacja">Popularyzacja</a><a href="#">Aktualności</a><span class="pasek-narz"><button type="button" data-motyw-przelacz aria-label="Tryb ciemny"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a><button type="button" class="pasek-burger" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></span></nav>
           </header>
           <section class="ok-pod" id="na-skroty">
             <nav class="ok-skr" aria-label="Szybki dostęp">
@@ -1080,7 +1172,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
         <div id="in-nowa">
         <header class="ok-pasek">
           <a class="marka" href="#"><span class="logo-uwr" aria-hidden="true"></span><span><b>Instytut Matematyczny</b><small>Wydział Matematyki i Informatyki</small></span></a>
-          <nav aria-label="Menu makiety"><a href="#" data-dzial="instytut">Instytut</a><a href="#" data-dzial="nauka">Nauka</a><a href="#" data-dzial="studia">Studia</a><a href="#" data-dzial="popularyzacja">Popularyzacja</a><a href="#">Aktualności</a><a href="#" class="rekr">Rekrutacja</a><a href="#">Szukaj</a><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a></nav>
+          <nav aria-label="Menu makiety"><a href="#" data-dzial="instytut">Instytut</a><a href="#" data-dzial="nauka">Nauka</a><a href="#" data-dzial="studia">Studia</a><a href="#" data-dzial="popularyzacja">Popularyzacja</a><a href="#">Aktualności</a><span class="pasek-narz"><button type="button" data-motyw-przelacz aria-label="Tryb ciemny"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button><a href="#" class="en" lang="en"><svg class="flaga" viewBox="0 0 60 30" aria-hidden="true"><use href="#flaga-uk"/></svg>EN</a><button type="button" class="pasek-burger" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></span></nav>
         </header>
         <div id="in-baner"></div>
         <div class="in-pod" id="in-pod"></div>
@@ -1744,7 +1836,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   });
   document.addEventListener('click', (e) => {
     const a = e.target.closest('#v-instytut [data-strona], #in-pod a'); if (!a) return;
-    const v = a.dataset.strona || (PODSTRONY[dzial] && a.textContent.trim() === PODSTRONY[dzial].nazwa ? 'pod' : null); if (!v) return;
+    const v = a.dataset.strona || (PODSTRONY[dzial] && (a.dataset.n || a.textContent.trim()) === PODSTRONY[dzial].nazwa ? 'pod' : null); if (!v) { if (a.closest('#in-pod')) e.preventDefault(); return; }
     e.preventDefault(); document.querySelector(`#wybor-strony [data-v="${v}"]`).click();
   });
   /* strona działu: szkic i podpis rysują się tylko przy pierwszym wejściu w wizycie (sessionStorage); gdy się nie da zapisać — jak przy powrocie */
@@ -1865,6 +1957,57 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     studia: [['Kierunki', ['Matematyka', 'SIAD', 'ISIM', 'Szkoła doktorska', 'Studia podyplomowe']], ['Na co dzień', ['Plan zajęć', 'Rok akademicki', 'Zajęcia i konsultacje', 'Pierwszy rok', 'USOSweb ↗']], ['Dyplom i sprawy', ['Egzaminy i dyplom', 'Procedura dyplomowania', 'Sprawy studenckie', 'Program MOST', 'Skrypty i materiały']]],
     popularyzacja: [['Na tej stronie', ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy']], ['Partnerzy', ['Fundacja Matematyków Wrocławskich|fmw.math.uni.wroc.pl ↗', 'Wrocławski Portal Matematyczny|matematyka.wroc.pl ↗', 'Wrocławski Oddział PTM|ptm.math.uni.wroc.pl ↗']]]
   };
+  /* menu działu: trzy sekcje, pole z pozycjami wybranej (4 projekty, 4.11) */
+  let menuDz = 'A', mzSekcja = 0;
+  const MZ_OPIS = {
+    'Matematyka': 'studia I i II stopnia, pięć specjalności', 'SIAD': 'sztuczna inteligencja w analizie danych', 'ISIM': 'Indywidualne Studia Informatyczno-Matematyczne',
+    'Szkoła doktorska': 'Kolegium Doktorskie Matematyki', 'Studia podyplomowe': 'kwalifikacje do nauczania matematyki',
+    'Plan zajęć': 'przedmioty, terminy i sale z USOS', 'Rok akademicki': 'semestry, sesje, przerwy, kolory dni', 'Zajęcia i konsultacje': 'zapisy, wersje przedmiotów, dyżury',
+    'Pierwszy rok': 'pierwsze kroki na studiach', 'USOSweb': 'oceny, zapisy, legitymacja',
+    'Egzaminy i dyplom': 'sesja i egzamin dyplomowy', 'Procedura dyplomowania': 'praca, recenzje i obrona krok po kroku', 'Sprawy studenckie': 'wnioski, stypendia, dziekanat',
+    'Program MOST': 'semestr na innej polskiej uczelni', 'Skrypty i materiały': 'materiały do przedmiotów',
+    'Seminaria': 'cotygodniowe seminaria zakładów', 'Konferencje': 'organizowane przez Instytut', 'Obrony doktorskie': 'rozprawy i terminy obron',
+    'Projekty i granty': 'realizowane i zakończone', 'Publikacje': 'wykazy roczne', 'Sukcesy': 'nagrody i wyróżnienia', 'Rada Dyscypliny Matematyka': 'doktoraty i habilitacje',
+    'Władze': 'dyrekcja i Rada Instytutu', 'Pracownicy': 'spis osób, pokoje, kontakt', 'Struktura i zakłady': 'osiem zakładów i pracownia', 'Kontakt': 'adres, sekretariat, dojazd',
+    'Infrastruktura informatyczna': 'konta, sieć, drukarki', 'Biblioteka': 'Biblioteka Matematyczna'
+  };
+  const MZ_SEKCJA = {
+    'Kierunki': 'Matematyka, SIAD, ISIM, doktorat i studia podyplomowe', 'Na co dzień': 'plan, kalendarz, zajęcia, pierwszy rok', 'Dyplom i sprawy': 'egzaminy, dyplom, wnioski, wyjazdy',
+    'Wydarzenia naukowe': 'seminaria, konferencje, obrony', 'Badania': 'projekty, publikacje, sukcesy', 'Stopnie naukowe': 'doktorat i habilitacja',
+    'Ludzie': 'władze i pracownicy', 'Organizacja': 'zakłady i kontakt', 'Więcej': 'informatyka i biblioteka'
+  };
+  const mzStron = (n) => n + ' ' + (n === 1 ? 'strona' : n >= 2 && n <= 4 ? 'strony' : 'stron');
+  function htmlMenuDzialu(dz) {
+    const G = IN_GRUPY[dz], w = dz === 'popularyzacja' ? 'obecne' : menuDz;
+    if (w === 'obecne') return G.map(([h, l]) => `<section><h5>${h}</h5>${l.map((x) => { const z = x.endsWith(' ↗'), [a, b] = (z ? x.slice(0, -2) : x).split('|'); return `<a href="#" data-n="${a}"${z ? ' class="zew"' : ''}>${a}${b ? `<small>${b}</small>` : ''}</a>`; }).join('')}</section>`).join('');
+    const k = Math.min(mzSekcja, G.length - 1);
+    const nazwa = (x) => (x.endsWith(' ↗') ? x.slice(0, -2) : x).split('|')[0];
+    const tab = ([h, l], i) => {
+      const sel = i === k ? 'true' : 'false', wsp = `type="button" role="tab" class="mz-tab" id="mz-t${i}" aria-selected="${sel}" aria-controls="mz-p${i}" tabindex="${i === k ? 0 : -1}" data-mz="${i}"`;
+      if (w === 'A' || w === 'B') return `<button ${wsp}>${h}<sup>${l.length}</sup></button>`;
+      if (w === 'C') return `<button ${wsp}><b>${h}</b><small>${l.map(nazwa).join(' · ')}</small></button>`;
+      return `<button ${wsp}><i>${mzStron(l.length)}</i><b>${h}</b><small>${MZ_SEKCJA[h] || ''}</small></button>`;
+    };
+    const link = (x) => { const z = x.endsWith(' ↗'), n = nazwa(x); return `<a class="mz-link${z ? ' zew' : ''}" href="#" data-n="${n}"><b>${n}</b><small>${MZ_OPIS[n] || ''}</small></a>`; };
+    // wszystkie pola są w HTML jedno na drugim (ta sama komórka siatki): wysokość = najwyższe, więc treść pod spodem nie skacze
+    return `<div class="mz-taby" role="tablist" aria-label="Strony działu">${G.map(tab).join('')}</div>
+      <div class="mz-pola">${G.map(([, l], i) => `<div class="mz-panel${i === k ? ' akt' : ''}" id="mz-p${i}" role="tabpanel" aria-labelledby="mz-t${i}"${i === k ? '' : ' inert'}>${l.map(link).join('')}</div>`).join('')}</div>`;
+  }
+  function mzWybierz(i) {
+    mzSekcja = i;
+    document.querySelectorAll('#in-pod .mz-tab').forEach((t, j) => { t.setAttribute('aria-selected', String(i === j)); t.tabIndex = i === j ? 0 : -1; });
+    document.querySelectorAll('#in-pod .mz-panel').forEach((p, j) => { p.classList.toggle('akt', i === j); p.inert = i !== j; });
+    $('#in-pod .mz-tab[aria-selected="true"]').focus();
+  }
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('#in-pod .mz-tab'); if (!t) return;
+    mzWybierz(+t.dataset.mz);
+  });
+  document.addEventListener('keydown', (e) => {
+    const t = e.target.closest('#in-pod .mz-tab'); if (!t || !['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+    e.preventDefault(); const n = IN_GRUPY[dzial].length, d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
+    mzWybierz((+t.dataset.mz + d + n) % n);
+  });
   function rysujInstytut() {
     const dz = dzial, f = IN_FOTO[dz], w = dz === 'instytut' ? wariantInst : '4';
     const d = dz === 'instytut' ? { ...D.instytut, tytul: 'O Instytucie', tekst: IN_INST.tekst, skrot: IN_INST.skrot }
@@ -1872,6 +2015,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const obecna = wersja === 'obecna', pod = strona === 'pod' && !!PODSTRONY[dz];
     const pierwsze = !pod && !obecna && w === '4' && pierwszeWejscie(dz);
     $('#wybor-strony').hidden = !PODSTRONY[dz];
+    $('#wybor-menu').hidden = pod || dz === 'popularyzacja';
     $('#wybor-nagl').hidden = !pod; $('#wybor-zdjec').hidden = !pod; $('#wybor-boku').hidden = !pod;
     $('#v-instytut').classList.toggle('n-jasny', pod && naglowek === 'jasny');
     $('#in-nowa').hidden = obecna; $('#in-obecna').hidden = !obecna;
@@ -1885,7 +2029,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#v-instytut').dataset.dzial = dz;
     $('#wybor-inst').hidden = dz !== 'instytut';
     const tytul = `<div class="in-tytul"><a class="wstecz" href="#">← Strona główna</a><h2>${d.nazwa}</h2><p class="haslo">${d.haslo}</p><p class="lead">${IN_DANE[dz].lead}</p>${d.liczby.length ? '' : '<!--'}<div class="in-liczby">${d.liczby.map(([a, b]) => `<div><b>${a}</b>${b}</div>`).join('')}</div>${d.liczby.length ? '' : '-->'}</div>`;
-    $('#in-pod').innerHTML = IN_GRUPY[dz].map(([h, l]) => `<section><h5>${h}</h5>${l.map((x) => { const z = x.endsWith(' ↗'), [a, b] = (z ? x.slice(0, -2) : x).split('|'); return `<a href="#"${z ? ' class="zew"' : ''}>${a}${b ? `<small>${b}</small>` : ''}</a>`; }).join('')}</section>`).join('');
+    $('#in-pod').dataset.menu = dz === 'popularyzacja' ? 'obecne' : menuDz;
+    $('#in-pod').innerHTML = htmlMenuDzialu(dz);
     $('#in-tresc').hidden = pod || !d.tekst.length;
     $('#in-tresc').innerHTML = `<div><h4>${d.tytul}</h4>${d.tekst.map((t, i) => `<p${i === 0 ? ' class="wst"' : ''}>${t}</p>`).join('')}</div><aside class="skrot"><h5>W skrócie</h5>${d.skrot.map(([a, b]) => `<div><b>${a}</b><span>${b}</span></div>`).join('')}</aside>`;
     $('#in-baner').innerHTML = w === '4'
@@ -1912,6 +2057,23 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     const r = $('#ok-ramka');
     r.style.width = ekran[0] + 'px'; r.style.height = ekran[1] + 'px';
   }
+  // hamburger w pasku menu (4.11): ten sam panel co na okładce, dołączony do każdego paska
+  document.querySelectorAll('.ok-pasek').forEach((h, i) => {
+    const m = document.createElement('div'); m.className = 'ok-menu pasek-menu'; m.id = 'pasek-menu-' + i; m.setAttribute('role', 'navigation'); m.setAttribute('aria-label', 'Menu');
+    m.innerHTML = $('#ok-menu').innerHTML.replace(' id="ok-zamknij"', '');
+    h.appendChild(m); h.querySelector('.pasek-burger').setAttribute('aria-controls', m.id);
+  });
+  const menuPasek = (h, otw) => {
+    const m = h.querySelector('.pasek-menu'), b = h.querySelector('.pasek-burger');
+    m.classList.toggle('otwarte', otw); b.setAttribute('aria-expanded', String(otw));
+    (otw ? m.querySelector('.zamknij button') : b).focus();
+  };
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.pasek-burger'); if (b) { menuPasek(b.closest('.ok-pasek'), true); return; }
+    const z = e.target.closest('.pasek-menu .zamknij button'); if (z) { menuPasek(z.closest('.ok-pasek'), false); return; }
+    document.querySelectorAll('.pasek-menu.otwarte').forEach((m) => { if (!m.contains(e.target)) menuPasek(m.closest('.ok-pasek'), false); });
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.pasek-menu.otwarte').forEach((m) => menuPasek(m.closest('.ok-pasek'), false)); });
   const menuOk = (otw) => { $('#ok-menu').classList.toggle('otwarte', otw); $('#ok-burger').setAttribute('aria-expanded', String(otw)); if (otw) $('#ok-zamknij').focus(); else $('#ok-burger').focus(); };
   $('#ok-burger').addEventListener('click', () => menuOk(true));
   $('#ok-zamknij').addEventListener('click', () => menuOk(false));
@@ -2063,6 +2225,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#wybor-baner').hidden = widok !== 'instytut';
     $('#wybor-paska').hidden = widok !== 'instytut';
     $('#wybor-strony').hidden = widok !== 'instytut';
+    $('#wybor-menu').hidden = widok !== 'instytut';
     $('#wybor-anim').hidden = widok !== 'instytut';
     if (widok === 'instytut') rysujInstytut();
     $('#scena').classList.toggle('telefony', widok === 'telefon');
@@ -2096,6 +2259,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'naglowek') { naglowek = v; rysujInstytut(); skaluj(); }
     if (co === 'zdjeciaWl') { zdjeciaWl = v === 'tak'; rysujInstytut(); skaluj(); }
     if (co === 'strona') { strona = v; rysujInstytut(); skaluj(); window.scrollTo(0, 0); }
+    if (co === 'menuDz') { menuDz = v; mzSekcja = 0; rysujInstytut(); skaluj(); }
     if (co === 'tlo') document.documentElement.dataset.tlo = v;
     if (co === 'pasek') { pasekIn = v; rysujInstytut(); skaluj(); }
     if (co === 'motyw') { if (v === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = v; }
