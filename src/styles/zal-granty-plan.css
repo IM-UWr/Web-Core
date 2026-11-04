@@ -2,11 +2,9 @@
    Kierunek „Założyciele” — podstrony „Projekty i granty” (ListaGrantow.astro, blok .z-gr) i „Plan zajęć” (PlanZajec.astro,
    blok .z-pl) na komputerze (≥ 761 px). Wzorzec: prototyp proto/zalozyciele.src.html (trescGranty, trescPlan, filtrujPlan),
    specyfikacja: dok/estetyka.md „Podstrony działów”. Wspólna rama podstrony (.z-pd, .z-bok, .z-pd-tresc, .z-nast) — zalozyciele.css.
-   Telefon (≤ 760 px) bez zmian: wszystko poniżej jest w @media (min-width: 761px), nowe bloki mają .tylko-komputer.
+   Komputer: @media (min-width: 761px); telefon (≤ 760 px): bloki na końcu pliku.
    ========================================================================== */
 @media (min-width: 761px) {
-  /* dotychczasowa treść tych stron zostaje w HTML (telefon, wyszukiwarka) — na komputerze tylko nagłówek i nowy układ */
-  body:has(.z-pd > .z-gr, .z-pd > .z-pl) main > :not(.page-head, .z-pd, .z-pd-dol) { display: none !important; }
   :is(.z-gr, .z-pl) [hidden] { display: none !important; }
   /* interlinia jak w prototypie (treść podstrony 16 px / 1.6, nagłówki sekcji bez własnej interlinii) */
   .z-gr, .z-pl, .z-gr h2, .z-pl h2 { line-height: 1.6; }
@@ -73,4 +71,88 @@
   .z-pl .pl-w .uw a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; }
   .z-pl .pl-w .uw a:hover { color: var(--d-a); }
   .z-pl .pl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+}
+
+/* ---------- telefon (≤ 760 px): Plan zajęć ----------
+   Przedmiot jako blok (nazwa Brygadą), pod nią zajęcia w dwóch liniach: „wyk. · gr. 1 · pon. · 10:15–12:00 · HS”
+   i prowadzący z uwagami. Przyklejony pasek pod nagłówkiem: semestr i wyszukiwarka w jednym rzędzie, dni w drugim.
+   Spis kategorii zwijany nad planem (zal/SpisStrony.astro, zal-podstrona.css). */
+@media (max-width: 760px) {
+  :is(.z-gr, .z-pl) [hidden] { display: none !important; }
+  .z-gr, .z-pl { line-height: 1.6; }
+
+  .z-pl .pl-narz { position: sticky; top: var(--hdr-h); z-index: 5; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px;
+    margin: 0 -16px; padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--ink); }
+  html:not(.js) .z-pl .pl-narz { display: none; }
+  html.js .z-pl [data-z-panel]:not([data-z-aktywny]) { display: none; }
+  .z-pl .pl-narz:not(:has(.pl-sem)) .pl-szukaj { grid-column: 1 / -1; }
+  .z-pl .pl-sem, .z-pl .pl-dni { display: flex; border: 1px solid var(--line); }
+  .z-pl .pl-dni { grid-column: 1 / -1; }
+  .z-pl .pl-sem button, .z-pl .pl-dni button { flex: 1 1 auto; margin: 0; min-height: 40px; padding: 6px 10px; border: 0; border-radius: 0; background: transparent;
+    font: inherit; font-size: 13.5px; font-weight: 600; color: var(--text); cursor: pointer; }
+  .z-pl .pl-sem button + button, .z-pl .pl-dni button + button { border-left: 1px solid var(--line); }
+  .z-pl .pl-sem button[aria-pressed="true"], .z-pl .pl-dni button[aria-pressed="true"] { background: var(--d-a); color: var(--bg); }
+  .z-pl .pl-sem button:focus-visible, .z-pl .pl-dni button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .z-pl .pl-szukaj { width: 100%; min-width: 0; margin: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 0; background: var(--bg);
+    font: inherit; font-size: 16px; color: var(--ink); }
+  .z-pl .pl-szukaj::placeholder { color: var(--muted); opacity: 1; }
+  .z-pl .pl-szukaj:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+  .z-pl .pl-info { margin: 12px 0 6px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+
+  .z-pl .pl-kat { margin: 22px 0 0; scroll-margin-top: calc(var(--hdr-h) + 120px); }
+  .z-pl .pl-kat h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.25; color: var(--d-a); }
+  .z-pl .pl-nagl { display: none; }
+  .z-pl .pl-p { padding: 10px 0 8px; border-top: 1px solid var(--line); }
+  .z-pl .pl-p h3 { margin: 0 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.3; }
+  .z-pl .pl-p h3 a { color: var(--ink); text-decoration: none; }
+  /* wiersz zajęć: pierwsza linia (typ, grupa, dzień, godziny, sala), druga (prowadzący, uwagi) */
+  .z-pl .pl-w { display: flex; flex-wrap: wrap; align-items: baseline; padding: 5px 0; font-size: 14.5px; line-height: 1.45; color: var(--text); }
+  .z-pl .pl-w::before { content: ''; order: 2; flex-basis: 100%; }
+  .z-pl .pl-w > * { order: 1; min-width: 0; overflow-wrap: anywhere; }
+  .z-pl .pl-w > :is(.prow, .uw) { order: 3; }
+  .z-pl .pl-w > :is(.gr, .dz, .sala):not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
+  .z-pl .pl-w > .godz:not(:empty)::before { content: ''; margin-left: 6px; }
+  .z-pl .pl-w > .typ + .gr:empty + .dz:empty + .godz:not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
+  .z-pl .pl-sem button { flex: none; padding: 6px 8px; font-size: 12.5px; }
+  .z-pl .pl-w abbr { text-decoration: none; }
+  .z-pl .pl-w .typ { font-weight: 700; color: var(--ink); }
+  .z-pl .pl-w .gr .sr-only { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; clip-path: none; white-space: normal; }
+  .z-pl .pl-w .dz { font-weight: 700; color: var(--d-a); }
+  .z-pl .pl-w .godz { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .z-pl .pl-w .godz small { margin-left: 5px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+  .z-pl .pl-w .prow { color: var(--text); }
+  .z-pl .pl-w .uw:not(:empty) { margin-left: 8px; font-size: 13px; color: var(--muted); }
+  .z-pl .pl-w .prow:empty + .uw { margin-left: 0; }
+  .z-pl .pl-w .uw a { color: inherit; text-underline-offset: 2px; }
+  .z-pl .pl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+}
+
+/* ---------- telefon (≤ 760 px): Projekty i granty ----------
+   Wiersz projektu w jednej kolumnie: rodzaj i lata, tytuł, kierownik · zakład · numer, pod spodem pasek czasu na całą
+   szerokość; oś lat nad listą (te same marginesy co paski, żeby skrajne lata się mieściły). */
+@media (max-width: 760px) {
+  .z-gr > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .z-gr > section:last-of-type { border-bottom: 0; margin-bottom: 0; }
+  .z-gr h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  .z-gr p { margin: 0 0 12px; font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-gr p.wst { font-size: 16.5px; }
+  .z-gr .os-lat { display: block; margin: 10px 0 2px; }
+  .z-gr .os-lat > span:first-child { display: none; }
+  .z-gr .tor-os { position: relative; display: block; height: 18px; margin: 0 14px; border-bottom: 1px solid var(--line); }
+  .z-gr .tor-os b { position: absolute; bottom: 3px; transform: translateX(-50%); font-size: 11.5px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .z-gr .gr-w { display: block; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .z-gr .gr-w.maly { padding: 9px 0; }
+  .z-gr .gr-w .rola { font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-gr .gr-w .imie { margin: 3px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.25; }
+  .z-gr .gr-w .imie a, .z-gr .gr-t { color: var(--ink); text-decoration: none; }
+  .z-gr .gr-t { font-family: var(--f-display); font-size: 17px; line-height: 1.3; }
+  .z-gr .gr-w .kont { margin-top: 3px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .z-gr .nr { font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+  .z-gr .tor { position: relative; display: block; height: 8px; margin: 9px 14px 2px; background: color-mix(in srgb, var(--d-a) 10%, transparent); }
+  .z-gr .tor.duzy { height: 10px; }
+  .z-gr .tor .pas { position: absolute; top: 0; bottom: 0; background: var(--d-a); }
+  .z-gr .tor i { position: absolute; top: -5px; bottom: -5px; width: 0; border-left: 1.5px dashed var(--ink); }
+  .z-gr .gr-w > span:empty { display: none; }
+  .z-gr .gr-rok { margin: 20px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.4; color: var(--d-a); }
+  .z-gr .gr-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
 }

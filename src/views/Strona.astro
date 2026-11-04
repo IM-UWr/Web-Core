@@ -1,54 +1,42 @@
 ---
 // Strona stała (Markdown z src/content/strony). Adres = ścieżka pliku, np. studia/matematyka.md → /studia/matematyka
+// Jedna wersja HTML: treść w jednej kolumnie; na telefonie (≤ 760 px) spis „Na tej stronie” zwijany nad treścią (zal/SpisStrony.astro).
 import type { CollectionEntry } from 'astro:content';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import Ikona from '../components/Ikona.astro';
 import SpisTresci from '../components/SpisTresci.astro';
-import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz } from '../lib/i18n';
+import { t, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneStrony } from '../lib/widoki/strona';
 import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
+import SpisStrony from '../components/zal/SpisStrony.astro';
 
 interface Props { strona: CollectionEntry<'strony'>; lang: Lang }
 const { strona, lang } = Astro.props;
 const { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ } = await daneStrony(strona, lang);
-const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 ---
 <Baza tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}>
   <NaglowekStrony tytul={tytul} lead={opis} haslo={haslo} lang={lang} okruszki={[...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang), adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang), adres: rodzic.adres }] : []), { etykieta: tytul }]}>
     <LiczbyBanera lang={lang} pozycje={liczby} />
   </NaglowekStrony>
   <div class:list={['wrap layout', wygladPortalZwarta && 'st-odstep']}>
+    {/* „Na tej stronie”: na telefonie zwijany nad treścią; na komputerze spis jest w bocznej nawigacji działu */}
+    <SpisStrony spis={spisZ} lang={lang} />
     <div class="main">
-      {(pasek === 'spis' || pasek === 'oba') && <SpisTresci naglowki={naglowki} lang={lang} wariant="gora" />}
       {tylkoPolski && <p class="notice">{t('en', 'wersjaPolska')}</p>}
       <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
         {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
       </div>
     </div>
-    {pasek !== 'brak' && (
-    <aside class="side" data-pagefind-ignore>
-      {(pasek === 'spis' || pasek === 'oba') && <SpisTresci naglowki={naglowki} lang={lang} wariant="bok" />}
-      {(pasek === 'menu' || pasek === 'oba') && linkiDzialu.length > 0 && (
-        <nav class="side-box side-nav" aria-label={wybierz(dzial, 'etykieta', lang)}>
-          <h2>{wybierz(dzial, 'etykieta', lang)}</h2>
-          <div style="display:flex;flex-direction:column">
-            {linkiDzialu.map((l) => (
-              <a href={href(l.adres)} aria-current={l.adres === adres ? 'page' : l === rodzic ? 'true' : undefined}>
-                {wybierz(l, 'etykieta', lang)}{isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-              </a>
-            ))}
-          </div>
-        </nav>
-      )}
-    </aside>
+    {/* strony bez działu (np. deklaracja dostępności): spis z prawej na komputerze — do zastąpienia wspólnym szablonem (etap 2) */}
+    {!dzialZ && pasek !== 'brak' && (pasek === 'spis' || pasek === 'oba') && (
+      <aside class="side" data-pagefind-ignore>
+        <SpisTresci naglowki={naglowki} lang={lang} wariant="bok" />
+      </aside>
     )}
-    {/* komputer (kierunek „Założyciele”): boczna nawigacja działu z lewej (siatka .layout w zal-podstrony.css), stary pasek
-         boczny schowany; na telefonie ten element nie istnieje (.tylko-komputer) */}
-    {dzialZ && <BocznaNawigacja dzial={dzialZ} lang={lang} spis={spisZ} class="tylko-komputer" />}
+    {/* komputer: boczna nawigacja działu z lewej (zalozyciele.css: .layout:has(> .z-bok)) */}
+    {dzialZ && <BocznaNawigacja dzial={dzialZ} lang={lang} spis={spisZ} />}
   </div>
 </Baza>
 

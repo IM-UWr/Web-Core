@@ -1,0 +1,36 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — szablon podstrony: spis „Na tej stronie” (zal/SpisStrony.astro) i rama podstrony (.z-pd)
+   na telefonie. Rama na komputerze: zalozyciele.css (.z-pd, .z-bok, .z-pd-tresc).
+   ========================================================================== */
+@media (min-width: 761px) {
+  /* komputer: spis jeszcze w bocznej nawigacji działu (BocznaNawigacja.astro) */
+  .z-spis { display: none; }
+}
+
+@media (max-width: 760px) {
+  /* rama podstrony: jedna kolumna, bez bocznej nawigacji działu */
+  .z-pd { display: block; padding: 18px 16px 24px; }
+  .z-bok { display: none; }
+
+  /* spis „Na tej stronie”: zwijany nad treścią, lista z cienką kreską po lewej */
+  .z-spis { margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
+  .z-spis-h { margin: 12px 0 6px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-spis-js .z-spis-h { display: none; }
+  .z-spis-przelacz { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; margin: 0; padding: 0;
+    border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; }
+  .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform .2s; }
+  .z-spis-otwarty .z-spis-przelacz svg { transform: rotate(180deg); }
+  .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .z-spis-lista { list-style: none; margin: 0 0 14px; padding: 0; border-left: 1px solid var(--line); }
+  .z-spis-js:not(.z-spis-otwarty) .z-spis-lista { display: none; }
+  .z-spis-lista li[hidden] { display: none; }
+  .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; }
+  .z-spis-lista a:hover { color: var(--d-a); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .z-spis-przelacz svg { transition: none; }
+}
+@media (max-width: 760px) {
+  /* strony tekstowe (Strona.astro): spis nad treścią na całą szerokość */
+  .layout > .z-spis { flex: 1 1 100%; margin-bottom: 0; }
+}

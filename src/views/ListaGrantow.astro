@@ -1,28 +1,18 @@
 ---
-// Projekty i granty (/nauka/granty): liczby wyliczone z kolekcji, realizowane projekty jako karty,
-// zakończone jako zwarta lista pogrupowana wg roku zakończenia (najnowsze u góry), na końcu projekty bez podanych lat.
-// Bez wyszukiwarki i filtrów (decyzja właściciela strony). Prawy pasek: tylko spis „Na tej stronie” (sekcje i lata).
-// Sekcje (Realizowane, Zakończone, Pozostałe) to .zsec jak na stronach działów (kreska sekcji, tytuł h2).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
-// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner jak w działach — hasło (nauka.json: granty_haslo / granty_haslo_en)
-// zamiast opisu i trzy liczby pod kreską (LiczbyBanera): realizowane · zakończone · łącznie. Dawnych kafelków .stats pod
-// banerem już nie ma (liczby są w banerze, jak na stronach działów).
-// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola granty_tekst / granty_tekst_en; puste = brak).
-// Kierunek „Założyciele” (komputer): nowy układ podstrony (.z-pd: boczna nawigacja działu i treść) stoi na końcu strony;
-// dotychczasową treść ukrywa na komputerze src/styles/zal-granty-plan.css (zostaje dla telefonu i wyszukiwarki Pagefind).
+// Projekty i granty (/nauka/granty), kierunek „Założyciele” (prototyp: trescGranty): wstęp (nauka.json: granty_tekst),
+// Realizowane z paskami czasu na wspólnej osi lat i przerywaną linią „dziś” (data budowania), Zakończone według roku
+// zakończenia z małymi paskami (oś co 4 lata), Pozostałe (bez lat). Liczby w banerze wyliczone z kolekcji.
+// Jedna wersja HTML: komputer — wiersz z paskiem z prawej; telefon (≤ 760 px) — wiersz w jednej kolumnie, pasek pod tytułem
+// na całą szerokość, oś lat nad listą, spis sekcji zwijany nad treścią (src/styles/zal-granty-plan.css).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
-import LiczbyBanera from '../components/LiczbyBanera.astro';
-import TekstWstepny from '../components/TekstWstepny.astro';
-import WierszGrantu from '../components/WierszGrantu.astro';
-import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneListyGrantow, odm } from '../lib/widoki/listaGrantow';
 import BocznaNawigacja from '../components/zal/BocznaNawigacja.astro';
+import SpisStrony from '../components/zal/SpisStrony.astro';
 import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
@@ -37,7 +27,7 @@ const {
   realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje,
   wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
 } = await daneListyGrantow(lang);
-// Komputer (kierunek „Założyciele”): wiersz „Kierownik: … · zakład · numer” i krótka linia pod tytułem w małych wierszach.
+// Wiersz „Kierownik: … · zakład · numer” i krótka linia pod tytułem w małych wierszach.
 const rodzaj = (g: Grant) => RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '';
 const kierownicyTekst = (g: Grant) => kier(g).map((x) => x.nazwa).join(', ');
 // części linii pod tytułem (puste pomijane); na końcu numer projektu cyframi tabelarycznymi (.nr), a bez numeru — program (jak w prototypie)
@@ -49,113 +39,14 @@ const dzisR = osRealizowanych && dzisNaOsi(osRealizowanych);
 const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
 ---
 <Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
-  {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
-       Telefon: hasło zamiast opisu i trzy liczby pod kreską (LiczbyBanera, .tylko-telefon). */}
   <NaglowekStrony tytul={naglowek} lead={lead} haslo={haslo} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
-    <ul class="pt-liczby tylko-komputer">
+    <ul class="pt-liczby">
       {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
     </ul>
-    <LiczbyBanera lang={lang} pozycje={liczbyTelefon} />
   </NaglowekStrony>
 
-  <div class="wrap layout">
-    <div class="main">
-      <TekstWstepny pole="granty_tekst" lang={lang} />
-
-      {sekcje.length > 1 && (
-        <details class="toc toc-top gl-spis" data-pagefind-ignore>
-          <summary>{naTejStronie}<Ikona nazwa="dol" class="chev" rozmiar={18} /></summary>
-          <ol>
-            {sekcje.map((s) => (
-              <li>
-                <a href={`#${s.id}`}>{s.tekst} <span class="gl-spis-ile">({s.ile})</span></a>
-                {s.id === 'zakonczone' && <ol class="gl-lata" aria-label={T('Rok zakończenia', 'Year completed')}>{grupy.map((gr) => <li><a href={`#rok-${gr.rok}`}>{gr.rok}</a></li>)}</ol>}
-              </li>
-            ))}
-          </ol>
-        </details>
-      )}
-
-      <section class="zsec gl-sekcja" id="realizowane" aria-labelledby="h-realizowane">
-        <h2 id="h-realizowane">{T('Realizowane', 'Ongoing')} <span class="muted gl-ile">({realizowane.length})</span></h2>
-        {realizowane.length === 0 && <p class="muted">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
-        {realizowane.length > 0 && (
-          <div class="spec-grid">
-            {realizowane.map((g) => {
-              const k = kier(g);
-              const z = zakladProjektu(g);
-              const lata = lataGrantu(g);
-              return (
-                <article class="spec spec-link gl-karta">
-                  <div class="news-meta">
-                    <span class={klasaRodzaju(g)}>{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span>
-                    {g.data.program && <span class="badge">{g.data.program}</span>}
-                    {lata && <span class="gl-lata-txt">{lata}</span>}
-                  </div>
-                  <h3><a href={adresGrantu(g)}>{tytul(g)}</a></h3>
-                  {k.length > 0 && <p><span class="lbl">{k.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}</span>{k.map((x) => x.nazwa).join(', ')}</p>}
-                  {(z || g.data.kod) && (
-                    <p class="foot">
-                      {z && <a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a>}
-                      {g.data.kod && <span class="muted gl-kod">{g.data.kod}</span>}
-                    </p>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {zakonczone.length > 0 && (
-        <section class="zsec gl-sekcja" id="zakonczone" aria-labelledby="h-zakonczone">
-          <h2 id="h-zakonczone">{T('Zakończone', 'Completed')} <span class="muted gl-ile">({zakonczone.length})</span></h2>
-          {grupy.map((gr) => (
-            <section class="gl-rok" id={`rok-${gr.rok}`} aria-labelledby={`h-rok-${gr.rok}`}>
-              <h3 class="gl-rok-h" id={`h-rok-${gr.rok}`}>
-                <span class="r">{gr.rok}</span><span class="sr-only">, </span><span class="n">{ileProjektow(gr.lista.length)}</span>
-              </h3>
-              <ul class="gw-lista">
-                {gr.lista.map((g) => <WierszGrantu grant={g} kierownicy={kier(g)} lang={lang} />)}
-              </ul>
-            </section>
-          ))}
-        </section>
-      )}
-
-      {bezLat.length > 0 && (
-        <section class="zsec gl-sekcja" id="pozostale" aria-labelledby="h-pozostale">
-          <h2 id="h-pozostale">{T('Pozostałe', 'Other')} <span class="muted gl-ile">({bezLat.length})</span></h2>
-          <p class="muted gl-uwaga">{T('Projekty bez podanych lat realizacji.', 'Projects without recorded dates.')}</p>
-          <ul class="gw-lista">
-            {bezLat.map((g) => <WierszGrantu grant={g} kierownicy={kier(g)} lang={lang} />)}
-          </ul>
-        </section>
-      )}
-    </div>
-
-    <aside class="side" data-pagefind-ignore>
-      {sekcje.length > 1 && (
-        <nav class="side-box toc toc-side gl-spis" aria-label={naTejStronie}>
-          <h2>{naTejStronie}</h2>
-          <ol>
-            {sekcje.map((s) => (
-              <li>
-                <a href={`#${s.id}`} data-gl-sekcja>{s.tekst} <span class="gl-spis-ile">({s.ile})</span></a>
-                {s.id === 'zakonczone' && <ol class="gl-lata" aria-label={T('Rok zakończenia', 'Year completed')}>{grupy.map((gr) => <li><a href={`#rok-${gr.rok}`} data-gl-rok>{gr.rok}</a></li>)}</ol>}
-              </li>
-            ))}
-          </ol>
-        </nav>
-      )}
-    </aside>
-  </div>
-
-  {/* ---------- Komputer (≥ 761 px), kierunek „Założyciele” (dok/estetyka.md „Podstrony działów”, prototyp: trescGranty) ----------
-       Boczna nawigacja działu i treść bez kafelków: realizowane z paskami czasu na wspólnej osi lat i przerywaną linią „dziś”
-       (data budowania), zakończone według roku zakończenia z małymi paskami (oś co 4 lata), pozostałe bez pasków.
-       Dotychczasowa treść (wyżej) zostaje dla telefonu i wyszukiwarki; na komputerze ukrywa ją src/styles/zal-granty-plan.css. */}
-  <div class="z-pd tylko-komputer" data-dzial="nauka" data-pagefind-ignore>
+  <div class="z-pd" data-dzial="nauka">
+    <SpisStrony spis={spisKomputer} lang={lang} />
     <BocznaNawigacja dzial="nauka" lang={lang} spis={spisKomputer} />
     <div class="z-pd-tresc z-gr">
       {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
@@ -234,75 +125,3 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
     </div>
   </div>
 </Baza>
-
-<script>
-  // Spis po prawej: podświetla czytaną sekcję i rok — ostatni, którego początek minął górne 30% okna.
-  const sekcje = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-gl-sekcja]'));
-  const lata = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc-side a[data-gl-rok]'));
-  const pary = (linki: HTMLAnchorElement[]) =>
-    linki.map((a) => ({ a, el: document.getElementById(a.hash.slice(1)) })).filter((x): x is { a: HTMLAnchorElement; el: HTMLElement } => !!x.el);
-  const grupy = [pary(sekcje), pary(lata)];
-  if (grupy.some((g) => g.length)) {
-    const ustaw = () => {
-      // na samym dole strony krótka ostatnia sekcja nie dojdzie do linii — wtedy ostatnia widoczna
-      const dol = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-      const linia = dol ? window.innerHeight : window.innerHeight * 0.3;
-      for (const g of grupy) {
-        let biezacy: HTMLAnchorElement | undefined;
-        for (const { a, el } of g) {
-          const r = el.getBoundingClientRect();
-          if (r.top <= linia && r.bottom > 0) biezacy = a;
-        }
-        g.forEach(({ a }) => a.toggleAttribute('aria-current', a === biezacy));
-      }
-    };
-    let ramka = 0;
-    const zaplanuj = () => {
-      cancelAnimationFrame(ramka);
-      ramka = requestAnimationFrame(ustaw);
-    };
-    window.addEventListener('scroll', zaplanuj, { passive: true });
-    window.addEventListener('resize', zaplanuj);
-    ustaw();
-  }
-</script>
-
-<style>
-  .gl-ile { font-size: .65em; font-weight: 600; }
-  .gl-uwaga { margin: -8px 0 10px; font-size: 15px; }
-  .gl-karta h3 { line-height: 1.3; overflow-wrap: anywhere; }
-  .gl-lata-txt, .gl-kod { font-variant-numeric: tabular-nums; }
-  .gl-kod { overflow-wrap: anywhere; }
-
-  /* zakończone: rok po lewej (przyklejony podczas przewijania grupy), lista po prawej */
-  .gl-rok { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0 12px; padding: 14px 0; border-top: 1px solid var(--line); }
-  .gl-rok-h { position: sticky; top: calc(var(--hdr-h) + 16px); align-self: start; display: flex; flex-direction: column; gap: 2px; margin: 0; padding-top: 10px; }
-  .gl-rok-h .r { font-size: 28px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
-  .gl-rok-h .n { font-size: 13px; font-weight: 600; color: var(--muted); }
-  @media (max-width: 640px) {
-    .gl-rok { grid-template-columns: minmax(0, 1fr); padding: 18px 0 8px; }
-    .gl-rok-h { position: static; flex-direction: row; align-items: baseline; gap: 10px; padding: 0 0 4px; }
-    .gl-rok-h .r { font-size: 24px; }
-    .gw-lista { margin: 0 -14px; }
-  }
-
-  /* spis: sekcje jak w „Na tej stronie”, lata jako pigułki */
-  .gl-spis-ile { font-weight: 600; color: var(--muted); }
-  .gl-spis .gl-lata { flex-direction: row; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px 14px; }
-  .gl-spis .gl-lata a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 11px; border: 1.5px solid var(--line); border-radius: 999px; font-size: 14px; font-weight: 700; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .gl-spis .gl-lata a:hover { border-color: var(--ink); }
-  .gl-spis .gl-lata a[aria-current] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
-  .toc-side.gl-spis { max-height: calc(100vh - var(--hdr-h) - 32px); overflow-y: auto; }
-
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
-     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” — treść nie przylega do banera.
-     Zakończone i pozostałe projekty (WierszGrantu) jako osobne białe karty z odstępem 10 px — jak pozycje w kalendarzu
-     (.karty-lista w global.css): tło strony, cienka ramka, po najechaniu ciemniejsza ramka; telefon — wiersze jak dotąd. */
-  @media (min-width: 761px) {
-    .layout { padding-top: 24px; }
-    .gl-sekcja :global(.gw-lista) { gap: 10px; }
-    .gl-sekcja :global(.gw) { padding: 16px 20px; border-color: var(--line); border-radius: var(--radius-l); background: var(--bg); }
-    .gl-sekcja :global(.gw + .gw::before) { display: none; }
-    .gl-sekcja :global(.gw:hover), .gl-sekcja :global(.gw:focus-within) { border-color: var(--ink); background: var(--bg); }
-  }
-</style>

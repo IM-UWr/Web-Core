@@ -1,0 +1,39 @@
+---
+// „Na tej stronie” — spis sekcji podstrony (kierunek „Założyciele”, zlecenie 11, zalecenie 3: wariant „kreska”).
+// Jedna wersja HTML: na telefonie (≤ 760 px) zwijany blok nad treścią (przycisk „Na tej stronie”, bez JS lista rozwinięta),
+// na komputerze kolumna spisu w szablonie podstrony (src/styles/zal-podstrona.css). Zwykłe linki #kotwica — działają bez JS.
+// spis: { id, etykieta, krotka? } — w spisie krótka etykieta (np. kategorie planu), w nagłówku sekcji pełna.
+// Strony z mniej niż 2 sekcjami nie mają spisu (komponent nic nie wstawia).
+import type { Lang } from '../../lib/daty';
+
+interface Props { spis: { id: string; etykieta: string; krotka?: string }[]; lang: Lang }
+const { spis, lang } = Astro.props;
+const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
+---
+{spis.length >= 2 && (
+  <nav class="z-spis" aria-labelledby="z-spis-h" data-pagefind-ignore data-z-spis>
+    <p class="z-spis-h" id="z-spis-h">{tytul}</p>
+    <button type="button" class="z-spis-przelacz" aria-expanded="false" aria-controls="z-spis-lista" hidden>
+      {tytul}<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+    <ul class="z-spis-lista" id="z-spis-lista">
+      {spis.map((s) => <li><a href={`#${s.id}`} title={s.krotka && s.krotka !== s.etykieta ? s.etykieta : undefined}>{s.krotka ?? s.etykieta}</a></li>)}
+    </ul>
+  </nav>
+)}
+
+<script>
+  // Telefon: spis zwinięty pod przyciskiem „Na tej stronie”; po kliknięciu linku zwija się z powrotem.
+  const spis = document.querySelector<HTMLElement>('[data-z-spis]');
+  const przycisk = spis?.querySelector<HTMLButtonElement>('.z-spis-przelacz');
+  if (spis && przycisk) {
+    przycisk.hidden = false;
+    spis.classList.add('z-spis-js');
+    const ustaw = (otwarty: boolean) => {
+      przycisk.setAttribute('aria-expanded', String(otwarty));
+      spis.classList.toggle('z-spis-otwarty', otwarty);
+    };
+    przycisk.addEventListener('click', () => ustaw(przycisk.getAttribute('aria-expanded') !== 'true'));
+    spis.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => ustaw(false)));
+  }
+</script>
