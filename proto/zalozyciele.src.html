@@ -85,6 +85,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .scena { width: 1280px; transform-origin: 0 0; margin: 0 auto; }
 .scena.telefony { width: 900px; }
 .widok[hidden] { display: none !important; }
+/* sprzątanie 4.11, 23:30: przełączniki i widoki z ustalonymi decyzjami schowane (wartości domyślne = ustalone; opis w zleceniach 10–12) */
+.ustalone { display: none !important; }
 
 /* ---------- makieta: wspólne ---------- */
 .m { font-family: var(--f-text); color: var(--m-text); background: var(--m-bg); font-size: 16px; line-height: 1.6; }
@@ -781,7 +783,8 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 @keyframes pisz { to { clip-path: inset(-40% -5% -40% -5%); } }
 @media (prefers-reduced-motion: reduce) { .podpis-r { animation: none; clip-path: none; } }
 .in-b4 .podpis-r { right: calc(var(--marg) + 90px); bottom: 24px; font-size: 46px; }
-.pd-b .tyt-g { position: relative; }
+/* sygnet (pomniejszona twarz patrona) graficznie na środku bloku tekstu nagłówka, podpis pod nim (4.11, 23:33) */
+.pd-b .tyt-g { position: static; }
 .pd-b .podpis-r { right: calc(100% + 6px); top: calc(100% - 2px); font-size: 34px; transform-origin: right center; }
 .pd-b.z-liczbami { height: calc(268px + var(--gora)); }
 .pd-b.z-liczbami .tyt { top: calc(30px + var(--gora)); }
@@ -797,10 +800,9 @@ a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-sha
 @keyframes pisz2 { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .podpis-svg.pisze mask path { animation: none !important; stroke-dashoffset: 0; } }
 .in-b4 .podpis-s { right: calc(var(--marg) + 60px); bottom: 20px; height: 46px; transform: rotate(-4deg); }
-.pd-b .podpis-s { right: calc(100% + 47px); top: calc(100% + 20px); height: auto; filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
+.pd-b .podpis-s { right: calc(100% + 50px); top: calc(50% + 52px); height: auto; filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
 .pd-b .podpis-s svg { width: 56px; height: auto; }
-.pd-b .tyt-g .sygnet { bottom: -14px; }
-.pd-b:not(.z-liczbami) .tyt-g .sygnet { bottom: 26px; }
+.pd-b .tyt-g .sygnet { top: 50%; bottom: auto; transform: translateY(-50%); }
 .pd-b:not(.z-liczbami) .podpis-s { top: calc(100% - 21px); }
 .pd-b[data-n="jasny"] .podpis-s { color: var(--d-g); filter: none; }
 .pd-b .sygnet path, .mega .glowa-d svg path { stroke-width: 1.5px; }
@@ -1325,12 +1327,12 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     <div class="grupa"><span>Widok</span><div class="seg" data-ustaw="widok">
       <button type="button" id="w-okladka" data-v="okladka" aria-pressed="true">Okładka</button>
       <button type="button" id="w-instytut" data-v="instytut" aria-pressed="false">Strona działu</button>
-      <button type="button" id="w-glowna" data-v="glowna" aria-pressed="false">Główna v1</button>
-      <button type="button" id="w-dzial" data-v="dzial" aria-pressed="false">Dział</button>
-      <button type="button" id="w-telefon" data-v="telefon" aria-pressed="false">Telefon</button>
-      <button type="button" id="w-przyciski" data-v="przyciski" aria-pressed="false">Przyciski</button>
+      <button type="button" id="w-glowna" class="ustalone" data-v="glowna" aria-pressed="false">Główna v1</button>
+      <button type="button" id="w-dzial" class="ustalone" data-v="dzial" aria-pressed="false">Dział</button>
+      <button type="button" id="w-telefon" class="ustalone" data-v="telefon" aria-pressed="false">Telefon</button>
+      <button type="button" id="w-przyciski" class="ustalone" data-v="przyciski" aria-pressed="false">Przyciski</button>
     </div></div>
-    <div class="grupa"><span>Szkic</span><div class="seg" data-ustaw="szkic">
+    <div class="grupa ustalone"><span>Szkic</span><div class="seg" data-ustaw="szkic">
       <button type="button" id="s-twarz" data-v="twarz" aria-pressed="true">Twarz</button>
       <button type="button" id="s-znak" data-v="znak" aria-pressed="false">Znak matematyczny</button>
     </div></div>
@@ -1343,7 +1345,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="m-light" data-v="light" aria-pressed="false">jasny</button>
       <button type="button" id="m-dark" data-v="dark" aria-pressed="false">ciemny</button>
     </div></div>
-    <div class="grupa" id="wybor-tla"><span>Tło</span><div class="seg" data-ustaw="tlo">
+    <div class="grupa ustalone" id="wybor-tla"><span>Tło</span><div class="seg" data-ustaw="tlo">
       <button type="button" id="t-cieple" data-v="cieple" aria-pressed="true">ciepłe</button>
       <button type="button" id="t-biale" data-v="biale" aria-pressed="false">białe</button>
     </div></div>
@@ -1359,12 +1361,12 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="d-studia" data-v="studia" aria-pressed="true">Studia</button>
       <button type="button" id="d-popularyzacja" data-v="popularyzacja" aria-pressed="false">Popularyzacja</button>
     </div></div>
-    <div class="grupa" id="wybor-wersja" hidden><span>Wersja</span><div class="seg" data-ustaw="wersja">
+    <div class="grupa ustalone" id="wybor-wersja" hidden><span>Wersja</span><div class="seg" data-ustaw="wersja">
       <button type="button" id="wr-nowa" data-v="nowa" aria-pressed="true">Nowa</button>
       <button type="button" id="wr-obecna" data-v="obecna" aria-pressed="false">Obecna strona (zrzut)</button>
     </div></div>
     <div class="grupa" id="wybor-anim" hidden><span>Animacja</span><div class="seg"><button type="button" id="anim-powtorz">pokaż pierwsze wejście jeszcze raz</button></div></div>
-    <div class="grupa" id="wybor-menu" hidden><span>Menu działu</span><div class="seg" data-ustaw="menuDz">
+    <div class="grupa ustalone" id="wybor-menu" hidden><span>Menu działu</span><div class="seg" data-ustaw="menuDz">
       <button type="button" data-v="obecne" aria-pressed="false">obecne</button>
       <button type="button" data-v="A" aria-pressed="false">A jedna linia</button>
       <button type="button" data-v="B" aria-pressed="false">B dwie linie</button>
@@ -1376,31 +1378,31 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
       <button type="button" id="s-pod" data-v="pod" aria-pressed="false">podstrona</button>
     </div></div>
-    <div class="grupa" id="wybor-nagl" hidden><span>Nagłówek podstrony</span><div class="seg" data-ustaw="naglowek">
+    <div class="grupa ustalone" id="wybor-nagl" hidden><span>Nagłówek podstrony</span><div class="seg" data-ustaw="naglowek">
       <button type="button" id="n-zdjecie" data-v="zdjecie" aria-pressed="true">głęboki + zdjęcie</button>
       <button type="button" id="n-przejscie" data-v="przejscie" aria-pressed="false">przejście</button>
       <button type="button" id="n-gleboki" data-v="gleboki" aria-pressed="false">pełny głęboki</button>
       <button type="button" id="n-jasny" data-v="jasny" aria-pressed="false">pełny jasny</button>
     </div></div>
-    <div class="grupa" id="wybor-boku" hidden><span>Nawigacja na podstronie</span><div class="seg" data-ustaw="bok">
+    <div class="grupa ustalone" id="wybor-boku" hidden><span>Nawigacja na podstronie</span><div class="seg" data-ustaw="bok">
       <button type="button" id="bok-A" data-v="A" aria-pressed="true">A: kreska</button>
       <button type="button" id="bok-B" data-v="B" aria-pressed="false">B: oś z kropkami</button>
       <button type="button" id="bok-C" data-v="C" aria-pressed="false">C: spis numerowany</button>
       <button type="button" id="bok-lewy" data-v="lewy" aria-pressed="false">dotychczasowa z lewej</button>
     </div></div>
-    <div class="grupa" id="wybor-zdjec" hidden><span>Zdjęcia osób</span><div class="seg" data-ustaw="zdjeciaWl">
+    <div class="grupa ustalone" id="wybor-zdjec" hidden><span>Zdjęcia osób</span><div class="seg" data-ustaw="zdjeciaWl">
       <button type="button" id="z-tak" data-v="tak" aria-pressed="true">tak</button>
       <button type="button" id="z-nie" data-v="nie" aria-pressed="false">nie</button>
     </div></div>
-    <div class="grupa" id="wybor-paska" hidden><span>Pasek menu</span><div class="seg" data-ustaw="pasek">
+    <div class="grupa ustalone" id="wybor-paska" hidden><span>Pasek menu</span><div class="seg" data-ustaw="pasek">
       <button type="button" id="pk-baner" data-v="baner" aria-pressed="true">na banerze</button>
       <button type="button" id="pk-jasny" data-v="jasny" aria-pressed="false">jasny</button>
     </div></div>
-    <div class="grupa" id="wybor-baner" hidden><span>Baner</span><div class="seg" data-ustaw="baner">
+    <div class="grupa ustalone" id="wybor-baner" hidden><span>Baner</span><div class="seg" data-ustaw="baner">
       <button type="button" id="b-haslo" data-v="haslo" aria-pressed="true">samo hasło (niższy)</button>
       <button type="button" id="b-opis" data-v="opis" aria-pressed="false">hasło + opis</button>
     </div></div>
-    <div class="grupa" id="wybor-inst" hidden><span>Wariant</span><div class="seg" data-ustaw="inst">
+    <div class="grupa ustalone" id="wybor-inst" hidden><span>Wariant</span><div class="seg" data-ustaw="inst">
       <button type="button" id="i-4" data-v="4" aria-pressed="true">4: zdjęcie w kolorze działu</button>
       <button type="button" id="i-2" data-v="2" aria-pressed="false">2: kalendarium</button>
     </div></div>
@@ -1417,20 +1419,20 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="ostry" aria-pressed="false">jak dotąd</button>
       <button type="button" data-v="plynny" aria-pressed="true">płynny</button>
     </div></div>
-    <div class="grupa" id="wybor-skosu"><span>Krawędź</span><div class="seg" data-ustaw="skos">
+    <div class="grupa ustalone" id="wybor-skosu"><span>Krawędź</span><div class="seg" data-ustaw="skos">
       <button type="button" id="k-pion" data-v="0" aria-pressed="false">Pion</button>
       <button type="button" id="k-skos" data-v="0.32" aria-pressed="true">Skos</button>
       <button type="button" id="k-mocny" data-v="0.62" aria-pressed="false">Mocny skos</button>
     </div></div>
-    <div class="grupa" id="wybor-barwy"><span>Zdjęcie przy najechaniu</span><div class="seg" data-ustaw="barwa">
+    <div class="grupa ustalone" id="wybor-barwy"><span>Zdjęcie przy najechaniu</span><div class="seg" data-ustaw="barwa">
       <button type="button" id="b-tak" data-v="tak" aria-pressed="true">Barwione</button>
       <button type="button" id="b-nie" data-v="nie" aria-pressed="false">Bez zmian</button>
     </div></div>
-    <div class="grupa" id="wybor-proby"><span>Seminaria w tygodniu</span><div class="seg" data-ustaw="proba">
+    <div class="grupa ustalone" id="wybor-proby"><span>Seminaria w tygodniu</span><div class="seg" data-ustaw="proba">
       <button type="button" id="pr-5" data-v="5" aria-pressed="true">5</button>
       <button type="button" id="pr-20" data-v="20" aria-pressed="false">20 (próba)</button>
     </div></div>
-    <div class="grupa" id="wybor-prel"><span>Prelegent</span><div class="seg" data-ustaw="prel">
+    <div class="grupa ustalone" id="wybor-prel"><span>Prelegent</span><div class="seg" data-ustaw="prel">
       <button type="button" id="pl-po" data-v="po" aria-pressed="true">Po tytule</button>
       <button type="button" id="pl-nad" data-v="nad" aria-pressed="false">Nad tytułem</button>
       <button type="button" id="pl-pod" data-v="pod" aria-pressed="false">Pod tytułem</button>
@@ -1633,7 +1635,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     <ul>
       <li>Strona główna ma dwie części: okładkę na jeden ekran i wszystko, co dziś jest na głównej, pod strzałką „Szybki dostęp”. Przewijanie jest zwykłe, bez dociągania.</li>
       <li>Pod strzałką, gęsto: pasek Szybki dostęp (z kolorem dnia), dwie krótkie kolumny po 3 pozycje i długa trzecia kolumna z prawej; „Zobacz więcej” płynnie przenosi klikniętą listę do trzeciej kolumny i tam ją rozwija (tyle pozycji, ile się zmieści, potem link do pełnej listy), Studia z rekrutacją i kierunkami (spokojnie, bez kolorowego tła), Warto wiedzieć i stopka w jednej linii. Na Full HD to wszystko mieści się na drugim ekranie, razem ze stopką; po rozwinięciu strona po prostu się przewija.</li>
-      <li>Na okładce nie ma paska menu, bo działy są na niej. W prawym rogu są Szukaj, EN, tryb ciemny i dyskretny hamburger: w panelu cztery działy z podstronami i duże Aktualności (Szukaj i EN są już w rogu). Pełny pasek z menu wjeżdża po zjechaniu z okładki.</li>
+      <li>Na okładce nie ma paska menu, bo działy są na niej. W lewym górnym rogu logo UWr i „Wydział Matematyki i Informatyki”, w prawym tryb ciemny, EN i hamburger (w panelu: Szukaj, działy z twarzami patronów, Aktualności, Rekrutacja). Pełny pasek z menu wjeżdża po zjechaniu z okładki.</li>
+      <li class="ustalone">W prawym rogu są Szukaj, EN, tryb ciemny i dyskretny hamburger: w panelu cztery działy z podstronami i duże Aktualności (Szukaj i EN są już w rogu). Pełny pasek z menu wjeżdża po zjechaniu z okładki.</li>
       <li>Wymiary liczone od wysokości okna: na 1366×768 szkice mają ok. 115 px, na Full HD ok. 170 px.</li>
       <li>Logo: pełny logotyp UWr z plików strony, na okładce w bieli, w pasku w kolorze UWr. Zdjęcie jest przesunięte w prawo i w górę, a z lewej przechodzi w granat: tytuł leży na spokojnym tle, a gmach stoi w prawej części nad działami.</li>
     </ul>
@@ -1664,11 +1667,13 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   <section>
     <h2>Do decyzji</h2>
     <ul>
-      <li>Twarze, znaki, czy oba: twarze na głównej, znaki w działach.</li>
-      <li>Czy kolor działu zastępuje bursztyn także w animacjach podstron (dziś na komputerze bursztynowe, na telefonie szare).</li>
-      <li>Przejście banera w jasną treść: gradient (jak w Twoim opisie) czy ostra krawędź z kreską i jasnym tłem działu pod nią. Oba są w przełączniku „Przejście”.</li>
-      <li>Czy podbarwiać zdjęcie przy najechaniu (teraz delikatnie, w kolorze działu).</li>
-      <li>Telefon: cztery działy także na okładce (2×2) i czy zostaje zwijany pas z B2.</li>
+      <li><b>Paleta</b> działów: Atramenty czy Stonowana (przełącznik „Paleta”).</li>
+      <li><b>Ciemny motyw:</b> A nocny granat (polecany), B ciepły grafit, C łupek (przełącznik „Ciemny”; włącz „Motyw: ciemny”).</li>
+      <li><b>Okładka:</b> wielkość liter tytułu (równe końce / równa wielkość) i zakręt ciemnego pola (jak dotąd / płynny).</li>
+      <li><b>Przejście banera w treść</b> na stronie działu: gradient czy kreska i jasne tło (przełącznik „Przejście”).</li>
+      <li><b>Plakietka</b> na okładce na sprawy pilne (np. rekrutacja).</li>
+      <li><b>Liczby nad strzałką</b> na okładce („3 wydarzenia | 5 seminariów | 5 nowych aktualności”).</li>
+      <li><b>Ciekawostki patronów</b> na podstronach: pula w przygotowaniu.</li>
     </ul>
   </section>
 </div>

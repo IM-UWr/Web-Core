@@ -146,3 +146,18 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
 
 ### 8. Wersja angielska: flaga przy „PL” (decyzja 4.11, 23:19)
 - Przełącznik języka zawsze z flagą języka docelowego: na stronach polskich flaga UK i „EN” (jak dziś), na stronach angielskich **flaga Polski i „PL”**. Ten sam wygląd i rozmiar co flaga UK, także w panelu i na telefonie.
+
+### 9. Nagłówki podstron: liczby kierunków, długie tytuły, sygnet na środku (uwagi 4.11, 23:33)
+- **Kierunki zgubiły liczby** (Matematyka, SIAD, ISIM): hasło jest, liczb nie ma.
+  - Przyczyna (stan `d12c994`): w `zalozyciele.css` reguła `.z-slot .pt-liczby + .pt-liczby { display: none !important; }` chowa drugą listę liczb. W `Kierunek.astro` pierwsza jest lista telefonu (`LiczbyBanera`, `.tylko-telefon`), którą chowa reguła `.z-slot:has(.pt-liczby:not(.tylko-telefon)) .pt-liczby.tylko-telefon`. Druga jest lista komputera (`.kh-liczby`), którą chowa ta pierwsza reguła. W efekcie znikają obie.
+  - Napraw tak, żeby kierunki znowu pokazywały liczby z faktów, z zasadą „hasło i liczby razem albo wcale” (zalecenie 2): bez liczb nie ma też hasła. Sprawdź wszystkie strony z dwiema listami liczb.
+  - Po zleceniu 12 (jedna wersja HTML) lista telefonu i tak znika, więc zostaje jedna lista. Sprawdź, czy liczby się pokazują.
+- **Długie tytuły najwyżej w dwóch liniach.** Np. „Indywidualne Studia Informatyczno-Matematyczne” łamie się dziś na 3 linie.
+  - Jeśli tytuł w normalnym stopniu zająłby więcej niż 2 linie, stopień maleje krokami (np. co 4 px), najwyżej do ok. 44 px.
+  - Szerokość tytułu może sięgać do ciekawostki z prawej, z odstępem ok. 40 px.
+  - Łamanie najlepiej po pełnych słowach; przy wyrazie z łącznikiem dopuszczalne po łączniku.
+  - Sprawdź też inne długie nazwy (specjalności, zakłady, seminaria).
+- **Sygnet (pomniejszona twarz patrona) graficznie na środku nagłówka.** Zmienia to zasadę z 2.11 („środek sygnetu na pierwszej literze tytułu” / „podpis na linii bazowej”).
+  - Twarz stoi w lewym marginesie z kreską jak dziś, ale **jej środek wypada na pionowy środek bloku tekstu nagłówka**: od „← Dział” do ostatniej linii (tytuł, hasło, liczby).
+  - Podpis pod twarzą, wyśrodkowany względem niej (ok. 8 px niżej).
+  - Działa tak samo dla nagłówków z liczbami i bez. Wzór: prototyp, podstrony.
