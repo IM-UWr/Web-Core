@@ -24,6 +24,8 @@
 .tresc .etyk { display: block; margin: 0 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
 .tresc p { margin: 0 0 14px; max-width: 70ch; font-size: inherit; line-height: inherit; color: inherit; }
 .tresc p.wst { color: var(--ink); }
+/* pierwszy akapit: odstęp i stopień jak reszta tekstu (bez .z-pd-tresc .wst z zalozyciele.css i zal-podstrona.css) */
+.z-pd-tresc.tresc .wst { margin: 0 0 14px; font-size: inherit; }
 .tresc a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
   text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); transition: color .15s; }
 .tresc a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
