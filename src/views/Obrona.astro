@@ -19,16 +19,15 @@ const { obrona, lang } = Astro.props;
 const d = obrona.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-// `tytul` („Obrona doktoratu: …”) był dotąd tytułem karty (<title>), a baner pokazywał samo imię i nazwisko; szablon
-// Podstrona.astro ma jeden tytuł — zostaje imię i nazwisko (baner bez zmian), patrz raport (potrzebny osobny tytuł karty).
-const { Content, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
+// tytuł karty (<title>): „Obrona doktoratu: …”; w banerze samo imię i nazwisko
+const { Content, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
   const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
   return m ? m[1].toUpperCase() : isExternal(a) ? T('strona ↗', 'website ↗') : '';
 };
 ---
-<Podstrona lang={lang} tytul={d.kandydat} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner"
+<Podstrona lang={lang} tytul={d.kandydat} tytulKarty={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner"
   haslo={haslo} wstecz={{ etykieta: T('Wszystkie obrony doktorskie', 'All PhD defences'), telefon: t(lang, 'obrony'), adres: '/obrony-doktorskie' }}
   dzial="nauka" klasa="tresc z-obr">
   <Fragment slot="baner">
