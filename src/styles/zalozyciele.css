@@ -306,17 +306,6 @@
   .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
   .z-nast-meta a { color: var(--d-a); }
 
-  /* ---------- strony treści (Strona.astro) w szablonie podstrony: Markdown bez pasów i kafelków ---------- */
-  .z-pd .prose { max-width: 800px; }
-  /* strony Instytutu i Studiów (wygląd „Zwarta”): odstęp nad treścią 24 px, jak na stronach działów */
-  .z-pd.z-pd-zwarta { padding-top: 24px; }
-  /* nagłówki sekcji bez pasów i kafelków (Ustawienia → „Sekcje”) */
-  body[data-sekcje] .z-pd .prose h2 { margin: 1.6em 0 .5em; padding: 0; border-radius: 0; background: none; box-shadow: none;
-    font-size: 30px; font-weight: 800; line-height: 1.3; color: var(--ink); }
-  body[data-sekcje] .z-pd .prose > h2:first-child { margin-top: 0; }
-  .z-pd .prose :is(p, li) { max-width: none; font-size: 16.5px; line-height: 1.65; }
-  .z-pd .prose a { color: var(--d-a); }
-
   /* ---------- odchudzona stopka w jednej linii ---------- */
   .z-stopka { --marg: max(64px, calc((100% - var(--kol)) / 2)); padding: 13px var(--marg); background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.4; }
   .z-stopka-in { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 24px; }

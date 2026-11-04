@@ -126,3 +126,46 @@
   .tresc table.tab td:first-child { font-weight: 700; }
   .tresc table.tab td:last-child { min-width: 0; }
 }
+
+/* ---------- treść z Markdown (strony tekstowe i opisy w widokach): .prose w .tresc ----------
+   Ten sam wzorzec: ## — sekcja (kreska nad każdą poza pierwszą: 44 px nad, 40 px pod), ### — podsekcja, lista z kreskami,
+   cytat blokowy (>) — ramka uwagi, tabela jak table.tab, pierwszy akapit w kolorze nagłówków. Selektory z „body”, żeby
+   wygrać ze starymi ozdobami nagłówków sekcji (Ustawienia → „Sekcje”: pasy, linia, karty). */
+body .tresc .prose { max-width: none; font-size: inherit; line-height: inherit; color: inherit; }
+body .tresc .prose > :first-child { margin-top: 0; }
+body .tresc .prose h2 { position: static; margin: 44px 0 16px; padding: 40px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none;
+  box-shadow: none; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -.005em; color: var(--ink); }
+body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+body .tresc .prose h2::before, body .tresc .prose h2::after { content: none; display: none; }
+body .tresc .prose h3 { margin: 30px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.3; color: var(--d-a); }
+body .tresc .prose :is(h2 + h3, h2 + p + h3) { margin-top: 10px; }
+body .tresc .prose h4 { margin: 22px 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+body .tresc .prose p { margin: 0 0 14px; max-width: 70ch; font-size: inherit; line-height: inherit; }
+body .tresc .prose > p:first-child { color: var(--ink); }
+body .tresc .prose ul { list-style: none; margin: 0 0 16px; padding: 0; max-width: 70ch; }
+body .tresc .prose ul > li { position: relative; max-width: none; margin: 6px 0; padding-left: 24px; font-size: inherit; line-height: inherit; }
+body .tresc .prose ul > li::before { content: ''; position: absolute; left: 0; top: .84em; width: 12px; height: 2px; background: var(--d-a); }
+body .tresc .prose ol { margin: 0 0 16px; padding-left: 24px; max-width: 70ch; }
+body .tresc .prose ol > li { max-width: none; margin: 6px 0; padding-left: 4px; font-size: inherit; line-height: inherit; }
+body .tresc .prose ol > li::marker { font-weight: 700; color: var(--d-a); }
+body .tresc .prose blockquote { max-width: 70ch; margin: 12px 0 16px; padding: 16px 20px 6px; border: 0; border-left: 3px solid var(--d-a); border-radius: 0;
+  background: var(--d-t); color: inherit; font-size: inherit; }
+body .tresc .prose blockquote a { color: var(--ink); }
+body .tresc .prose a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); }
+body .tresc .prose a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
+body .tresc .prose table { display: table; width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15.5px; line-height: 1.5; }
+body .tresc .prose th { padding: 0 18px 8px 0; border: 0; border-bottom: 2px solid var(--ink); background: none; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
+body .tresc .prose td { padding: 11px 18px 11px 0; border: 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+body .tresc .prose td:first-child { color: var(--ink); }
+body .tresc .prose :is(img, code) { border-radius: 0; }
+@media (max-width: 760px) {
+  body .tresc .prose h2 { margin-top: 30px; padding-top: 28px; font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
+  body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; }
+  body .tresc .prose h3 { font-size: 20px; margin-top: 24px; }
+  body .tresc .prose :is(table, tbody, tr, td) { display: block; width: auto; }
+  body .tresc .prose thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  body .tresc .prose tr { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  body .tresc .prose td { padding: 0; border: 0; }
+  body .tresc .prose td:first-child { font-weight: 700; }
+}

@@ -1,7 +1,8 @@
 ---
 // Strona stała (Markdown z src/content/strony). Adres = ścieżka pliku, np. studia/matematyka.md → /studia/matematyka
 // Szablon podstrony (zal/Podstrona.astro): treść, spis „Na tej stronie” z nagłówków ## (pole „Prawy pasek”: spis albo oba —
-// ze spisem; menu albo brak — bez spisu), na telefonie (≤ 760 px) spis zwijany nad treścią.
+// ze spisem; menu albo brak — bez spisu), na telefonie (≤ 760 px) spis zwijany nad treścią. Treść według wzorca treści
+// (zalecenie 14, src/styles/zal-tresc.css: .tresc .prose — sekcje ##, podsekcje ###, listy, ramka uwagi z >, tabele).
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -16,7 +17,7 @@ const okruszki = [...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang) as s
 ---
 <Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}
   lead={opis} haslo={haslo} okruszki={okruszki} dzial={dzialZ} spis={pasek === 'spis' || pasek === 'oba' ? spisZ : []}
-  klasaRamy={wygladPortalZwarta ? 'z-pd-zwarta' : undefined}>
+  klasa="tresc">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
   {tylkoPolski && <p class="notice">{t('en', 'wersjaPolska')}</p>}
   <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
