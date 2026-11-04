@@ -181,3 +181,17 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
 
 ### 11. Lead na stronach działów bez powiększenia (decyzja 4.11, 23:37)
 - Pierwszy akapit tekstu działu (`.z-dz-tresc p.wst`, „O studiach”, „O Instytucie” itd.) ma **ten sam stopień i interlinię co reszta tekstu** (17 px / 1,68). Wyróżnia go tylko **odrobinę mocniejszy kolor** (kolor nagłówków `--ink` zamiast `--text`). Dziś ma 20 px.
+
+### 12. Wersja angielska bez polskich zaleciałości (audyt 4.11, 23:41)
+- Pełny raport: `dok/en/RAPORT-EN.md` na gałęzi `kopia/2026-11-01-estetyka-prototypy`. Sprawdzono 373 strony `/en` w 1440 i 390 px. Menu, stopka, hamburger, „← Dział”, „Następna strona”, przełącznik języka i komunikaty JS są w porządku.
+- **Popraw w kodzie** wszystkie pozycje z sekcji „K. Problemy w kodzie” (12), m.in.:
+  - puste `notka_en` i `fakt_en` w `src/lib/patroni.ts` (polskie notki na banerach działów i fakty na okładce `/en/`). Przetłumacz notki;
+  - daty w polskim formacie: `short()` w `src/lib/daty.ts` ma zależeć od języka (EN np. „29 Oct 2026”, „Wed 4 Nov”);
+  - „grant promotorski” mimo istniejącego tłumaczenia (`Grant.astro`, `grant.ts`);
+  - kalki na drugim ekranie („r. HS”, „and 4 · All news →”) w `DrugiEkran.astro`;
+  - treść obron bez `tresc_en`: na `/en` pokaż angielski szablon zaproszenia z danych (data, sala, kandydat, promotor, tytuł) zamiast polskiej treści;
+  - linki w treściach Markdown na `/en`: `rehype-base.mjs` ma dopisywać `/en` do linków wewnętrznych, jeśli angielska strona istnieje. Popraw też martwy link w `warto_wiedziec/wyklad-terencea-tao.md` i polski kanał RSS w `<head>` na `/en`.
+- **Nie zmieniaj treści CMS.** Pozycje z sekcji „C. Problemy w treściach CMS” (brakujące pola `_en`, ok. 100 pozycji w ok. 35 plikach) wypisz w raporcie jako listę dla redakcji. Tam, gdzie brakuje pola `_en` w schemacie (np. `tematy_prac`, afiliacja i sala referatu, `tresc_en` obron), dodaj je jako **opcjonalne** i pokaż polską wartość, dopóki puste.
+- **Dane zewnętrzne** (sekcja D: plan z USOS, wykazy publikacji) bez zmian w danych. W planie na `/en` przetłumacz w kodzie powtarzalne uwagi z USOS („co 2 tygodnie” → „every other week” itd.) według listy z raportu. Nazwy przedmiotów bez angielskiej wersji zostają po polsku.
+- **Wpisy testowe** („Testowe:”, pliki `test-*`) to sprawa redakcji przed startem strony. Nie usuwaj ich.
+- **„Do decyzji”** (sekcja raportu, 16 pozycji, np. „prof. dr hab.” w wersji EN) zostaw bez zmian.
