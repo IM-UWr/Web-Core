@@ -1,20 +1,22 @@
 ---
-// Podstrona zakładu: opis, skład (z tabeli pracowników), seminaria, granty, konferencje, obrony, aktualności.
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (bez liczb — zakład ich nie ma; w banerze obszary badań),
-// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px; zlecenie 01, decyzje 31.10.2026): baner we wspólnym układzie — tytuł, bursztynowe hasło (pola haslo /
-// haslo_en zakładu; puste = opis jak dotąd), kreska i liczby (pracownicy · projekty · konferencje); obszary badań pod banerem.
+// Podstrona zakładu (/instytut/zaklady/<id>), kierunek „Założyciele”, szablon podstrony (zal/Podstrona.astro) i wzorzec treści
+// (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). W nagłówku hasło (pola haslo / haslo_en zakładu)
+// i liczby (pracownicy · projekty · konferencje). Sekcje (spis „Na tej stronie” z ich nagłówków):
+// - O zakładzie: zdjęcie, opis (Markdown; pierwszy akapit jak .wst), pary „Obszary badań” i „Strona zespołu” (dl.para);
+// - Skład: kierownik jako blok kontaktu (.kontakty), pozostali w grupach (podsekcje h3) jako tabela (table.tab);
+// - Seminaria z najbliższym referatem (jak ul.dwa) i Projekty i granty (ul.dwa; zakończone zwinięte jak pytania, .faq details);
+// - Konferencje, Obrony doktorskie, Aktualności: wiersze z datą (jeden wzór daty — duży dzień Brygadą w kolorze działu,
+//   pod nim miesiąc i rok, jak zal/dzial/Wiersz.astro);
+// - Zakłady Instytutu: lista linków do zakładów (ul.linki; bieżący wyróżniony) — nawigacja, poza indeksem wyszukiwarki.
+// Jedna wersja HTML: komputer — dwie kolumny list, tabela składu; telefon (≤ 760 px) — jedna kolumna, tabela w bloki.
 import { zTytulem } from '../lib/osoby';
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import Ikona from '../components/Ikona.astro';
-import TytulZewn from '../components/TytulZewn.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
-import { range, long, short, type Lang } from '../lib/daty';
-import { slugOf, sala, miejsce, trwaLubBedzie, type Zaklad } from '../lib/tresci';
+import { range, long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
+import { slugOf, sala, miejsce, trwaLubBedzie, type Zaklad, type Pracownik } from '../lib/tresci';
 import { daneZakladu } from '../lib/widoki/zaklad';
 
 interface Props { zaklad: Zaklad; lang: Lang }
@@ -23,173 +25,259 @@ const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const {
   d, id, nazwa, opis, opisZdjecia, obszary, Content, htmlEn,
   czlonkowie, kierownik, grupySkladu,
-  sem, motyw, nastepny,
+  sem, nastepny,
   gr, grTrwa, grKon, konf, obr, akt,
-  haslo, liczby, wszystkieZaklady,
+  haslo, liczby, naglowki, wszystkieZaklady,
 } = await daneZakladu(zaklad, lang);
 const lata = (g: (typeof gr)[number]) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
 const tytulGrantu = (g: (typeof gr)[number]) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 const adresGrantu = (g: (typeof gr)[number]) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
+const etykietaGrantu = (g: (typeof gr)[number]) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang], lata(g), g.data.kod].filter(Boolean).join(' · ');
+const imie = (o: Pracownik) => zTytulem(o.data.stopien, o.data.imie_nazwisko);
+// jeden wzór daty: dzień, pod nim skrót miesiąca i rok
+const data = (s: string) => ({ iso: s.slice(0, 10), dzien: dayNum(s), reszta: `${monthShort(s, lang)} ${parse(s).y}` });
+const konfPokaz = konf.slice(0, 8);
+// spis „Na tej stronie”: sekcje z danych widoku (naglowki) i lista zakładów na końcu
+const spis = [...naglowki.map((h) => ({ id: h.slug, etykieta: h.text })), { id: 'zaklady', etykieta: T('Zakłady Instytutu', 'Departments') }];
+const kierTel = kierownik?.data.telefon || d.telefon;
 ---
-<Baza tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={nazwa} lead={opis} haslo={haslo} lang={lang} motyw={motyw} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}>
-    {/* obszary badań w banerze tylko na komputerze (na telefonie — pod banerem, niżej; styl na końcu pliku) */}
-    {obszary.length > 0 && <div class="tags">{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
-    <LiczbyBanera lang={lang} pozycje={liczby} />
-  </NaglowekStrony>
+<Podstrona lang={lang} tytul={nazwa} opis={opis} opublikowany={d.opublikowany} obraz={d.zdjecie} uklad="zwarta portal-baner" lead={opis} haslo={haslo}
+  okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: T('Struktura i zakłady', 'Structure and departments'), adres: '/instytut/struktura' }]}
+  dzial="instytut" spis={spis} klasa="tresc z-zakl">
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
-  <div class="wrap layout">
-    <div class="main">
-      {/* telefon: obszary badań pod banerem (w banerze zostaje tylko szkielet: tytuł, hasło, liczby) */}
-      {obszary.length > 0 && <div class="tags zk-obszary tylko-telefon" data-pagefind-ignore>{obszary.map((o) => <span class="badge">{o}</span>)}</div>}
+  <section id="o-zakladzie" aria-labelledby="o-zakladzie-h">
+    <h2 id="o-zakladzie-h">{T('O zakładzie', 'About')}</h2>
+    {d.zdjecie && <figure class="zk-foto"><img src={u(d.zdjecie)} alt={opisZdjecia} />{opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}</figure>}
+    <div class="zk-opis">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+    {(obszary.length > 0 || d.strona) && (
+      <dl class="para zk-o">
+        {obszary.length > 0 && <><dt>{T('Obszary badań', 'Research areas')}</dt><dd>{obszary.join(' · ')}</dd></>}
+        {d.strona && <><dt>{T('Strona zespołu', 'Group website')}</dt><dd><a href={d.strona}>{d.strona.replace(/^https?:\/\//, '').replace(/\/$/, '')}<span aria-hidden="true"> ↗</span></a></dd></>}
+      </dl>
+    )}
+  </section>
 
-      <section class="zsec" aria-labelledby="o-zakladzie">
-        <h2 id="o-zakladzie">{T('O zakładzie', 'About')}</h2>
-        {d.zdjecie && <figure class="article-figure"><img src={u(d.zdjecie)} alt={opisZdjecia} />{opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}</figure>}
-        <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
-        {d.strona && <p><a class="link-arrow" href={d.strona}>{T('Strona zespołu', 'Group website')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
-      </section>
+  <section id="sklad" aria-labelledby="sklad-h">
+    <h2 id="sklad-h">{T('Skład', 'People')} <small class="zk-ile">({czlonkowie.length})</small></h2>
+    {(kierownik || d.kierownik) && (
+      <div class="kontakty zk-kier">
+        <div>
+          <span class="etyk">{T('Kierownik', 'Head')}</span>
+          <b>{kierownik?.data.strona
+            ? <a href={kierownik.data.strona}>{imie(kierownik)}<span aria-hidden="true"> ↗</span></a>
+            : kierownik ? imie(kierownik) : d.kierownik}</b>
+          {(kierownik?.data.email || kierTel || kierownik?.data.pokoj) && (
+            <dl class="para">
+              {kierownik?.data.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${kierownik.data.email}`}>{kierownik.data.email}</a></dd></>}
+              {kierTel && <><dt>{T('tel.', 'phone')}</dt><dd>{kierTel}</dd></>}
+              {kierownik?.data.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{kierownik.data.pokoj}</dd></>}
+            </dl>
+          )}
+        </div>
+      </div>
+    )}
+    {grupySkladu.map((g) => (
+      <>
+        <h3>{g.tytul}</h3>
+        <table class="tab zk-os">
+          <thead><tr><th scope="col">{t(lang, 'imieNazwisko')}</th><th scope="col">{t(lang, 'email')}</th><th scope="col">{t(lang, 'pokoj')}</th></tr></thead>
+          <tbody>
+            {g.osoby.map((o) => (
+              <tr>
+                <td>{o.data.strona ? <a href={o.data.strona}>{imie(o)}<span aria-hidden="true"> ↗</span></a> : imie(o)}</td>
+                <td class="zk-mail">{o.data.email && <a href={`mailto:${o.data.email}`}>{o.data.email}</a>}</td>
+                <td class="zk-pok">{o.data.pokoj && <><span class="zk-lbl">{T('pok.', 'room')} </span>{o.data.pokoj}</>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
+    ))}
+    <p class="zk-dalej">{T('Pełne dane kontaktowe:', 'Full contact details:')} <a href={u(wJezyku('/pracownicy', lang))}>{t(lang, 'pracownicy')}</a>.</p>
+  </section>
 
-      <section class="zsec" aria-labelledby="sklad">
-        <h2 id="sklad">{T('Skład', 'People')} <span class="muted" style="font-size:16px;font-weight:600">({czlonkowie.length})</span></h2>
-        {(kierownik || d.kierownik) && (
-          <div class={kierownik?.data.strona ? 'person lead-person os-link' : 'person lead-person'}>
-            <span class="role">{T('Kierownik', 'Head')}</span>
-            <span class="os-n">{kierownik?.data.strona
-              ? <a class="os-a" href={kierownik.data.strona}>{zTytulem(kierownik.data.stopien, kierownik.data.imie_nazwisko)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>
-              : kierownik ? zTytulem(kierownik.data.stopien, kierownik.data.imie_nazwisko) : d.kierownik}</span>
-            <span class="os-c">
-              {kierownik?.data.email && <a href={`mailto:${kierownik.data.email}`}><Ikona nazwa="mail" rozmiar={14} />{kierownik.data.email}</a>}
-              {(kierownik?.data.telefon || d.telefon) && <span><Ikona nazwa="telefon" rozmiar={14} />{kierownik?.data.telefon || d.telefon}</span>}
-              {kierownik?.data.pokoj && <span>{T('pok.', 'room')} {kierownik.data.pokoj}</span>}
-            </span>
-          </div>
-        )}
-        {grupySkladu.map((g) => (
-          <>
-            <h3 class="subhead">{g.tytul}</h3>
-            <ul class="people">
-              {g.osoby.map((o) => (
-                <li class={o.data.strona ? 'person os-link' : 'person'}>
-                  <span class="os-n">{o.data.strona ? <a class="os-a" href={o.data.strona}>{zTytulem(o.data.stopien, o.data.imie_nazwisko)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a> : zTytulem(o.data.stopien, o.data.imie_nazwisko)}</span>
-                  <span class="os-c">
-                    {o.data.email && <a href={`mailto:${o.data.email}`}>{o.data.email}</a>}
-                    {o.data.pokoj && <span>{T('pok.', 'room')} {o.data.pokoj}</span>}
-                  </span>
+  {sem.length > 0 && (
+    <section id="seminaria" aria-labelledby="seminaria-h">
+      <h2 id="seminaria-h">{sem.length > 1 ? T('Seminaria', 'Seminars') : T('Seminarium', 'Seminar')}</h2>
+      {/* jak ul.dwa wzorca, ale bez reguły „span = blok” (tytuł referatu może mieć wzory KaTeX ze spanami) */}
+      <ul class="zk-sem">
+        {sem.map((s) => {
+          const r = nastepny(s.id);
+          return (
+            <li>
+              <p class="t"><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{wybierz(s.data, 'nazwa', lang)}</a></p>
+              {r ? (
+                <p><strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="zk-kto">({r.data.prelegent})</span></p>
+              ) : (
+                <p class="zk-brak">{t(lang, 'brakNadchodzacych')}</p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  )}
+
+  {gr.length > 0 && (
+    <section id="granty" aria-labelledby="granty-h">
+      <h2 id="granty-h">{T('Projekty i granty', 'Grants')}</h2>
+      {grTrwa.length === 0 && <p>{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
+      {grTrwa.length > 0 && (
+        <ul class="dwa">
+          {grTrwa.map((g) => (
+            <li>
+              <small class="etyk">{etykietaGrantu(g)}</small>
+              <b><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
+              {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {g.data.kierownik}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {grKon.length > 0 && (
+        <div class="faq zk-zakonczone">
+          <details>
+            <summary>{T('Zakończone projekty', 'Completed projects')} ({grKon.length})</summary>
+            <ul class="dwa">
+              {grKon.map((g) => (
+                <li>
+                  <small class="etyk">{etykietaGrantu(g)}</small>
+                  <b><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
+                  {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {g.data.kierownik}</span>}
                 </li>
               ))}
             </ul>
-          </>
-        ))}
-        <p class="muted" style="font-size:14px">{T('Pełne dane kontaktowe:', 'Full contact details:')} <a href={u(wJezyku('/pracownicy', lang))}>{t(lang, 'pracownicy')}</a>.</p>
-      </section>
-
-      {sem.length > 0 && (
-        <section class="zsec" aria-labelledby="seminaria">
-          <h2 id="seminaria">{sem.length > 1 ? T('Seminaria', 'Seminars') : T('Seminarium', 'Seminar')}</h2>
-          <div class="sem-cards">
-            {sem.map((s) => {
-              const r = nastepny(s.id);
-              return (
-                <a class="sem-card" href={u(wJezyku(`/seminaria/${s.id}`, lang))}>
-                  <span class="t">{wybierz(s.data, 'nazwa', lang)}</span>
-                  {r ? (
-                    <span style="font-size:15px;padding-top:10px;border-top:1px solid var(--line)"><strong style="color:var(--ink)">{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="muted">({r.data.prelegent})</span></span>
-                  ) : (
-                    <span class="muted" style="font-size:14px;padding-top:10px;border-top:1px solid var(--line)">{t(lang, 'brakNadchodzacych')}</span>
-                  )}
-                </a>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {gr.length > 0 && (
-        <section class="zsec" aria-labelledby="granty">
-          <h2 id="granty">{T('Projekty i granty', 'Grants')}</h2>
-          {grTrwa.length === 0 && <p class="muted">{T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')}</p>}
-          {grTrwa.map((g) => (
-            <article class="grant">
-              <div class="news-meta kropki"><span class="badge badge-wydarzenie">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span class="kropka">{g.data.kod}</span>}</div>
-              <h3><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></h3>
-              {g.data.kierownik && <p class="who"><span class="muted">{T('Kierownik', 'PI')}:</span> {g.data.kierownik}</p>}
-            </article>
-          ))}
-          {grKon.length > 0 && (
-            <details class="more">
-              <summary>{T('Zakończone projekty', 'Completed projects')} ({grKon.length})</summary>
-              {grKon.map((g) => (
-                <article class="grant">
-                  <div class="news-meta kropki"><span class="badge">{RODZAJE_GRANTOW[g.data.rodzaj][lang]}</span><span>{lata(g)}</span>{g.data.kod && <span class="kropka">{g.data.kod}</span>}</div>
-                  <h3 style="font-size:16px"><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></h3>
-                  {g.data.kierownik && <p class="who muted" style="font-size:14px">{g.data.kierownik}</p>}
-                </article>
-              ))}
-            </details>
-          )}
-        </section>
-      )}
-
-      {konf.length > 0 && (
-        <section class="zsec" aria-labelledby="konferencje">
-          {/* link do pełnej listy w nagłówku sekcji, z prawej (.zsec-head w global.css) — gdy nie wszystkie się tu mieszczą */}
-          <div class="zsec-head">
-            <h2 id="konferencje">{T('Konferencje', 'Conferences')}</h2>
-            {konf.length > 8 && <a class="link-arrow" href={u(wJezyku('/nauka/konferencje', lang))}>{T('Wszystkie konferencje', 'All conferences')}<Ikona nazwa="strzalka" rozmiar={16} /></a>}
-          </div>
-          <ul class="plain-list">
-            {konf.slice(0, 8).map((k) => (
-              <li>
-                {/* konferencje nie mają naszych podstron: link na stronę konferencji, bez strony — sam tytuł */}
-                {k.data.strona ? <a href={k.data.strona}><TytulZewn tekst={wybierz(k.data, 'tytul', lang)} rozmiar={13} /></a> : wybierz(k.data, 'tytul', lang)}
-                <span class="muted"> — {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? `, ${miejsce(k.data.miejsce, lang)}` : ''}</span>
-                {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="badge badge-konferencja" style="margin-left:6px">{T('nadchodząca', 'upcoming')}</span>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {obr.length > 0 && (
-        <section class="zsec" aria-labelledby="obrony">
-          <h2 id="obrony">{T('Obrony doktorskie', 'PhD defences')}</h2>
-          <ul class="plain-list">
-            {obr.map((o) => <li><a href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>{o.data.kandydat}</a> <span class="muted">— {short(o.data.termin)}</span></li>)}
-          </ul>
-        </section>
-      )}
-
-      {akt.length > 0 && (
-        <section class="zsec" aria-labelledby="aktualnosci">
-          <h2 id="aktualnosci">{T('Aktualności', 'News')}</h2>
-          <ul class="plain-list">
-            {akt.map((a) => <li><a href={u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang))}>{wybierz(a.data, 'tytul', lang)}</a> <span class="muted">— {short(a.data.data)}</span></li>)}
-          </ul>
-        </section>
-      )}
-    </div>
-
-    <aside class="side" data-pagefind-ignore>
-      <nav class="side-box side-nav" aria-label={T('Zakłady', 'Departments')}>
-        <h2>{T('Zakłady', 'Departments')}</h2>
-        <div style="display:flex;flex-direction:column">
-          {wszystkieZaklady.map((z) => (
-            <a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))} aria-current={z.id === id ? 'page' : undefined}>{wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang)}</a>
-          ))}
+          </details>
         </div>
-      </nav>
-    </aside>
-  </div>
-</Baza>
+      )}
+    </section>
+  )}
+
+  {konf.length > 0 && (
+    <section id="konferencje" aria-labelledby="konferencje-h">
+      <h2 id="konferencje-h">{T('Konferencje', 'Conferences')}</h2>
+      <ul class="zk-daty">
+        {konfPokaz.map((k) => {
+          const dt = data(k.data.poczatek);
+          return (
+            <li>
+              <time class="dz" datetime={dt.iso}>{dt.dzien}<small>{dt.reszta}</small></time>
+              <div>
+                <span class="etyk">
+                  {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? ` · ${miejsce(k.data.miejsce, lang)}` : ''}
+                  {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="zk-nadch">{T('nadchodząca', 'upcoming')}</span>}
+                </span>
+                {/* konferencje nie mają naszych podstron: link na stronę konferencji, bez strony — sam tytuł */}
+                <p class="t">{k.data.strona ? <a class="zew" href={k.data.strona}>{wybierz(k.data, 'tytul', lang)}</a> : wybierz(k.data, 'tytul', lang)}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {konf.length > konfPokaz.length && <p class="zk-dalej"><a href={u(wJezyku('/nauka/konferencje', lang))}>{T('Wszystkie konferencje', 'All conferences')} →</a></p>}
+    </section>
+  )}
+
+  {obr.length > 0 && (
+    <section id="obrony" aria-labelledby="obrony-h">
+      <h2 id="obrony-h">{T('Obrony doktorskie', 'PhD defences')}</h2>
+      <ul class="zk-daty">
+        {obr.map((o) => {
+          const dt = data(o.data.termin);
+          return (
+            <li>
+              <time class="dz" datetime={dt.iso}>{dt.dzien}<small>{dt.reszta}</small></time>
+              <div><p class="t"><a href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>{o.data.kandydat}</a></p></div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  )}
+
+  {akt.length > 0 && (
+    <section id="aktualnosci" aria-labelledby="aktualnosci-h">
+      <h2 id="aktualnosci-h">{T('Aktualności', 'News')}</h2>
+      <ul class="zk-daty">
+        {akt.map((a) => {
+          const dt = data(a.data.data);
+          return (
+            <li>
+              <time class="dz" datetime={dt.iso}>{dt.dzien}<small>{dt.reszta}</small></time>
+              <div><p class="t"><a href={u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang))}>{wybierz(a.data, 'tytul', lang)}</a></p></div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  )}
+
+  {/* nawigacja między zakładami (dawniej ramka z boku) — poza indeksem wyszukiwarki */}
+  <section id="zaklady" aria-labelledby="zaklady-h" data-pagefind-ignore>
+    <h2 id="zaklady-h">{T('Zakłady Instytutu', 'Departments')}</h2>
+    <nav aria-labelledby="zaklady-h">
+      <ul class="linki zk-nav">
+        {wszystkieZaklady.map((z) => (
+          <li><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))} aria-current={z.id === id ? 'page' : undefined}>{wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang)}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </section>
+</Podstrona>
 
 <style>
-  /* komputer (≥ 761 px): odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Instytut” — bursztynowy
-     początek kreski sekcji nie przylega do banera (reszta odstępów .layout — uklad-zwarta.css) */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
-  /* telefon (≤ 760 px; zlecenie 01): obszary badań nie w banerze, tylko pod nim — nad sekcją „O zakładzie” */
+  /* Zakład (blok .z-zakl w .z-pd-tresc.tresc): własne style tylko tam, gdzie wzorzec treści (zal-tresc.css) czegoś nie ma. */
+  .zk-ile { font-family: var(--f-text); font-size: 15px; font-weight: 600; color: var(--muted); }
+  /* zdjęcie zakładu: bez zaokrągleń i cieni, podpis przygaszony */
+  .zk-foto { margin: 0 0 18px; }
+  .zk-foto img { display: block; width: 100%; max-width: 760px; height: auto; }
+  .zk-foto figcaption { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  /* opis z Markdown: akapity wzorca, pierwszy w kolorze nagłówków (jak p.wst) */
+  .zk-opis > :global(p:first-child) { color: var(--ink); }
+  .zk-opis :global(ul) { max-width: 70ch; margin: 0 0 14px; padding-left: 1.2em; }
+  .zk-o { margin-top: 18px; }
+  /* kierownik: jeden blok kontaktu wzorca, szerszy niż kolumna 1/3 */
+  :global(.tresc) .kontakty.zk-kier { grid-template-columns: minmax(0, 480px); margin: 0 0 6px; }
+  .zk-kier .para { overflow-wrap: anywhere; }
+  /* tabela składu: kolumna pokoju wąska (wzorzec daje ostatniej kolumnie 14em), e-mail łamany w dowolnym miejscu */
+  table.tab.zk-os td.zk-pok { min-width: 0; width: 5.5em; font-variant-numeric: tabular-nums; }
+  table.tab.zk-os td.zk-mail { overflow-wrap: anywhere; }
+  table.tab.zk-os td a :global(span) { font-size: .8em; }
+  .zk-lbl { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .zk-dalej { margin: 18px 0 0; font-size: 15px; color: var(--muted); }
+  .zk-brak, .zk-kto { color: var(--muted); }
+  .zk-zakonczone { margin-top: 22px; }
+  /* global.css (.faq summary) pogrubia pytanie — wzorzec ma Brygadę 500 */
+  .zk-zakonczone summary { min-height: 0; font-weight: 500; }
+  /* seminaria: dwie kolumny, kreska nad pozycją, nazwa Brygadą 20 px, pod nią najbliższy referat (wartości ul.dwa wzorca) */
+  .zk-sem { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; margin: 0; padding: 0; list-style: none; }
+  .zk-sem li { max-width: none; margin: 0; padding: 14px 0 16px; border-top: 1px solid var(--line); }
+  .zk-sem .t { margin: 0 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--ink); }
+  .zk-sem .t a { text-decoration: none; }
+  .zk-sem p:not(.t) { margin: 0; font-size: 15.5px; line-height: 1.55; }
+  /* tytuły na listach (seminarium, projekt) bez podkreślenia, jak lista linków wzorca; po najechaniu kolor działu */
+  ul.dwa b a { text-decoration: none; }
+  .zk-zakonczone details > ul { margin-bottom: 18px; }
+  .zk-nadch { margin-left: 8px; padding: 0 6px; border: 1px solid currentColor; font-size: 11.5px; }
+  /* wiersze z datą: jeden wzór daty (jak zal/dzial/Wiersz.astro) */
+  .zk-daty { list-style: none; margin: 0; padding: 0; }
+  .zk-daty li { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; max-width: none; margin: 0; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .zk-daty .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .zk-daty .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .zk-daty .t { margin: 2px 0 0; max-width: none; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .zk-daty .t a { color: inherit; text-decoration: none; }
+  .zk-daty .t a:hover { color: var(--d-a); }
+  /* lista zakładów: bieżący w kolorze działu, bez strzałki */
+  .zk-nav a[aria-current] { color: var(--d-a); }
+  .zk-nav a[aria-current]::after { content: '•'; color: var(--d-a); }
+
   @media (max-width: 760px) {
-    :global(.page-head) .tags { display: none; }
-    .zk-obszary { margin: 0 0 22px; }
+    .zk-foto { margin-bottom: 14px; }
+    .zk-sem { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .zk-daty li { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .zk-daty .dz { font-size: 28px; }
+    .zk-daty .t { font-size: 18.5px; }
+    .zk-lbl { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; color: var(--muted); }
+    table.tab.zk-os td.zk-pok { width: auto; }
   }
 </style>
