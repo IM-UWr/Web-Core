@@ -2,6 +2,8 @@
 // Jeden semestr na stronie /studia/rok-akademicki: kalendarze miesięcy (kolory dni), opcjonalnie listy dni wolnych i zamian, PDF.
 // Kolory (--kd-*) dziedziczy z RokAkademicki.astro. W komórkach nie ma liter N/P — kolor, a dla czytników ekranu opis dnia.
 // Zamiana dni: duży skrót dnia, według którego planu są zajęcia („ŚR”), na środku komórki.
+// Wygląd według wzorca treści (src/styles/zal-tresc.css; strona stoi w treści .tresc): nazwa semestru jako podsekcja (h3),
+// uwagi w ramce uwagi, listy z kreskami, PDF jako pozycja listy plików; komórki kalendarza bez zaokrągleń.
 // panel = element przełącznika semestrów (PrzelacznikSemestrow.astro): id + data-ps-panel (+ data-ps-aktywny).
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
@@ -57,7 +59,7 @@ const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, la
     {T('Zajęcia', 'Classes')}: {range(s.poczatek, s.koniec, lang)} · {st.razem} {T('dni zajęć', 'class days')}
     ({st.niebieskie} {T('niebieskich', 'blue')}, {st.pomaranczowe} {T('pomarańczowych', 'orange')}) · {liczby}
   </p>
-  {uwagi && <p class="notice kd-uwagi">{uwagi}</p>}
+  {uwagi && <div class="uwaga kd-uwagi"><p>{uwagi}</p></div>}
 
   <div class="kd-miesiace" data-pagefind-ignore>
     {miesiace.map((m) => (
@@ -92,7 +94,7 @@ const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, la
       {wolne.length > 0 && (
         <div>
           <h4>{T('Dni wolne od zajęć', 'Days without classes')}</h4>
-          <ul>
+          <ul class="kreski">
             {wolne.map((w) => <li><strong>{zakres(w.od, w.do)}</strong> — {T(w.opis, w.opis_en)}</li>)}
           </ul>
         </div>
@@ -100,7 +102,7 @@ const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, la
       {zamiany.length > 0 && (
         <div>
           <h4>{T('Zamiany dni', 'Day swaps')}</h4>
-          <ul>
+          <ul class="kreski">
             {zamiany.map((d) => (
               <li>
                 <strong>{wielka(longWithDay(d.data, lang))}</strong> — {opisZamiany(d.plan ?? 1, lang)}
@@ -114,22 +116,22 @@ const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, la
   )}
 
   {s.pdf && (
-    <a class="link-arrow" href={href(s.pdf)}><Ikona nazwa="plik" rozmiar={16} />{T('Kalendarz Instytutu w PDF', 'Institute calendar (PDF)')}</a>
+    <ul class="pliki kd-pdf"><li><a href={href(s.pdf)}><Ikona nazwa="plik" rozmiar={18} /><span>{T('Kalendarz Instytutu w PDF', 'Institute calendar (PDF)')}</span><span class="typ">PDF</span></a></li></ul>
   )}
 </section>
 
 <style>
   .kd-sem { margin-top: 8px; }
-  .kd-sem + .kd-sem { margin-top: 34px; }
-  .kd-sem h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.01em; scroll-margin-top: 16px; }
-  .kd-meta { margin: 6px 0 0; font-size: 15px; color: var(--muted); }
-  .kd-uwagi { margin: 14px 0 0; font-size: 15px; }
+  .kd-sem + .kd-sem { margin-top: 40px; }
+  .kd-sem h3 { margin: 0; scroll-margin-top: 16px; }
+  .kd-sem .kd-meta { margin: 4px 0 0; max-width: none; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
+  .kd-uwagi { margin-top: 14px; }
   .kd-miesiace { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 22px 30px; margin: 20px 0 6px; }
   .kd-mies { width: 100%; border-collapse: separate; border-spacing: 3px; table-layout: fixed; }
-  .kd-mies caption { padding: 0 3px 6px; text-align: left; font-size: 16px; font-weight: 800; color: var(--ink); }
+  .kd-mies caption { padding: 0 3px 6px; text-align: left; font-family: var(--f-display); font-size: 18px; font-weight: 500; color: var(--ink); }
   .kd-mies th { padding: 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
   .kd-mies abbr { text-decoration: none; }
-  .kd-mies td { position: relative; height: 46px; padding: 3px 5px; border-radius: 8px; vertical-align: top; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .kd-mies td { position: relative; height: 46px; padding: 3px 5px; vertical-align: top; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--ink); }
   .kd-mies td.niebieski { background: var(--kd-n); color: var(--kd-n-ink); }
   .kd-mies td.pomaranczowy { background: var(--kd-p); color: var(--kd-p-ink); }
   .kd-mies td.wolne { background: repeating-linear-gradient(135deg, var(--surface) 0 5px, var(--kd-kreski) 5px 7px); background-color: var(--surface); }
@@ -143,9 +145,8 @@ const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, la
   .kd-mies td .z { position: absolute; inset: 0; display: grid; place-items: center; padding-top: 9px; font-size: 19px; font-weight: 900; letter-spacing: .02em; line-height: 1; }
   .kd-mies td .z:lang(en) { font-size: 15px; letter-spacing: 0; }
   .kd-mies td.dzis { outline: 2.5px solid var(--ink); outline-offset: 1px; }
-  .kd-listy { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 4px 30px; }
-  .kd-listy h4 { margin: 16px 0 6px; font-size: 17px; font-weight: 800; }
-  .kd-listy ul { margin: 0; padding-left: 20px; font-size: 15px; }
-  .kd-listy li { margin: 3px 0; }
-  .kd-sem .link-arrow { margin-top: 10px; }
+  .kd-listy { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 4px 40px; }
+  .kd-listy h4 { margin: 18px 0 6px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+  .kd-listy ul { font-size: 15.5px; line-height: 1.55; }
+  .kd-pdf { margin-top: 14px; max-width: 760px; }
 </style>

@@ -1,6 +1,6 @@
 ---
-// Przełącznik semestrów — podłużne przyciski-pigułki jak zakładki w Kierunek.astro (.tabs + .chip, role="tablist").
-// Wspólny dla stron Rok akademicki (/studia/rok-akademicki) i Plan zajęć (/studia/plan-zajec).
+// Przełącznik semestrów — pasek przycisków wzorca treści (.tresc-taby w src/styles/zal-tresc.css, jak przełącznik roczników
+// programu w Kierunek.astro; role="tablist"). Używa go strona Rok akademicki (/studia/rok-akademicki); stoi w treści .tresc.
 //
 // Panele renderuje strona, zaraz pod przełącznikiem: element z id = `id` semestru i atrybutem data-ps-panel;
 // panel semestru wybranego podczas budowania dostaje też data-ps-aktywny. Elementy towarzyszące panelowi
@@ -28,21 +28,20 @@ const krotka = (e: string) => {
 };
 ---
 {semestry.length > 1 && lustro && (
-  <div class="tabs ps-tabs ps-lustro" role="group" aria-label={etykieta} data-ps-lustro>
+  <div class="tresc-taby ps-tabs ps-lustro" role="group" aria-label={etykieta} data-ps-lustro>
     {semestry.map((s) => (
-      <button type="button" class="chip" aria-pressed={s.id === aktywny ? 'true' : 'false'} data-ps-cel={s.id}>
+      <button type="button" aria-pressed={s.id === aktywny ? 'true' : 'false'} data-ps-cel={s.id}>
         {krotka(s.etykieta) === s.etykieta ? s.etykieta : <><span class="ps-pelna">{s.etykieta}</span><span class="ps-krotka">{krotka(s.etykieta)}</span></>}
       </button>
     ))}
   </div>
 )}
 {semestry.length > 1 && !lustro && (
-  <div class="tabs ps-tabs" role="tablist" aria-label={etykieta} data-ps>
+  <div class="tresc-taby ps-tabs" role="tablist" aria-label={etykieta} data-ps>
     {semestry.map((s) => (
       <button
         type="button"
         role="tab"
-        class="chip"
         id={`ps-tab-${s.id}`}
         aria-controls={s.id}
         aria-selected={s.id === aktywny ? 'true' : 'false'}
