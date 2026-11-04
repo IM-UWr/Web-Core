@@ -161,6 +161,7 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - Twarz stoi w lewym marginesie z kreską jak dziś, ale **jej środek wypada na pionowy środek bloku tekstu nagłówka**: od „← Dział” do ostatniej linii (tytuł, hasło, liczby).
   - Podpis pod twarzą, wyśrodkowany względem niej (ok. 8 px niżej).
   - Działa tak samo dla nagłówków z liczbami i bez. Wzór: prototyp, podstrony.
+  - **Doprecyzowanie (5.11, 00:09, na podstawie `wyglad/porzadki`):** obecne położenie jest dobre przy tytule w jednej linii z liczbami pod spodem (wzór: Plan zajęć) i bez liczb (wzór: Władze Instytutu). **Przy tytule w dwóch liniach** (wzór: kierunek „Sztuczna inteligencja w analizie danych”) sygnet stoi za nisko: podnieś go trochę, tak żeby jego środek wypadał wyżej niż środek całego bloku (z hasłem i liczbami). Orientacyjnie: blisko środka dwóch linii tytułu, ale nie niżej niż dziś. Pionowa kreska obok sygnetu może być wtedy dłuższa (uwaga 00:03; sprawdzić na podglądzie). Zrób zrzuty tych trzech stron przed i po zmianie.
 
 ### 10. Paleta i ciemny motyw (decyzje 4.11, 23:36)
 - **Paleta działów: „Atramenty”** (potwierdzona; tak jest już w kodzie). „Stonowana” odpada.
@@ -191,10 +192,16 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - kalki na drugim ekranie („r. HS”, „and 4 · All news →”) w `DrugiEkran.astro`;
   - treść obron bez `tresc_en`: na `/en` pokaż angielski szablon zaproszenia z danych (data, sala, kandydat, promotor, tytuł) zamiast polskiej treści;
   - linki w treściach Markdown na `/en`: `rehype-base.mjs` ma dopisywać `/en` do linków wewnętrznych, jeśli angielska strona istnieje. Popraw też martwy link w `warto_wiedziec/wyklad-terencea-tao.md` i polski kanał RSS w `<head>` na `/en`.
-- **Nie zmieniaj treści CMS.** Pozycje z sekcji „C. Problemy w treściach CMS” (brakujące pola `_en`, ok. 100 pozycji w ok. 35 plikach) wypisz w raporcie jako listę dla redakcji. Tam, gdzie brakuje pola `_en` w schemacie (np. `tematy_prac`, afiliacja i sala referatu, `tresc_en` obron), dodaj je jako **opcjonalne** i pokaż polską wartość, dopóki puste.
-- **Dane zewnętrzne** (sekcja D: plan z USOS, wykazy publikacji) bez zmian w danych. W planie na `/en` przetłumacz w kodzie powtarzalne uwagi z USOS („co 2 tygodnie” → „every other week” itd.) według listy z raportu. Nazwy przedmiotów bez angielskiej wersji zostają po polsku.
+- **Decyzja właściciela (4.11, ok. 23:50): „Niech wszystko co nie jest angielskie przetłumaczy”.** Na `/en` nie ma zostać nic po polsku poza nazwami własnymi.
+- **Treści CMS** (sekcja „C. Problemy w treściach CMS”: brakujące pola `_en`, ok. 100 pozycji w ok. 35 plikach): **przetłumacz wszystkie**, ale nie commituj w repozytoriach treści (Web-*). Przygotuj tłumaczenia jako łatki, po jednej na repozytorium, w `dok/en/latki/<Repozytorium>.patch` (zmiany tylko w polach `_en`), oraz zbiorczą tabelę `dok/en/TLUMACZENIA.md` (plik, pole, PL, EN) do przejrzenia. Właściciel nałoży łatki po akceptacji. Do podglądu możesz je nałożyć na lokalne kopie treści.
+  - Tam, gdzie brakuje pola `_en` w schemacie (np. `tematy_prac`, afiliacja i sala referatu, `tresc_en` obron), dodaj je jako **opcjonalne**, wypełnij w łatce i pokaż polską wartość tylko wtedy, gdy pole jest puste.
+- **Dane zewnętrzne** (sekcja D: plan z USOS, wykazy publikacji): danych nie zmieniaj, tłumacz w kodzie przy wyświetlaniu na `/en`, przez mapy tłumaczeń (np. `src/lib/en/*.ts`):
+  - uwagi z USOS („co 2 tygodnie” → „every other week” itd.), typy zajęć, sale i budynki;
+  - **nazwy przedmiotów**: użyj angielskich nazw z USOS/katalogu, jeśli są; brakujące przetłumacz w mapie (przejrzysta lista do akceptacji w `dok/en/TLUMACZENIA.md`);
+  - metadane publikacji (typ, „w druku”, nazwy pól), stopnie i tytuły naukowe (np. „dr hab.” → „Dr hab.” / „prof.” → „Prof.” — propozycja w tabeli do akceptacji), afiliacje (oficjalne angielskie nazwy jednostek UWr).
+  - **Wyjątek:** oryginalne tytuły prac, referatów i publikacji zostają w języku oryginału (to cytaty, nie interfejs).
 - **Wpisy testowe** („Testowe:”, pliki `test-*`) to sprawa redakcji przed startem strony. Nie usuwaj ich.
-- **„Do decyzji”** (sekcja raportu, 16 pozycji, np. „prof. dr hab.” w wersji EN) zostaw bez zmian.
+- **„Do decyzji”** (sekcja raportu, 16 pozycji, np. „prof. dr hab.” w wersji EN): przygotuj propozycje tłumaczeń w `dok/en/TLUMACZENIA.md` (osobna sekcja), wdrażaj po akceptacji właściciela.
 
 ### 13. Studia: przycisk „Rekrutacja” w pasie menu, bez linku do USOS (decyzja 4.11, 23:54)
 - Na stronie działu Studia, w pasie menu (zalecenie 5) **z prawej przycisk** wypełniony kolorem działu, kanciasty: małe „Dla kandydatów” (12,5 px, pogrubione) nad „Rekrutacja 2027/28 ↗” (Brygada ok. 22 px), biały tekst, `padding: 16px 22px`. Link do strony rekrutacji (dziś `studia-wmi.uwr.edu.pl`), rok z danych.
