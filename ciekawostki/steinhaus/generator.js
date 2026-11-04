@@ -171,39 +171,39 @@ function rysLebesgue() {
 }
 
 /* =====================================================================================
-   3. Zadanie o 18 punktach („Sto zadań”, 1958): 17 punktów, pierwsze n zawsze w różnych n-tych częściach odcinka
+   3. Zadanie o 18 punktach („Sto zadań”, 1958): 17 punktów, pierwsze n zawsze w różnych n-tych częściach odcinka; przeszukanie wyczerpujące
    ===================================================================================== */
-function szukaj17() {
-  // komórki: przedziały między kolejnymi ułamkami o mianownikach ≤ 17; punkt w komórce ma ustalony numer części dla każdego n
-  const N = 17, ulamki = new Set([0, 1]);
-  for (let n = 2; n <= N; n++) for (let j = 1; j < n; j++) ulamki.add(j / n);
-  const U = [...ulamki].sort((a, b) => a - b), kom = [];
-  for (let i = 0; i + 1 < U.length; i++) kom.push((U[i] + U[i + 1]) / 2);
-  const idx = kom.map((m) => { const r = [0]; for (let n = 1; n <= N; n++) r.push(Math.floor(n * m)); return r; });
-  const roz = [], wyb = [];
-  (function dfs(k) {
-    if (k > N) { roz.push(wyb.slice()); return; }
-    for (let c = 0; c < kom.length; c++) {
-      let ok = true;
-      for (let j = 0; j < wyb.length && ok; j++) for (let n = k; n <= N; n++) if (idx[c][n] === idx[wyb[j]][n]) { ok = false; break; }
-      if (ok) { wyb.push(c); dfs(k + 1); wyb.pop(); }
-    }
+/** dokładne przeszukiwanie (przedziały w jednostkach 1/lcm(1..18)): wszystkie układy N punktów spełniające warunek Steinhausa */
+function szukajPunktow(N, naRozw) {
+  const L = 12252240, iv = [];
+  let liczba = 0;
+  (function poziom(n) {
+    if (n > N) { liczba++; if (naRozw) naRozw(iv.map((a) => a.slice())); return; }
+    const m = n - 1, zajete = new Array(n).fill(false), wyb = new Array(m), k = L / n;
+    (function przydz(j) {
+      if (j === m) {
+        const p = zajete.indexOf(false), zap = iv.map((a) => a.slice());
+        for (let i = 0; i < m; i++) { iv[i][0] = Math.max(iv[i][0], wyb[i] * k); iv[i][1] = Math.min(iv[i][1], (wyb[i] + 1) * k); }
+        iv.push([p * k, (p + 1) * k]);
+        poziom(n + 1);
+        iv.pop();
+        for (let i = 0; i < m; i++) { iv[i][0] = zap[i][0]; iv[i][1] = zap[i][1]; }
+        return;
+      }
+      for (let q = Math.floor(iv[j][0] / k); q <= Math.ceil(iv[j][1] / k) - 1; q++) if (!zajete[q]) { zajete[q] = true; wyb[j] = q; przydz(j + 1); zajete[q] = false; }
+    })(0);
   })(1);
-  // dla rysunku: punkt k stoi w środku największego przedziału bez granic j/n dla n ≥ k (tylko te wiersze go pokazują)
-  const pozycje = (r) => r.map((c, i) => {
-    const k = i + 1, m = kom[c];
-    let lo = 0, hi = 1;
-    for (let n = k; n <= N; n++) { lo = Math.max(lo, Math.floor(n * m) / n); hi = Math.min(hi, (Math.floor(n * m) + 1) / n); }
-    return { x: (lo + hi) / 2, lo, hi };
-  });
+  return liczba;
+}
+function szukaj17() {
+  const L = 12252240;
   let najl = null, zapas = -1;
-  for (const r of roz) {
-    const p = pozycje(r), z = Math.min(...p.map((q) => (q.hi - q.lo) / 2));
-    if (z > zapas) { zapas = z; najl = p; }
-  }
-  log('18 punktów: rozwiązań (ciągi komórek) dla 17 punktów:', roz.length, ' najmniejszy odstęp od granicy (jedn. rysunku):', (zapas * 168).toFixed(2));
-  // kontrola: 18 punktów — brak rozwiązań (szybki test: żadne rozwiązanie dla 17 nie daje się przedłużyć przy N = 18 nie sprawdzamy tu; patrz literatura)
-  return najl.map((q) => q.x);
+  const ile17 = szukajPunktow(17, (iv) => { const z = Math.min(...iv.map(([a, b]) => b - a)); if (z > zapas) { zapas = z; najl = iv; } });
+  const ile18 = szukajPunktow(18);
+  // Warmus (1976): 768 układów przedziałów, 1536 z odbiciami; dla 18 punktów rozwiązań nie ma
+  log('18 punktów: układów dla 17 punktów:', ile17, '(z odbiciami; Warmus: 768·2), dla 18 punktów:', ile18, '; najwęższy przedział (jedn. rysunku):', (zapas / L * 168).toFixed(2));
+  if (ile17 !== 1536 || ile18 !== 0) throw new Error('niezgodność z literaturą');
+  return najl.map(([a, b]) => (a + b) / 2 / L);
 }
 function rys18() {
   const xs = szukaj17(), N = xs.length;

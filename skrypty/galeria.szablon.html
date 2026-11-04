@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Galeria zdjęć IM UWr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Brygada+1918:ital,wght@0,400..700;1,400..700&family=Manrope:wght@400..800&display=swap">
+<style>
+/* Układ: arkusz stykowy z numerami klatek; każda klatka da się przymierzyć do prawdziwego banera. Kolory i kroje z kierunku „Założyciele”. */
+:root {
+  --bg: #fcfaf6; --pow: #f4f1ea; --linia: #e5e0d6; --ink: #131c31; --tekst: #2b3245; --mut: #5b6375;
+  --klatka: #e9e5dc; --on: #131c31; --on-ink: #fcfaf6; --ok: #0a6b63; --uwaga: #8a5300; --zle: #b03a1f;
+  --granat: #0d1830;
+  --instytut-j: #f2a33a; --instytut-g: #5c3a0e; --instytut-a: #8a5300;
+  --nauka-j: #4cc3b2; --nauka-g: #0a4a47; --nauka-a: #0a6b63;
+  --studia-j: #f07d5e; --studia-g: #5e1f14; --studia-a: #b03a1f;
+  --popularyzacja-j: #a991f7; --popularyzacja-g: #30216a; --popularyzacja-a: #5b3fc4;
+  --f-d: 'Brygada 1918', 'Iowan Old Style', Georgia, serif;
+  --f-t: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0a1020; --pow: #111a2e; --linia: #243049; --ink: #ecf0f7; --tekst: #d3d9e6; --mut: #98a3b8;
+  --klatka: #060b16; --on: #ecf0f7; --on-ink: #0a1020; --ok: #4cc3b2; --uwaga: #f2a33a; --zle: #f07d5e;
+  --instytut-a: #f2a33a; --nauka-a: #4cc3b2; --studia-a: #f07d5e; --popularyzacja-a: #a991f7; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0a1020; --pow: #111a2e; --linia: #243049; --ink: #ecf0f7; --tekst: #d3d9e6; --mut: #98a3b8;
+  --klatka: #060b16; --on: #ecf0f7; --on-ink: #0a1020; --ok: #4cc3b2; --uwaga: #f2a33a; --zle: #f07d5e;
+  --instytut-a: #f2a33a; --nauka-a: #4cc3b2; --studia-a: #f07d5e; --popularyzacja-a: #a991f7; color-scheme: dark; }
+[data-dzial="instytut"] { --d-j: var(--instytut-j); --d-g: var(--instytut-g); --d-a: var(--instytut-a); }
+[data-dzial="nauka"] { --d-j: var(--nauka-j); --d-g: var(--nauka-g); --d-a: var(--nauka-a); }
+[data-dzial="studia"] { --d-j: var(--studia-j); --d-g: var(--studia-g); --d-a: var(--studia-a); }
+[data-dzial="popularyzacja"] { --d-j: var(--popularyzacja-j); --d-g: var(--popularyzacja-g); --d-a: var(--popularyzacja-a); }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--tekst); font: 15px/1.5 var(--f-t); }
+a { color: inherit; }
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.kol { max-width: 1560px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.gora { padding-block: 28px 14px; }
+.gora h1 { margin: 0 0 6px; font: 500 38px/1.15 var(--f-d); color: var(--ink); text-wrap: balance; }
+.gora p { margin: 0; max-width: 78ch; }
+.gora .wazne { margin-top: 8px; color: var(--ink); font-weight: 600; }
+
+.narz { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--linia); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.narz .kol { display: grid; gap: 8px; padding-block: 10px; }
+.zakl { display: flex; flex-wrap: wrap; gap: 4px; }
+.zakl button { padding: 6px 12px; border: 0; border-bottom: 3px solid transparent; background: none; font-weight: 600; color: var(--mut); cursor: pointer; }
+.zakl button small { margin-left: 5px; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.zakl button:hover { color: var(--ink); }
+.zakl button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--d-a, var(--ink)); }
+.fil { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; font-size: 14px; }
+.fil label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.fil select { padding: 4px 8px; border: 1px solid var(--linia); background: var(--pow); }
+.seg { display: inline-flex; border: 1px solid var(--linia); }
+.seg button { padding: 4px 12px; border: 0; background: none; font-weight: 600; font-size: 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--linia); }
+.seg button[aria-pressed="true"] { background: var(--on); color: var(--on-ink); }
+.wyb { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; }
+.wyb b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.gl { padding: 5px 14px; border: 1px solid var(--on); background: var(--on); color: var(--on-ink); font-weight: 700; font-size: 14px; cursor: pointer; }
+.gl.drugi { background: none; color: var(--ink); border-color: var(--linia); font-weight: 600; }
+
+.opis { padding-block: 16px 2px; max-width: 90ch; }
+.opis h2 { margin: 0 0 2px; font: 500 27px/1.2 var(--f-d); color: var(--ink); }
+.opis p { margin: 0; }
+.licz { color: var(--mut); font-size: 14px; }
+
+.siatka { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); padding-block: 14px 60px; }
+.strona-tryb .siatka { grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); }
+.karta { display: flex; flex-direction: column; min-width: 0; border-top: 2px solid var(--linia); padding-top: 8px; }
+.karta.wybrana { border-top-color: var(--d-a, var(--ink)); }
+.karta header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.nr { font: 500 15px/1 var(--f-d); color: var(--mut); font-variant-numeric: tabular-nums; }
+.oc { margin-left: auto; font-size: 12.5px; color: var(--mut); white-space: nowrap; }
+.med { display: block; width: 100%; cursor: zoom-in; }
+.ram { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--klatka); }
+.ram img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.brak { position: absolute; inset: 0; display: grid; place-items: center; padding: 14px; text-align: center; font-size: 13.5px; color: var(--mut); }
+.karta h3 { margin: 8px 0 3px; font: 500 17.5px/1.28 var(--f-d); color: var(--ink); }
+.dane { margin: 0 0 6px; font-size: 13px; color: var(--mut); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.zn { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 6px; padding: 0; list-style: none; font-size: 12.5px; font-weight: 700; }
+.zn .dob { color: var(--ok); } .zn .uw { color: var(--uwaga); } .zn .zl { color: var(--zle); }
+.karta details { font-size: 13.5px; margin-bottom: 8px; }
+.karta summary { cursor: pointer; font-weight: 600; color: var(--mut); }
+.karta details p { margin: 6px 0 0; }
+.dol { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: auto; font-size: 13.5px; }
+.dol a { font-weight: 600; text-underline-offset: 3px; }
+.biore { margin-left: auto; padding: 4px 12px; border: 1px solid var(--linia); background: none; font-weight: 700; font-size: 13.5px; cursor: pointer; }
+.biore:hover { border-color: var(--ink); }
+.biore[aria-pressed="true"] { background: var(--d-a, var(--on)); border-color: var(--d-a, var(--on)); color: #fff; }
+.karta.obecne { border-top-style: dashed; }
+.pusto { padding-block: 34px; font-size: 16px; color: var(--mut); }
+
+/* przymiarki: te same warstwy co w prototypie */
+.sym { position: relative; overflow: hidden; container-type: inline-size; background: var(--granat); color: #fff; isolation: isolate; text-align: left; font-family: var(--f-t); }
+.sym + .sym { margin-top: 6px; }
+.sym-ok { aspect-ratio: 1920 / 950; }
+.sym-ok > img { position: absolute; top: -13%; left: 24%; width: 76%; height: 100%; object-fit: cover; object-position: 2% 50%; z-index: -3;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%); mask-image: linear-gradient(90deg, transparent 0, #000 7%); }
+.sym-ok .skos { position: absolute; inset: 0; z-index: -1; background: rgb(9 16 34 / .97); clip-path: polygon(0 0, 21.4% 0, 37.2% 100%, 0 100%); }
+.sym-ok::after { content: ''; position: absolute; inset: 0; z-index: -2; background: linear-gradient(180deg, rgb(9 16 34 / .5) 0, rgb(9 16 34 / 0) 16%), linear-gradient(0deg, var(--granat) 0, var(--granat) 33%, rgb(13 24 48 / .8) 46%, rgb(13 24 48 / 0) 64%); }
+.sym-ok .t { position: absolute; left: 2.5cqw; top: 20%; font-family: var(--f-d); line-height: 1.02; }
+.sym-ok .t b { display: block; font-weight: 500; font-size: 5.4cqw; }
+.sym-ok .t i { display: block; font-style: normal; font-size: 3.4cqw; margin-top: .3cqw; }
+.sym-ok .dz { position: absolute; left: 2.5cqw; right: 2.5cqw; bottom: 7%; display: grid; grid-template-columns: repeat(4, 1fr); font-family: var(--f-d); font-size: 2.2cqw; }
+.sym-b { aspect-ratio: 1920 / 366; }
+.sym-pod { aspect-ratio: 1920 / 270; background: var(--d-g); }
+.foto { position: absolute; inset: 0 0 0 36%; z-index: -2; background: var(--d-j); }
+.sym-pod .foto { left: 0; }
+.foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; filter: grayscale(1) contrast(1.2) brightness(1.04); mix-blend-mode: multiply; }
+.foto::after { content: ''; position: absolute; inset: 0; background: var(--granat); mix-blend-mode: lighten; }
+.sym-pod .foto::after { background: color-mix(in srgb, var(--d-g) 70%, var(--granat)); }
+.sym-b::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
+  radial-gradient(15.6cqw 11cqw at 76% 52%, rgb(13 24 48 / .62), rgb(13 24 48 / 0) 100%),
+  radial-gradient(17cqw 10.5cqw at 62% 40%, rgb(13 24 48 / .6), rgb(13 24 48 / 0) 100%),
+  linear-gradient(100deg, var(--granat) 0, var(--granat) 41%, rgb(13 24 48 / .86) 47%, rgb(13 24 48 / .4) 58%, rgb(13 24 48 / 0) 70%); }
+.sym-pod::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
+  radial-gradient(18cqw 9cqw at 74% 58%, color-mix(in srgb, var(--d-g) 70%, transparent), transparent 100%),
+  linear-gradient(90deg, color-mix(in srgb, var(--d-g) 90%, transparent) 0, color-mix(in srgb, var(--d-g) 72%, transparent) 45%, color-mix(in srgb, var(--d-g) 56%, transparent) 100%); }
+.sym-b .t, .sym-pod .t { position: absolute; left: 3.4cqw; top: 26%; font-family: var(--f-d); line-height: 1.05; }
+.sym-b .t b, .sym-pod .t b { display: block; font-weight: 500; font-size: 4.6cqw; }
+.sym-pod .t b { font-size: 3.1cqw; }
+.sym-b .t i { display: block; margin-top: .5cqw; font: 500 1.35cqw var(--f-t); color: var(--d-j); }
+.etyk { margin: 8px 0 3px; font-size: 12.5px; font-weight: 600; color: var(--mut); }
+
+dialog { width: min(1240px, 96vw); max-height: 94vh; padding: 16px; border: 1px solid var(--linia); background: var(--bg); color: var(--tekst); overflow: auto; }
+dialog::backdrop { background: rgb(6 11 22 / .8); }
+.dl-gora { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 10px; }
+.dl-gora h3 { margin: 0; min-width: 0; font: 500 21px/1.25 var(--f-d); color: var(--ink); flex: 1 1 280px; }
+.dl-duze { display: block; max-width: 100%; max-height: 74vh; margin: 0 auto; }
+
+.tropy { list-style: none; margin: 14px 0 60px; padding: 0; }
+.tropy li { display: grid; gap: 2px 16px; grid-template-columns: 110px minmax(0, 1fr); padding: 10px 0; border-top: 1px solid var(--linia); }
+.tropy .dz { font-size: 13px; font-weight: 700; color: var(--d-a, var(--mut)); }
+.tropy a { font-weight: 600; overflow-wrap: anywhere; text-underline-offset: 3px; }
+.tropy p { grid-column: 2; margin: 0; font-size: 13.5px; color: var(--mut); }
+@media (max-width: 640px) { .tropy li { grid-template-columns: 1fr; } .tropy p { grid-column: 1; } .wyb { margin-left: 0; } .gora h1 { font-size: 30px; } .narz { position: static; } }
+
+.kopia-pole { width: 100%; min-height: 150px; margin-top: 8px; padding: 8px; border: 1px solid var(--linia); background: var(--pow); color: var(--tekst); font: 13px/1.45 ui-monospace, Consolas, monospace; }
+@media (prefers-reduced-motion: no-preference) { .biore, .karta { transition: background-color .15s, border-color .15s; } }
+</style>
+</head>
+<body>
+<div class="kol gora">
+  <h1>Galeria zdjęć: Instytut Matematyczny UWr</h1>
+  <p>Kandydaci na okładkę i banery czterech działów. Klatki łączą wyniki trzech poszukiwań: archiwum strony, otwarte licencje i źródła UWr. Kliknij zdjęcie, żeby je powiększyć i przymierzyć do okładki albo dowolnego działu.</p>
+  <p class="wazne">Agenci nie widzieli żadnego zdjęcia. Opisy kadrów i oceny pochodzą z podpisów i nazw plików, więc są wstępne. Decyduje Twoje oko.</p>
+</div>
+<div class="narz" id="narz">
+  <div class="kol">
+    <div class="zakl" id="zakl" role="group" aria-label="Sekcje"></div>
+    <div class="fil">
+      <label for="f-prawa">Prawa
+        <select id="f-prawa">
+          <option value="">wszystkie</option>
+          <option value="nasze">nasze (UWr, IM)</option>
+          <option value="wolne">wolne licencje</option>
+          <option value="ustalic">do ustalenia</option>
+        </select></label>
+      <label for="f-duze"><input id="f-duze" type="checkbox"> co najmniej 2400 px</label>
+      <label for="f-osoby"><input id="f-osoby" type="checkbox"> bez rozpoznawalnych osób</label>
+      <span class="seg" role="group" aria-label="Widok">
+        <button type="button" data-w="zdjecie" aria-pressed="true">Zdjęcie</button>
+        <button type="button" data-w="strona" aria-pressed="false">Na stronie</button>
+      </span>
+      <span class="wyb"><span>Wybrane: <b id="ile">0</b></span>
+        <button type="button" class="gl" id="kopiuj">Kopiuj wybór</button>
+        <button type="button" class="gl drugi" id="czysc">Wyczyść</button></span>
+    </div>
+    <p class="licz" id="kom" role="status" hidden></p>
+    <textarea class="kopia-pole" id="kopia-pole" aria-label="Lista wybranych zdjęć do skopiowania" hidden></textarea>
+  </div>
+</div>
+<main class="kol" id="tresc"></main>
+<dialog id="dl" aria-label="Powiększone zdjęcie"></dialog>
+
+<script>
+const DANE = /*DANE*/null;
+const SEK = [['okladka', 'Okładka', 'Zdjęcie na cały ekran. Lewa część i dół są zakryte, więc temat powinien stać z prawej lub w prawym górnym rogu. Bez przebarwiania. Co najmniej 2400 px.'],
+  ['instytut', 'Instytut', 'Instytucja, historia, budynek, ludzie. Szeroki pas w dwóch kolorach, zdjęcie zaczyna się od ok. 1/3 szerokości; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
+  ['nauka', 'Nauka', 'Badania, seminaria, tablica z wzorami, konferencje, biblioteka. Szeroki pas w dwóch kolorach; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
+  ['studia', 'Studia', 'Studenci, sale wykładowe, kampus, zajęcia. Szeroki pas w dwóch kolorach; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
+  ['popularyzacja', 'Popularyzacja', 'Uczniowie, warsztaty, wykłady otwarte, festiwale nauki. Szeroki pas w dwóch kolorach; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
+  ['ogolne', 'Ogólne', 'Zdjęcia, które agenci zostawili bez przypisania do działu. W powiększeniu możesz je przymierzyć wszędzie.']];
+const NAZWA = Object.fromEntries(SEK.map(([s, n]) => [s, n]));
+const HASLO = { instytut: 'Wrocławska szkoła matematyczna', nauka: 'Poznaj nasze badania na A+', studia: 'Studiuj matematykę we Wrocławiu', popularyzacja: 'Matematyka dla uczniów i nauczycieli' };
+const PODSTRONA = { instytut: 'Władze Instytutu', nauka: 'Seminaria', studia: 'Plan zajęć', popularyzacja: 'Dla uczniów' };
+const PRAWA = { nasze: ['dob', 'Nasze (UWr, IM)'], wolne: ['dob', 'Wolna licencja'], ustalic: ['uw', 'Prawa do ustalenia'] };
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const czytaj = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const zapisz = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* wybór zostaje w pamięci strony */ } };
+
+const WSZYSTKIE = Object.values(DANE.karty).flat();
+const stan = { sek: 'okladka', widok: 'zdjecie', prawa: '', duze: false, osoby: false, wyb: new Set(czytaj('galeria-wybor', [])) };
+const klucz = (c) => c.s + '|' + c.k;
+
+const img = (c, alt) => `<img src="${esc(c.m)}" alt="${esc(alt ?? c.t)}" loading="lazy" referrerpolicy="no-referrer">`;
+const tytSym = {
+  okladka: () => `<div class="skos"></div><div class="t"><b>Instytut</b><i>Matematyczny</i></div><div class="dz"><span>Instytut</span><span>Nauka</span><span>Studia</span><span>Popularyzacja</span></div>`,
+};
+function przymiarka(c, dz) {
+  if (dz === 'okladka') return `<div class="sym sym-ok">${img(c)}${tytSym.okladka()}</div>`;
+  return `<div class="sym sym-b" data-dzial="${dz}"><div class="foto">${img(c)}</div><div class="t"><b>${NAZWA[dz]}</b><i>${HASLO[dz]}</i></div></div>
+    <p class="etyk">Nagłówek podstrony</p>
+    <div class="sym sym-pod" data-dzial="${dz}"><div class="foto">${img(c)}</div><div class="t"><b>${PODSTRONA[dz]}</b></div></div>`;
+}
+function rozmiar(c) {
+  if (!c.w) return 'rozmiar nieznany';
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a); const g = gcd(c.w, c.h || c.w);
+  const r = c.h ? ` · ${(c.w / c.h).toFixed(2).replace('.', ',')}:1` : '';
+  return `${c.w}×${c.h ?? '?'} px${r}`;
+}
+function znaczniki(c) {
+  const [kl, op] = PRAWA[c.pr]; const z = [`<li class="${kl}">${op}</li>`];
+  if (!c.w) z.push('<li class="uw">Sprawdź rozmiar</li>');
+  else if (c.w < 2400) z.push('<li class="zl">Za małe, potrzebny oryginał</li>');
+  if (c.ucz) z.push('<li class="zl">Uczniowie: zgoda opiekunów</li>');
+  else if (c.os) z.push('<li class="uw">Osoby: zgoda na wizerunek</li>');
+  return `<ul class="zn">${z.join('')}</ul>`;
+}
+function karta(c) {
+  const dz = c.s === 'ogolne' ? 'instytut' : c.s, wb = stan.wyb.has(klucz(c));
+  const med = stan.widok === 'strona' ? przymiarka(c, dz) : `<div class="ram">${img(c)}</div>`;
+  const opis = [c.ko && `<p><b>Kadr:</b> ${esc(c.ko)}</p>`, c.d && `<p><b>Dlaczego:</b> ${esc(c.d)}</p>`, c.u && `<p><b>Uwagi:</b> ${esc(c.u)}</p>`, `<p><b>Znalazł:</b> ${esc(c.ag.join(', '))}</p>`].filter(Boolean).join('');
+  return `<article class="karta${wb ? ' wybrana' : ''}" data-klucz="${esc(klucz(c))}">
+    <header><span class="nr">${esc(c.nr)}</span><span class="oc">wstępnie ${c.oc}/5</span></header>
+    <div class="med" role="button" tabindex="0" data-duze="${esc(klucz(c))}" aria-label="Powiększ: ${esc(c.t)}">${med}</div>
+    <h3>${esc(c.t)}</h3>
+    <p class="dane">${esc(rozmiar(c))} · ${esc(c.l)}${c.a ? ' · ' + esc(c.a) : ''}</p>
+    ${znaczniki(c)}
+    <details><summary>Opis agenta</summary>${opis}</details>
+    <div class="dol">${c.p ? `<a href="${esc(c.p)}" target="_blank" rel="noopener">Strona źródłowa</a>` : ''}${c.o ? `<a href="${esc(c.o)}" target="_blank" rel="noopener">Pełny plik</a>` : ''}
+      <button type="button" class="biore" data-biore="${esc(klucz(c))}" aria-pressed="${wb}">${wb ? 'Wybrane' : 'Wybieram'}</button></div>
+  </article>`;
+}
+function obecna(s) {
+  if (!DANE.obecne[s]) return '';
+  const c = { k: 'obecne', s, t: 'Obecne zdjęcie, do porównania', m: DANE.obecne[s] };
+  const med = stan.widok === 'strona' ? przymiarka(c, s) : `<div class="ram">${img(c)}</div>`;
+  return `<article class="karta obecne"><header><span class="nr">Teraz</span></header><div class="med" style="cursor:default">${med}</div><h3>${esc(c.t)}</h3><p class="dane">Dziś w prototypie</p></article>`;
+}
+const pasuje = (c) => (!stan.prawa || c.pr === stan.prawa) && (!stan.duze || (c.w || 0) >= 2400) && (!stan.osoby || !c.os);
+
+function rysujZakladki() {
+  const lista = SEK.filter(([s]) => DANE.karty[s]?.length).map(([s, n]) => [s, n, DANE.karty[s].filter(pasuje).length]);
+  const wybr = WSZYSTKIE.filter((c) => stan.wyb.has(klucz(c))).length;
+  $('#zakl').innerHTML = lista.map(([s, n, l]) => `<button type="button" data-sek="${s}" ${s !== 'okladka' && s !== 'ogolne' ? `data-dzial="${s}"` : ''} aria-pressed="${stan.sek === s}">${n}<small>${l}</small></button>`).join('')
+    + `<button type="button" data-sek="tropy" aria-pressed="${stan.sek === 'tropy'}">Tropy bez podglądu<small>${DANE.tropy.length}</small></button>`
+    + `<button type="button" data-sek="wybrane" aria-pressed="${stan.sek === 'wybrane'}">Wybrane<small>${wybr}</small></button>`;
+  $('#ile').textContent = wybr;
+}
+function rysuj() {
+  rysujZakladki();
+  document.body.classList.toggle('strona-tryb', stan.widok === 'strona');
+  document.querySelectorAll('[data-w]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.w === stan.widok));
+  const T = $('#tresc');
+  if (stan.sek === 'tropy') {
+    T.innerHTML = `<div class="opis"><h2>Tropy bez podglądu</h2><p>Adresy z wyszukiwarki, głównie Wikimedia Commons, którego agent nie mógł otworzyć. Nie ma tu sprawdzonych licencji ani rozmiarów. Jeśli coś Ci się spodoba, prześlij mi adres, a uzupełnię dane.</p></div>
+      <ul class="tropy">${DANE.tropy.map((t) => `<li data-dzial="${t.s}"><span class="dz">${esc(NAZWA[t.s] ?? t.s)}</span><a href="${esc(t.p)}" target="_blank" rel="noopener">${esc(t.t || t.p)}</a><p>${esc(t.n)}</p></li>`).join('')}</ul>`;
+    return;
+  }
+  if (stan.sek === 'wybrane') {
+    const L = WSZYSTKIE.filter((c) => stan.wyb.has(klucz(c)));
+    T.innerHTML = `<div class="opis"><h2>Wybrane</h2><p>Gdy skończysz, naciśnij „Kopiuj wybór” i wklej listę do rozmowy.</p></div>` +
+      (L.length ? `<div class="siatka">${L.map(karta).join('')}</div>` : '<p class="pusto">Nic jeszcze nie wybrano. Przy każdym zdjęciu jest przycisk „Wybieram”.</p>');
+    return;
+  }
+  const [s, n, op] = SEK.find(([x]) => x === stan.sek);
+  const L = DANE.karty[s].filter(pasuje);
+  T.innerHTML = `<div class="opis"><h2>${n}</h2><p>${op}</p></div>` + `<div class="siatka" ${s !== 'okladka' && s !== 'ogolne' ? `data-dzial="${s}"` : ''}>${obecna(s)}${L.map(karta).join('')}</div>` + (L.length ? '' : '<p class="pusto">Żadne zdjęcie nie spełnia tych filtrów. Zmień filtr prawa, rozmiaru albo osób.</p>');
+}
+let dlMiar = 'zdjecie', dlK = null;
+function rysujDl() {
+  const c = WSZYSTKIE.find((x) => klucz(x) === dlK); if (!c) return;
+  const opcje = [['zdjecie', 'Zdjęcie'], ...SEK.filter(([s]) => s !== 'ogolne').map(([s, n]) => [s, n])];
+  $('#dl').innerHTML = `<div class="dl-gora"><h3>${esc(c.nr)}. ${esc(c.t)}</h3>
+      <span class="seg" role="group" aria-label="Przymierz">${opcje.map(([v, n]) => `<button type="button" data-miara="${v}" aria-pressed="${dlMiar === v}">${n}</button>`).join('')}</span>
+      <button type="button" class="gl drugi" data-zamknij>Zamknij</button></div>
+    <div>${dlMiar === 'zdjecie' ? `<img class="dl-duze" src="${esc(c.m)}" alt="${esc(c.t)}" referrerpolicy="no-referrer">` : przymiarka(c, dlMiar).replace(/ loading="lazy"/g, '')}</div>
+    <p class="dane" style="margin-top:8px">${esc(rozmiar(c))} · ${esc(c.l)}${c.a ? ' · ' + esc(c.a) : ''}</p>`;
+}
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  const sek = t.closest('[data-sek]'); if (sek) { stan.sek = sek.dataset.sek; rysuj(); window.scrollTo({ top: Math.min(window.scrollY, $('#narz').offsetTop) }); return; }
+  const w = t.closest('[data-w]'); if (w) { stan.widok = w.dataset.w; rysuj(); return; }
+  const b = t.closest('[data-biore]'); if (b) {
+    const k = b.dataset.biore; if (stan.wyb.has(k)) stan.wyb.delete(k); else stan.wyb.add(k);
+    zapisz('galeria-wybor', [...stan.wyb]); const on = stan.wyb.has(k);
+    b.setAttribute('aria-pressed', on); b.textContent = on ? 'Wybrane' : 'Wybieram'; b.closest('.karta').classList.toggle('wybrana', on); rysujZakladki(); return; }
+  const d = t.closest('[data-duze]'); if (d) { dlK = d.dataset.duze; const c = WSZYSTKIE.find((x) => klucz(x) === dlK); dlMiar = stan.widok === 'strona' ? (c.s === 'ogolne' ? 'okladka' : c.s) : 'zdjecie'; rysujDl(); $('#dl').showModal(); return; }
+  const m = t.closest('[data-miara]'); if (m) { dlMiar = m.dataset.miara; rysujDl(); return; }
+  if (t.closest('[data-zamknij]') || t === $('#dl')) $('#dl').close();
+});
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('.med[role="button"]')) { e.preventDefault(); e.target.click(); }
+});
+$('#f-prawa').addEventListener('change', (e) => { stan.prawa = e.target.value; rysuj(); });
+$('#f-duze').addEventListener('change', (e) => { stan.duze = e.target.checked; rysuj(); });
+$('#f-osoby').addEventListener('change', (e) => { stan.osoby = e.target.checked; rysuj(); });
+let wczytane = 0, nieudane = 0;
+document.addEventListener('load', (e) => { const i = e.target; if (i.tagName === 'IMG' && /^http/.test(i.src)) wczytane++; }, true);
+document.addEventListener('error', (e) => {
+  const i = e.target; if (i.tagName !== 'IMG' || i.dataset.zle) return; i.dataset.zle = '1'; i.style.visibility = 'hidden';
+  nieudane++; if (nieudane >= 5 && !wczytane) komunikat('Zdjęcia się nie wczytują, bo ten podgląd blokuje obce adresy. Zapisz plik na komputerze i otwórz go w zwykłej przeglądarce.');
+  const r = i.closest('.ram'); if (r) r.insertAdjacentHTML('beforeend', '<div class="brak">Zdjęcie się nie wczytało. Otwórz stronę źródłową albo pełny plik.</div>');
+}, true);
+function tekstWyboru() {
+  const L = WSZYSTKIE.filter((c) => stan.wyb.has(klucz(c)));
+  return L.map((c) => `${NAZWA[c.s]} ${c.nr}: ${c.t}\n  plik: ${c.o || c.m || '-'}\n  strona: ${c.p || '-'}`).join('\n');
+}
+function komunikat(t) { const k = $('#kom'); k.textContent = t; k.hidden = false; }
+$('#kopiuj').addEventListener('click', () => {
+  const t = tekstWyboru(), pole = $('#kopia-pole');
+  if (!t) { pole.hidden = true; komunikat('Nic jeszcze nie wybrano.'); return; }
+  const awaryjnie = () => { pole.value = t; pole.hidden = false; pole.focus(); pole.select(); komunikat('Skopiuj listę z pola poniżej i wklej ją do rozmowy.'); };
+  if (!navigator.clipboard) { awaryjnie(); return; }
+  navigator.clipboard.writeText(t).then(() => { pole.hidden = true; komunikat('Skopiowano. Wklej listę do rozmowy.'); }, awaryjnie);
+});
+$('#czysc').addEventListener('click', () => { stan.wyb.clear(); zapisz('galeria-wybor', []); $('#kopia-pole').hidden = true; $('#kom').hidden = true; rysuj(); });
+rysuj();
+</script>
+</body>
+</html>
