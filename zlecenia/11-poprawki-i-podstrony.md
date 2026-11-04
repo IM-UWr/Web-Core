@@ -178,3 +178,6 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
     - `--m-panel` na panel menu.
   - Sztywne kolory, które trzeba było nadpisać, wypisuje raport: panel hamburgera, pole szukania w panelu, przejście banera w treść i inne.
 - **Do potwierdzenia (propozycja agenta):** w jasnym motywie ramki przycisków i pól mają ok. 1,3:1, a norma WCAG dla elementów interfejsu to 3:1. Ta sama zmienna `--m-line-ui` w jasnym motywie by to naprawiła. Nie wdrażaj bez decyzji, tylko wypisz w raporcie, jak by to wyglądało.
+
+### 11. Lead na stronach działów bez powiększenia (decyzja 4.11, 23:37)
+- Pierwszy akapit tekstu działu (`.z-dz-tresc p.wst`, „O studiach”, „O Instytucie” itd.) ma **ten sam stopień i interlinię co reszta tekstu** (17 px / 1,68). Wyróżnia go tylko **odrobinę mocniejszy kolor** (kolor nagłówków `--ink` zamiast `--text`). Dziś ma 20 px.
