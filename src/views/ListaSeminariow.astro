@@ -1,21 +1,18 @@
 ---
-// Lista seminariów z najbliższym referatem.
-// Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium bez zakładu (pole puste albo zakład,
-// którego nie ma na stronie) to seminarium niezależne — pokazuje się w osobnej grupie.
-// Między najbliższymi seminariami a grupami — tekst wprowadzający z CMS (TekstWstepny: src/data/dzialy/nauka.json,
-// pola seminaria_tekst / _en; akapity oddzielone pustą linią, puste pole = bez tekstu). Sekcje jak na stronach działów: .zsec z tytułem h2
-// (kreska sekcji, odstępy i rozmiar tytułu z global.css, tlo.css, telefon.css i uklad-zwarta.css).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import TabelaReferatow from '../components/TabelaReferatow.astro';
+// Lista seminariów (/seminaria), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro (spis „Na tej stronie” z prawej,
+// na telefonie zwijany nad treścią). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px) — style na końcu pliku.
+// Sekcje: najbliższe referaty (tydzień albo przyszły tydzień), tekst wprowadzający z CMS (src/data/dzialy/nauka.json,
+// pola seminaria_tekst / _en; akapity oddzielone pustą linią, puste pole = bez tekstu), seminaria zakładów i niezależne
+// z najbliższym referatem, pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
+// bez zakładu (pole puste albo zakład, którego nie ma na stronie) to seminarium niezależne.
+// Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”.
+import Podstrona from '../components/zal/Podstrona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
-import TekstWstepny from '../components/TekstWstepny.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
+import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
-import { long, type Lang } from '../lib/daty';
+import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
 import { sala, type Seminarium } from '../lib/tresci';
 import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
 
@@ -24,75 +21,126 @@ const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const nazwa = (s: Seminarium) => (lang === 'en' && s.data.nazwa_en) || s.data.nazwa;
 const { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, lead, haslo, liczby } = await daneListySeminariow(lang);
+// tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
+const wstep = ((wybierz(dzialNauka as Record<string, any>, 'seminaria_tekst', lang) as string) || '')
+  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+const tytulTygodnia = t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien');
+// sekcje strony (id w treści) — spis „Na tej stronie”
+const idGrupy = (id: string) => id.replace(/^h-/, 'z-');
+const spis = [
+  { id: 'z-tydzien', etykieta: tytulTygodnia },
+  ...grupy.map((g) => ({ id: idGrupy(g.id), etykieta: g.tytul })),
+  ...(nieaktywne.length > 0 ? [{ id: 'z-nieaktywne', etykieta: T('Pozostałe seminaria', 'Other seminars') }] : []),
+];
+// część wiersza: godzina i sala (puste pomijane)
+const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
 ---
-<Baza tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'seminaria')} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <LiczbyBanera lang={lang} pozycje={liczby} />
-  </NaglowekStrony>
-  <div class="wrap ls-wrap">
-    <section class="zsec ls-pierwsza" aria-labelledby="h-tydzien">
-      <h2 id="h-tydzien">{t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien')}</h2>
-      <div class="ls-ramka">
-        <TabelaReferatow wiersze={wTygodniu} lang={lang} etykieta={t(lang, 'seminariaTydzien')} pusty={t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')} />
-      </div>
-    </section>
+<Podstrona lang={lang} tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} dzial="nauka" spis={spis} klasa="z-sem">
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
-    <TekstWstepny pole="seminaria_tekst" lang={lang} />
-
-    {grupy.map((g) => (
-      <section class="zsec" aria-labelledby={g.id}>
-        <h2 id={g.id}>{g.tytul}</h2>
-        <div class="sem-cards">
-          {g.lista.map((s) => {
-            const r = nastepny(s.id);
-            const zs = zakladySem(s);
-            return (
-              <a class="sem-card" href={u(wJezyku(`/seminaria/${s.id}`, lang))}>
-                {zs.length > 0 && <span class="muted ls-zaklad">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</span>}
-                <span class="t">{nazwa(s)}</span>
-                {r ? (
-                  <span class="ls-ref">
-                    <strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="muted">({r.data.prelegent})</span>
-                  </span>
-                ) : (
-                  <span class="muted ls-ref ls-brak">{t(lang, 'brakNadchodzacych')}</span>
-                )}
-              </a>
-            );
-          })}
-        </div>
-      </section>
-    ))}
-
-    {nieaktywne.length > 0 && (
-      <section class="zsec" aria-labelledby="h-nieaktywne">
-        <h2 id="h-nieaktywne">{T('Pozostałe seminaria', 'Other seminars')}</h2>
-        <ul>
-          {nieaktywne.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
-        </ul>
-      </section>
+  <section id="z-tydzien" aria-labelledby="h-tydzien">
+    <h2 id="h-tydzien">{tytulTygodnia}</h2>
+    {wTygodniu.length === 0 && <p class="pusto">{t(lang, tydzien.przyszly ? 'brakReferatowPrzyszly' : 'brakReferatow')}</p>}
+    {wTygodniu.length > 0 && (
+      <ul class="wiersze">
+        {wTygodniu.map((w) => (
+          <li class="wiersz klik">
+            <time class="dz" datetime={w.termin.slice(0, 10)}>{dayNum(w.termin)}<small> {monthShort(w.termin, lang)} {parse(w.termin).y}</small></time>
+            <div>
+              <p class="rodz">{[dayShort(w.termin, lang), kiedyGdzie(w.termin, w.sala)].filter(Boolean).join(' · ')}</p>
+              <h3><a href={u(wJezyku(w.href, lang))}><TytulReferatu tekst={w.tytul} /></a></h3>
+              <p class="kto">{w.prelegent}<span class="sem"> · {w.seminarium}</span></p>
+            </div>
+          </li>
+        ))}
+      </ul>
     )}
-  </div>
-</Baza>
+  </section>
+
+  {wstep.length > 0 && <section class="wstep">{wstep.map((a) => <p>{a}</p>)}</section>}
+
+  {grupy.map((g) => (
+    <section id={idGrupy(g.id)} aria-labelledby={g.id}>
+      <h2 id={g.id}>{g.tytul}</h2>
+      <ul class="wiersze dwie">
+        {g.lista.map((s) => {
+          const r = nastepny(s.id);
+          const zs = zakladySem(s);
+          return (
+            <li class="wiersz klik">
+              {r
+                ? <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
+                : <span class="dz" aria-hidden="true"></span>}
+              <div>
+                {zs.length > 0 && <p class="rodz">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</p>}
+                <h3><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></h3>
+                {r ? (
+                  <p class="ref">
+                    {kiedyGdzie(r.data.termin, r.data.sala) && <span class="kiedy">{kiedyGdzie(r.data.termin, r.data.sala)}</span>}
+                    <TytulReferatu tekst={r.data.tytul} /> <span class="kto">({r.data.prelegent})</span>
+                  </p>
+                ) : (
+                  <p class="ref pusto">{t(lang, 'brakNadchodzacych')}</p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  ))}
+
+  {nieaktywne.length > 0 && (
+    <section id="z-nieaktywne" aria-labelledby="h-nieaktywne">
+      <h2 id="h-nieaktywne">{T('Pozostałe seminaria', 'Other seminars')}</h2>
+      <ul class="inne">
+        {nieaktywne.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
+      </ul>
+    </section>
+  )}
+</Podstrona>
 
 <style>
-  /* sekcje .zsec jak na stronach działów (odstępy między nimi — margines .zsec); odstępy kontenera jak .dz-wrap */
-  .ls-wrap { padding-top: 32px; padding-bottom: 64px; }
-  .ls-ramka { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  /* „Najbliższe seminaria” zaraz pod banerem — bez kreski sekcji nad nagłówkiem (komputer i telefon) */
-  .zsec.ls-pierwsza { border-top: 0; padding-top: 0; }
-  .zsec.ls-pierwsza::before, .zsec.ls-pierwsza > h2::before { display: none; }
-  /* karta seminarium: zakład nad nazwą, pod kreską najbliższy referat albo „brak” */
-  .ls-zaklad { font-size: 14px; font-weight: 600; }
-  .ls-ref { font-size: 15px; padding-top: 10px; border-top: 1px solid var(--line); }
-  .ls-ref strong { color: var(--ink); }
-  .ls-brak { font-size: 14px; }
+  /* ---------- wspólne (każda szerokość) ---------- */
+  :global(.z-sem) h2 { color: var(--d-a); }
+  .wiersze, .inne { list-style: none; margin: 0; padding: 0; }
+  .wiersze > li, .inne > li { max-width: none; margin: 0; }
+  .wiersz { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .wiersz .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .wiersz .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .wiersz p { margin: 0; max-width: none; }
+  .wiersz .rodz { font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--d-a); }
+  .wiersz h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .wiersz h3 a { color: inherit; text-decoration: none; }
+  .wiersz .kto, .wiersz .ref { font-size: 14.5px; line-height: 1.5; color: var(--text); }
+  .wiersz .sem, .wiersz .ref .kto { color: var(--muted); }
+  .wiersz .kiedy { margin-right: 8px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .wiersz .pusto, .pusto { font-size: 14.5px; font-style: italic; color: var(--muted); }
+  /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
+  .klik { position: relative; }
+  .klik h3 a::after { content: ''; position: absolute; inset: 0; }
+  .klik:hover h3 a { color: var(--d-a); }
+  .klik h3 a:focus-visible { outline: none; }
+  .klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
+  .inne a { display: block; padding: 9px 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500; font-size: 18px;
+    line-height: 1.35; color: var(--ink); text-decoration: none; }
+  .inne a:hover { color: var(--d-a); }
 
-  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css); nad pierwszą
-     sekcją stały odstęp 24 px, jak na stronie działu „Nauka” */
-  @media (min-width: 761px) { .ls-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }
-  /* telefon (≤ 760 px): odstępy jak na stronach działów (wygląd „Portal”) */
+  /* ---------- komputer (≥ 761 px) ---------- */
+  @media (min-width: 761px) {
+    .wiersze.dwie, .inne { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
+    .wstep p { max-width: 72ch; }
+  }
+
+  /* ---------- telefon (≤ 760 px): jedna kolumna, mniejszy dzień ---------- */
   @media (max-width: 760px) {
-    .ls-wrap { padding-top: 4px; padding-bottom: 36px; }
+    :global(.z-sem) h2 { margin-bottom: 4px; }
+    .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .wiersz .dz { font-size: 28px; }
+    .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
+    .wiersz h3 { font-size: 18.5px; }
+    .wiersz .kto, .wiersz .ref { font-size: 14px; }
+    .inne a { font-size: 17px; }
   }
 </style>

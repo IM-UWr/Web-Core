@@ -1,17 +1,19 @@
 ---
-// Strona seminarium: informacje, nadchodzące i minione referaty ze streszczeniami — sekcje .zsec jak na stronach
-// działów (kreska sekcji, tytuł h2).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (koordynatorzy i kontakt bez zmian), reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px; zlecenie 01): w banerze hasło i liczby, koordynatorzy pod banerem — opis przy `haslo` w src/lib/widoki/seminarium.ts.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+// Strona seminarium (/seminaria/<id>), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: opis seminarium,
+// nadchodzące referaty (ze streszczeniami), zapis na powiadomienia e-mail, minione referaty (streszczenie zwinięte)
+// i link do archiwum. Spis „Na tej stronie” z sekcji; na telefonie zwijany nad treścią.
+// Baner: hasło, liczby i — pod nimi — koordynatorzy, e-mail i zakład (na każdej szerokości; opis przy `haslo`
+// w src/lib/widoki/seminarium.ts). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
+// w kolorze działu, pod nim „mie rrrr”; obok dzień tygodnia, godzina i sala, tytuł Brygadą, prelegent z afiliacją.
+// Kotwice referatów (#<slug>) bez zmian — prowadzą do nich Kalendarz i lista seminariów.
+// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px) — style na końcu pliku.
+import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
-import LiczbyBanera from '../components/LiczbyBanera.astro';
-import { longWithDay, short, time, hasTime, type Lang } from '../lib/daty';
+import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
 import { slugOf, sala, type Seminarium } from '../lib/tresci';
 import { daneSeminarium } from '../lib/widoki/seminarium';
 
@@ -21,12 +23,24 @@ const d = seminarium.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, adresListy, haslo, liczby, maKoord } = await daneSeminarium(seminarium, lang);
+// linia nad tytułem referatu: (dzień tygodnia ·) godzina · sala — puste pomijane
+const dzienTygodnia = (termin: string) => longWithDay(termin, lang).split(', ')[0];
+const kiedyGdzie = (termin: string, s: string | undefined, zDniem: boolean) =>
+  [zDniem ? dzienTygodnia(termin) : '', time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
+const tytulPow = T('Powiadomienia e-mail', 'Email notifications');
+const spis = [
+  { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
+  { id: 'powiadomienia', etykieta: tytulPow },
+  ...(minione.length > 0 ? [{ id: 'z-minione', etykieta: t(lang, 'minione') }] : []),
+];
 ---
-<Baza tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={nazwa} haslo={haslo} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}>
+<Podstrona lang={lang} tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
+  haslo={haslo} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}
+  dzial="nauka" spis={spis} klasa="z-sm">
+  <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczby} />
     {maKoord && (
-      <div class="sem-koord tylko-komputer">
+      <div class="sem-koord">
         {koordynatorzy.length > 0 && (
           <p class="sem-koord-osoby">
             <span class="sem-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
@@ -41,95 +55,79 @@ const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy,
         )}
       </div>
     )}
-  </NaglowekStrony>
-  <div class="wrap layout">
-    <div class="main">
-      {/* telefon: koordynatorzy, e-mail i zakład pod banerem (wzór: .przekazanie/prototypy/uklad-banerow-zmiany-dom.js);
-           kopia bloku z banera, więc bez indeksowania */}
-      {maKoord && (
-        <div class="sm-koord tylko-telefon" data-pagefind-ignore>
-          {koordynatorzy.length > 0 && (
-            <>
-              <p class="sm-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</p>
-              <p class="sm-koord-n">{koordynatorzy.map((k, i) => <>{i > 0 && ', '}{k.strona ? <a href={k.strona}>{k.nazwa}</a> : k.nazwa}</>)}</p>
-            </>
-          )}
-          {(d.kontakt || zakladySem.length > 0) && (
-            <p class="sm-koord-meta kropki">
-              {d.kontakt && <span><a href={`mailto:${d.kontakt}`}>{d.kontakt}</a></span>}
-              {zakladySem.map((z, i) => <span class:list={[(i > 0 || d.kontakt) && 'kropka']}><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a></span>)}
-            </p>
+  </Fragment>
+
+  <section class="opis">
+    <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+  </section>
+
+  <section id="z-nadchodzace" aria-labelledby="h-nad">
+    <h2 id="h-nad">{t(lang, 'nadchodzace')}</h2>
+    {nadchodzace.length === 0 && <p class="pusto">{t(lang, 'brakNadchodzacych')}</p>}
+    {nadchodzace.map(({ r, C }) => (
+      <article class="ref" id={slugOf(r.id)}>
+        <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
+        <div>
+          <p class="rodz">{kiedyGdzie(r.data.termin, r.data.sala, true)}</p>
+          <h3><TytulReferatu tekst={r.data.tytul} /></h3>
+          <p class="kto">{r.data.prelegent}{r.data.afiliacja && <span> ({r.data.afiliacja})</span>}</p>
+          {r.body?.trim() && <div class="prose streszcz"><C /></div>}
+          {r.data.pliki.length > 0 && (
+            <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={16} />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
           )}
         </div>
-      )}
-      <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+      </article>
+    ))}
+  </section>
 
-      <section class="zsec sm-sek" aria-labelledby="h-nad">
-        <h2 id="h-nad">{t(lang, 'nadchodzace')}</h2>
-        {nadchodzace.length === 0 && <p class="muted">{t(lang, 'brakNadchodzacych')}</p>}
-        {nadchodzace.map(({ r, C }) => (
-          <article class="talk" id={slugOf(r.id)}>
-            <div class="talk-meta kropki">
-              <strong style="color:var(--ink)">{longWithDay(r.data.termin, lang)}</strong>
-              {r.data.sala && <span class="kropka">{sala(r.data.sala, lang)}</span>}
-            </div>
+  <section id="powiadomienia" aria-labelledby="h-pow" data-pagefind-ignore>
+    <h2 id="h-pow">{tytulPow}</h2>
+    <p class="pw-opis">{T('Zostaw adres, a o każdym nowym referacie tego seminarium dostaniesz wiadomość (po angielsku). Z listy wypiszesz się jednym kliknięciem w każdej wiadomości.', 'Leave your address to get an email about every new talk in this seminar. Every message has a one-click unsubscribe link.')}</p>
+    {adresListy ? (
+      <form class="pw-form" data-zapis action={adresListy} method="post" data-ok={T('Sprawdź skrzynkę — wysłaliśmy link potwierdzający zapis (jeśli nie widzisz wiadomości, zajrzyj do spamu).', 'Check your inbox — we have sent a confirmation link (look in the spam folder if you cannot see it).')} data-blad={T('Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.', 'Something went wrong. Please try again in a moment.')}>
+        <input type="hidden" name="akcja" value="zapisz" />
+        <input type="hidden" name="seminarium" value={seminarium.id} />
+        <input type="hidden" name="jezyk" value={lang} />
+        <label class="sr-only" for="zapis-email">{T('Adres e-mail', 'Email address')}</label>
+        <div class="pw-wiersz">
+          <input id="zapis-email" type="email" name="email" required autocomplete="email" inputmode="email" placeholder={T('twój@adres.pl', 'you@example.com')} />
+          <button type="submit"><Ikona nazwa="mail" rozmiar={16} />{T('Zapisz mnie', 'Subscribe')}</button>
+        </div>
+        <div class="pw-hp" aria-hidden="true"><label>Nie wypełniaj / leave empty <input type="text" name="www" tabindex="-1" autocomplete="off" /></label></div>
+        <p class="pw-stan" role="status" aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="pusto">{T('Zapisy na listę ruszą wkrótce.', 'Sign-up will open soon.')}</p>
+    )}
+    <p class="pw-uwaga">{T('Adres służy wyłącznie do tych powiadomień —', 'Your address is used only for these notifications —')} <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{T('polityka prywatności', 'privacy policy')}</a>.</p>
+  </section>
+
+  {(minione.length > 0 || d.archiwum) && (
+    <section id="z-minione" aria-labelledby="h-min">
+      {minione.length > 0 && <h2 id="h-min">{t(lang, 'minione')}</h2>}
+      {minione.map(({ r, C }) => (
+        <article class="ref maly" id={slugOf(r.id)}>
+          <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
+          <div>
+            {kiedyGdzie(r.data.termin, r.data.sala, false) && <p class="rodz">{kiedyGdzie(r.data.termin, r.data.sala, false)}</p>}
             <h3><TytulReferatu tekst={r.data.tytul} /></h3>
-            <div class="who">{r.data.prelegent}{r.data.afiliacja && <span class="muted"> ({r.data.afiliacja})</span>}</div>
-            {r.body?.trim() && <div class="prose" style="font-size:16px;margin-top:10px"><C /></div>}
-            {r.data.pliki.length > 0 && (
-              <ul class="files" style="margin-top:10px">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
+            <p class="kto">{r.data.prelegent}{r.data.afiliacja && <span> ({r.data.afiliacja})</span>}</p>
+            {r.body?.trim() && (
+              <details>
+                <summary>{t(lang, 'streszczenie')}</summary>
+                <div class="prose streszcz"><C /></div>
+              </details>
             )}
-          </article>
-        ))}
-      </section>
-
-      {minione.length > 0 && (
-        <section class="zsec sm-sek" aria-labelledby="h-min">
-          <h2 id="h-min">{t(lang, 'minione')}</h2>
-          {minione.map(({ r, C }) => (
-            <article class="talk" id={slugOf(r.id)}>
-              <div class="talk-meta kropki"><span>{short(r.data.termin)}{hasTime(r.data.termin) ? `, ${time(r.data.termin)}` : ''}</span>{r.data.sala && <span class="kropka">{sala(r.data.sala, lang)}</span>}</div>
-              <h3 style="font-size:17px"><TytulReferatu tekst={r.data.tytul} /></h3>
-              <div class="who">{r.data.prelegent}{r.data.afiliacja && <span class="muted"> ({r.data.afiliacja})</span>}</div>
-              {r.body?.trim() && (
-                <details>
-                  <summary>{t(lang, 'streszczenie')}</summary>
-                  <div class="prose" style="font-size:16px;margin-top:8px"><C /></div>
-                </details>
-              )}
-              {r.data.pliki.length > 0 && (
-                <ul class="files" style="margin-top:10px">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
-              )}
-            </article>
-          ))}
-        </section>
-      )}
-      {d.archiwum && <p style="margin-top:28px"><a class="link-arrow" href={d.archiwum}>{t(lang, 'archiwumSem')}<Ikona nazwa="zewnetrzny" rozmiar={14} /></a></p>}
-    </div>
-
-    <aside class="side" data-pagefind-ignore>
-      <div class="side-box" id="powiadomienia">
-        <h2>{T('Powiadomienia e-mail', 'Email notifications')}</h2>
-        <p style="margin:0;font-size:15px">{T('Zostaw adres, a o każdym nowym referacie tego seminarium dostaniesz wiadomość (po angielsku). Z listy wypiszesz się jednym kliknięciem w każdej wiadomości.', 'Leave your address to get an email about every new talk in this seminar. Every message has a one-click unsubscribe link.')}</p>
-        {adresListy ? (
-          <form class="zapis" data-zapis action={adresListy} method="post" data-ok={T('Sprawdź skrzynkę — wysłaliśmy link potwierdzający zapis (jeśli nie widzisz wiadomości, zajrzyj do spamu).', 'Check your inbox — we have sent a confirmation link (look in the spam folder if you cannot see it).')} data-blad={T('Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.', 'Something went wrong. Please try again in a moment.')}>
-            <input type="hidden" name="akcja" value="zapisz" />
-            <input type="hidden" name="seminarium" value={seminarium.id} />
-            <input type="hidden" name="jezyk" value={lang} />
-            <label class="sr-only" for="zapis-email">{T('Adres e-mail', 'Email address')}</label>
-            <input id="zapis-email" type="email" name="email" required autocomplete="email" inputmode="email" placeholder={T('twój@adres.pl', 'you@example.com')} />
-            <div class="hp" aria-hidden="true"><label>Nie wypełniaj / leave empty <input type="text" name="www" tabindex="-1" autocomplete="off" /></label></div>
-            <button type="submit" class="btn btn-primary btn-small"><Ikona nazwa="mail" rozmiar={16} />{T('Zapisz mnie', 'Subscribe')}</button>
-            <p class="zapis-stan" role="status" aria-live="polite"></p>
-          </form>
-        ) : (
-          <p class="notice" style="font-size:14px;margin:0">{T('Zapisy na listę ruszą wkrótce.', 'Sign-up will open soon.')}</p>
-        )}
-        <p class="muted" style="font-size:13px;margin:0">{T('Adres służy wyłącznie do tych powiadomień —', 'Your address is used only for these notifications —')} <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{T('polityka prywatności', 'privacy policy')}</a>.</p>
-      </div>
-    </aside>
-  </div>
-</Baza>
+            {r.data.pliki.length > 0 && (
+              <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={16} />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
+            )}
+          </div>
+        </article>
+      ))}
+      {d.archiwum && <p class="archiwum"><a href={d.archiwum}>{t(lang, 'archiwumSem')} <span aria-hidden="true">↗</span></a></p>}
+    </section>
+  )}
+</Podstrona>
 
 <script>
   // Zapis na listę: wysyłka w tle (bez przeładowania strony). Automat zawsze odpowiada tak samo,
@@ -137,7 +135,7 @@ const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy,
   document.querySelectorAll<HTMLFormElement>('form[data-zapis]').forEach((f) =>
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const stan = f.querySelector<HTMLElement>('.zapis-stan');
+      const stan = f.querySelector<HTMLElement>('.pw-stan');
       const btn = f.querySelector<HTMLButtonElement>('button[type="submit"]');
       if (btn) btn.disabled = true;
       let ok = true;
@@ -155,21 +153,73 @@ const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy,
 </script>
 
 <style>
-  /* sekcje referatów: kreska sekcji po opisie seminarium; pod tytułem od razu pierwszy referat (ma własny odstęp) */
-  .prose + .sm-sek { margin-top: 24px; }
-  .sm-sek > h2 { margin-bottom: 4px; }
-  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
-     do banera (reszta odstępów .layout — uklad-zwarta.css) */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
-  /* telefon (≤ 760 px; zlecenie 01): zwarty blok koordynatorów pod banerem — mała etykieta, nazwiska, pod nimi e-mail
-     i zakład w jednym wierszu (separator „·” nigdy na początku linii: .kropki, global.css); kreska oddziela blok od opisu */
+  /* ---------- wspólne (każda szerokość) ---------- */
+  :global(.z-sm) h2 { color: var(--d-a); }
+  .opis .prose > :global(:first-child) { margin-top: 0; }
+  .opis .prose > :global(:last-child) { margin-bottom: 0; }
+  /* referat: dzień | treść */
+  .ref { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .ref .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .ref p { margin: 0; max-width: none; }
+  .ref .rodz { font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--d-a); font-variant-numeric: tabular-nums; }
+  .ref h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .ref.maly h3 { font-size: 18.5px; }
+  .ref .kto { font-size: 14.5px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+  .ref .kto span { font-weight: 400; color: var(--muted); }
+  .ref .streszcz { margin-top: 10px; }
+  .ref .streszcz :global(p) { font-size: 15.5px; line-height: 1.65; }
+  .ref .streszcz > :global(:last-child) { margin-bottom: 0; }
+  .ref details { margin-top: 6px; }
+  .ref summary { width: fit-content; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--d-a); }
+  .ref summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .pliki { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 20px; }
+  .pliki li { margin: 0; font-size: 14.5px; }
+  .pliki a { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--d-a); }
+  .pliki :global(svg) { flex: none; }
+  .pusto { font-size: 15px; font-style: italic; color: var(--muted); }
+  .archiwum { margin: 18px 0 0; font-size: 15px; font-weight: 600; }
+  .archiwum a { color: var(--d-a); }
+  /* kotwice referatów: zapas nad wpisem */
+  .ref[id] { scroll-margin-top: 20px; }
+
+  /* powiadomienia e-mail: pole i przycisk w jednym rzędzie, bez kafelka */
+  #powiadomienia .pw-opis { margin: 0 0 14px; }
+  .pw-form { position: relative; margin: 0; }
+  .pw-wiersz { display: flex; flex-wrap: wrap; gap: 8px; max-width: 560px; }
+  .pw-wiersz input { flex: 1 1 240px; min-width: 0; min-height: 44px; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 0;
+    background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; }
+  .pw-wiersz input::placeholder { color: var(--muted); opacity: 1; }
+  .pw-wiersz input:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+  .pw-wiersz button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; padding: 8px 18px; border: 0; border-radius: 0;
+    background: var(--d-a); color: var(--bg); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .pw-wiersz button:hover { background: var(--ink); }
+  .pw-wiersz button:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .pw-wiersz button:disabled { opacity: .6; cursor: wait; }
+  .pw-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .pw-stan { margin: 10px 0 0; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+  .pw-stan:empty { display: none; }
+  #powiadomienia .pw-uwaga { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); }
+
+  /* ---------- telefon (≤ 760 px) ---------- */
   @media (max-width: 760px) {
-    .sm-koord { margin: 0 0 18px; padding: 0 0 16px; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--muted); }
-    .sm-koord p { margin: 0; }
-    .sm-koord .sm-koord-l { margin-bottom: 4px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .sm-koord-n { color: var(--ink); }
-    .sm-koord .sm-koord-meta { display: flex; flex-wrap: wrap; gap: 0 .3em; margin-top: 6px; }
-    .sm-koord-meta a { overflow-wrap: anywhere; }
-    .sm-koord a { color: var(--ink); }
+    :global(.z-sm) h2 { margin-bottom: 4px; }
+    .ref { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .ref .dz { font-size: 28px; }
+    .ref .dz small { font-size: 12.5px; white-space: nowrap; }
+    .ref h3 { font-size: 18.5px; }
+    .ref.maly h3 { font-size: 17.5px; }
+    .ref .kto { font-size: 14px; }
+    .ref .streszcz :global(p) { font-size: 15px; }
+    /* streszczenie na całą szerokość (pod dniem też) — wąska kolumna obok dnia jest za wąska na dłuższy tekst */
+    .ref .streszcz { margin-left: -66px; }
+    .ref[id] { scroll-margin-top: calc(var(--hdr-h) + 16px); }
+    /* koordynatorzy w banerze (na ciemnym tle): mała etykieta, nazwiska, pod nimi e-mail i zakład */
+    .sem-koord { margin: 14px 0 0; padding-top: 10px; border-top: 1px solid rgb(255 255 255 / .22); }
+    .sem-koord-osoby { display: block; margin: 0; }
+    .sem-koord-l { display: block; font-size: 12px; color: var(--na-ciemnym-2); }
+    .sem-koord-n { display: block; font-size: 16px; font-weight: 600; color: #fff; }
+    .sem-meta { gap: 2px 16px; margin: 6px 0 0; font-size: 14px; color: var(--na-ciemnym-2); }
+    .sem-meta :global(svg) { color: var(--d-j); }
   }
 </style>
