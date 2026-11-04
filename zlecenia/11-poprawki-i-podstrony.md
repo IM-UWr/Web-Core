@@ -198,6 +198,6 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
 
 ### 13. Studia: przycisk „Rekrutacja” w pasie menu, bez linku do USOS (decyzja 4.11, 23:54)
 - Na stronie działu Studia, w pasie menu (zalecenie 5) **z prawej przycisk** wypełniony kolorem działu, kanciasty: małe „Dla kandydatów” (12,5 px, pogrubione) nad „Rekrutacja 2027/28 ↗” (Brygada ok. 22 px), biały tekst, `padding: 16px 22px`. Link do strony rekrutacji (dziś `studia-wmi.uwr.edu.pl`), rok z danych.
-- Układ: przycisk stoi obok **dwóch pierwszych wierszy** (pionowo wyśrodkowany), a **trzeci wiersz (Dyplom i sprawy) idzie na całą szerokość pod nim**. Dzięki temu żaden wiersz się nie łamie przy kolumnie 1240 px (siatka: dwie kolumny, wiersze 1–2 w pierwszej, przycisk w drugiej przez dwa wiersze, wiersz 3 przez obie). Wzór: prototyp.
+- Układ (poprawka 23:56): przycisk stoi z prawej **obok wszystkich wierszy** (pionowo wyśrodkowany), a wiersze zostają w kolumnie obok niego. **Najdłuższy wiersz (Dyplom i sprawy) łamie się na dwie linie**, co jest zamierzone; nie rozciągaj go na całą szerokość pod przyciskiem. Wzór: prototyp.
 - **USOSweb usunięty z menu Studiów** (grupa „Na co dzień”), żeby wiersze były krótsze. To zmiana w danych menu (`nawigacja.json`, Web-Ustawienia), czyli w CMS: wypisz ją w raporcie dla redakcji. Do czasu zmiany w CMS możesz pominąć zewnętrzny link USOS w tym pasie w kodzie.
 - Rekrutacja zostaje też w panelu hamburgera (zalecenie 6).

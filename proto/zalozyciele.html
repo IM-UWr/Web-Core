@@ -606,12 +606,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-liczby .in-cta { align-self: center; display: inline-flex; align-items: center; gap: 10px; margin-left: 6px; padding: 10px 18px; background: var(--d-j); color: var(--granat); font-size: 15px; font-weight: 700; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: filter .15s; }
 .in-liczby .in-cta:hover { filter: brightness(1.08); }
 .in-liczby .in-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-/* przycisk obok dwóch pierwszych wierszy, trzeci (najdłuższy) wiersz na całą szerokość pod nim — nic się nie łamie (4.11, 23:54) */
+/* przycisk z prawej obok wszystkich wierszy; najdłuższy wiersz (Dyplom i sprawy) łamie się na dwie linie (4.11, 23:56) */
 .in-pod[data-menu="E"]:has(.mz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 36px; }
 .in-pod[data-menu="E"] .mz-wiersze { display: contents; }
 .in-pod[data-menu="E"]:has(.mz-rekr) .mz-wiersz { grid-column: 1; }
-.in-pod[data-menu="E"]:has(.mz-rekr) .mz-wiersz:nth-child(n+3) { grid-column: 1 / -1; }
-.in-pod[data-menu="E"] .mz-rekr { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.in-pod[data-menu="E"] .mz-rekr { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
 .in-pod .mz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display); font-size: 22px; line-height: 1.2; text-decoration: none; white-space: nowrap; transition: filter .15s; }
 .mz-rekr small { font-family: var(--f-text); font-size: 12.5px; font-weight: 700; opacity: .85; }
 .mz-rekr:hover { filter: brightness(1.1); }
