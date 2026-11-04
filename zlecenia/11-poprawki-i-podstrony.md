@@ -245,3 +245,14 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - O Kolegium, potem strony szkoły doktorskiej (pole `przyciski` jako lista linków);
   - Dlaczego warto, Od rekrutacji do obrony, Terminy, Program kształcenia, Najczęstsze pytania, Kontakt, Akty prawne;
   - w banerze tylko liczby (8 semestrów, 270 godzin, zalecenie 9).
+
+### 15. Okładka: liczby nad „Szybkim dostępem”, przygaszone (decyzja 5.11, 00:57; wzór: prototyp v75, wariant „przygaszone”)
+- Na okładce strony głównej (komputer), nad przyciskiem „⌄ Szybki dostęp”, wyśrodkowana linia z liczbami z tych samych danych co drugi ekran: **nadchodzące wydarzenia** (najbliższe 7 dni), **seminaria** w najbliższych dniach (jak kolumna seminariów na drugim ekranie), **nowe aktualności** (np. z ostatnich 7 dni). Pozycja z zerem znika; polska odmiana (1 wydarzenie / 3 wydarzenia / 5 wydarzeń itd.); na `/en` po angielsku (np. „3 events · 5 seminars · 5 new posts”).
+- **Styl „przygaszone”** — liczby nie mogą konkurować z nazwami działów:
+  - cyfra w kroju tekstu (Manrope), pogrubiona, 14 px, `rgb(255 255 255 / .72)`;
+  - opis 12,5 px, `rgb(255 255 255 / .5)`, odstęp cyfra–opis 6 px, pozycje z `padding: 3px 16px`;
+  - między pozycjami pionowa kreska 1 px `rgb(255 255 255 / .14)`;
+  - po najechaniu cyfra i opis białe; fokus: obrys 2 px biały.
+- **Kliknięcie** w pozycję przewija do drugiego ekranu i krótko podświetla odpowiadającą kolumnę (ok. 1,6 s); przy ograniczonym ruchu bez przewijania z animacją, podświetlenie jako obrys.
+- Telefon: bez tej linii (chyba że zlecenie telefonu mówi inaczej).
+
