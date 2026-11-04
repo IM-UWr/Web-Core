@@ -303,3 +303,11 @@ Strona wygląda bardzo „AI”, a wszystkie zakładki wyglądają tak samo. Chc
 - **Odrzucone:** oznaczanie sal w planie zajęć.
 - **Na później:** sekcja „Sale wykładowe” na podstronie Infrastruktura (sygnet patrona, piętro, liczba miejsc, zdanie o patronie).
 - **„W skrócie”: bez informacji o salach (09:39).** Pasowałaby tylko w Instytucie, a skoro nie we wszystkich działach, to nigdzie.
+
+## Zlecenie 12: przebudowa i porządki (4.11, 22:19–22:31)
+- **Problem:** na `wyglad/zalozyciele` każda przeniesiona strona ma dwie wersje HTML (dotychczasową dla telefonu i wyszukiwarki, nową dla komputera), a starą chowają reguły `body:has(...)`. Nowy blok stoi po starym, więc przy wczytywaniu miga stara wersja (np. okrągłe przyciski semestrów na Planie zajęć).
+- **Decyzja:** telefon dostaje nowy wygląd, stary wygląd idzie do kosza. Bazą telefonu jest próbna łatka z Web-Podglad (`testy/telefon-TEST.patch`, podgląd `/test-telefon/`); zakaz „nie wzorować się” zniesiony dla gałęzi porządków.
+- **Nie piszemy od zera:** warstwa danych, CMS, skrypty treści i planu, `/en`, przekierowania, wyszukiwarka i wdrożenie zostają; przebudowywany jest tylko wygląd.
+- **Tryb pracy:** porządki robi sesja w chmurze na osobnej gałęzi `wyglad/porzadki` (założona z `d12c994`), równolegle rozmowa dalej pracuje nad grafiką i detalami (zlecenie 11). Zlecenie 11 nakłada się po porządkach.
+- **Zakres zlecenia 12:** etap 1 telefon z łatki i jedna wersja HTML na stronach już przeniesionych; etap 2 wspólny szablon podstrony z nawigacją z zalecenia 3 zlecenia 11; etap 3 przeniesienie pozostałych 16 podstron; etap 4 usunięcie starego kodu. Komputer poza etapami 2–3 ma zostać co do piksela taki sam.
+- **Silnik animacji banerów telefonu** (`src/scripts/baner/`, 36 motywów) **zostaje w repozytorium nieużywany**, z opisem jak go podpiąć (22:30–22:31: „usunąć łatwiej niż przywrócić”). Animacja szkiców patronów to osobny mały skrypt i działa dalej.
