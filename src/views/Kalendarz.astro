@@ -1,166 +1,143 @@
 ---
-// Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta jak w „Zwarta” (uklad="zwarta portal-baner"),
-// miesiące jako sekcje z kreską jak na stronach działów, pozycje jako osobne białe karty (.karty-lista w global.css). Filtry rodzaju w banerze;
-// pod banerem przyciski widoku „Nadchodzące” / „Archiwum”.
-// Telefon (≤ 760 px; decyzja 31.10.2026 — jeden styl z Aktualnościami): w banerze tytuł, bursztynowe hasło zamiast opisu
-// i trzy liczby: obrony, referaty, wydarzenia (LiczbyBanera; zlecenie 01); przyciski rodzajów z banera schowane (.tylko-komputer), pod banerem
-// wiersz filtrów jak w Aktualnościach — lista rozwijana rodzajów i pole szukania (FiltrISzukaj, tylko telefon), pod nim
-// zwarty przełącznik „Nadchodzące | Archiwum” (te same przyciski widoku, inny wygląd). Stan filtrów wspólny dla przycisków
-// komputera i listy rozwijanej (skrypt niżej), więc przejście przez 760 px go nie gubi; etykiety — EtykietaRodzaju (B1).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import FiltrISzukaj from '../components/FiltrISzukaj.astro';
+// Kalendarz (/kalendarz, EN /en/kalendarz): nadchodzące i minione wydarzenia, obrony, konferencje i referaty seminaryjne
+// (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują). Wspólny szablon podstrony
+// (zal/Podstrona.astro; zlecenie 12, etap 3). Strona poza działami: granatowy nagłówek z hasłem i trzema liczbami (obrony,
+// referaty, wydarzenia — LiczbyBanera; zlecenie 01), bez spisu „Na tej stronie” (miesiące to grupy listy).
+// Widok „Nadchodzące” / „Archiwum” (w adresie #archiwum), filtr rodzaju (w adresie także ?rodzaj=…) i szukanie po tekście
+// pozycji działają razem. Pozycje po miesiącach: nagłówek miesiąca Brygadą, wiersze z cienkimi liniami i datą jak na
+// stronach działów (WierszWydarzenia.astro). Jedna wersja HTML: komputer (≥ 761 px) — przyklejony pasek: widok, rodzaje
+// i pole szukania w jednym wierszu (jak w Planie zajęć); telefon (≤ 760 px) — widok, rodzaje (po trzy w rzędzie) i pole
+// szukania jedno pod drugim, pasek nieprzyklejony. Bez JS: pasek schowany, widać oba widoki jeden pod drugim (z podpisami).
+import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import EtykietaRodzaju from '../components/EtykietaRodzaju.astro';
-import TytulZewn from '../components/TytulZewn.astro';
-import TytulReferatu from '../components/TytulReferatu.astro';
-import { u, isExternal } from '../lib/url';
-import { t, wJezyku, RODZAJE } from '../lib/i18n';
-import { dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
-import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
+import WierszWydarzenia from '../components/WierszWydarzenia.astro';
+import { t, RODZAJE_FILTRY } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
 import { daneKalendarza } from '../lib/widoki/kalendarz';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { widoki, lead, haslo, liczby, rodzajeListy, filtrEtykieta, szukajDlugo, szukajKrotko } = await daneKalendarza(lang);
-// Adres pozycji: nasza podstrona albo strona zewnętrzna (konferencje nie mają naszych podstron — link prowadzi na stronę
-// konferencji, z ikoną przy tytule); konferencja bez podanej strony — pozycja bez linku (<div>, bez podświetlenia).
-const adres = (w: Wydarzenie) => (w.href ? (isExternal(w.href) ? w.href : u(wJezyku(w.href, lang))) : undefined);
+const { widoki, lead, haslo, liczby, filtrEtykieta, szukajDlugo } = await daneKalendarza(lang);
+const tytul = t(lang, 'kalendarz');
+// rodzaje w kolejności dotychczasowych przycisków na komputerze, nazwy w liczbie mnogiej jak w Aktualnościach (referaty — „Seminaria”)
+const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
 ---
-<Baza tytul={t(lang, 'kalendarz')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} haslo={haslo} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <LiczbyBanera lang={lang} pozycje={liczby} />
-    <div class="filters tylko-komputer">
-      <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
-        <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="wydarzenie">{RODZAJE.wydarzenie[lang]}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="obrona">{RODZAJE.obrona[lang]}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="konferencja">{RODZAJE.konferencja[lang]}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="referat">{t(lang, 'seminaria')}</button>
-      </div>
-    </div>
-  </NaglowekStrony>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} klasa="z-kal" atrybuty={{ 'data-kalendarz': '' }}>
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
-  <div class="wrap layout kal-wrap">
-    <div class="main">
-      {/* telefon: wiersz filtrów jak w Aktualnościach (wspólny stan z przyciskami w banerze — skrypt niżej) */}
-      <div class="filters filters-lewo tylko-telefon">
-        <FiltrISzukaj lang={lang} rodzaje={rodzajeListy} etykieta={filtrEtykieta} szukajDlugo={szukajDlugo} szukajKrotko={szukajKrotko} szukajTylkoTelefon />
-      </div>
-      {/* widok pod banerem: nadchodzące / archiwum (przyciski jak w tabeli pracowników; na telefonie — przełącznik segmentowy) */}
-      <div class="chips kal-widok" role="group" aria-label={lang === 'en' ? 'View' : 'Widok'}>
-        {widoki.map((v, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
-      </div>
-      {widoki.map((v, i) => (
-        <div data-widok={v.id} hidden={i > 0} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
-          {v.grupy.length === 0 && <p class="muted kal-pusto">{v.pusty}</p>}
-          {v.grupy.map((g) => (
-            <section class="lista-miesiac" data-grupa>
-              <h2 class="month">{g.miesiac}</h2>
-              <div class="karty-lista">
-              {g.pozycje.map((w) => { const Tag = w.href ? 'a' : 'div'; return (
-                <Tag class:list={['row-item', !w.href && 'kal-bez-linku']} href={adres(w)} data-rodzaj={w.rodzaj}>
-                  <span class={`datebox small${trwaLubBedzie(w) ? '' : ' minione'}`} aria-hidden="true">
-                    <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
-                  </span>
-                  <span class="body">
-                    <span class="news-meta kropki">
-                      <EtykietaRodzaju rodzaj={w.rodzaj} lang={lang} />
-                      <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
-                      {w.miejsce && <span class="kropka">{w.miejsce}</span>}
-                    </span>
-                    <span class="t" style="font-size:18px">{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : <TytulZewn tekst={w.tytul} zewn={!!w.href && isExternal(w.href)} />}</span>
-                    {w.podtytul && <span class="x">{w.podtytul}</span>}
-                    {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
-                  </span>
-                </Tag>
-              ); })}
-              </div>
-            </section>
-          ))}
-          <p class="muted kal-pusto" data-pusty-filtr data-pusty-szukaj={T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')} hidden>{T('Brak pozycji tego rodzaju.', 'Nothing of this kind here.')}</p>
-        </div>
-      ))}
+  <div class="kal-narz" data-pagefind-ignore>
+    <div class="kal-widok" role="group" aria-label={T('Widok', 'View')}>
+      {widoki.map((v, i) => <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
     </div>
-
+    <div class="kal-rodzaje" role="group" aria-label={filtrEtykieta}>
+      <button type="button" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
+      {rodzaje.map((r) => <button type="button" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
+    </div>
+    <input type="search" class="kal-szukaj" placeholder={szukajDlugo} aria-label={szukajDlugo} autocomplete="off" data-szukaj />
   </div>
-</Baza>
+
+  {widoki.map((v, i) => (
+    <div class="kal-panel" data-widok={v.id} data-aktywny={i === 0 ? '' : undefined} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
+      <p class="kal-podpis">{v.etykieta}</p>
+      {v.grupy.length === 0 && <p class="kal-pusto">{v.pusty}</p>}
+      {v.grupy.map((g) => (
+        <section class="kal-mies" data-grupa>
+          <h2>{g.miesiac}</h2>
+          {g.pozycje.map((w) => <WierszWydarzenia w={w} lang={lang} />)}
+        </section>
+      ))}
+      <p class="kal-pusto" role="status" data-pusty-filtr data-pusty-rodzaj={T('Brak pozycji tego rodzaju.', 'Nothing of this kind here.')} data-pusty-szukaj={T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')} hidden></p>
+    </div>
+  ))}
+</Podstrona>
 
 <script>
-  // Widok (Nadchodzące / Archiwum, w adresie #archiwum), filtr rodzaju (przyciski w banerze na komputerze, lista rozwijana
-  // na telefonie; w adresie także ?rodzaj=…, jak w Aktualnościach) i szukanie po tekście pozycji (pole tylko na telefonie)
-  // — działają razem. Przyciski i lista są zawsze w dokumencie (jedno schowane przez CSS), stan trzyma skrypt, więc
-  // przejście przez 760 px (obrót telefonu, zmiana okna) nie gubi filtra ani widoku. Szukanie liczy się tylko na telefonie
-  // (na komputerze pola nie widać); wpisany tekst zostaje w polu i wraca po powrocie do wąskiego ekranu.
-  const btnRodzaj = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
-  const btnWidok = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
-  const widoki = Array.from(document.querySelectorAll<HTMLElement>('[data-widok]'));
-  const rodzajLista = document.querySelector<HTMLSelectElement>('[data-rodzaj-lista]');
-  const szukaj = document.querySelector<HTMLInputElement>('[data-szukaj]');
-  const naTelefonie = window.matchMedia('(max-width: 760px)');
-  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
-  const znanyRodzaj = (r: string) => btnRodzaj.some((b) => (b.dataset.rodzaj ?? '') === r);
-  let rodzaj = '';
-  let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
-  const pokaz = () => {
-    const q = naTelefonie.matches ? norm(szukaj?.value.trim() ?? '') : '';
-    btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
-    btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
-    if (rodzajLista) rodzajLista.value = rodzaj;
-    widoki.forEach((v) => {
-      v.hidden = v.dataset.widok !== widok;
-      // szukanie w treści pozycji (etykieta, termin, miejsce, tytuł, prelegent, seminarium) — bez kafelka daty („2 LIS”)
-      v.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]').forEach((p) => (p.hidden = (!!rodzaj && p.dataset.rodzaj !== rodzaj) || (!!q && !norm(p.querySelector('.body')?.textContent ?? '').includes(q))));
-      const grupy = Array.from(v.querySelectorAll<HTMLElement>('[data-grupa]'));
-      grupy.forEach((g) => (g.hidden = !g.querySelector('.row-item:not([hidden])')));
-      // komunikat „brak pozycji” tylko, gdy widok ma pozycje, ale filtr (albo szukanie) wszystkie schował
-      const pf = v.querySelector<HTMLElement>('[data-pusty-filtr]');
-      if (pf) {
-        pf.dataset.pustyRodzaj ??= pf.textContent ?? '';
-        pf.textContent = (q ? pf.dataset.pustySzukaj : pf.dataset.pustyRodzaj) ?? '';
-        pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
-      }
-    });
-  };
-  const ustawRodzaj = (r: string) => { rodzaj = znanyRodzaj(r) ? r : ''; pokaz(); };
-  btnRodzaj.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
-  rodzajLista?.addEventListener('change', () => ustawRodzaj(rodzajLista.value));
-  szukaj?.addEventListener('input', pokaz);
-  naTelefonie.addEventListener('change', pokaz);
-  btnWidok.forEach((b) => b.addEventListener('click', () => {
-    widok = b.dataset.widokBtn ?? 'nadchodzace';
-    history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
-    pokaz();
-  }));
-  // ?rodzaj=… z adresu; lista rozwijana zawsze zgodna ze stanem (także gdy przeglądarka przywróciła jej wartość po powrocie)
-  ustawRodzaj(new URLSearchParams(location.search).get('rodzaj') ?? '');
+  // Widok (Nadchodzące / Archiwum, w adresie #archiwum), filtr rodzaju (?rodzaj=… z adresu) i szukanie po tekście pozycji
+  // (etykieta, termin, miejsce, tytuł, prelegent, seminarium — bez daty z lewej) działają razem.
+  const kal = document.querySelector<HTMLElement>('[data-kalendarz]');
+  if (kal) {
+    const btnRodzaj = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
+    const btnWidok = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
+    const widoki = Array.from(kal.querySelectorAll<HTMLElement>('[data-widok]'));
+    const szukaj = kal.querySelector<HTMLInputElement>('[data-szukaj]');
+    const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
+    const znanyRodzaj = (r: string) => btnRodzaj.some((b) => (b.dataset.rodzaj ?? '') === r);
+    let rodzaj = '';
+    let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
+    const pokaz = () => {
+      const q = norm(szukaj?.value.trim() ?? '');
+      btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
+      btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
+      widoki.forEach((v) => {
+        v.toggleAttribute('data-aktywny', v.dataset.widok === widok);
+        v.querySelectorAll<HTMLElement>('[data-ww]').forEach((p) => {
+          p.hidden = (!!rodzaj && p.dataset.rodzaj !== rodzaj) || (!!q && !norm(p.querySelector('.ww-tresc')?.textContent ?? '').includes(q));
+        });
+        const grupy = Array.from(v.querySelectorAll<HTMLElement>('[data-grupa]'));
+        grupy.forEach((g) => (g.hidden = !g.querySelector('[data-ww]:not([hidden])')));
+        // komunikat „brak pozycji” tylko, gdy widok ma pozycje, ale filtr (albo szukanie) wszystkie schował
+        const pf = v.querySelector<HTMLElement>('[data-pusty-filtr]');
+        if (pf) {
+          pf.textContent = (q ? pf.dataset.pustySzukaj : pf.dataset.pustyRodzaj) ?? '';
+          pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
+        }
+      });
+    };
+    const ustawRodzaj = (r: string) => { rodzaj = znanyRodzaj(r) ? r : ''; pokaz(); };
+    btnRodzaj.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
+    szukaj?.addEventListener('input', pokaz);
+    btnWidok.forEach((b) => b.addEventListener('click', () => {
+      widok = b.dataset.widokBtn ?? 'nadchodzace';
+      history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
+      pokaz();
+    }));
+    ustawRodzaj(new URLSearchParams(location.search).get('rodzaj') ?? '');
+  }
 </script>
 
 <style>
-  /* ---------- komputer (≥ 761 px): wygląd „Zwarta” jak na stronach działów ----------
-     24 px od banera; miesiąc = sekcja z kreską (.lista-miesiac, global.css — jak .zsec przy oprawie „linia”;
-     klasy .zsec nie dajemy, bo zmieniłaby telefon);
-     pozycje miesiąca jako osobne białe karty (.karty-lista, global.css); pusty kalendarz — komunikat w takiej karcie. */
+  [hidden] { display: none !important; }
+  /* bez JS: bez paska, oba widoki jeden pod drugim z podpisami; z JS — tylko wybrany widok, bez podpisu */
+  :global(html:not(.js)) .kal-narz { display: none; }
+  :global(html.js) .kal-panel:not([data-aktywny]) { display: none; }
+  :global(html.js) .kal-podpis { display: none; }
+  .kal-podpis { margin: 30px 0 0; font-size: 13px; font-weight: 700; color: var(--d-a); }
+
+  .kal-widok, .kal-rodzaje { display: flex; border: 1px solid var(--line); }
+  .kal-narz button { margin: 0; font: inherit; font-weight: 600; border: 0; border-radius: 0; background: transparent; color: var(--text); cursor: pointer; }
+  .kal-narz button + button { border-left: 1px solid var(--line); }
+  .kal-narz button:hover { color: var(--d-a); }
+  .kal-narz button[aria-pressed='true'] { background: var(--d-a); color: var(--bg); }
+  .kal-narz button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .kal-szukaj { min-width: 0; margin: 0; font: inherit; border: 1px solid var(--line); border-radius: 0; background: var(--bg); color: var(--ink); }
+  .kal-szukaj::placeholder { color: var(--muted); opacity: 1; }
+  .kal-szukaj:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+
+  /* miesiąc: nagłówek Brygadą, wiersze z cienkimi liniami (bez kreski i odstępów sekcji szablonu) */
+  .kal-mies { margin: 0; padding: 0; border: 0; }
+  .kal-mies h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
+    font-size: 23px; line-height: 1.4; color: var(--d-a); }
+  .kal-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+
+  /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   @media (min-width: 761px) {
-    .kal-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
-    .kal-pusto { border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-    .kal-pusto { margin: 0; padding: 16px 18px; }
+    .kal-narz { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
+      background: var(--bg); border-bottom: 2px solid var(--ink); }
+    .kal-narz button { font-size: 14px; padding: 7px 12px; }
+    .kal-szukaj { flex: 1; min-width: 200px; font-size: 15px; padding: 8px 12px; }
   }
-  /* pozycja bez linku (konferencja bez strony): bez podświetlenia ramki i podkreślenia po najechaniu */
-  .karty-lista > .kal-bez-linku:hover { border-color: var(--line); }
-  .kal-bez-linku:hover :global(.t) { text-decoration: none; }
-  /* przyciski widoku pod banerem, nad listą miesięcy */
-  .kal-widok { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
-  /* ---------- telefon (≤ 760 px): zwarty przełącznik segmentowy „Nadchodzące | Archiwum” (decyzja 31.10.2026) ----------
-     Jedna linia pod wierszem filtrów, 36 px wysokości (ramka 1 + wypełnienie 3 + przycisk 28 + 3 + 1): szare tło z cienką
-     ramką, wybrany widok w kolorze znacznika (token --znacznik, jak aktywny filtr — telefon.css). Odstępy: 10 px pod wierszem
-     filtrów, 8 px nad miesiącem (+ jego 14 px — razem tyle, ile w Aktualnościach między filtrami a miesiącem). */
+
+  /* ---------- telefon (≤ 760 px): widok, rodzaje po trzy w rzędzie i pole szukania jedno pod drugim ---------- */
   @media (max-width: 760px) {
-    .filters.filters-lewo { margin-bottom: 10px; }
-    .kal-widok { display: flex; flex-wrap: nowrap; gap: 2px; width: max-content; max-width: 100%; margin: 0 0 8px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
-    .kal-widok .chip { min-height: 28px; padding: 0 14px; border: 0; background: transparent; font-size: 14px; line-height: 1; }
-    .kal-widok .chip[aria-pressed='true'] { background: var(--znacznik, var(--primary)); color: var(--znacznik-ink, var(--primary-ink)); }
+    .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+    .kal-narz button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
+    .kal-widok, .kal-rodzaje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kal-rodzaje { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .kal-rodzaje button:nth-child(3n + 1) { border-left: 0; }
+    .kal-rodzaje button:nth-child(n + 4) { border-top: 1px solid var(--line); }
+    .kal-szukaj { width: 100%; padding: 8px 10px; font-size: 16px; }
+    .kal-mies h2 { margin-top: 22px; font-size: 20px; }
   }
 </style>
