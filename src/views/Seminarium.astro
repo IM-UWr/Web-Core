@@ -6,7 +6,9 @@
 // w src/lib/widoki/seminarium.ts). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
 // w kolorze działu, pod nim „mie rrrr”; obok dzień tygodnia, godzina i sala, tytuł Brygadą, prelegent z afiliacją.
 // Kotwice referatów (#<slug>) bez zmian — prowadzą do nich Kalendarz i lista seminariów.
-// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px) — style na końcu pliku.
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
+// etykieta .etyk, pliki ul.pliki. Własne style (na końcu pliku): wiersz referatu z datą, formularz zapisu, koordynatorzy
+// w banerze na telefonie. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
@@ -28,6 +30,11 @@ const dzienTygodnia = (termin: string) => longWithDay(termin, lang).split(', ')[
 const kiedyGdzie = (termin: string, s: string | undefined, zDniem: boolean) =>
   [zDniem ? dzienTygodnia(termin) : '', time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
 const tytulPow = T('Powiadomienia e-mail', 'Email notifications');
+// typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
+const typPliku = (a: string) => {
+  const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
+  return m ? m[1].toUpperCase() : isExternal(a) ? T('strona ↗', 'website ↗') : '';
+};
 const spis = [
   { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
   { id: 'powiadomienia', etykieta: tytulPow },
@@ -36,7 +43,7 @@ const spis = [
 ---
 <Podstrona lang={lang} tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
   haslo={haslo} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}
-  dzial="nauka" spis={spis} klasa="z-sm">
+  dzial="nauka" spis={spis} klasa="tresc z-sm">
   <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczby} />
     {maKoord && (
@@ -68,12 +75,12 @@ const spis = [
       <article class="ref" id={slugOf(r.id)}>
         <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
         <div>
-          <p class="rodz">{kiedyGdzie(r.data.termin, r.data.sala, true)}</p>
+          <p class="etyk">{kiedyGdzie(r.data.termin, r.data.sala, true)}</p>
           <h3><TytulReferatu tekst={r.data.tytul} /></h3>
           <p class="kto">{r.data.prelegent}{r.data.afiliacja && <span> ({r.data.afiliacja})</span>}</p>
           {r.body?.trim() && <div class="prose streszcz"><C /></div>}
           {r.data.pliki.length > 0 && (
-            <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={16} />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
+            <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></a></li>)}</ul>
           )}
         </div>
       </article>
@@ -109,7 +116,7 @@ const spis = [
         <article class="ref maly" id={slugOf(r.id)}>
           <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
           <div>
-            {kiedyGdzie(r.data.termin, r.data.sala, false) && <p class="rodz">{kiedyGdzie(r.data.termin, r.data.sala, false)}</p>}
+            {kiedyGdzie(r.data.termin, r.data.sala, false) && <p class="etyk">{kiedyGdzie(r.data.termin, r.data.sala, false)}</p>}
             <h3><TytulReferatu tekst={r.data.tytul} /></h3>
             <p class="kto">{r.data.prelegent}{r.data.afiliacja && <span> ({r.data.afiliacja})</span>}</p>
             {r.body?.trim() && (
@@ -119,7 +126,7 @@ const spis = [
               </details>
             )}
             {r.data.pliki.length > 0 && (
-              <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={16} />{p.nazwa || p.plik.split('/').pop()}</a></li>)}</ul>
+              <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></a></li>)}</ul>
             )}
           </div>
         </article>
@@ -153,33 +160,28 @@ const spis = [
 </script>
 
 <style>
-  /* ---------- wspólne (każda szerokość) ---------- */
-  :global(.z-sm) h2 { color: var(--d-a); }
+  /* Wiersz referatu z datą (jak zal/dzial/Wiersz.astro): dzień | etykieta (dzień tygodnia, godzina, sala), tytuł,
+     prelegent, streszczenie, pliki. Reszta — wzorzec treści .tresc (src/styles/zal-tresc.css). */
   .opis .prose > :global(:first-child) { margin-top: 0; }
   .opis .prose > :global(:last-child) { margin-bottom: 0; }
-  /* referat: dzień | treść */
   .ref { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
   .ref .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
   .ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
   .ref p { margin: 0; max-width: none; }
-  .ref .rodz { font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--d-a); font-variant-numeric: tabular-nums; }
+  .ref .etyk { font-variant-numeric: tabular-nums; }
   .ref h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .ref.maly h3 { font-size: 18.5px; }
-  .ref .kto { font-size: 14.5px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+  .ref .kto { font-size: 15.5px; font-weight: 600; line-height: 1.55; color: var(--ink); }
   .ref .kto span { font-weight: 400; color: var(--muted); }
   .ref .streszcz { margin-top: 10px; }
-  .ref .streszcz :global(p) { font-size: 15.5px; line-height: 1.65; }
+  .ref .streszcz :global(p) { max-width: 70ch; font-size: 15.5px; line-height: 1.55; }
   .ref .streszcz > :global(:last-child) { margin-bottom: 0; }
   .ref details { margin-top: 6px; }
   .ref summary { width: fit-content; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--d-a); }
   .ref summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
-  .pliki { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 20px; }
-  .pliki li { margin: 0; font-size: 14.5px; }
-  .pliki a { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--d-a); }
-  .pliki :global(svg) { flex: none; }
-  .pusto { font-size: 15px; font-style: italic; color: var(--muted); }
-  .archiwum { margin: 18px 0 0; font-size: 15px; font-weight: 600; }
-  .archiwum a { color: var(--d-a); }
+  .ref .pliki { margin-top: 10px; }
+  .pusto { font-style: italic; color: var(--muted); }
+  .archiwum { margin: 18px 0 0; font-weight: 600; }
   /* kotwice referatów: zapas nad wpisem */
   .ref[id] { scroll-margin-top: 20px; }
 
@@ -203,7 +205,6 @@ const spis = [
 
   /* ---------- telefon (≤ 760 px) ---------- */
   @media (max-width: 760px) {
-    :global(.z-sm) h2 { margin-bottom: 4px; }
     .ref { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .ref .dz { font-size: 28px; }
     .ref .dz small { font-size: 12.5px; white-space: nowrap; }

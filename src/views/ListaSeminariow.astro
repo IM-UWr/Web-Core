@@ -6,6 +6,8 @@
 // z najbliższym referatem, pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
 // bez zakładu (pole puste albo zakład, którego nie ma na stronie) to seminarium niezależne.
 // Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”.
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
+// etykieta .etyk, pierwszy akapit .wst, lista linków ul.linki. Własne style (na końcu pliku) tylko dla wierszy z datą.
 import Podstrona from '../components/zal/Podstrona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -36,7 +38,7 @@ const spis = [
 const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
 ---
 <Podstrona lang={lang} tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
-  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} dzial="nauka" spis={spis} klasa="z-sem">
+  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} dzial="nauka" spis={spis} klasa="tresc z-sem">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
   <section id="z-tydzien" aria-labelledby="h-tydzien">
@@ -48,7 +50,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
           <li class="wiersz klik">
             <time class="dz" datetime={w.termin.slice(0, 10)}>{dayNum(w.termin)}<small> {monthShort(w.termin, lang)} {parse(w.termin).y}</small></time>
             <div>
-              <p class="rodz">{[dayShort(w.termin, lang), kiedyGdzie(w.termin, w.sala)].filter(Boolean).join(' · ')}</p>
+              <p class="etyk">{[dayShort(w.termin, lang), kiedyGdzie(w.termin, w.sala)].filter(Boolean).join(' · ')}</p>
               <h3><a href={u(wJezyku(w.href, lang))}><TytulReferatu tekst={w.tytul} /></a></h3>
               <p class="kto">{w.prelegent}<span class="sem"> · {w.seminarium}</span></p>
             </div>
@@ -58,7 +60,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
     )}
   </section>
 
-  {wstep.length > 0 && <section class="wstep">{wstep.map((a) => <p>{a}</p>)}</section>}
+  {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
 
   {grupy.map((g) => (
     <section id={idGrupy(g.id)} aria-labelledby={g.id}>
@@ -73,7 +75,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
                 ? <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
                 : <span class="dz" aria-hidden="true"></span>}
               <div>
-                {zs.length > 0 && <p class="rodz">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</p>}
+                {zs.length > 0 && <p class="etyk">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</p>}
                 <h3><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></h3>
                 {r ? (
                   <p class="ref">
@@ -94,7 +96,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
   {nieaktywne.length > 0 && (
     <section id="z-nieaktywne" aria-labelledby="h-nieaktywne">
       <h2 id="h-nieaktywne">{T('Pozostałe seminaria', 'Other seminars')}</h2>
-      <ul class="inne">
+      <ul class="linki">
         {nieaktywne.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
       </ul>
     </section>
@@ -102,45 +104,38 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
 </Podstrona>
 
 <style>
-  /* ---------- wspólne (każda szerokość) ---------- */
-  :global(.z-sem) h2 { color: var(--d-a); }
-  .wiersze, .inne { list-style: none; margin: 0; padding: 0; }
-  .wiersze > li, .inne > li { max-width: none; margin: 0; }
+  /* Wiersze z datą (jak zal/dzial/Wiersz.astro): dzień | etykieta, tytuł, prelegent albo najbliższy referat. Reszta
+     (sekcje, etykieta .etyk, akapity, ul.linki) — wzorzec treści .tresc (src/styles/zal-tresc.css). */
+  .wiersze { list-style: none; margin: 0; padding: 0; }
+  .wiersze > li { max-width: none; margin: 0; font-size: inherit; }
   .wiersz { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
   .wiersz .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
   .wiersz .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
   .wiersz p { margin: 0; max-width: none; }
-  .wiersz .rodz { font-size: 12.5px; font-weight: 700; line-height: 1.5; color: var(--d-a); }
   .wiersz h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .wiersz h3 a { color: inherit; text-decoration: none; }
-  .wiersz .kto, .wiersz .ref { font-size: 14.5px; line-height: 1.5; color: var(--text); }
+  .wiersz .kto, .wiersz .ref { font-size: 15.5px; line-height: 1.55; color: var(--text); }
   .wiersz .sem, .wiersz .ref .kto { color: var(--muted); }
   .wiersz .kiedy { margin-right: 8px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .wiersz .pusto, .pusto { font-size: 14.5px; font-style: italic; color: var(--muted); }
+  .pusto { font-style: italic; color: var(--muted); }
   /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
   .klik { position: relative; }
   .klik h3 a::after { content: ''; position: absolute; inset: 0; }
   .klik:hover h3 a { color: var(--d-a); }
   .klik h3 a:focus-visible { outline: none; }
   .klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
-  .inne a { display: block; padding: 9px 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500; font-size: 18px;
-    line-height: 1.35; color: var(--ink); text-decoration: none; }
-  .inne a:hover { color: var(--d-a); }
 
-  /* ---------- komputer (≥ 761 px) ---------- */
+  /* ---------- komputer (≥ 761 px): seminaria w dwóch kolumnach ---------- */
   @media (min-width: 761px) {
-    .wiersze.dwie, .inne { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
-    .wstep p { max-width: 72ch; }
+    .wiersze.dwie { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
   }
 
   /* ---------- telefon (≤ 760 px): jedna kolumna, mniejszy dzień ---------- */
   @media (max-width: 760px) {
-    :global(.z-sem) h2 { margin-bottom: 4px; }
     .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .wiersz .dz { font-size: 28px; }
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
     .wiersz h3 { font-size: 18.5px; }
-    .wiersz .kto, .wiersz .ref { font-size: 14px; }
-    .inne a { font-size: 17px; }
+    .wiersz .kto, .wiersz .ref { font-size: 15px; }
   }
 </style>
