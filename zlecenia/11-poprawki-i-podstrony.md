@@ -161,3 +161,20 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - Twarz stoi w lewym marginesie z kreską jak dziś, ale **jej środek wypada na pionowy środek bloku tekstu nagłówka**: od „← Dział” do ostatniej linii (tytuł, hasło, liczby).
   - Podpis pod twarzą, wyśrodkowany względem niej (ok. 8 px niżej).
   - Działa tak samo dla nagłówków z liczbami i bez. Wzór: prototyp, podstrony.
+
+### 10. Paleta i ciemny motyw (decyzje 4.11, 23:36)
+- **Paleta działów: „Atramenty”** (potwierdzona; tak jest już w kodzie). „Stonowana” odpada.
+- **Ciemny motyw: wariant A „Nocny granat”.** Specyfikacja, wartości i kontrasty są w `dok/ciemny/RAPORT-CIEMNY.md`, a gotowy CSS w `dok/ciemny/ciemny-propozycja.css` na gałęzi `kopia/2026-11-01-estetyka-prototypy`.
+  - Bierzesz z CSS tylko wariant A i robisz z niego **zwykły ciemny motyw**, bez atrybutu `data-ciemny`. Obie formy jak dziś: `[data-theme="dark"]` i `prefers-color-scheme: dark` bez `data-theme="light"`.
+  - Najważniejsze wartości:
+    - tło `#18243b` zamiast `#0a1020`; banery i granat marki zostają o ton ciemniejsze od treści, jak w jasnym motywie;
+    - powierzchnia `#222e46`, tekst `#ced5e3`, przygaszony `#a5afc1`;
+    - panel menu `#24324f`, ramki przycisków i pól `#727c8f`.
+  - **Kolor działu w ciemnym motywie:** jasny kolor działu z ok. 20% koloru nagłówków (pastel, nie neon). **Tło działu** (`--d-t`): ok. 11% koloru działu w powierzchni.
+  - **Zdjęcia w dwóch kolorach** mają światła przygaszone granatem, a zwykłe zdjęcia lekko przyciemnione (`brightness(.86–.92) saturate(.92–.94)`).
+  - **Nowe zmienne:**
+    - `--m-line-ui` na ramki przycisków i pól (≥ 3:1);
+    - `--m-rule` na grube kreski 2 px (zamiast prawie białej);
+    - `--m-panel` na panel menu.
+  - Sztywne kolory, które trzeba było nadpisać, wypisuje raport: panel hamburgera, pole szukania w panelu, przejście banera w treść i inne.
+- **Do potwierdzenia (propozycja agenta):** w jasnym motywie ramki przycisków i pól mają ok. 1,3:1, a norma WCAG dla elementów interfejsu to 3:1. Ta sama zmienna `--m-line-ui` w jasnym motywie by to naprawiła. Nie wdrażaj bez decyzji, tylko wypisz w raporcie, jak by to wyglądało.
