@@ -65,3 +65,32 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - spis mieści się w oknie 1366×640 bez przewijania; jeśli jest dłuższy niż okno, przewija się w swojej kolumnie (`max-height` i `overflow-y: auto`);
   - nawigacja klawiaturą po linkach spisu;
   - `/en`.
+
+### 4. Przyciski: jeden styl na całej stronie, jak na Planie zajęć (decyzja 4.11, 22:37)
+- **Koniec okrągłych przycisków.** Wszystkie przyciski, zakładki, pola wyszukiwania i listy wyboru dostają styl przycisków z Planu zajęć (`.pl-sem`, `.pl-dni`, `.pl-szukaj` w `zal-granty-plan.css`). Wzór: prototyp, widok „Przyciski” (dziś i po zmianie, na prawdziwych etykietach).
+- **Grupa przełączników** (filtr, widok, semestr, zakładki):
+  - przyciski sklejone w jeden pasek w ramce `1px var(--line)`, między nimi kreska `1px`;
+  - bez zaokrągleń, 14 px, waga 600, `padding: 7px 12px`;
+  - wybrany wypełniony kolorem działu (`--d-a`, tekst w kolorze tła), na stronach poza działami (Aktualności, Kalendarz, pojedyncza aktualność) kolorem tekstu (granat; w ciemnym motywie jasny);
+  - najechanie zmienia kolor tekstu na kolor działu; fokus: obrys `2px` w kolorze działu.
+- **Przyciski-linki** (np. „Rekrutacja ↗”, „Strona projektu ↗”, „Zapisz mnie”, „PDF”):
+  - ramka `1px var(--line)`, bez zaokrągleń, 14 px, waga 600, `padding: 7px 14px`;
+  - najechanie: ramka i tekst w kolorze działu;
+  - główny przycisk (pierwszy przycisk kierunku, „Strona projektu”, „Zapisz mnie”) wypełniony kolorem działu.
+- **Pola wyszukiwania i listy wyboru:** jak pole szukania na Planie: ramka `1px`, bez zaokrągleń, 15 px, `padding: 8px 12px`; fokus: obrys `2px` w kolorze działu. Lista wyboru ze strzałką w dół.
+- **Miejsca** (stan `d12c994`):
+  - Aktualności: filtr rodzajów, pole szukania, „Pokaż wszystkie”;
+  - Kalendarz: rodzaj wydarzeń, widok (Nadchodzące / Archiwum);
+  - Pracownicy: pole szukania, lista zakładów, grupy osób;
+  - kierunek: przyciski pod opisem, zakładki programu studiów, wybór roku;
+  - Rok akademicki i Kolory dni: przełącznik semestrów (`PrzelacznikSemestrow.astro`);
+  - specjalność: linki pod opisem;
+  - seminarium: pole e-mail i „Zapisz mnie”;
+  - grant: „Strona projektu”;
+  - Publikacje i rocznik: „PDF”, „Wykaz w PDF”;
+  - pojedyncza aktualność: „Pełny album zdjęć”, zamiana dni: link do kalendarza;
+  - Warto wiedzieć (wpis): link pod treścią;
+  - Konferencje, Sukcesy, Projekty i granty: lata w bocznym pasku przestają być przyciskami i trafiają do spisu „Na tej stronie” (zalecenie 3).
+- **Także na telefonie** (po zleceniu 12 telefon ma ten sam wygląd). Długie grupy na wąskim ekranie: pasek może przejść do drugiego rzędu, ramki i kreski zostają spójne. Na Aktualnościach i Kalendarzu na telefonie zostaje lista wyboru zamiast przycisków (jak dziś), w nowym stylu pola.
+- **Nie dotyczy** (to nie przyciski): kropek kolorów dni, liczników przy latach, etykiet rodzaju przy aktualnościach. Do osobnej decyzji.
+- Najprościej: zmienić wspólne klasy `.chip`, `.btn`, `.search`, `.tabs` w jednym miejscu, zamiast poprawiać każdą stronę osobno.

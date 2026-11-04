@@ -809,6 +809,48 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 [data-bok="C"] .spis-p li a[aria-current] b, [data-bok="C"] .spis-p li a.minione b { color: var(--d-a); }
 [data-bok="C"] .spis-p li a[aria-current] { font-weight: 600; }
 @media (prefers-reduced-motion: reduce) { .spis-p .wskaznik, [data-bok="B"] .spis-p ul::after { transition: none; } }
+/* ---------- widok „Przyciski”: dziś (okrągłe) i po zmianie (styl z Planu zajęć) ---------- */
+.pk { --pk-stary: var(--granat); --pk-stary-ink: #fff; padding: 48px 64px 80px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pk { --pk-stary: #c9d0de; --pk-stary-ink: #0a1020; } }
+:root[data-theme="dark"] .pk { --pk-stary: #c9d0de; --pk-stary-ink: #0a1020; }
+.pk h2 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 34px; line-height: 1.2; color: var(--m-ink); }
+.pk-op { max-width: 78ch; margin: 0 0 28px; color: var(--m-muted); font-size: 15px; }
+.pk-wiersz { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; padding: 22px 0; border-top: 1px solid var(--m-line); }
+.pk-wiersz:not([data-dzial]) { --d-a: var(--m-ink); }
+.pk-str small { display: block; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+.pk-str b { display: block; margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.25; color: var(--m-ink); }
+.pk-str span { display: block; font-size: 13.5px; line-height: 1.45; color: var(--m-muted); }
+.pk-stan { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: start; }
+.pk-stan + .pk-stan { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--m-line); }
+.pk-stan > i { padding-top: 8px; font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--m-muted); }
+.pk-stan.nowy > i { color: var(--d-a); }
+.pk-rzad { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.pk-ikona { width: 17px; height: 17px; flex: none; }
+/* dziś: pigułki z global.css */
+.pk-s-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pk-s-chips button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--m-line); background: var(--m-bg); color: var(--m-ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.pk-s-chips button[aria-pressed="true"] { background: var(--pk-stary); border-color: var(--pk-stary); color: var(--pk-stary-ink); }
+.pk-s-chips.lata button { min-height: 36px; padding: 0 12px; }
+.pk-s-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1.5px solid var(--m-line); background: var(--m-bg); color: var(--m-ink); font-size: 15px; font-weight: 700; text-decoration: none; }
+.pk-s-btn.glowny { background: var(--pk-stary); border-color: var(--pk-stary); color: var(--pk-stary-ink); }
+.pk-s-pole { display: inline-flex; align-items: center; gap: 8px; height: 46px; min-width: 260px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--m-line); background: var(--m-bg); color: var(--m-muted); font-size: 15px; }
+/* po zmianie: styl z Planu zajęć */
+.pk-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--m-line); }
+.pk-seg button { margin: 0; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.6; padding: 7px 12px; border: 0; border-radius: 0; background: transparent; color: var(--m-text); cursor: pointer; }
+.pk-seg button + button { border-left: 1px solid var(--m-line); }
+.pk-seg button:hover { color: var(--d-a); }
+.pk-seg button[aria-pressed="true"] { background: var(--d-a); color: var(--m-bg); }
+.pk-seg button:focus-visible, .pk-btn:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
+.pk-btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--m-line); background: transparent; color: var(--m-ink); font-size: 14px; font-weight: 600; line-height: 1.6; text-decoration: none; transition: border-color .15s, color .15s; }
+.pk-btn:hover { border-color: var(--d-a); color: var(--d-a); }
+.pk-btn.glowny { background: var(--d-a); border-color: var(--d-a); color: var(--m-bg); }
+.pk-btn.glowny:hover { color: var(--m-bg); filter: brightness(1.1); }
+.pk-pole { display: inline-flex; align-items: center; gap: 8px; min-width: 260px; margin: 0; padding: 8px 12px; font: inherit; font-size: 15px; line-height: 1.6; border: 1px solid var(--m-line); border-radius: 0; background: var(--m-bg); color: var(--m-ink); }
+.pk-pole::placeholder { color: var(--m-muted); opacity: 1; }
+.pk-pole:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-ink); }
+.pk-spis .spis-p { position: static; }
+.pk-spis .spis-p li a[aria-current] { box-shadow: inset 3px 0 0 var(--d-a); margin-left: -1px; padding-left: 17px; }
 
 /* ---------- uwagi pod sceną ---------- */
 .uwagi { max-width: 1280px; margin: 0 auto; padding-block: 34px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 30px 48px; }
@@ -844,6 +886,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
       <button type="button" id="w-glowna" data-v="glowna" aria-pressed="false">Główna v1</button>
       <button type="button" id="w-dzial" data-v="dzial" aria-pressed="false">Dział</button>
       <button type="button" id="w-telefon" data-v="telefon" aria-pressed="false">Telefon</button>
+      <button type="button" id="w-przyciski" data-v="przyciski" aria-pressed="false">Przyciski</button>
     </div></div>
     <div class="grupa"><span>Szkic</span><div class="seg" data-ustaw="szkic">
       <button type="button" id="s-twarz" data-v="twarz" aria-pressed="true">Twarz</button>
@@ -1081,6 +1124,15 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
           </div>
         </nav>
         <div id="dzial-pc"></div>
+      </div>
+
+      <!-- ============ PRZYCISKI: dziś (okrągłe) i po zmianie (styl z Planu zajęć) ============ -->
+      <div class="widok m" id="v-przyciski" hidden>
+        <div class="pk">
+          <h2>Przyciski na całej stronie</h2>
+          <p class="pk-op">Zasada (4.11): wszystkie okrągłe przyciski, zakładki, pola wyszukiwania i listy wyboru dostają styl z Planu zajęć. Kanciaste, cienka ramka, przyciski jednej grupy sklejone w pasek, wybrany wypełniony kolorem działu (poza działami granatem). Poniżej każde miejsce, gdzie dziś są okrągłe: górny rząd to stan obecny, dolny po zmianie. Przyciski da się klikać.</p>
+          <div id="pk-lista"></div>
+        </div>
       </div>
 
       <!-- ============ TELEFON ============ -->
@@ -1881,6 +1933,61 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     // tusz rysuje się po wejściu na stronę
     requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('#dzial-pc .szkic').forEach((s) => s.classList.add('rysuj'))));
   }
+  /* ---------- widok „Przyciski” ---------- */
+  const PRZYCISKI = [
+    { str: 'Aktualności', co: 'Filtr rodzajów i wyszukiwarka nad listą.', el: [
+      { t: 'seg', et: ['Wszystkie', 'Ogłoszenia', 'Wydarzenia', 'Sukcesy', 'Kariera', 'Obrony', 'Seminaria', 'Konferencje'] },
+      { t: 'szukaj', et: 'Szukaj w aktualnościach' }] },
+    { str: 'Kalendarz', co: 'Rodzaj wydarzeń i widok: nadchodzące albo archiwum.', el: [
+      { t: 'seg', et: ['Wszystkie', 'Wydarzenia', 'Obrony', 'Konferencje', 'Seminaria'] },
+      { t: 'seg', et: ['Nadchodzące', 'Archiwum'] }] },
+    { str: 'Pracownicy', dz: 'instytut', co: 'Wyszukiwarka, zakład i grupa osób.', el: [
+      { t: 'szukaj', et: 'Szukaj: nazwisko, pokój, e-mail…' }, { t: 'lista', et: 'Wszystkie zakłady' },
+      { t: 'seg', et: ['Wszyscy', 'Nauczyciele akademiccy', 'Doktoranci', 'Administracja', 'Emerytowani pracownicy'] }] },
+    { str: 'Kierunek (np. Matematyka)', dz: 'studia', co: 'Przyciski pod opisem i zakładki programu studiów.', el: [
+      { t: 'btn', et: ['Rekrutacja ↗', 'Plan zajęć', 'Katalog przedmiotów ↗'], glowny: 0 },
+      { t: 'seg', et: ['Nowy program (od 2026/27)', 'Stary program (2022–2025/26)'] }] },
+    { str: 'Rok akademicki, Kolory dni', dz: 'studia', co: 'Przełącznik semestrów, taki sam jak na Planie zajęć.', el: [
+      { t: 'seg', et: ['Zimowy 2026/27', 'Letni 2026/27'], stare: ['Semestr zimowy 2026/27', 'Semestr letni 2026/27'] }] },
+    { str: 'Specjalność', dz: 'studia', co: 'Linki pod opisem specjalności.', el: [
+      { t: 'btn', et: ['Katalog przedmiotów (USOS) ↗', 'Praktyki pedagogiczne'] }] },
+    { str: 'Seminarium', dz: 'nauka', co: 'Zapis na listę ogłoszeń seminarium.', el: [
+      { t: 'szukaj', et: 'Twój adres e-mail', bezIkony: true }, { t: 'btn', et: ['Zapisz mnie'], glowny: 0 }] },
+    { str: 'Grant', dz: 'nauka', co: 'Link do strony projektu.', el: [{ t: 'btn', et: ['Strona projektu ↗'], glowny: 0 }] },
+    { str: 'Publikacje, rocznik', dz: 'nauka', co: 'Wykaz publikacji w PDF (lista lat i strona rocznika).', el: [{ t: 'btn', et: ['PDF', 'Wykaz w PDF'] }] },
+    { str: 'Aktualność', co: 'Link do pełnego albumu zdjęć.', el: [{ t: 'btn', et: ['Pełny album zdjęć ↗'] }] },
+    { str: 'Konferencje, Sukcesy, Projekty i granty', dz: 'nauka', co: 'Lata w bocznym pasku: zamiast przycisków trafiają do spisu „Na tej stronie” (zalecenie 3).', el: [
+      { t: 'lata', et: ['2026', '2025', '2024', '2023', '2022', '2021'] }] }
+  ];
+  const IKONA_SZUKAJ = '<svg class="pk-ikona" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
+  const IKONA_DOL = '<svg class="pk-ikona" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  function pkStary(e) {
+    if (e.t === 'seg' || e.t === 'lata') return `<div class="pk-s-chips${e.t === 'lata' ? ' lata' : ''}">${(e.stare || e.et).map((x, i) => `<button type="button" aria-pressed="${i === 0 && e.t === 'seg'}">${x}</button>`).join('')}</div>`;
+    if (e.t === 'szukaj') return `<span class="pk-s-pole">${e.bezIkony ? '' : IKONA_SZUKAJ}${e.et}</span>`;
+    if (e.t === 'lista') return `<span class="pk-s-pole">${e.et}${IKONA_DOL}</span>`;
+    if (e.t === 'btn') return e.et.map((x, i) => `<a class="pk-s-btn${i === e.glowny ? ' glowny' : ''}" href="#">${x}</a>`).join('');
+    return '';
+  }
+  function pkNowy(e) {
+    if (e.t === 'seg') return `<div class="pk-seg" role="group">${e.et.map((x, i) => `<button type="button" aria-pressed="${i === 0}">${x}</button>`).join('')}</div>`;
+    if (e.t === 'szukaj') return `<input type="search" class="pk-pole" placeholder="${e.et}">`;
+    if (e.t === 'lista') return `<span class="pk-pole">${e.et}${IKONA_DOL}</span>`;
+    if (e.t === 'btn') return e.et.map((x, i) => `<a class="pk-btn${i === e.glowny ? ' glowny' : ''}" href="#">${x}</a>`).join('');
+    if (e.t === 'lata') return `<div class="pk-spis" data-bok="A"><nav class="spis-p" aria-label="Na tej stronie"><h6>Na tej stronie</h6><ul>${e.et.map((x, i) => `<li><a href="#"${i === 0 ? ' aria-current="location"' : ''}><b></b><span>${x}</span></a></li>`).join('')}</ul></nav></div>`;
+    return '';
+  }
+  function rysujPrzyciski() {
+    $('#pk-lista').innerHTML = PRZYCISKI.map((w) => `<section class="pk-wiersz"${w.dz ? ` data-dzial="${w.dz}"` : ''}>
+      <div class="pk-str"><small>${w.dz ? D[w.dz].nazwa : 'Poza działami'}</small><b>${w.str}</b><span>${w.co}</span></div>
+      <div><div class="pk-stan"><i>Dziś</i><div class="pk-rzad">${w.el.map(pkStary).join('')}</div></div>
+      <div class="pk-stan nowy"><i>Po zmianie</i><div class="pk-rzad">${w.el.map(pkNowy).join('')}</div></div></div></section>`).join('');
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('#v-przyciski .pk-seg button, #v-przyciski .pk-s-chips:not(.lata) button');
+    if (b) b.parentElement.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    if (e.target.closest('#v-przyciski a')) e.preventDefault();
+  });
+
   function rysujTelefon() {
     $('#t-menu').innerHTML = KOLEJ.map((dz) => `
       <div class="t-dz" data-dzial="${dz}"><div class="szkic rysuj">${svg(dz)}</div><div><b>${D[dz].nazwa}</b><small>${D[dz].haslo}</small></div></div>`).join('') +
@@ -1920,7 +2027,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
   /* ---------- przełączniki ---------- */
   let widok = 'okladka';
   function pokaz() {
-    ['okladka', 'instytut', 'glowna', 'dzial', 'telefon'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
+    ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
     $('#wybor-inst').hidden = widok !== 'instytut';
     $('#wybor-wersja').hidden = widok !== 'instytut';
     $('#wybor-baner').hidden = widok !== 'instytut';
@@ -1936,11 +2043,12 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     $('#wybor-barwy').hidden = widok !== 'okladka';
     $('#wybor-proby').hidden = widok !== 'okladka';
     $('#wybor-prel').hidden = widok !== 'okladka';
-    $('#wybor-dzialu').hidden = widok === 'glowna' || widok === 'okladka';
-    $('#wybor-przejscia').hidden = widok === 'glowna' || widok === 'okladka';
+    $('#wybor-dzialu').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski';
+    $('#wybor-przejscia').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski';
     $('#podpowiedz').textContent = widok === 'okladka' ? 'Najedź na dział. Strzałka na dole albo kółko myszy przewija w dół, jak w prawdziwym oknie.' : widok === 'glowna' ? 'Najedź myszką na nazwę działu pod zdjęciem.' : widok === 'dzial' ? 'Tusz szkicu rysuje się przy wejściu na stronę działu.' : 'Telefon nie ma najechania, więc szkice są w menu.';
     if (widok === 'dzial') rysujDzial();
     if (widok === 'telefon') rysujTelefon();
+    if (widok === 'przyciski') { rysujPrzyciski(); $('#podpowiedz').textContent = 'Górny rząd: jak jest dziś. Dolny: po zmianie. Kliknij, żeby zobaczyć wybrany przycisk.'; }
     skaluj();
   }
   document.querySelectorAll('.seg').forEach((seg) => seg.addEventListener('click', (e) => {
