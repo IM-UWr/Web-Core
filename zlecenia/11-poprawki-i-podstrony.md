@@ -66,31 +66,46 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
   - nawigacja klawiaturą po linkach spisu;
   - `/en`.
 
-### 4. Przyciski: jeden styl na całej stronie, jak na Planie zajęć (decyzja 4.11, 22:37)
+### 4. Przyciski: jeden styl na całej stronie, jak na Planie zajęć (decyzje 4.11, 22:37–22:51)
 - **Koniec okrągłych przycisków.** Wszystkie przyciski, zakładki, pola wyszukiwania i listy wyboru dostają styl przycisków z Planu zajęć (`.pl-sem`, `.pl-dni`, `.pl-szukaj` w `zal-granty-plan.css`). Wzór: prototyp, widok „Przyciski” (dziś i po zmianie, na prawdziwych etykietach).
+- Najprościej: zmienić wspólne klasy `.chip`, `.btn`, `.search`, `.tabs`, `.zapis` w jednym miejscu, zamiast poprawiać każdą stronę osobno.
 - **Grupa przełączników** (filtr, widok, semestr, zakładki):
   - przyciski sklejone w jeden pasek w ramce `1px var(--line)`, między nimi kreska `1px`;
   - bez zaokrągleń, 14 px, waga 600, `padding: 7px 12px`;
-  - wybrany wypełniony kolorem działu (`--d-a`, tekst w kolorze tła), na stronach poza działami (Aktualności, Kalendarz, pojedyncza aktualność) kolorem tekstu (granat; w ciemnym motywie jasny);
-  - najechanie zmienia kolor tekstu na kolor działu; fokus: obrys `2px` w kolorze działu.
-- **Przyciski-linki** (np. „Rekrutacja ↗”, „Strona projektu ↗”, „Zapisz mnie”, „PDF”):
+  - wybrany wypełniony kolorem działu (`--d-a`, tekst w kolorze tła). Na stronach poza działami (Aktualności, Kalendarz, pojedyncza aktualność) wypełniony kolorem tekstu: granatem, a w ciemnym motywie jasnym;
+  - najechanie zmienia kolor tekstu na kolor działu, fokus to obrys `2px` w kolorze działu.
+- **Przyciski-linki:**
   - ramka `1px var(--line)`, bez zaokrągleń, 14 px, waga 600, `padding: 7px 14px`;
   - najechanie: ramka i tekst w kolorze działu;
-  - główny przycisk (pierwszy przycisk kierunku, „Strona projektu”, „Zapisz mnie”) wypełniony kolorem działu.
-- **Pola wyszukiwania i listy wyboru:** jak pole szukania na Planie: ramka `1px`, bez zaokrągleń, 15 px, `padding: 8px 12px`; fokus: obrys `2px` w kolorze działu. Lista wyboru ze strzałką w dół.
-- **Miejsca** (stan `d12c994`):
-  - Aktualności: filtr rodzajów, pole szukania, „Pokaż wszystkie”;
-  - Kalendarz: rodzaj wydarzeń, widok (Nadchodzące / Archiwum);
-  - Pracownicy: pole szukania, lista zakładów, grupy osób;
-  - kierunek: przyciski pod opisem, zakładki programu studiów, wybór roku;
-  - Rok akademicki i Kolory dni: przełącznik semestrów (`PrzelacznikSemestrow.astro`);
-  - specjalność: linki pod opisem;
-  - seminarium: pole e-mail i „Zapisz mnie”;
-  - grant: „Strona projektu”;
-  - Publikacje i rocznik: „PDF”, „Wykaz w PDF”;
-  - pojedyncza aktualność: „Pełny album zdjęć”, zamiana dni: link do kalendarza;
-  - Warto wiedzieć (wpis): link pod treścią;
-  - Konferencje, Sukcesy, Projekty i granty: lata w bocznym pasku przestają być przyciskami i trafiają do spisu „Na tej stronie” (zalecenie 3).
-- **Także na telefonie** (po zleceniu 12 telefon ma ten sam wygląd). Długie grupy na wąskim ekranie: pasek może przejść do drugiego rzędu, ramki i kreski zostają spójne. Na Aktualnościach i Kalendarzu na telefonie zostaje lista wyboru zamiast przycisków (jak dziś), w nowym stylu pola.
-- **Nie dotyczy** (to nie przyciski): kropek kolorów dni, liczników przy latach, etykiet rodzaju przy aktualnościach. Do osobnej decyzji.
-- Najprościej: zmienić wspólne klasy `.chip`, `.btn`, `.search`, `.tabs` w jednym miejscu, zamiast poprawiać każdą stronę osobno.
+  - główny przycisk („Strona projektu”, „Zapisz mnie”) wypełniony kolorem działu.
+- **Pola wyszukiwania i listy wyboru:** jak pole szukania na Planie (ramka `1px`, bez zaokrągleń, 15 px, `padding: 8px 12px`, fokus: obrys `2px` w kolorze działu). Lista wyboru ma strzałkę w dół.
+- **Strona po stronie** (stan `d12c994`):
+  - **Aktualności:** filtr rodzajów jako pasek i pole szukania **w jednej linii** (pole zajmuje resztę szerokości). „Pokaż wszystkie” jako przycisk-link.
+  - **Kalendarz:** rodzaj wydarzeń i widok (Nadchodzące / Archiwum) jako dwa paski.
+  - **Pracownicy:**
+    - pole szukania i lista zakładów zostają (w nowym stylu);
+    - **przyciski grup osób znikają**: grupy (Nauczyciele akademiccy, Doktoranci, Administracja, Emerytowani pracownicy) są sekcjami listy i trafiają do spisu „Na tej stronie” z prawej (zalecenie 3).
+  - **Kierunek:**
+    - zakładki programu studiów jako pasek;
+    - **przyciski pod opisem (Rekrutacja, Plan zajęć, Katalog przedmiotów) usunąć**, bo te linki są wyżej na stronie.
+    
+    Pola `przyciski` w CMS nie ruszać, tylko ich nie wyświetlać; w raporcie zapisz, czy pole jest jeszcze potrzebne.
+  - **Rok akademicki, Kolory dni:** przełącznik semestrów (`PrzelacznikSemestrow.astro`) jak na Planie, z krótkimi etykietami („Zimowy 2026/27”).
+  - **Specjalność:** linki na dole treści, pod opiekunem (zakład, katalog przedmiotów, koło naukowe) jako przyciski-linki. **Do potwierdzenia przez właściciela**; do tego czasu w nowym stylu.
+  - **Seminarium — pole powiadomień e-mail:**
+    - nie karta w bocznym pasku, tylko blok w prawej kolumnie **pod spisem „Na tej stronie”**, oddzielony kreską `1px`;
+    - nagłówek „Powiadomienia e-mail” jak nagłówek spisu (12,5 px, pogrubiony, w kolorze działu);
+    - tekst 13,5 px, pole e-mail na całą szerokość kolumny, „Zapisz mnie” jako główny przycisk z ikoną koperty, notka o prywatności 13 px przygaszona;
+    - działanie formularza bez zmian.
+  - **Grant:** „Strona projektu ↗” jako główny przycisk.
+  - **Publikacje i rocznik:** „PDF”, „Wykaz w PDF” jako przyciski-linki.
+  - **Pojedyncza aktualność:** „Pełny album zdjęć ↗” i link do kalendarza zajęć jako przyciski-linki. **Warto wiedzieć (wpis):** link pod treścią jako główny przycisk.
+  - **Konferencje, Sukcesy, Projekty i granty:**
+    - lata w bocznym pasku przestają być przyciskami i trafiają do spisu „Na tej stronie”;
+    - **na Sukcesach usunąć ramkę „Wcześniejsze sukcesy”** (tekst, „Zestawienie historyczne”, „Archiwum starej strony”).
+    
+    Uwaga: to jedyny link do strony `/nauka/sukcesy/historia`. Po usunięciu zostaje dostępna tylko z wyszukiwarki i spod adresu. Decyzja właściciela, co z tą stroną; do tego czasu nie usuwaj samej strony.
+- **Także na telefonie** (po zleceniu 12 telefon ma ten sam wygląd):
+  - długie paski na wąskim ekranie mogą przejść do drugiego rzędu, ramki i kreski mają zostać spójne;
+  - na Aktualnościach i Kalendarzu na telefonie zostaje lista wyboru zamiast paska (jak dziś), w nowym stylu pola.
+- **Nie dotyczy** (to nie przyciski): kropki kolorów dni, liczniki przy latach, etykiety rodzaju przy aktualnościach. Do osobnej decyzji.
