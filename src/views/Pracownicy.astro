@@ -2,6 +2,8 @@
 // Lista pracowników (/pracownicy), kierunek „Założyciele”, szablon podstrony (zal/Podstrona.astro). Każda osoba to osobny
 // plik w src/content/pracownicy (edycja w Pages CMS). Kolejność: alfabetycznie po nazwisku; doktorantów komponent dzieli
 // dodatkowo według roku studiów. Telefony podajemy tylko przy administracji (pilnuje tego skrypty/sprawdz_tresci.py).
+// Wzorzec treści (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14): sekcja h2, podsekcja h3 (rok studiów
+// doktorantów), kreski między sekcjami; tu własne style tylko na pasek filtrów i wiersze osób (w duchu tabeli wzorca).
 // W nagłówku hasło (pole pracownicy_haslo / pracownicy_haslo_en w src/data/dzialy/instytut.json) i liczby (osoby · zakłady ·
 // doktoranci). Treść: pasek filtrów (szukaj, grupa, zakład) i grupy osób jako sekcje — spis „Na tej stronie” prowadzi do
 // grup (TabelaPracownikow.tsx, wyspa React). Jedna wersja HTML: komputer — wiersz osoby w kolumnach (imię i nazwisko,
@@ -21,35 +23,37 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
 ---
 <Podstrona lang={lang} tytul={t(lang, 'pracownicy')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
   okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]}
-  dzial="instytut" spis={spis} klasa="z-prac">
+  dzial="instytut" spis={spis} klasa="tresc z-prac">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
   <TabelaPracownikow client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
 </Podstrona>
 
 <style is:global>
-  /* Pracownicy (blok .z-prac w .z-pd-tresc; elementy wyspy TabelaPracownikow.tsx). Komputer ≥ 761 px, telefon ≤ 760 px. */
+  /* Pracownicy (blok .z-prac w .z-pd-tresc.tresc; elementy wyspy TabelaPracownikow.tsx). Nagłówki h2/h3, linki i kolory —
+     wzorzec treści (zal-tresc.css); sekcje grup nie są dziećmi .z-pd-tresc (siedzą w wyspie), więc kreski między nimi
+     ustawione tu tymi samymi wartościami. Wiersze osób jak tabela wzorca: nagłówek kolumn 13 px przygaszony z kreską
+     2 px, wiersze oddzielone 1 px. Komputer ≥ 761 px, telefon ≤ 760 px. */
   .z-prac [hidden] { display: none !important; }
   /* bez JS filtry nie działają — pasek schowany, lista pełna */
   html:not(.js) .z-prac .zp-narz { display: none; }
+  .z-prac .zp-sek { padding: 0 0 44px; margin: 0 0 40px; border-bottom: 1px solid var(--line); }
+  .z-prac .zp-sek:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
   .z-prac .zp-lista { list-style: none; margin: 0; padding: 0; }
-  .z-prac .zp-w { position: relative; max-width: none; margin: 0; border-top: 1px solid var(--line); color: var(--text); overflow-wrap: anywhere; }
-  .z-prac .zp-sek:last-child .zp-lista:last-child .zp-w:last-child { border-bottom: 1px solid var(--line); }
+  .z-prac .zp-w { position: relative; max-width: none; margin: 0; border-bottom: 1px solid var(--line); font-size: 15.5px; line-height: 1.5; color: var(--text); overflow-wrap: anywhere; }
   .z-prac .zp-imie { font-family: var(--f-display); font-weight: 500; color: var(--ink); text-decoration: none; }
   .z-prac .zp-n small { display: block; color: var(--muted); }
   .z-prac .zp-n small a { position: relative; z-index: 1; color: inherit; text-decoration: none; }
   .z-prac .zp-n small a:hover { color: var(--d-a); text-decoration: underline; text-underline-offset: 3px; }
-  .z-prac :is(.zp-mail, .zp-tel) a { position: relative; z-index: 1; color: var(--d-a); text-decoration: none; }
-  .z-prac :is(.zp-mail, .zp-tel) a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .z-prac :is(.zp-mail, .zp-tel) a { position: relative; z-index: 1; }
   .z-prac .zp-pok { font-variant-numeric: tabular-nums; color: var(--ink); }
-  .z-prac .zp-www { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; overflow-wrap: normal; color: var(--muted); }
+  .z-prac .zp-www { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; overflow-wrap: normal; color: var(--muted); }
   .z-prac .zp-lbl { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   /* osoba ze stroną domową: link na imieniu i nazwisku obejmuje cały wiersz (e-mail, telefon i zakład nad nim) */
   .z-prac .zp-klik .zp-imie::after { content: ''; position: absolute; inset: 0; }
   .z-prac .zp-klik:hover :is(.zp-imie, .zp-www) { color: var(--d-a); }
   .z-prac .zp-klik .zp-imie:focus-visible { outline: none; }
   .z-prac .zp-klik:has(.zp-imie:focus-visible) { outline: 2px solid var(--d-a); outline-offset: 2px; }
-  /* pasek filtrów: pole szukania i dwie listy (grupa, zakład), cienkie ramki jak w „Planie zajęć” */
-  .z-prac .zp-narz { border-bottom: 2px solid var(--ink); }
+  /* pasek filtrów: pole szukania i dwie listy (grupa, zakład) w cienkich ramkach, jak przełączniki we wzorcu i w Planie zajęć */
   .z-prac .zp-szukaj { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0 12px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); }
   .z-prac .zp-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 8px 0; border: 0; border-radius: 0; background: transparent; font: inherit; color: var(--ink); outline: none; }
   .z-prac .zp-szukaj input::placeholder { color: var(--muted); opacity: 1; }
@@ -59,42 +63,37 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
   .z-prac .zp-wybor svg { position: absolute; right: 10px; pointer-events: none; color: var(--d-a); }
   .z-prac :is(.zp-szukaj, .zp-wybor):focus-within { outline: 2px solid var(--d-a); outline-offset: -1px; }
   .z-prac .zp-wybor select:focus { outline: none; }
-  .z-prac .zp-ile { max-width: none; color: var(--muted); }
-  .z-prac .zp-sek h2 { font-family: var(--f-display); font-weight: 500; letter-spacing: normal; color: var(--d-a); }
-  .z-prac .zp-rok { font-family: var(--f-display); font-weight: 500; letter-spacing: normal; color: var(--ink); }
+  .z-prac .zp-ile { max-width: none; margin: 0; color: var(--muted); }
 
   @media (min-width: 761px) {
-    .z-prac .zp-narz { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; padding: 0 0 14px; }
+    .z-prac .zp-narz { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; }
     .z-prac .zp-szukaj { flex: 1 1 240px; }
-    .z-prac .zp-szukaj input { font-size: 15px; }
+    .z-prac .zp-szukaj input { font-size: 15px; line-height: 1.6; }
     .z-prac .zp-wybor { flex: 0 1 auto; max-width: 280px; }
-    .z-prac .zp-wybor select { font-size: 15px; }
-    .z-prac .zp-ile { margin: 10px 0 0; font-size: 13.5px; line-height: 1.6; }
-    .z-prac .zp-sek { --zp-kol: minmax(0, 1.6fr) minmax(0, 1.35fr) 60px 60px; margin-top: 30px; }
-    .z-prac .zp-sek.zp-z-tel { --zp-kol: minmax(0, 1.6fr) minmax(0, 1.35fr) 120px 60px 60px; }
-    .z-prac .zp-sek h2 { margin: 0 0 4px; font-size: 32px; line-height: 1.6; }
-    .z-prac .zp-nagl, .z-prac .zp-w { display: grid; grid-template-columns: var(--zp-kol); gap: 2px 16px; }
-    .z-prac .zp-nagl { padding: 0 0 6px; font-size: 11.5px; font-weight: 700; line-height: 1.4; color: var(--muted); }
-    .z-prac .zp-rok { margin: 20px 0 4px; font-size: 22px; line-height: 1.4; }
-    .z-prac .zp-w { align-items: baseline; padding: 9px 0; font-size: 14px; line-height: 1.45; }
-    .z-prac .zp-imie { font-size: 17.5px; line-height: 1.3; }
-    .z-prac .zp-n small { margin-top: 1px; font-size: 13px; line-height: 1.45; }
+    .z-prac .zp-wybor select { font-size: 15px; line-height: 1.6; }
+    .z-prac .zp-ile { margin: 10px 0 30px; font-size: 13.5px; line-height: 1.6; }
+    .z-prac .zp-sek { --zp-kol: minmax(0, 1.55fr) minmax(0, 1.4fr) 56px 60px; }
+    .z-prac .zp-sek.zp-z-tel { --zp-kol: minmax(0, 1.55fr) minmax(0, 1.4fr) 116px 56px 60px; }
+    .z-prac .zp-nagl, .z-prac .zp-w { display: grid; grid-template-columns: var(--zp-kol); gap: 2px 18px; }
+    .z-prac .zp-nagl { padding: 0 0 8px; border-bottom: 2px solid var(--ink); font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--muted); }
+    .z-prac .zp-w { align-items: baseline; padding: 10px 0; }
+    .z-prac .zp-imie { font-size: 18px; line-height: 1.3; }
+    .z-prac .zp-n small { margin-top: 1px; font-size: 13.5px; line-height: 1.45; }
   }
 
   @media (max-width: 760px) {
     /* pasek: pole szukania w pierwszym rzędzie, grupa i zakład obok siebie w drugim */
-    .z-prac .zp-narz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 0 12px; }
+    .z-prac .zp-narz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .z-prac .zp-szukaj { grid-column: 1 / -1; min-height: 44px; }
     .z-prac .zp-narz:not(:has(.zp-wybor + .zp-wybor)) .zp-wybor { grid-column: 1 / -1; }
     .z-prac .zp-szukaj input { font-size: 16px; }
     .z-prac .zp-wybor select { min-height: 42px; font-size: 14.5px; }
-    .z-prac .zp-ile { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; }
-    .z-prac .zp-sek { margin-top: 22px; }
-    .z-prac .zp-sek h2 { margin: 0 0 4px; font-size: 26px; line-height: 1.25; }
+    .z-prac .zp-ile { margin: 8px 0 22px; font-size: 13.5px; line-height: 1.5; }
+    .z-prac .zp-sek { padding-bottom: 30px; margin-bottom: 28px; }
     .z-prac .zp-nagl { display: none; }
-    .z-prac .zp-rok { margin: 16px 0 4px; font-size: 19px; line-height: 1.3; }
-    /* wiersz osoby: imię i nazwisko, funkcja · zakład, e-mail, w ostatniej linii telefon · pokój · WWW */
-    .z-prac .zp-w { display: flex; flex-wrap: wrap; align-items: baseline; padding: 11px 0; font-size: 14.5px; line-height: 1.5; }
+    .z-prac .zp-lista { border-top: 1px solid var(--line); }
+    /* wiersz osoby (jak blok tabeli wzorca): imię i nazwisko, funkcja · zakład, e-mail, w ostatniej linii telefon · pokój · WWW */
+    .z-prac .zp-w { display: flex; flex-wrap: wrap; align-items: baseline; padding: 10px 0; font-size: 15px; }
     .z-prac .zp-n, .z-prac .zp-mail { flex: 0 0 100%; }
     .z-prac .zp-c:empty { display: none; }
     .z-prac .zp-imie { font-size: 18.5px; line-height: 1.3; }

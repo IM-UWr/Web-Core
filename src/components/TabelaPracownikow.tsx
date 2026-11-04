@@ -7,7 +7,7 @@
 // Każda osoba to wiersz listy: gdy ma stronę domową, link na imieniu i nazwisku obejmuje cały wiersz (e-mail i zakład
 // to osobne linki nad nim). Kolumna „Telefon” pojawia się tylko w sekcjach, w których ktoś ma numer (w praktyce:
 // administracja). Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
-// Komputer: wiersz w kolumnach z nagłówkiem nad listą; telefon (≤ 760 px): wiersz w jednej kolumnie.
+// Komputer: wiersz w kolumnach z nagłówkiem nad listą (jak tabela wzorca treści); telefon (≤ 760 px): wiersz w jednej kolumnie.
 import { zTytulem } from '../lib/osoby';
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 
@@ -197,16 +197,17 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
       {sekcje.map((g) => (
         <section key={g.id} id={`zp-${g.id}`} className={g.maTel ? 'zp-sek zp-z-tel' : 'zp-sek'} aria-labelledby={`zp-h-${g.id}`}>
           <h2 id={`zp-h-${g.id}`}>{g.nazwa}</h2>
-          <div className="zp-nagl" aria-hidden="true">
-            <span>{napisy.imie}</span>
-            <span>{napisy.email}</span>
-            {g.maTel && <span>{napisy.telefon}</span>}
-            <span>{napisy.pokoj}</span>
-            <span>{napisy.strona}</span>
-          </div>
           {g.podsekcje.map((p) => (
             <Fragment key={p.klucz}>
               {p.tytul && <h3 className="zp-rok">{p.tytul}</h3>}
+              {/* nagłówek kolumn (komputer) nad każdą listą — jak nagłówek tabeli we wzorcu treści */}
+              <div className="zp-nagl" aria-hidden="true">
+                <span>{napisy.imie}</span>
+                <span>{napisy.email}</span>
+                {g.maTel && <span>{napisy.telefon}</span>}
+                <span>{napisy.pokoj}</span>
+                <span>{napisy.strona}</span>
+              </div>
               <ul className="zp-lista" role="list">
                 {p.osoby.map((o) => wiersz(o, g.maTel))}
               </ul>
