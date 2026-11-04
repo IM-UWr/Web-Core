@@ -1,6 +1,6 @@
 ---
-// Liczby pod hasłem w banerze — tylko na telefonie (decyzje 31.10.2026; komputer później): wspólne dla działów i podstron
-// (zlecenie 01). Trzy kolumny z kreską nad nimi (.pt-liczby w portal.css): liczba, pod nią etykieta, łamana równo
+// Liczby pod hasłem w banerze nagłówka podstrony (zal/NaglowekZ.astro; komputer: w jednym wierszu, telefon: trzy kolumny
+// z kreską nad nimi — zalozyciele.css, zal-telefon.css): liczba, pod nią etykieta, łamana równo
 // (text-wrap: balance) — najwyżej dwie linijki przy 360 i 390 px. Pozycja to albo liczba z odmianą rzeczownika
 // (odmiana w i18n.ts; np. „5 / zapowiedzianych referatów”), opcjonalnie z okresem („… z 30 dni”), albo gotowy krótki napis
 // z etykietą (np. „3 lata / studia I stopnia”, „20 paź / 2026”). Jednoliterowe wyrazy z twardą spacją (bezSierotek).
@@ -20,7 +20,7 @@ const liczby = pozycje
     : { n: (en && (x as Napis).n_en) || x.n, l: bezSierotek((en && (x as Napis).en) || (x as Napis).pl) });
 ---
 {liczby.length > 0 && (
-  <ul class="pt-liczby tylko-telefon" data-pagefind-ignore>
+  <ul class="pt-liczby" data-pagefind-ignore>
     {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
   </ul>
 )}

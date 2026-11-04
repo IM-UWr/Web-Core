@@ -71,10 +71,10 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
 <Podstrona lang={lang} tytul={nazwa} tytulKarty={`${nazwa} — ${nazwaKierunku}`} opis={w(d, 'opis')} opublikowany={d.opublikowany}
   uklad="zwarta portal-baner" lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo}
   wstecz={{ etykieta: nazwaKierunku, adres: `/studia/${d.kierunek}#specjalnosci` }} dzial="studia" spis={spis} klasa="tresc">
-  {/* Baner bez zmian: liczby (telefon i komputer) i etykiety specjalności (komputer). */}
+  {/* Baner: liczby i etykiety specjalności (na każdej szerokości). */}
   <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczbyTel} />
-    <div class="tags tylko-komputer">
+    <div class="tags">
       {d.skrot && <span class="badge">{d.skrot}</span>}
       {d.poziom && <span class="badge">{w(d, 'poziom')}</span>}
       {d.wygaszana && <span class="badge">{T('wygaszana', 'phased out')}</span>}

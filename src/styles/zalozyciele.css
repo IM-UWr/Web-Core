@@ -100,7 +100,6 @@
   .z-haslo { margin: 10px 0 0; font-size: 19px; font-weight: 500; color: var(--d-j); }
   /* liczby pod hasłem: lista przekazana przez widok (.pt-liczby) */
   .z-slot .pt-liczby { display: flex !important; flex-wrap: wrap; gap: 8px 34px; width: fit-content; max-width: 100%; margin: 20px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid rgb(255 255 255 / .2); }
-  .z-slot:has(.pt-liczby:not(.tylko-telefon)) .pt-liczby.tylko-telefon { display: none !important; }
   .z-slot .pt-liczby li { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: 14px; font-weight: 500; white-space: nowrap; color: var(--na-ciemnym-2); }
   .z-slot .pt-liczby .n { font-family: var(--f-display); font-size: 30px; font-weight: 500; line-height: 1.1; color: #fff; }
   .z-slot .lead { margin: 10px 0 0; max-width: 640px; font-size: 15.5px; color: var(--na-ciemnym-2); }

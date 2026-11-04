@@ -9,12 +9,11 @@
 //   roczników .tresc-taby i wybór roku rozpoczęcia, pliki ul.pliki) → Praktyki → Po studiach → Pytania (.faq) → Kontakt
 //   (.kontakty) → Akty prawne (ul.pliki).
 // Nagłówki sekcji szkoły doktorskiej jak we wzorze („O Kolegium Doktorskim”, „Od rekrutacji do obrony” …).
-// Liczby w banerze bez zmian (telefon: LiczbyBanera, komputer: fakty w wierszu). Jedna wersja HTML: komputer (≥ 761 px)
+// Liczby w banerze: fakty kierunku w jednym wierszu (na telefonie schowane). Jedna wersja HTML: komputer (≥ 761 px)
 // i telefon (≤ 760 px, jedna kolumna, tabela w bloki — zal-tresc.css).
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
-import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -85,11 +84,10 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
 <Podstrona lang={lang} tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
   lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}
   dzial="studia" spis={spis} klasa="tresc" atrybuty={{ 'data-kierunek': '' }}>
-  {/* Baner bez zmian: na telefonie hasło i trzy liczby z faktów (LiczbyBanera), na komputerze fakty w jednym wierszu. */}
+  {/* Baner: fakty kierunku w jednym wierszu (na telefonie bez liczb, jak dotąd — reguła .kh-liczby niżej). */}
   <Fragment slot="baner">
-    <LiczbyBanera lang={lang} pozycje={liczbyTel} />
     {d.fakty.length > 0 && (
-      <ul class="pt-liczby kh-liczby tylko-komputer">
+      <ul class="pt-liczby kh-liczby">
         {d.fakty.map((f) => <li><span class="n">{w(f, 'wartosc')}</span>{w(f, 'etykieta')}</li>)}
       </ul>
     )}
@@ -320,6 +318,8 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
 </script>
 
 <style>
+  /* baner: fakty kierunku tylko na komputerze (na telefonie baner bez liczb — jak dotąd; cztery fakty nie mieszczą się w trzech kolumnach) */
+  @media (max-width: 760px) { :global(.z-nagl .z-slot .pt-liczby.kh-liczby) { display: none !important; } }
   [hidden] { display: none !important; }
   /* bez JS: bez przełącznika i wyboru roku, wszystkie programy z podpisami; z JS podpis tylko dla czytników ekranu */
   :global(html:not(.js)) :is(.tresc-taby, .kier-rok) { display: none; }

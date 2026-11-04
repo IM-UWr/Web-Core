@@ -31,11 +31,9 @@ interface Props {
 }
 const { rodzaj, dzial, tytul, lang, slot = '', wstecz, znak = false } = Astro.props;
 const P = dzial ? PATRONI[dzial] : undefined;
-// liczby w banerze: lista .pt-liczby przeznaczona na komputer (bez .tylko-telefon) albo — gdy takiej nie ma — telefoniczna
-const maLiczbyKomputer = /<ul class="pt-liczby(?![^"]*tylko-telefon)/.test(slot);
-const maLiczbyTelefon = /<ul class="pt-liczby[^"]*tylko-telefon/.test(slot);
-// Popularyzacja: liczby „TBA” na komputerze ukryte (decyzja 22:46); strona działu pokazuje liczby tylko z listy na komputer
-const zLiczbami = rodzaj === 'dzial' ? maLiczbyKomputer : (maLiczbyKomputer || maLiczbyTelefon);
+// liczby w banerze: lista .pt-liczby przekazana przez widok (LiczbyBanera.astro albo własna lista widoku)
+const maLiczby = /<ul class="pt-liczby/.test(slot);
+const zLiczbami = maLiczby;
 // hasło działu z danych (to samo co na telefonie); gdy w CMS puste — hasło z prototypu (jak na okładce strony głównej)
 const haslo = zLiczbami ? Astro.props.haslo?.trim() || (rodzaj === 'dzial' && P ? pole(P, 'haslo', lang) : undefined) : undefined;
 
