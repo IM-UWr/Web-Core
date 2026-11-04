@@ -1006,7 +1006,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 .ck-gora p { margin: 0 0 18px; max-width: 900px; font-size: 16px; line-height: 1.6; color: var(--m-muted); }
 .ck-gora .pk-seg button small { margin-left: 6px; font-weight: 500; opacity: .75; }
 .ck-baner-op { padding: 14px var(--marg) 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--d-a); }
-.ck-siatka { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; padding: 30px var(--marg) 90px; }
+.ck-siatka { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; padding: 30px var(--marg) 90px; }
 .ck-k { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 16px; padding: 16px; border: 1px solid var(--m-line); background: var(--m-bg); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
 .ck-k:hover { border-color: var(--d-a); }
 .ck-k.wybrana { border-color: var(--d-a); box-shadow: inset 0 0 0 1px var(--d-a); }
@@ -1016,7 +1016,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 .ck-k .ck-m { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--m-muted); }
 .ck-k .ck-m .nr { display: inline-block; min-width: 20px; margin-right: 6px; padding: 0 5px; background: var(--d-a); color: #fff; text-align: center; }
 .ck-k .ck-m .spr { color: #b06a00; }
-.ck-k h3 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.25; color: var(--m-ink); }
+.ck-k h3 { white-space: nowrap; margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.25; color: var(--m-ink); }
 .ck-k h3 small { font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--m-muted); }
 .ck-k .ck-zd { margin: 0 0 8px; font-size: 15px; line-height: 1.5; color: var(--m-ink); }
 .ck-k .ck-pod { margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: var(--m-muted); }
@@ -1026,6 +1026,8 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 .ck-k details ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.5; }
 .ck-k details a { color: var(--d-a); word-break: break-all; }
 .ck-brak { padding: 30px var(--marg); font-size: 17px; color: var(--m-muted); }
+/* tytuł ciekawostki (znaku) w nagłówku podstrony zawsze w jednej linii; wychodzi w lewo poza kolumnę opisu (5.11, 00:25) */
+.pd-b .znak-podpis b { white-space: nowrap; margin-left: -240px; }
 
 /* overflow: clip zamiast hidden na ramce podglądu, żeby przyklejone elementy (spis, boczna nawigacja) działały */
 #okno { overflow: clip; }
@@ -2794,8 +2796,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <div id="ck-gora-baner">${ckBaner()}</div>
       <div class="ck-siatka">${L.map((c, i) => `<article class="ck-k${i === ckNr ? ' wybrana' : ''}" data-ck="${i}">
         <svg viewBox="0 0 200 240" aria-hidden="true">${ckSvg(c)}</svg>
-        <div><p class="ck-m"><span class="nr">${i + 1}</span>${ckEsc(c.rodzaj)}${c.pewnosc && c.pewnosc !== 'pewne' ? ` · <span class="spr">${ckEsc(c.pewnosc)}</span>` : ''}</p>
-          <h3>${ckEsc(c.nazwa)} <small>${ckEsc(c.rok)}</small></h3>
+        <div><p class="ck-m"><span class="nr">${i + 1}</span>${ckEsc(c.rok)} · ${ckEsc(c.rodzaj)}${c.pewnosc && c.pewnosc !== 'pewne' ? ` · <span class="spr">${ckEsc(c.pewnosc)}</span>` : ''}</p>
+          <h3>${ckEsc(c.nazwa)}</h3>
           <p class="ck-zd">${ckEsc(c.zdanie)}</p>
           <p class="ck-pod">Podstrona: <b>${ckEsc(c.podstrona)}</b>${c.dlaczego_tu ? ` — ${ckEsc(c.dlaczego_tu)}` : ''}</p>
           <details><summary>Więcej i źródła</summary><p>${ckEsc(c.notka)}</p><ul>${(c.zrodla || []).map((u) => `<li><a href="${ckEsc(u)}" target="_blank" rel="noopener">${ckEsc(u)}</a></li>`).join('')}</ul></details></div></article>`).join('')}</div></div>`;
