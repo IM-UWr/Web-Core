@@ -1566,7 +1566,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
     const nav = document.querySelector('#in-reszta .spis-p'); if (!nav) return;
     const sekcje = [...document.querySelectorAll('#in-reszta .pd-tresc > section, #in-reszta .pd-tresc .pl-kat')].filter((x) => x.querySelector('h3'));
     const ul = nav.querySelector('ul');
-    ul.innerHTML = sekcje.map((x, i) => { x.id = 'sek-' + i; const t = x.querySelector('h3').textContent.replace(/\s*\((\d+)\)$/, ' ($1)'); return `<li><a href="#sek-${i}" data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b><span>${t}</span></a></li>`; }).join('');
+    ul.innerHTML = sekcje.map((x, i) => { x.id = 'sek-' + i; const t = x.dataset.krotko || x.querySelector('h3').textContent.replace(/\s*\((\d+)\)$/, ' ($1)'); return `<li><a href="#sek-${i}" data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b><span>${t}</span></a></li>`; }).join('');
     nav._sekcje = sekcje;
     ul.addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); const cel = sekcje[+a.dataset.i]; window.scrollTo({ top: window.scrollY + cel.getBoundingClientRect().top - 20, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); });
     odswiezSpis();
@@ -1585,10 +1585,12 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
       nav.style.transform = `translateY(${dy.toFixed(1)}px)`;
     }
     const progi = nav._sekcje.map((x) => x.getBoundingClientRect().top), h = window.innerHeight, prog = panel + (h - panel) * 0.3;
-    let akt = 0; progi.forEach((t, i) => { if (t < prog) akt = i; });
+    // sekcje ukryte filtrem (np. kategoria planu bez pasujących zajęć) znikają ze spisu i nie liczą się do znacznika
     const linki = [...nav.querySelectorAll('li a')];
+    nav._sekcje.forEach((x, i) => { linki[i].parentElement.hidden = x.hidden; });
+    let akt = nav._sekcje.findIndex((x) => !x.hidden); progi.forEach((t, i) => { if (!nav._sekcje[i].hidden && t < prog) akt = i; });
     linki.forEach((a, i) => { a.toggleAttribute('aria-current', i === akt); a.classList.toggle('minione', i < akt); });
-    const a = linki[akt]; if (!a) return;
+    const a = linki[akt]; if (!a) { nav.querySelector('.wskaznik').style.height = '0'; return; }
     const w = nav.querySelector('.wskaznik'), ul = nav.querySelector('ul');
     w.style.top = (a.offsetTop + ul.offsetTop) + 'px'; w.style.height = a.offsetHeight + 'px';
     nav.style.setProperty('--os', (a.offsetTop + a.offsetHeight / 2) + 'px');
@@ -1622,13 +1624,25 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
   /* Plan zajęć: wszystkie przedmioty semestru zimowego, filtr tekstowy i po dniach */
   const DNI = [['poniedziałek', 'pon.'], ['wtorek', 'wt.'], ['środa', 'śr.'], ['czwartek', 'czw.'], ['piątek', 'pt.']];
   const krotkiDzien = (d) => (DNI.find(([a]) => a === d) || [, d])[1];
+  // krótkie nazwy kategorii do spisu „Na tej stronie” (pełne zostają w nagłówkach sekcji)
+  const KROTKO_KAT = {
+    'Przedmioty obowiązkowe (O)': 'Obowiązkowe (O)',
+    'Standardowe przedmioty do wyboru (L)': 'Do wyboru (L)',
+    'Zaawansowane przedmioty do wyboru (M)': 'Zaawansowane do wyboru (M)',
+    'Zaawansowane przedmioty do wyboru (M): przedmioty niestandardowe (E)': 'Niestandardowe (E)',
+    'Zaawansowane przedmioty do wyboru (M): seminaria przeglądowe (S)': 'Seminaria przeglądowe (S)',
+    'Przedmioty z zakresu nauk humanistycznych i społecznych (H)': 'Humanistyczne i społeczne (H)',
+    'Przedmioty dla specjalności nauczycielskiej (N)': 'Specjalność nauczycielska (N)',
+    'Przedmioty z zakresu nauk przyrodniczych (NP)': 'Przyrodnicze (NP)',
+    'Pozostałe przedmioty': 'Pozostałe'
+  };
   function trescPlan() {
     return `<div class="pd-tresc pl">
       <div class="pl-narz"><div class="pl-sem" role="group" aria-label="Semestr"><button type="button" aria-pressed="true">Zimowy 2026/27</button><button type="button" aria-pressed="false" title="W prototypie tylko semestr zimowy">Letni 2026/27</button></div>
         <input type="search" id="pl-szukaj" placeholder="Szukaj przedmiotu, prowadzącego albo sali" aria-label="Szukaj w planie">
         <div class="pl-dni" role="group" aria-label="Dni">${DNI.map(([d, k]) => `<button type="button" data-dzien="${d}" aria-pressed="false">${k}</button>`).join('')}</div></div>
       <p class="pl-info">Semestr zimowy roku akademickiego 2026/2027 · dane z USOS z 28 października 2026, 08:25. Kliknij nazwę przedmiotu, by zobaczyć opis w USOSie. Grupy 99 przeznaczone są dla powtarzających przedmiot mających zaliczenia ćwiczeń.</p>
-      ${PLAN.map(([kat, przed]) => `<section class="pl-kat"><h3>${kat}</h3><div class="pl-nagl"><span></span><span>typ</span><span>gr.</span><span>prowadzący</span><span>dzień</span><span>godziny</span><span>sala</span><span>uwagi</span></div>
+      ${PLAN.map(([kat, przed]) => `<section class="pl-kat" data-krotko="${KROTKO_KAT[kat] || kat}"><h3>${kat}</h3><div class="pl-nagl"><span></span><span>typ</span><span>gr.</span><span>prowadzący</span><span>dzień</span><span>godziny</span><span>sala</span><span>uwagi</span></div>
         ${przed.map(([n, rows]) => `<div class="pl-p" data-n="${n.toLowerCase()}"><h4><a href="#">${n}</a></h4><div>${rows.map(([gr, typ, pr, dz, g, sala, uw]) => `<div class="pl-w" data-d="${dz}" data-t="${[n, pr, sala, uw].join(' ').toLowerCase()}"><span class="typ">${typ}</span><span>${gr.replace('gr. ', '')}</span><span>${pr}</span><span class="dz">${krotkiDzien(dz)}</span><span class="godz">${g}</span><span>${sala.replace('sala ', '')}</span><span class="uw">${uw}</span></div>`).join('')}</div></div>`).join('')}</section>`).join('')}
       <p class="pl-pusto" hidden>Nic nie pasuje do wyszukiwania.</p>
     </div>`;
@@ -1647,6 +1661,7 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
       kat.hidden = !wk; wid += wk;
     });
     const pu = $('.pl-pusto'); if (pu) pu.hidden = !!wid;
+    odswiezSpis();
   }
   document.addEventListener('input', (e) => { if (e.target.id === 'pl-szukaj') filtrujPlan(); });
   document.getElementById('anim-powtorz').addEventListener('click', (e) => { e.stopPropagation(); zapomnijWejscie(dzial); if (strona === 'pod') document.querySelector('#wybor-strony [data-v="dzial"]').click(); else rysujInstytut(); window.scrollTo(0, 0); });
