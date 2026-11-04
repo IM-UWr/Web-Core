@@ -1,0 +1,503 @@
+diff --git a/TEST-TELEFON.md b/TEST-TELEFON.md
+new file mode 100644
+index 00000000..cb1b73f7
+--- /dev/null
++++ b/TEST-TELEFON.md
+@@ -0,0 +1,21 @@
++# ⚠️ TEST — wersja „Założycieli” na telefon. NIE WZOROWAĆ SIĘ.
++
++Ten plik jest częścią **łatki testowej** (`testy/telefon-TEST.patch` w repozytorium `IM-UWr/Web-Podglad`), nakładanej na
++`wyglad/zalozyciele` tylko przy budowaniu podglądu https://im-uwr.github.io/Web-Podglad/test-telefon/ (na stronach widoczna
++plakietka „TEST · wersja na telefon”). Jeśli widzisz ten plik w repozytorium `Web-Core` — łatka trafiła tam przez pomyłkę.
++
++To **próba** przeniesienia kierunku „Założyciele” na telefon (≤ 760 px), zrobiona na prośbę właściciela 2.11.2026 do
++obejrzenia i dyskusji. **Projekt telefonu nie jest ustalony** (w `dok/estetyka.md` sprawy telefonu są „otwarte”). Agenci
++i zlecenia: **nie bierzcie stąd wzorców, nie nakładajcie tej łatki** na `wyglad/zalozyciele` ani na `main`. Obowiązujący
++telefon to dotychczasowy wygląd na `wyglad/zalozyciele`.
++
++Zmiany względem `wyglad/zalozyciele` (oznaczone komentarzem „TEST telefonu” albo nazwą pliku z „TEST”):
++- `src/styles/zal-telefon-TEST.css` — cały wygląd telefonu w teście (`@media (max-width: 760px)`);
++- klasa `z-tel` na blokach nowego wyglądu (okładka, drugi ekran, nagłówki, treść działu, Władze, stopka), żeby były widoczne
++  także na telefonie;
++- `zal-dzialy.css` i `zalozyciele-strony.css` działają na każdej szerokości (telefon je nadpisuje);
++- sygnet patrona przy działach w menu na telefonie (`Naglowek.astro`) i na okładce (`Okladka.astro`), „Zobacz więcej”
++  rozwija listę w miejscu (`drugi-ekran.ts`), szkic na banerze działu rysuje się także na telefonie (`NaglowekZ.astro`),
++  plakietka TEST (`Baza.astro`).
++
++Komputer po nałożeniu łatki wygląda tak samo jak na `wyglad/zalozyciele` (zrzuty 1440 px identyczne co do piksela).
+diff --git a/src/components/Naglowek.astro b/src/components/Naglowek.astro
+index 28d81a3c..88a5080b 100644
+--- a/src/components/Naglowek.astro
++++ b/src/components/Naglowek.astro
+@@ -2,6 +2,8 @@
+ // Nagłówek: logo, menu z rozwijanymi grupami (dane w src/data/nawigacja.json),
+ // wyszukiwarka, przełącznik języka i trybu ciemnego, menu na telefon.
+ import Ikona from './Ikona.astro';
++import Szkic from './zal/Szkic.astro';
++import { dzialZeSciezki, PATRONI } from '../lib/patroni';
+ import { menuGlowne, type Pozycja } from '../lib/menu';
+ import ustawienia from '../data/ustawienia.json';
+ import { u, isExternal } from '../lib/url';
+@@ -113,8 +115,10 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
+   {bezJezyka !== '/' && <a href={u(wJezyku('/', lang))}>{t(lang, 'stronaGlowna')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
+   {menu.map((p, i) =>
+     p.grupy ? (
+-      <div class="mitem">
++      <div class="mitem" data-dzial={p.adres && dzialZeSciezki(p.adres) && PATRONI[dzialZeSciezki(p.adres)!].adres === p.adres ? dzialZeSciezki(p.adres) : undefined}>
+         <div class="mrow">
++          {/* TEST telefonu: sygnet patrona przy dziale (łatka testowa z Web-Podglad) */}
++          {p.adres && dzialZeSciezki(p.adres) && PATRONI[dzialZeSciezki(p.adres)!].adres === p.adres && <Szkic dzial={dzialZeSciezki(p.adres)!} rodzaj="sygnet" class="z-mnav-sygnet" />}
+           {p.adres ? (
+             <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
+           ) : (
+diff --git a/src/components/zal/DrugiEkran.astro b/src/components/zal/DrugiEkran.astro
+index d5132c5d..7de7ed36 100644
+--- a/src/components/zal/DrugiEkran.astro
++++ b/src/components/zal/DrugiEkran.astro
+@@ -130,7 +130,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
+   `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
+   `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
+ ---
+-<section class="z-druga tylko-komputer" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
++<section class="z-druga tylko-komputer z-tel" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
+   <nav class="z-skr" aria-label={T('Szybki dostęp', 'Quick access')}>
+     <h2>{T('Szybki dostęp', 'Quick access')}</h2>
+     {skr.map((k) => k.kd ? (
+diff --git a/src/components/zal/NaglowekZ.astro b/src/components/zal/NaglowekZ.astro
+index 5cab0e28..84704d19 100644
+--- a/src/components/zal/NaglowekZ.astro
++++ b/src/components/zal/NaglowekZ.astro
+@@ -59,14 +59,14 @@ const zMenu = rodzaj === 'dzial' && P ? (await menuGlowne()).find((m) => m.adres
+ const tytulBanera = rodzaj === 'dzial' && P ? ((zMenu && (wybierz(zMenu, 'etykieta', lang) as string)) || pole(P, 'nazwa', lang)) : tytul;
+ // Stan szkicu ustawiany od razu, zanim strona się narysuje (opis w zalozyciele.css i src/scripts/zal/szkice.ts).
+ const STAN = `(function(b){var s='z-gotowe',k='im-wizyta-dzialy',dz=b.getAttribute('data-z-baner-dzialu');try{` +
+-  `if(matchMedia('(min-width: 761px)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches){` +
++  `if(!matchMedia('(prefers-reduced-motion: reduce)').matches){` +
+   `var z=JSON.parse(sessionStorage.getItem(k)||'[]');if(z.indexOf(dz)<0){z.push(dz);sessionStorage.setItem(k,JSON.stringify(z));` +
+   `if(JSON.parse(sessionStorage.getItem(k)||'[]').indexOf(dz)>=0)s='z-czeka';}}}catch(e){}` +
+   `b.classList.add(s);})(document.currentScript.parentElement);`;
+ const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
+ ---
+ {rodzaj === 'dzial' && P && (
+-  <div class="z-nagl z-baner-dzialu tylko-komputer" data-dzial={P.dzial} data-z-baner-dzialu={P.dzial} data-pagefind-ignore>
++  <div class="z-nagl z-baner-dzialu tylko-komputer z-tel" data-dzial={P.dzial} data-z-baner-dzialu={P.dzial} data-pagefind-ignore>
+     <div class="z-foto"><img src={u(f.zdjecie)} alt="" fetchpriority="high" style={styl} /></div>
+     <div class="z-szkic-ramka"><Szkic dzial={P.dzial} rodzaj="pelny" /></div>
+     <div class="z-tytul">
+@@ -85,7 +85,7 @@ const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
+   </div>
+ )}
+ {rodzaj === 'podstrona' && (
+-  <div class:list={['z-nagl', 'z-nagl-pod', 'tylko-komputer', zLiczbami && 'z-liczbami', !P && 'z-granat']} data-dzial={P?.dzial} data-pagefind-ignore>
++  <div class:list={['z-nagl', 'z-nagl-pod', 'tylko-komputer', 'z-tel', zLiczbami && 'z-liczbami', !P && 'z-granat']} data-dzial={P?.dzial} data-pagefind-ignore>
+     <div class="z-foto"><img src={u(f.zdjecie)} alt="" fetchpriority="high" style={styl} /></div>
+     <div class="z-tyt">
+       <div class="z-tyt-g">
+diff --git a/src/components/zal/Okladka.astro b/src/components/zal/Okladka.astro
+index 0f626395..72c67086 100644
+--- a/src/components/zal/Okladka.astro
++++ b/src/components/zal/Okladka.astro
+@@ -42,7 +42,7 @@ const baner = ustawienia.baner;
+ const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');
+ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
+ ---
+-<section class="z-okladka tylko-komputer" id="okladka" data-pagefind-ignore>
++<section class="z-okladka tylko-komputer z-tel" id="okladka" data-pagefind-ignore>
+   {baner.zdjecie && <img class="z-okl-foto" src={u(baner.zdjecie)} alt={wybierz(baner, 'opis', lang) || ''} decoding="async" fetchpriority="high" />}
+   <div class="z-skos" aria-hidden="true"></div>
+   <nav class="z-narz" aria-label={lang === 'en' ? 'Tools' : 'Narzędzia'}>
+@@ -70,6 +70,8 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
+     {dzialy.map((d) => (
+       <a class="z-okl-dz" href={href(d.P.adres)} data-dzial={d.dz}>
+         <span class="z-okl-szkic"><Szkic dzial={d.dz} rodzaj="pelny" duch /></span>
++        {/* TEST telefonu: uproszczony sygnet na wąski ekran (łatka testowa z Web-Podglad) */}
++        <Szkic dzial={d.dz} rodzaj="sygnet" class="z-okl-sygnet" />
+         <span class="z-okl-nazwa"><span>{d.nazwa}</span></span>
+         <span class="slot">
+           <span class="haslo-dz">{d.haslo}</span>
+diff --git a/src/components/zal/StopkaZ.astro b/src/components/zal/StopkaZ.astro
+index fae66a39..c38d1a62 100644
+--- a/src/components/zal/StopkaZ.astro
++++ b/src/components/zal/StopkaZ.astro
+@@ -12,7 +12,7 @@ const { lang } = Astro.props;
+ const k = ustawienia.kontakt;
+ const rok = new Date().getFullYear();
+ ---
+-<footer class="z-stopka tylko-komputer">
++<footer class="z-stopka tylko-komputer z-tel">
+   <div class="z-stopka-in">
+     <div><b>{t(lang, 'instytut')} UWr</b> · {k.adres} · <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a> · <a href={`mailto:${k.email}`}>{k.email}</a></div>
+     <nav aria-label={lang === 'en' ? 'Legal' : 'Informacje prawne'}>
+diff --git a/src/components/zal/TrescDzialu.astro b/src/components/zal/TrescDzialu.astro
+index 5fc34bbc..8ba0fd93 100644
+--- a/src/components/zal/TrescDzialu.astro
++++ b/src/components/zal/TrescDzialu.astro
+@@ -30,7 +30,7 @@ const href = (a: string) => (isExternal(a) || a.startsWith('#') ? a : u(wJezyku(
+ const zGrupami = grupy.filter((g) => g.linki.length > 0);
+ const fakty = tekst?.fakty ?? [];
+ ---
+-<div class="z-dz tylko-komputer" data-dzial={dzial} data-pagefind-ignore>
++<div class="z-dz tylko-komputer z-tel" data-dzial={dzial} data-pagefind-ignore>
+   {zGrupami.length > 0 && (
+     <nav class="z-dz-pod" aria-labelledby="z-dz-pod-h">
+       <h2 class="sr-only" id="z-dz-pod-h">{en ? 'In this section' : 'W tym dziale'}</h2>
+diff --git a/src/layouts/Baza.astro b/src/layouts/Baza.astro
+index acafbf66..ed7a8e35 100644
+--- a/src/layouts/Baza.astro
++++ b/src/layouts/Baza.astro
+@@ -18,6 +18,8 @@ import '@fontsource-variable/brygada-1918/wght.css';
+ import '@fontsource-variable/brygada-1918/wght-italic.css';
+ import '../styles/zalozyciele.css';
+ import '../styles/zal-przejscia.css';
++// TEST telefonu — łatka testowa z Web-Podglad, NIE WZOROWAĆ SIĘ (patrz TEST-TELEFON.md)
++import '../styles/zal-telefon-TEST.css';
+ import PasekMenu from '../components/zal/PasekMenu.astro';
+ import StopkaZ from '../components/zal/StopkaZ.astro';
+ import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
+@@ -133,5 +135,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
+     {dzialStrony && <NastepnaStrona dzial={dzialStrony} lang={lang} tytul={tytul} />}
+     <Stopka lang={lang} />
+     <StopkaZ lang={lang} />
++    {/* TEST telefonu: widoczna plakietka, że to wersja próbna (łatka testowa z Web-Podglad, TEST-TELEFON.md) */}
++    <div class="z-test-plakietka" aria-hidden="true">TEST · wersja na telefon</div>
+   </body>
+ </html>
+diff --git a/src/scripts/zal/drugi-ekran.ts b/src/scripts/zal/drugi-ekran.ts
+index 90d8f932..a204cc79 100644
+--- a/src/scripts/zal/drugi-ekran.ts
++++ b/src/scripts/zal/drugi-ekran.ts
+@@ -4,9 +4,11 @@
+ //   listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
+ //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
+ const siatka = document.querySelector<HTMLElement>('[data-z-siatka]');
++// TEST telefonu (łatka testowa z Web-Podglad): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
++const TELEFON = matchMedia('(max-width: 760px)');
+ 
+ function dopasujDluga() {
+-  if (!siatka || !siatka.offsetHeight) return; // telefon: blok schowany
++  if (!siatka || !siatka.offsetHeight || TELEFON.matches) return;
+   const kol = siatka.querySelector<HTMLElement>('.z-kolumna[data-slot="2"]');
+   if (!kol) return;
+   const box = kol.querySelector<HTMLElement>('.pozycje');
+@@ -24,6 +26,12 @@ function dopasujDluga() {
+ 
+ function zamien(key: string) {
+   if (!siatka) return;
++  if (TELEFON.matches) {
++    const kol = siatka.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`);
++    kol?.classList.add('z-rozwin');
++    kol?.querySelector<HTMLElement>('.z-h h2')?.focus({ preventScroll: true });
++    return;
++  }
+   const kliknieta = siatka.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`);
+   const dluga = siatka.querySelector<HTMLElement>('.z-kolumna[data-slot="2"]');
+   if (!kliknieta || !dluga || kliknieta === dluga) return;
+diff --git a/src/scripts/zal/okladka.ts b/src/scripts/zal/okladka.ts
+index 9f55e637..f514586e 100644
+--- a/src/scripts/zal/okladka.ts
++++ b/src/scripts/zal/okladka.ts
+@@ -8,7 +8,7 @@ const ok = document.querySelector<HTMLElement>('.z-okladka');
+ const S = 0.32;
+ 
+ function uloz() {
+-  if (!ok || !ok.offsetHeight) return; // telefon: okładka schowana
++  if (!ok || !ok.offsetHeight || matchMedia('(max-width: 760px)').matches) return; // telefon (TEST): bez skosu
+   const tyt = ok.querySelector<HTMLElement>('.z-okl-tytul');
+   const w1 = ok.querySelector<HTMLElement>('.w1');
+   const w2 = ok.querySelector<HTMLElement>('.w2');
+diff --git a/src/styles/zal-dzialy.css b/src/styles/zal-dzialy.css
+index b1f5f2ef..1968a72a 100644
+--- a/src/styles/zal-dzialy.css
++++ b/src/styles/zal-dzialy.css
+@@ -5,7 +5,8 @@
+    (proto/zalozyciele.src.html: .in-pod, .in-tresc, .in-sek, .in-suk, .in-kont, .in-mapa, .in-kart, .in-wiersz, .in-tba).
+    Telefon (≤ 760 px) bez zmian: blok ma klasę .tylko-komputer, a wszystkie reguły siedzą w @media (min-width: 761px).
+    ========================================================================== */
+-@media (min-width: 761px) {
++/* TEST telefonu (łatka testowa z Web-Podglad): reguły na każdej szerokości; telefon nadpisuje src/styles/zal-telefon-TEST.css */
++@media all {
+   /* dotychczasowa treść pod banerem znika — zostaje baner (.ph-z → nowy nagłówek) i nowy blok */
+   body:has(.z-dz) main > :not(.ph-z, .z-dz) { display: none !important; }
+ 
+diff --git a/src/styles/zal-telefon-TEST.css b/src/styles/zal-telefon-TEST.css
+new file mode 100644
+index 00000000..a1dd3860
+--- /dev/null
++++ b/src/styles/zal-telefon-TEST.css
+@@ -0,0 +1,249 @@
++/* ==========================================================================
++   ⚠️ TEST — wersja „Założycieli” na telefon (≤ 760 px). NIE WZOROWAĆ SIĘ, NIE SCALAĆ.
++   Łatka testowa z repozytorium Web-Podglad (testy/telefon-TEST.patch), próba do obejrzenia (TEST-TELEFON.md). Projekt telefonu nie jest ustalony.
++   Bloki nowego wyglądu mają klasę .z-tel (widoczne też na telefonie); tu ich układ na wąski ekran,
++   kolory i kroje jak na komputerze (paleta „Atramenty”, Brygada 1918 + Manrope, ciepłe tło).
++   ========================================================================== */
++.z-test-plakietka { display: none; }
++.z-okl-sygnet { display: none; }
++
++@media (max-width: 760px) {
++  /* ---------- plakietka TEST ---------- */
++  .z-test-plakietka { display: block; position: fixed; left: 8px; bottom: 8px; z-index: 200; padding: 3px 8px; border-radius: 4px;
++    background: #c4122f; color: #fff; font: 700 11px/1.3 var(--f-text); letter-spacing: .03em; pointer-events: none; box-shadow: 0 2px 8px rgb(0 0 0 / .25); }
++
++  /* ---------- bloki nowego wyglądu widoczne na telefonie ---------- */
++  .tylko-komputer.z-tel { display: block !important; }
++
++  /* ---------- kolory i kroje (jak na komputerze) ---------- */
++  :root {
++    --bg: #fcfaf6; --surface: #f4f1ea; --line: #e5e0d6;
++    --ink: #131c31; --text: #2b3245; --muted: #5b6375;
++    --tint: #efeae0; --tint-ink: #131c31;
++    --primary: var(--granat); --accent: var(--d-a); --accent-ink: #ffffff;
++    --znacznik: var(--granat); --znacznik-ink: #fff;
++    --font: var(--f-text);
++  }
++  :root[data-theme="dark"] {
++    --bg: #0a1020; --surface: #111a2e; --line: #243049;
++    --ink: #ecf0f7; --text: #d3d9e6; --muted: #98a3b8;
++    --tint: #16213a; --tint-ink: #ecf0f7;
++    --primary: #c9d0de; --accent: var(--d-a); --accent-ink: #0a1020;
++  }
++  [data-dzial] { --accent: var(--d-a); }
++  body { font-family: var(--f-text); }
++  main :is(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; letter-spacing: -.005em; }
++  body[data-tlo] { background: var(--bg); }
++  body[data-tlo]::before, body[data-tlo]::after { content: none !important; }
++
++  /* ---------- nagłówek strony: granat, nazwa Brygadą ---------- */
++  .hdr, .js .hdr.hdr-glowna:not(.hdr-stopka):not(.menu-otwarte), .js .hdr-foto:not(.przewiniety):not(.menu-otwarte), .hdr.menu-otwarte {
++    background: var(--granat) !important; border-bottom-color: rgb(255 255 255 / .12) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; }
++  .hdr .brand-name { font-family: var(--f-display); font-weight: 600; letter-spacing: 0; color: #fff !important; }
++  .hdr .brand-sub { color: var(--na-ciemnym-2) !important; }
++  .hdr .brand-logo { background: #fff !important; }
++  .hdr .icon-btn { color: #fff !important; background: transparent; }
++  .hdr .icon-btn.burger { background: rgb(255 255 255 / .14) !important; color: #fff !important; }
++  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 1; transform: none; visibility: visible; }
++  /* stary układ podciągał baner pod przezroczysty nagłówek (.hdr-foto) — nowy nagłówek stoi pod paskiem */
++  .js .hdr-foto { margin-bottom: 0 !important; }
++
++  /* ---------- menu na telefonie: granat, działy Brygadą z sygnetem i kreską w kolorze działu ---------- */
++  .mnav { background: var(--granat) !important; color: #fff; }
++  .mnav a, .mnav .mrow-link, .mnav .mgroup a { color: #fff !important; }
++  .mnav .mgroup a { color: var(--na-ciemnym-2) !important; font-weight: 500; }
++  .mnav .mgroup h3 { color: var(--d-j, var(--na-ciemnym-2)) !important; letter-spacing: .02em; text-transform: none; font-size: 12.5px; }
++  .mnav .mitem, .mnav > a { border-color: rgb(255 255 255 / .12) !important; }
++  .mnav .mrow-btn { color: #fff !important; }
++  .mnav .mitem[data-dzial] .mrow { align-items: center; gap: 12px; }
++  .mnav .mitem[data-dzial] .mrow-link { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; flex-direction: column; align-items: flex-start; }
++  .mnav .mitem[data-dzial] .mrow-link::after { content: ''; display: block; width: 26px; height: 2px; margin-top: 5px; background: var(--d-j); }
++  .z-mnav-sygnet { flex: none; width: 34px; height: 41px; }
++  .z-mnav-sygnet path { fill: none; stroke: color-mix(in srgb, var(--d-j) 80%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
++
++  /* ---------- stara stopka → stopka nowego wyglądu ---------- */
++  .ftr { display: none !important; }
++  .z-stopka { padding: 18px 16px 44px !important; background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.55; }
++  .z-stopka-in { display: flex; flex-direction: column; gap: 10px; }
++  .z-stopka b { color: #fff; font-family: var(--f-display); font-weight: 500; font-size: 15.5px; }
++  .z-stopka a { color: inherit; text-decoration: none; }
++  .z-stopka nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
++  .z-autor { flex-basis: 100%; color: rgb(201 208 222 / .75); }
++
++  /* ---------- dotychczasowy baner .ph: zostaje tylko nowy nagłówek ---------- */
++  .ph.ph-z:has(> .z-nagl.z-tel), .page-head.ph-z:has(> .z-nagl.z-tel) { display: contents; }
++  .ph.ph-z:has(> .z-nagl.z-tel)::before, .ph.ph-z:has(> .z-nagl.z-tel)::after { content: none !important; display: none !important; }
++  .ph.ph-z:has(> .z-nagl.z-tel) > :not(.z-nagl) { display: none !important; }
++
++  /* ---------- szkice: kontur, detale, podpis (stany jak na komputerze) ---------- */
++  .z-szkic { display: block; width: 100%; height: 100%; overflow: visible; }
++  .z-szkic path { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
++  .z-szkic .tusz path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.2; stroke-dasharray: 1 1; stroke-dashoffset: 0;
++    transition: stroke-dashoffset 1.5s cubic-bezier(.35,.6,.2,1) calc(var(--i, 0) * 45ms), opacity .35s; }
++  .z-szkic .detale path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1; }
++  .z-szkic .detale { transition: opacity .7s ease .55s; }
++  [data-z-baner-dzialu].z-czeka .z-szkic .tusz path { stroke-dashoffset: 1; opacity: 0; }
++  [data-z-baner-dzialu].z-czeka .z-szkic .detale { opacity: 0; }
++  [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
++  [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
++  @keyframes z-pisz { to { stroke-dashoffset: 0; } }
++
++  /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
++  body:has(.z-okladka.z-tel) main > :not(.z-okladka, .z-druga-start, .z-druga) { display: none !important; }
++  .z-okladka.z-tel { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h));
++    padding: 0 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
++  .z-okl-foto { position: absolute; inset: 0 0 auto 0; width: 100%; height: 52%; object-fit: cover; object-position: 62% 50%; z-index: -2; }
++  .z-okladka.z-tel::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
++    background: linear-gradient(180deg, rgb(9 16 34 / .1) 0, rgb(9 16 34 / .35) 26%, var(--granat) 50%, var(--granat) 100%); }
++  .z-skos, .z-narz, .z-menu { display: none !important; }
++  .z-okl-tytul { position: relative; margin: 0 0 14px; }
++  .z-okl-flaga { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-radius: 6px; background: rgb(9 16 34 / .6);
++    box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 12.5px; font-weight: 600; color: #fff; text-decoration: none; }
++  .z-okl-flaga::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--studia-j); }
++  .z-okl-uwr { display: block; width: fit-content; }
++  .z-okl-logo { display: block; height: 42px; aspect-ratio: 500 / 160; background: #fff; -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
++  .z-okl-tytul h1 { margin: 10px 0 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; color: #fff; }
++  .z-okl-tytul h1 > span { display: block; }
++  .z-okl-tytul .w1 { font-size: 56px; }
++  .z-okl-tytul .w2 { font-size: 34px; margin-top: .06em; }
++  .z-okl-dzialy { display: block; border-top: 1px solid rgb(255 255 255 / .14); }
++  .z-okl-dz { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 0 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgb(255 255 255 / .12);
++    color: #fff; text-decoration: none; }
++  /* na telefonie zamiast pełnego szkicu uproszczony sygnet (dok/estetyka.md: małe rozmiary — sygnet) */
++  .z-okl-szkic { display: none; }
++  .z-okl-sygnet { display: block; grid-row: 1 / span 2; width: 40px; height: 48px; }
++  .z-okl-sygnet path { fill: none; stroke: color-mix(in srgb, var(--d-j) 85%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
++  .z-okl-nazwa { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; }
++  .z-okl-nazwa span::after { content: ''; display: block; width: 24px; height: 2px; margin-top: 4px; background: var(--d-j); }
++  .z-okl-dz .slot { grid-column: 2; margin-top: 3px; font-size: 13px; line-height: 1.35; color: var(--na-ciemnym-2); }
++  .z-okl-dz .slot .patron { display: none; }
++  .z-okl-dz:focus-visible { outline: 2px solid var(--d-j); outline-offset: 2px; }
++  .z-strzalka { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;
++    color: rgb(255 255 255 / .78); text-decoration: none; white-space: nowrap; }
++  .z-strzalka svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
++
++  /* ---------- drugi ekran: kolumny jedna pod drugą, po 3 pozycje i „Zobacz więcej” ---------- */
++  .z-druga.z-tel { display: block !important; min-height: 0; padding: 18px 16px 26px !important; font-size: 14.5px; line-height: 1.4; }
++  body:has(.z-druga) .z-stopka { padding-inline: 16px !important; }
++  .z-druga.z-tel h2 { font-size: 22px; }
++  .z-druga.z-tel .z-skr { grid-template-columns: 1fr 1fr; }
++  .z-druga.z-tel .z-skr h2 { grid-column: 1 / -1; padding: 10px 0 6px; }
++  .z-druga.z-tel .z-skr a { border-left: 0; border-top: 1px solid var(--line); padding: 9px 2px; }
++  .z-druga.z-tel .z-skr a:nth-of-type(even) { border-left: 1px solid var(--line); padding-left: 12px; }
++  .z-druga.z-tel .z-siatka { display: block; margin-top: 20px; }
++  .z-druga.z-tel .z-kolumna { display: block !important; margin-bottom: 24px; }
++  .z-druga.z-tel .z-kolumna :is(.lista, .lista-in, .pozycje) { position: static; display: block; min-height: 0; overflow: visible; }
++  .z-druga.z-tel .z-kolumna .z-w:nth-child(n+4) { display: none; }
++  .z-druga.z-tel .z-kolumna.z-rozwin .z-w { display: grid; }
++  .z-druga.z-tel .z-kolumna .z-w[hidden] { display: none !important; }
++  .z-druga.z-tel .z-kolumna .reszta { display: none; }
++  .z-druga.z-tel .z-kolumna .z-wiecej { display: flex; }
++  .z-druga.z-tel .z-kolumna.z-rozwin .z-wiecej { display: none; }
++  .z-druga.z-tel .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 0 10px; }
++  .z-druga.z-tel .z-w .min { width: 64px; height: 48px; }
++  .z-druga.z-tel .z-studia { display: block; padding-top: 10px; margin-bottom: 24px; }
++  .z-druga.z-tel .z-kier { grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 12px; }
++  .z-druga.z-tel .z-warto .rzad { grid-template-columns: 1fr; }
++
++  /* ---------- baner strony działu ---------- */
++  .z-baner-dzialu.z-tel { position: relative; overflow: hidden; isolation: isolate; height: auto; padding: 18px 16px 16px; color: #fff; background: var(--granat); }
++  .z-nagl.z-tel .z-foto { position: absolute; inset: 0; z-index: -2; background: var(--d-j); }
++  .z-nagl.z-tel .z-foto img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.2) brightness(1.04); mix-blend-mode: multiply; }
++  .z-nagl.z-tel .z-foto::after { content: ''; position: absolute; inset: 0; background: var(--granat); mix-blend-mode: lighten; }
++  .z-baner-dzialu.z-tel::before { content: ''; position: absolute; inset: 0; z-index: -1;
++    background: linear-gradient(165deg, var(--granat) 0, rgb(13 24 48 / .9) 34%, rgb(13 24 48 / .55) 68%, rgb(13 24 48 / .35) 100%); }
++  .z-baner-dzialu.z-tel .z-szkic-ramka { position: absolute; right: 2px; top: 12px; width: 138px; height: 166px; z-index: 0;
++    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--d-j) 55%, transparent)); }
++  .z-baner-dzialu.z-tel .z-tytul { position: relative; z-index: 1; }
++  .z-nagl.z-tel :is(.z-wstecz, .z-sciezka a) { font-size: 13px; font-weight: 600; color: var(--na-ciemnym-2); text-decoration: none; }
++  .z-baner-dzialu.z-tel h1 { max-width: 64%; margin: 26px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 44px; line-height: 1; letter-spacing: -.01em; color: #fff; }
++  /* długa nazwa działu (Popularyzacja) nie łamie się — mniejszy stopień, żeby nie wchodziła na szkic */
++  .z-baner-dzialu.z-tel[data-dzial="popularyzacja"] h1 { font-size: 35px; max-width: none; padding-right: 96px; }
++  .z-nagl.z-tel .z-haslo { max-width: 64%; margin: 8px 0 0; font-size: 15px; font-weight: 500; color: var(--d-j); }
++  .z-nagl.z-tel .z-slot .pt-liczby { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 10px; margin: 18px 0 0; padding: 10px 0 0;
++    list-style: none; border-top: 1px solid rgb(255 255 255 / .22); }
++  .z-nagl.z-tel .z-slot:has(.pt-liczby:not(.tylko-telefon)) .pt-liczby.tylko-telefon { display: none !important; }
++  /* gdy widok podał osobną listę na komputer (np. Nauka: „w ostatnim roku”) — tylko pierwsza lista */
++  .z-nagl.z-tel .z-slot .pt-liczby ~ .pt-liczby { display: none !important; }
++  .z-nagl.z-tel .z-slot .pt-liczby li { margin: 0; font-size: 12px; line-height: 1.3; color: var(--na-ciemnym-2); }
++  .z-nagl.z-tel .z-slot .pt-liczby .n { display: block; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.1; color: #fff; }
++  .z-baner-dzialu.z-tel .z-podpis-ramka { position: absolute; z-index: 1; right: 14px; top: 156px; height: 28px; line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
++    transform: rotate(-4deg); filter: drop-shadow(0 1px 4px rgb(13 24 48 / .8)); }
++  .z-baner-dzialu.z-tel .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
++  .z-baner-dzialu.z-tel .z-patron { position: relative; z-index: 1; margin-top: 14px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 40%, transparent); }
++  .z-baner-dzialu.z-tel .z-patron b { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 17px; color: #fff; }
++  .z-baner-dzialu.z-tel .z-patron span { display: block; font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
++  .z-baner-dzialu.z-tel .z-patron p { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: rgb(255 255 255 / .82); }
++
++  /* ---------- nagłówek podstrony: głęboki kolor działu na zdjęciu, sygnet przy tytule, znak w tle ---------- */
++  .z-nagl-pod.z-tel { position: relative; overflow: hidden; isolation: isolate; min-height: 0; padding: 16px 16px 18px; color: #fff; background: var(--d-g); }
++  .z-nagl-pod.z-tel.z-granat { --d-g: var(--granat); --d-j: #c9d0de; }
++  .z-nagl-pod.z-tel .z-foto::after { background: color-mix(in srgb, var(--d-g) 70%, var(--granat)); }
++  .z-nagl-pod.z-tel::before { content: ''; position: absolute; inset: 0; z-index: -1;
++    background: linear-gradient(90deg, color-mix(in srgb, var(--d-g) 92%, transparent) 0, color-mix(in srgb, var(--d-g) 70%, transparent) 60%, color-mix(in srgb, var(--d-g) 55%, transparent) 100%); }
++  .z-nagl-pod.z-tel .z-tyt { position: relative; z-index: 1; margin: 0; max-width: none; padding: 0; }
++  .z-nagl-pod.z-tel .z-tyt-g { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: end; max-width: none; }
++  .z-nagl-pod.z-tel:not(:has(.z-sygnet-nagl)) .z-tyt-g { display: block; }
++  .z-nagl-pod.z-tel .z-sygnet-nagl { grid-row: 1 / span 2; width: 40px; height: 48px; padding-right: 10px; border-right: 1px solid rgb(255 255 255 / .28); box-sizing: content-box; }
++  .z-nagl-pod.z-tel .z-sygnet-nagl path { fill: none; stroke: color-mix(in srgb, var(--d-j) 75%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
++  .z-nagl-pod.z-tel .z-sciezka { margin: 0; }
++  .z-nagl-pod.z-tel h1 { margin: 4px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.08; letter-spacing: -.005em; color: #fff; text-wrap: balance; }
++  .z-nagl-pod.z-tel .z-podpis-maly, .z-nagl-pod.z-tel .z-znak-opis { display: none; }
++  .z-nagl-pod.z-tel .z-znak { position: absolute; right: -14px; top: 4px; width: 112px; height: 130px; z-index: 0; opacity: .4; pointer-events: none; }
++  .z-nagl-pod.z-tel .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.3; stroke-linecap: round; }
++  .z-nagl-pod.z-tel .z-haslo { max-width: none; }
++  .z-nagl.z-tel .z-slot .lead { margin: 8px 0 0; font-size: 14px; color: var(--na-ciemnym-2); }
++  .z-nagl.z-tel .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }
++  .z-nagl.z-tel .z-slot a { color: #fff; }
++
++  /* ---------- treść strony działu ---------- */
++  .z-dz.z-tel { --marg: 16px; font-size: 15.5px; }
++  .z-dz.z-tel .z-dz-pod { grid-template-columns: 1fr; gap: 16px; padding: 18px 16px 6px; }
++  .z-dz.z-tel .z-dz-pod a { font-size: 19px; padding: 9px 0; }
++  .z-dz.z-tel .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
++  .z-dz.z-tel .z-dz-tresc h2 { font-size: 28px; }
++  .z-dz.z-tel .z-dz-tresc p { font-size: 15.5px; line-height: 1.62; }
++  .z-dz.z-tel .z-dz-tresc p.wst { font-size: 17px; }
++  .z-dz.z-tel .z-dz-skrot dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
++  .z-dz.z-tel .z-dz-skrot dt { font-size: 26px; }
++  .z-dz.z-tel .z-dz-skrot dd { font-size: 13px; }
++  .z-dz.z-tel .z-dz-sek { padding: 22px 16px 24px; }
++  .z-dz.z-tel .z-dz-glowa { flex-direction: column; align-items: flex-start; gap: 6px; }
++  .z-dz.z-tel .z-dz-sek h2 { font-size: 26px; }
++  .z-dz.z-tel .z-dz-linki { justify-content: flex-start; gap: 2px 18px; }
++  .z-dz.z-tel .z-dz-linki a { font-size: 14px; }
++  .z-dz.z-tel .z-dz-suk, .z-dz.z-tel .z-dz-kart, .z-dz.z-tel .z-dz-wiersze, .z-dz.z-tel .z-dz-tba, .z-dz.z-tel .z-dz-kont { grid-template-columns: 1fr; gap: 20px; }
++  .z-dz.z-tel .z-dz-suk h3 { font-size: 20px; }
++  .z-dz.z-tel .z-dz-kont dl > div { grid-template-columns: 76px 1fr; }
++  .z-dz.z-tel .z-dz-kont dd { font-size: 15.5px; }
++  .z-dz.z-tel .z-dz-mapa { min-height: 200px; }
++  .z-dz.z-tel .z-dz-wiersze { gap: 0; }
++  .z-dz.z-tel .z-dz-wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
++  .z-dz.z-tel .z-dz-wiersz .dz { font-size: 28px; }
++  .z-dz.z-tel :is(.z-dz-wiersz, .z-dz-kart, .z-dz-inic) h3 { font-size: 18.5px; }
++  .z-dz.z-tel .z-dz-tba h2 { font-size: 22px; }
++
++  /* ---------- podstrona z nowym układem (Władze): bez bocznej nawigacji, schemat dyrekcji w dwóch kolumnach ---------- */
++  .z-pd.z-tel { padding: 18px 16px 24px; }
++  .z-pd.z-tel .z-bok { display: none; }
++  .z-pd.z-tel .z-pd-tresc > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
++  .z-pd.z-tel .z-pd-tresc > section:last-of-type { border-bottom: 0; }
++  .z-pd.z-tel .z-pd-tresc h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
++  .z-pd.z-tel .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
++  .z-pd.z-tel .z-pd-tresc :is(p, li) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
++  .z-pd.z-tel .z-pd-tresc a { color: var(--d-a); }
++  .z-pd.z-tel .z-drzewo .z-dyr { width: 100%; margin-bottom: 30px; padding: 14px; }
++  .z-pd.z-tel .z-drzewo .z-dyr:has(.fot) { grid-template-columns: 84px minmax(0, 1fr); column-gap: 14px; width: 100%; }
++  .z-pd.z-tel .z-drzewo .z-dyr .fot { width: 84px; height: 105px; }
++  .z-pd.z-tel .z-drzewo .z-dyr .imie { font-size: 22px; }
++  .z-pd.z-tel .z-drzewo .z-dyr::after { bottom: -30px; height: 30px; }
++  .z-pd.z-tel .z-zast { grid-template-columns: 1fr 1fr; gap: 22px 14px; }
++  .z-pd.z-tel .z-zast::before { left: 25%; right: 25%; }
++  .z-pd.z-tel .z-zast .z-os:nth-child(n+3)::before, .z-pd.z-tel .z-zast .z-os:nth-child(n+3)::after { display: none; }
++  .z-pd.z-tel .z-zast .z-os .fot { width: 76px; height: 95px; }
++  .z-pd.z-tel .z-os .imie { font-size: 18px; }
++  .z-pd.z-tel .z-dwie, .z-pd.z-tel .z-kont { grid-template-columns: 1fr; gap: 0; }
++  .z-pd.z-tel .z-kont dl > div { grid-template-columns: 76px 1fr; }
++  .z-pd.z-tel .z-zob { columns: 1; }
++  .z-pd.z-tel .z-pd-tresc .z-zob a { font-size: 17px; }
++}
+diff --git a/src/styles/zalozyciele-strony.css b/src/styles/zalozyciele-strony.css
+index e1c288df..0ad600c0 100644
+--- a/src/styles/zalozyciele-strony.css
++++ b/src/styles/zalozyciele-strony.css
+@@ -2,7 +2,8 @@
+    Kierunek „Założyciele” — strony z prototypu na komputer (≥ 761 px): drugi ekran strony głównej, strony działów,
+    Władze, Projekty i granty, Plan zajęć. Zmienne i elementy wspólne: zalozyciele.css. Telefon bez zmian.
+    ========================================================================== */
+-@media (min-width: 761px) {
++/* TEST telefonu (łatka testowa z Web-Podglad): reguły na każdej szerokości; telefon nadpisuje src/styles/zal-telefon-TEST.css */
++@media all {
+   /* ---------- drugi ekran strony głównej ---------- */
+   body:has(.z-druga) :is(.gl-skroty, .gl-wyd, .gl-sem, .gl-studia, main > .section.tylko-komputer, main > .warto, .ww-pas) { display: none !important; }
+   .z-druga { --marg: 48px; display: flex; flex-direction: column; min-height: calc(100svh - var(--gora) - 47px); padding: 22px var(--marg); font-size: 14.5px; line-height: 1.4; color: var(--text); }
+diff --git a/src/views/Wladze.astro b/src/views/Wladze.astro
+index 1ec4ad2f..e688fd92 100644
+--- a/src/views/Wladze.astro
++++ b/src/views/Wladze.astro
+@@ -197,7 +197,7 @@ const mail = (e: string) => esc(e).replace('@', '@<wbr>');
+ 
+   {/* Komputer (≥ 761 px), kierunek „Założyciele”: układ podstrony (boczna nawigacja, treść bez kafelków; „Następna strona
+        w dziale” dodaje Baza.astro). Dotychczasowa treść wyżej zostaje dla telefonu (na komputerze schowana: src/styles/zalozyciele-strony.css). */}
+-  <div class="z-pd z-wladze tylko-komputer" data-dzial="instytut" data-pagefind-ignore>
++  <div class="z-pd z-wladze tylko-komputer z-tel" data-dzial="instytut" data-pagefind-ignore>
+     <BocznaNawigacja dzial="instytut" lang={lang} spis={kom.spis} />
+     <div class="z-pd-tresc"><WladzeZ lang={lang} {...kom} /></div>
+   </div>
