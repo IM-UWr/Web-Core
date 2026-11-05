@@ -110,17 +110,19 @@ const dzialStrony = dzialZeSciezki(sciezka);
         d.setAttribute('data-theme', m);
       })();
     </script>
-    {/* Wczytywanie z wyprzedzeniem stron, nad którymi stoi kursor (Chrome/Edge; inne przeglądarki pomijają). Bez plików z /pliki i /grafiki. */}
-    <script type="speculationrules" is:inline set:html={JSON.stringify({
-      prefetch: [{
-        where: { and: [
-          { href_matches: u('/*') },
-          { not: { href_matches: [u('/pliki/*'), u('/grafiki/*'), u('/pagefind/*'), u('/*.xml'), u('/*.pdf')] } },
-          { not: { selector_matches: '[download], [target=_blank]' } },
-        ] },
-        eagerness: 'moderate',
-      }],
-    })} />
+    {/* Następna strona gotowa przed kliknięciem (Chrome/Edge; inne przeglądarki pomijają): po chwili najechania kursorem
+        (eagerness „moderate”, na dotyku — przy naciśnięciu) strona składa się w tle (prerender; zlecenie 13, punkt 4), a gdy
+        przeglądarka nie może jej złożyć — przynajmniej się pobiera (prefetch). Bez plików z /pliki i /grafiki. Skrypty, które
+        coś zapisują albo animują (szkic na banerze działu, ciekawostki patronów), czekają na pokazanie strony
+        (document.prerendering, zdarzenie prerenderingchange) — NaglowekZ.astro. */}
+    <script type="speculationrules" is:inline set:html={JSON.stringify(((gdzie) => ({
+      prerender: [{ where: gdzie, eagerness: 'moderate' }],
+      prefetch: [{ where: gdzie, eagerness: 'moderate' }],
+    }))({ and: [
+      { href_matches: u('/*') },
+      { not: { href_matches: [u('/pliki/*'), u('/grafiki/*'), u('/pagefind/*'), u('/*.xml'), u('/*.pdf'), u('/*.ics')] } },
+      { not: { selector_matches: '[download], [target=_blank]' } },
+    ] }))} />
     <slot name="head" />
   </head>
   <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
