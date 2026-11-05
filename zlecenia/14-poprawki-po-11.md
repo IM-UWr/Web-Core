@@ -9,7 +9,7 @@ Decyzje właściciela z 5.11 przed południem (godziny przy zaleceniach). Wzór 
 - Treści (nakładka: `src/data`, `src/content`, `public/pliki`) są poza gitem. Gdy zalecenie wymaga zmiany treści, **nie zmieniaj nakładki na stałe**: przygotuj łatkę dla repozytorium treści w `dok/latki/zlecenie-14/<Repozytorium>.patch` (jak `dok/en/latki/`) i opisz ją w raporcie. Do sprawdzenia lokalnie możesz zmienić plik nakładki, ale najpierw skopiuj oryginał do `.przekazanie\robocze\nakladka-przed-14\` (ta sama ścieżka), a po sprawdzeniu przywróć oryginał.
 - Po każdym zaleceniu: `npm run build`, zrzuty 1440 i 1920 px oraz telefon 390 px, jasny i ciemny motyw.
 
-**Zakres i kolejność:** 25 → 26 → 23 → 24 → 22. Zalecenie **21 CZEKA** (nie wykonywać).
+**Zakres i kolejność:** 25 → 26 → 23 → 24 → 22 → 27. Zalecenie **21 CZEKA** (nie wykonywać).
 
 ## Zalecenia
 
@@ -77,6 +77,17 @@ Treść zalecenia dopisze właściciel. Nie wykonywać.
   - Szkoła doktorska zostaje i w Nauce, i w Studiach (jak w menu działów).
 - **Otwarte pytanie właściciela** (nie robić, dopóki nie zostanie dopisane): czy na stronie działu i jego podstronach panel ma się otwierać z rozwiniętym bieżącym działem.
 - **Sprawdzenie:** klawiatura (Tab, Enter/Spacja na przycisku, Esc zamyka panel jak dziś), czytnik ekranu (stan rozwinięcia), wysokość panelu na 1920×950 i telefonie: zwinięty mieści się bez przewijania, a najdłuższy rozwinięty dział (Studia) z przewijaniem panelu, nie strony.
+
+### 27. Stopka: link „O stronie” i strona „O stronie” (decyzje 5.11, 12:56–13:06)
+- Źródła ilustracji **nie trafiają do stopki** (za duża), tylko na osobną stronę „O stronie”. Na stronie głównej żadnego dopisku o zdjęciu okładki.
+- **Stopka** (`src/components/zal/StopkaZ.astro`, wszystkie strony, także główna i telefon): po „Archiwum starej strony” link „O stronie” / EN „About this site” (`/o-stronie`, `/en/o-stronie`; napis w `i18n` jak pozostałe). Deklaracja dostępności i Polityka prywatności **zostają w stopce** (link do deklaracji ma być zawsze łatwy do znalezienia). „© … · Created by Szymon Cygan” zostaje.
+- **Strona:** Markdown `src/content/strony/o-stronie.md` obok `deklaracja-dostepnosci.md` i `polityka-prywatnosci.md`: ten sam szablon i wzorzec treści, bez działu (kolory neutralne, tylko pozycje patronów w kolorach ich działów, jeśli Markdown na to pozwala; jeśli nie — neutralnie). Treść to **łatka** do repozytorium, w którym leżą te strony (`dok/latki/zlecenie-14/`, kopia oryginałów jak w nagłówku). Hasło np. „Patroni, źródła i kulisy” / „Patrons, sources and how it was made”. Wzór: prototyp v94, widok „O stronie”. Sekcje:
+  1. **Czterech patronów:** wstęp (cztery osoby, które po wojnie tworzyły matematykę we Wrocławiu; każda patronuje działowi i nadaje mu kolor; ich imiona noszą sale), cztery pozycje: dział · patron · lata · kolor · sala (Instytut — Edward Marczewski, 1907–1976, bursztyn, EM; Nauka — Władysław Ślebodziński, 1884–1972, szmaragd, WS; Studia — Bronisław Knaster, 1893–1980, lazur, B; Popularyzacja — Hugo Steinhaus, 1887–1972, malina, HS), zdanie o szkicach rysowanych przy pierwszym wejściu i ciekawostkach losowanych na wizytę. Ramki „Do potwierdzenia” z prototypu nie przenoś: „sala B = Knaster” wpisz do raportu jako pytanie do właściciela.
+  2. **Źródła ilustracji** (dane: `szkice/ZRODLA.md` na gałęzi kopii): szkice — Ślebodziński (1938) i Steinhaus (1968): Wikimedia Commons, domena publiczna; Marczewski i Knaster: MacTutor History of Mathematics, University of St Andrews. Podpisy — Marczewski: *Nowa Księga Szkocka*, t. I, wpis z 7 lipca 1946 (Biblioteka WMI UWr); Ślebodziński: legitymacja z 1948 r., w: H. Langner-Matuszczyk, *Władysław Ślebodziński – matematyk, więzień KL Auschwitz nr 79053*, „Śląska Republika Uczonych”, t. 7, 2016; Knaster (1946) i Steinhaus (1957): J. Dutkiewicz, *Mieczysław Warmus. Życie i praca naukowa*, 2003 (Biblioteka Cyfrowa PW). Zdjęcie kampusu na stronie głównej: Corvus monedula, fotopolska.eu (https://fotopolska.eu/1158570), licencja CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/deed.pl), fragment, wyostrzony. Linki do źródeł z `ZRODLA.md`.
+  3. **Błąd na stronie?** Link „Zgłoś błąd na tej stronie” na dole podstron i adres redakcji — adres ustali właściciel: w łatce zostaw miejsce do wpisania, w raporcie przypomnij.
+  4. **Jak zrobiona jest ta strona:** projekt i wykonanie Szymon Cygan; treści w Pages CMS, strona przebudowuje się sama kilka minut po zmianie; kod na GitHubie (https://github.com/IM-UWr/Web-Core); kroje Brygada 1918 i Manrope (SIL Open Font License), wzory KaTeX; zdanie o braku ciasteczek śledzących z linkiem do Polityki prywatności — sprawdź z polityką i obecną analityką, że to prawda.
+  5. **Poprzednia strona:** link do archiwum (adres z `ustawienia.archiwum`, ten sam co w stopce).
+- EN: cała strona po angielsku („About this site”), jak zasada z zalecenia 12.
 
 ## Na koniec
 `RAPORT-ZLECENIE-14.md`: co zrobione, czego nie i dlaczego, łatki treści (jeśli są), wyjątki z zalecenia 23, zrzuty przed/po, `astro check` bez nowych błędów.

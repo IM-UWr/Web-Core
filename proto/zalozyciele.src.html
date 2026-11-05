@@ -547,6 +547,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .wa.wyr h3 { margin: 6px 0 8px; font-size: 30px; line-height: 1.2; }
 .wa.wyr p { font-size: 16.5px; }
 .wa.wyr .wa-fot { width: 360px; }
+/* strona „O stronie” (5.11, 13:06): wzorzec treści, bez działu (kolory patronów tylko przy ich pozycjach) */
+.os-in { padding-top: 46px; padding-bottom: 90px; --d-a: var(--m-ink); --d-t: var(--m-surface); }
+.os-in .tresc ul.dwa { max-width: 900px; margin: 6px 0 18px; }
+.os-in .tresc ul.kreski b { color: var(--m-ink); }
 /* Studia z rekrutacją: pas w kolorze tła działu */
 .ok-studia { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 0 36px; margin-top: 22px; padding: 10px 0 0; border-top: 2px solid var(--m-ink); }
 .ok-studia .gdzie { display: block; font-size: 12px; font-weight: 700; color: var(--d-a); }
@@ -1621,14 +1625,15 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="w-telefon" class="ustalone" data-v="telefon" aria-pressed="false">Telefon</button>
       <button type="button" id="w-przyciski" class="ustalone" data-v="przyciski" aria-pressed="false">Przyciski</button>
       <button type="button" id="w-ciekawostki" data-v="ciekawostki" aria-pressed="false">Ciekawostki</button>
-      <button type="button" id="w-kolory" data-v="kolory" aria-pressed="false">Kolory działów</button>
+      <button type="button" id="w-kolory" class="ustalone" data-v="kolory" aria-pressed="false">Kolory działów</button>
       <button type="button" id="w-aktualnosci" data-v="aktualnosci" aria-pressed="false">Aktualności</button>
+      <button type="button" id="w-o-stronie" data-v="o-stronie" aria-pressed="false">O stronie</button>
     </div></div>
     <div class="grupa ustalone"><span>Szkic</span><div class="seg" data-ustaw="szkic">
       <button type="button" id="s-twarz" data-v="twarz" aria-pressed="true">Twarz</button>
       <button type="button" id="s-znak" data-v="znak" aria-pressed="false">Znak matematyczny</button>
     </div></div>
-    <div class="grupa" id="wybor-palety"><span>Kolory działów</span><div class="seg" data-ustaw="paleta">
+    <div class="grupa ustalone" id="wybor-palety"><span>Kolory działów</span><div class="seg" data-ustaw="paleta">
       <button type="button" id="p-atramenty" data-v="atramenty" aria-pressed="false">Atramenty</button>
       <button type="button" id="p-stonowana" data-v="stonowana" aria-pressed="false">Stonowana</button>
       <button type="button" id="p-wyrownane" data-v="wyrownane" aria-pressed="false">Atramenty wyrównane</button>
@@ -1682,7 +1687,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="baner" aria-pressed="false">przycisk w banerze</button>
       <button type="button" data-v="pas" aria-pressed="true">przycisk w pasie menu</button>
     </div></div>
-    <div class="grupa" id="wybor-pop" hidden><span>Tekst Popularyzacji</span><div class="seg" data-ustaw="popTekst">
+    <div class="grupa ustalone" id="wybor-pop" hidden><span>Tekst Popularyzacji</span><div class="seg" data-ustaw="popTekst">
       <button type="button" data-v="opowiesc" aria-pressed="true">opowieść + podstrony (5.11)</button>
       <button type="button" data-v="nowy" aria-pressed="false">tekst agenta z nocy</button>
       <button type="button" data-v="obecny" aria-pressed="false">obecny</button>
@@ -1759,7 +1764,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="pr-5" data-v="5" aria-pressed="true">5</button>
       <button type="button" id="pr-20" data-v="20" aria-pressed="false">20 (próba)</button>
     </div></div>
-    <div class="grupa" id="wybor-panelu"><span>Hamburger</span><div class="seg" data-ustaw="panel">
+    <div class="grupa ustalone" id="wybor-panelu"><span>Hamburger</span><div class="seg" data-ustaw="panel">
       <button type="button" data-v="skrot" aria-pressed="false">Skrót (dotąd)</button>
       <button type="button" data-v="bez" aria-pressed="false">Bez nagłówków</button>
       <button type="button" data-v="male" aria-pressed="false">Małe nagłówki</button>
@@ -1767,12 +1772,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="obok" aria-pressed="false">Nagłówek z lewej</button>
       <button type="button" data-v="zwijane" aria-pressed="true">Zwijane działy ✓</button>
     </div></div>
-    <div class="grupa" id="wybor-zrodel"><span>Źródła w stopce</span><div class="seg" data-ustaw="zrodla">
-      <button type="button" data-v="linia" aria-pressed="true">Jedna linia</button>
-      <button type="button" data-v="link" aria-pressed="false">Rozwijane „Źródła ilustracji”</button>
-      <button type="button" data-v="bez" aria-pressed="false">Bez (jak dotąd)</button>
-    </div></div>
-    <div class="grupa" id="wybor-wyr"><span>Pierwsza aktualność</span><div class="seg" data-ustaw="wyr">
+    <div class="grupa ustalone" id="wybor-wyr"><span>Pierwsza aktualność</span><div class="seg" data-ustaw="wyr">
       <button type="button" id="wy-tak" data-v="tak" aria-pressed="true">Powiększona ✓</button>
       <button type="button" id="wy-nie" data-v="nie" aria-pressed="false">Zwykła</button>
     </div></div>
@@ -1863,7 +1863,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
             </section>
             </div>
           </section>
-          <footer class="ok-stopka"><div><b>Instytut Matematyczny UWr</b> · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01 · dyrekcja@math.uni.wroc.pl</div><nav aria-label="Stopka"><a href="#">Deklaracja dostępności</a><a href="#">Polityka prywatności</a><a href="#">Archiwum starej strony</a><span class="autor">© 2026 Uniwersytet Wrocławski · Created by Szymon Cygan</span></nav></footer>
+          <footer class="ok-stopka"><div><b>Instytut Matematyczny UWr</b> · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01 · dyrekcja@math.uni.wroc.pl</div><nav aria-label="Stopka"><a href="#">Deklaracja dostępności</a><a href="#">Polityka prywatności</a><a href="#">Archiwum starej strony</a><a href="#" data-o-stronie>O stronie</a><span class="autor">© 2026 Uniwersytet Wrocławski · Created by Szymon Cygan</span></nav></footer>
           </div>
         </div>
       </div>
@@ -1879,7 +1879,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
         <div class="in-pod" id="in-pod"></div>
         <div class="in-tresc" id="in-tresc"></div>
         <div id="in-reszta"></div>
-        <footer class="ok-stopka"><div><b>Instytut Matematyczny UWr</b> · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01 · dyrekcja@math.uni.wroc.pl</div><nav aria-label="Stopka"><a href="#">Deklaracja dostępności</a><a href="#">Polityka prywatności</a><a href="#">Archiwum starej strony</a><span class="autor">© 2026 Uniwersytet Wrocławski · Created by Szymon Cygan</span></nav><div class="st-zrodla"><p class="zr-linia">Szkice patronów na podstawie fotografii z <a href="#">Wikimedia Commons<span class="zew" aria-hidden="true">&nbsp;↗</span></a> (W. Ślebodziński, H. Steinhaus; domena publiczna) i <a href="#">MacTutor History of Mathematics<span class="zew" aria-hidden="true">&nbsp;↗</span></a> (E. Marczewski, B. Knaster). Podpisy według reprodukcji: <i>Nowa Księga Szkocka</i>, t. I (Biblioteka WMI UWr); H. Langner-Matuszczyk w: <i>Śląska Republika Uczonych</i>, t. 7 (2016); J. Dutkiewicz, <i>Mieczysław Warmus. Życie i praca naukowa</i> (2003). Zdjęcie kampusu na stronie głównej: Corvus monedula, <a href="#">fotopolska.eu<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, licencja <a href="#">CC BY-SA 3.0<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, fragment, zmodyfikowany.</p><details class="zr-lista"><summary>Źródła ilustracji</summary><ul><li><b>Szkice patronów</b> na podstawie fotografii: W. Ślebodziński (1938) i H. Steinhaus (1968) — <a href="#">Wikimedia Commons<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, domena publiczna; E. Marczewski i B. Knaster — <a href="#">MacTutor History of Mathematics<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, University of St Andrews.</li><li><b>Podpisy</b> według reprodukcji: E. Marczewski — <i>Nowa Księga Szkocka</i>, t. I, wpis z 7 lipca 1946 (<a href="#">Biblioteka WMI UWr<span class="zew" aria-hidden="true">&nbsp;↗</span></a>); W. Ślebodziński — legitymacja z 1948, w: H. Langner-Matuszczyk, <i>Śląska Republika Uczonych</i>, t. 7, 2016; B. Knaster (1946) i H. Steinhaus (1957) — J. Dutkiewicz, <i>Mieczysław Warmus. Życie i praca naukowa</i>, 2003 (<a href="#">BCPW<span class="zew" aria-hidden="true">&nbsp;↗</span></a>).</li><li><b>Zdjęcie kampusu</b> na stronie głównej: Corvus monedula, <a href="#">fotopolska.eu<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, licencja <a href="#">CC BY-SA 3.0<span class="zew" aria-hidden="true">&nbsp;↗</span></a>; fragment, wyostrzony.</li></ul></details></div></footer>
+        <footer class="ok-stopka"><div><b>Instytut Matematyczny UWr</b> · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01 · dyrekcja@math.uni.wroc.pl</div><nav aria-label="Stopka"><a href="#">Deklaracja dostępności</a><a href="#">Polityka prywatności</a><a href="#">Archiwum starej strony</a><a href="#" data-o-stronie>O stronie</a><span class="autor">© 2026 Uniwersytet Wrocławski · Created by Szymon Cygan</span></nav></footer>
         </div>
         <img class="in-obecna" id="in-obecna" src="" alt="Zrzut obecnej strony Instytut (1920 px)" hidden>
       </div>
@@ -1946,6 +1946,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <div class="widok m" id="v-kolory" hidden></div>
       <!-- ============ AKTUALNOŚCI (5.11, 11:51): lista z wyróżnionym wpisem na górze ============ -->
       <div class="widok m" id="v-aktualnosci" hidden></div>
+      <!-- ============ O STRONIE (5.11, 13:06): patroni, źródła ilustracji, błędy, jak zrobiona; link w stopce ============ -->
+      <div class="widok m" id="v-o-stronie" hidden></div>
 
       <!-- ============ PRZYCISKI: dziś (okrągłe) i po zmianie (styl z Planu zajęć) ============ -->
       <div class="widok m" id="v-przyciski" hidden>
@@ -3058,8 +3060,6 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (otw) { sec.classList.add('rozwiniety'); b.setAttribute('aria-expanded', 'true'); }
   });
   rysujPanel();
-  document.getElementById('v-instytut').dataset.zrodla = 'linia';
-  document.addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('zr-lista')) skaluj(); }, true);
   const menuPasek = (h, otw) => {
     const m = h.querySelector('.pasek-menu'), b = h.querySelector('.pasek-burger');
     m.classList.toggle('otwarte', otw); b.setAttribute('aria-expanded', String(otw));
@@ -3442,6 +3442,29 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <div class="ak-in"><div class="ak-filtr">${['Wszystkie', 'Ogłoszenia', 'Wydarzenia', 'Sukcesy', 'Kariera'].map((x, i) => `<button type="button" aria-pressed="${i === 0}">${x}</button>`).join('')}<label><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Szukaj w aktualnościach</label></div>
       <div class="ak-lista">${AKT_L.map(wpis).join('')}</div></div>`;
   }
+  /* strona „O stronie” (5.11, 13:06: „dopisz do zlecenia, zaktualizuj podgląd”): link w stopce obok deklaracji i polityki */
+  function rysujOStronie() {
+    const Z = (t) => `<a class="zew" href="#">${t}</a>`;
+    const P = [['instytut', 'Instytut', 'Edward Marczewski', '1907–1976 · bursztyn · sala EM'], ['nauka', 'Nauka', 'Władysław Ślebodziński', '1884–1972 · szmaragd · sala WS'], ['studia', 'Studia', 'Bronisław Knaster', '1893–1980 · lazur · sala B'], ['popularyzacja', 'Popularyzacja', 'Hugo Steinhaus', '1887–1972 · malina · sala HS']];
+    $('#v-o-stronie').innerHTML = `<header class="ak-gl"><div class="ak-in"><h2>O stronie</h2><p>Patroni działów, źródła ilustracji, zgłaszanie błędów i jak zrobiona jest ta strona</p></div></header>
+      <div class="ak-in os-in"><div class="pd-tresc tresc">
+        <section><h3>Czterech patronów</h3><p class="wst">Strona jest zbudowana wokół czterech matematyków, którzy po wojnie tworzyli od podstaw matematykę we Wrocławiu. Każdy patronuje jednemu działowi i nadaje mu kolor, a ich imiona noszą sale wykładowe Instytutu.</p>
+          <ul class="dwa">${P.map(([dz, n, p, o]) => `<li data-dzial="${dz}"><span class="etyk">${n}</span><b>${p}</b><span>${o}</span></li>`).join('')}</ul>
+          <p>Twarz patrona rysuje się kreską przy pierwszym wejściu na stronę działu, a w nagłówkach podstron przy każdej wizycie losują się ciekawostki z jego życia i matematyki.</p>
+          <div class="uwaga"><span class="etyk">Do potwierdzenia</span><p>Czy sala B nosi imię Bronisława Knastera (w Instytucie jest też zwykła sala A).</p></div></section>
+        <section><h3>Źródła ilustracji</h3><ul class="kreski">
+          <li><b>Szkice patronów</b> na podstawie fotografii: Władysław Ślebodziński (1938) i Hugo Steinhaus (1968) — ${Z('Wikimedia Commons')}, domena publiczna; Edward Marczewski i Bronisław Knaster — ${Z('MacTutor History of Mathematics')}, University of St Andrews.</li>
+          <li><b>Podpisy</b> według reprodukcji: Edward Marczewski — <i>Nowa Księga Szkocka</i>, t. I, wpis z 7 lipca 1946 (${Z('Biblioteka WMI UWr')}); Władysław Ślebodziński — legitymacja z 1948 r., w: H. Langner-Matuszczyk, <i>Władysław Ślebodziński – matematyk, więzień KL Auschwitz nr 79053</i>, „Śląska Republika Uczonych”, t. 7, 2016; Bronisław Knaster (1946) i Hugo Steinhaus (1957) — J. Dutkiewicz, <i>Mieczysław Warmus. Życie i praca naukowa</i>, 2003 (${Z('Biblioteka Cyfrowa Politechniki Warszawskiej')}).</li>
+          <li><b>Zdjęcie kampusu</b> na stronie głównej: Corvus monedula, ${Z('fotopolska.eu')}, licencja ${Z('CC BY-SA 3.0')}; fragment, wyostrzony.</li></ul></section>
+        <section><h3>Błąd na stronie?</h3><p>Na dole każdej podstrony jest link „Zgłoś błąd na tej stronie”. Można też napisać do redakcji: <a href="#">adres do ustalenia</a>.</p></section>
+        <section><h3>Jak zrobiona jest ta strona</h3><p>Projekt i wykonanie: Szymon Cygan. Treści prowadzi redakcja w Pages CMS, a strona przebudowuje się sama kilka minut po każdej zmianie. Kod jest otwarty: ${Z('IM-UWr/Web-Core na GitHubie')}.</p><p>Kroje pisma: Brygada 1918 i Manrope (licencja SIL Open Font License); wzory matematyczne: KaTeX. Strona nie używa ciasteczek śledzących — szczegóły w <a href="#">Polityce prywatności</a>.</p></section>
+        <section><h3>Poprzednia strona</h3><p>Kopia poprzedniej strony Instytutu jest dostępna w ${Z('archiwum')} (adres do potwierdzenia).</p></section>
+      </div></div>`;
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-o-stronie]'); if (!a) return;
+    e.preventDefault(); document.getElementById('w-o-stronie').click(); window.scrollTo(0, 0);
+  });
   function rysujKolory() {
     const HASLA = { instytut: 'Wrocławska szkoła matematyczna', nauka: 'Poznaj nasze badania na A+', studia: 'Studiuj matematykę we Wrocławiu', popularyzacja: 'Matematyka dla uczniów i nauczycieli' };
     const PRZ = { instytut: ['Władze', 'Kontakt'], nauka: ['Seminaria', 'Konferencje'], studia: ['Plan zajęć', 'Rekrutacja'], popularyzacja: ['Dla uczniów', 'Wykłady'] };
@@ -3462,10 +3485,9 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   /* ---------- przełączniki ---------- */
   let widok = 'okladka';
   function pokaz() {
-    ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski', 'ciekawostki', 'kolory', 'aktualnosci'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
+    ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski', 'ciekawostki', 'kolory', 'aktualnosci', 'o-stronie'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
     $('#wybor-wyr').hidden = widok !== 'okladka' && widok !== 'aktualnosci';
     $('#wybor-panelu').hidden = widok !== 'okladka' && widok !== 'instytut';
-    $('#wybor-zrodel').hidden = widok !== 'instytut';
     $('#wybor-inst').hidden = widok !== 'instytut';
     $('#wybor-wersja').hidden = widok !== 'instytut';
     $('#wybor-baner').hidden = widok !== 'instytut';
@@ -3489,13 +3511,14 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#wybor-barwy').hidden = widok !== 'okladka';
     $('#wybor-proby').hidden = widok !== 'okladka';
     $('#wybor-prel').hidden = widok !== 'okladka';
-    $('#wybor-dzialu').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki' || widok === 'kolory' || widok === 'aktualnosci';
-    $('#wybor-przejscia').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki' || widok === 'kolory' || widok === 'aktualnosci';
+    $('#wybor-dzialu').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki' || widok === 'kolory' || widok === 'aktualnosci' || widok === 'o-stronie';
+    $('#wybor-przejscia').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki' || widok === 'kolory' || widok === 'aktualnosci' || widok === 'o-stronie';
     $('#podpowiedz').textContent = widok === 'okladka' ? 'Najedź na dział. Strzałka na dole albo kółko myszy przewija w dół, jak w prawdziwym oknie.' : widok === 'glowna' ? 'Najedź myszką na nazwę działu pod zdjęciem.' : widok === 'dzial' ? 'Tusz szkicu rysuje się przy wejściu na stronę działu.' : 'Telefon nie ma najechania, więc szkice są w menu.';
     if (widok === 'dzial') rysujDzial();
     if (widok === 'telefon') rysujTelefon();
     if (widok === 'kolory') { rysujKolory(); $('#podpowiedz').textContent = 'Wszystkie komplety obok siebie. „Użyj” włącza komplet w całym prototypie; potem obejrzyj okładkę i strony działów.'; }
     if (widok === 'ciekawostki') { rysujCiekawostki(); $('#podpowiedz').textContent = '„Losuj zestaw” pokazuje, co dostanie nowa wizyta. Kliknij wiersz albo kartę: ciekawostka pojawi się w nagłówku podstrony.'; }
+    if (widok === 'o-stronie') { rysujOStronie(); $('#podpowiedz').textContent = 'Strona „O stronie”: link w stopce obok Deklaracji dostępności i Polityki prywatności (na każdej stronie). Źródła ilustracji są tutaj, nie w stopce.'; }
     if (widok === 'aktualnosci') { rysujAktualnosci(); $('#podpowiedz').textContent = 'Strona Aktualności w stylu list z porządków. Pierwszy, najnowszy wpis jest zawsze powiększony: większa data, tytuł i zdjęcie (decyzja 5.11, 12:36). Przełącznik „Pierwsza aktualność” porównuje ze zwykłym wierszem.'; }
     if (widok === 'przyciski') { rysujPrzyciski(); $('#podpowiedz').textContent = 'Górny rząd: jak jest dziś. Dolny: po zmianie. Kliknij, żeby zobaczyć wybrany przycisk.'; }
     skaluj();
@@ -3514,7 +3537,6 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'zakret') { zakret = v; ulozTytul(); }
     if (co === 'proba') { liczbaSem = Number(v); rysujKolumny(); }
     if (co === 'prel') { wariantPrel = v; rysujKolumny(); }
-    if (co === 'zrodla') { $('#v-instytut').dataset.zrodla = v; skaluj(); }
     if (co === 'panel') { panelNagl = v; rysujPanel(); setTimeout(() => { if (widok === 'okladka') { if (!$('#ok-menu').classList.contains('otwarte')) $('#ok-burger').click(); } else { const pb = document.querySelector('#v-instytut .pasek-burger'); if (pb) pb.click(); } }, 0); }
     if (co === 'wyr') { wyrAkt = v === 'tak'; rysujKolumny(); if (widok === 'aktualnosci') { rysujAktualnosci(); skaluj(); } }
     if (co === 'bok') { bok = v; rysujInstytut(); skaluj(); }
