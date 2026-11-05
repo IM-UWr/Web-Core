@@ -152,7 +152,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           <span class="kiedy"><b>{o.d}</b>{o.m}</span>
           <span class="tr">
             <span class="gdzie">{o.gdzie}{o.co && <i> · {o.co}</i>}</span>
-            <span class="t">{o.polski ? <><span lang="pl">{o.tytul}</span> {DOPISEK_PO_POLSKU}</> : o.tytulLang ? <span lang={o.tytulLang}>{o.tytul}</span> : o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
+            <span class="t">{o.polski ? <><span lang="pl">{o.tytul}</span>{' '}{DOPISEK_PO_POLSKU}</> : o.tytulLang ? <span lang={o.tytulLang}>{o.tytul}</span> : o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
           </span>
           {'min' in k && (o.min
             ? <span class="min"><ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 72, 54])} /></span>

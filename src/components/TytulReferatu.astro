@@ -13,5 +13,5 @@ const html = await renderTytulZWzorami(tekst);
 const poPolsku = poPolskuNaEn(jezyk, lang);
 ---
 {poPolsku
-  ? <><span lang="pl">{html ? <Fragment set:html={html} /> : tekst}</span> {DOPISEK_PO_POLSKU}</>
+  ? <><span lang="pl">{html ? <Fragment set:html={html} /> : tekst}</span>{' '}{DOPISEK_PO_POLSKU}</>
   : html ? <Fragment set:html={html} /> : tekst}
