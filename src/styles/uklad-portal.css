@@ -7,6 +7,8 @@
    Wartości z wariantu Portal (gałąź wariant-portal, koniec src/styles/portal.css). Każda reguła ma ten sam selektor co tam,
    poprzedzony warunkiem w :where(…) (bez dodatkowej wagi). Nagłówek u góry strony (--hdr-h, menu) zostaje jak na main.
    Telefon (≤ 760 px): wszystko poniżej siedzi w @media (min-width: 761px).
+   PO PORZĄDKACH (zlecenie 12, 5.11.2026): nadal działa interlinia 1,55 w nagłówku (opakowanie .page-head) na stronach
+   z data-uklad="… portal-baner" — od niej zależy położenie hasła i liczb w nowym nagłówku; dlatego plik zostaje.
    ========================================================================== */
 
 @media (min-width: 761px) {

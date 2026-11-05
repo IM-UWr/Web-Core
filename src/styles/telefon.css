@@ -6,6 +6,9 @@
    na każdej szerokości). Plik ładuje się po global.css i tlo.css, więc reguły z węższych progów tamtych plików
    (720, 560 px), które nadpisywały te same właściwości, są tu powtórzone niżej — inaczej przegrałyby kolejnością.
    Klocki wariantu (.pt-box, .pt-list, …) są w portal.css; na tej gałęzi używają ich tylko bloki .tylko-telefon.
+   PO PORZĄDKACH (zlecenie 12, 5.11.2026): telefon ma nowy wygląd (src/styles/zal-telefon.css i końce plików bloków).
+   Tu zostały tylko reguły dawnego telefonu, które nadal trafiają w elementy (nagłówek .hdr i menu .mnav z Naglowek.astro,
+   tokeny kolorów, odstępy treści); bloki .tylko-telefon / .tylko-komputer i ich przełączanie usunięte.
    ========================================================================== */
 
 /* ---------- bloki tylko na jeden rodzaj ekranu ----------

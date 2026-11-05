@@ -9,6 +9,8 @@
    .pt-links  lista linków ze strzałkami (wiersze ≥ 40 px), .pt-links-2 = w dwóch kolumnach
    .pt-cards  zwarte karty w siatce (.pt-card: etykieta .l, nazwa .n, opis .o)
    .pt-liczby liczby działu w jednym wierszu (w granatowym nagłówku podstrony)
+   PO PORZĄDKACH (zlecenie 12, 5.11.2026): klocków .pt-* już nikt nie używa; zostały podstawy listy liczb .pt-liczby
+   (baner nowego nagłówka: zal/NaglowekZ.astro, LiczbyBanera.astro) i reguły jeszcze trafiające w elementy stron.
    ========================================================================== */
 /* mały kafelek daty (wydarzenia, konferencje, obrony); kolor z tokenu --znacznik jak .datebox (global.css) */
 .pt-dbox .d { font-size: 19px; font-weight: 800; }

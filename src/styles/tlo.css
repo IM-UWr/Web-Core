@@ -3,6 +3,9 @@
    - Tło: Ustawienia → „Tło strony” (ustawienia.tlo_strony): pole | kratka | penrose | zmierzch | fale | brak.
      Baza.astro ustawia <body data-tlo="…">; bez atrybutu strona ma zwykłe białe (ciemne) tło.
    - Nagłówki podstron: NaglowekStrony.astro (klasy .ph, .ph-motyw / .ph-zdjecie / .ph-granat, data-dzial).
+   PO PORZĄDKACH (zlecenie 12, 5.11.2026): zostały tylko reguły, które trafiają w elementy nowego wyglądu albo w klasy
+   wstawiane przez kod (opakowanie nagłówka .page-head.ph w NaglowekStrony.astro, tło body[data-tlo], oprawa sekcji
+   body[data-sekcje] dla .prose poza wzorcem treści). Rysunki banera (.ph-m, .ph-fala) przeniesione do src/scripts/baner/baner.css.
    ========================================================================== */
 
 /* ---------- warstwa stała ----------

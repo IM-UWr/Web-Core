@@ -11,6 +11,9 @@
    menu .nav / .dropdown / .mnav, .icon-btn, .hdr-search, --hdr-h), przyciski (.btn, .btn-small) i stopka.
    Odstępy własne widoków (np. strona działu) są w stylach widoku, też w @media (min-width: 761px).
    Telefon (≤ 760 px): wszystko poniżej siedzi w @media (min-width: 761px), więc telefon wygląda jak bez tego pliku.
+   PO PORZĄDKACH (zlecenie 12, 5.11.2026): zostały tylko reguły, które nadal trafiają w elementy na stronach z
+   data-uklad (podstawowy stopień i interlinia treści, zaokrąglenia, .prose). Przełącznik zostaje, bo usunięcie zmieniłoby
+   piksele 105 stron — opis w RAPORT-PORZADKI.md (etap 4).
    ========================================================================== */
 
 @media (min-width: 761px) {

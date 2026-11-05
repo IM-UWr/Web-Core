@@ -2,6 +2,9 @@
    Instytut Matematyczny UWr — style strony
    Wszystkie kolory, odstępy i zaokrąglenia są tokenami poniżej.
    Zmiana palety = zmiana wartości w :root (jasny) i [data-theme="dark"] (ciemny).
+   PO PORZĄDKACH (zlecenie 12, 5.11.2026): usunięte reguły, które nie trafiały w żaden element żadnej strony (dawne menu
+   komputera, baner strony głównej, karty, kafelki…); zostały podstawy (tokeny, typografia, .wrap, .prose, .sr-only…)
+   i reguły jeszcze używane przez nowy wygląd.
    ========================================================================== */
 
 :root {

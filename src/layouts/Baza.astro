@@ -2,25 +2,25 @@
 // Wspólny szkielet każdej strony: <head>, nagłówek, stopka.
 import '@fontsource-variable/manrope';
 import 'katex/dist/katex.min.css';
+// Podstawy (tokeny, typografia, .prose) i resztki dawnego wyglądu, które nowy wygląd jeszcze wykorzystuje (pliki przycięte
+// do reguł trafiających w elementy stron — zlecenie 12, etap 4; opis w nagłówkach plików).
 import '../styles/global.css';
 import '../styles/tlo.css';
-// Komputer (≥ 761 px): wygląd wybrany dla danej podstrony (prop `uklad` → <body data-uklad>; bez niego — wygląd z main).
+// Komputer (≥ 761 px): przełącznik prop `uklad` → <body data-uklad> (interlinia nagłówka i treści na części podstron).
 import '../styles/uklad-zwarta.css';
 import '../styles/uklad-portal.css';
-// Telefon (≤ 760 px): wygląd wariantu „Portal” — klocki (portal.css) i nadpisania odstępów i skali (telefon.css).
 import '../styles/portal.css';
 import '../styles/telefon.css';
-// Cała strona (telefon i komputer, na próbę): przejścia między stronami i łagodne wejście treści.
+// Cała strona: przejścia między stronami i łagodne wejście treści (bez ruchu przy „ogranicz ruch”).
 import '../styles/przejscia.css';
-// Komputer (≥ 761 px): kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource),
-// paleta „Atramenty”, pasek menu na banerze, nowe nagłówki i odchudzona stopka (src/styles/zalozyciele.css, src/components/zal/).
+// Kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource), paleta „Atramenty”,
+// pasek menu, nagłówki, stopka (src/styles/zalozyciele.css, src/components/zal/), szablon podstrony i spis (zal-podstrona.css),
+// wzorzec treści (zal-tresc.css; zlecenie 11, zalecenie 14), telefon ≤ 760 px (zal-telefon.css i końce plików bloków).
 import '@fontsource-variable/brygada-1918/wght.css';
 import '@fontsource-variable/brygada-1918/wght-italic.css';
 import '../styles/zalozyciele.css';
 import '../styles/zal-przejscia.css';
-// Telefon (≤ 760 px): wygląd „Założycieli” na wąski ekran (src/styles/zal-telefon.css)
 import '../styles/zal-podstrona.css';
-// Wzorzec treści podstron (zlecenie 11, zalecenie 14): sekcje, podsekcje i elementy treści (.tresc …)
 import '../styles/zal-tresc.css';
 import '../styles/zal-telefon.css';
 import PasekMenu from '../components/zal/PasekMenu.astro';
