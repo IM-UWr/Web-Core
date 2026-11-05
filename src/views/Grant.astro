@@ -33,7 +33,10 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
 <Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner" haslo={haslo}
   wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }} dzial="nauka" klasa="tresc z-grant">
   <Fragment slot="baner">
-    {tytulDrugi && <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
+    {/* D5, zlecenie 16: na /en oryginalny polski tytuł z etykietą */}
+    {tytulDrugi && (lang === 'en'
+      ? <p class="lead">Original title: <span lang="pl">{tytulDrugi.tekst}</span></p>
+      : <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>)}
     <div class="tags">
       <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>
       {program && <span class="badge">{program}</span>}
