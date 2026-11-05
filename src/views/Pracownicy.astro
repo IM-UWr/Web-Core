@@ -25,7 +25,7 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
   okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]}
   dzial="instytut" spis={spis} klasa="tresc z-prac">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
-  <TabelaPracownikow client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
+  <TabelaPracownikow lang={lang} client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
 </Podstrona>
 
 <style is:global>

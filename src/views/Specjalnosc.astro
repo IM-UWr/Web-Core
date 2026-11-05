@@ -212,8 +212,8 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
           <div>
             {o.rola && <span class="etyk">{w(o, 'rola')}</span>}
             <b>{o.osoba?.data.strona
-              ? <Link href={o.osoba.data.strona}>{zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko)}</Link>
-              : o.osoba ? zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko) : o.imie_nazwisko}</b>
+              ? <Link href={o.osoba.data.strona}>{zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang)}</Link>
+              : o.osoba ? zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang) : o.imie_nazwisko}</b>
             {o.osoba && (o.osoba.data.email || o.osoba.data.pokoj || o.osoba.data.telefon) && (
               <dl class="para">
                 {o.osoba.data.email && <><dt>e-mail</dt><dd><a href={`mailto:${o.osoba.data.email}`}>{o.osoba.data.email}</a></dd></>}

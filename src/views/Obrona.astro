@@ -15,6 +15,7 @@ import { t } from '../lib/i18n';
 import { longWithDay, short, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { miejsce, type Obrona } from '../lib/tresci';
 import { daneObrony } from '../lib/widoki/obrona';
+import { tytulyWJezyku } from '../lib/osoby';
 
 interface Props { obrona: Obrona; lang: Lang }
 const { obrona, lang } = Astro.props;
@@ -46,7 +47,7 @@ const typPliku = (a: string) => {
         <dl class="para">
           <dt>{t(lang, 'kiedy')}</dt><dd>{longWithDay(d.termin, lang)}</dd>
           {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{miejsce(d.miejsce, lang)}</dd></>}
-          {d.promotorzy.length > 0 && <><dt>{t(lang, 'promotorzy')}</dt><dd>{d.promotorzy.join(', ')}</dd></>}
+          {d.promotorzy.length > 0 && <><dt>{t(lang, 'promotorzy')}</dt><dd>{d.promotorzy.map((p) => tytulyWJezyku(p, lang)).join(', ')}</dd></>}
         </dl>
       </div>
     </div>

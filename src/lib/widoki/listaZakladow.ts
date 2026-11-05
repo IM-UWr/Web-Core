@@ -11,9 +11,9 @@ export async function daneListyZakladow(lang: Lang) {
   const kadra = osoby.filter((o) => o.data.grupa === 'nauczyciel');
   const ile = (r: number) => kadra.filter((o) => rangaStopnia(o.data.stopien) === r).length;
   const liczby = [
-    { n: ile(0), l: T('profesorów', 'full professors') },
-    { n: ile(1), l: T('doktorów habilitowanych', 'associate professors (dr hab.)') },
-    { n: ile(2), l: T('doktorów', 'assistant professors (PhD)') },
+    { n: ile(0), l: T('profesorów', 'professors') },
+    { n: ile(1), l: T('doktorów habilitowanych', 'Dr hab. holders') },
+    { n: ile(2), l: T('doktorów', 'PhD holders') },
     { n: osoby.filter((o) => o.data.grupa === 'doktorant').length, l: T('doktorantów', 'PhD students') },
   ];
   const naglowek = T('Struktura i zakłady', 'Structure and departments');

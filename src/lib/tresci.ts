@@ -2,7 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { now, today, weekday, addDays, hasTime, plusMinutes, type Lang } from './daty';
 import { swietaPanstwowe, pozycjeZamianDni } from './kolory-dni';
-import { zTytulem } from './osoby';
+import { zTytulem, tytulyWJezyku } from './osoby';
 
 export type Aktualnosc = CollectionEntry<'aktualnosci'>;
 export type Obrona = CollectionEntry<'obrony'>;
@@ -103,7 +103,7 @@ export const lataGrantu = (g: Grant) => {
 // Fragment z samym tytułem („dr hab. Jan Dymara, prof. UWr”, „dr hab., prof. UWr Jan Dymara”) zostaje przy sąsiedniej osobie.
 // `tekst` — zapis z pola; `nazwa` — imię i nazwisko z tytułem ze spisu (zTytulem), a gdy osoby nie ma w spisie lub nie ma tam tytułu — `tekst`.
 export interface KierownikGrantu { tekst: string; nazwa: string; osoba?: Pracownik }
-export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[]): KierownikGrantu[] {
+export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[], lang: Lang = 'pl'): KierownikGrantu[] {
   const czesci: { tekst: string; osoba?: Pracownik }[] = [];
   let przedrostek = '';
   for (const czesc of (zapis ?? '').split(/[,;]/).map((s) => s.trim()).filter(Boolean)) {
@@ -117,7 +117,7 @@ export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[]):
     przedrostek = '';
   }
   if (!czesci.length && zapis?.trim()) czesci.push({ tekst: zapis.trim() });
-  return czesci.map((k) => ({ ...k, nazwa: k.osoba?.data.stopien ? zTytulem(k.osoba.data.stopien, k.osoba.data.imie_nazwisko) : k.tekst }));
+  return czesci.map((k) => ({ ...k, nazwa: k.osoba?.data.stopien ? zTytulem(k.osoba.data.stopien, k.osoba.data.imie_nazwisko, lang) : tytulyWJezyku(k.tekst, lang) }));
 }
 
 // Kolejność na liście składu: profesorowie, doktorzy habilitowani, doktorzy, magistrzy.

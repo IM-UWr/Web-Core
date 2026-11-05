@@ -12,6 +12,7 @@ import { u } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { kierownicyGrantu, lataGrantu, slugOf, type Grant } from '../lib/tresci';
+import { tytulyWJezyku } from '../lib/osoby';
 import { daneGrantu } from '../lib/widoki/grant';
 
 interface Props { grant: Grant; lang: Lang }
@@ -26,7 +27,7 @@ const {
 } = await daneGrantu(grant, lang);
 // wiersz innego projektu: tytuł i linia „rodzaj · kierownik · lata · numer” (puste pomijane)
 const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
-const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kierownicyGrantu(g.data.kierownik, osoby).map((k) => k.nazwa).join(', '), lataGrantu(g)]
+const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kierownicyGrantu(g.data.kierownik, osoby, lang).map((k) => k.nazwa).join(', '), lataGrantu(g)]
   .filter(Boolean);
 ---
 <Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner" haslo={haslo}
@@ -65,7 +66,7 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
           </dd>
         </>
       )}
-      {d.wykonawcy && <><dt>{T('Wykonawcy', 'Team')}</dt><dd>{d.wykonawcy}</dd></>}
+      {d.wykonawcy && <><dt>{T('Wykonawcy', 'Team')}</dt><dd>{tytulyWJezyku(d.wykonawcy, lang)}</dd></>}
     </dl>
     {d.strona && <p class="akcja glowny"><Link href={d.strona}>{T('Strona projektu', 'Project website')}</Link></p>}
     {maOpis && <div class="prose opis"><Content /></div>}

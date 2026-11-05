@@ -22,7 +22,7 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
   const zTytulemZeSpisu = (n: string) => {
     const kand = osoby.filter((p) => p.data.imie_nazwisko === n.trim());
     const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
-    return zTytulem(o?.data.stopien, n);
+    return zTytulem(o?.data.stopien, n, lang);
   };
   const specjalnosci = (await getCollection('specjalnosci'))
     .filter((s) => s.data.kierunek === kierunek.id && s.data.opublikowany !== false && s.data.na_stronie_kierunku)

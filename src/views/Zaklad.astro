@@ -10,7 +10,7 @@
 // - Zakłady Instytutu: lista linków do zakładów (ul.linki; bieżący wyróżniony) — nawigacja, poza indeksem wyszukiwarki.
 // Jedna wersja HTML: komputer — dwie kolumny list, tabela składu; telefon (≤ 760 px) — jedna kolumna, tabela w bloki.
 import Link from '../components/Link.astro';
-import { zTytulem } from '../lib/osoby';
+import { zTytulem, tytulyWJezyku } from '../lib/osoby';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
@@ -35,7 +35,7 @@ const lata = (g: (typeof gr)[number]) => (g.data.rok_od && g.data.rok_do && g.da
 const tytulGrantu = (g: (typeof gr)[number]) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 const adresGrantu = (g: (typeof gr)[number]) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
 const etykietaGrantu = (g: (typeof gr)[number]) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang], lata(g), g.data.kod].filter(Boolean).join(' · ');
-const imie = (o: Pracownik) => zTytulem(o.data.stopien, o.data.imie_nazwisko);
+const imie = (o: Pracownik) => zTytulem(o.data.stopien, o.data.imie_nazwisko, lang);
 // jeden wzór daty: dzień, pod nim skrót miesiąca i rok
 const data = (s: string) => ({ iso: s.slice(0, 10), dzien: dayNum(s), reszta: `${monthShort(s, lang)} ${parse(s).y}` });
 const konfPokaz = konf.slice(0, 8);
@@ -68,7 +68,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
           <span class="etyk">{T('Kierownik', 'Head')}</span>
           <b>{kierownik?.data.strona
             ? <Link href={kierownik.data.strona}>{imie(kierownik)}</Link>
-            : kierownik ? imie(kierownik) : d.kierownik}</b>
+            : kierownik ? imie(kierownik) : tytulyWJezyku(d.kierownik ?? '', lang)}</b>
           {(kierownik?.data.email || kierTel || kierownik?.data.pokoj) && (
             <dl class="para">
               {kierownik?.data.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${kierownik.data.email}`}>{kierownik.data.email}</a></dd></>}
@@ -131,7 +131,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
             <li>
               <small class="etyk">{etykietaGrantu(g)}</small>
               <b><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
-              {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {g.data.kierownik}</span>}
+              {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {tytulyWJezyku(g.data.kierownik, lang)}</span>}
             </li>
           ))}
         </ul>
@@ -145,7 +145,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
                 <li>
                   <small class="etyk">{etykietaGrantu(g)}</small>
                   <b><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
-                  {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {g.data.kierownik}</span>}
+                  {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {tytulyWJezyku(g.data.kierownik, lang)}</span>}
                 </li>
               ))}
             </ul>

@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import dzial from '../../data/dzialy/nauka.json';
 import { t, wybierz } from '../i18n';
 import { renderMarkdown } from '../markdown';
+import { tytulyEn, tytulyWJezyku } from '../osoby';
 import { longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
 import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../tresci';
 
@@ -22,7 +23,7 @@ export async function daneObrony(obrona: Obrona, lang: Lang) {
     d.rozprawa && { nazwa: t(lang, 'rozprawa'), plik: d.rozprawa },
     d.streszczenie_pl && { nazwa: t(lang, 'streszczeniePl'), plik: d.streszczenie_pl },
     d.streszczenie_en && { nazwa: t(lang, 'streszczenieEn'), plik: d.streszczenie_en },
-    ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${r.recenzent}`, plik: r.plik })),
+    ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${tytulyWJezyku(r.recenzent, lang)}`, plik: r.plik })),
   ].filter(Boolean) as { nazwa: string; plik: string }[];
   // Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Obrony doktorskie”, imię i nazwisko,
   // hasło (src/data/dzialy/nauka.json, obrona_haslo / _en), kreska i trzy pozycje: data („20 paź”, pod nią dzień tygodnia
@@ -53,11 +54,11 @@ const lista = (x: string[]) => (x.length < 2 ? x.join('') : `${x.slice(0, -1).jo
 // „The public defence … took place on …”), „Supervisor: …”, „The dissertation, abstracts and reviews are available below.”
 function zaproszenieEn(obrona: Obrona, przyszla: boolean): string {
   const d = obrona.data;
-  const kto = `the doctoral dissertation of ${esc(d.kandydat)}, entitled <em>${esc(d.tytul_rozprawy)}</em>`;
+  const kto = `the doctoral dissertation of ${esc(d.kandydat)}, MSc, entitled <em>${esc(d.tytul_rozprawy)}</em>`;
   const gdzie = miejsce(d.miejsce, 'en');
   const kiedy = `on ${esc(longWithDay(d.termin, 'en'))}${gdzie ? `, in ${esc(gdzie)}` : ''}`;
   const akapity = [przyszla ? `You are cordially invited to the public defence of ${kto}, ${kiedy}.` : `The public defence of ${kto}, took place ${kiedy}.`];
-  if (d.promotorzy.length) akapity[0] += ` ${d.promotorzy.length > 1 ? 'Supervisors' : 'Supervisor'}: ${esc(d.promotorzy.join(', '))}.`;
+  if (d.promotorzy.length) akapity[0] += ` ${d.promotorzy.length > 1 ? 'Supervisors' : 'Supervisor'}: ${esc(d.promotorzy.map(tytulyEn).join(', '))}.`;
   const dok = [d.rozprawa && 'dissertation', (d.streszczenie_pl || d.streszczenie_en) && (d.streszczenie_pl && d.streszczenie_en ? 'abstracts' : 'abstract'), d.recenzje.length && (d.recenzje.length > 1 ? 'reviews' : 'review')]
     .filter(Boolean) as string[];
   if (dok.length) akapity.push(`The ${lista(dok)} ${dok.length > 1 || /s$/.test(dok[0]) ? 'are' : 'is'} available below.`);

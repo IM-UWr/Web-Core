@@ -11,6 +11,7 @@ import { u } from '../lib/url';
 import { t, wJezyku, wybierz, odmiana } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneListyZakladow } from '../lib/widoki/listaZakladow';
+import { tytulyWJezyku } from '../lib/osoby';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -38,7 +39,7 @@ const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], [
             {z.data.opis && <span>{wybierz(z.data, 'opis', lang)}</span>}
             {obszary.length > 0 && <span class="zs-obszary">{obszary.slice(0, 4).join(' · ')}</span>}
             <dl class="para">
-              {z.data.kierownik && <><dt>{T('Kierownik', 'Head')}</dt><dd>{z.data.kierownik}</dd></>}
+              {z.data.kierownik && <><dt>{T('Kierownik', 'Head')}</dt><dd>{tytulyWJezyku(z.data.kierownik, lang)}</dd></>}
               <dt>{T('Skład', 'Members')}</dt><dd>{ileOsob(n)}</dd>
             </dl>
           </li>

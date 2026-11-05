@@ -56,7 +56,7 @@ export async function daneWladz(lang: Lang) {
     const z = p?.data.zaklad ? listaZakladow.find((x) => x.id === p.data.zaklad) : undefined;
     return {
       rola: w(o, 'rola'),
-      nazwa: zTytulem(o.stopien || p?.data.stopien, o.imie_nazwisko),
+      nazwa: zTytulem(o.stopien || p?.data.stopien, o.imie_nazwisko, lang),
       inicjaly: inicjaly(o.imie_nazwisko),
       email: o.email || p?.data.email || '',
       pokoj: o.pokoj || (zeSpisuPokoj ? p?.data.pokoj : '') || '',

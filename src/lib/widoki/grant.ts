@@ -52,7 +52,7 @@ export async function daneGrantu(grant: Grant, lang: Lang) {
 
   // Kierownik (albo kilku) ze spisu pracowników: imię i nazwisko z tytułem; link do strony domowej, a gdy jej brak — do zakładu.
   const osoby = await pracownicy();
-  const kierownicy = kierownicyGrantu(d.kierownik, osoby);
+  const kierownicy = kierownicyGrantu(d.kierownik, osoby, lang);
   const wszystkieZaklady = await zaklady();
   const zaklad = wszystkieZaklady.find((z) => z.id === zakladGrantu(grant, osoby));
   const zakladOsoby = (id?: string) => (id && wszystkieZaklady.some((z) => z.id === id) ? id : undefined);

@@ -10,6 +10,7 @@
 // administracja). Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
 // Komputer: wiersz w kolumnach z nagłówkiem nad listą (jak tabela wzorca treści); telefon (≤ 760 px): wiersz w jednej kolumnie.
 import { zTytulem } from '../lib/osoby';
+import type { Lang } from '../lib/daty';
 import { isExternal } from '../lib/url';
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 
@@ -28,6 +29,7 @@ export interface Osoba {
 }
 
 interface Props {
+  lang?: Lang;
   osoby: Osoba[];
   // krotko: krótsza nazwa grupy (dane: src/lib/widoki/pracownicy.ts) — używa jej spis „Na tej stronie” w widoku
   grupy: { id: string; nazwa: string; krotko?: string }[];
@@ -71,7 +73,7 @@ function wedlugRoku(osoby: Osoba[], napisy: Record<string, string>): Podsekcja[]
   return wynik;
 }
 
-export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Props) {
+export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy, lang = 'pl' }: Props) {
   const [q, setQ] = useState('');
   const [zaklad, setZaklad] = useState('');
   const nazwyZakladow = useMemo(() => Object.fromEntries(zaklady.map((z) => [z.id, z.nazwa])), [zaklady]);
@@ -100,7 +102,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     .filter((g) => g.osoby.length > 0);
 
   const wiersz = (o: Osoba, maTel: boolean) => {
-    const nazwa = zTytulem(o.stopien, o.imie_nazwisko);
+    const nazwa = zTytulem(o.stopien, o.imie_nazwisko, lang);
     const linkZakladu = o.zaklad ? linkiZakladow[o.zaklad] : undefined;
     return (
       <li key={o.id} className={o.strona ? 'zp-w zp-klik' : 'zp-w'}>

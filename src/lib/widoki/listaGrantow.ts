@@ -26,7 +26,7 @@ export async function daneListyGrantow(lang: Lang) {
     .sort((a, b) => b - a)
     .map((r) => ({ rok: r, lista: zakonczone.filter((g) => g.data.rok_do === r) }));
 
-  const kier = (g: Grant) => kierownicyGrantu(g.data.kierownik, osoby);
+  const kier = (g: Grant) => kierownicyGrantu(g.data.kierownik, osoby, lang);
   const zakladProjektu = (g: Grant) => listaZakladow.find((z) => z.id === zakladGrantu(g, osoby));
 
   // Pasek liczb — wszystko liczone z kolekcji (kwot nie sumujemy: różne waluty i zapisy).

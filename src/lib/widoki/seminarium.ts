@@ -31,7 +31,7 @@ export async function daneSeminarium(seminarium: Seminarium, lang: Lang) {
   const koordynatorzy = d.prowadzacy.map((imie) => {
     const kand = osoby.filter((p) => p.data.imie_nazwisko === imie.trim());
     const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
-    return { nazwa: zTytulem(o?.data.stopien, imie), strona: o?.data.strona as string | undefined };
+    return { nazwa: zTytulem(o?.data.stopien, imie, lang), strona: o?.data.strona as string | undefined };
   });
   // Adres automatu listy mailingowej (Google Apps Script, patrz README → „Powiadomienia e-mail”); pusty = zapisy wyłączone.
   const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
