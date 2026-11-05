@@ -3,6 +3,21 @@
 Gałąź robocza: `wyglad/porzadki` (z `wyglad/zalozyciele`, `d12c994`). Gałęzie etapów: `wyglad/porzadki-01-telefon`, …
 Pytania do właściciela: `PYTANIA.md`, sekcja „Zlecenie 12”.
 
+## Podsumowanie (stan na 5.11.2026, rano)
+| Etap | Gałąź | Stan |
+|---|---|---|
+| 0 — wzorce | — | zrobione: zrzuty komputera (216) i telefonu z łatką (72), rozmiary |
+| 1 — telefon z łatki, jedna wersja HTML | `wyglad/porzadki-01-telefon` | zrobione |
+| 2 — wspólny szablon podstrony, spis z prawej | `wyglad/porzadki-02-szablon` | zrobione (zalecenie 3 zlecenia 11 w całości) |
+| 3 — pozostałe podstrony | `wyglad/porzadki-03-podstrony` | zrobione: wszystkie 16 z listy, według wzorca treści (zalecenie 14) |
+| 4 — usunięcie starego kodu | `wyglad/porzadki` | zrobione, z wyjątkami opisanymi niżej (przełącznik `uklad`, resztki starych plików CSS w użyciu) |
+
+- Każda przeniesiona strona ma jedną wersję HTML; stary wygląd usunięty (komponenty, reguły chowające, `.tylko-*`, ok. 40%
+  starego CSS); silnik animacji banerów zachowany nieużywany z instrukcją.
+- Komputer na stronach nieruszanych w etapach 2–3 i telefon na stronach z łatki — identyczne co do piksela z wzorcami.
+- Decyzje do oceny: wygląd telefonu na Planie zajęć, Projektach i stronach tekstowych (etap 1), zmiany w menu telefonu
+  i banerze Kierunku (etap 4), `PYTANIA.md` sekcja „Zlecenie 12”.
+
 ## Jak budowałem i sprawdzałem
 - **Treści:** prawdziwe, pobrane `skrypty/pobierz_tresci.py` w chmurze (zgoda w czacie 4.11: zakaz dotyczył komputera
   właściciela), raz, na początku pracy (1234 pliki z 21 repozytoriów Web-*). Leżą tylko w ścieżkach z `.gitignore` i nie są
@@ -203,3 +218,114 @@ Strony nieprzeniesione: **brak** (wszystkie 16 z listy, w tym Kalendarz i zamian
   główna, 4 działy, Władze, Projekty i granty, Plan zajęć (komputer: identyczne co do piksela; telefon Planu zajęć —
   jeden rząd pikseli dolnej krawędzi wciśniętego przycisku semestru, ok. 0,5 px różnicy wysokości przycisku).
   Zmienione — strony z etapu 3 i strony tekstowe (zamierzone). Przykłady: `raport-zrzuty/etap3-*.png`.
+
+## Etap 4: usunięcie starego kodu — zrobione
+Gałąź: `wyglad/porzadki` (końcowa). Commity: `67e9849`, `446b864`, `ef67ad3`, `9a8c99a`, `27b923e`, `412aae7`, `738d34b`.
+
+**Jak usuwałem.** Skrypt (Playwright + postcss) ładował wszystkie 748 zbudowanych stron i sprawdzał każdy selektor starych
+plików CSS (`global.css`, `tlo.css`, `telefon.css`, `portal.css`, `uklad-zwarta.css`, `uklad-portal.css`, `przejscia.css`)
+— z pominięciem stanów, których w statycznym HTML nie ma (`:hover`, `:focus`, klasy i atrybuty ustawiane skryptami, ciemny
+motyw, ustawienia tła). Usunięte są reguły, które nie trafiają w żaden element na żadnej stronie; reguła zostawała, jeśli
+któraś jej klasa występuje w kodzie w napisie (atrybut `class`, lista klas, skrypt) — to chroni stany zależne od danych
+(podgląd nieopublikowanej strony, brak tłumaczenia, puste listy). Po każdej rundzie: build i porównanie zrzutów.
+
+**Usunięte pliki**
+- komponenty: `Stopka`, `KafelekKoloryDni`, `KartaAktualnosci`, `ListaReferatow`, `WTymDziale`, `ZobaczWiecej`,
+  `EtykietaRodzaju`, `FiltrISzukaj`, `KartaWydarzenia`, `SpisTresci` (stary spis, także wariant `bok`), `TekstWstepny`,
+  `Wstecz`, `zal/BocznaNawigacja` (etap 2); przy przenoszeniu (etap 3): `TabelaReferatow`, `WierszGrantu`;
+- style: `src/styles/plan.css`;
+- `TEST-TELEFON.md` z łatki nigdy nie trafił do repozytorium (etap 1).
+
+**Usunięte reguły i fragmenty**
+- `global.css` 69,5 → 42,2 kB (dawne menu komputera `.nav`/`.dropdown`, pole szukania w nagłówku, baner strony głównej
+  `.hero`, karty i kafelki, stopka `.ftr`…); `telefon.css` 31,0 → 18,7 kB (klocki i bloki dawnego telefonu, przełączanie
+  `.tylko-komputer` / `.tylko-telefon`); `portal.css` 11,9 → 4,6 kB; `tlo.css` 21,9 → 18,5 kB (rysunki banera przeniesione
+  do `src/scripts/baner/baner.css`); `uklad-zwarta.css` 23,2 → 13,1 kB; razem `src/styles` 235,6 → 215,0 kB mimo nowych
+  plików (`zal-telefon.css`, `zal-podstrona.css`, `zal-tresc.css`);
+- klasy `.tylko-komputer` / `.tylko-telefon`: nie ma ich już w żadnym elemencie ani regule (`LiczbyBanera` daje zwykłe
+  `.pt-liczby`, nagłówek wybiera pierwszą listę liczb);
+- `Naglowek.astro` (nagłówek telefonu): bez logiki dawnego banera — przezroczystość na zdjęciu (`hdr-foto`, `hdr-glowna`),
+  cień po przewinięciu, kolor stopki na dole strony, „ciemne menu na ciemnym pasie”; panel menu ma na stałe ciemne kolory
+  (`.menu-ciemne`), bo nagłówek jest zawsze granatowy;
+- nieużywane zmienne i importy w widokach (`astro check`: 0 ostrzeżeń i 0 podpowiedzi).
+
+**Silnik animacji banerów — zostaje, nieużywany** (decyzja 4.11, 22:30): `src/scripts/baner/` (silnik, 36 motywów),
+`src/lib/motywyBanerow.ts` i dane motywów w `src/lib/widoki/*` bez zmian; nic ich nie importuje. Style, którymi obsługiwał
+go stary baner (`.ph-m`, `.ph-fala`, `.ph-anim`, `.ph-anim-gra`, `--ph-rysunek`, pole rysunku na telefonie), przeniesione
+bez zmian do niepodpiętego `src/scripts/baner/baner.css`; opis i instrukcja podpięcia: `src/scripts/baner/README.md`.
+Animacja szkiców patronów (`src/scripts/zal/szkice.ts`) działa dalej.
+
+**Czego nie usunąłem i dlaczego**
+- **Przełącznik `uklad` (`<body data-uklad="zwarta portal-baner">`) z `uklad-zwarta.css` i `uklad-portal.css`** (przycięte do
+  żywych reguł). Jest dziś na 105 stronach (działy, Władze, Projekty, Plan, część stron tekstowych, Pracownicy, Struktura,
+  zakłady, Kierunek, Specjalność, Rok akademicki…), a na ponad 600 go nie ma (aktualności, granty, roczniki, obrony…). Jego
+  reguły nadal ustalają interlinię nagłówka (1,55 — położenie hasła i liczb), podstawowy stopień i interlinię treści oraz
+  wygląd `.prose`. Usunięcie zmieni piksele stron, które miały zostać bez zmian (np. banery działów). Do zrobienia razem
+  z ujednoliceniem odstępów, z jedną wartością dla wszystkich stron.
+- **`skrypty/warianty.py` i `wyglad-podstron.json`** — wywołuje je workflow `deploy.yml` (warianty wyglądu na GitHub Pages);
+  workflowów nie zmieniam.
+- **Opakowanie `.page-head.ph.ph-granat…` w `NaglowekStrony.astro`** i reguły `tlo.css` / `telefon.css`, które w nie trafiają:
+  na każdej szerokości ma `display: contents`, ale jego klasy wciąż wpływają na odstępy strony Szukaj (jedynej podstrony
+  spoza szablonu) i na interlinię nagłówka. `NaglowekStrony.astro` zostaje jako cienka warstwa nad `zal/NaglowekZ.astro`
+  (przyjmuje dawne propsy widoków).
+- **Reszta `global.css`, `tlo.css`, `telefon.css`, `portal.css`** — reguły, które nadal trafiają w elementy nowego wyglądu
+  (tokeny kolorów, typografia, `.wrap`, `.prose` poza wzorcem treści, `.sr-only`, nagłówek i menu telefonu z
+  `Naglowek.astro`, tło `body[data-tlo]`, podstawy `.pt-liczby`). Każdy plik ma w nagłówku notę „PO PORZĄDKACH” z opisem.
+  Scalenie ich w jeden plik nic nie zmienia w wyglądzie, a przeniesienie reguł do nowych plików wymaga sprawdzania kaskady
+  reguła po regule — zostawiam na później.
+- **Strona Szukaj, powiadomienia, 404** — mają nowy nagłówek i dotychczasową treść (poza listą etapu 3).
+
+**Zmiany widoczne w etapie 4 (zamierzone)**
+- Menu telefonu na podstronach: kreski między pozycjami i obok strzałek w ciemnych kolorach — jak dotąd na stronie głównej
+  (`raport-zrzuty/etap4-menu-telefonu-podstrona-przed-po-roznica.png`).
+- Kierunek (komputer): fakty w banerze są widoczne. W stanie po etapie 3 (i wcześniej na `wyglad/zalozyciele`) baner miał
+  miejsce na liczby, ale dwie listy chowały się nawzajem i nie było żadnej (`etap4-kierunek-liczby-w-banerze-…png`).
+  Na telefonie fakty dalej schowane (cztery nie mieszczą się w trzech kolumnach).
+- Specjalność (telefon): etykiety specjalności w banerze widoczne także na telefonie (jedna wersja;
+  `etap4-specjalnosc-telefon-etykiety-…png`).
+- Plan zajęć: panele semestrów mają `id` `zimowy` / `letni` — linki z treści (`/studia/plan-zajec#letni`) znów mają cel.
+
+**Sprawdzenie etapu 4**
+- `npm run build` bez błędów i ostrzeżeń (748 stron, Pagefind 734); `skrypty/sprawdz_tresci.py`: OK (550 plików).
+- `astro check` (doinstalowany tymczasowo, bez zapisu w `package.json`): 3 błędy — te same co na `d12c994`
+  (`astro.config.mjs`: brak typów Node dla `process`), 0 ostrzeżeń, 0 podpowiedzi (przed porządkami: 3 podpowiedzi).
+- `.github/qa/qa.py` lokalnie (build z `BASE_PATH=''` jak w workflow; bez lychee i pa11y — brak narzędzi, sprawdzenie plików
+  i kotwic własnym kodem skryptu): zepsute linki wewnętrzne jak przed porządkami — 1 adres w treściach (2 wystąpienia,
+  konferencja 2017 w „Warto wiedzieć”); brakujące kotwice: 9 — te same co przed porządkami (`rok-akademicki#zamiany-dni`,
+  `#day-swaps`, `egzaminy-i-dyplom#egzamin-magisterski`).
+- Zrzuty (każda runda usuwania): komputer 216/216 identycznych; telefon 70/72 (dwie różnice to szum: jeden rząd pikseli
+  krawędzi wciśniętego przycisku semestru Planu zajęć — różni się też między dwoma przebiegami tego samego builda);
+  dodatkowe strony (Szukaj PL/EN, powiadomienia, 404, zamiana dni, Szkoła doktorska, rocznik 2010, `/en/aktualnosci`,
+  `/en/instytut/wladze`, Polityka prywatności — 10 stron × 8 wariantów) identyczne; stany interaktywne (menu telefonu na
+  podstronie i na głównej, spis rozwinięty na telefonie, hamburger okładki, rozwinięte pytanie FAQ — w obu motywach)
+  identyczne poza zamierzoną zmianą menu. Wyszukiwarka z zapytaniem „Karch” wygląda jak przed porządkami.
+- **Telefon na stronach z łatki** (główna, 4 działy, `/en`, `/en/nauka`): identyczny z wzorcem łatki w obu motywach
+  (`raport-zrzuty/etap1-4-telefon-glowna-latka-i-koniec.png`); Władze różnią się tylko spisem i „Następną stroną w dziale”
+  (etap 2).
+- **Komputer na stronach nieruszanych w etapach 2–3** (strona główna, 4 działy, `/en`, `/en/nauka`): identyczny z wzorcem
+  z etapu 0 (sprawdzane po każdym etapie; przykład `etap4-przyklad-identyczny-wladze-1366-ciemny.png`).
+
+## Rozmiary przed i po (te same treści, `npm run build`)
+
+| | przed (`d12c994`) | po (`wyglad/porzadki`) |
+|---|---|---|
+| CSS w `dist/_astro` | 268 639 B | 227 760 B (−15%) |
+| JS w `dist/_astro` | 395 316 B | 247 494 B (−37%) |
+| HTML Planu zajęć | 1 126 257 B | 351 542 B (−69%) |
+| HTML strony głównej | 213 322 B | 176 424 B (−17%) |
+| HTML wszystkich 748 stron | 42 361 439 B | 43 671 406 B (+3%) |
+| pliki w `src/styles` / `src/scripts` / `src/components` | 13 / 43 / 42 | 15 / 46 / 30 |
+| bajty w `src/styles` | 235 580 | 215 042 |
+
+Łączny HTML urósł o 3% przez sygnety patronów w menu telefonu z łatki: cztery szkice w linii w każdym nagłówku
+(+16 kB na stronę, dobrze się kompresują). Mniejsze strony mogłyby je mieć jako jeden plik SVG z maską CSS — do decyzji
+(PYTANIA 12.9). `src/scripts` +3: `zal/kolor-dnia.ts`, `baner/baner.css`, `baner/README.md`.
+
+## Potrzebne zmiany w CMS (nie wprowadzałem — tylko lista)
+- Pole „Prawy pasek” (`pasek_boczny`) stron tekstowych — uprościć do „Spis na tej stronie: tak / nie” (PYTANIA 12.4).
+- Pola wyglądu, które już nic nie zmieniają: „Tło strony” (`tlo_strony`), „Sekcje” (`sekcje`), „Nagłówki podstron”
+  (`naglowki_podstron.wariant`) — do usunięcia z Pages CMS (PYTANIA 12.5).
+- Pola „hasło” i „liczby” stron, które pokazywały się tylko na dawnym telefonie (np. `plan_haslo`, `granty_haslo`) — działają
+  dalej w nowym banerze (hasło razem z liczbami); bez zmian.
+- Bez zmian względem `RAPORT-WYGLAD.md`: pole „Dział” przy aktualnościach, Popularyzacja w „Warto wiedzieć”, patroni
+  w Ustawieniach.

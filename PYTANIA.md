@@ -124,3 +124,24 @@ konfiguracji CMS), ale nowy wygląd ich nie używa (stare style usunięte w etap
 ## 12.6. Liczby w banerze Projektów i grantów na telefonie
 **Pytanie.** Cztery liczby w trzech kolumnach — ostatnia wychodzi poza ekran (tak było w łatce). **Przyjęta odpowiedź.**
 Bez zmian (telefon identyczny z łatką); rozwiązuje to zalecenie 2 zlecenia 11 (liczby w jednym rzędzie, nadmiarowe chowane).
+
+## 12.7. Menu telefonu: ciemne kolory panelu na każdej stronie
+**Pytanie.** Dotąd panel menu dostawał ciemne kolory (`.menu-ciemne`) tylko na stronie głównej (nagłówek na zdjęciu);
+na podstronach kreski w panelu były jasne. Nagłówek jest teraz zawsze granatowy. **Przyjęta odpowiedź.** Ciemne kolory
+panelu na każdej stronie (jak na głównej). **Jak cofnąć.** Usunąć klasę `menu-ciemne` z `.mnav` i `.mnav-tlo` w `Naglowek.astro`.
+
+## 12.8. Liczby w banerze Kierunku
+**Pytanie.** Baner Kierunku miał na komputerze miejsce na liczby, ale żadnej nie pokazywał (dwie listy chowały się nawzajem).
+**Przyjęta odpowiedź.** Pokazuję fakty kierunku (np. „3 lata — studia I stopnia”, „A+ — kategoria naukowa”); na telefonie
+schowane jak dotąd. Przy czterech faktach rząd łamie się na komputerze — rozwiązuje to zalecenie 2 zlecenia 11.
+**Jak cofnąć.** W `Kierunek.astro` usunąć listę `.kh-liczby` ze slotu `baner`.
+
+## 12.9. Sygnety w menu telefonu a rozmiar stron
+**Pytanie.** Łatka telefonu wstawia w menu cztery szkice-sygnety w linii: +16 kB HTML na każdej z 748 stron (łącznie HTML
++3%). **Przyjęta odpowiedź.** Zostawione (telefon identyczny z łatką). **Do decyzji:** sygnety jako jeden plik SVG z maską CSS.
+
+## 12.10. Przełącznik `uklad` („zwarta portal-baner”)
+**Pytanie.** Zlecenie wymienia przełączniki wariantów jako kandydatów do usunięcia, „jeśli nic poza starym wyglądem z nich nie
+korzysta”. Nowy wygląd korzysta: interlinia nagłówka i treści na 105 stronach zależy od `data-uklad`. **Przyjęta odpowiedź.**
+Przełącznik zostaje (pliki przycięte do żywych reguł); usunięcie = jedna wartość dla wszystkich stron i zmiana pikseli na
+części z nich — do zrobienia razem z ujednoliceniem odstępów. `skrypty/warianty.py` zostaje, bo używa go `deploy.yml`.
