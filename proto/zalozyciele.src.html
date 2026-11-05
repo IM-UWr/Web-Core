@@ -1643,8 +1643,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="p-ziemia" data-v="ziemia" aria-pressed="false">Ziemia i niebo</button>
     </div></div>
     <div class="grupa" id="wybor-motywu"><span>Motyw</span><div class="seg" data-ustaw="motyw">
-      <button type="button" id="m-auto" data-v="auto" aria-pressed="true">jak w systemie</button>
-      <button type="button" id="m-light" data-v="light" aria-pressed="false">jasny</button>
+      <button type="button" id="m-light" data-v="light" aria-pressed="true">jasny</button>
       <button type="button" id="m-dark" data-v="dark" aria-pressed="false">ciemny</button>
     </div></div>
     <div class="grupa ustalone" id="wybor-tla"><span>Tło</span><div class="seg" data-ustaw="tlo">
@@ -2415,6 +2414,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     document.querySelector(`#wybor-motywu [data-v="${v}"]`).click();
   });
   document.documentElement.dataset.tlo = 'cieple';
+  document.documentElement.dataset.theme = 'light'; /* 5.11, 13:13: bez „jak w systemie” — strona startuje w jasnym (jak Baza.astro), przełącza księżyc */
   document.documentElement.dataset.ciemny = 'A';
   let pasekIn = 'baner', strona = 'dzial', naglowek = 'zdjecie', zdjeciaWl = true;
   const wbr = (e) => e.replace('@', '<wbr>@');
@@ -2843,7 +2843,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (popTekst === 'nowy') return `<section class="in-sek" style="border-top:0;padding-top:10px"><div class="in-tba pop-nowy">${POP_NOWY.sekcje.map((x) => `<section><h4>${x.h}</h4>${(x.p || []).map((t) => `<p>${t}</p>`).join('')}${x.li ? `<ul>${x.li.map(([b, t]) => `<li><b>${b}:</b> ${t}</li>`).join('')}</ul>` : ''}<p class="pop-uz"><b>Do uzupełnienia:</b> ${x.uz}</p><div class="pop-linki">${x.l.map((k) => `<a href="${POP_LINKI[k][1]}" target="_blank" rel="noopener">${POP_LINKI[k][0]} ↗</a>`).join('')}</div></section>`).join('')}</div></section>`;
     return `<section class="in-sek" style="border-top:0;padding-top:10px"><div class="in-tba">${['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy'].map((h) => `<section><h4>${h}</h4><p>To be announced</p></section>`).join('')}</div></section>`;
   }
-  const SALE = { instytut: 'EM', nauka: 'WS', studia: 'B', popularyzacja: 'HS' }; // sale wykładowe nazwane od patronów; B = Knaster do sprawdzenia
+  const SALE = { instytut: 'EM', nauka: 'WS', studia: 'B', popularyzacja: 'HS' }; // sale wykładowe nazwane od patronów; B = Knaster (potwierdzone 5.11, 13:13)
   const PODPISY = { instytut: 'E. Marczewski', nauka: 'W. Ślebodziński', studia: 'B. Knaster', popularyzacja: 'H. Steinhaus' };
   const IN_NOTA = {
     instytut: 'Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1957–1962. Zabiegał o budowę gmachu Instytutu.',
@@ -3450,8 +3450,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <div class="ak-in os-in"><div class="pd-tresc tresc">
         <section><h3>Czterech patronów</h3><p class="wst">Strona jest zbudowana wokół czterech matematyków, którzy po wojnie tworzyli od podstaw matematykę we Wrocławiu. Każdy patronuje jednemu działowi i nadaje mu kolor, a ich imiona noszą sale wykładowe Instytutu.</p>
           <ul class="dwa">${P.map(([dz, n, p, o]) => `<li data-dzial="${dz}"><span class="etyk">${n}</span><b>${p}</b><span>${o}</span></li>`).join('')}</ul>
-          <p>Twarz patrona rysuje się kreską przy pierwszym wejściu na stronę działu, a w nagłówkach podstron przy każdej wizycie losują się ciekawostki z jego życia i matematyki.</p>
-          <div class="uwaga"><span class="etyk">Do potwierdzenia</span><p>Czy sala B nosi imię Bronisława Knastera (w Instytucie jest też zwykła sala A).</p></div></section>
+          <p>Twarz patrona rysuje się kreską przy pierwszym wejściu na stronę działu, a w nagłówkach podstron przy każdej wizycie losują się ciekawostki z jego życia i matematyki.</p></section>
         <section><h3>Źródła ilustracji</h3><ul class="kreski">
           <li><b>Szkice patronów</b> na podstawie fotografii: Władysław Ślebodziński (1938) i Hugo Steinhaus (1968) — ${Z('Wikimedia Commons')}, domena publiczna; Edward Marczewski i Bronisław Knaster — ${Z('MacTutor History of Mathematics')}, University of St Andrews.</li>
           <li><b>Podpisy</b> według reprodukcji: Edward Marczewski — <i>Nowa Księga Szkocka</i>, t. I, wpis z 7 lipca 1946 (${Z('Biblioteka WMI UWr')}); Władysław Ślebodziński — legitymacja z 1948 r., w: H. Langner-Matuszczyk, <i>Władysław Ślebodziński – matematyk, więzień KL Auschwitz nr 79053</i>, „Śląska Republika Uczonych”, t. 7, 2016; Bronisław Knaster (1946) i Hugo Steinhaus (1957) — J. Dutkiewicz, <i>Mieczysław Warmus. Życie i praca naukowa</i>, 2003 (${Z('Biblioteka Cyfrowa Politechniki Warszawskiej')}).</li>
