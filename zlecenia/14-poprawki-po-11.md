@@ -9,15 +9,26 @@ Decyzje właściciela z 5.11 przed południem (godziny przy zaleceniach). Wzór 
 - Treści (nakładka: `src/data`, `src/content`, `public/pliki`) są poza gitem. Gdy zalecenie wymaga zmiany treści, **nie zmieniaj nakładki na stałe**: przygotuj łatkę dla repozytorium treści w `dok/latki/zlecenie-14/<Repozytorium>.patch` (jak `dok/en/latki/`) i opisz ją w raporcie. Do sprawdzenia lokalnie możesz zmienić plik nakładki, ale najpierw skopiuj oryginał do `.przekazanie\robocze\nakladka-przed-14\` (ta sama ścieżka), a po sprawdzeniu przywróć oryginał.
 - Po każdym zaleceniu: `npm run build`, zrzuty 1440 i 1920 px oraz telefon 390 px, jasny i ciemny motyw.
 
-**Zakres i kolejność:** 25 → 26 → 23 → 24. Zalecenie **21 CZEKA** (nie wykonywać), **22 ODŁOŻONE** (nie wykonywać).
+**Zakres i kolejność:** 25 → 26 → 23 → 24 → 22. Zalecenie **21 CZEKA** (nie wykonywać).
 
 ## Zalecenia
 
 ### 21. Wpisy na listach — CZEKA
 Treść zalecenia dopisze właściciel. Nie wykonywać.
 
-### 22. Wyróżniona aktualność — ODŁOŻONA (decyzja 5.11, 12:00: „Wyróżnionego na razie nie będzie, mam wątpliwości co do wyróżniania”)
-Nie wykonywać. Pole `wyroznij_do` i dotychczasowa plakietka na okładce zostają bez zmian.
+### 22. Pierwsza aktualność zawsze powiększona (decyzja 5.11, 12:36: „chodzi żeby pierwsza była powiększona, dwa wiersze, duże zdjęcie, ale nie wtedy gdy jest wyróżniona, tylko zawsze pierwsza i najnowsza”)
+- Zastępuje „wyróżnioną aktualność” (11:51, odłożona o 12:00). **Bez znacznika i bez nowego pola w CMS.** Pole `wyroznij_do` i dotychczasowa plakietka na okładce zostają bez zmian.
+- **Wzór:** prototyp v92: okładka → Szybki dostęp (kolumna „Aktualności”) i widok „Aktualności”; przełącznik „Pierwsza aktualność” (Powiększona / Zwykła). Kod: `wierszWyr()`, `rysujAktualnosci()`, CSS `.ok-w.wyr` i `.wa.wyr`.
+- **Szybki dostęp, kolumna „Aktualności”:** pierwszy wpis kolumny (najnowszy) zajmuje miejsce dwóch wierszy:
+  - kolumny 50 px | tekst | zdjęcie 168×126 (`object-fit: cover`), odstępy 9 px nad i 10 px pod;
+  - data w kolorze tekstu (nie przygaszona jak w pozostałych wierszach), etykieta „Dział · rodzaj” jak dziś;
+  - tytuł Brygadą 21 px / 1,25 (zamiast pogrubionego tekstu), pod nim zajawka 13 px / 1,45, najwyżej 2 linie (`line-clamp`);
+  - w krótkiej kolumnie (pozycje 1 i 2 siatki) widać powiększony wpis i jeszcze jeden zwykły; „Zobacz więcej (N)” liczy powiększony za dwa; w długiej kolumnie dopasowanie liczby wierszy działa jak dziś;
+  - wpis bez zdjęcia: w polu 168×126 zastępczy sygnet patrona działu, jak przy miniaturach bez zdjęcia.
+  - Jeśli dzisiejsze reguły (`aktualnosciNaGlowna`: wpisy pilne i wyróżnione na górze) postawią na pierwszym miejscu inny wpis niż najnowszy, powiększony jest i tak pierwszy wpis kolumny. Opisz w raporcie, czy taki wpis jest dziś w danych.
+- **Strona Aktualności** (`ListaAktualnosci`, `WierszAktualnosci.astro`): pierwszy widoczny wpis listy powiększony: kolumny 76 px | tekst | 360 px (zdjęcie 3:2), data 44 px, tytuł 30 px / 1,2, tekst 16,5 px, odstępy 22 / 24 px. Po filtrze rodzaju albo szukaniu powiększa się pierwszy widoczny wpis (skrypt listy przestawia klasę). Bez zdjęcia: bez pola zdjęcia, powiększone tylko data i tytuł.
+- **Telefon:** pierwszy wpis z większym zdjęciem (na całą szerokość kolumny tekstu, 3:2, nad etykietą) i tytułem o krok większym; zrzuty w raporcie do oceny.
+- Ciemny motyw i wersja angielska jak reszta listy.
 
 ### 25. Kolory działów: paleta „Lazur i malina” zamiast „Atramentów” (decyzja 5.11, 10:32)
 - Instytut bursztyn, Nauka szmaragd, Studia lazur, Popularyzacja malina. W OKLCH każda rola (jasny, głęboki, atrament, tło) ma tę samą jasność i nasycenie we wszystkich działach, różni się tylko odcień.

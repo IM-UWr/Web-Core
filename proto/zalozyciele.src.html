@@ -510,8 +510,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-wiecej:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
 .ok-wiecej .kropki3 { letter-spacing: .12em; color: var(--m-ink); }
 .ok-w.akt .kiedy { padding-top: 1px; font-weight: 700; }
-/* wyróżniona aktualność (5.11, 11:51): pierwsze dwa wiersze scalone w jeden — znacznik „Ważne”, tytuł Brygadą, zajawka
-   i większe zdjęcie; w krótkiej kolumnie zajmuje miejsce dwóch wierszy (zostaje jeszcze jeden zwykły) */
+/* powiększona pierwsza aktualność (5.11, 12:36; wcześniej „wyróżniona” z 11:51): pierwszy, najnowszy wpis zajmuje miejsce dwóch wierszy —
+   tytuł Brygadą, zajawka i większe zdjęcie, bez znacznika; w krótkiej kolumnie zostaje jeszcze jeden zwykły wiersz */
 .ok-w.wyr { grid-template-columns: 50px minmax(0, 1fr) 168px; padding: 9px 0 10px; }
 .ok-w.wyr .min { width: 168px; height: 126px; }
 .ok-w.wyr .t { margin-top: 3px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.25; }
@@ -1750,8 +1750,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="zwijane" aria-pressed="true">Zwijane działy ✓</button>
     </div></div>
     <div class="grupa" id="wybor-wyr"><span>Pierwsza aktualność</span><div class="seg" data-ustaw="wyr">
-      <button type="button" id="wy-nie" data-v="nie" aria-pressed="true">Zwykła</button>
-      <button type="button" id="wy-tak" data-v="tak" aria-pressed="false">Wyróżniona (odłożona)</button>
+      <button type="button" id="wy-tak" data-v="tak" aria-pressed="true">Powiększona ✓</button>
+      <button type="button" id="wy-nie" data-v="nie" aria-pressed="false">Zwykła</button>
     </div></div>
     <div class="grupa ustalone" id="wybor-prel"><span>Prelegent</span><div class="seg" data-ustaw="prel">
       <button type="button" id="pl-po" data-v="po" aria-pressed="true">Po tytule</button>
@@ -2243,8 +2243,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     ['nauka', '2', 'paź · pt.', 'Nauka', 'obrona doktorska', 'Regularity of free boundaries in the thin obstacle problem', '{{MIN_OBRONA}}'],
     ['studia', '1', 'paź · czw.', 'Studia', 'studenci', 'Witamy studentów pierwszego roku', '']];
   let liczbaSem = 5;
-  /* wyróżniona aktualność (5.11, 11:51; pole „Wyróżnij do…” w CMS, wyroznij_do): pierwszy wpis AKT */
-  let wyrAkt = false; /* 5.11, 12:00: „Wyróżnionego na razie nie będzie, mam wątpliwości co do wyróżniania” — przełącznik zostaje do porównań */
+  /* powiększona pierwsza aktualność (5.11, 12:36): zawsze pierwszy, najnowszy wpis AKT — bez znacznika, niezależnie od pola „Wyróżnij do…” */
+  let wyrAkt = true; /* 5.11, 12:36: „pierwsza ma być powiększona, dwa wiersze, duże zdjęcie, ale nie wtedy gdy jest wyróżniona, tylko zawsze pierwsza i najnowsza” — bez znacznika i bez pola w CMS */
   const AKT_WYR = { fot: '{{MIN_MACIERZE_D}}', zaj: 'Gościnny wykład o zaskakującym związku zer funkcji dzeta Riemanna z wartościami własnymi macierzy losowych. Czwartek, 12 listopada, 13:15, sala WS.' };
   /* prelegent przy seminariach: kilka wariantów do porównania (przełącznik „Prelegent”) */
   let wariantPrel = 'po';
@@ -2256,7 +2256,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (wariantPrel === 'najpierw') return `<span class="gdzie">${o[3]} <i>· ${o[4]}</i></span><span class="kto-naj">${n}</span><span class="t t-cichy">${o[5]}</span>`;
     return `<span class="gdzie">${o[3]} <i>· ${o[4]}</i></span><span class="t">${o[5]} <span class="kto">– ${n}</span></span>`;
   }
-  const wierszWyr = (o) => `<a class="ok-w wyr" href="#" data-dzial="${o[0]}"><span class="kiedy"><b>${o[1]}</b>${o[2]}</span><span class="tr"><span class="gdzie"><em class="wyr-zn">Ważne</em>${o[3]} <i>· ${o[4]}</i></span><span class="t">${o[5]}</span><span class="zaj">${AKT_WYR.zaj}</span></span><span class="min"><img src="${AKT_WYR.fot}" alt=""></span></a>`;
+  const wierszWyr = (o) => `<a class="ok-w wyr" href="#" data-dzial="${o[0]}"><span class="kiedy"><b>${o[1]}</b>${o[2]}</span><span class="tr"><span class="gdzie">${o[3]} <i>· ${o[4]}</i></span><span class="t">${o[5]}</span><span class="zaj">${AKT_WYR.zaj}</span></span><span class="min"><img src="${AKT_WYR.fot}" alt=""></span></a>`;
   const wiersz = (o, k) => k.min && wyrAkt && o === AKT[0] ? wierszWyr(o) : `<a class="ok-w${k.minelo ? ' minelo' : ''}${k.prelegent && wariantPrel === 'inicjaly' ? ' z-inicjalami' : ''}" href="#" data-dzial="${o[0]}"><span class="kiedy"><b>${o[1]}</b>${o[2]}</span><span class="tr">${k.prelegent ? srodekSeminarium(o) : `<span class="gdzie">${o[3]} <i>· ${o[4]}</i></span><span class="t">${o[5]}</span>`}</span>${k.min ? (o[6] ? `<span class="min"><img src="${o[6]}" alt=""></span>` : `<span class="min zastepcza" data-szkic="${o[0]}"></span>`) : ''}${k.prelegent && wariantPrel === 'inicjaly' ? `<span class="inic" title="${o[6]}">${inicjaly(o[6] || '')}</span>` : ''}</a>`;
   const KOL = {
     wyd: { tytul: 'Nadchodzące wydarzenia', link: 'Kalendarz →', wsz: 'Cały kalendarz →', dane: () => WYD, minelo: false },
@@ -3412,7 +3412,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     ['popularyzacja', '23', 'wrz 2026', 'Wydarzenie · kandydaci', '2. Kongres Młodych Odkrywców', '', 'Prawie 170 uczniów z niemal 20 szkół średnich wzięło udział w wykładach, warsztatach i grze terenowej.', ''],
     ['nauka', '3', 'sie 2026', 'Sukces · pracownicy, studenci', 'Otrzymaliśmy kategorię naukową A+', '', 'Dyscyplina matematyka na Uniwersytecie Wrocławskim otrzymała najwyższą ocenę naukową A+.', '']];
   function rysujAktualnosci() {
-    const wpis = (a) => { const wyr = wyrAkt && a[8]; return `<article class="wa${wyr ? ' wyr' : ''}" data-dzial="${a[0]}"><div class="wa-data">${a[1]}<small>${a[2]}</small></div><div class="wa-tresc"><div class="wa-rodz">${wyr ? '<em class="wyr-zn">Ważne</em>' : ''}${a[3]}</div><h3><a href="#">${a[4]}</a></h3>${a[5] ? `<p class="wa-kiedy"><strong>Kiedy:</strong> ${a[5]}</p>` : ''}<p>${a[6]}</p></div>${a[7] ? `<span class="wa-fot"><img src="${wyr ? AKT_WYR.fot : a[7]}" alt=""></span>` : ''}</article>`; };
+    const wpis = (a, i) => { const wyr = wyrAkt && i === 0; return `<article class="wa${wyr ? ' wyr' : ''}" data-dzial="${a[0]}"><div class="wa-data">${a[1]}<small>${a[2]}</small></div><div class="wa-tresc"><div class="wa-rodz">${a[3]}</div><h3><a href="#">${a[4]}</a></h3>${a[5] ? `<p class="wa-kiedy"><strong>Kiedy:</strong> ${a[5]}</p>` : ''}<p>${a[6]}</p></div>${a[7] ? `<span class="wa-fot"><img src="${wyr ? AKT_WYR.fot : a[7]}" alt=""></span>` : ''}</article>`; };
     $('#v-aktualnosci').innerHTML = `<header class="ak-gl"><div class="ak-in"><h2>Aktualności</h2><p>Ogłoszenia, wydarzenia, sukcesy i oferty pracy</p></div></header>
       <div class="ak-in"><div class="ak-filtr">${['Wszystkie', 'Ogłoszenia', 'Wydarzenia', 'Sukcesy', 'Kariera'].map((x, i) => `<button type="button" aria-pressed="${i === 0}">${x}</button>`).join('')}<label><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Szukaj w aktualnościach</label></div>
       <div class="ak-lista">${AKT_L.map(wpis).join('')}</div></div>`;
@@ -3470,7 +3470,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (widok === 'telefon') rysujTelefon();
     if (widok === 'kolory') { rysujKolory(); $('#podpowiedz').textContent = 'Wszystkie komplety obok siebie. „Użyj” włącza komplet w całym prototypie; potem obejrzyj okładkę i strony działów.'; }
     if (widok === 'ciekawostki') { rysujCiekawostki(); $('#podpowiedz').textContent = '„Losuj zestaw” pokazuje, co dostanie nowa wizyta. Kliknij wiersz albo kartę: ciekawostka pojawi się w nagłówku podstrony.'; }
-    if (widok === 'aktualnosci') { rysujAktualnosci(); $('#podpowiedz').textContent = 'Strona Aktualności w stylu list z porządków. Wyróżniony wpis (znacznik „Ważne”, większe zdjęcie) odłożony 5.11, 12:00; można go jeszcze obejrzeć przełącznikiem „Pierwsza aktualność”.'; }
+    if (widok === 'aktualnosci') { rysujAktualnosci(); $('#podpowiedz').textContent = 'Strona Aktualności w stylu list z porządków. Pierwszy, najnowszy wpis jest zawsze powiększony: większa data, tytuł i zdjęcie (decyzja 5.11, 12:36). Przełącznik „Pierwsza aktualność” porównuje ze zwykłym wierszem.'; }
     if (widok === 'przyciski') { rysujPrzyciski(); $('#podpowiedz').textContent = 'Górny rząd: jak jest dziś. Dolny: po zmianie. Kliknij, żeby zobaczyć wybrany przycisk.'; }
     skaluj();
   }
