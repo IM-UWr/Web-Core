@@ -43,7 +43,7 @@ function zamien(key: string) {
   const slot = kliknieta.dataset.slot!;
   kliknieta.dataset.slot = '2';
   dluga.dataset.slot = slot;
-  // w krótkiej kolumnie wszystkie pozycje z powrotem widoczne (CSS i tak pokazuje pierwsze trzy)
+  // w krótkiej kolumnie wszystkie pozycje z powrotem widoczne (CSS i tak pokazuje pierwsze trzy, przy powiększonym wpisie dwa)
   dluga.querySelectorAll<HTMLElement>('.z-w').forEach((w) => { w.hidden = false; });
   dopasujDluga();
   kliknieta.querySelector<HTMLElement>('.z-h h2')?.focus({ preventScroll: true });
@@ -58,7 +58,7 @@ function zamien(key: string) {
       .finished.then(() => { el.style.zIndex = ''; }).catch(() => {});
   }
   if (bezRuchu) return;
-  Array.from(kliknieta.querySelectorAll<HTMLElement>('.z-w:not([hidden])')).slice(3).forEach((w, i) =>
+  Array.from(kliknieta.querySelectorAll<HTMLElement>('.z-w:not([hidden])')).slice(kliknieta.querySelector('.z-w.wyr') ? 2 : 3).forEach((w, i) =>
     w.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 250, delay: 250 + i * 35, easing: RYTM, fill: 'backwards' }));
 }
 

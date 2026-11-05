@@ -4,7 +4,8 @@
 // zapowiedziane referaty — LiczbyBanera; zlecenie 01), bez spisu „Na tej stronie” (miesiące to grupy listy, nie sekcje strony).
 // Filtr rodzaju i szukanie (filtrowanie w przeglądarce, także bez polskich znaków); ?dla=studenci itp. z linków zawęża listę
 // (z przyciskiem „Pokaż wszystkie”), ?rodzaj=… wybiera rodzaj. Wpisy po miesiącach: nagłówek miesiąca Brygadą, wiersze
-// z cienkimi liniami i datą jak na stronach działów (WierszAktualnosci.astro, wzór: zal/dzial/Wiersz.astro).
+// z cienkimi liniami i datą jak na stronach działów (WierszAktualnosci.astro, wzór: zal/dzial/Wiersz.astro). Pierwszy widoczny wpis
+// powiększony (zlecenie 14, zalecenie 22): w HTML najnowszy, po filtrze albo szukaniu skrypt przestawia klasę.
 // Jedna wersja HTML: komputer (≥ 761 px) — przyklejony pasek: przyciski rodzajów i pole szukania w jednym wierszu (jak pasek
 // Planu zajęć); telefon (≤ 760 px) — rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
 // Bez JS: pasek schowany, widać całą listę.
@@ -47,10 +48,10 @@ const tytul = t(lang, 'aktualnosci');
     <button type="button" data-dla-wyczysc>{en ? 'Show all' : 'Pokaż wszystkie'}</button>
   </p>
 
-  {grupy.map((g) => (
+  {grupy.map((g, nrGrupy) => (
     <section class="ak-mies" data-grupa>
       <h2>{g.miesiac}</h2>
-      {g.pozycje.map((p) => <WierszAktualnosci p={p} lang={lang} />)}
+      {g.pozycje.map((p, i) => <WierszAktualnosci p={p} lang={lang} wyr={nrGrupy === 0 && i === 0} />)}
     </section>
   ))}
   <p class="ak-pusto" role="status" data-pusto hidden>{en ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
@@ -73,6 +74,15 @@ const tytul = t(lang, 'aktualnosci');
   let dla = '';
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
   const znanyRodzaj = (r: string) => rodzajBtn.some((b) => (b.dataset.rodzaj ?? '') === r);
+  // rozmiar zdjęcia przy przełożeniu powiększenia na inny wpis (te same pola co w WierszAktualnosci.astro)
+  const ROZMIAR_DUZY = '(max-width: 760px) calc(100vw - 98px), 360px';
+  const ROZMIAR_MALY = '(max-width: 760px) 81px, 120px';
+  function powieksz(w: HTMLElement, tak: boolean) {
+    w.classList.toggle('wyr', tak);
+    w.querySelectorAll<HTMLImageElement | HTMLSourceElement>('source, img').forEach((e) => { e.sizes = tak ? ROZMIAR_DUZY : ROZMIAR_MALY; });
+    // zdjęcie, które właśnie urosło, widać od razu: bez leniwego wczytywania
+    if (tak) w.querySelector('img')?.setAttribute('loading', 'eager');
+  }
 
   function filtruj() {
     const q = norm(szukaj?.value.trim() ?? '');
@@ -82,6 +92,8 @@ const tytul = t(lang, 'aktualnosci');
       p.hidden = !ok;
       if (ok) ile++;
     }
+    const pierwszy = pozycje.find((p) => !p.hidden);
+    for (const p of pozycje) if (p.classList.contains('wyr') !== (p === pierwszy)) powieksz(p, p === pierwszy);
     for (const g of grupy) g.hidden = !g.querySelector('[data-wa]:not([hidden])');
     if (pusto) pusto.hidden = ile > 0;
   }
