@@ -151,9 +151,9 @@
   /* liczby pod hasłem: lista przekazana przez widok (.pt-liczby) */
   /* liczby zawsze w jednym rzędzie (zlecenie 11, zalecenie 2): rząd zawija się, ale ma wysokość jednego rzędu — liczby, które
      przeszłyby do drugiego, znikają w całości (kolejność z danych: pierwsze najważniejsze). Szerokość rzędu do ciekawostki
-     lub notki o patronie (minus 40 px) i aria-hidden ukrytych ustawia skrypt w nagłówku (NaglowekZ.astro). */
+     lub notki o patronie (minus 20 px) i aria-hidden ukrytych ustawia skrypt w nagłówku (NaglowekZ.astro). */
   .z-slot .pt-liczby { display: flex !important; flex-wrap: wrap; gap: 60px 34px; width: fit-content; max-width: 100%; max-height: 52px; overflow: hidden; margin: 20px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid rgb(255 255 255 / .2); }
-  .z-baner-dzialu .z-slot .pt-liczby { max-width: calc(100vw - 2 * var(--marg) - 580px); }
+  .z-baner-dzialu .z-slot .pt-liczby { max-width: calc(100vw - 2 * var(--marg) - 560px); } /* bez JS: notka 540 px + 20 px odstępu */
   .z-slot .pt-liczby li { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: 14px; font-weight: 500; white-space: nowrap; color: var(--na-ciemnym-2); }
   .z-slot .pt-liczby .n { font-family: var(--f-display); font-size: 30px; font-weight: 500; line-height: 1.1; color: #fff; }
   .z-slot .lead { margin: 10px 0 0; max-width: 640px; font-size: 15.5px; color: var(--na-ciemnym-2); }
