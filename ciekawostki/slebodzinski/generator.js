@@ -387,6 +387,373 @@ function rysTkanina() {
   return out;
 }
 
+/* ================ Dopisane 5.11: rysunki nowych ciekawostek ================ */
+const grot = (e, u, g = 7, k = 0.42) => { // sam grot w punkcie e, u = kierunek jednostkowy
+  const r = (a) => [Math.cos(a) * -u[0] - Math.sin(a) * -u[1], Math.sin(a) * -u[0] + Math.cos(a) * -u[1]];
+  const h1 = r(k), h2 = r(-k);
+  return `M${pt([e[0] + g * h1[0], e[1] + g * h1[1]])} L${pt(e)} ${pt([e[0] + g * h2[0], e[1] + g * h2[1]])}`;
+};
+const jedn = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1; return [dx / L, dy / L]; };
+
+/* 12. Teoria Galois: pierwiastki siódmego stopnia z jedynki i generator grupy Galois k ↦ 3k (mod 7) */
+function rysGalois() {
+  const c = [100, 129], R = 78, n = 7;
+  const P = (k, r = R) => { const a = PI / 2 - 2 * PI * k / n; return [c[0] + r * Math.cos(a), c[1] - r * Math.sin(a)]; };
+  const orb = [1]; for (let x = 3; x !== 1; x = (x * 3) % n) orb.push(x);
+  const out = [{ d: lamana(okrag(c, R, 180).slice(0, -1), true) }];
+  for (let k = 0; k < n; k++) out.push({ d: `M${pt(c)} L${pt(P(k))}` });
+  orb.forEach((k, i) => { // grot w 3/4 każdej cięciwy
+    const a = P(k), b = P(orb[(i + 1) % orb.length]);
+    out.push({ d: grot([a[0] + (b[0] - a[0]) * 0.76, a[1] + (b[1] - a[1]) * 0.76], jedn(a, b), 8), gruba: true });
+  });
+  out.push({ d: lamana(orb.map((k) => P(k)), true), gruba: true });
+  for (let k = 0; k < n; k++) out.push({ d: kropka(P(k)), gruba: true });
+  out.push({ d: lamana(okrag(P(0), 9.5, 36).slice(0, -1), true), gruba: true }); // k = 0 jest punktem stałym
+  kontrola.galois = `orbita k ↦ 3k mod 7: ${orb.join(' → ')} → 1 (długość ${orb.length} = 7 − 1, więc 3 generuje grupę Galois); ζ⁰ = 1 pozostaje na miejscu`;
+  return out;
+}
+
+/* 13. Ogród botaniczny: filotaksja wg modelu Vogla (n-ty liść: r = C√n, kąt n · 137,508°); 13 + 21 parastych */
+function rysLiscie() {
+  const c = [100, 129], zloty = PI * (3 - Math.sqrt(5)), Nmax = 430, C = 86 / Math.sqrt(Nmax), n0 = 72;
+  const owin = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+  const out = [];
+  [[21, 0], [13, 5]].forEach(([k, wyr]) => {
+    const dl = owin(k * zloty);
+    for (let j = 0; j < k; j++) {
+      const nS = n0 + ((j - n0) % k + k) % k; // pierwszy liść tej parastychy; krzywą przedłużamy w obie strony do promieni n0 i Nmax
+      const p = [], s0 = (n0 - nS) / k, s1 = (Nmax - nS) / k, kr = Math.ceil((s1 - s0) / 0.25);
+      for (let q = 0; q <= kr; q++) {
+        const s = s0 + (s1 - s0) * q / kr, m = nS + k * s, r = C * Math.sqrt(m), a = nS * zloty + s * dl;
+        p.push([c[0] + r * Math.cos(a), c[1] - r * Math.sin(a)]);
+      }
+      out.push({ d: lamana(p, false, 0.25), gruba: j === wyr });
+    }
+  });
+  out.push({ d: lamana(okrag(c, C * Math.sqrt(Nmax), 200).slice(0, -1), true, 0.2) }, { d: lamana(okrag(c, C * Math.sqrt(n0), 120).slice(0, -1), true, 0.2) });
+  kontrola.liscie = `kąt ${(zloty * 180 / PI).toFixed(3)}°; ${Nmax} liści; 13 i 21 parastych (kolejne liczby Fibonacciego), odcięte wnętrze n < ${n0}; obrót na krok parastychy: 21 → ${(owin(21 * zloty) * 180 / PI).toFixed(2)}°, 13 → ${(owin(13 * zloty) * 180 / PI).toFixed(2)}°`;
+  return out;
+}
+
+/* 14. Getynga: krzywa Hilberta rzędu 4 (Hilbert 1891); pogrubiony obraz odcinka [0, 1/4] */
+function rysHilbert() {
+  const rzad = 4, N = 1 << rzad, bok = 168, x0 = 16, y0 = 45;
+  const d2xy = (d) => {
+    let x = 0, y = 0, t = d;
+    for (let s = 1; s < N; s *= 2) {
+      const rx = 1 & (t / 2), ry = 1 & (t ^ rx);
+      if (ry === 0) { if (rx === 1) { x = s - 1 - x; y = s - 1 - y; } [x, y] = [y, x]; }
+      x += s * rx; y += s * ry; t = Math.floor(t / 4);
+    }
+    return [x, y];
+  };
+  const P = Array.from({ length: N * N }, (_, d) => { const [x, y] = d2xy(d); return [x0 + (x + 0.5) * bok / N, y0 + bok - (y + 0.5) * bok / N]; });
+  const cw = N * N / 4, out = [];
+  for (let q = 0; q < 4; q++) out.push({ d: 'M' + pt(P[q * cw]) + ' L' + P.slice(q * cw + 1, Math.min((q + 1) * cw + 1, N * N)).map(pt).join(' '), gruba: q === 0 });
+  out.push({ d: `M${x0},${y0} L${x0 + bok},${y0} ${x0 + bok},${y0 + bok} ${x0},${y0 + bok}Z` });
+  const krok = P.every((p, i) => !i || Math.abs(Math.hypot(p[0] - P[i - 1][0], p[1] - P[i - 1][1]) - bok / N) < 1e-9);
+  kontrola.hilbert = `${N * N} punktów, każdy krok ma długość ${(bok / N).toFixed(1)}: ${krok}; każda ćwiartka odcinka wypełnia jedną ćwiartkę kwadratu`;
+  return out;
+}
+
+/* 15. Toczenie: elipsa toczona bez poślizgu po prostej; ognisko kreśli „elipsoidalną łańcuchową”, której obrót daje undoloid Delaunaya */
+function rysToczenie() {
+  const a = 31, b = 22, f = Math.sqrt(a * a - b * b), y0 = 136, N = 3000;
+  const E = (t) => [a * Math.cos(t), b * Math.sin(t)];
+  const T = [], S = [0];
+  for (let i = 0; i <= N; i++) T.push(2 * PI * i / N); // start: dotyka wierzchołek osi wielkiej przy ognisku, ognisko najniżej
+  for (let i = 1; i <= N; i++) S.push(S[i - 1] + Math.hypot(E(T[i])[0] - E(T[i - 1])[0], E(T[i])[1] - E(T[i - 1])[1]));
+  const obw = S[N], x0 = (200 - obw) / 2;
+  const obraz = (i, q) => { // położenie punktu q elipsy, gdy prostej dotyka punkt o parametrze T[i] (toczenie bez poślizgu)
+    const t = T[i], p = E(t), tx = -a * Math.sin(t), ty = b * Math.cos(t), L = Math.hypot(tx, ty), u = [tx / L, ty / L], n = [ty / L, -tx / L];
+    const d = [q[0] - p[0], q[1] - p[1]];
+    return [x0 + S[i] + (d[0] * u[0] + d[1] * u[1]), y0 - (d[0] * -n[0] + d[1] * -n[1])];
+  };
+  const F = [f, 0], slad = T.map((_, i) => obraz(i, F));
+  const dol = slad.map((p) => [p[0], 2 * y0 - p[1]]);
+  const out = [{ d: `M${fmt(x0 - 3)},${y0} L${fmt(x0 + obw + 3)},${y0}` }, { d: lamana(dol) }, { d: lamana(slad), gruba: true }];
+  // pod osią: połówki przekrojów powierzchni obrotowej (undoloidu)
+  for (let k = 1; k <= 5; k++) {
+    const i = Math.round(N * k / 6), p = slad[i], h = y0 - p[1], w = 0.26 * h;
+    out.push({ d: lamana(Array.from({ length: 33 }, (_, m) => { const s = PI * m / 32; return [p[0] + w * Math.cos(s), y0 + h * Math.sin(s)]; })) });
+  }
+  // trzy położenia elipsy nad osią
+  [0.2, 0.5, 0.8].forEach((u, m) => {
+    const i = Math.round(N * u), el = Array.from({ length: 120 }, (_, q) => obraz(i, E(2 * PI * q / 120)));
+    out.push({ d: lamana(el, true), gruba: m === 1 });
+    out.push({ d: kropka(obraz(i, F)), gruba: true });
+  });
+  const hs = slad.map((p) => y0 - p[1]);
+  kontrola.toczenie = `a = ${a}, b = ${b}, obwód ${obw.toFixed(1)}; odległość ogniska od prostej: min ${Math.min(...hs).toFixed(2)} = a − c (${(a - f).toFixed(2)}), max ${Math.max(...hs).toFixed(2)} = a + c (${(a + f).toFixed(2)})`;
+  return out;
+}
+
+/* 16. PTM: okręgi ściśle styczne spirali Eulera są zagnieżdżone (twierdzenie Taita–Knesera) */
+function rysOkregi() {
+  const M = 4000, sMax = 3.3, ds = sMax / M, kl = [[0, 0]]; let th = 0;
+  for (let i = 1; i <= M; i++) { const s = (i - 0.5) * ds; th = s * s / 2; const q = kl[i - 1]; kl.push([q[0] + Math.cos(th) * ds, q[1] + Math.sin(th) * ds]); }
+  const dane = [0.62, 1.0, 1.4, 1.8, 2.2, 2.6, 3.0].map((s) => {
+    const i = Math.round(s / ds), a = s * s / 2, r = 1 / s, p = kl[i];
+    return { s, p, r, c: [p[0] - Math.sin(a) * r, p[1] + Math.cos(a) * r] };
+  });
+  const wsz = dane.flatMap((d) => [[d.c[0] - d.r, d.c[1] - d.r], [d.c[0] + d.r, d.c[1] + d.r]]);
+  const xs = wsz.map((p) => p[0]), ys = wsz.map((p) => p[1]);
+  const sk = Math.min(172 / (Math.max(...xs) - Math.min(...xs)), 186 / (Math.max(...ys) - Math.min(...ys)));
+  const sx = (Math.min(...xs) + Math.max(...xs)) / 2, sy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const P = (p) => [100 + sk * (p[0] - sx), 129 - sk * (p[1] - sy)];
+  const i0 = Math.round(0.45 / ds), luk = kl.slice(i0).filter((_, i) => i % 8 === 0).map(P);
+  const pole = luk.filter((p) => wPolu(p));
+  const out = dane.map((d) => ({ d: lamana(okrag(P(d.c), d.r * sk, 160).slice(0, -1), true) }));
+  out.push({ d: lamana(pole), gruba: true });
+  dane.forEach((d) => out.push({ d: kropka(P(d.p)), gruba: true }));
+  const zag = dane.every((d, i) => !i || Math.hypot(d.c[0] - dane[i - 1].c[0], d.c[1] - dane[i - 1].c[1]) < dane[i - 1].r - d.r);
+  kontrola.okregi = `spirala Eulera, krzywizna = s; ${dane.length} okręgów; każdy leży wewnątrz poprzedniego (odległość środków < różnica promieni): ${zag}`;
+  return out;
+}
+
+/* 17. Doktorat: dysk Poincarégo i teselacja Fareya; łuki to geodezyjne przestrzeni o stałej krzywiźnie ujemnej */
+function rysPoincare() {
+  const c = [100, 129], R = 84;
+  const kat = (u) => PI / 2 - 2 * Math.atan(u.q === 0 ? Infinity : u.p / u.q); // wartość ∞ na górze dysku, 0 na dole
+  const geod = (al, be) => {
+    const d = Math.atan2(Math.sin(be - al), Math.cos(be - al));
+    const A = [Math.cos(al), Math.sin(al)], B = [Math.cos(be), Math.sin(be)];
+    if (Math.abs(Math.abs(d) - PI) < 1e-6) return [A, B].map((q) => [c[0] + R * q[0], c[1] - R * q[1]]);
+    const sr = al + d / 2, r = Math.tan(Math.abs(d) / 2), C = [Math.cos(sr) / Math.cos(d / 2), Math.sin(sr) / Math.cos(d / 2)];
+    const a0 = Math.atan2(A[1] - C[1], A[0] - C[0]), a1 = Math.atan2(B[1] - C[1], B[0] - C[0]);
+    let da = Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0));
+    const n = Math.max(12, Math.ceil(Math.abs(da) * 40));
+    return Array.from({ length: n + 1 }, (_, i) => { const a = a0 + da * i / n; return [c[0] + R * (C[0] + r * Math.cos(a)), c[1] - R * (C[1] + r * Math.sin(a))]; });
+  };
+  const krawedzie = [];
+  const dodaj = (a, b, g) => { krawedzie.push([a, b, g]); };
+  const rek = (a, b, g) => { // trójkąt nad krawędzią (a, b): mediant
+    if (g === 0) return;
+    const m = { p: a.p + b.p, q: a.q + b.q };
+    dodaj(a, m, g); dodaj(m, b, g); rek(a, m, g - 1); rek(m, b, g - 1);
+  };
+  const O = { p: 0, q: 1 }, J = { p: 1, q: 1 }, N = { p: 1, q: 0 }, Jm = { p: -1, q: 1 }, Nm = { p: -1, q: 0 };
+  dodaj(O, N, 9); dodaj(O, J, 9); dodaj(J, N, 9); dodaj(O, Jm, 9); dodaj(Jm, Nm, 9);
+  rek(O, J, 3); rek(J, N, 3); rek(Jm, O, 3); rek(Nm, Jm, 3);
+  const out = [{ d: lamana(okrag(c, R, 200).slice(0, -1), true) }];
+  const gr = new Set(['0/1|1/0', '0/1|1/1', '1/1|1/0']);
+  krawedzie.forEach(([a, b]) => {
+    const kl = `${a.p}/${a.q}|${b.p}/${b.q}`;
+    const pts = geod(kat(a), kat(b));
+    if (Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 9) return;
+    out.push({ d: lamana(pts, false, 0.2), gruba: gr.has(kl) });
+  });
+  const det = krawedzie.every(([a, b]) => Math.abs(a.p * b.q - a.q * b.p) === 1);
+  kontrola.poincare = `${krawedzie.length} krawędzi Fareya; każda łączy p/q i r/s z |ps − qr| = 1: ${det}; łuki prostopadłe do brzegu (środek w sec(δ/2), promień tan(δ/2))`;
+  return out;
+}
+
+/* 18. Wnuk Liego: grupa jednoparametrowa obrotów hiperbolicznych, orbity x² − y² = const i równe kroki parametru */
+function rysLie1p() {
+  const c = [100, 129], P = (x, y) => [c[0] + x, c[1] - y];
+  const hip = (r, f) => Array.from({ length: 121 }, (_, i) => { const t = -3 + 6 * i / 120; return f(r * Math.cosh(t), r * Math.sinh(t)); });
+  const out = [];
+  out.push({ d: `M${pt(P(-84, -84))} L${pt(P(84, 84))}` }, { d: `M${pt(P(-84, 84))} L${pt(P(84, -84))}` });
+  [24, 42, 62].forEach((r) => {
+    [(a, b) => P(a, b), (a, b) => P(-a, b), (a, b) => P(b, a), (a, b) => P(b, -a)].forEach((f, m) => {
+      const g = r === 42 && m === 0;
+      przytnij(hip(r, f), 1).forEach((k) => out.push({ d: lamana(k), gruba: g }));
+    });
+  });
+  const r0 = 42, krok = 0.46, zb = [];
+  for (let k = -2; k <= 2; k++) {
+    const t = k * krok, p = P(r0 * Math.cosh(t), r0 * Math.sinh(t));
+    zb.push(p); out.push({ d: kropka(p), gruba: true });
+  }
+  const nien = zb.map((_, k) => { const t = (k - 2) * krok, x = r0 * Math.cosh(t), y = r0 * Math.sinh(t); return x * x - y * y; });
+  kontrola.lie1p = `punkty φ_t(r, 0), t = k · ${krok}: x² − y² = ${nien.map((v) => v.toFixed(0)).join(', ')} (stałe na orbicie = ${r0 * r0}); φ_s ∘ φ_t = φ_{s+t}`;
+  return out;
+}
+
+/* 19. Geometria grawitacji: orbita w polu Schwarzschilda, równanie Bineta u'' + u = 1/p + 3μu² (RK4), μ dobrane przesadnie duże */
+function rysPeryhelium() {
+  const p0 = 1, e = 0.5, mu = 0.018, h = 0.002, f = (u) => 1 / p0 + 3 * mu * u * u - u;
+  const c = [100, 129];
+  let u = (1 + e) / p0, v = 0, phi = 0, poprz = v;
+  const bieg = [[1 / u, 0]], peri = [0], nrOd = [];
+  const obr = 7;
+  while (peri.length <= obr) {
+    const k1u = v, k1v = f(u), k2u = v + h * k1v / 2, k2v = f(u + h * k1u / 2), k3u = v + h * k2v / 2, k3v = f(u + h * k2u / 2), k4u = v + h * k3v, k4v = f(u + h * k3u);
+    u += h * (k1u + 2 * k2u + 2 * k3u + k4u) / 6; v += h * (k1v + 2 * k2v + 2 * k3v + k4v) / 6; phi += h;
+    if (Math.round(phi / h) % 5 === 0) bieg.push([1 / u, phi]);
+    if (poprz > 0 && v <= 0) { peri.push(phi); nrOd.push(bieg.length - 1); }
+    poprz = v;
+  }
+  const rMax = Math.max(...bieg.map((q) => q[0])), skala = 84 / rMax;
+  const Q = (q) => [c[0] + skala * q[0] * Math.cos(q[1]), c[1] - skala * q[0] * Math.sin(q[1])];
+  const pts = bieg.map(Q), rP = 1 / ((1 + e) / p0);
+  const out = [{ d: lamana(pts.slice(nrOd[0]), false, 0.12) }, { d: lamana(pts.slice(0, nrOd[0] + 1), false, 0.12), gruba: true }];
+  peri.forEach((a) => out.push({ d: `M${pt(c)} L${pt(Q([rP, a]))}` }));
+  out.push({ d: kropka(c), gruba: true });
+  const dph = peri[1] - peri[0] - 2 * PI;
+  kontrola.peryhelium = `μ/p = ${mu}, e = ${e}: przesunięcie peryhelium ${(dph * 180 / PI).toFixed(1)}° na obieg (przybliżenie 6πμ/p = ${(6 * PI * mu * 180 / PI).toFixed(1)}°; dla Merkurego μ/p ≈ 2,7·10⁻⁸); ${obr} obiegów`;
+  return out;
+}
+
+/* 20. Nagroda: linie krzywizny elipsoidy trójosiowej (przecięcia z konfokalnymi kwadrykami) i punkty kuliste */
+function rysElipsoida() {
+  const a = 1, b = 0.76, c0 = 0.52, a2 = a * a, b2 = b * b, c2 = c0 * c0;
+  // obrót: oś widzenia v, rzut prostokątny
+  const al = 0.62, be = 0.42, ce = 0.28;
+  const Rz = (p, t) => [p[0] * Math.cos(t) - p[1] * Math.sin(t), p[0] * Math.sin(t) + p[1] * Math.cos(t), p[2]];
+  const Rx = (p, t) => [p[0], p[1] * Math.cos(t) - p[2] * Math.sin(t), p[1] * Math.sin(t) + p[2] * Math.cos(t)];
+  const Ry = (p, t) => [p[0] * Math.cos(t) + p[2] * Math.sin(t), p[1], -p[0] * Math.sin(t) + p[2] * Math.cos(t)];
+  const obr = (p) => Rx(Ry(Rz(p, ce), al), be); // po obrocie patrzymy wzdłuż osi z
+  const skala = 84, sr = [100, 129], rz = (q) => { const r = obr(q); return [sr[0] + skala * r[0], sr[1] - skala * r[1]]; };
+  const widoczny = (q) => obr([q[0] / a2, q[1] / b2, q[2] / c2])[2] > 0;
+  const kawalki = (f) => { // krzywa zamknięta τ ↦ f(τ), tylko część widoczna
+    const n = 240, wyn = []; let cur = [];
+    const start = (() => { for (let i = 0; i < n; i++) if (!widoczny(f(2 * PI * i / n))) return i; return 0; })();
+    for (let i = 0; i <= n; i++) {
+      const q = f(2 * PI * (start + i) / n);
+      if (widoczny(q)) cur.push(rz(q)); else { if (cur.length > 2) wyn.push(cur); cur = []; }
+    }
+    if (cur.length > 2) wyn.push(cur);
+    return wyn.filter((k) => dlug(k) >= 8);
+  };
+  const out = [];
+  // kontur: u na okręgu wielkim prostopadłym do D⁻¹ v
+  const v = (() => { let w = [0, 0, 1]; const rI = (p) => { const q1 = Rx(p, -be), q2 = Ry(q1, -al); return Rz(q2, -ce); }; return rI(w); })();
+  const w = [v[0] / a, v[1] / b, v[2] / c0], Lw = Math.hypot(...w), wn = w.map((x) => x / Lw);
+  const e1 = (() => { const t = Math.abs(wn[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0]; const d = t[0] * wn[0] + t[1] * wn[1] + t[2] * wn[2]; const x = [t[0] - d * wn[0], t[1] - d * wn[1], t[2] - d * wn[2]], L = Math.hypot(...x); return x.map((y) => y / L); })();
+  const e2 = [wn[1] * e1[2] - wn[2] * e1[1], wn[2] * e1[0] - wn[0] * e1[2], wn[0] * e1[1] - wn[1] * e1[0]];
+  const kontur = Array.from({ length: 200 }, (_, i) => { const t = 2 * PI * i / 200, u = [0, 1, 2].map((k) => Math.cos(t) * e1[k] + Math.sin(t) * e2[k]); return rz([a * u[0], b * u[1], c0 * u[2]]); });
+  out.push({ d: lamana(kontur, true), gruba: true });
+  // rodzina λ = const (c² < λ < b²): krzywe wokół osi z
+  const lam = [0.12, 0.3, 0.5, 0.72, 0.9].map((u) => c2 + (b2 - c2) * u);
+  lam.forEach((la, i) => [1, -1].forEach((sg) => {
+    const f = (t) => { const s = Math.sin(t), mu2 = b2 + (a2 - b2) * s * s; return [a * Math.sqrt((a2 - la) / (a2 - c2)) * Math.cos(t), b * Math.sqrt((b2 - la) / (b2 - c2)) * s, sg * c0 * Math.sqrt((la - c2) * (mu2 - c2) / ((a2 - c2) * (b2 - c2)))]; };
+    kawalki(f).forEach((k) => out.push({ d: lamana(k, false, 0.2) }));
+  }));
+  // rodzina μ = const (b² < μ < a²): krzywe wokół osi x
+  const mu = [0.12, 0.3, 0.5, 0.72, 0.9].map((u) => b2 + (a2 - b2) * u);
+  mu.forEach((m, i) => [1, -1].forEach((sg) => {
+    const f = (t) => { const s = Math.sin(t), la = c2 + (b2 - c2) * s * s; return [sg * a * Math.sqrt((a2 - m) * (a2 - la) / ((a2 - b2) * (a2 - c2))), b * Math.sqrt((m - b2) / (a2 - b2)) * Math.cos(t), c0 * Math.sqrt((m - c2) / (a2 - c2)) * s]; };
+    kawalki(f).forEach((k) => out.push({ d: lamana(k, false, 0.2) }));
+  }));
+  // punkty kuliste (umbiliki): y = 0
+  const ux = a * Math.sqrt((a2 - b2) / (a2 - c2)), uz = c0 * Math.sqrt((b2 - c2) / (a2 - c2));
+  const umb = [[ux, 0, uz], [ux, 0, -uz], [-ux, 0, uz], [-ux, 0, -uz]].filter(widoczny);
+  umb.forEach((q) => out.push({ d: kropka(rz(q)), gruba: true }));
+  // kontrola: punkt z rodziny leży na elipsoidzie
+  const q = (() => { const la = lam[1], t = 0.7, s = Math.sin(t), mu2 = b2 + (a2 - b2) * s * s; return [a * Math.sqrt((a2 - la) / (a2 - c2)) * Math.cos(t), b * Math.sqrt((b2 - la) / (b2 - c2)) * s, c0 * Math.sqrt((la - c2) * (mu2 - c2) / ((a2 - c2) * (b2 - c2)))]; })();
+  kontrola.elipsoida = `półosie ${a}, ${b}, ${c0}; x²/a² + y²/b² + z²/c² = ${(q[0] * q[0] / a2 + q[1] * q[1] / b2 + q[2] * q[2] / c2).toFixed(6)}; widocznych punktów kulistych: ${umb.length} z 4`;
+  return out;
+}
+
+/* 21. Pionier elektryki: prąd trójfazowy, wskazy co 120° i trzy sinusoidy; suma w każdej chwili = 0 */
+function rysTrojfaza() {
+  const c = [100, 78], R = 40, y0 = 172, A = 42, x0 = 18, x1 = 182, t0 = 2 * PI + 0.95;
+  const wsk = (k) => { const a = t0 - 2 * PI * k / 3; return [Math.cos(a), Math.sin(a)]; };
+  const out = [{ d: lamana(okrag(c, R, 120).slice(0, -1), true) }];
+  [0, 1, 2].forEach((k) => {
+    const w = wsk(k), u = [w[0], -w[1]];
+    out.push({ d: strzalka(c, u, R, 8), gruba: k === 0 });
+  });
+  out.push({ d: `M${x0},${y0} L${x1},${y0}` });
+  const X = (t) => x0 + (x1 - x0) * t / (4 * PI);
+  [1, 2, 0].forEach((k) => {
+    const p = Array.from({ length: 201 }, (_, i) => { const t = 4 * PI * i / 200; return [X(t), y0 - A * Math.sin(t - 2 * PI * k / 3)]; });
+    out.push({ d: lamana(p), gruba: k === 0 });
+  });
+  const xt = X(t0);
+  out.push({ d: `M${fmt(xt)},${fmt(y0 - A - 5)} L${fmt(xt)},${fmt(y0 + A + 5)}` });
+  const wart = [0, 1, 2].map((k) => Math.sin(t0 - 2 * PI * k / 3));
+  wart.forEach((v, k) => out.push({ d: kropka([xt, y0 - A * v]), gruba: k === 0 }));
+  kontrola.trojfaza = `sinusoidy przesunięte o 120°; suma wartości w chwili t₀: ${wart.reduce((s, v) => s + v, 0).toFixed(12)}`;
+  return out;
+}
+
+/* 22. Monografia Yano: przepływ konforemny (hiperboliczne przekształcenie Möbiusa): okręgi przez dwa punkty i prostopadłe okręgi Apoloniusza */
+function rysApollo() {
+  const c = [100, 129], d = 62, F1 = [c[0], c[1] - d], F2 = [c[0], c[1] + d], out = [];
+  const plaski = (pk) => przytnij(pk, 0).forEach((k) => out.push({ d: lamana(k) }));
+  [[17, -1], [62, 1], [62, -1], [150, 1], [150, -1]].forEach(([h, s]) => plaski(okrag([c[0] + s * h, c[1]], Math.hypot(h, d), 500))); // linie przepływu: okręgi przez F1 i F2
+  [14, 30, 52].forEach((r) => [1, -1].forEach((s) => plaski(okrag([c[0], c[1] + s * Math.hypot(d, r)], r, 300)))); // okręgi Apoloniusza
+  out.push({ d: `M${POLE.x0},${c[1]} L${POLE.x1},${c[1]}` }, { d: `M${pt(F1)} L${pt(F2)}` });
+  const h0 = 17, r0 = Math.hypot(h0, d), a1 = Math.atan2(F1[1] - c[1], F1[0] - (c[0] + h0)), a2 = Math.atan2(F2[1] - c[1], F2[0] - (c[0] + h0));
+  let da = a2 - a1; if (da < 0) da += 2 * PI; // od F1 do F2 przez prawą stronę
+  const prawa = Array.from({ length: 161 }, (_, i) => { const a = a1 + da * i / 160; return [c[0] + h0 + r0 * Math.cos(a), c[1] + r0 * Math.sin(a)]; });
+  out.push({ d: lamana(prawa), gruba: true });
+  [0.3, 0.52, 0.74].forEach((u) => { const i = Math.round(160 * u); out.push({ d: grot(prawa[i], jedn(prawa[i - 1], prawa[i + 1]), 8), gruba: true }); });
+  out.push({ d: kropka(F1), gruba: true }, { d: kropka(F2), gruba: true });
+  const h = 62, r = 30, c1 = [c[0] + h, c[1]], c2 = [c[0], c[1] + Math.hypot(d, r)], dd = (c1[0] - c2[0]) ** 2 + (c1[1] - c2[1]) ** 2, rr = Math.hypot(h, d) ** 2 + r * r;
+  kontrola.apollo = `prostopadłość rodzin: |c₁ − c₂|² = ${dd.toFixed(3)}, r₁² + r₂² = ${rr.toFixed(3)}`;
+  return out;
+}
+
+/* 23. Cartan: pętla przeniesiona przepływem; pas między pętlami realizuje wzór L_X = d i_X + i_X d (Stokes) */
+function rysCartan() {
+  const s0 = [80, 136], al = 0.1, T = 2.1;
+  // przepływ spiralny wokół s0 (na ekranie przeciwnie do ruchu wskazówek zegara)
+  const fl = (p, t) => { const e = Math.exp(al * t), co = Math.cos(t), si = Math.sin(t), x = p[0] - s0[0], y = p[1] - s0[1]; return [s0[0] + e * (co * x + si * y), s0[1] + e * (-si * x + co * y)]; };
+  const start = (a) => { const r = 23 * (1 + 0.2 * Math.cos(2 * a + 0.5) + 0.1 * Math.sin(3 * a)); return [s0[0] + 36 + r * 1.15 * Math.cos(a), s0[1] + 42 + r * Math.sin(a)]; };
+  const n = 160, Pet0 = Array.from({ length: n }, (_, i) => start(2 * PI * i / n));
+  const Pet1 = Pet0.map((p) => fl(p, T)), Pol = Pet0.map((p) => fl(p, T / 2));
+  const out = [{ d: lamana(Pet0, true) }, { d: lamana(Pol, true) }, { d: lamana(Pet1, true), gruba: true }];
+  const ile = 16;
+  for (let k = 0; k < ile; k++) {
+    const q = start(2 * PI * k / ile);
+    out.push({ d: lamana(Array.from({ length: 61 }, (_, i) => fl(q, T * i / 60)), false, 0.2) });
+  }
+  [0.4, 3.5].forEach((a) => { const z = start(a); out.push({ d: grot(fl(z, T), jedn(fl(z, T - 0.03), fl(z, T)), 8), gruba: true }); });
+  kontrola.cartan = `przepływ spiralny, t ∈ [0, ${T}]; pole pętli: ${poleWiel(Pet0).toFixed(0)} → ${poleWiel(Pet1).toFixed(0)} (stosunek ${(poleWiel(Pet1) / poleWiel(Pet0)).toFixed(3)}, e^{2·${al}·${T}} = ${Math.exp(2 * al * T).toFixed(3)})`;
+  return out;
+}
+
+/* 24. Spinory: wstęga Möbiusa. Jej brzeg to jedna krzywa, a pełny obieg odwraca normalną (analogia: spinor po obrocie o 360° zmienia znak) */
+function rysMobius() {
+  const W = 0.46, R0 = 1, skala = 57, c = [100, 129];
+  const F = (u, w) => { const r = R0 + w * Math.cos(u / 2); return [r * Math.cos(u), r * Math.sin(u), w * Math.sin(u / 2)]; };
+  const ax = -1.02, az = 0.35;
+  const obr = (p) => { const x = p[0] * Math.cos(az) - p[1] * Math.sin(az), y = p[0] * Math.sin(az) + p[1] * Math.cos(az), z = p[2]; return [x, y * Math.cos(ax) - z * Math.sin(ax), y * Math.sin(ax) + z * Math.cos(ax)]; };
+  const P = (p) => { const r = obr(p); return [c[0] + skala * r[0], c[1] - skala * r[1]]; };
+  const out = [];
+  const ile = 34;
+  for (let k = 0; k < ile; k++) { const u = 2 * PI * k / ile; out.push({ d: `M${pt(P(F(u, -W)))} L${pt(P(F(u, W)))}` }); }
+  out.push({ d: lamana(Array.from({ length: 240 }, (_, i) => P(F(2 * PI * i / 240, 0))), true) });
+  const brzeg = Array.from({ length: 480 }, (_, i) => P(F(4 * PI * i / 480, W)));
+  out.push({ d: lamana(brzeg, true), gruba: true });
+  // kontrola: F(u + 2π, w) = F(u, −w), więc po jednym obiegu „góra” staje się „dołem”
+  const a = F(0.7 + 2 * PI, W), b = F(0.7, -W);
+  kontrola.mobius = `F(u + 2π, w) = F(u, −w): różnica ${Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]).toExponential(1)}; brzeg to jedna krzywa zamknięta o parametrze u ∈ [0, 4π]`;
+  return out;
+}
+
+/* 25. Tom 26: pole Killinga na sferze; długość wektora rośnie z odległością od osi, a przepływ jest izometrią */
+function rysIzometrie() {
+  const c = [100, 134], R = 84, tilt = 0.42;
+  const P3 = (la, fi) => { const x = Math.cos(la) * Math.cos(fi), y = Math.cos(la) * Math.sin(fi), z = Math.sin(la); return [x, y * Math.sin(tilt) + z * Math.cos(tilt), -y * Math.cos(tilt) + z * Math.sin(tilt)]; }; // (x, pion, głębia)
+  const S = (p) => [c[0] + R * p[0], c[1] - R * p[1]];
+  const out = [{ d: lamana(okrag(c, R, 200).slice(0, -1), true) }];
+  const kawalki = (f, a0, a1, n = 240) => { const wyn = []; let cur = []; for (let i = 0; i <= n; i++) { const t = a0 + (a1 - a0) * i / n, p = f(t); if (p[2] > 0.0) cur.push(S(p)); else { if (cur.length > 2) wyn.push(cur); cur = []; } } if (cur.length > 2) wyn.push(cur); return wyn; };
+  // południki
+  for (let k = 0; k < 8; k++) { const fi = -PI / 2 + PI / 8 + k * 2 * PI / 8; kawalki((t) => P3(t, fi), -PI / 2, PI / 2).forEach((q) => out.push({ d: lamana(q) })); }
+  // równoleżniki; pogrubiony: równoleżnik 0°... przepływ
+  const szer = [-40, -20, 0, 20, 40, 60].map((d) => d * PI / 180);
+  szer.forEach((la) => {
+    const g = Math.abs(la - 20 * PI / 180) < 1e-9;
+    const f = (t) => P3(la, t);
+    // start w punkcie niewidocznym, by nie przecinać łuku
+    kawalki(f, PI / 2, PI / 2 + 2 * PI).forEach((q) => out.push({ d: lamana(q), gruba: g }));
+    // grot na równoleżniku: strzałka w kierunku rosnącego φ, długość ∝ cos φ
+    [-PI / 2 - 0.9, -PI / 2, -PI / 2 + 0.9].forEach((t0) => {
+      const p = f(t0), q = f(t0 + 0.2);
+      if (p[2] > 0.05 && q[2] > 0.05 && Math.abs(la) < 0.75) out.push({ d: grot(S(q), jedn(S(p), S(q)), 6.5), gruba: g });
+    });
+  });
+  const biegun = P3(PI / 2, 0);
+  out.push({ d: `M${pt(S(biegun))} L${pt([S(biegun)[0], S(biegun)[1] - 22])}`, gruba: true });
+  out.push({ d: kropka(S(biegun)), gruba: true });
+  kontrola.izometrie = `pole V = ∂/∂φ (obrót wokół osi): |V| = cos(szerokość), L_V g = 0; widoczna tylko przednia półkula, oś nachylona o ${(tilt * 180 / PI).toFixed(0)}°`;
+  return out;
+}
+
 /* ---------------- dane ---------------- */
 const Z = {
   mactutor: 'https://mathshistory.st-andrews.ac.uk/Biographies/Slebodzinski/',
@@ -511,6 +878,147 @@ const DANE = [
     zrodla: [Z.dudaWeron, Z.pwrSite, Z.pwrWeny, 'https://oeaw.ac.at/resources/Record/990001927720504498', 'https://encyclopediaofmath.org/wiki/Webs,_geometry_of'],
     podstrona: 'zapas',
     dlaczego_tu: 'Zapas: pasuje do Seminariów albo Konferencji (pierwsze zebranie naukowe), a także do historii w dziale Instytut.'
+  },
+  /* ================ Dopisane 5.11 ================ */
+  {
+    id: 'galois-tarnobrzeg', rys: rysGalois,
+    nazwa: 'Teoria Galois w Tarnobrzegu', rok: '1909–1912',
+    zdanie: 'Badania zaczął jako nauczyciel w szkole realnej w Tarnobrzegu; najpierw pociągała go teoria Galois.',
+    notka: 'Od 13 października 1909 r. do sierpnia 1912 r. uczył w c.k. Szkole Realnej w Tarnobrzegu i tam, według MacTutor, zaczął pracę badawczą; na początku interesowała go teoria Galois, a dopiero później geometria różniczkowa (to samo podaje angielska Wikipedia). Prac z tego okresu nie widzieliśmy. Rysunek to standardowy przykład, nie jego wynik: pierwiastki siódmego stopnia z jedynki i generator grupy Galois k ↦ 3k (mod 7), który przestawia sześć pierwiastków w jeden cykl, a jedynkę zostawia w miejscu (sprawdzone w generator.js).',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, Z.wikiSleb, 'https://kconrad.math.uconn.edu/blurbs/galoistheory/cyclotomic.pdf'],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: dobry początek opowieści „jak zaczyna się nauka”: bez instytutu, po lekcjach w szkole; ogólnie do działu Nauka.'
+  },
+  {
+    id: 'ogrod-botaniczny', rys: rysLiscie,
+    nazwa: 'Szkolny ogród botaniczny', rok: '1909–1912',
+    zdanie: 'W Tarnobrzegu uczył też niemieckiego, polskiego i geografii oraz opiekował się szkolnym ogrodem botanicznym.',
+    notka: 'MacTutor: poza matematyką i fizyką uczył w Tarnobrzegu niemieckiego i polskiego, przyrody, geografii i rysunku geometrycznego, zarządzał bibliotekami szkolnymi i „looked after the school’s botanical garden”. Rysunek nawiązuje do ogrodu, nie do jego pracy: układ liści według modelu Vogla (n-ty liść pod kątem n · 137,508° w odległości proporcjonalnej do √n), czyli klasyczny przykład matematyki w botanice. Widać dwie rodziny spiral, 13 i 21: kolejne liczby Fibonacciego.',
+    rodzaj: 'anegdota', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, 'https://en.wikipedia.org/wiki/Golden_angle', 'https://algorithmicbotany.org/papers/abop/abop-ch4.pdf'],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: pogodna ciekawostka do działu jako całości; twórca pochodnej Liego zaczynał od lekcji geografii i grządek.'
+  },
+  {
+    id: 'getynga-1913', rys: rysHilbert,
+    nazwa: 'Rok w Getyndze', rok: '1913–1914',
+    zdanie: 'Dzięki stypendium fundacji Kretkowskiego słuchał w Getyndze wykładów Hilberta, Landaua i Carathéodory’ego.',
+    notka: 'W 1913 r. dostał stypendium Fundacji Władysława Kretkowskiego i roczny urlop ze szkoły w Krakowie, by studiować w Getyndze, wówczas światowym centrum matematyki; słuchał Carathéodory’ego, Landaua i Hilberta. Wrócił do Krakowa 1 sierpnia 1914 r., gdy wybuchła wojna (MacTutor). Rysunek: krzywa Hilberta (D. Hilbert, 1891), która w granicy przechodzi przez każdy punkt kwadratu; tu krok czwarty, pogrubiony obraz pierwszej czwartej odcinka, czyli jedna ćwiartka kwadratu. Ilustracja nawiązuje do wykładowcy, nie do pracy Ślebodzińskiego.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, Z.wikiSleb, Z.pwrSite, 'https://en.wikipedia.org/wiki/Hilbert_curve'],
+    podstrona: 'Projekty i granty',
+    dlaczego_tu: 'Stypendium zagraniczne fundacji sprzed ponad stu lat: przodek dzisiejszego grantu wyjazdowego.'
+  },
+  {
+    id: 'toczenie-1923', rys: rysToczenie,
+    nazwa: 'Toczenie się powierzchni', rok: '1923',
+    zdanie: 'Jedna z jego wczesnych prac, „Kilka twierdzeń o toczeniu się powierzchni”, ukazała się po polsku w 1923 r.',
+    notka: 'MacTutor wymienia tę pracę (ang. „Several theorems on the rolling of surfaces”) wśród publikacji poprzedzających doktorat; nie podaje czasopisma, a treści nie widzieliśmy, więc o twierdzeniach nic tu nie mówimy. Rysunek to płaski, klasyczny odpowiednik, nie wynik z pracy: elipsa toczona bez poślizgu po prostej; jej ognisko kreśli krzywą, której obrót wokół prostej daje undoloid Delaunaya (1841), powierzchnię o stałej krzywiźnie średniej. Odległość ogniska od prostej waha się od a − c do a + c, co sprawdza generator.js.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, 'https://en.wikipedia.org/wiki/Unduloid'],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: mogłoby trafić do Publikacji; pokazuje, od czego zaczynał geometrię różniczkową.'
+  },
+  {
+    id: 'ptm-1923-1963', rys: rysOkregi,
+    nazwa: 'Od oddziału do prezesury PTM', rok: '1923–1963',
+    zdanie: 'Założył poznański oddział PTM (1923), a w latach 1961–1963 był prezesem całego Towarzystwa.',
+    notka: 'Według MacTutor w 1923 r. założył oddział Polskiego Towarzystwa Matematycznego w Poznaniu, gdzie wykładał w Państwowej Wyższej Szkole Mechaniczno-Elektrotechnicznej (1921–1939) i na Uniwersytecie. Po wojnie był wiceprezesem, a potem wieloletnim przewodniczącym oddziału wrocławskiego (strona Wydziału Elektrycznego PWr), w latach 1961–1963 prezesem PTM, później członkiem honorowym. Rysunek (z przymrużeniem oka: koła w kołach): spirala Eulera i jej okręgi ściśle styczne; twierdzenie Taita–Knesera mówi, że przy monotonicznej krzywiźnie leżą jeden w drugim.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, Z.wikiSleb, Z.pwrWeny, 'https://en.wikipedia.org/wiki/Tait%E2%80%93Kneser_theorem'],
+    podstrona: 'Konferencje',
+    dlaczego_tu: 'Praca organizacyjna środowiska: bez towarzystw naukowych nie byłoby zjazdów i konferencji.'
+  },
+  {
+    id: 'doktorat-1928', rys: rysPoincare,
+    nazwa: 'Doktorat w wieku 44 lat', rok: '1928',
+    zdanie: 'Doktorat obronił w wieku 44 lat, mając już dorobek; zachęcił go Sierpiński, który załatwił wsparcie finansowe.',
+    notka: 'Doktorat „O pewnej klasie przestrzeni Riemanna” uzyskał na Uniwersytecie Warszawskim 20 czerwca 1928 r. (urodzony 6 lutego 1884 r.), choć publikował już wcześniej na wysokim poziomie; zachęcali go koledzy, a Sierpiński załatwił wsparcie finansowe (MacTutor). Wikipedia podaje tytuł z „powierzchni” zamiast „przestrzeni”; rozprawy nie widzieliśmy. Rysunek to tylko ilustracja pojęcia, nie treść rozprawy: płaszczyzna hiperboliczna, najprostsza przestrzeń Riemanna o stałej ujemnej krzywiźnie, z teselacją Fareya; łuki to jej „proste” (geodezyjne).',
+    rodzaj: 'anegdota', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, Z.genealogy, Z.wikiSleb, 'https://homepages.warwick.ac.uk/staff/C.M.Series/HypGeomandCntdFractions-2.pdf'],
+    podstrona: 'Szkoła doktorska',
+    dlaczego_tu: 'Dla doktorantów: na doktorat nigdy nie jest za późno, a późniejszy wielki wynik przyszedł trzy lata po obronie.'
+  },
+  {
+    id: 'wnuk-liego', rys: rysLie1p,
+    nazwa: 'Naukowy wnuk Sophusa Liego', rok: '1891–1928',
+    zdanie: 'Jego promotor Żorawski był doktorantem Liego, więc twórca pochodnej Liego to naukowy wnuk jej patrona.',
+    notka: 'Mathematics Genealogy Project: Kazimierz Żorawski, doktorat w Lipsku 1891 u Sophusa Liego, o zastosowaniach grup przekształceń w geometrii różniczkowej; Ślebodziński, doktorat na UW 1928 u Żorawskiego. Promotora Żorawskiego podają też MacTutor i Wikipedia. Rozbieżność: lista w artykule Dudy i Werona (Wiad. Mat. 42, 2006) przy Ślebodzińskim ma „dr 1928 (W. Sierpiński)”, a biografia Żorawskiego w MacTutor nie nazywa Liego promotorem wprost (pisze o studiach w Lipsku i pochwale Liego dla jego pracy). Warto sprawdzić dokumenty doktoratu. Rysunek: pojęcie Liego, grupa jednoparametrowa; obroty hiperboliczne, ich orbity i pięć punktów w równych krokach parametru.',
+    rodzaj: 'anegdota', pewnosc: 'do sprawdzenia',
+    zrodla: [Z.genealogy, 'https://mathgenealogy.org/id.php?id=60302', 'https://mathshistory.st-andrews.ac.uk/Biographies/Zorawski/', Z.mactutor, Z.dudaWeron],
+    podstrona: 'Obrony doktorskie',
+    dlaczego_tu: 'Genealogia naukowa: promotor, promotor promotora; nazwa operatora okazuje się sprawą rodzinną.'
+  },
+  {
+    id: 'pole-grawitacji-1926', rys: rysPeryhelium,
+    nazwa: 'Geometria pola grawitacji', rok: '1926',
+    zdanie: 'Dekadę po Einsteinie badał geometrię statycznego pola grawitacji i metrykę wokół punktu materialnego.',
+    notka: '„Recherches géométriques sur le champ statique de gravitation” (Prace Mat.-Fiz. 34, 1925–1926, s. 91–118) oraz polska praca o metryce przestrzeni w otoczeniu stacjonarnego punktu materialnego (MacTutor, 1926). Treści nie sprawdzaliśmy w oryginale; ogólną teorię względności Einstein ogłosił w 1915 r. Rysunek to znany efekt tej teorii, nie jego wynik: orbita w polu Schwarzschilda z równania Bineta (RK4), pogrubiony pierwszy obieg, cienkie kreski do kolejnych peryheliów. Przesunięcie jest mocno przesadzone: tu ok. 23° na obieg, dla Merkurego ok. 0,1 sekundy łuku.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: ['https://eudml.org/doc/215456', Z.mactutor, 'https://arxiv.org/pdf/1206.1869'],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: geometria w służbie fizyki; mogłoby pójść do Publikacji.'
+  },
+  {
+    id: 'nagroda-doktoraty-hc', rys: rysElipsoida,
+    nazwa: 'Nagroda i trzy doktoraty honoris causa', rok: '1955–1970',
+    zdanie: 'Dostał Nagrodę Państwową (1955) i trzy doktoraty honorowe: Politechnik Wrocławskiej i Poznańskiej oraz UWr.',
+    notka: 'Państwowa Nagroda Naukowa z 1955 r. (Wikipedia: zespołowa II stopnia, za geometrię różniczkową; strona Wydziału Elektrycznego PWr: Państwowa Nagroda Naukowa). Doktoraty honoris causa: Politechnika Wrocławska 1965, Politechnika Poznańska 1967, Uniwersytet Wrocławski 1970 (MacTutor, strona PWr). Rysunek (Monge, klasyka geometrii różniczkowej, nie jego wynik): linie krzywizny elipsoidy trójosiowej, policzone jako przecięcia z konfokalnymi kwadrykami, oraz dwa z czterech punktów kulistych, w których obie rodziny linii się spotykają.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, Z.pwrSite, Z.pwrWeny, Z.wikiSleb, 'https://geodesic.mathdoc.fr/articles/10.14708/am.v10i0.1918'],
+    podstrona: 'Sukcesy',
+    dlaczego_tu: 'Lista wyróżnień: naturalne miejsce to Sukcesy.'
+  },
+  {
+    id: 'pionier-elektryki', rys: rysTrojfaza,
+    nazwa: 'Pionier dolnośląskiej elektryki', rok: '1946',
+    zdanie: 'Matematyk wśród „Pionierów Dolnośląskiej Elektryki”: od marca 1946 r. zasiadał w radzie wydziału Politechniki.',
+    notka: 'Strony Wydziału Elektrycznego PWr zaliczają go do Pionierów Dolnośląskiej Elektryki: uczestniczył w pracach Rady Wydziału Mechaniczno-Elektrotechnicznego od jej pierwszego posiedzenia 13 marca 1946 r., pilnował programów z matematyki, był organizatorem i pierwszym kierownikiem Katedry Matematyki PWr. Rozbieżność co do tej katedry: strona PWr o patronie podaje 1 września 1951 r. (także MacTutor, Duda i Weron: 1951), a strona Wydziału Elektrycznego: od 1952 r.; w zdaniu nie podajemy tego roku. Rysunek: prąd trójfazowy, wskazy co 120° i sinusoidy, których suma jest w każdej chwili równa zeru.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.pwrWeny, 'https://weny.pwr.edu.pl/fcp/zGBUKOQtTKlQhbx08SlkTUAxQX2o8DAoHNiwFE1xVSX1RFVZpCFghUHcKVigEQUw/38/public/o_wydziale/profil_wydzialu/pionierzy/slebodzinski.pdf', Z.pwrSite, Z.mactutor, Z.dudaWeron],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: matematyka w służbie techniki; pasuje też do „Rady Dyscypliny”, ale ta pozycja menu to link zewnętrzny.'
+  },
+  {
+    id: 'yano-1957', rys: rysApollo,
+    nazwa: 'Monografia Kentaro Yano', rok: '1957',
+    zdanie: 'Kentaro Yano poświęcił pochodnej Liego i jej zastosowaniom całą monografię, wznowioną jeszcze w 2020 r.',
+    notka: 'K. Yano (uczeń É. Cartana), „The Theory of Lie Derivatives and its Applications”, North-Holland (Bibliotheca Mathematica 3). Rozbieżność co do roku: Wikipedia i wydawnictwo Dover (wznowienie 2020) podają 1957, MacTutor 1955, a katalog w Nantes „[1956?]”, stąd „do sprawdzenia”; najczęściej cytowany jest 1957. Rysunek: pochodna Liego opisuje też przekształcenia konforemne, zachowujące kąty. Tu przepływ przekształcenia Möbiusa z dwoma punktami stałymi: okręgi przez oba punkty (linie przepływu) i okręgi Apoloniusza, prostopadłe do nich. Czy i jak ten przykład występuje w książce Yano, nie sprawdzaliśmy.',
+    rodzaj: 'historia', pewnosc: 'do sprawdzenia',
+    zrodla: ['https://en.wikipedia.org/wiki/Kentaro_Yano_(mathematician)', 'https://store.doverpublications.com/products/9780486842097', 'https://nantilus.univ-nantes.fr/vufind/Record/PPN006430244', Z.mactutor, 'https://en.wikipedia.org/wiki/Apollonian_circles'],
+    podstrona: 'Publikacje',
+    dlaczego_tu: 'Cudza książka o jego pojęciu: najlepsza miara tego, jak publikacja żyje dalej.'
+  },
+  {
+    id: 'cartan-1922', rys: rysCartan,
+    nazwa: 'Cartan był o krok wcześniej', rok: '1922',
+    zdanie: 'W 1922 r. Cartan określił taki operator, ale tylko dla form; wzór dla wszystkich tensorów dał Ślebodziński.',
+    notka: 'Trautman (2008): É. Cartan w „Leçons sur les invariants intégraux” (Paryż 1922) zdefiniował operator L(X) na formach zewnętrznych, wykazał, że komutuje z różniczką zewnętrzną d, i podał wzór L(X) = d∘i(X) + i(X)∘d, używany do dziś jako „magiczny wzór Cartana”. Dziewięć lat później Ślebodziński podał wzór dla dowolnego tensora i regułę Leibniza; właśnie dlatego Trautman uznaje go za pierwszego, który zdefiniował pochodną Liego w ogólnym przypadku. Rysunek: wzór Cartana po scałkowaniu: pętla przeniesiona przepływem; zmiana całki z formy po pętli to całka z dω po pasie zamiatanym przez pętlę plus brzeg.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.trautman, Z.wikiLie],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: o pierwszeństwie w nauce; pasuje do Publikacji albo Sukcesów.'
+  },
+  {
+    id: 'spinory-kosmann', rys: rysMobius,
+    nazwa: 'Pochodna Liego spinorów', rok: '1963–1972',
+    zdanie: 'Pojęcie rosło dalej: Lichnerowicz i Yvette Kosmann rozszerzyli pochodną Liego na spinory znane z fizyki cząstek.',
+    notka: 'A. Lichnerowicz („Spineurs harmoniques”, C. R. Acad. Sci. Paris 257, 1963) określił pochodną Liego spinora wzdłuż pól Killinga, czyli izometrii. Y. Kosmann (noty 1966–1967, teza „Dérivées de Lie des spineurs”, Ann. Mat. Pura Appl. 91, 1972, s. 317–395) przyjęła ten wzór jako definicję dla dowolnych pól wektorów. Sprawa nie jest prosta, bo spinory nie są obiektami tensorowymi; późniejsze prace ujmują to przez wiązki. Rysunek to analogia, nie treść tych prac: wstęga Möbiusa; pełny obieg odwraca jej normalną, jak obrót o 360° zmienia znak spinora; brzeg wstęgi (pogrubiony) domyka się dopiero po dwóch obiegach.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne',
+    zrodla: ['https://arxiv.org/pdf/1411.7845', Z.wikiLie, 'https://scilit.com/publications/127328e2d72e287f3902a1b18fed03be'],
+    podstrona: 'zapas',
+    dlaczego_tu: 'Zapas: jak pomysł z 1931 r. żyje w badaniach następnych pokoleń; do działu Nauka jako całości.'
+  },
+  {
+    id: 'tom-26-colloquium', rys: rysIzometrie,
+    nazwa: 'Tom ku jego pamięci', rok: '1972',
+    zdanie: 'Tom 26 „Colloquium Mathematicum” uczcił jego pamięć; otwiera go praca Kentaro Yano o izometriach.',
+    notka: 'Współzakładane przez niego pismo poświęciło mu w 1972 r. cały tom 26 (s. 1–389; MacTutor: „A collection of articles commemorating Władysław Ślebodziński”). Spis na stronie IMPAN zaczyna się pracami: K. Yano „Notes on isometries”, G. Gheorghiev o pochodnej Liego w rozmaitościach Banacha, G. H. Katzin i J. Levine o zastosowaniach pochodnych Liego, S. Gołąb o pochodnej kowariantnej i pochodnej Liego, H. V. Craig o „formulation given by W. Ślebodziński”. Rysunek: pole Killinga na sferze (obrót wokół osi): jego przepływ jest izometrią, czyli pochodna Liego metryki wzdłuż tego pola znika.',
+    rodzaj: 'historia', pewnosc: 'pewne',
+    zrodla: [Z.mactutor, 'https://www.impan.pl/en/publishing-house/journals-and-series/colloquium-mathematicum/all/26', Z.trautman],
+    podstrona: 'Publikacje',
+    dlaczego_tu: 'Cały tom czasopisma z tytułami, w których wraca pochodna Liego: publikacyjny pomnik patrona.'
   }
 ];
 
@@ -558,7 +1066,7 @@ fs.writeFileSync(path.join(KAT, 'ciekawostki.json'), JSON.stringify(json, null, 
 /* ---------------- podgląd HTML ---------------- */
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const svg = (w, kl) => `<svg class="${kl}" viewBox="0 0 200 240" aria-hidden="true">${kl === 'duzy' ? '<rect class="ramka" x="12" y="34" width="176" height="190"/>' : ''}${w.sciezki.map((s) => `<path d="${s.d}"${s.gruba ? ' class="gruba"' : ''}/>`).join('')}</svg>`;
-const kontrolaId = { 'pochodna-liego': 'lie', 'nazwa-van-dantzig': 'dantzig', 'hamilton-1931': 'hamilton', 'nawias-liego': 'nawias', 'zjazd-lwow-1927': 'flamm', 'seminarium-1948': 'sfera', 'wyklady-1946': 'ewoluta', 'jedenastu-doktorow': 'wezel', 'formes-exterieures': 'forma', 'zespol-impan-1956': 'siatka', 'geometria-tkanin-1945': 'tkanina' };
+const kontrolaId = { 'pochodna-liego': 'lie', 'nazwa-van-dantzig': 'dantzig', 'hamilton-1931': 'hamilton', 'nawias-liego': 'nawias', 'zjazd-lwow-1927': 'flamm', 'seminarium-1948': 'sfera', 'wyklady-1946': 'ewoluta', 'jedenastu-doktorow': 'wezel', 'formes-exterieures': 'forma', 'zespol-impan-1956': 'siatka', 'geometria-tkanin-1945': 'tkanina', 'galois-tarnobrzeg': 'galois', 'ogrod-botaniczny': 'liscie', 'getynga-1913': 'hilbert', 'toczenie-1923': 'toczenie', 'ptm-1923-1963': 'okregi', 'doktorat-1928': 'poincare', 'wnuk-liego': 'lie1p', 'pole-grawitacji-1926': 'peryhelium', 'nagroda-doktoraty-hc': 'elipsoida', 'pionier-elektryki': 'trojfaza', 'yano-1957': 'apollo', 'cartan-1922': 'cartan', 'spinory-kosmann': 'mobius', 'tom-26-colloquium': 'izometrie' };
 const html = `<!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ślebodziński: rysunki ciekawostek</title>
