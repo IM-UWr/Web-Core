@@ -1,5 +1,5 @@
 // Kierunek „Założyciele” (dok/estetyka.md): cztery działy, każdy z patronem z czwórki twórców wrocławskiej matematyki,
-// własnym kolorem z palety „Atramenty”, szkicem twarzy, sygnetem, podpisem i znakiem matematycznym.
+// własnym kolorem z palety „Lazur i malina” (zlecenie 14; wcześniej „Atramenty”), szkicem twarzy, sygnetem, podpisem i znakiem matematycznym.
 // Teksty o patronach są robocze (z prototypu „Założyciele”, wersja 33) — DO SPRAWDZENIA u historyka Instytutu,
 // zanim strona trafi do publikacji. Puste pole *_en = strona angielska pokazuje tekst polski. Notki i fakty po angielsku —
 // tłumaczenie z audytu wersji angielskiej (dok/en/RAPORT-EN.md, K1–K2; zlecenie 11, zalecenie 12), do sprawdzenia razem z polskimi.

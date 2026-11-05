@@ -4,19 +4,21 @@
    Telefon (≤ 760 px) bez zmian: tu poza @media (min-width: 761px) są wyłącznie nowe zmienne (nieużywane na telefonie).
    ========================================================================== */
 
-/* ---------- zmienne: paleta „Atramenty” (jasny / głęboki / atrament / tło), granat, kroje, kolumna ---------- */
+/* ---------- zmienne: paleta »Lazur i malina« (jasny / głęboki / atrament / tło), granat, kroje, kolumna ----------
+   Zlecenie 14, zalecenie 25 (decyzja 5.11, 10:32): Instytut bursztyn, Nauka szmaragd, Studia lazur, Popularyzacja malina.
+   W OKLCH każda rola ma tę samą jasność i nasycenie we wszystkich działach — różni się tylko odcień (prototyp: PALETY.lazur). */
 :root {
   --granat: #0d1830;
   --granat-2: #142241;
   --na-ciemnym: #ffffff;
   --na-ciemnym-2: #c9d0de;
-  --instytut-j: #f2a33a; --instytut-g: #5c3a0e; --instytut-a: #8a5300; --instytut-t: #fbf1e1;
-  --nauka-j: #4cc3b2; --nauka-g: #0a4a47; --nauka-a: #0a6b63; --nauka-t: #e2f3f0;
-  --studia-j: #f07d5e; --studia-g: #5e1f14; --studia-a: #b03a1f; --studia-t: #fbe8e2;
-  --popularyzacja-j: #a991f7; --popularyzacja-g: #30216a; --popularyzacja-a: #5b3fc4; --popularyzacja-t: #eeeafd;
+  --instytut-j: #e4a550; --instytut-g: #523300; --instytut-a: #845502; --instytut-t: #faefe1;
+  --nauka-j: #61cb97; --nauka-g: #00472c; --nauka-a: #03734a; --nauka-t: #e5f6ec;
+  --studia-j: #50c0f4; --studia-g: #004059; --studia-a: #00698f; --studia-t: #e3f4fd;
+  --popularyzacja-j: #ef90bb; --popularyzacja-g: #59273f; --popularyzacja-a: #953c68; --popularyzacja-t: #feebf2;
   /* kolor mocny działu (zlecenie 11, zalecenie 16): jasny (-j) w OKLCH — nasycenie ×1,45, jasność +0,02 (najwyżej 0,86), przycięty
-     do sRGB; szkic patrona i podpis na banerze działu. Paleta „Lazur i malina” (na później): #faa401, #03da91, #4cc7ff, #ff8fc3 */
-  --instytut-jm: #ffa625; --nauka-jm: #0aceba; --studia-jm: #ff7d5b; --popularyzacja-jm: #af97ff;
+     do sRGB; szkic patrona i podpis na banerze działu */
+  --instytut-jm: #faa401; --nauka-jm: #03da91; --studia-jm: #4cc7ff; --popularyzacja-jm: #ff8fc3;
   --f-display: 'Brygada 1918 Variable', 'Brygada zast', 'Brygada 1918', 'Iowan Old Style', Georgia, serif;
   --f-text: 'Manrope Variable', 'Manrope zast', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --kol: 1240px;

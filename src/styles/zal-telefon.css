@@ -1,7 +1,7 @@
 /* ==========================================================================
    Kierunek „Założyciele” — wygląd na telefon (≤ 760 px). Podstawa: próbna wersja z Web-Podglad (testy/telefon-TEST.patch),
    przyjęta jako docelowa 4.11.2026 (zlecenie 12).
-   Tu: kolory i kroje jak na komputerze (paleta „Atramenty”, Brygada 1918 + Manrope, ciepłe tło), nagłówek i menu,
+   Tu: kolory i kroje jak na komputerze (paleta „Lazur i malina”, Brygada 1918 + Manrope, ciepłe tło), nagłówek i menu,
    stopka, okładka, banery działów i nagłówki podstron. Układ bloków treści na wąski ekran jest na końcu plików tych bloków
    (zal-dzialy.css, zalozyciele-strony.css, zal-granty-plan.css), żeby nadpisywał wspólne reguły kolejnością w pliku.
    ========================================================================== */
