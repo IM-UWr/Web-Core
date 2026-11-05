@@ -27,9 +27,7 @@
   /* fill-mode: backwards — po skończeniu nie zostaje żaden translate ani opacity, więc elementy
      position: fixed w treści (np. lightbox galerii) liczą położenie od okna, a sticky (spis „Na tej stronie”,
      nagłówek planu zajęć) działa jak dotąd */
-  #tresc > .page-head > .wrap > :not(.ph-m, .ph-foto),
-  #tresc > .hero .hero-in,
-  #tresc > :not(.page-head, .hero, script) {
+  #tresc > .page-head > .wrap > :not(.ph-m, .ph-foto), #tresc > :not(.page-head, .hero, script) {
     animation: wejscie .5s cubic-bezier(.22, 1, .36, 1) backwards;
   }
   #tresc > :not(.page-head, .hero, script) { animation-delay: 60ms; }

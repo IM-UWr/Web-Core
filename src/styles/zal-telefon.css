@@ -32,16 +32,13 @@
 
   /* ---------- nagłówek strony: granat, nazwa Brygadą (pasek menu komputera schowany) ---------- */
   .z-pasek { display: none !important; }
-  .hdr, .js .hdr.hdr-glowna:not(.hdr-stopka):not(.menu-otwarte), .js .hdr-foto:not(.przewiniety):not(.menu-otwarte), .hdr.menu-otwarte {
+  .hdr, .hdr.menu-otwarte {
     background: var(--granat) !important; border-bottom-color: rgb(255 255 255 / .12) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; }
   .hdr .brand-name { font-family: var(--f-display); font-weight: 600; letter-spacing: 0; color: #fff !important; }
   .hdr .brand-sub { color: var(--na-ciemnym-2) !important; }
   .hdr .brand-logo { background: #fff !important; }
   .hdr .icon-btn { color: #fff !important; background: transparent; }
   .hdr .icon-btn.burger { background: rgb(255 255 255 / .14) !important; color: #fff !important; }
-  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 1; transform: none; visibility: visible; }
-  /* stary układ podciągał baner pod przezroczysty nagłówek (.hdr-foto) — nowy nagłówek stoi pod paskiem */
-  .js .hdr-foto { margin-bottom: 0 !important; }
 
   /* ---------- menu na telefonie: granat, działy Brygadą z sygnetem i kreską w kolorze działu ---------- */
   .mnav { background: var(--granat) !important; color: #fff; }

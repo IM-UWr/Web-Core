@@ -21,12 +21,8 @@
   /* ---------- nagłówek ---------- */
   .hdr-row { min-height: 60px; }
   .brand-logo { height: 36px; }
-
-  /* ---------- baner (strona główna): niższy ---------- */
-  .hero { --hero-tekst: 720px; }
   /* +40 px = miejsce po logotypie UWr nad tytułem (30 px + odstęp 10 px) — tytuł zostaje tam, gdzie był, nie klei się do nagłówka */
   .js .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 62px); }
-  .hero h1 { font-size: clamp(34px, 3.9vw, 56px); line-height: 1.02; letter-spacing: -0.03em; }
 
   /* ---------- wydarzenia i seminaria ---------- */
   .event { gap: 14px; padding: 14px; }
@@ -122,15 +118,9 @@
      decyzja 31.10.2026): jedno krótkie zdanie, bursztynowe na granatowym pasie (--accent = #f2a33a w .ph-granat),
      bez kreski pod spodem. Na jasnym pasie (inne warianty) — kolor tytułu, bo bursztyn na jasnym tle byłby nieczytelny.
      Odstęp do kreski nad liczbami działu: 8 px więcej niż pod zwykłym opisem. */
-  .ph-granat .ph-haslo { color: var(--accent); }
   .ph-haslo ~ .pt-liczby { margin-top: 10px; }
   /* baner z samym hasłem, bez kreski i liczb (Władze, Plan zajęć, Szukaj…; zlecenie 01): 4 px oddechu pod hasłem jak w prototypie */
   .ph .wrap:not(:has(> .pt-liczby:not(.tylko-komputer))) > .ph-haslo { padding-bottom: 4px; }
-  /* Fala Fouriera w banerze Aktualności (tlo.css, NaglowekStrony.astro) szara jak linie rysunku zamiast bursztynowej:
-     na ekranie jeden bursztynowy akcent — na telefonie jest nim hasło (decyzja 31.10.2026). Animacja bez zmian.
-     Na granatowym pasie (jasny i ciemny motyw) biaława, trochę wyraźniejsza niż linie motywu (grubsza kreska);
-     na jasnym pasie (inne warianty nagłówka) — w kolorze linii motywu. Komputer: bursztynowa jak dotąd. */
-  .ph-granat .ph-fala path { stroke: rgb(232 239 248 / .55); }
   /* Animacja w tle banera (src/scripts/baner/silnik.ts, motyw z data-animacja; zlecenie 02, decyzje 31.10.2026): płótna
      .ph-anim na całą szerokość pasa, pod tekstem; po pierwszej klatce pas dostaje .ph-anim-gra — płótna łagodnie się
      pojawiają, a statyczny rysunek .ph-m gaśnie. Kolor rysunku: token --ph-rysunek (składowe RGB, krycie daje motyw) —
@@ -233,17 +223,11 @@
   :root.js:has(.hero-b2) { scroll-padding-top: calc(var(--pas) + 8px); }
 
   /* --scrim: kolor otoczki tekstu, przycisku i przyciemnienia u góry; --zwin: ciemnienie całego banera przy zwijaniu */
-  .hero.hero-b2 { --scrim: 8 14 30; --zwin: rgb(14 25 52 / .9); z-index: 10; height: 100vh; height: 100svh; overflow: hidden; background: #0b1428; }
-  :root[data-theme='dark'] .hero.hero-b2 { --scrim: 5 9 20; --zwin: rgb(9 16 34 / .92); }
   .js .hero.hero-b2 { position: sticky; top: calc(var(--pas) - 100vh); top: calc(var(--pas) - 100svh); }
   /* zamiast dzisiejszych gradientów komputera: przyciemnienie u góry (124 px, pod napisami nagłówka) i ciemnienie całego
      banera przy zwijaniu; podpis komputera (figcaption) wyłączony — telefon ma własny (.hero-podpis, pole podpis_telefon) */
   .js .hdr-foto ~ main .hero-b2 .hero-fig::after { content: ''; position: absolute; inset: 0; z-index: 1; height: auto; pointer-events: none;
     background: var(--zwin); opacity: clamp(0, calc((var(--p, 0) - .35) * 1.6), 1); }
-
-  /* tekst: blok u dołu po lewej, szeroki na najdłuższą linię; tytuł w dwóch liniach (szerokość najdłuższego słowa) */
-  #tresc > .hero.hero-b2 .hero-in { animation: none; }
-  .hero.hero-b2 h1 { width: min-content; margin: 0; font-size: 40px; font-weight: 800; line-height: 1.02; letter-spacing: -.028em; color: #fff; text-wrap: balance; }
 
   /* ruch przy załadowaniu: wejście tytułu, hasła i podtytułu (10 px w górę) i dwa podskoki strzałki przycisku —
      tylko gdy użytkownik nie prosi o ograniczenie ruchu */

@@ -145,10 +145,8 @@
   }
 
   /* baner strony głównej */
-  :where([data-uklad~='zwarta-baner']) .hero { --hero-tekst: 640px; }
   .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main .hero-fig::after { height: calc(var(--hdr-h) + 70px); }
   .js :where([data-uklad~='zwarta-baner']) .hdr-foto ~ main .hero-in { padding-top: calc(var(--hdr-h) + 20px); }
-  :where([data-uklad~='zwarta-baner']) .hero h1 { font-size: clamp(34px, 3.4vw, 50px); line-height: 1; }
 
   /* nagłówek podstrony (global.css) */
   :where([data-uklad~='zwarta-baner']) .page-head .wrap { padding-top: clamp(12px, 1.8vw, 22px); padding-bottom: clamp(14px, 2vw, 22px); gap: 6px; }

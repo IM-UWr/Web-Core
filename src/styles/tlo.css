@@ -136,10 +136,6 @@ body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-c
 .js .hdr-foto ~ main > .ph-granat:first-child::before { content: ''; position: absolute; inset: 0 0 auto 0; height: calc(var(--hdr-h) + 48px); z-index: -1; pointer-events: none;
   background: linear-gradient(rgb(10 18 38 / .62), rgb(10 18 38 / 0)); }
 .ph-granat .wrap a:hover { color: var(--accent); }
-.ph-granat .ph-foto { position: absolute !important; top: 0; bottom: 0; right: calc(50% - 50vw); width: min(58vw, 1000px); z-index: -2; background: #7f9bd0; }
-.ph-granat .ph-foto img { filter: grayscale(1) contrast(1.08); mix-blend-mode: multiply; opacity: .9; }
-.ph-granat .ph-foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, var(--ph-tlo) 0%, rgb(27 45 82 / .55) 38%, rgb(27 45 82 / .12) 100%); }
-:root[data-theme='dark'] .ph-granat .ph-foto::after { background: linear-gradient(to right, var(--ph-tlo) 0%, rgb(20 33 61 / .6) 38%, rgb(20 33 61 / .2) 100%); }
 .ph-granat.ph-z-foto .ph-m { width: min(560px, 46%); }
 .ph-granat.ph-z-foto { --ph-linie: rgb(232 239 248 / .22); }
 
@@ -153,10 +149,6 @@ body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-c
   .ph-zdjecie.ph-z-foto .ph-m, .ph-granat.ph-z-foto .ph-m { top: 0; bottom: auto; height: 150px; right: 0; width: 78%; opacity: .8; }
   .ph-zdjecie.ph-z-foto .ph-foto { position: relative !important; inset: auto; width: auto; height: 150px; margin: -22px calc(-1 * var(--gutter)) 18px; border-radius: 0; box-shadow: none; }
   .ph-zdjecie.ph-z-foto .ph-m { display: none; }
-  .ph-granat .ph-foto { width: 100vw; }
-  /* na górze zdjęcie widać wyraźniej; nawet w najjaśniejszym miejscu biały tekst ma kontrast > 5:1 */
-  .ph-granat .ph-foto::after { background: linear-gradient(to bottom, rgb(27 45 82 / .45), rgb(27 45 82 / .86) 60%, var(--ph-tlo)); }
-  :root[data-theme='dark'] .ph-granat .ph-foto::after { background: linear-gradient(to bottom, rgb(20 33 61 / .5), rgb(20 33 61 / .88) 60%, var(--ph-tlo)); }
 }
 
 /* ==========================================================================
