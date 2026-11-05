@@ -8,8 +8,8 @@ for k, f in [('{{KAMPUS}}', 'kampus-2000.jpg'), ('{{INSTYTUT}}', 'instytut-560.j
 import re as _re
 s = _re.sub(r'\{\{FOT_([a-z-]+)\}\}', lambda m: 'data:image/jpeg;base64,' + base64.b64encode(open(z + 'fot/' + m.group(1) + '.jpg', 'rb').read()).decode(), s)
 s = s.replace('{{LOGO}}', 'data:image/png;base64,' + base64.b64encode(open(z + 'uwr-logo.png', 'rb').read()).decode())
-for k in ['MACIERZE','WARSZTATY','KOLO','OBRONA','DZIEN']:
-    s = s.replace('{{MIN_'+k+'}}', 'data:image/jpeg;base64,' + base64.b64encode(open(z + 'min/' + {'MACIERZE':'macierze','WARSZTATY':'warsztaty','KOLO':'kolo','OBRONA':'obrona','DZIEN':'dzien'}[k] + '.jpg', 'rb').read()).decode())
+for k in ['MACIERZE','WARSZTATY','KOLO','OBRONA','DZIEN','MACIERZE_D']:
+    s = s.replace('{{MIN_'+k+'}}', 'data:image/jpeg;base64,' + base64.b64encode(open(z + 'min/' + {'MACIERZE':'macierze','WARSZTATY':'warsztaty','KOLO':'kolo','OBRONA':'obrona','DZIEN':'dzien','MACIERZE_D':'macierze-d'}[k] + '.jpg', 'rb').read()).decode())
 lm = z + 'lm/'
 for k, f in [('{{LM10R}}', 'lmroman10-regular'), ('{{LM10I}}', 'lmroman10-italic'), ('{{LM10B}}', 'lmroman10-bold'), ('{{LM17R}}', 'lmroman17-regular'), ('{{LMCAPS}}', 'lmromancaps10-regular')]:
     if k in s:
