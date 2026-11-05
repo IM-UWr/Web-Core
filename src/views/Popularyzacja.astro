@@ -1,70 +1,43 @@
 ---
-// Popularyzacja matematyki: baner działu, pod nim blok TrescDzialu — grupy z menu „Popularyzacja” (partnerzy z domeną),
-// potem sekcje inicjatyw (dla uczniów, nauczycieli…); grupa bez inicjatyw jako „To be announced”.
-// Dane: src/data/popularyzacja.json (edycja w Pages CMS, repozytorium Web-Popularyzacja).
-// Jedna wersja HTML: komputer i telefon (≤ 760 px, jedna kolumna) — src/styles/zal-dzialy.css.
-import Link from '../components/Link.astro';
+// Strona działu „Popularyzacja” (/popularyzacja, /en/popularyzacja): baner działu z latami tradycji, pod nim blok TrescDzialu —
+// podstrony w grupach jak w menu, „O popularyzacji” z „W skrócie”, karty „Dla kogo” (po jednej na stronę działu).
+// Dane: src/data/popularyzacja.json i nagłówki stron src/content/strony/popularyzacja/ (edycja w Pages CMS, repozytorium
+// Web-Popularyzacja). Jedna wersja HTML: komputer i telefon (≤ 760 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TrescDzialu from '../components/zal/TrescDzialu.astro';
-import { u, isExternal } from '../lib/url';
-import { wJezyku } from '../lib/i18n';
+import Sekcja from '../components/zal/dzial/Sekcja.astro';
+import { u } from '../lib/url';
+import { wJezyku, bezSierotek } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import { danePopularyzacji, poleWJezyku } from '../lib/widoki/popularyzacja';
+import { danePopularyzacji } from '../lib/widoki/popularyzacja';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const w = poleWJezyku(lang);
-const { grupy, tytul, lead, haslo, grupyMenu } = await danePopularyzacji(lang);
-
-// Pliki (/pliki/...) nie mają wersji językowych — bez prefiksu /en.
-const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
-const host = (a: string) => {
-  try { return new URL(a).hostname.replace(/^www\./, ''); } catch { return ''; }
-};
-// Komputer: podstrony jak w menu — sekcje tej strony (kotwice w nowym bloku) i grupy z menu „Popularyzacja”.
-const grupyPod = [
-  { nazwa: 'Na tej stronie', nazwa_en: 'On this page', linki: grupy.map((g) => ({ etykieta: g.nazwa, etykieta_en: g.nazwa_en || undefined, adres: `#z-pop-${g.slug}` })) },
-  ...grupyMenu,
-];
+const { tytul, lead, haslo, liczby, grupy, akapity, fakty, karty } = await danePopularyzacji(lang);
 ---
 <Baza tytul={tytul} opis={lead || undefined} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]} />
-  <TrescDzialu dzial="popularyzacja" lang={lang} grupy={grupyPod}>
-    {grupy.length > 0 && (
-      <div class="z-dz-sek z-dz-bez-kreski">
-        <div class="z-dz-tba">
-          {grupy.map((g) => (
-            <section id={`z-pop-${g.slug}`} aria-labelledby={`z-pop-${g.slug}-h`}>
-              <h2 id={`z-pop-${g.slug}-h`}>{w(g, 'nazwa')}</h2>
-              {g.opis && <p class="opis">{w(g, 'opis')}</p>}
-              {g.pozycje.length === 0 ? (
-                <p class="tba" lang={lang === 'pl' ? 'en' : undefined}>To be announced</p>
-              ) : (
-                <ul class="z-dz-inic">
-                  {g.pozycje.map((p) => {
-                    const adres = (p.adres ?? '').trim();
-                    const zew = isExternal(adres);
-                    const meta = [p.archiwalne && T('archiwum', 'archive'), p.dla && `${T('Dla kogo', 'For whom')}: ${w(p, 'dla')}`, zew && host(adres)].filter(Boolean).join(' · ');
-                    return (
-                      <li class:list={[adres && 'z-dz-klik']}>
-                        <h3>
-                          {adres ? (
-                            <Link href={href(adres)}>{w(p, 'nazwa')}</Link>
-                          ) : w(p, 'nazwa')}
-                        </h3>
-                        {p.opis && <p>{w(p, 'opis')}</p>}
-                        {meta && <p class="meta">{meta}</p>}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </section>
+  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby">
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
+  <TrescDzialu dzial="popularyzacja" lang={lang} grupy={grupy} tekst={{ tytul: T('O popularyzacji', 'About outreach'), akapity, fakty }}>
+    {karty.length > 0 && (
+      <Sekcja id="z-dz-dla-kogo" tytul={T('Dla kogo', 'Who it’s for')} lang={lang}>
+        <div class="z-dz-kart">
+          {karty.map((k) => (
+            <article class="z-dz-klik">
+              <div class="gora">{k.nazwa}</div>
+              <h3><a href={u(wJezyku(k.adres, lang))}>{k.tytul}</a></h3>
+              {k.opis && <p>{k.opis}</p>}
+            </article>
           ))}
         </div>
-      </div>
+      </Sekcja>
     )}
   </TrescDzialu>
 </Baza>

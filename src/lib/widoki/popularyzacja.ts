@@ -17,9 +17,6 @@ type Dane = {
 };
 
 // Domena strony bez „www.” (podpis linku do partnera, np. „fmw.math.uni.wroc.pl”).
-// Pole obiektu w wybranym języku; używane też w szablonie widoku.
-export const poleWJezyku = (lang: Lang) => (o: any, pole: string) => wybierz(o, pole, lang);
-
 const domena = (a: string) => {
   try { return new URL(a).hostname.replace(/^www\./, ''); } catch { return ''; }
 };
@@ -70,6 +67,5 @@ export async function danePopularyzacji(lang: Lang) {
     }))
     .sort((a, b) => pozycjaWMenu(a.adres) - pozycjaWMenu(b.adres) || a.adres.localeCompare(b.adres));
 
-  // widok działu przejdzie na te dane w punkcie 2
-  return { tytul, lead, haslo, liczby, grupy: [] as any[], grupyMenu: grupy, akapity, fakty, karty };
+  return { tytul, lead, haslo, liczby, grupy, akapity, fakty, karty };
 }
