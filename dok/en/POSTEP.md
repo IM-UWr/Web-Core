@@ -31,7 +31,22 @@ Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`). Audyt: `dok/en/RAPORT-EN.
 - Sprawdzenie: `npm run build` bez błędów, `astro check` — te same 3 błędy co na `wyglad/porzadki` (`process`
   w `astro.config.mjs`), `skrypty/sprawdz_tresci.py` OK.
 
+## Krok 2: mapy tłumaczeń dla danych z USOS i publikacji — zrobione (5.11, ok. 02:45)
+- **Plan zajęć** (`src/lib/en/plan.ts`, użyte w `src/lib/widoki/planZajec.ts`): 31 nazw przedmiotów bez angielskiej nazwy
+  w USOS (mapa po kodzie przedmiotu; nazwa z USOS ma pierwszeństwo, gdy się pojawi), uwagi z USOS — zwroty tłumaczone
+  po kolei („co 2 tygodnie” → „every other week”, „tylko dla SIAD” → „SIAD students only”, „pierwsze zajęcia 6.11” →
+  „first class on 6 Nov”, „pn 19.10 (20.00-21.30)” → „Mon 19 Oct (20:00–21:30)” itd.; wszystkie 49 uwag z obecnego planu
+  mają tłumaczenie), typy zajęć i sale (krok 1). Angielskich nazw z katalogu USOS nie dało się pobrać (USOS API zablokowane
+  w sieci tej sesji), więc brakujące nazwy przetłumaczyłem — lista do akceptacji w `dok/en/TLUMACZENIA.md`.
+- **Publikacje** (`src/lib/en/publikacje.ts`, użyte w `src/lib/widoki/publikacjeRok.ts`): uwagi bibliograficzne
+  („jęz. angielski, wydawnictwo zagraniczne, praca recenzowana, afiliacja UWr” → „in English, foreign publisher,
+  peer-reviewed, University of Wrocław affiliation”), zwroty w źródle i opisie („s. 405-422” → „pp. 405–422”, „nr” → „no.”,
+  „Dostęp do abstraktu:” → „Abstract:”, „Przy nazwisku X podwójna afiliacja: A oraz B” → „X has a dual affiliation: A and B”,
+  „(red.)”, „[i in.]” itd.). Tytuły prac, nazwy czasopism, serii, wydawnictw i miejsc — bez zmian (cytaty).
+- Po kroku 2 na stronach `/en/nauka/publikacje/*` i `/en/studia/plan-zajec` zostały po polsku tylko tytuły prac, nazwy
+  czasopism i serii oraz nazwy przedmiotów cytowane w uwagach (np. „Miara i całka R”) — celowo.
+- `dok/en/TLUMACZENIA.md`: tabele do przejrzenia (patroni, napisy w kodzie, plan, publikacje).
+
 ## Zostało
-- Krok 2: mapy tłumaczeń dla danych z USOS (uwagi, nazwy przedmiotów) i wykazów publikacji (`src/lib/en/…`).
-- Krok 3: łatki z tłumaczeniami pól `_en` dla repozytoriów Web-* (`dok/en/latki/`), tabela `dok/en/TLUMACZENIA.md`
-  (też „Do decyzji”), martwy link w `warto_wiedziec/wyklad-terencea-tao.md`.
+- Krok 3: łatki z tłumaczeniami pól `_en` dla repozytoriów Web-* (`dok/en/latki/`), tabela w `dok/en/TLUMACZENIA.md`
+  (też „Do decyzji”), martwy link w `warto_wiedziec/wyklad-terencea-tao.md`, nowe pola w `.pages.yml`.

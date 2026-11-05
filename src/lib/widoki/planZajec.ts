@@ -4,7 +4,7 @@ import surowe from '../../data/plan/plan.json';
 import studia from '../../data/dzialy/studia.json';
 import { today, short, type Lang } from '../daty';
 import { odmiana } from '../i18n';
-import { TYPY_EN, salaEn } from '../en/plan';
+import { TYPY_EN, salaEn, nazwaPrzedmiotuEn, uwagaEn } from '../en/plan';
 
 const MIESIACE = [
   ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'],
@@ -35,6 +35,9 @@ export async function danePlanuZajec(lang: Lang) {
   // po angielsku nazwy typów z src/lib/en/plan.ts (zamiast kalk z USOS), potem z USOS
   const typPelny = (t: string) => (en && TYPY_EN[t]?.pelna) || dane.typy?.[t]?.[lang] || t;
   const typKrotki = (t: string) => (en && TYPY_EN[t]?.krotka) || KROTKO[t]?.[en ? 1 : 0] || typPelny(t).toLowerCase();
+  // na /en uwagi z USOS po angielsku (src/lib/en/plan.ts: zwroty tłumaczone po kolei, linki bez zmian), nazwy przedmiotów
+  // bez angielskiej nazwy w USOS — z mapy PRZEDMIOTY_EN
+  const zajecieW = (z: Zajecie): Zajecie => (en && z.uwagi ? { ...z, uwagi: z.uwagi.map((f) => (typeof f === 'string' ? uwagaEn(f) : f)) } : z);
   // sala z USOS; po angielsku „inna” → „other”, „zd” (zdalnie) → „online”
   const salaW = (s?: string) => (s && en ? salaEn(s) : s);
   // jak w dawnym planie: przy wykładzie i konwersatorium bez numeru grupy
@@ -55,7 +58,7 @@ export async function danePlanuZajec(lang: Lang) {
         nazwa: en ? k.en : k.pl,
         przedmioty: s.przedmioty
           .filter((p) => p.kategoria === k.id)
-          .map((p) => ({ ...p, nazwaW: (en && p.nazwa_en) || p.nazwa, zajecia: s.zajecia.filter((z) => z.kod === p.kod) })),
+          .map((p) => ({ ...p, nazwaW: en ? nazwaPrzedmiotuEn(p) : p.nazwa, zajecia: s.zajecia.filter((z) => z.kod === p.kod).map(zajecieW) })),
       }))
       .filter((k) => k.przedmioty.length);
     const kotwica = m ? (zimowy ? 'zimowy' : 'letni') : s.id.replace(/[^\w-]/g, '-');

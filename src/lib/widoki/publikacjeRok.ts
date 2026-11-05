@@ -3,6 +3,7 @@ import dzial from '../../data/dzialy/nauka.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { lata, odmiana, liczbaWspolautorskich, liczbaZrodel, wspolautorzy } from './publikacje';
+import { pracaEn } from '../en/publikacje';
 
 export async function danePublikacjiRoku(rok: number, lang: Lang) {
   const en = lang === 'en';
@@ -37,7 +38,8 @@ export async function danePublikacjiRoku(rok: number, lang: Lang) {
   const grupy = w.grupy.map((g, k) => {
     const nag = wybierz(g as any, 'naglowek', lang);
     const pelny = nag ? (g.rok_wydania && g.rok_wydania !== rok ? `${T('Rok', 'Year')} ${g.rok_wydania}: ${nag}` : nag) : '';
-    const out = { ...g, pelny, id: pelny ? `${slug(pelny)}-${k + 1}` : '', start };
+    // na /en zwroty opisu bibliograficznego po angielsku (src/lib/en/publikacje.ts), tytuły prac bez zmian
+    const out = { ...g, prace: lang === 'en' ? g.prace.map(pracaEn) : g.prace, pelny, id: pelny ? `${slug(pelny)}-${k + 1}` : '', start };
     start += g.prace.length;
     return out;
   });
