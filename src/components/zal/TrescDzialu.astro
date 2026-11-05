@@ -37,6 +37,9 @@ const zGrupami = grupy.map((g) => ({ ...g, linki: g.linki.filter(bezUsos) })).fi
 const fakty = tekst?.fakty ?? [];
 const rek = dzial === 'studia' ? await rekrutacja(lang) : undefined;
 const rokRek = rokRekrutacji();
+const DOPISEK_RE = /\s*\(in Polish\)\s*$/;
+const rekPoPolsku = !!rek && DOPISEK_RE.test(rek.etykieta);
+const etykietaRek = rek?.etykieta.replace(DOPISEK_RE, '');
 ---
 <div class="z-dz" data-dzial={dzial}>
   {zGrupami.length > 0 && (
@@ -60,8 +63,8 @@ const rokRek = rokRekrutacji();
       </div>
       {rek && (
         <Link class="z-dz-rekr" href={rek.adres}>
-          <small>{en ? 'For applicants' : 'Dla kandydatów'}</small>
-          <span class="z-dz-rekr-t">{rek.etykieta}{rokRek && ` ${rokRek}`}</span>
+          <small>{en ? `For applicants${rekPoPolsku ? ' · in Polish' : ''}` : 'Dla kandydatów'}</small>
+          <span class="z-dz-rekr-t">{etykietaRek}{rokRek && ` ${rokRek}`}</span>
         </Link>
       )}
     </nav>
