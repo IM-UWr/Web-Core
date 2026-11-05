@@ -643,6 +643,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .z-opisem .in-b4 { height: calc(380px + var(--gora)); }
 .in-b4 .in-tytul { top: calc(50px + var(--gora)); }
 .in-b4 .szkic { top: calc(50% - 138px + var(--gora) / 2); }
+/* ciemna plama pod szkicem patrona (5.11, 01:37, wariant A): szkic odcina się od zdjęcia, np. od tłumu na Nauce */
+.in-b4 .szkic::before { content: ''; position: absolute; inset: -12% -22%; z-index: -1; background: radial-gradient(closest-side, rgb(13 24 48 / .86) 0, rgb(13 24 48 / .72) 60%, rgb(13 24 48 / 0) 100%); }
 .in-tytul .lead { display: none; }
 .z-opisem .in-tytul .lead { display: block; }
 .in-tytul .lead { margin: 10px 0 0; max-width: 540px; font-size: 15.5px; line-height: 1.55; color: var(--na-ciemnym-2); }
