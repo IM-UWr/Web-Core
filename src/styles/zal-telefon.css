@@ -41,6 +41,9 @@
   .mnav .mgroup a { color: var(--na-ciemnym-2) !important; font-weight: 500; }
   .mnav .mgroup h3 { color: var(--d-j, var(--na-ciemnym-2)) !important; letter-spacing: .02em; text-transform: none; font-size: 12.5px; }
   .mnav .mitem, .mnav > a { border-color: rgb(255 255 255 / .12) !important; }
+  /* przełącznik języka w menu: flaga języka docelowego przed napisem (zlecenie 11, zalecenie 8) */
+  .mnav-jezyk > span { display: inline-flex; align-items: center; gap: 10px; }
+  .mnav-jezyk .z-flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-shadow: 0 0 0 1px rgb(0 0 0 / .12); }
   .mnav .mrow-btn { color: #fff !important; }
   .mnav .mitem[data-dzial] .mrow { align-items: center; gap: 12px; }
   .mnav .mitem[data-dzial] .mrow-link { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; flex-direction: column; align-items: flex-start; }

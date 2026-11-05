@@ -3,6 +3,7 @@
 // przełącznik trybu ciemnego i menu wysuwane z prawej (grupy z src/data/nawigacja.json, działy z sygnetem patrona).
 import Ikona from './Ikona.astro';
 import Szkic from './zal/Szkic.astro';
+import Flaga from './zal/Flaga.astro';
 import { dzialZeSciezki, PATRONI } from '../lib/patroni';
 import { menuGlowne, type Pozycja } from '../lib/menu';
 import ustawienia from '../data/ustawienia.json';
@@ -91,7 +92,8 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
       <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
     )
   )}
-  {inny && <a href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}>{t(lang, 'innyJezyk')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
+  {/* przełącznik języka z flagą języka docelowego (zlecenie 11, zalecenie 8) */}
+  {inny && <a class="mnav-jezyk" href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}><span><Flaga jezyk={lang === 'pl' ? 'en' : 'pl'} />{t(lang, 'innyJezyk')}</span><Ikona nazwa="strzalka" rozmiar={18} /></a>}
 </nav>
 
 <script>
