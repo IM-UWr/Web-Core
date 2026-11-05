@@ -9,7 +9,7 @@
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
-import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
+import { wJezyku, wybierz, RODZAJE_GRANTOW, langPola } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { kierownicyGrantu, lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { tytulyWJezyku } from '../lib/osoby';
@@ -30,7 +30,7 @@ const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.t
 const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kierownicyGrantu(g.data.kierownik, osoby, lang).map((k) => k.nazwa).join(', '), lataGrantu(g)]
   .filter(Boolean);
 ---
-<Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner" haslo={haslo}
+<Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner" haslo={haslo}
   wstecz={{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }} dzial="nauka" klasa="tresc z-grant">
   <Fragment slot="baner">
     {/* D5, zlecenie 16: na /en oryginalny polski tytuł z etykietą */}

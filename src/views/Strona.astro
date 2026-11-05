@@ -6,7 +6,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import { t, wybierz } from '../lib/i18n';
+import { t, wybierz, langPola } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneStrony } from '../lib/widoki/strona';
 
@@ -15,7 +15,7 @@ const { strona, lang } = Astro.props;
 const { d, tytul, opis, haslo, liczby, Content, htmlEn, tylkoPolski, dzial, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ } = await daneStrony(strona, lang);
 const okruszki = [...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang) as string, adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang) as string, adres: rodzic.adres }] : []), { etykieta: tytul }];
 ---
-<Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}
+<Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}
   lead={opis} haslo={haslo} okruszki={okruszki} dzial={dzialZ} spis={pasek === 'spis' || pasek === 'oba' ? spisZ : []}
   klasa="tresc">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>

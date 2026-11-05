@@ -22,6 +22,7 @@ interface Props {
   rodzaj: 'dzial' | 'podstrona';
   dzial?: Dzial;
   tytul: string;
+  tytulLang?: string;
   haslo?: string;
   lang: Lang;
   // HTML przekazany do banera przez widok (liczby .pt-liczby, plakietki, linki) — pokazywany pod tytułem
@@ -31,7 +32,7 @@ interface Props {
   // ciekawostka patrona: znak z opisem, losowana na wizytę (podstrony z menu działu; zlecenie 11, zalecenie 19)
   znak?: boolean;
 }
-const { rodzaj, dzial, tytul, lang, slot: slotWidoku = '', wstecz, znak = false } = Astro.props;
+const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false } = Astro.props;
 const P = dzial ? PATRONI[dzial] : undefined;
 // Trzy style banerów (zlecenie 11, zalecenie 2): baner działu; podstrona z liczbami (tytuł, hasło, kreska, liczby);
 // podstrona bez liczb (sam tytuł). Hasło i liczby razem albo wcale: liczby bez hasła w danych nie pokazują się
@@ -196,7 +197,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
       <div class="z-tyt-g">
         {P && <Szkic dzial={P.dzial} rodzaj="sygnet" class="z-sygnet-nagl" />}
         <p class="z-sciezka"><a href={u(wJezyku(wstecz.adres, lang))}>← {wstecz.etykieta}</a></p>
-        <h1 data-pagefind-meta="title">{tytul}</h1>
+        <h1 data-pagefind-meta="title" lang={tytulLang}>{tytul}</h1>
         {P && <span class="z-podpis-maly"><Szkic dzial={P.dzial} rodzaj="podpis" /></span>}
       </div>
       {haslo && <p class="z-haslo">{haslo}</p>}

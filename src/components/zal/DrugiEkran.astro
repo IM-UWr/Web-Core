@@ -41,7 +41,7 @@ const krotkaSala = (s?: string) => (s ? (/^[\w.\-]{1,6}$/.test(s) ? `${en ? 'roo
 const dzialZ = (adres?: string): Dzial | undefined => (adres && !isExternal(adres) ? dzialZeSciezki(adres) : undefined);
 const NAZWY_DZ: Record<Dzial, [string, string]> = { instytut: ['Instytut', 'Institute'], nauka: ['Nauka', 'Research'], studia: ['Studia', 'Studies'], popularyzacja: ['Popularyzacja', 'Outreach'] };
 
-type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; polski?: boolean; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean };
+type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; tytulLang?: string; polski?: boolean; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean };
 
 // Dział wpisu (aktualności nie mają jeszcze pola „Dział” — reguła z dok/estetyka.md, „CMS: dział przy aktualnościach”):
 // „dla” studenci lub kandydaci → Studia; sukces, obrona albo wpisany zakład → Nauka; pozostałe → Instytut.
@@ -60,7 +60,7 @@ const wydarzenia: Wiersz[] = (await wydarzeniaNaTelefon(10, lang, dniTel)).map((
   return {
     dzial: dz, ...data(w.poczatek), gdzie: dz ? T(...NAZWY_DZ[dz]) : T('Wydarzenie', 'Event'),
     co: [RODZ_WYD[w.rodzaj] ? T(...RODZ_WYD[w.rodzaj]) : '', godzina(w.poczatek), krotkieMiejsce(w.miejsce)].filter(Boolean).join(' · '),
-    tytul: w.rodzaj === 'obrona' && w.podtytul ? w.podtytul : w.tytul, adres: w.href,
+    tytul: w.rodzaj === 'obrona' && w.podtytul ? w.podtytul : w.tytul, tytulLang: w.tytulLang, adres: w.href,
   };
 });
 
@@ -81,7 +81,7 @@ const akt = await aktualnosciNaGlowna(12, lang);
 const aktualnosci: Wiersz[] = akt.map((p) => {
   const dz = dzialWpisu(p);
   const etyk = p.rodzaj !== 'ogloszenie' ? RODZAJE[p.rodzaj]?.[lang] : p.dla[0] ? ODBIORCY[p.dla[0]]?.[lang] : RODZAJE.ogloszenie[lang];
-  return { dzial: dz, ...data(p.data), gdzie: T(...NAZWY_DZ[dz]), co: (etyk ?? '').toLowerCase(), tytul: p.tytul, adres: p.href, min: p.zdjecie, szkic: !p.zdjecie, minelo: true };
+  return { dzial: dz, ...data(p.data), gdzie: T(...NAZWY_DZ[dz]), co: (etyk ?? '').toLowerCase(), tytul: p.tytul, tytulLang: p.tytulLang, adres: p.href, min: p.zdjecie, szkic: !p.zdjecie, minelo: true };
 });
 
 const KOL = {
@@ -152,7 +152,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           <span class="kiedy"><b>{o.d}</b>{o.m}</span>
           <span class="tr">
             <span class="gdzie">{o.gdzie}{o.co && <i> · {o.co}</i>}</span>
-            <span class="t">{o.polski ? <><span lang="pl">{o.tytul}</span> {DOPISEK_PO_POLSKU}</> : o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
+            <span class="t">{o.polski ? <><span lang="pl">{o.tytul}</span> {DOPISEK_PO_POLSKU}</> : o.tytulLang ? <span lang={o.tytulLang}>{o.tytul}</span> : o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
           </span>
           {'min' in k && (o.min
             ? <span class="min"><ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 72, 54])} /></span>

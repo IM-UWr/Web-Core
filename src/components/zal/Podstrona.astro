@@ -18,6 +18,8 @@ import type { Dzial } from '../../lib/patroni';
 interface Props {
   lang: Lang;
   tytul: string;
+  // 'pl', gdy na /en tytuł to wartość polska (decyzja D14, zlecenie 16)
+  tytulLang?: string;
   // tytuł karty przeglądarki (<title>), gdy inny niż tytuł w nagłówku (np. „Obrona doktoratu: …”)
   tytulKarty?: string;
   opis?: string;
@@ -37,8 +39,8 @@ interface Props {
   klasaRamy?: string;
   atrybuty?: Record<string, string>;
 }
-const { lang, tytul, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
-const naglowek = { tytul, lead, haslo, lang, okruszki, wstecz };
+const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
+const naglowek = { tytul, tytulLang, lead, haslo, lang, okruszki, wstecz };
 ---
 <Baza tytul={tytulKarty ?? tytul} opis={opis} obraz={obraz} opublikowany={opublikowany} alternatywa={alternatywa} typ={typ} uklad={uklad}>
   {Astro.slots.has('baner')

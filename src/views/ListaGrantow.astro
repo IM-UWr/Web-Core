@@ -6,7 +6,7 @@
 // na całą szerokość, oś lat nad listą (src/styles/zal-granty-plan.css). Szablon podstrony: zal/Podstrona.astro.
 import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
-import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
+import { wJezyku, wybierz, RODZAJE_GRANTOW, langPola } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneListyGrantow, odm } from '../lib/widoki/listaGrantow';
@@ -58,7 +58,7 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
           <div class="gr-w">
             <div>
               <div class="rola">{[rodzaj(g), lata].filter(Boolean).join(' · ')}</div>
-              <div class="imie"><a href={adresGrantu(g)}>{tytul(g)}</a></div>
+              <div class="imie"><a href={adresGrantu(g)} lang={langPola(g.data, 'tytul', lang)}>{tytul(g)}</a></div>
               <div class="kont">
                 {czesciKont(g,
                   k.length > 0 ? `${k.length > 1 ? T('Kierownicy', 'Principal investigators') : T('Kierownik', 'Principal investigator')}: ${kierownicyTekst(g)}` : '',
@@ -84,7 +84,7 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
               return (
                 <div class="gr-w maly">
                   <div>
-                    <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
+                    <a href={adresGrantu(g)} class="gr-t" lang={langPola(g.data, 'tytul', lang)}>{tytul(g)}</a>
                     <div class="kont">
                       {czesciKont(g, rodzaj(g), kierownicyTekst(g), lataGrantu(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
                     </div>
@@ -104,7 +104,7 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
         {bezLat.map((g) => (
           <div class="gr-w maly">
             <div>
-              <a href={adresGrantu(g)} class="gr-t">{tytul(g)}</a>
+              <a href={adresGrantu(g)} class="gr-t" lang={langPola(g.data, 'tytul', lang)}>{tytul(g)}</a>
               <div class="kont">
                 {czesciKont(g, rodzaj(g), kierownicyTekst(g)).map((c, i) => <>{i > 0 && ' · '}{c.nr ? <span class="nr">{c.t}</span> : c.t}</>)}
               </div>

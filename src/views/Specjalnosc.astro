@@ -16,7 +16,7 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
-import { wJezyku, wybierz } from '../lib/i18n';
+import { wJezyku, wybierz, langTekstu } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneSpecjalnosci } from '../lib/widoki/specjalnosc';
 
@@ -84,7 +84,7 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
 
   <section id="o-specjalnosci" aria-labelledby="o-specjalnosci-h">
     <h2 id="o-specjalnosci-h">{H.o}</h2>
-    <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+    <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
     {dlaKogo && (
       <div class="uwaga">
         <span class="etyk">{T('Dla kogo', 'Who is it for')}</span>
@@ -168,7 +168,7 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
   {d.tematy_prac.length > 0 && (
     <section id="tematy" aria-labelledby="tematy-h">
       <h2 id="tematy-h">{H.tematy}</h2>
-      <ul class="kreski">{d.tematy_prac.map((x) => <li>{x.tytul}{x.opis && <span class="sp-opis"> — {wybierz(x, 'opis', lang)}</span>}</li>)}</ul>
+      <ul class="kreski">{d.tematy_prac.map((x) => <li>{langTekstu(x.tytul, lang) ? <span lang="pl">{x.tytul}</span> : x.tytul}{x.opis && <span class="sp-opis"> — {wybierz(x, 'opis', lang)}</span>}</li>)}</ul>
     </section>
   )}
 

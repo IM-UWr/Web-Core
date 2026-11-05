@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { now, today, weekday, addDays, hasTime, plusMinutes, type Lang } from './daty';
 import { swietaPanstwowe, pozycjeZamianDni } from './kolory-dni';
 import { zTytulem, tytulyWJezyku } from './osoby';
+import { langPola } from './i18n';
 
 export type Aktualnosc = CollectionEntry<'aktualnosci'>;
 export type Obrona = CollectionEntry<'obrony'>;
@@ -180,6 +181,8 @@ export interface Wydarzenie {
   tytul: string;
   // referat: język (pole jezyk w CMS)
   jezyk?: string;
+  // 'pl', gdy na /en tytuł to wartość polska (decyzja D14, zlecenie 16)
+  tytulLang?: string;
   podtytul?: string;
   poczatek: string;
   // koniec podany przez redaktora (wyświetlany na stronie)
@@ -205,7 +208,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
   for (const a of akt) {
     if (!a.data.wydarzenie_poczatek) continue;
     out.push({
-      rodzaj: 'wydarzenie', tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, poczatek: a.data.wydarzenie_poczatek,
+      rodzaj: 'wydarzenie', tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), poczatek: a.data.wydarzenie_poczatek,
       koniec: a.data.wydarzenie_koniec, koniecIcs: a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120),
       miejsce: miejsce(a.data.wydarzenie_miejsce, lang), href: `/aktualnosci/${slugOf(a.id)}`, uid: `akt-${slugOf(a.id)}`, opis: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka,
     });
@@ -219,7 +222,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
   for (const k of konf) {
     if (k.data.odwolana) continue;
     out.push({
-      rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, poczatek: k.data.poczatek, koniec: k.data.koniec,
+      rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, tytulLang: langPola(k.data, 'tytul', lang), poczatek: k.data.poczatek, koniec: k.data.koniec,
       miejsce: miejsce(k.data.miejsce, lang), href: k.data.strona || undefined, uid: `konf-${slugOf(k.id)}`,
     });
   }
@@ -341,6 +344,9 @@ export const ZDJECIE_OBRONY = '/grafiki/obrona-domyslna.jpg';
 export interface PozycjaListy {
   rodzaj: string;
   tytul: string;
+  // 'pl', gdy na /en to wartość polska (decyzja D14, zlecenie 16)
+  tytulLang?: string;
+  zajawkaLang?: string;
   data: string;
   zajawka?: string;
   zdjecie?: string;
@@ -362,8 +368,8 @@ const odbyloSie = (p: PozycjaListy) => !!p.wydarzenie && !trwaLubBedzie({ poczat
 export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
   const [akt, obr] = await Promise.all([aktualnosci(), obrony()]);
   const items: PozycjaListy[] = akt.map((a) => ({
-    rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, data: a.data.data,
-    zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zdjecie: a.data.zdjecie,
+    rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), data: a.data.data,
+    zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zajawkaLang: langPola(a.data, 'zajawka', lang), zdjecie: a.data.zdjecie,
     zdjecie_opis: (lang === 'en' && a.data.zdjecie_opis_en) || a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
     koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
     wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`,

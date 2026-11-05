@@ -11,7 +11,7 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
+import { t, wJezyku, langPola } from '../lib/i18n';
 import { slugOf } from '../lib/tresci';
 import { renderMarkdown } from '../lib/markdown';
 import type { Lang } from '../lib/daty';
@@ -38,7 +38,7 @@ const spis = [
 const jezykTresci = tylkoPolski ? 'pl' : undefined;
 const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: zewnetrzny } : undefined;
 ---
-<Podstrona lang={lang} tytul={tytul} opis={zajawka || undefined} obraz={d.obraz} opublikowany={d.opublikowany} typ="article"
+<Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={zajawka || undefined} obraz={d.obraz} opublikowany={d.opublikowany} typ="article"
   lead={zajawka || undefined} haslo={haslo} wstecz={{ etykieta: wszystkie, adres: '/warto-wiedziec' }} dzial="instytut"
   spis={sekcje.length ? spis : []} klasa="tresc">
   <section>

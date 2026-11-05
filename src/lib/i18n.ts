@@ -1,4 +1,5 @@
 import type { Lang } from './daty';
+import { wygladaNaPolski } from './jezykTekstu';
 
 const T = {
   pl: {
@@ -306,6 +307,17 @@ export function wybierz<T extends Record<string, any>>(obj: T, pole: string, lan
   if (lang === 'en' && obj[pole + '_en']) return obj[pole + '_en'];
   return obj[pole] ?? '';
 }
+
+// Pole z informacją o języku (decyzja D14, zlecenie 16): lang = 'pl', gdy na /en pokazujemy wartość polską w miejsce pustego
+// pola _en. Wartość w polu „polskim” bywa oryginałem po angielsku (tytuły konferencji i grantów), więc liczy się też jej
+// wygląd (src/lib/jezykTekstu.ts). Widok: <h3 lang={langPola(d, 'tytul', lang)}>{wybierz(d, 'tytul', lang)}</h3>; undefined = bez atrybutu.
+export function wybierzZJezykiem<T extends Record<string, any>>(obj: T, pole: string, lang: Lang): { tekst: string; lang: 'pl' | undefined } {
+  const tekst = wybierz(obj, pole, lang);
+  return { tekst, lang: lang === 'en' && !obj[pole + '_en'] && wygladaNaPolski(tekst) ? 'pl' : undefined };
+}
+export const langPola = <T extends Record<string, any>>(obj: T, pole: string, lang: Lang) => wybierzZJezykiem(obj, pole, lang).lang;
+// To samo dla tekstu bez odpowiednika _en (tematy prac, streszczenia).
+export const langTekstu = (tekst: string | undefined | null, lang: Lang): 'pl' | undefined => (lang === 'en' && wygladaNaPolski(tekst) ? 'pl' : undefined);
 
 // Polska typografia (decyzja 31.10.2026): po jednoliterowych wyrazach (a, i, o, u, w, z) twarda spacja, żeby nie
 // zostawały na końcu linijki — np. etykiety liczb w banerach działów: „w ostatnim miesiącu”, „zakłady i pracownie”.

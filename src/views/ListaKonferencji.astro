@@ -12,7 +12,7 @@ import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import dzialNauka from '../data/dzialy/nauka.json';
-import { odmiana, wybierz } from '../lib/i18n';
+import { odmiana, wybierz, langPola } from '../lib/i18n';
 import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
 import { miejsce, type Konferencja } from '../lib/tresci';
 import { daneListyKonferencji } from '../lib/widoki/listaKonferencji';
@@ -58,7 +58,7 @@ const spis = [
                 <time class="dz" datetime={k.data.poczatek.slice(0, 10)}>{dayNum(k.data.poczatek)}<small> {monthShort(k.data.poczatek, lang)} {parse(k.data.poczatek).y}</small></time>
                 <div>
                   <p class="etyk">{etykieta(k)}{k.data.odwolana && <span class="odw">{odwolana}</span>}</p>
-                  <h4>
+                  <h4 lang={langPola(k.data, 'tytul', lang)}>
                     {k.data.strona
                       ? <Link href={k.data.strona}>{tytul(k)}</Link>
                       : tytul(k)}

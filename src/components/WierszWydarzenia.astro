@@ -25,7 +25,7 @@ const etykieta = [RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce].filter(Boolean).j
   <time class="ww-data" datetime={w.poczatek.slice(0, 10)}>{dayNum(w.poczatek)}<small>{monthShort(w.poczatek, lang)} {parse(w.poczatek).y}</small></time>
   <div class="ww-tresc">
     <div class="ww-rodz">{etykieta}</div>
-    <H class="ww-t">
+    <H class="ww-t" lang={w.tytulLang}>
       {adres
         ? <Link href={adres}>{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}</Link>
         : w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}

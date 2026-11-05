@@ -21,9 +21,9 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
   <time class="wa-data" datetime={p.data.slice(0, 10)}>{dayNum(p.data)}<small>{monthShort(p.data, lang)} {parse(p.data).y}</small></time>
   <div class="wa-tresc">
     <div class="wa-rodz">{etykieta}</div>
-    <h3><a href={href}>{p.tytul}</a></h3>
+    <h3 lang={p.tytulLang}><a href={href}>{p.tytul}</a></h3>
     {p.wydarzenie && <p class="wa-kiedy"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</p>}
-    {p.zajawka && <p class="wa-zaj">{p.zajawka}</p>}
+    {p.zajawka && <p class="wa-zaj" lang={p.zajawkaLang}>{p.zajawka}</p>}
   </div>
   {p.zdjecie && <span class="wa-fot" aria-hidden="true"><ZdjecieZ src={p.zdjecie} sizes={rozmiarPola(['(max-width: 760px)', 54, 54], [null, 120, 80])} /></span>}
 </article>

@@ -99,7 +99,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
 
   <section id="o-kierunku" aria-labelledby="o-kierunku-h">
     <h2 id="o-kierunku-h">{H.o}</h2>
-    <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+    <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
   </section>
 
   {strony && (

@@ -16,7 +16,7 @@ import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
+import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
 import { slugOf, sala, salaReferatu, afiliacjaReferatu, type Seminarium } from '../lib/tresci';
 import { daneSeminarium } from '../lib/widoki/seminarium';
@@ -42,7 +42,7 @@ const spis = [
   ...(minione.length > 0 ? [{ id: 'z-minione', etykieta: t(lang, 'minione') }] : []),
 ];
 ---
-<Podstrona lang={lang} tytul={nazwa} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
+<Podstrona lang={lang} tytul={nazwa} tytulLang={langPola(d, 'nazwa', lang)} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
   haslo={haslo} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}
   dzial="nauka" spis={spis} klasa="tresc z-sm">
   <Fragment slot="baner">
@@ -89,7 +89,7 @@ const spis = [
   </aside>
 
   <section class="opis">
-    <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+    <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
   </section>
 
   <section id="z-nadchodzace" aria-labelledby="h-nad">
@@ -102,7 +102,7 @@ const spis = [
           <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), true)}</p>
           <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
           <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
-          {(en || r.body?.trim()) && <div class="prose streszcz">{en ? <Fragment set:html={en} /> : <C />}</div>}
+          {(en || r.body?.trim()) && <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>}
           {r.data.pliki.length > 0 && (
             <ul class="pliki">{r.data.pliki.map((p) => <li><Link href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></Link></li>)}</ul>
           )}
@@ -125,7 +125,7 @@ const spis = [
             {(en || r.body?.trim()) && (
               <details>
                 <summary>{t(lang, 'streszczenie')}</summary>
-                <div class="prose streszcz">{en ? <Fragment set:html={en} /> : <C />}</div>
+                <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>
               </details>
             )}
             {r.data.pliki.length > 0 && (

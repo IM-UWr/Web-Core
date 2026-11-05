@@ -16,7 +16,7 @@ import WierszWydarzenia from '../components/WierszWydarzenia.astro';
 import Galeria from '../components/Galeria.tsx';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, langPola } from '../lib/i18n';
 import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, type Lang } from '../lib/daty';
 import { slugOf, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
@@ -37,11 +37,11 @@ const href = (a: string) => (isExternal(a) ? a : u(a));
 const typPliku = (a: string) => (isExternal(a) && !/\.[a-z0-9]{2,5}$/i.test(a.split(/[?#]/)[0]) ? (en ? 'website' : 'strona') : (a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i)?.[1] ?? '').toUpperCase());
 const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}` : '';
 ---
-<Podstrona lang={lang} tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta"
+<Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta"
   wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} klasa="tresc">
   <section class="akt-wpis">
     <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}</p>
-    {zajawka && <p class="wst">{zajawka}</p>}
+    {zajawka && <p class="wst" lang={langPola(d, 'zajawka', lang)}>{zajawka}</p>}
 
     {wydarzenie && (
       <div class="akt-wyd" role="group" aria-label={en ? 'Event details' : 'Szczegóły wydarzenia'}>
@@ -108,10 +108,10 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   {(nowszy || starszy) && (
     <nav class="akt-pn" aria-label={en ? 'Other posts' : 'Inne wpisy'} data-pagefind-ignore>
       {nowszy ? (
-        <a href={u(wJezyku(`/aktualnosci/${slugOf(nowszy.id)}`, lang))}><small>← {t(lang, 'nowszy')}</small>{tytulInny(nowszy)}</a>
+        <a href={u(wJezyku(`/aktualnosci/${slugOf(nowszy.id)}`, lang))}><small>← {t(lang, 'nowszy')}</small>{langPola(nowszy.data, 'tytul', lang) ? <span lang="pl">{tytulInny(nowszy)}</span> : tytulInny(nowszy)}</a>
       ) : <span />}
       {starszy && (
-        <a class="akt-starszy" href={u(wJezyku(`/aktualnosci/${slugOf(starszy.id)}`, lang))}><small>{t(lang, 'starszy')} →</small>{tytulInny(starszy)}</a>
+        <a class="akt-starszy" href={u(wJezyku(`/aktualnosci/${slugOf(starszy.id)}`, lang))}><small>{t(lang, 'starszy')} →</small>{langPola(starszy.data, 'tytul', lang) ? <span lang="pl">{tytulInny(starszy)}</span> : tytulInny(starszy)}</a>
       )}
     </nav>
   )}

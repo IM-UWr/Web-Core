@@ -13,7 +13,7 @@ import TytulReferatu from '../components/TytulReferatu.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
-import { t, wJezyku, wybierz } from '../lib/i18n';
+import { t, wJezyku, wybierz, langPola } from '../lib/i18n';
 import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
 import { sala, salaReferatu, type Seminarium } from '../lib/tresci';
 import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
@@ -76,7 +76,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
                 : <span class="dz" aria-hidden="true"></span>}
               <div>
                 {zs.length > 0 && <p class="etyk">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</p>}
-                <h3><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></h3>
+                <h3 lang={langPola(s.data, 'nazwa', lang)}><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></h3>
                 {r ? (
                   <p class="ref">
                     {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang)) && <span class="kiedy">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang))}</span>}
@@ -97,7 +97,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
     <section id="z-nieaktywne" aria-labelledby="h-nieaktywne">
       <h2 id="h-nieaktywne">{T('Pozostałe seminaria', 'Other seminars')}</h2>
       <ul class="linki">
-        {nieaktywne.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
+        {nieaktywne.map((s) => <li lang={langPola(s.data, 'nazwa', lang)}><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></li>)}
       </ul>
     </section>
   )}

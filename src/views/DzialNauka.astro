@@ -9,7 +9,7 @@ import TrescDzialu from '../components/zal/TrescDzialu.astro';
 import Sekcja from '../components/zal/dzial/Sekcja.astro';
 import Wiersz from '../components/zal/dzial/Wiersz.astro';
 import { u, isExternal } from '../lib/url';
-import { wJezyku, wybierz, RODZAJE_GRANTOW, bezSierotek } from '../lib/i18n';
+import { wJezyku, wybierz, RODZAJE_GRANTOW, bezSierotek, langPola } from '../lib/i18n';
 import { range, type Lang } from '../lib/daty';
 import { slugOf, miejsce, type Grant } from '../lib/tresci';
 import { daneDzialuNauka } from '../lib/widoki/dzialNauka';
@@ -43,7 +43,7 @@ const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomput
           {przyklady.map((g) => (
             <article class="z-dz-klik">
               <div class="gora">{[RODZAJE_GRANTOW[g.data.rodzaj][lang], lata(g)].filter(Boolean).join(' · ')}</div>
-              <h3><a href={href(`/nauka/granty/${slugOf(g.id)}`)}>{tytulGrantu(g)}</a></h3>
+              <h3 lang={langPola(g.data, 'tytul', lang)}><a href={href(`/nauka/granty/${slugOf(g.id)}`)}>{tytulGrantu(g)}</a></h3>
               {g.data.kierownik && <p>{T('Kierownik', 'Principal investigator')}: {tytulyWJezyku(g.data.kierownik, lang)}</p>}
               {g.data.kod && <p class="nr">{g.data.kod}</p>}
             </article>

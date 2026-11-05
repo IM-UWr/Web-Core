@@ -16,7 +16,7 @@ import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u } from '../lib/url';
-import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
+import { t, wJezyku, wybierz, RODZAJE_GRANTOW, langPola } from '../lib/i18n';
 import { range, long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { slugOf, sala, salaReferatu, miejsce, trwaLubBedzie, type Zaklad, type Pracownik } from '../lib/tresci';
 import { daneZakladu } from '../lib/widoki/zaklad';
@@ -51,7 +51,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
   <section id="o-zakladzie" aria-labelledby="o-zakladzie-h">
     <h2 id="o-zakladzie-h">{T('O zakładzie', 'About')}</h2>
     {d.zdjecie && <figure class="zk-foto"><ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes="(min-width: 820px) 760px, calc(100vw - 32px)" loading="eager" />{opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}</figure>}
-    <div class="zk-opis">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+    <div class="zk-opis" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
     {(obszary.length > 0 || d.strona) && (
       <dl class="para zk-o">
         {obszary.length > 0 && <><dt>{T('Obszary badań', 'Research areas')}</dt><dd>{obszary.join(' · ')}</dd></>}
@@ -130,7 +130,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
           {grTrwa.map((g) => (
             <li>
               <small class="etyk">{etykietaGrantu(g)}</small>
-              <b><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
+              <b lang={langPola(g.data, 'tytul', lang)}><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
               {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {tytulyWJezyku(g.data.kierownik, lang)}</span>}
             </li>
           ))}
@@ -144,7 +144,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
               {grKon.map((g) => (
                 <li>
                   <small class="etyk">{etykietaGrantu(g)}</small>
-                  <b><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
+                  <b lang={langPola(g.data, 'tytul', lang)}><a href={adresGrantu(g)}>{tytulGrantu(g)}</a></b>
                   {g.data.kierownik && <span>{T('Kierownik', 'PI')}: {tytulyWJezyku(g.data.kierownik, lang)}</span>}
                 </li>
               ))}
