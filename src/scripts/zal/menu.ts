@@ -32,3 +32,6 @@ document.addEventListener('click', (e) => {
   const cel = e.target as Element;
   if (!cel.closest('[data-z-menu], [data-z-menu-otworz]')) zamknij(false);
 });
+// powrót przyciskiem „wstecz” z pamięci przeglądarki (bfcache, zlecenie 13, punkt 7): strona wraca w stanie sprzed wyjścia,
+// więc panel, z którego kliknięto link, byłby wciąż otwarty — zamykamy go
+window.addEventListener('pageshow', (e) => { if (e.persisted) zamknij(false); });

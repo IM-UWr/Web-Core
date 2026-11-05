@@ -15,7 +15,11 @@ if (ok) {
     const wylacz = () => ok.classList.remove('zabarwione');
     dz.addEventListener('mouseenter', wlacz);
     dz.addEventListener('mouseleave', wylacz);
-    dz.addEventListener('focus', wlacz);
+    // fokus z klawiatury (po kliknięciu myszą wystarcza mouseenter; fokus po kliknięciu wracałby po powrocie „wstecz”)
+    dz.addEventListener('focus', () => { if (dz.matches(':focus-visible')) wlacz(); });
     dz.addEventListener('blur', wylacz);
   });
+  // powrót „wstecz” z pamięci przeglądarki (bfcache, zlecenie 13, punkt 7): strona wraca zabarwiona kolorem klikniętego
+  // działu, a kursora nad nim już nie ma (mouseleave nie przyjdzie) — zdejmujemy barwienie
+  window.addEventListener('pageshow', (e) => { if (e.persisted) ok.classList.remove('zabarwione'); });
 }
