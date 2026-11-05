@@ -571,6 +571,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-stopka a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .ok-stopka nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
 .ok-stopka .autor { padding-left: 18px; border-left: 1px solid rgb(255 255 255 / .2); color: rgb(201 208 222 / .75); }
+/* źródła ilustracji w stopce (5.11, 12:56: „źródła na stopce wyglądają nieźle, fotopolska też, nie na głównej stronie”):
+   tylko stopka stron działów i podstron; dwa warianty (przełącznik „Źródła w stopce”) */
+.st-zrodla { flex-basis: 100%; margin-top: 6px; padding-top: 9px; border-top: 1px solid rgb(255 255 255 / .1); font-size: 12px; line-height: 1.55; color: rgb(201 208 222 / .62); }
+.st-zrodla a { color: rgb(201 208 222 / .85); text-decoration: underline; text-decoration-color: rgb(255 255 255 / .22); text-underline-offset: 2px; }
+.st-zrodla a:hover { color: #fff; }
+.st-zrodla .zew { font-size: .85em; }
+.st-zrodla i { font-style: italic; }
+.zr-linia { margin: 0; max-width: 1240px; }
+.zr-lista summary { display: inline-block; cursor: pointer; list-style: none; font-size: 13px; color: var(--na-ciemnym-2); }
+.zr-lista summary::-webkit-details-marker { display: none; }
+.zr-lista summary::after { content: ' +'; }
+.zr-lista[open] summary::after { content: ' −'; }
+.zr-lista summary:hover { color: #fff; }
+.zr-lista ul { list-style: none; margin: 8px 0 2px; padding: 0; display: grid; gap: 4px; max-width: 1240px; }
+.st-zrodla b { font-family: inherit; font-size: inherit; font-weight: 700; color: rgb(201 208 222 / .85); }
+[data-zrodla="bez"] .st-zrodla { display: none; }
+[data-zrodla="link"] .zr-linia { display: none; }
+[data-zrodla="linia"] .zr-lista { display: none; }
 @media (prefers-reduced-motion: reduce) { .ok-ramka { scroll-behavior: auto; } .ok-strzalka svg { animation: none; } .ok-dz::before, .ok-dz .slot > span, .ok-dz h3 span, .ok-okladka .barwa { transition: none; } }
 
 /* ---------- widok „Instytut”: dwa warianty strony działu (2 kalendarium, 4 zdjęcie w kolorze działu) ---------- */
@@ -1749,6 +1767,11 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="obok" aria-pressed="false">Nagłówek z lewej</button>
       <button type="button" data-v="zwijane" aria-pressed="true">Zwijane działy ✓</button>
     </div></div>
+    <div class="grupa" id="wybor-zrodel"><span>Źródła w stopce</span><div class="seg" data-ustaw="zrodla">
+      <button type="button" data-v="linia" aria-pressed="true">Jedna linia</button>
+      <button type="button" data-v="link" aria-pressed="false">Rozwijane „Źródła ilustracji”</button>
+      <button type="button" data-v="bez" aria-pressed="false">Bez (jak dotąd)</button>
+    </div></div>
     <div class="grupa" id="wybor-wyr"><span>Pierwsza aktualność</span><div class="seg" data-ustaw="wyr">
       <button type="button" id="wy-tak" data-v="tak" aria-pressed="true">Powiększona ✓</button>
       <button type="button" id="wy-nie" data-v="nie" aria-pressed="false">Zwykła</button>
@@ -1856,7 +1879,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
         <div class="in-pod" id="in-pod"></div>
         <div class="in-tresc" id="in-tresc"></div>
         <div id="in-reszta"></div>
-        <footer class="ok-stopka"><div><b>Instytut Matematyczny UWr</b> · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01 · dyrekcja@math.uni.wroc.pl</div><nav aria-label="Stopka"><a href="#">Deklaracja dostępności</a><a href="#">Polityka prywatności</a><a href="#">Archiwum starej strony</a><span class="autor">© 2026 Uniwersytet Wrocławski · Created by Szymon Cygan</span></nav></footer>
+        <footer class="ok-stopka"><div><b>Instytut Matematyczny UWr</b> · pl. Grunwaldzki 2, 50-384 Wrocław · +48 71 375 74 01 · dyrekcja@math.uni.wroc.pl</div><nav aria-label="Stopka"><a href="#">Deklaracja dostępności</a><a href="#">Polityka prywatności</a><a href="#">Archiwum starej strony</a><span class="autor">© 2026 Uniwersytet Wrocławski · Created by Szymon Cygan</span></nav><div class="st-zrodla"><p class="zr-linia">Szkice patronów na podstawie fotografii z <a href="#">Wikimedia Commons<span class="zew" aria-hidden="true">&nbsp;↗</span></a> (W. Ślebodziński, H. Steinhaus; domena publiczna) i <a href="#">MacTutor History of Mathematics<span class="zew" aria-hidden="true">&nbsp;↗</span></a> (E. Marczewski, B. Knaster). Podpisy według reprodukcji: <i>Nowa Księga Szkocka</i>, t. I (Biblioteka WMI UWr); H. Langner-Matuszczyk w: <i>Śląska Republika Uczonych</i>, t. 7 (2016); J. Dutkiewicz, <i>Mieczysław Warmus. Życie i praca naukowa</i> (2003). Zdjęcie kampusu na stronie głównej: Corvus monedula, <a href="#">fotopolska.eu<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, licencja <a href="#">CC BY-SA 3.0<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, fragment, zmodyfikowany.</p><details class="zr-lista"><summary>Źródła ilustracji</summary><ul><li><b>Szkice patronów</b> na podstawie fotografii: W. Ślebodziński (1938) i H. Steinhaus (1968) — <a href="#">Wikimedia Commons<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, domena publiczna; E. Marczewski i B. Knaster — <a href="#">MacTutor History of Mathematics<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, University of St Andrews.</li><li><b>Podpisy</b> według reprodukcji: E. Marczewski — <i>Nowa Księga Szkocka</i>, t. I, wpis z 7 lipca 1946 (<a href="#">Biblioteka WMI UWr<span class="zew" aria-hidden="true">&nbsp;↗</span></a>); W. Ślebodziński — legitymacja z 1948, w: H. Langner-Matuszczyk, <i>Śląska Republika Uczonych</i>, t. 7, 2016; B. Knaster (1946) i H. Steinhaus (1957) — J. Dutkiewicz, <i>Mieczysław Warmus. Życie i praca naukowa</i>, 2003 (<a href="#">BCPW<span class="zew" aria-hidden="true">&nbsp;↗</span></a>).</li><li><b>Zdjęcie kampusu</b> na stronie głównej: Corvus monedula, <a href="#">fotopolska.eu<span class="zew" aria-hidden="true">&nbsp;↗</span></a>, licencja <a href="#">CC BY-SA 3.0<span class="zew" aria-hidden="true">&nbsp;↗</span></a>; fragment, wyostrzony.</li></ul></details></div></footer>
         </div>
         <img class="in-obecna" id="in-obecna" src="" alt="Zrzut obecnej strony Instytut (1920 px)" hidden>
       </div>
@@ -3035,6 +3058,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (otw) { sec.classList.add('rozwiniety'); b.setAttribute('aria-expanded', 'true'); }
   });
   rysujPanel();
+  document.getElementById('v-instytut').dataset.zrodla = 'linia';
+  document.addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('zr-lista')) skaluj(); }, true);
   const menuPasek = (h, otw) => {
     const m = h.querySelector('.pasek-menu'), b = h.querySelector('.pasek-burger');
     m.classList.toggle('otwarte', otw); b.setAttribute('aria-expanded', String(otw));
@@ -3440,6 +3465,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski', 'ciekawostki', 'kolory', 'aktualnosci'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
     $('#wybor-wyr').hidden = widok !== 'okladka' && widok !== 'aktualnosci';
     $('#wybor-panelu').hidden = widok !== 'okladka' && widok !== 'instytut';
+    $('#wybor-zrodel').hidden = widok !== 'instytut';
     $('#wybor-inst').hidden = widok !== 'instytut';
     $('#wybor-wersja').hidden = widok !== 'instytut';
     $('#wybor-baner').hidden = widok !== 'instytut';
@@ -3488,6 +3514,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'zakret') { zakret = v; ulozTytul(); }
     if (co === 'proba') { liczbaSem = Number(v); rysujKolumny(); }
     if (co === 'prel') { wariantPrel = v; rysujKolumny(); }
+    if (co === 'zrodla') { $('#v-instytut').dataset.zrodla = v; skaluj(); }
     if (co === 'panel') { panelNagl = v; rysujPanel(); setTimeout(() => { if (widok === 'okladka') { if (!$('#ok-menu').classList.contains('otwarte')) $('#ok-burger').click(); } else { const pb = document.querySelector('#v-instytut .pasek-burger'); if (pb) pb.click(); } }, 0); }
     if (co === 'wyr') { wyrAkt = v === 'tak'; rysujKolumny(); if (widok === 'aktualnosci') { rysujAktualnosci(); skaluj(); } }
     if (co === 'bok') { bok = v; rysujInstytut(); skaluj(); }
