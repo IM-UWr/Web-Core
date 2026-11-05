@@ -3,11 +3,14 @@
    (zal/SpisStrony.astro). Zlecenie 11, zalecenie 3; wzór: prototyp, „Nawigacja na podstronie: A” (.pd.bok-prawy, .spis-p).
    Komputer (≥ 761 px): treść i kolumna spisu 236 px z prawej, odstęp 56 px; spis przyklejony, wariant „kreska”.
    Strona bez spisu (mniej niż 2 sekcje) ma tę samą szerokość treści, a miejsce po prawej puste.
+   Wyjątek: .z-pd-bez-boku (lista Aktualności), przy węższym oknie treść zajmuje też to puste miejsce.
    Telefon (≤ 760 px): jedna kolumna, spis zwijany nad treścią.
    ========================================================================== */
 @media (min-width: 761px) {
   .z-pd { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px;
     padding: 40px var(--marg) 30px; }
+  /* kolumna jak na innych podstronach (948 px), ale węższe okno zabiera najpierw puste miejsce, nie treść (przy 800 px lista miała 380 px) */
+  .z-pd.z-pd-bez-boku { grid-template-columns: minmax(0, calc(var(--kol) - 292px)); gap: 0; }
   .z-pd > .z-pd-tresc { grid-column: 1; grid-row: 1; min-width: 0; }
   .z-pd > .z-spis { grid-column: 2; grid-row: 1; }
   /* prawa kolumna ze spisem i blokiem pod nim (slot „bok” w Podstrona.astro): przyklejona jako całość */

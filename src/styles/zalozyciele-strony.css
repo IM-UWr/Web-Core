@@ -159,6 +159,16 @@
   .z-druga .z-w.wyr .min { grid-column: 2; grid-row: 1; width: 100%; height: auto; aspect-ratio: 3 / 2; margin-bottom: 8px; }
   .z-druga .z-w.wyr .tr { grid-column: 2; grid-row: 2; }
 }
+/* Studia: poniżej 1366 px pięć kierunków nie mieści się obok opisu (karta potrzebuje ok. 96 px, przy 1024 px miała 53 px i teksty
+   nachodziły na siebie): opis nad kierunkami, a przy wąskim pasku trzy kolumny. Warto wiedzieć: długie słowa nie mieściły się
+   w czterech kolumnach, więc dwie. Telefon ma własny układ (niżej). */
+@media (min-width: 761px) and (max-width: 1365px) {
+  .z-studia { grid-template-columns: minmax(0, 1fr); gap: 12px 0; }
+  .z-warto .rzad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 761px) and (max-width: 959px) {
+  .z-kier { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 14px; }
+}
 /* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
 @media (min-width: 761px) {
   .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }

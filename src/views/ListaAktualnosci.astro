@@ -24,7 +24,7 @@ const { ustawienia, grupy, rodzaje, lead, haslo, liczby, filtrEtykieta, szukajDl
 const tytul = t(lang, 'aktualnosci');
 ---
 <Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
-  okruszki={[{ etykieta: tytul }]} klasa="z-ak" atrybuty={{ 'data-lista': '' }}>
+  okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-bez-boku" atrybuty={{ 'data-lista': '' }}>
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
   <div class="ak-narz" data-pagefind-ignore>

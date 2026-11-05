@@ -60,13 +60,12 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
     .wa.wyr:has(.wa-fot) p { font-size: 16.5px; }
     .wa.wyr .wa-fot { width: 360px; }
   }
-  /* do 1279 px kolumna listy jest za wąska na tekst obok zdjęcia 360 px (przy 1024 px zostawało mu 132 px): zdjęcie nad tekstem */
-  @media (min-width: 761px) and (max-width: 1279px) {
+  /* do 987 px kolumna listy jest za wąska na tekst obok zdjęcia 360 px: zdjęcie nad tekstem */
+  @media (min-width: 761px) and (max-width: 987px) {
     .wa.wyr { grid-template-columns: 76px minmax(0, 1fr); row-gap: 0; }
     .wa.wyr .wa-data { grid-row: 1 / span 2; }
-    .wa.wyr .wa-fot { grid-column: 2; grid-row: 1; width: min(100%, 360px); margin-bottom: 12px; }
+    .wa.wyr .wa-fot { grid-column: 2; grid-row: 1; margin-bottom: 12px; }
     .wa.wyr .wa-tresc { grid-column: 2; grid-row: 2; }
-    .wa.wyr h3 { font-size: clamp(24px, 2.35vw, 30px); }
   }
 
   @media (max-width: 760px) {
