@@ -116,8 +116,11 @@
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-foto::after { content: ''; position: absolute; inset: 0; background: var(--granat); mix-blend-mode: lighten; }
   .z-nagl.z-baner-dzialu::before { content: ''; position: absolute; inset: 0; z-index: -1;
     background: linear-gradient(165deg, var(--granat) 0, rgb(13 24 48 / .9) 34%, rgb(13 24 48 / .55) 68%, rgb(13 24 48 / .35) 100%); }
+  /* szkic w mocniejszym kolorze działu z ciemnym cieniem kreski, jak na komputerze (zalecenie 16) */
   .z-nagl.z-baner-dzialu .z-szkic-ramka { position: absolute; right: 2px; top: 12px; width: 138px; height: 166px; z-index: 0;
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--d-j) 55%, transparent)); }
+    filter: drop-shadow(0 0 1.5px rgb(9 16 34 / .95)) drop-shadow(0 0 4px rgb(9 16 34 / .7)) drop-shadow(0 0 10px color-mix(in srgb, var(--d-jm) 40%, transparent)); }
+  .z-nagl.z-baner-dzialu .z-szkic :is(.tusz, .detale) path { stroke: var(--d-jm); }
+  .z-nagl.z-baner-dzialu .z-szkic .tusz path { stroke-width: 2px; }
   .z-nagl.z-baner-dzialu .z-tytul { position: relative; z-index: 1; }
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) :is(.z-wstecz, .z-sciezka a) { font-size: 13px; font-weight: 600; color: var(--na-ciemnym-2); text-decoration: none; }
   .z-nagl.z-baner-dzialu h1 { max-width: 64%; margin: 26px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 44px; line-height: 1; letter-spacing: -.01em; color: #fff; }
@@ -132,7 +135,7 @@
   /* liczby w jednym rzędzie (zlecenie 11, zalecenie 2): najwyżej trzy pierwsze z danych */
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby li:nth-child(n+4) { display: none; }
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby .n { display: block; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.1; color: #fff; }
-  .z-nagl.z-baner-dzialu .z-podpis-ramka { position: absolute; z-index: 1; right: 14px; top: 156px; height: 28px; line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
+  .z-nagl.z-baner-dzialu .z-podpis-ramka { position: absolute; z-index: 1; right: 14px; top: 156px; height: 28px; line-height: 0; color: var(--d-jm);
     transform: rotate(-4deg); filter: drop-shadow(0 1px 4px rgb(13 24 48 / .8)); }
   .z-nagl.z-baner-dzialu .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
   .z-nagl.z-baner-dzialu .z-patron { position: relative; z-index: 1; margin-top: 14px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 40%, transparent); }

@@ -14,17 +14,20 @@
   --nauka-j: #4cc3b2; --nauka-g: #0a4a47; --nauka-a: #0a6b63; --nauka-t: #e2f3f0;
   --studia-j: #f07d5e; --studia-g: #5e1f14; --studia-a: #b03a1f; --studia-t: #fbe8e2;
   --popularyzacja-j: #a991f7; --popularyzacja-g: #30216a; --popularyzacja-a: #5b3fc4; --popularyzacja-t: #eeeafd;
+  /* kolor mocny działu (zlecenie 11, zalecenie 16): jasny (-j) w OKLCH — nasycenie ×1,45, jasność +0,02 (najwyżej 0,86), przycięty
+     do sRGB; szkic patrona i podpis na banerze działu. Paleta „Lazur i malina” (na później): #faa401, #03da91, #4cc7ff, #ff8fc3 */
+  --instytut-jm: #ffa625; --nauka-jm: #0aceba; --studia-jm: #ff7d5b; --popularyzacja-jm: #af97ff;
   --f-display: 'Brygada 1918 Variable', 'Brygada 1918', 'Iowan Old Style', Georgia, serif;
   --f-text: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --kol: 1240px;
   --gora: 66px;
   /* kolory poza działami: neutralnie (bursztyn jest tylko kolorem Instytutu) */
-  --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4;
+  --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de;
 }
-[data-dzial="instytut"] { --d-j: var(--instytut-j); --d-g: var(--instytut-g); --d-a: var(--instytut-a); --d-t: var(--instytut-t); }
-[data-dzial="nauka"] { --d-j: var(--nauka-j); --d-g: var(--nauka-g); --d-a: var(--nauka-a); --d-t: var(--nauka-t); }
-[data-dzial="studia"] { --d-j: var(--studia-j); --d-g: var(--studia-g); --d-a: var(--studia-a); --d-t: var(--studia-t); }
-[data-dzial="popularyzacja"] { --d-j: var(--popularyzacja-j); --d-g: var(--popularyzacja-g); --d-a: var(--popularyzacja-a); --d-t: var(--popularyzacja-t); }
+[data-dzial="instytut"] { --d-j: var(--instytut-j); --d-g: var(--instytut-g); --d-a: var(--instytut-a); --d-t: var(--instytut-t); --d-jm: var(--instytut-jm); }
+[data-dzial="nauka"] { --d-j: var(--nauka-j); --d-g: var(--nauka-g); --d-a: var(--nauka-a); --d-t: var(--nauka-t); --d-jm: var(--nauka-jm); }
+[data-dzial="studia"] { --d-j: var(--studia-j); --d-g: var(--studia-g); --d-a: var(--studia-a); --d-t: var(--studia-t); --d-jm: var(--studia-jm); }
+[data-dzial="popularyzacja"] { --d-j: var(--popularyzacja-j); --d-g: var(--popularyzacja-g); --d-a: var(--popularyzacja-a); --d-t: var(--popularyzacja-t); --d-jm: var(--popularyzacja-jm); }
 /* kolor nagłówka podstrony (głęboki kolor działu; w ciemnym motywie z domieszką granatu) — na elemencie nagłówka, po --d-g */
 .z-nagl-pod { --g-pod: var(--d-g); }
 /* Zmienne interfejsu (zlecenie 11, zalecenie 10): --line-ui — ramki przycisków i pól; --rule — grube kreski 2 px;
@@ -179,6 +182,13 @@
   .z-podpis-ramka { position: absolute; z-index: 3; right: calc(var(--marg) + 60px); bottom: 20px; height: 46px; line-height: 0;
     color: color-mix(in srgb, var(--d-j) 72%, #fff); transform: rotate(-4deg); filter: drop-shadow(0 1px 6px rgb(13 24 48 / .8)); }
   .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
+  /* szkic patrona na banerze działu bez plamy (zlecenie 11, zalecenie 16; prototyp „mocniejszy + cień kreski”): kreski i podpis
+     w mocniejszym kolorze działu (--d-jm), wzdłuż kresek wąski ciemny cień — szkic odcina się od zdjęcia (np. od tłumu na Nauce) */
+  .z-baner-dzialu .z-szkic :is(.tusz, .detale) path { stroke: var(--d-jm); }
+  .z-baner-dzialu .z-szkic .tusz path { stroke-width: 2px; }
+  .z-baner-dzialu .z-szkic-ramka { filter: drop-shadow(0 0 1.5px rgb(9 16 34 / .95)) drop-shadow(0 0 4px rgb(9 16 34 / .7))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--d-jm) 40%, transparent)); }
+  .z-baner-dzialu .z-podpis-ramka { color: var(--d-jm); }
   .z-patron { position: absolute; z-index: 2; top: calc(58px + var(--gora)); right: calc(var(--marg) + 270px); width: 270px; text-align: right; text-shadow: 0 1px 10px rgb(13 24 48 / .9); }
   .z-patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 23px; color: #fff; }
   .z-patron span { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
