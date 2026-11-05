@@ -24,6 +24,28 @@
   .z-dz-pod a:hover { color: var(--d-a); }
   .z-dz-pod a small { flex: none; margin-left: auto; font-family: var(--f-text); font-size: 13px; font-weight: 500; color: var(--muted); }
 
+  /* ---------- podstrony: pas w jasnym kolorze działu z wierszami grup (zlecenie 11, zalecenie 5; prototyp: menu E) ----------
+     Nazwa grupy z lewej (kolumna 140 px), strony jako zwykłe linki Brygadą 21 px; wiersze rozdziela kreska w kolorze działu.
+     Linki się nie łamią w środku — za długi wiersz zawija się pod sobą. Na Studiach z prawej przycisk rekrutacji (zalecenie 13):
+     stoi obok wszystkich wierszy, pionowo na środku; najdłuższy wiersz może się wtedy złamać na dwie linie (zamierzone). */
+  .z-dz-pas { padding: 12px var(--marg); background: var(--d-t); }
+  .z-dz-pas:has(.z-dz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 36px; }
+  .z-dz-rzad { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 8px 0; }
+  .z-dz-rzad + .z-dz-rzad { border-top: 1px solid color-mix(in srgb, var(--d-a) 20%, transparent); }
+  .z-dz-rzad h3 { margin: 0; font-family: var(--f-text); font-size: 13.5px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+  .z-dz .z-dz-rzad ul { display: flex; flex-wrap: wrap; gap: 2px 24px; }
+  .z-dz-rzad a { font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink); white-space: nowrap; transition: color .15s; }
+  .z-dz-rzad a:hover { color: var(--d-a); }
+  .z-dz-rzad a.zew::after { content: ' ↗'; font-family: var(--f-text); font-size: .8em; color: var(--muted); }
+  .z-dz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display);
+    font-weight: 500; font-size: 22px; line-height: 1.2; white-space: nowrap; transition: filter .15s; }
+  .z-dz-rekr small { font-family: var(--f-text); font-size: 12.5px; font-weight: 700; opacity: .85; }
+  .z-dz-rekr:hover { filter: brightness(1.1); }
+  .z-dz-rekr:focus-visible { outline: 2px solid var(--d-a); outline-offset: 3px; }
+  /* w ciemnym motywie kolor działu jest jasnym pastelem — napis granatowy (biały byłby nieczytelny) */
+  :root[data-theme="dark"] .z-dz-rekr { color: var(--accent-ink); }
+  .z-dz-pas + .z-dz-tresc { padding-top: 34px; }
+
   /* ---------- tekst działu i „W skrócie” ---------- */
   .z-dz-tresc { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 72px; padding: 30px var(--marg) 50px; }
   .z-dz-tresc h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 34px; color: var(--ink); }
@@ -140,6 +162,14 @@
   .z-dz { --marg: 16px; font-size: 15.5px; }
   .z-dz .z-dz-pod { grid-template-columns: 1fr; gap: 16px; padding: 18px 16px 6px; }
   .z-dz .z-dz-pod a { font-size: 19px; padding: 9px 0; }
+  /* pas podstron: nazwa grupy nad linkami, linki zawijane; przycisk rekrutacji pod wierszami */
+  .z-dz .z-dz-pas { display: block; padding: 10px 16px 14px; }
+  .z-dz .z-dz-rzad { display: block; padding: 9px 0; }
+  .z-dz .z-dz-rzad h3 { margin-bottom: 2px; font-size: 13px; }
+  .z-dz .z-dz-rzad ul { gap: 2px 18px; }
+  .z-dz .z-dz-rzad a { font-size: 19px; }
+  .z-dz .z-dz-rekr { display: inline-flex; margin-top: 10px; padding: 12px 18px; font-size: 20px; }
+  .z-dz .z-dz-pas + .z-dz-tresc { padding-top: 22px; }
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
   .z-dz .z-dz-tresc h2 { font-size: 28px; }
   .z-dz .z-dz-tresc p { font-size: 15.5px; line-height: 1.62; }
