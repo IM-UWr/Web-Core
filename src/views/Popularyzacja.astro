@@ -15,7 +15,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const w = poleWJezyku(lang);
-const { linki, grupy, sekcje, tytul, lead, haslo, grupyMenu } = await danePopularyzacji(lang);
+const { grupy, tytul, lead, haslo, grupyMenu } = await danePopularyzacji(lang);
 
 // Pliki (/pliki/...) nie mają wersji językowych — bez prefiksu /en.
 const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));

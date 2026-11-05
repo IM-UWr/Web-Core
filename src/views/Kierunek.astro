@@ -29,8 +29,7 @@ const w = (o: any, pole: string) => wybierz(o, pole, lang);
 const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
 const {
   Content, htmlEn, kariera, praktyki, faq, nazwyZakladow, specjalnosci, nazwa, etapyI, etapyII, etapyIII, doktorat, N, lata,
-  wieleProgramow, linkDyplom, haslo, liczbyTel, nadtytul, nadtytulTel,
-} = await daneKierunku(kierunek, lang);
+  wieleProgramow, linkDyplom, haslo, } = await daneKierunku(kierunek, lang);
 
 // typ pozycji na liście plików (wzorzec: „PDF”, „strona ↗”): rozszerzenie pliku, strona zewnętrzna albo nasza podstrona
 const typPliku = (a: string) => {

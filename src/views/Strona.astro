@@ -12,7 +12,7 @@ import { daneStrony } from '../lib/widoki/strona';
 
 interface Props { strona: CollectionEntry<'strony'>; lang: Lang }
 const { strona, lang } = Astro.props;
-const { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ } = await daneStrony(strona, lang);
+const { d, tytul, opis, haslo, liczby, Content, htmlEn, tylkoPolski, dzial, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ } = await daneStrony(strona, lang);
 const okruszki = [...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang) as string, adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang) as string, adres: rodzic.adres }] : []), { etykieta: tytul }];
 ---
 <Podstrona lang={lang} tytul={tytul} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}

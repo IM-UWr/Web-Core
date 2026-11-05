@@ -8,8 +8,7 @@ import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TrescDzialu from '../components/zal/TrescDzialu.astro';
 import Sekcja from '../components/zal/dzial/Sekcja.astro';
 import Wiersz from '../components/zal/dzial/Wiersz.astro';
-import { u, isExternal } from '../lib/url';
-import { wJezyku, RODZAJE, bezSierotek } from '../lib/i18n';
+import { RODZAJE, bezSierotek } from '../lib/i18n';
 import { type Lang } from '../lib/daty';
 import { daneDzialuStudia } from '../lib/widoki/dzialStudia';
 
@@ -17,8 +16,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
 const T = (pl: string, angielski: string) => (en ? angielski : pl);
-const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
-const { liczby, grupy, oStudiach, fakty, aktualnosci, aktualnosciTel, tytul, wstep, haslo } = await daneDzialuStudia(lang);
+const { liczby, grupy, oStudiach, fakty, aktualnosci, tytul, wstep, haslo } = await daneDzialuStudia(lang);
 ---
 <Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={wstep} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>

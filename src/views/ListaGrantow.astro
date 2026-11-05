@@ -18,11 +18,9 @@ const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const ileProjektow = (n: number) => (lang === 'en' ? `${n} project${n === 1 ? '' : 's'}` : `${n} ${odm(n, 'projekt', 'projekty', 'projektów')}`);
 const tytul = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 const adresGrantu = (g: Grant) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
-const klasaRodzaju = (g: Grant) => `badge${g.data.rodzaj === 'ncn' ? ' badge-wydarzenie' : g.data.rodzaj === 'ue' ? ' badge-sukces' : ''}`;
 
 const {
-  realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje,
-  wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
+  realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, naglowek, lead, wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
 } = await daneListyGrantow(lang);
 // Wiersz „Kierownik: … · zakład · numer” i krótka linia pod tytułem w małych wierszach.
 const rodzaj = (g: Grant) => RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '';
