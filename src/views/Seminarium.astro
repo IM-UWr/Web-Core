@@ -3,18 +3,17 @@
 // nadchodzące referaty (ze streszczeniami), minione referaty (streszczenie zwinięte); zapis na powiadomienia e-mail w prawej
 // kolumnie pod spisem (slot „bok”, na telefonie pod treścią)
 // i link do archiwum. Spis „Na tej stronie” z sekcji; na telefonie zwijany nad treścią.
-// Baner: hasło, liczby i — pod nimi — koordynatorzy, e-mail i zakład (na każdej szerokości; opis przy `haslo`
-// w src/lib/widoki/seminarium.ts). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
+// Baner (zlecenie 17, punkt 4): link wstecz, sygnet i nazwa, bez hasła, liczb i podpisu. Koordynatorzy, e-mail i zakład
+// na końcu sekcji opisu (wzorzec .kontakty). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
 // w kolorze działu, pod nim „mie rrrr”; obok dzień tygodnia, godzina i sala, tytuł Brygadą, prelegent z afiliacją.
 // Kotwice referatów (#<slug>) bez zmian — prowadzą do nich Kalendarz i lista seminariów.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
-// etykieta .etyk, pliki ul.pliki. Własne style (na końcu pliku): wiersz referatu z datą, formularz zapisu, koordynatorzy
-// w banerze na telefonie. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// etykieta .etyk, pliki ul.pliki. Własne style (na końcu pliku): wiersz referatu z datą, formularz zapisu, blok
+// koordynatorów. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
-import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
@@ -26,11 +25,12 @@ const { seminarium, lang } = Astro.props;
 const d = seminarium.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, adresListy, haslo, liczby, maKoord } = await daneSeminarium(seminarium, lang);
+const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, adresListy, maKoord } = await daneSeminarium(seminarium, lang);
 // linia nad tytułem referatu: (dzień tygodnia ·) godzina · sala — puste pomijane
 const dzienTygodnia = (termin: string) => longWithDay(termin, lang).split(', ')[0];
 const kiedyGdzie = (termin: string, s: string | undefined, zDniem: boolean) =>
   [zDniem ? dzienTygodnia(termin) : '', time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
+const maOpis = !!htmlEn || !!seminarium.body?.trim();
 const tytulPow = T('Powiadomienia e-mail', 'Email notifications');
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
@@ -43,28 +43,8 @@ const spis = [
 ];
 ---
 <Podstrona lang={lang} tytul={nazwa} tytulLang={langPola(d, 'nazwa', lang)} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
-  haslo={haslo} wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}
+  bezPodpisu wstecz={{ etykieta: t(lang, 'wszystkieSeminaria'), telefon: t(lang, 'seminaria'), adres: '/seminaria' }}
   dzial="nauka" spis={spis} klasa="tresc z-sm">
-  <Fragment slot="baner">
-    <LiczbyBanera lang={lang} pozycje={liczby} />
-    {maKoord && (
-      <div class="sem-koord">
-        {koordynatorzy.length > 0 && (
-          <p class="sem-koord-osoby">
-            <span class="sem-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
-            <span class="sem-koord-n">{koordynatorzy.map((k, i) => <>{i > 0 && ', '}{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</>)}</span>
-          </p>
-        )}
-        {(d.kontakt || zakladySem.length > 0) && (
-          <ul class="sem-meta">
-            {d.kontakt && <li><Ikona nazwa="mail" rozmiar={18} /><a href={`mailto:${d.kontakt}`}>{d.kontakt}</a></li>}
-            {zakladySem.map((z) => <li><Ikona nazwa="ludzie" rozmiar={18} /><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a></li>)}
-          </ul>
-        )}
-      </div>
-    )}
-  </Fragment>
-
   {/* powiadomienia e-mail: w prawej kolumnie pod spisem „Na tej stronie” (zlecenie 11, zalecenie 4), na telefonie pod treścią */}
   <aside slot="bok" class="sem-pow" id="powiadomienia" aria-labelledby="h-pow" data-pagefind-ignore>
     <h2 class="sem-pow-h" id="h-pow">{tytulPow}</h2>
@@ -88,9 +68,33 @@ const spis = [
     <p class="pw-uwaga">{T('Adres służy wyłącznie do tych powiadomień —', 'Your address is used only for these notifications —')} <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{T('polityka prywatności', 'privacy policy')}</a>.</p>
   </aside>
 
-  <section class="opis">
-    <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
-  </section>
+  {(maOpis || maKoord) && (
+    <section class="opis">
+      {maOpis && <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>}
+      {maKoord && (
+        <div class="kontakty sem-dane">
+          {koordynatorzy.length > 0 && (
+            <div>
+              <span class="etyk">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
+              {koordynatorzy.map((k) => <b>{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</b>)}
+            </div>
+          )}
+          {d.kontakt && (
+            <div>
+              <span class="etyk">{T('Kontakt', 'Contact')}</span>
+              <a class="wart" href={`mailto:${d.kontakt}`}>{d.kontakt}</a>
+            </div>
+          )}
+          {zakladySem.length > 0 && (
+            <div>
+              <span class="etyk">{zakladySem.length > 1 ? T('Zakłady', 'Departments') : T('Zakład', 'Department')}</span>
+              {zakladySem.map((z) => <a class="wart" href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a>)}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  )}
 
   <section id="z-nadchodzace" aria-labelledby="h-nad">
     <h2 id="h-nad">{t(lang, 'nadchodzace')}</h2>
@@ -167,6 +171,10 @@ const spis = [
      prelegent, streszczenie, pliki. Reszta — wzorzec treści .tresc (src/styles/zal-tresc.css). */
   .opis .prose > :global(:first-child) { margin-top: 0; }
   .opis .prose > :global(:last-child) { margin-bottom: 0; }
+  /* koordynatorzy, kontakt i zakład pod opisem: wzorzec .kontakty (src/styles/zal-tresc.css; na telefonie sam daje jedną kolumnę) */
+  .prose + .sem-dane { margin-top: 18px; }
+  .sem-dane b { margin: 2px 0 0; font-size: 19px; }
+  .sem-dane .wart { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.45; overflow-wrap: anywhere; }
   .ref { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
   .ref .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
   .ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -225,12 +233,5 @@ const spis = [
     /* streszczenie na całą szerokość (pod dniem też) — wąska kolumna obok dnia jest za wąska na dłuższy tekst */
     .ref .streszcz { margin-left: -66px; }
     .ref[id] { scroll-margin-top: calc(var(--hdr-h) + 16px); }
-    /* koordynatorzy w banerze (na ciemnym tle): mała etykieta, nazwiska, pod nimi e-mail i zakład */
-    .sem-koord { margin: 14px 0 0; padding-top: 10px; border-top: 1px solid rgb(255 255 255 / .22); }
-    .sem-koord-osoby { display: block; margin: 0; }
-    .sem-koord-l { display: block; font-size: 12px; color: var(--na-ciemnym-2); }
-    .sem-koord-n { display: block; font-size: 16px; font-weight: 600; color: #fff; }
-    .sem-meta { gap: 2px 16px; margin: 6px 0 0; font-size: 14px; color: var(--na-ciemnym-2); }
-    .sem-meta :global(svg) { color: var(--d-j); }
   }
 </style>

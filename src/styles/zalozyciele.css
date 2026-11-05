@@ -282,6 +282,7 @@
   .z-sygnet-nagl { position: absolute; right: calc(100% + 22px); bottom: -14px; width: 74px; height: 89px; padding-right: 18px; box-sizing: content-box;
     border-right: 1px solid rgb(255 255 255 / .28); }
   .z-nagl-pod:not(.z-liczbami) .z-sygnet-nagl { bottom: 26px; }
+  .z-nagl-pod.z-bez-podpisu .z-sygnet-nagl { bottom: -5px; } /* bez podpisu: na środku bloku z linkiem i tytułem (seminarium) */
   .z-sygnet-nagl path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
   .z-podpis-maly { position: absolute; right: calc(100% + 47px); top: calc(100% + 20px); line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
     filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }

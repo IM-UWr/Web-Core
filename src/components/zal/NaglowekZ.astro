@@ -31,8 +31,10 @@ interface Props {
   wstecz: { etykieta: string; adres: string };
   // ciekawostka patrona: znak z opisem, losowana na wizytę (podstrony z menu działu; zlecenie 11, zalecenie 19)
   znak?: boolean;
+  // podstrona bez małego podpisu patrona (strona seminarium); sygnet wtedy na środku bloku z linkiem i tytułem
+  bezPodpisu?: boolean;
 }
-const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false } = Astro.props;
+const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false, bezPodpisu = false } = Astro.props;
 const P = dzial ? PATRONI[dzial] : undefined;
 // Trzy style banerów (zlecenie 11, zalecenie 2): baner działu; podstrona z liczbami (tytuł, hasło, kreska, liczby);
 // podstrona bez liczb (sam tytuł). Hasło i liczby razem albo wcale: liczby bez hasła w danych nie pokazują się
@@ -191,14 +193,14 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   </div>
 )}
 {rodzaj === 'podstrona' && (
-  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', !P && 'z-granat', ck && 'z-ck-losuje']} data-dzial={P?.dzial} data-ck={ck?.id} data-pagefind-ignore>
+  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', bezPodpisu && 'z-bez-podpisu', !P && 'z-granat', ck && 'z-ck-losuje']} data-dzial={P?.dzial} data-ck={ck?.id} data-pagefind-ignore>
     <div class="z-foto"><span class="z-foto-obr"><ZdjecieZ src={f.zdjecie} alt={altFoto} sizes={rozmiar} loading="eager" fetchpriority="high" style={styl} zastepczy /></span></div>
     <div class="z-tyt">
       <div class="z-tyt-g">
         {P && <Szkic dzial={P.dzial} rodzaj="sygnet" class="z-sygnet-nagl" />}
         <p class="z-sciezka"><a href={u(wJezyku(wstecz.adres, lang))}>← {wstecz.etykieta}</a></p>
         <h1 data-pagefind-meta="title" lang={tytulLang}>{tytul}</h1>
-        {P && <span class="z-podpis-maly"><Szkic dzial={P.dzial} rodzaj="podpis" /></span>}
+        {P && !bezPodpisu && <span class="z-podpis-maly"><Szkic dzial={P.dzial} rodzaj="podpis" /></span>}
       </div>
       {haslo && <p class="z-haslo">{haslo}</p>}
       {slot && <div class="z-slot" set:html={slot} />}

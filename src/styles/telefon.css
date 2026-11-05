@@ -94,10 +94,8 @@
   .faq summary { min-height: 44px; font-size: 15px; }
 
   /* Lżejsze podkreślenia (decyzja 31.10.2026): linki w treści, listach i banerze — kreska 1 px w 40% koloru tekstu, 3 px od liter
-     (gdzie link jest podkreślony; przyciski bez zmian). Baner seminarium: koordynatorzy 600 zamiast 700 (kreska jak wyżej,
-     w 40% bieli). Spis pracowników niżej: zakład zwykłym szarym tekstem (nadal link), e-mail z cienką jasną kreską. */
+     (gdzie link jest podkreślony; przyciski bez zmian). Spis pracowników niżej: zakład zwykłym szarym tekstem (nadal link), e-mail z cienką jasną kreską. */
   main a:not(.btn) { text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 3px; }
-  .ph .sem-koord-n { font-weight: 600; }
   /* zakład bez podkreślenia; e-mail jako całość przechodzi do nowej linii, zanim się złamie — w środku tylko w miejscu
      łącznika, w dowolnym miejscu dopiero w ostateczności (break-word zamiast anywhere z .staff-row; decyzja 31.10.2026) */
   .staff-row .n small a { text-decoration: none; }
