@@ -226,7 +226,9 @@
   .z-baner-dzialu .z-podpis-ramka { color: var(--d-jm); }
   .z-patron { position: absolute; z-index: 2; top: calc(58px + var(--gora)); right: calc(var(--marg) + 270px); width: 270px; text-align: right; text-shadow: 0 1px 10px rgb(13 24 48 / .9); }
   .z-patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 23px; color: #fff; }
-  .z-patron span { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
+  /* lata · patron działu · sala — zawsze w jednej linii (zlecenie 14, zalecenie 26); dłuższa wychodzi w lewo poza blok 270 px
+     (ujemny margines z lewej przy wyrównaniu do prawej, jak tytuł ciekawostki), nie w prawo */
+  .z-patron span { display: block; margin: 2px 0 0 -160px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
   .z-patron p { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 45%, transparent); font-size: 14px; line-height: 1.5; color: rgb(255 255 255 / .86); }
 
   /* szkic: kontur rysuje się (pathLength=1, dasharray/dashoffset), detale pojawiają się; po narysowaniu jednolity */

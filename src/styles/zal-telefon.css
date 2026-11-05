@@ -145,7 +145,8 @@
   .z-nagl.z-baner-dzialu .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
   .z-nagl.z-baner-dzialu .z-patron { position: relative; z-index: 1; margin-top: 14px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 40%, transparent); }
   .z-nagl.z-baner-dzialu .z-patron b { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 17px; color: #fff; }
-  .z-nagl.z-baner-dzialu .z-patron span { display: block; font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
+  /* w jednej linii jak na komputerze (zlecenie 14, zalecenie 26): przy 360 px najdłuższa (EN) ma ok. 210 px z 328 */
+  .z-nagl.z-baner-dzialu .z-patron span { display: block; white-space: nowrap; font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
   .z-nagl.z-baner-dzialu .z-patron p { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: rgb(255 255 255 / .82); }
 
   /* ---------- nagłówek podstrony: głęboki kolor działu na zdjęciu, sygnet przy tytule, znak w tle ---------- */

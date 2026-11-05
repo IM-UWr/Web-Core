@@ -92,7 +92,8 @@ if (P && pulaCk.length) {
 const kreski = ck ? ck.sciezki : P && znak ? znakDzialu(P.dzial, true) : [];
 const ramka = !ck && kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
 const opisZnaku = P && ck ? [tytulCiekawostki(ck, lang), zdanieCiekawostki(ck, lang)] : P ? [pole(P, 'znakNazwa', lang), pole(P, 'znakFakt', lang)] : [];
-const patronDzialu = lang === 'en' ? 'patron of the section' : 'patron działu';
+// EN krócej (zlecenie 14, zalecenie 26): „1887–1972 · section patron · room HS” mieści się w jednej linii
+const patronDzialu = lang === 'en' ? 'section patron' : 'patron działu';
 // Baner działu: tytułem jest nazwa działu z menu (np. „Popularyzacja”), a nie tytuł strony z danych („Popularyzacja
 // matematyki” zostaje w <title> i na telefonie).
 const zMenu = rodzaj === 'dzial' && P ? (await menuGlowne()).find((m) => m.adres === P.adres) : undefined;
@@ -115,7 +116,7 @@ const STAN = `(function(b){var k='im-wizyta-dzialy',dz=b.getAttribute('data-z-ba
   `if(document.prerendering&&nowy(false)){b.classList.add('z-czeka');` +
   `document.addEventListener('prerenderingchange',function(){if(nowy(true))rysuj();else gotowe()},{once:true})}` +
   `else if(!document.prerendering&&nowy(true)){b.classList.add('z-czeka');rysuj()}else gotowe()})(document.currentScript.parentElement);`;
-const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
+const salaNapis = lang === 'en' ? 'room' : 'sala';
 // Losowanie ciekawostki (wzór: prototyp, ckUloz / ckStart): 1) przypięte na swoich stronach, 2) zestaw tej wizyty (ważne
 // pozycje zostają), 3) reszta stron dostaje ciekawostki w kolejności ważonej Math.random() ** (1 / waga), waga 3 dla
 // ulubionych; bez powtórzeń w dziale. Wczytywanie z wyprzedzeniem (prerender, zlecenie 13): pokaz bez zapisu, po pokazaniu
