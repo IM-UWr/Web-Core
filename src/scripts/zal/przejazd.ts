@@ -193,7 +193,8 @@ if (okladka && obszar) {
   window.addEventListener('pointerdown', (e) => { wcisniety = true; if (jedzie && e.pointerType !== 'touch') stop(); }, { passive: true });
   window.addEventListener('pointerup', () => { wcisniety = false; dociagnij(); }, { passive: true });
   window.addEventListener('pointercancel', () => { wcisniety = false; }, { passive: true });
-  if ('onscrollend' in window) window.addEventListener('scrollend', dociagnij);
+  // test na document (ten sam GlobalEventHandlers): przy teście na window TypeScript zawęża window w else do never
+  if ('onscrollend' in document) window.addEventListener('scrollend', dociagnij);
   else {
     let czas = 0;
     window.addEventListener('scroll', () => { clearTimeout(czas); czas = window.setTimeout(dociagnij, 150); }, { passive: true });
