@@ -1,12 +1,13 @@
 # Raport: zlecenie 16 — wersja angielska (5.11.2026)
 
-Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów + 2 commity raportu (drugi z decyzją o obronach), **bez pushowania**. Repozytoria treści: 35 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
+Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów zlecenia, 2 commity decyzji o obronach (`4fe03c13`, `ac7855c2`), commit zalecenia 22 ze zlecenia 14 (`8f0019b2`) i 2 commity raportu, **bez pushowania**. Repozytoria treści: 36 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
 
 **Do Twojej decyzji albo działania**
 
 1. **Wklej nowy skrypt e-maili do Google (D16).** Zmiana w repozytorium nie wdraża się sama. Otwórz projekt na https://script.google.com, zastąp zawartość `Code.gs` plikiem `skrypty/powiadomienia/Code.gs`, zapisz i wybierz **Wdróż → Zarządzaj wdrożeniami → Edytuj → Nowa wersja → Wdróż**. Adres `/exec` się nie zmienia. Dopóki tego nie zrobisz, e-maile linkują do `/powiadomienia/`, a ta strona działa dalej i jest dwujęzyczna.
 2. **Przejrzyj tłumaczenia:** D4, D6, D8 (tabele niżej) oraz 31 nazw przedmiotów i notki patronów (załączniki na końcu). Tych dwóch ostatnich nie zatwierdziłeś od zalecenia 12.
-3. **Push czeka na Twoje słowo.** 20 repozytoriów treści i Web-Core; lista niżej.
+3. **Oceń zalecenie 22 na telefonie** (zrzut i pytanie 7 niżej).
+4. **Push czeka na Twoje słowo.** 20 repozytoriów treści i Web-Core; lista niżej.
 
 Stan sprawdzenia:
 
@@ -16,6 +17,7 @@ Stan sprawdzenia:
 - Treści: `skrypty/pobierz_tresci.py` nie był uruchamiany, repozytoria Web-* na GitHubie bez zmian. `package.json` bez zmian. **Nakładka zostaje zmieniona**, żebyś mógł obejrzeć wynik lokalnie (przywracanie niżej).
 - Wszystkie łatki weszły czysto, na klony i na nakładkę: bez `git apply -3` i bez konfliktów.
 - Sprawdzane w Edge (Playwright) na zbudowanej stronie: 20 stron `/en` na 1440 i 390 px przed i po, 3 strony na 1920 px w ciemnym motywie, otwarte menu na 390, 1024, 1280 i 1440 px. Żadna z tych stron nie ma poziomego przewijania.
+- Zalecenie 22, też w Edge na zbudowanej stronie: główna na 1920, 1440, 1280, 1024 i 390 px, Aktualności na 1920, 1440, 1024, 800 i 390 px, PL i EN, jasny i ciemny motyw. Bez błędów JavaScriptu i bez poziomego przewijania.
 - **Czego nie sprawdzałem:** Firefoksa, Safari, prawdziwych telefonów, czytnika ekranu (`lang="pl"` z D14 sprawdzony tylko w HTML), formularzy w samym Pages CMS. Skryptu `Code.gs` nie uruchamiałem w Google: strony potwierdzania i wypisywania testowałem z podstawionymi odpowiedziami serwera.
 
 ## Podsumowanie
@@ -39,7 +41,9 @@ Stan sprawdzenia:
 | D19 daty po angielsku | zrobione | — | Web-Studia |
 | D20 „(in Polish)” w menu | zrobione | `bf562674` | Web-Ustawienia |
 | 17 łatek z `dok/en/latki` i łatki 14, 15 | nałożone | — | 20 repozytoriów |
-| Obrony bez `tresc_en` (Twoja decyzja po raporcie) | zrobione | ten commit (łatka) | Web-Aktualnosci |
+| Obrony bez `tresc_en` (Twoja decyzja po raporcie) | zrobione | `4fe03c13` (łatka) | Web-Aktualnosci |
+| Polskie obrony: tekst z danych (Twoja decyzja po raporcie) | zrobione | `ac7855c2` | Web-Aktualnosci |
+| Zalecenie 22 ze zlecenia 14 (osobne polecenie) | zrobione, telefon do oceny | `8f0019b2` | — |
 | Łatki tego zlecenia | zapisane | `ec0b0a4a` | `dok/latki/zlecenie-16/` |
 
 ## Kryteria odbioru
@@ -48,16 +52,78 @@ Stan sprawdzenia:
 |---|---|
 | `/en` bez polskich stopni przy nazwiskach (poza „Dr hab.”) | skan całego `/en`: zostały 3 trafienia, wszystkie w cytowaniach bibliograficznych na `/en/nauka/publikacje/2006` i `/2018` („prof. E. Wirsinga”, „ks. dr hab. Adam Olszewski, prof. UP JPII”). To cytaty, więc ich nie ruszałem |
 | Poprawne tytuły stron | „Study · Mathematical Institute, University of Wrocław”; `og:site_name` tak samo; polskie strony bez zmian („Instytut · Instytut Matematyczny UWr”) |
-| Łatki w klonach (commity bez pushu) i na nakładce | 35 commitów w 20 klonach, wszystkie klony czyste; każda łatka z `dok/latki/zlecenie-16/` zgadza się ze stanem klonu |
+| Łatki w klonach (commity bez pushu) i na nakładce | 36 commitów w 20 klonach, wszystkie klony czyste; każda łatka z `dok/latki/zlecenie-16/` zgadza się ze stanem klonu |
 | Kopia oryginałów nakładki | `.przekazanie/robocze/nakladka-przed-16/` |
 | Build, `astro check`, `sprawdz_tresci.py` | bez nowych błędów, OK (wyżej) |
 | Zrzuty `/en` przed/po | niżej; `dok/en/POSTEP.md` nie zawiera nazwanej listy stron, więc wybrałem 20 reprezentatywnych |
+| Zalecenie 22: główna, lista, filtr, szukanie, telefon | sprawdzone, szczegóły w osobnej sekcji; prototyp obok wyniku, telefon do oceny |
+
+## Zalecenie 22 ze zlecenia 14: pierwsza aktualność zawsze powiększona
+
+Wykonane na Twoje polecenie na tej gałęzi, osobnym commitem `8f0019b2`, bez pushu. Bez nowych pól CMS i bez zmian w treści; `wyroznij_do` i plakietka na okładce zostają. `RAPORT-ZLECENIE-14.md` nadal mówi „nie zrobione”, bo kazałeś dopisać to tutaj.
+
+**Strona główna, kolumna „Aktualności”.** Pierwszy wpis ma datę w kolorze tekstu, tytuł Brygadą i zajawkę do dwóch linii.
+
+| Okno | Zdjęcie | Tytuł | Wysokość wiersza | Zdjęcie względem tekstu |
+|---|---|---|---|---|
+| 1920 px | 168×126 | 21 px | 160 px | obok |
+| 1440 px | 122×92 | 18 px | 171 px | obok |
+| 1280 px | 112×84 | 18 px | 171 px | obok |
+| 1024 px | 223×149 | 18 px | 328 px | nad |
+| 390 px | 304×203 | 19 px | zależy od tekstu | nad etykietą |
+
+![Kolumna Aktualności: prototyp i wynik](raport-zrzuty/z16-z22-glowna.jpg)
+
+**Strona Aktualności.** Powiększa się pierwszy widoczny wpis, także po filtrze i szukaniu.
+
+| Okno | Zdjęcie | Tytuł | Wysokość wiersza | Zdjęcie względem tekstu |
+|---|---|---|---|---|
+| od 1280 px | 360×240 | 30 px | 291 px (prototyp 287) | obok, kolumny 76 / tekst / 360 |
+| 1024 px | 360×240 | 24 px | 493 px | nad |
+| 800 px | 286×191 | 24 px | 545 px | nad |
+| 390 px | 292×195 | 22 px | 454 px | nad etykietą |
+
+Data ma 44 px, tekst 16,5 px, a odstępy 22 i 24 px (na telefonie data 28 px, tekst 15 px). Sprawdziłem pięć filtrów rodzaju, szukanie, szukanie bez wyniku (nic nie jest powiększone, widać komunikat), wyczyszczenie pola i `?dla=kandydaci`: za każdym razem powiększony jest dokładnie pierwszy widoczny wpis.
+
+![Strona Aktualności: prototyp i wynik](raport-zrzuty/z16-z22-lista.jpg)
+
+**Telefon, do Twojej oceny (pytanie 7):**
+
+![Telefon: główna i Aktualności, jasny i ciemny motyw](raport-zrzuty/z16-z22-telefon.jpg)
+
+**Okno 1024 i 800 px:**
+
+![Główna przy 1024 px, Aktualności przy 1024 i 800 px](raport-zrzuty/z16-z22-waskie.jpg)
+
+**Co jest dziś w danych.** Żaden wpis nie jest pilny ani wyróżniony, więc pierwszy wpis to najnowszy: „Testowe: Wykład otwarty…” z 30.10, wpis testowy. Gdyby `aktualnosciNaGlowna` postawiła na górze inny wpis, powiększony będzie właśnie on. Wynika to z kodu; na prawdziwym wpisie tego nie sprawdzałem, bo takiego nie ma.
+
+**Dwa stany sprawdzone tylko po wymuszeniu w przeglądarce**, bo dzisiejsze dane ich nie dają:
+
+- **Aktualności w krótkiej kolumnie.** Krótkie kolumny mają dziś najwyżej 3 pozycje, więc nie mają przycisku, który przenosi je do długiej. Po wymuszeniu zamiany widać powiększony wpis i jeden zwykły, przycisk pokazuje „Zobacz więcej (10)”.
+- **Najnowszy wpis bez zdjęcia na głównej.** Sygnet patrona działu wypełnia pole i nie jest przycięty. Na stronie Aktualności wpis bez zdjęcia nie ma pola zdjęcia; ten stan jest prawdziwy, widać go po filtrze „Ogłoszenia”.
+
+![Wpis bez zdjęcia: główna i strona Aktualności](raport-zrzuty/z16-z22-bez-zdjecia.jpg)
+
+**Odstępstwa od zlecenia:**
+
+1. **168×126 i 21 px obowiązują przy oknie 1920 px.** Prototyp ma płótno 1920 px skalowane do okna, więc te wartości dotyczą kolumny 584 px. Przy węższych oknach kolumna ma mniej (424 px przy 1440), dlatego zdjęcie maleje proporcjonalnie, najwyżej do 112 px, a tytuł do 18 px. Poniżej 1180 px zdjęcie staje nad tekstem.
+2. **Strona Aktualności poniżej 1280 px: zdjęcie nad tekstem**, najwyżej 360 px, tytuł 24–30 px. Zlecenie podaje tylko układ z kolumną 360 px, ale przy 1024 px zostawiał on tekstowi 132 px, a wiersz miał 818 px wysokości.
+3. **Telefon, strona główna: powiększony wpis i jeden zwykły** zamiast trzech wierszy. Powiększony liczy się za dwa, jak w krótkiej kolumnie; przycisk pokazuje „Zobacz więcej (10)”, po rozwinięciu widać 12 wpisów. Zlecenie nie mówi o liczbie wierszy na telefonie.
+
+Dwa skutki uboczne: wiersz „Kiedy:” w powiększonym wpisie też ma 16,5 px, jak w prototypie. Wszystkie zdjęcia listy mają szerszy `srcset`, bo filtr może powiększyć każdy wpis, więc budowa tworzy więcej wariantów.
+
+**Zauważone przy okazji, nie zmieniałem (pytanie 8).** Oba problemy były już na budowie ze zlecenia 15:
+
+- **Strona główna, 1024 px:** w pasku „Studia” teksty sąsiednich kart nachodzą na siebie („Matematyka” na „Studia I stopnia”), a etykieta „PODYPLOMOWE” dochodzi do kolumny Aktualności. Widać to na zrzucie przy 1024 px wyżej.
+- **Strona Aktualności, 761–1000 px:** obok listy stoi pusta kolumna 236 px, więc zwykłe wiersze są bardzo wąskie i wysokie (431 px przy 800, 574 px przy 761).
 
 ## Co warto wiedzieć o wykonaniu
 
 **Obrony (Twoja decyzja „Usuń”, 5.11).** Łatka z `dok/en/latki` dodawała `tresc_en` do ośmiu obron (5 prawdziwych, 3 testowe), przez co minione obrony zapraszały „You are cordially invited”, a obok było „This event has taken place”. Pola usunąłem, więc tekst składa widok z danych obrony. W zbudowanej stronie siedem minionych obron ma „… took place on …”, a jedna przyszła (testowa, 27.11) nadal zaprasza. Pole `tresc_en` zostaje w formularzu CMS, ale wpisany tam tekst znów zastąpi ten z kodu.
 
-**D1.** Osobna reguła dla „dr, prof. UWr”, której zlecenie nie wymienia: daję „Dr” (pytanie 2). Na stronie obrony „X, MSc” stoi w tekście, a nagłówek to samo nazwisko, bo tak wygląda on po polsku.
+**Obrony po polsku (Twoja decyzja „Tak, zmień”, 5.11).** To samo po polsku: osiem obron nie ma już treści wpisu (Web-Aktualnosci `af154c1`), a tekst składa `src/lib/widoki/obrona.ts` (`ac7855c2`). Przed terminem: „Zapraszamy na publiczną obronę rozprawy doktorskiej pt. …”. Po terminie: „Publiczna obrona rozprawy doktorskiej pt. … odbyła się 20 października 2026 r.” Drugi akapit wymienia dostępne dokumenty i odmienia „jest/są”. Nazwiska w zdaniu nie ma, bo stoi w nagłówku tuż wyżej i nie da się go odmienić z danych. W zbudowanej stronie siedem minionych obron ma „odbyła się”, a jedna przyszła (testowa, 27.11) zaprasza. Tekst wpisany w polu `body` wygrywa i nie zmieni się sam po terminie; mówi o tym nowy opis pola w `.pages.yml`.
+
+**D1.** Osobna reguła dla „dr, prof. UWr”, której zlecenie nie wymienia: daję „Dr” (pytanie 1). Na stronie obrony „X, MSc” stoi w tekście, a nagłówek to samo nazwisko, bo tak wygląda on po polsku.
 
 **D2.** Pełna nazwa mieści się w stopce: wiersz kontaktu ma 835 px (było 706) i jest w jednym wierszu na 1024, 1280, 1440 i 1920 px. Linki stopki były w drugim wierszu już wcześniej.
 
@@ -98,11 +164,13 @@ Etykieta „Admissions” zasila też kartę na `/en/studia`. Tam dopisek powię
 
 ## Zmiany na polskich stronach
 
-Z 380 polskich stron zmieniło się 17, wszystkie zgodnie ze zleceniem, i doszła jedna:
+Z 380 polskich stron zmieniło się 26, wszystkie zgodnie ze zleceniem albo Twoimi decyzjami, i doszła jedna:
 
 | Strony | Przyczyna |
 |---|---|
-| 11 stron (aktualności, sukcesy) | D8: pisownia „Krok w Przyszłość” |
+| 11 stron (aktualności, sukcesy) | D8: pisownia „Krok w Przyszłość”; lista `aktualnosci` także zalecenie 22 |
+| 8 stron obron | tekst składany z danych, Twoja decyzja |
+| strona główna | zalecenie 22 |
 | `nauka/konferencje`, `instytut/zaklady/algebra-i-teoria-modeli` | D11: „Szklarska Poręba” |
 | `404` | D15 |
 | `powiadomienia` | D16: `lang="en"` przy tekście angielskim |
@@ -114,7 +182,7 @@ Z 380 polskich stron zmieniło się 17, wszystkie zgodnie ze zleceniem, i doszł
 
 | Repozytorium | Commity (od najstarszego) | Co zawierają |
 |---|---|---|
-| Web-Aktualnosci | `c803e95`, `6b42382`, `feeacb9` | tłumaczenia z `dok/en/latki`; D4 (tytuły w nawiasach), D8 (nazwy konkursów, pisownia „Krok w Przyszłość” także w polu polskim), stopnie z D1; obrony bez `tresc_en` z tamtej łatki |
+| Web-Aktualnosci | `c803e95`, `6b42382`, `feeacb9`, `af154c1` | tłumaczenia z `dok/en/latki`; D4 (tytuły w nawiasach), D8 (nazwy konkursów, pisownia „Krok w Przyszłość” także w polu polskim), stopnie z D1; obrony bez `tresc_en` z tamtej łatki; osiem obron bez treści wpisu, nowy opis pola `body` w `.pages.yml` |
 | Web-Instytut | `dc44f49` | tylko łatka z `dok/en/latki`: naprawiony martwy link w „Wykładzie Terence’a Tao” (PL i EN) |
 | Web-Nauka | `13745e4` | D11: „Szklarska Poręba” w polu `miejsce` |
 | Web-Popularyzacja | `53f6556` | tylko łatka ze zlecenia 15: dane działu, cztery strony, formularz CMS |
@@ -135,14 +203,14 @@ Z 380 polskich stron zmieniło się 17, wszystkie zgodnie ze zleceniem, i doszł
 | Web-Studia | `187d2de`, `db6eae3` | tłumaczenia z `dok/en/latki`; D1 (stopnie w `tresc_en`), D6 (nazwy przedmiotów i systemów), D19 (daty) |
 | Web-Ustawienia | `d649b38`, `9f12643`, `0d12108` | łatki ze zleceń 14 i 15 (m.in. strona „O stronie”, menu Popularyzacji); D20: dopisek „(in Polish)” przy sześciu pozycjach menu |
 
-Commity mają opis „Wersja angielska: tłumaczenia (zlecenie 16)”, osobno dla każdego źródła łatki. Klony: `C:\Users\Szymek\source\tresci\<Repozytorium>`.
+Commity mają opis „Wersja angielska: tłumaczenia (zlecenie 16)”, osobno dla każdego źródła łatki; wyjątek to `af154c1`, „Obrony: tekst polski składany z danych (zlecenie 16)”. Klony: `C:\Users\Szymek\source\tresci\<Repozytorium>`.
 
 ## Łatki i nakładka
 
-- `dok/latki/zlecenie-16/`: 14 łatek względem stanu po `dok/en/latki`, opis w `README.md`. Łatka Web-Aktualnosci cofa też `tresc_en` obron dodane przez `dok/en/latki`, więc kolejność nakładania ma znaczenie. Samego `dok/en/latki` nie zmieniałem.
+- `dok/latki/zlecenie-16/`: 14 łatek względem stanu po `dok/en/latki`, opis w `README.md`. Łatka Web-Aktualnosci cofa też `tresc_en` obron dodane przez `dok/en/latki` i usuwa polską treść tych ośmiu wpisów, więc kolejność nakładania ma znaczenie. Samego `dok/en/latki` nie zmieniałem.
 - Nakładka zawiera łatki 14, 15, `dok/en/latki` i 16 (tylko `src/`).
 - **Przywracanie nakładki:** skopiuj zawartość `.przekazanie/robocze/nakladka-przed-16/src/` na `src/`. Plik z końcówką `.BRAK.txt` oznacza, że przed zleceniem pliku nie było, więc przywrócenie to usunięcie (dotyczy `src/content/strony/o-stronie.md`).
-- Nowe pole `jezyk` jest opisane w `.przekazanie/pola-do-cms.md`.
+- Nowe pole `jezyk` i nowe znaczenie pustego `body` obron są opisane w `.przekazanie/pola-do-cms.md`.
 
 ## Tłumaczenia do przejrzenia
 
@@ -308,13 +376,14 @@ Ciemny motyw (1920 px), po zmianach:
 
 ## Pytania
 
-1. **Minione obrony po polsku:** na polskich stronach nadal stoi „Zapraszamy na publiczną obronę” po terminie. Ten tekst pochodzi z treści wpisów, nie z kodu, i zlecenie go nie obejmuje. Czy zrobić dla wersji polskiej to samo, co dla angielskiej (tekst z danych, dobierający czas)?
-2. **„dr, prof. UWr”:** zlecenie opisuje tylko „dr hab. X, prof. UWr → Prof. X”. Daję „Dr X”. Czy tak zostawić?
-3. **„Mathematical Analysis” czy „Advanced calculus”:** USOS używa „Advanced calculus” i tak jest teraz w nawiasach z D6, a strona skryptów i tabela struktury w „First year” mają „Mathematical Analysis”. Czy ujednolicić? Na razie zostawiłem, bo D6 każe trzymać nazwę z USOS przy nazwie polskiej, a tamte miejsca to nie są nazwy z USOS.
-4. **„Iuvenes Wratislaviae”:** przetłumaczyłem jako „Young People of Wrocław”. To moje tłumaczenie; nie sprawdzałem, czy istnieje oficjalna angielska nazwa. Zostawić je czy samą nazwę łacińską?
-5. **Strona główna:** „Admission ↗” i „Study mathematics in Wrocław ↗” prowadzą na tę samą polską stronę co menu, ale są bez „(in Polish)”, bo D20 mówi o menu. Czy dodać? To mała zmiana w kodzie.
-6. **USOSweb:** bez dopisku, bo system ma wersję angielską, ale automatyczne pobranie się nie udało. Sprawdzisz po zalogowaniu?
-7. **Wpisy testowe** („Testowe: …”, „Mister Test”) nadal są w danych i dostają tłumaczenia z łatek. Usunięcie należy do redakcji.
+1. **„dr, prof. UWr”:** zlecenie opisuje tylko „dr hab. X, prof. UWr → Prof. X”. Daję „Dr X”. Czy tak zostawić?
+2. **„Mathematical Analysis” czy „Advanced calculus”:** USOS używa „Advanced calculus” i tak jest teraz w nawiasach z D6, a strona skryptów i tabela struktury w „First year” mają „Mathematical Analysis”. Czy ujednolicić? Na razie zostawiłem, bo D6 każe trzymać nazwę z USOS przy nazwie polskiej, a tamte miejsca to nie są nazwy z USOS.
+3. **„Iuvenes Wratislaviae”:** przetłumaczyłem jako „Young People of Wrocław”. To moje tłumaczenie; nie sprawdzałem, czy istnieje oficjalna angielska nazwa. Zostawić je czy samą nazwę łacińską?
+4. **Strona główna:** „Admission ↗” i „Study mathematics in Wrocław ↗” prowadzą na tę samą polską stronę co menu, ale są bez „(in Polish)”, bo D20 mówi o menu. Czy dodać? To mała zmiana w kodzie.
+5. **USOSweb:** bez dopisku, bo system ma wersję angielską, ale automatyczne pobranie się nie udało. Sprawdzisz po zalogowaniu?
+6. **Wpisy testowe** („Testowe: …”, „Mister Test”) nadal są w danych i dostają tłumaczenia z łatek. Usunięcie należy do redakcji. Dziś to wpis testowy jest powiększony na głównej i na liście.
+7. **Zalecenie 22 na telefonie:** na głównej widać powiększony wpis i jeden zwykły. Czy zostawić tak, czy pokazać trzy wiersze, jak przed zmianą?
+8. **Usterki zauważone przy okazji** (sekcja o zaleceniu 22): nachodzące teksty w pasku „Studia” przy 1024 px i wąska lista Aktualności przy 761–1000 px. Czy naprawić je osobnym commitem?
 
 ## Załącznik: 31 nazw przedmiotów bez angielskiej nazwy w USOS
 
