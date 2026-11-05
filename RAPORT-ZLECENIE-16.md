@@ -1,6 +1,6 @@
 # Raport: zlecenie 16 — wersja angielska (5.11.2026)
 
-Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów zlecenia, 2 commity decyzji o obronach (`4fe03c13`, `ac7855c2`), commit zalecenia 22 ze zlecenia 14 (`8f0019b2`) i 2 commity raportu, **bez pushowania**. Repozytoria treści: 36 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
+Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów zlecenia, 2 commity decyzji o obronach (`4fe03c13`, `ac7855c2`), commit zalecenia 22 ze zlecenia 14 (`8f0019b2`), commit naprawy układu (`775aa7bf`) i 3 commity raportu, **bez pushowania**. Repozytoria treści: 36 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
 
 **Do Twojej decyzji albo działania**
 
@@ -18,6 +18,7 @@ Stan sprawdzenia:
 - Wszystkie łatki weszły czysto, na klony i na nakładkę: bez `git apply -3` i bez konfliktów.
 - Sprawdzane w Edge (Playwright) na zbudowanej stronie: 20 stron `/en` na 1440 i 390 px przed i po, 3 strony na 1920 px w ciemnym motywie, otwarte menu na 390, 1024, 1280 i 1440 px. Żadna z tych stron nie ma poziomego przewijania.
 - Zalecenie 22, też w Edge na zbudowanej stronie: główna na 1920, 1440, 1280, 1024 i 390 px, Aktualności na 1920, 1440, 1024, 800 i 390 px, PL i EN, jasny i ciemny motyw. Bez błędów JavaScriptu i bez poziomego przewijania.
+- Naprawa układu, też w Edge: główna na 15 szerokościach od 761 do 2560 px, lista na 11 od 761 do 1920 px, do tego granice nowych reguł, PL i EN. Poziome przewijanie ma tylko główna poniżej 944 px, tak samo jak przed tym zleceniem (pytanie 8).
 - **Czego nie sprawdzałem:** Firefoksa, Safari, prawdziwych telefonów, czytnika ekranu (`lang="pl"` z D14 sprawdzony tylko w HTML), formularzy w samym Pages CMS. Skryptu `Code.gs` nie uruchamiałem w Google: strony potwierdzania i wypisywania testowałem z podstawionymi odpowiedziami serwera.
 
 ## Podsumowanie
@@ -44,6 +45,7 @@ Stan sprawdzenia:
 | Obrony bez `tresc_en` (Twoja decyzja po raporcie) | zrobione | `4fe03c13` (łatka) | Web-Aktualnosci |
 | Polskie obrony: tekst z danych (Twoja decyzja po raporcie) | zrobione | `ac7855c2` | Web-Aktualnosci |
 | Zalecenie 22 ze zlecenia 14 (osobne polecenie) | zrobione, telefon do oceny | `8f0019b2` | — |
+| Układ przy węższych oknach (Twoja decyzja po raporcie) | zrobione | `775aa7bf` | — |
 | Łatki tego zlecenia | zapisane | `ec0b0a4a` | `dok/latki/zlecenie-16/` |
 
 ## Kryteria odbioru
@@ -78,9 +80,8 @@ Wykonane na Twoje polecenie na tej gałęzi, osobnym commitem `8f0019b2`, bez pu
 
 | Okno | Zdjęcie | Tytuł | Wysokość wiersza | Zdjęcie względem tekstu |
 |---|---|---|---|---|
-| od 1280 px | 360×240 | 30 px | 291 px (prototyp 287) | obok, kolumny 76 / tekst / 360 |
-| 1024 px | 360×240 | 24 px | 493 px | nad |
-| 800 px | 286×191 | 24 px | 545 px | nad |
+| od 988 px | 360×240 | 30 px | 291 px (prototyp 287) | obok, kolumny 76 / tekst / 360 |
+| 800 px | 360×240 | 30 px | 482 px | nad |
 | 390 px | 292×195 | 22 px | 454 px | nad etykietą |
 
 Data ma 44 px, tekst 16,5 px, a odstępy 22 i 24 px (na telefonie data 28 px, tekst 15 px). Sprawdziłem pięć filtrów rodzaju, szukanie, szukanie bez wyniku (nic nie jest powiększone, widać komunikat), wyczyszczenie pola i `?dla=kandydaci`: za każdym razem powiększony jest dokładnie pierwszy widoczny wpis.
@@ -107,15 +108,39 @@ Data ma 44 px, tekst 16,5 px, a odstępy 22 i 24 px (na telefonie data 28 px, te
 **Odstępstwa od zlecenia:**
 
 1. **168×126 i 21 px obowiązują przy oknie 1920 px.** Prototyp ma płótno 1920 px skalowane do okna, więc te wartości dotyczą kolumny 584 px. Przy węższych oknach kolumna ma mniej (424 px przy 1440), dlatego zdjęcie maleje proporcjonalnie, najwyżej do 112 px, a tytuł do 18 px. Poniżej 1180 px zdjęcie staje nad tekstem.
-2. **Strona Aktualności poniżej 1280 px: zdjęcie nad tekstem**, najwyżej 360 px, tytuł 24–30 px. Zlecenie podaje tylko układ z kolumną 360 px, ale przy 1024 px zostawiał on tekstowi 132 px, a wiersz miał 818 px wysokości.
+2. **Strona Aktualności poniżej 988 px: zdjęcie nad tekstem.** Zlecenie podaje tylko układ z kolumną 360 px, a przy węższej liście zostawiałby on tekstowi mniej niż 388 px.
 3. **Telefon, strona główna: powiększony wpis i jeden zwykły** zamiast trzech wierszy. Powiększony liczy się za dwa, jak w krótkiej kolumnie; przycisk pokazuje „Zobacz więcej (10)”, po rozwinięciu widać 12 wpisów. Zlecenie nie mówi o liczbie wierszy na telefonie.
 
 Dwa skutki uboczne: wiersz „Kiedy:” w powiększonym wpisie też ma 16,5 px, jak w prototypie. Wszystkie zdjęcia listy mają szerszy `srcset`, bo filtr może powiększyć każdy wpis, więc budowa tworzy więcej wariantów.
 
-**Zauważone przy okazji, nie zmieniałem (pytanie 8).** Oba problemy były już na budowie ze zlecenia 15:
+**Układ przy węższych oknach (Twoja decyzja „Tak, napraw obie”, commit `775aa7bf`).** Obie usterki były już na budowie ze zlecenia 15. Pasek Studia miał problem szerszy, niż pisałem wcześniej: karty wychodziły poza pola przy każdym oknie od 761 do około 1340 px, nie tylko przy 1024.
 
-- **Strona główna, 1024 px:** w pasku „Studia” teksty sąsiednich kart nachodzą na siebie („Matematyka” na „Studia I stopnia”), a etykieta „PODYPLOMOWE” dochodzi do kolumny Aktualności. Widać to na zrzucie przy 1024 px wyżej.
-- **Strona Aktualności, 761–1000 px:** obok listy stoi pusta kolumna 236 px, więc zwykłe wiersze są bardzo wąskie i wysokie (431 px przy 800, 574 px przy 761).
+| Miejsce | Było | Jest |
+|---|---|---|
+| Studia na głównej, okno poniżej 1366 px | opis obok pięciu kart; karta miała 53 px przy 1024 i 18 px przy 761 | opis nad kartami; karta ma 110 px przy 1024; poniżej 960 px trzy kolumny, 134 px przy 761 |
+| Warto wiedzieć na głównej, okno poniżej 1366 px | cztery kolumny, długie słowa wchodziły na sąsiednią pozycję; 131 px przy 1024 | dwie kolumny, 289 px przy 1024 |
+| Lista Aktualności, okno poniżej 1368 px | pusta kolumna 236 px obok listy; przy 800 px lista miała 380 px, a zwykły wiersz 431 px wysokości | bez pustej kolumny; przy 800 px lista ma 672 px, a zwykły wiersz 208 px |
+
+Warto wiedzieć nie było w pytaniu, które zadałem. Dołożyłem je, bo to ta sama usterka tuż pod paskiem Studia i jedna linia CSS.
+
+Główna przy 1024 px, przed i po:
+
+![Główna przy 1024 px: przed i po](raport-zrzuty/z16-z22-naprawa-glowna.jpg)
+
+Lista przy 800 px, przed i po:
+
+![Lista Aktualności przy 800 px: przed i po](raport-zrzuty/z16-z22-naprawa-lista.jpg)
+
+Co jeszcze warto wiedzieć o tej naprawie:
+
+- **Bez zmian:** główna od 1366 px, lista od 1368 px, wszystkie inne podstrony. Inne podstrony mają w prawej kolumnie prawdziwy spis, więc przy 800 px tekst nadal ma tam 380 px.
+- **Pasek Studia jest wyższy:** 219 zamiast 158 px przy 1280 i 238 zamiast 161 px przy 1024. Długa kolumna sama dopasowuje liczbę wierszy.
+- **Jedno słowo przy 1366 px:** „popularnonaukowych” wchodzi 14 px w odstęp 28 px między kolumnami, ale niczego nie dotyka.
+
+**Znalezione przy sprawdzaniu, nie zmieniałem (pytanie 8).** Oba problemy były już na budowie ze zlecenia 15:
+
+- **Główna, okno poniżej 944 px (EN poniżej 881 px):** poziome przewijanie. Okładka ma cztery kolumny i „Popularyzacja” kończy się na 1022 px przy oknie 800, a pasek nawigacji też jest szerszy od okna.
+- **Pasek nawigacji, okno 1024 px i węższe:** nazwa instytutu łamie się na cztery wiersze i wystaje 5 px nad pasek i 3 px pod niego. Dotyczy głównej i listy; innych podstron nie mierzyłem.
 
 ## Co warto wiedzieć o wykonaniu
 
@@ -168,7 +193,7 @@ Z 380 polskich stron zmieniło się 26, wszystkie zgodnie ze zleceniem albo Twoi
 
 | Strony | Przyczyna |
 |---|---|
-| 11 stron (aktualności, sukcesy) | D8: pisownia „Krok w Przyszłość”; lista `aktualnosci` także zalecenie 22 |
+| 11 stron (aktualności, sukcesy) | D8: pisownia „Krok w Przyszłość”; lista `aktualnosci` także zalecenie 22 i naprawa układu |
 | 8 stron obron | tekst składany z danych, Twoja decyzja |
 | strona główna | zalecenie 22 |
 | `nauka/konferencje`, `instytut/zaklady/algebra-i-teoria-modeli` | D11: „Szklarska Poręba” |
@@ -383,7 +408,7 @@ Ciemny motyw (1920 px), po zmianach:
 5. **USOSweb:** bez dopisku, bo system ma wersję angielską, ale automatyczne pobranie się nie udało. Sprawdzisz po zalogowaniu?
 6. **Wpisy testowe** („Testowe: …”, „Mister Test”) nadal są w danych i dostają tłumaczenia z łatek. Usunięcie należy do redakcji. Dziś to wpis testowy jest powiększony na głównej i na liście.
 7. **Zalecenie 22 na telefonie:** na głównej widać powiększony wpis i jeden zwykły. Czy zostawić tak, czy pokazać trzy wiersze, jak przed zmianą?
-8. **Usterki zauważone przy okazji** (sekcja o zaleceniu 22): nachodzące teksty w pasku „Studia” przy 1024 px i wąska lista Aktualności przy 761–1000 px. Czy naprawić je osobnym commitem?
+8. **Główna i pasek nawigacji przy węższych oknach** (sekcja o zaleceniu 22): poziome przewijanie głównej poniżej 944 px i nazwa instytutu wystająca z paska przy oknie 1024 px i węższym. Czy naprawić?
 
 ## Załącznik: 31 nazw przedmiotów bez angielskiej nazwy w USOS
 
