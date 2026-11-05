@@ -52,6 +52,15 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
     };
     const widoczny = (el: HTMLElement | null): el is HTMLElement => !!el && el.getClientRects().length > 0;
 
+    let ramka = 0;
+    const zaplanuj = () => { cancelAnimationFrame(ramka); ramka = requestAnimationFrame(odswiez); };
+
+    // pozycja wybrana kliknięciem zostaje bieżąca do następnego przewinięcia przez użytkownika (krótka ostatnia sekcja
+    // może nie dojść do linii 30% okna, a płynne przewijanie nie powinno „przeskakiwać” znacznikiem po drodze)
+    let wybrana: (typeof pozycje)[number] | undefined;
+    const zwolnij = () => { if (wybrana) { wybrana = undefined; zaplanuj(); } };
+    ['wheel', 'touchstart', 'keydown'].forEach((t) => window.addEventListener(t, zwolnij, { passive: true }));
+
     const odswiez = () => {
       // pozycje, których sekcja jest schowana (filtr, inny semestr), znikają ze spisu
       pozycje.forEach((p) => { p.li.hidden = !widoczny(cel(p.a)); });
@@ -62,6 +71,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
       for (const p of widoczne) if ((cel(p.a)?.getBoundingClientRect().top ?? Infinity) <= prog) biezaca = p;
       // na samym dole strony krótka ostatnia sekcja nie dojdzie do linii — wtedy ostatnia
       if (dol && widoczne.length) biezaca = widoczne[widoczne.length - 1];
+      if (wybrana && !wybrana.li.hidden) biezaca = wybrana;
       pozycje.forEach((p) => (p === biezaca ? p.a.setAttribute('aria-current', 'location') : p.a.removeAttribute('aria-current')));
       if (biezaca && !telefon.matches) {
         znacznik.style.top = `${biezaca.li.offsetTop}px`;
@@ -76,6 +86,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
       if (!el) return;
       e.preventDefault();
       ustawOtwarty(false);
+      wybrana = pozycje.find((p) => p.a === a);
       const zapas = parseFloat(getComputedStyle(el).scrollMarginTop) || 20;
       window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - zapas, behavior: bezRuchu.matches ? 'auto' : 'smooth' });
       history.replaceState(history.state, '', a.hash);
@@ -83,8 +94,6 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
       el.focus({ preventScroll: true });
     }));
 
-    let ramka = 0;
-    const zaplanuj = () => { cancelAnimationFrame(ramka); ramka = requestAnimationFrame(odswiez); };
     window.addEventListener('scroll', zaplanuj, { passive: true });
     window.addEventListener('resize', zaplanuj);
     document.addEventListener('z-spis', zaplanuj);

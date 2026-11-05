@@ -248,6 +248,11 @@ któraś jej klasa występuje w kodzie w napisie (atrybut `class`, lista klas, s
   cień po przewinięciu, kolor stopki na dole strony, „ciemne menu na ciemnym pasie”; panel menu ma na stałe ciemne kolory
   (`.menu-ciemne`), bo nagłówek jest zawsze granatowy;
 - nieużywane zmienne i importy w widokach (`astro check`: 0 ostrzeżeń i 0 podpowiedzi).
+- poprawka spisu „Na tej stronie” (zgłoszona przez podagenta przy Konferencjach): po kliknięciu krótkiej ostatniej sekcji
+  znacznik zostawał na wcześniejszej (strona nie przewija się tak daleko); teraz kliknięta pozycja zostaje bieżąca do
+  następnego przewinięcia przez użytkownika (sprawdzone na Konferencjach, Władzach i Planie zajęć);
+- strony bez JS (komputer 1366 i telefon 390: główna, Plan zajęć, Pracownicy, Aktualności, Kalendarz, Kierunek, Władze):
+  treść pełna, spis rozwinięty, oba semestry planu jeden pod drugim, bez poziomego przewijania.
 
 **Silnik animacji banerów — zostaje, nieużywany** (decyzja 4.11, 22:30): `src/scripts/baner/` (silnik, 36 motywów),
 `src/lib/motywyBanerow.ts` i dane motywów w `src/lib/widoki/*` bez zmian; nic ich nie importuje. Style, którymi obsługiwał
