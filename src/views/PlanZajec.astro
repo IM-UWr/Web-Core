@@ -76,7 +76,7 @@ const L = en
       </div>
     )}
     {semestry.map((x) => (
-      <div class="pl-semestr" data-z-panel={x.kotwica} data-z-aktywny={x.kotwica === aktywny ? '' : undefined} data-od={x.s.od ?? ''} data-do={x.s.do ?? ''}>
+      <div class="pl-semestr" id={x.kotwica} data-z-panel={x.kotwica} data-z-aktywny={x.kotwica === aktywny ? '' : undefined} data-od={x.s.od ?? ''} data-do={x.s.do ?? ''}>
         <p class="pl-info">{`${x.opis}${x.aktualizacja ? ` · ${L.dane} ${x.aktualizacja.pelna}` : ''}. ${L.uwagi}`}</p>
         {x.sekcje.length === 0 && <p class="pl-info">{T.brakSem}</p>}
         {x.sekcje.map((k) => (
