@@ -1,0 +1,133 @@
+diff --git a/.pages.yml b/.pages.yml
+index 19a27ca..615bf92 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -658,3 +658,50 @@ content:
+   - name: tresc_en
+     label: 'EN: treść (Markdown)'
+     type: text
++- name: o-stronie
++  label: O stronie
++  type: file
++  path: src/content/strony/o-stronie.md
++  format: yaml-frontmatter
++  fields:
++  - name: tytul
++    label: Tytuł
++    type: string
++    required: true
++  - name: opis
++    label: Krótki opis (pod tytułem i w Google)
++    type: text
++  - name: haslo
++    label: Hasło na banerze (telefon)
++    type: string
++  - name: pasek_boczny
++    label: 'Prawy pasek: spis „Na tej stronie”, menu działu czy oba (puste = domyślnie tylko spis)'
++    type: select
++    options:
++      values:
++      - name: oba
++        label: Oba (spis i menu działu)
++      - name: spis
++        label: Tylko spis „Na tej stronie”
++      - name: menu
++        label: Tylko menu działu (podstrony)
++      - name: brak
++        label: Bez prawego paska (strona na całą szerokość)
++  - name: body
++    label: Treść
++    type: rich-text
++    options:
++      format: markdown
++      path: public/pliki/ustawienia
++  - name: tytul_en
++    label: 'EN: tytuł'
++    type: string
++  - name: opis_en
++    label: 'EN: opis'
++    type: text
++  - name: haslo_en
++    label: 'EN: hasło na banerze'
++    type: string
++  - name: tresc_en
++    label: 'EN: treść (Markdown)'
++    type: text
+diff --git a/src/content/strony/o-stronie.md b/src/content/strony/o-stronie.md
+new file mode 100644
+index 0000000..21e5fc1
+--- /dev/null
++++ b/src/content/strony/o-stronie.md
+@@ -0,0 +1,72 @@
++---
++tytul: "O stronie"
++opis: "Patroni działów, źródła ilustracji, zgłaszanie błędów i jak zrobiona jest ta strona."
++tytul_en: "About this site"
++opis_en: "The patrons of the site's sections, image sources, reporting errors and how the site was made."
++haslo: "Patroni, źródła i kulisy"
++haslo_en: "Patrons, sources and how it was made"
++pasek_boczny: spis
++tresc_en: |
++  ## Four patrons
++
++  The site is built around four mathematicians who, after the war, built mathematics in Wrocław from the ground up. Each of them is the patron of one section of the site and gives it its colour, and the Institute's lecture rooms bear their names.
++
++  - **Institute** — Edward Marczewski (1907–1976) · amber · room EM
++  - **Research** — Władysław Ślebodziński (1884–1972) · emerald · room WS
++  - **Study** — Bronisław Knaster (1893–1980) · azure · room B
++  - **Outreach** — Hugo Steinhaus (1887–1972) · raspberry · room HS
++
++  The patron's face is drawn line by line when you enter the section page, and the page headers show facts from his life and mathematics, drawn at random for each visit.
++
++  ## Image sources
++
++  - **Sketches of the patrons**, based on photographs: Władysław Ślebodziński (1938) and Hugo Steinhaus (1968) — Wikimedia Commons ([Ślebodziński](https://commons.wikimedia.org/wiki/File:W%C5%82adys%C5%82aw_%C5%9Alebodzi%C5%84ski.jpg), [Steinhaus](https://commons.wikimedia.org/wiki/File:Hugo_Steinhaus.jpg)), public domain; Edward Marczewski and Bronisław Knaster — MacTutor History of Mathematics, University of St Andrews ([Marczewski](https://mathshistory.st-andrews.ac.uk/Biographies/Marczewski/), [Knaster](https://mathshistory.st-andrews.ac.uk/Biographies/Knaster/pictdisplay/)).
++  - **Signatures**, from reproductions: Edward Marczewski — *Nowa Księga Szkocka* (New Scottish Book), vol. I, entry of 7 July 1946 ([Library of the Faculty of Mathematics and Computer Science, University of Wrocław](https://wmi.uwr.edu.pl/biblioteka-wydzialowa/nowa-ksiega-szkocka/)); Władysław Ślebodziński — membership card of 1948, in: H. Langner-Matuszczyk, *Władysław Ślebodziński – matematyk, więzień KL Auschwitz nr 79053*, „Śląska Republika Uczonych”, vol. 7, 2016 ([publication page](https://sites.google.com/pwr.edu.pl/slebodzinski/strona-g%C5%82%C3%B3wna)); Bronisław Knaster (1946) and Hugo Steinhaus (1957) — J. Dutkiewicz, *Mieczysław Warmus. Życie i praca naukowa*, 2003 ([Digital Library of the Warsaw University of Technology](https://bcpw.bg.pw.edu.pl/dlibra/publication/1567/edition/1591?language=pl)).
++  - **Campus photograph** on the home page: Corvus monedula, [fotopolska.eu](https://fotopolska.eu/1158570), licence [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/deed.en); cropped and sharpened.
++
++  ## Found an error?
++
++  At the bottom of every page there is a link “Report an error on this page”. You can also write to the editors: **(address to be added)**.
++
++  ## How this site was made
++
++  Design and development: Szymon Cygan. The content is maintained by the editors in Pages CMS, and the site rebuilds itself a few minutes after every change. The code is open: [IM-UWr/Web-Core on GitHub](https://github.com/IM-UWr/Web-Core).
++
++  Typefaces: Brygada 1918 and Manrope (SIL Open Font License); mathematical formulas: KaTeX. The site does not use tracking cookies — details in the [Privacy policy](/polityka-prywatnosci).
++
++  ## Previous website
++
++  A copy of the Institute's previous website is available in the [archive](https://www.math.uni.wroc.pl/).
++opublikowany: true
++---
++
++## Czterech patronów
++
++Strona jest zbudowana wokół czterech matematyków, którzy po wojnie tworzyli od podstaw matematykę we Wrocławiu. Każdy z nich patronuje jednemu działowi i nadaje mu kolor, a ich imiona noszą sale wykładowe Instytutu.
++
++- **Instytut** — Edward Marczewski (1907–1976) · bursztyn · sala EM
++- **Nauka** — Władysław Ślebodziński (1884–1972) · szmaragd · sala WS
++- **Studia** — Bronisław Knaster (1893–1980) · lazur · sala B
++- **Popularyzacja** — Hugo Steinhaus (1887–1972) · malina · sala HS
++
++Twarz patrona rysuje się kreską przy wejściu na stronę działu, a w nagłówkach podstron przy każdej wizycie losują się ciekawostki z jego życia i matematyki.
++
++## Źródła ilustracji
++
++- **Szkice patronów** na podstawie fotografii: Władysław Ślebodziński (1938) i Hugo Steinhaus (1968) — Wikimedia Commons ([Ślebodziński](https://commons.wikimedia.org/wiki/File:W%C5%82adys%C5%82aw_%C5%9Alebodzi%C5%84ski.jpg), [Steinhaus](https://commons.wikimedia.org/wiki/File:Hugo_Steinhaus.jpg)), domena publiczna; Edward Marczewski i Bronisław Knaster — MacTutor History of Mathematics, University of St Andrews ([Marczewski](https://mathshistory.st-andrews.ac.uk/Biographies/Marczewski/), [Knaster](https://mathshistory.st-andrews.ac.uk/Biographies/Knaster/pictdisplay/)).
++- **Podpisy** według reprodukcji: Edward Marczewski — *Nowa Księga Szkocka*, t. I, wpis z 7 lipca 1946 ([Biblioteka Wydziału Matematyki i Informatyki UWr](https://wmi.uwr.edu.pl/biblioteka-wydzialowa/nowa-ksiega-szkocka/)); Władysław Ślebodziński — legitymacja z 1948 r., w: H. Langner-Matuszczyk, *Władysław Ślebodziński – matematyk, więzień KL Auschwitz nr 79053*, „Śląska Republika Uczonych”, t. 7, 2016 ([strona publikacji](https://sites.google.com/pwr.edu.pl/slebodzinski/strona-g%C5%82%C3%B3wna)); Bronisław Knaster (1946) i Hugo Steinhaus (1957) — J. Dutkiewicz, *Mieczysław Warmus. Życie i praca naukowa*, 2003 ([Biblioteka Cyfrowa Politechniki Warszawskiej](https://bcpw.bg.pw.edu.pl/dlibra/publication/1567/edition/1591?language=pl)).
++- **Zdjęcie kampusu** na stronie głównej: Corvus monedula, [fotopolska.eu](https://fotopolska.eu/1158570), licencja [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/deed.pl); fragment, wyostrzony.
++
++## Błąd na stronie?
++
++Na dole każdej podstrony jest link „Zgłoś błąd na tej stronie”. Można też napisać do redakcji: **(adres do uzupełnienia)**.
++
++## Jak zrobiona jest ta strona
++
++Projekt i wykonanie: Szymon Cygan. Treści prowadzi redakcja w Pages CMS, a strona przebudowuje się sama kilka minut po każdej zmianie. Kod jest otwarty: [IM-UWr/Web-Core na GitHubie](https://github.com/IM-UWr/Web-Core).
++
++Kroje pisma: Brygada 1918 i Manrope (licencja SIL Open Font License); wzory matematyczne: KaTeX. Strona nie używa ciasteczek śledzących — szczegóły w [Polityce prywatności](/polityka-prywatnosci).
++
++## Poprzednia strona
++
++Kopia poprzedniej strony Instytutu jest dostępna w [archiwum](https://www.math.uni.wroc.pl/).
