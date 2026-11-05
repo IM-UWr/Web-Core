@@ -4,6 +4,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeBase from '../plugins/rehype-base.mjs';
 import rehypeZewn from '../plugins/rehype-zewn.mjs';
+import rehypeBloki from '../plugins/rehype-bloki.mjs';
 
 import type { Lang } from './daty';
 
@@ -16,18 +17,19 @@ export async function renderMarkdown(src: string | undefined, lang: Lang = 'pl')
   return (await renderMarkdownZNaglowkami(src, lang)).html;
 }
 
-export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl'): Promise<{ html: string; naglowki: Naglowek[] }> {
+// bloki — pole „Bloki wzorca” strony: listy Markdown jako bloki wzorca treści (src/plugins/rehype-bloki.mjs)
+export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl', bloki = false): Promise<{ html: string; naglowki: Naglowek[] }> {
   if (!src) return { html: '', naglowki: [] };
   let processor = procesory.get(lang);
   if (!processor) {
     processor = await createMarkdownProcessor({
       remarkPlugins: [remarkMath],
       // linki poza stronę: klasa zew (↗ z CSS) i ukryty dopisek „(inna strona)” / „(external site)” — zlecenie 14, zalecenie 23
-      rehypePlugins: [rehypeKatex, [rehypeBase, { base: import.meta.env.BASE_URL, lang }], [rehypeZewn, { site: import.meta.env.SITE, base: import.meta.env.BASE_URL, lang }]],
+      rehypePlugins: [rehypeKatex, [rehypeBloki, { lang }], [rehypeBase, { base: import.meta.env.BASE_URL, lang }], [rehypeZewn, { site: import.meta.env.SITE, base: import.meta.env.BASE_URL, lang }]],
     } as any);
     procesory.set(lang, processor);
   }
-  const result = await processor.render(src);
+  const result = await processor.render(src, { frontmatter: { bloki } });
   return { html: result.code, naglowki: ((result.metadata as any)?.headings ?? []) as Naglowek[] };
 }
 

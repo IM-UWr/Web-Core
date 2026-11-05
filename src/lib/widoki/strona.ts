@@ -12,8 +12,8 @@ type Link = { etykieta: string; etykieta_en?: string; adres: string };
 // więc obejmuje też wersje angielskie /en/instytut/…, /en/studia/…) — np. kontakt, infrastruktura informatyczna z podstronami,
 // pierwszy rok, egzaminy i dyplom, sprawy studenckie, podstrony szkoły doktorskiej — mają baner jak w wariancie „Portal”
 // i treść jak w wariancie „Zwarta”, tak jak strony tych działów i ich pozostałe podstrony. Strony innych działów z tego
-// widoku — bez zmian (bez propu `uklad`). Telefon (≤ 760 px) bez zmian na wszystkich stronach.
-const DZIALY_PORTAL_ZWARTA = ['/instytut/', '/studia/'];
+// widoku — bez zmian (bez propu `uklad`). Telefon (≤ 760 px) bez zmian na wszystkich stronach. Popularyzacja: zlecenie 15.
+const DZIALY_PORTAL_ZWARTA = ['/instytut/', '/studia/', '/popularyzacja/'];
 
 export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) {
   const d = strona.data;
@@ -26,7 +26,7 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
     .filter((l) => lang !== 'en' || l.etykieta_en)
     .map((l) => ({ n: l.n, n_en: l.n_en, pl: l.etykieta, en: l.etykieta_en }));
   const { Content, headings } = await render(strona);
-  const en = lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang) : undefined;
+  const en = lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang, d.bloki === true) : undefined;
   const htmlEn = en?.html ?? '';
   const naglowki = en ? en.naglowki : headings;
   const tylkoPolski = lang === 'en' && !d.tresc_en;
@@ -35,7 +35,10 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
   const adres = '/' + strona.id;
   // Podstrona (np. /instytut/infrastruktura-informatyczna/regulamin-sieci) należy do działu swojej strony nadrzędnej.
   const wDziale = (l: Link) => l.adres === adres || adres.startsWith(l.adres + '/');
-  const dzial = ((await menuGlowne()) as any[]).find((m) => (m.grupy ?? []).some((g: any) => g.linki.some(wDziale)));
+  const menu = (await menuGlowne()) as any[];
+  // Organizatorzy Popularyzacji nie ma w menu (decyzja 5.11, 11:36), ale to strona działu: okruszki i powrót jak na pozostałych.
+  const dzial = menu.find((m) => (m.grupy ?? []).some((g: any) => g.linki.some(wDziale)))
+    ?? (adres.startsWith('/popularyzacja/') ? menu.find((m) => m.adres === '/popularyzacja') : undefined);
   const linkiDzialu: Link[] = dzial ? dzial.grupy.flatMap((g: any) => g.linki) : [];
   const rodzic = linkiDzialu.filter((l) => !isExternal(l.adres) && adres.startsWith(l.adres + '/')).sort((x, y) => y.adres.length - x.adres.length)[0];
   // Prawy pasek: domyślnie tylko spis „Na tej stronie”, bez menu działu (decyzja właściciela); pole „Prawy pasek” w CMS może to zmienić dla strony.

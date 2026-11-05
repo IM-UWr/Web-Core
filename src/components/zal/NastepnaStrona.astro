@@ -3,7 +3,8 @@
 // bez linków zewnętrznych) oraz „Ostatnia aktualizacja: … · Zgłoś błąd na tej stronie”.
 // Data aktualizacji — gdy widok ją poda (prop `aktualizacja`, RRRR-MM-DD); na razie żaden widok jej nie zna
 // (historia zmian treści jest w repozytoriach Web-*), więc pokazujemy tylko link zgłoszenia błędu.
-// Wstawiany przez Baza.astro na każdej podstronie, która jest w menu działu (strony głębiej i spoza menu — nic).
+// Wstawiany przez Baza.astro na każdej podstronie, która jest w menu działu (strony głębiej i spoza menu — nic). Wyjątek: strony
+// Popularyzacji spoza menu (Organizatorzy) mają tylko „Zgłoś błąd”, bez następnej strony.
 import ustawienia from '../../data/ustawienia.json';
 import { menuGlowne } from '../../lib/menu';
 import { u, isExternal, stripBase, absolute } from '../../lib/url';
@@ -18,7 +19,7 @@ const linki = (pozycja?.grupy ?? []).flatMap((g) => g.linki).filter((l) => !isEx
 const tu = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
 const k = linki.findIndex((l) => l.adres.replace(/\/$/, '') === tu);
 const nast = k >= 0 ? linki[k + 1] : undefined;
-const wMenu = k >= 0;
+const wMenu = k >= 0 || tu.startsWith('/popularyzacja/');
 const adresStrony = absolute(stripBase(Astro.url.pathname), Astro.site);
 const mail = `mailto:${ustawienia.kontakt.email}?subject=${encodeURIComponent(`${lang === 'en' ? 'Error on page' : 'Błąd na stronie'}: ${tytul}`)}&body=${encodeURIComponent(adresStrony)}`;
 ---

@@ -164,10 +164,32 @@ body .tresc .prose th { padding: 0 18px 8px 0; border: 0; border-bottom: 2px sol
 body .tresc .prose td { padding: 11px 18px 11px 0; border: 0; border-bottom: 1px solid var(--line); vertical-align: top; }
 body .tresc .prose td:first-child { color: var(--ink); }
 body .tresc .prose :is(img, code) { border-radius: 0; }
+/* bloki wzorca z Markdownu (pole „Bloki wzorca”, src/plugins/rehype-bloki.mjs): te same elementy co wyżej, z rozbrojonymi regułami .prose */
+body .tresc .prose :is(ul.dwa, ul.linki) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; max-width: none; margin: 0 0 16px; padding: 0; }
+body .tresc .prose :is(ul.dwa, ul.linki) > li { margin: 0; padding: 0; }
+body .tresc .prose ul.dwa > li { padding: 14px 0 16px; }
+body .tresc .prose :is(ul.dwa, ul.linki) > li::before { content: none; }
+body .tresc .prose ul.linki a { text-decoration: none; }
+body .tresc .prose ul.dwa .akcja { margin: 6px 0 0; }
+body .tresc .prose ul.dwa dl.para { margin: 6px 0 0; }
+body .tresc .prose ol.etapy { max-width: none; margin: 0 0 16px; padding: 0; list-style: none; }
+body .tresc .prose ol.etapy > li { margin: 0; padding: 0 0 26px 40px; }
+body .tresc .prose ol.etapy > li:last-child { padding-bottom: 0; }
+body .tresc .prose ol.etapy .t { margin: 0 0 4px; font-size: 21px; line-height: 1.3; }
+body .tresc .prose ol.etapy p:not(.t) { margin: 0 0 8px; font-size: 15.5px; line-height: 1.55; }
+body .tresc .prose ol.etapy p.akcja { margin: 10px 0 0; }
+body .tresc .prose .akcja a { text-decoration: none; }
+body .tresc .prose .kontakty { margin: 0 0 16px; }
+body .tresc .prose .kontakty p { margin: 0 0 8px; font-size: 15px; line-height: 1.55; }
+body .tresc .prose :is(.kontakty, ul.dwa) .akcja a { color: var(--d-a); font-size: 14.5px; }
+body .tresc .prose blockquote .etyk { margin-bottom: 4px; }
 @media (max-width: 760px) {
   body .tresc .prose h2 { margin-top: 30px; padding-top: 28px; font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
   body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; }
   body .tresc .prose h3 { font-size: 20px; margin-top: 24px; }
+  body .tresc .prose :is(ul.dwa, ul.linki) { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  body .tresc .prose ol.etapy > li { padding-left: 32px; }
+  body .tresc .prose ol.etapy .t { font-size: 19px; }
   body .tresc .prose :is(table, tbody, tr, td) { display: block; width: auto; }
   body .tresc .prose thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   body .tresc .prose tr { padding: 10px 0; border-bottom: 1px solid var(--line); }

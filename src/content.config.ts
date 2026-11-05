@@ -76,6 +76,8 @@ const strony = defineCollection({
     // prawy pasek: spis „Na tej stronie”, menu działu (podstrony) albo oba
     // puste = domyślnie tylko spis „Na tej stronie” (bez menu działu)
     pasek_boczny: z.preprocess(empty, z.enum(['oba', 'spis', 'menu', 'brak']).optional()),
+    // listy Markdown jako bloki wzorca treści: dwie kolumny, kontakty, etapy, linki (src/plugins/rehype-bloki.mjs)
+    bloki: z.boolean().optional(),
     ...haslo,
     liczby: liczbyBanera,
     opublikowany: published,

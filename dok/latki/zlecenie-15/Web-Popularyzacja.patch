@@ -1,8 +1,8 @@
 diff --git a/.pages.yml b/.pages.yml
-index d0b77c1..99569eb 100644
+index d0b77c1..ef1d32a 100644
 --- a/.pages.yml
 +++ b/.pages.yml
-@@ -27,78 +27,65 @@ content:
+@@ -27,78 +27,119 @@ content:
    - name: wstep_en
      label: 'EN: tekst pod tytułem'
      type: text
@@ -126,6 +126,429 @@ index d0b77c1..99569eb 100644
 +      label: Adres strony (https://… albo /ścieżka na naszej stronie)
 +      type: string
 +      required: true
++- name: strony
++  label: Strony Popularyzacji
++  description: Adres strony = ścieżka pliku, np. popularyzacja/uczniowie.md → /popularyzacja/uczniowie. Strona z tego katalogu sama dostaje kartę „Dla kogo” na stronie działu; do menu dopisz ją w repozytorium Web-Ustawienia.
++  type: collection
++  path: src/content/strony/popularyzacja
++  format: yaml-frontmatter
++  subfolders: true
++  filename: '{primary}.md'
++  view:
++    fields:
++    - tytul
++    primary: tytul
++  fields:
++  - name: tytul
++    label: Tytuł (nazwa nad kartą „Dla kogo”)
++    type: string
++    required: true
++  - name: haslo
++    label: Hasło (baner strony, tytuł karty „Dla kogo”)
++    type: string
++  - name: opis
++    label: Opis (baner strony, zdanie na karcie „Dla kogo”)
++    type: text
++  - name: pasek_boczny
++    label: Prawy pasek (puste = spis „Na tej stronie”)
++    type: select
++    options:
++      values:
++      - oba
++      - spis
++      - menu
++      - brak
++  - name: bloki
++    label: 'Bloki wzorca: listy jako dwie kolumny, kontakty i etapy (opis w dok/latki/zlecenie-15)'
++    type: boolean
++  - name: body
++    label: Treść
++    type: rich-text
++    options:
++      format: markdown
++      input: public/pliki/popularyzacja
++      output: /pliki/popularyzacja
++  - name: tytul_en
++    label: 'EN: tytuł'
++    type: string
++  - name: haslo_en
++    label: 'EN: hasło'
++    type: string
++  - name: opis_en
++    label: 'EN: opis'
++    type: text
++  - name: tresc_en
++    label: 'EN: treść (Markdown; budowa list jak w polskiej treści)'
++    type: text
+diff --git a/src/content/strony/popularyzacja/nauczyciele.md b/src/content/strony/popularyzacja/nauczyciele.md
+new file mode 100644
+index 0000000..01f66a8
+--- /dev/null
++++ b/src/content/strony/popularyzacja/nauczyciele.md
+@@ -0,0 +1,91 @@
++---
++tytul: "Dla nauczycieli"
++haslo: "Seminarium, studia, wyjazdy"
++opis: "Seminarium I³ co wtorek, studia podyplomowe, Poznajemy Matematyczną Europę."
++bloki: true
++---
++
++## Dla nauczycieli matematyki
++
++Seminarium co tydzień, studia podyplomowe, wyjazdy i kursy — a do tego zajęcia, konkursy i obozy, na które warto wysłać uczniów albo przyjść z całą klasą.
++
++- **Seminarium I³**
++
++  Inspiracja, Indywidualizacja, Interdyscyplinarność: spotkania nauczycieli szkół podstawowych i średnich, w Instytucie od 2004 roku. Raz w semestrze posiedzenie wyjazdowe.
++
++  Kiedy: wtorki, 17:00–18:30
++
++  Gdzie: Instytut, sala 601
++
++  [Seminarium I³](https://fmw.math.uni.wroc.pl/dla-nauczycieli/seminarium-i3/seminarium-dla-nauczycieli-i3)
++
++- **Studia podyplomowe „Nauczanie matematyki”**
++
++  Kwalifikacyjne studia prowadzone przez Instytut: uprawnienia do nauczania matematyki dla absolwentów innych kierunków.
++
++  Nabór: co roku, czerwiec–październik (IRK)
++
++  Gdzie: Instytut
++
++  [Studia podyplomowe](https://www.math.uni.wroc.pl/kwalifikacyjne-studia-podyplomowe-nauczanie-matematyki)
++
++- **Poznajemy Matematyczną Europę**
++
++  Od 2008 roku wyjazdy dla nauczycieli z dolnośląskich szkół, śladami matematyki w Polsce i za granicą.
++
++  Kiedy: weekendy, ferie, wakacje
++
++  [Wyjazdy](https://fmw.math.uni.wroc.pl/dla-nauczycieli/matematyczna-europa/poznajemy-matematyczn%C4%85-europ%C4%99)
++
++- **Kursy i szkolenia**
++
++  Kursy Fundacji, np. o specyficznych trudnościach w uczeniu się matematyki (dyskalkulia), gdy zbierze się grupa.
++
++  Kiedy: według naboru
++
++  [Szkolenia](https://fmw.math.uni.wroc.pl/dla-nauczycieli/szkolenia-dla-nauczycieli-matematyki)
++
++## Rok szkolny nauczyciela matematyki
++
++| Kiedy | Co | Dla kogo |
++| --- | --- | --- |
++| co wtorek | [Seminarium I³](https://fmw.math.uni.wroc.pl/dla-nauczycieli/seminarium-i3/seminarium-dla-nauczycieli-i3) w Instytucie | nauczyciele |
++| wrzesień | [Dolnośląski Festiwal Nauki](http://www.festiwal.wroc.pl): wykłady i warsztaty, także dla klas | z klasą |
++| początek października | [Marsze na Orientację](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/marsz-na-orientacj%C4%99/wroc%C5%82awskie-matematyczne-marsze-na-orientacj%C4%99-0): kategoria „nauczyciele i rodziny” | nauczyciele, rodziny |
++| jesień | zgłoszenia szkół do [konkursu KOMA](https://fmw.math.uni.wroc.pl/koma/konkurs-matematyczny-koma) i [Maratonu](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/maraton-matematyczny/maraton-matematyczny) | z uczniami |
++| w roku szkolnym | [Wrocławskie Spotkania Matematyczne](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/spotkania-matematyczne/wroc%C5%82awskie-spotkania-matematyczne), najczęściej w soboty | z klasą |
++| ferie, wakacje | [Poznajemy Matematyczną Europę](https://fmw.math.uni.wroc.pl/dla-nauczycieli/matematyczna-europa/poznajemy-matematyczn%C4%85-europ%C4%99) | nauczyciele |
++| czerwiec – październik | nabór na [studia podyplomowe](https://www.math.uni.wroc.pl/kwalifikacyjne-studia-podyplomowe-nauczanie-matematyki) | kandydaci |
++
++## Dla Twoich uczniów
++
++- **Kółka matematyczne**
++
++  W soboty, od 3. klasy szkoły podstawowej, z grupami olimpijskimi.
++
++  [Kółka](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/k%C3%B3%C5%82ka-matematyczne/mi%C4%99dzyszkolne-k%C3%B3%C5%82ka-matematyczne)
++
++- **Obozy**
++
++  Zimowe Szkoły Matematyki, Letni Obóz Naukowy, obozy przygotowawcze do OMJ i OM.
++
++  [Zimowe Szkoły](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/zimowa-szko%C5%82a-matematyki/zimowe-szko%C5%82y-matematyki)
++
++- **Konkursy przez cały rok**
++
++  Od Maratonu we wrześniu po Wings for Maths w wakacje — kalendarz na stronie „Dla uczniów”.
++
++- **Materiały do lekcji**
++
++  Archiwa zadań: Matematyka dla Myślących i tygodnik Trapez.
++
++  [Matematyka dla Myślących](http://www.math.uni.wroc.pl/matematyka-dla-myslacych)
++
++[Wszystko dla uczniów](/popularyzacja/uczniowie)
++
++## Przyszli nauczyciele
++
++Pracownia Dydaktyki i Popularyzacji Matematyki kształci studentów na specjalności nauczycielskiej i opiekuje się ich praktykami w szkołach — chętnie we współpracy ze szkołami z regionu.
++
++- [Specjalność nauczycielska](/studia/matematyka/matematyka-nauczycielska)
++- [Kto prowadzi popularyzację](/popularyzacja/organizatorzy)
+diff --git a/src/content/strony/popularyzacja/organizatorzy.md b/src/content/strony/popularyzacja/organizatorzy.md
+new file mode 100644
+index 0000000..b6d370e
+--- /dev/null
++++ b/src/content/strony/popularyzacja/organizatorzy.md
+@@ -0,0 +1,50 @@
++---
++tytul: "Organizatorzy"
++haslo: "Kto to robi"
++opis: "Fundacja Matematyków Wrocławskich, Portal, PTM i Pracownia Dydaktyki."
++bloki: true
++---
++
++## Kto to robi
++
++Popularyzację w Instytucie prowadzimy razem z partnerami. Każdy z nich ma własną stronę z terminami i zapisami.
++
++## Partnerzy
++
++- *od 2007*
++
++  **Fundacja Matematyków Wrocławskich**
++
++  Kółka, obozy, konkursy, szkolenia i wyjazdy dla nauczycieli, stypendia. Kontynuuje Fundację Stypendialną Matematyków Wrocławskich, działającą od 1993 roku. Siedziba w Instytucie.
++
++  [fmw.math.uni.wroc.pl](https://fmw.math.uni.wroc.pl/)
++
++- *od 2006*
++
++  **Wrocławski Portal Matematyczny**
++
++  Artykuły, ligi zadaniowe i zapowiedzi wydarzeń.
++
++  [matematyka.wroc.pl](https://www.matematyka.wroc.pl/)
++
++- *konkurs od 1967*
++
++  **Wrocławski Oddział PTM**
++
++  Konkurs na prace studenckie, zainicjowany przez Józefa Łukaszewicza, ucznia Steinhausa — jeden z najstarszych w Polsce.
++
++  [Konkurs PTM](https://ptm.math.uni.wroc.pl/konkurs/historia-konkursu)
++
++## W Instytucie
++
++- *pracownia*
++
++  **Pracownia Dydaktyki i Popularyzacji Matematyki**
++
++  Kształci przyszłych nauczycieli i opiekuje się praktykami. W praktyce łączy Instytut z Fundacją: koordynuje kółka, obozy, konkursy i seminarium I³.
++
++  [Struktura i zakłady →](/instytut/struktura)
++
++## Chcesz pomóc?
++
++Zajęcia na kółkach i obozach prowadzą także studenci i doktoranci Instytutu. Jeśli chcesz uczyć — napisz do Fundacji.
+diff --git a/src/content/strony/popularyzacja/uczniowie.md b/src/content/strony/popularyzacja/uczniowie.md
+new file mode 100644
+index 0000000..85c5d3d
+--- /dev/null
++++ b/src/content/strony/popularyzacja/uczniowie.md
+@@ -0,0 +1,114 @@
++---
++tytul: "Dla uczniów"
++haslo: "Kółka, obozy i zawody"
++opis: "Kółka w soboty od 3. klasy, Zimowe Szkoły i Letni Obóz, kilkanaście konkursów w roku szkolnym."
++bloki: true
++---
++
++## Matematyka po lekcjach
++
++W soboty na kółkach, zimą i latem na obozach, kilka razy w roku na zawodach. Zajęcia prowadzą studenci, doktoranci i pracownicy Instytutu razem z Fundacją Matematyków Wrocławskich.
++
++## Regularnie: kółka matematyczne
++
++Międzyszkolne Kółka Matematyczne spotykają się w Instytucie w soboty, zwykle co dwa tygodnie, po trzy godziny. Grupy według wieku i poziomu: od 3. klasy szkoły podstawowej do liceum, osobno grupy olimpijskie.
++
++- **Szkoła podstawowa**
++
++  Zagadki, gry, pierwsze dowody, a w 7–8 klasie przygotowanie do Olimpiady Matematycznej Juniorów.
++
++  Klasy: 3–8
++
++  Gdzie: Instytut, pl. Grunwaldzki 2/4
++
++  [Grupy i zapisy](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/k%C3%B3%C5%82ka-matematyczne/mi%C4%99dzyszkolne-k%C3%B3%C5%82ka-matematyczne)
++
++- **Szkoła ponadpodstawowa**
++
++  Zadania olimpijskie i matematyka spoza programu, przygotowanie do Olimpiady Matematycznej.
++
++  Klasy: licea i technika
++
++  Gdzie: Instytut, pl. Grunwaldzki 2/4
++
++  [Grupy i zapisy](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/k%C3%B3%C5%82ka-matematyczne/mi%C4%99dzyszkolne-k%C3%B3%C5%82ka-matematyczne)
++
++## Obozy
++
++- **Zimowe Szkoły Matematyki**
++
++  Od 1989 roku, zwykle w drugim tygodniu po feriach zimowych: wyjazd dla uzdolnionej młodzieży, na koniec Wielki Test Wiadomości.
++
++  Kiedy: zima
++
++  [Zimowe Szkoły](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/zimowa-szko%C5%82a-matematyki/zimowe-szko%C5%82y-matematyki)
++
++- **Letni Obóz Naukowy**
++
++  Od 2002 roku, na koniec roku szkolnego: od 4. klasy podstawówki do maturzystów.
++
++  Kiedy: czerwiec
++
++  [Letni Obóz](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/letni-ob%C3%B3z-naukowy/letni-ob%C3%B3z-naukowy)
++
++- **Obóz przygotowawczy do OMJ**
++
++  Dla uczniów 7–8 klasy: listopad i marzec (dla finalistów).
++
++  Kiedy: listopad, marzec
++
++  [Obóz OMJ](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/ob%C3%B3z-omj/ob%C3%B3z-przygotowawczy-do-omj)
++
++- **Obóz Olimpiady Matematycznej**
++
++  Dla licealistów przygotowujących się do Olimpiady Matematycznej.
++
++  [Obóz OM](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/ob%C3%B3z-om/ob%C3%B3z-olimpiady-matematycznej)
++
++## Rok szkolny w skrócie: zawody i konkursy
++
++| Kiedy | Co | Dla kogo |
++| --- | --- | --- |
++| wrzesień | [Wrocławski Maraton Matematyczny](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/maraton-matematyczny/maraton-matematyczny) (finał w Instytucie, Dolnośląski Festiwal Nauki) | SP 3 – liceum, też dorośli |
++| wrzesień | [Olimpiada Lingwistyki Matematycznej](https://olm.math.uni.wroc.pl/): etap szkolny | szkoły średnie |
++| początek października | [Matematyczne Marsze na Orientację](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/marsz-na-orientacj%C4%99/wroc%C5%82awskie-matematyczne-marsze-na-orientacj%C4%99-0) | SP 4 – liceum, rodziny |
++| listopad | [Konkurs KOMA](https://fmw.math.uni.wroc.pl/koma/konkurs-matematyczny-koma): zgłoszenia do połowy listopada | SP 3 – liceum |
++| styczeń | [Konkurs lingwistyczny „Wieża Babel”](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/lingwistyka-matematyczna/konkursy-z-lingwistyki-matematycznej) | szkoła podstawowa |
++| styczeń – marzec | [Memoriał Urszuli Marciniak](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/memoria%C5%82-urszuli-marciniak/memoria%C5%82-urszuli-marciniak): łamigłówki (finał w marcu) | SP 3 – liceum |
++| styczeń, luty | Zawody II stopnia [OMJ i OM](https://om.mimuw.edu.pl/) w Instytucie | uczestnicy olimpiad |
++| w ciągu roku | [Dolnośląskie Mecze Matematyczne](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/mecze-matematyczne/dolno%C5%9Bl%C4%85skie-mecze-matematyczne) · [Mistrzostwa Polski w Geometrii Elementarnej](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/geometria-elementarna/mistrzostwa-polski-w-geometrii-elementarnej) · [Origami „Żuraw”](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/matorigami-%C5%BCuraw/konkurs-matematycznego-origami-%C5%BCuraw) · [KoALa](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/koala/konkurs-koala-kombinatoryka-algorytmikalogika) | różne kategorie wiekowe |
++| pierwsza sobota wakacji | [Wings for Maths](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/wings-maths/wings-maths): charytatywny konkurs drużynowy w Instytucie | drużyny w każdym wieku |
++
++## Wykłady: Wrocławskie Spotkania Matematyczne
++
++Popularne wykłady w Instytucie w roku szkolnym, najczęściej w soboty. Dla uczniów, nauczycieli i studentów.
++
++- [Program Spotkań](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/spotkania-matematyczne/wroc%C5%82awskie-spotkania-matematyczne)
++
++## Do samodzielnej pracy
++
++- [Wrocławski Portal Matematyczny: ligi zadaniowe i artykuły](https://www.matematyka.wroc.pl/)
++- [Matematyka dla Myślących: materiały kursu (archiwum)](http://www.math.uni.wroc.pl/matematyka-dla-myslacych)
++- [Trapez: tygodnik zadaniowy 2015–2019 (archiwum)](http://www.math.uni.wroc.pl/~jwr/trapez/)
++
++## Jak zacząć
++
++1. **Wybierz**
++
++   Kółko, jeśli chcesz regularnie; zawody albo obóz, jeśli wolisz raz, a porządnie.
++
++2. **Zapisz się**
++
++   Zapisy są na stronach Fundacji Matematyków Wrocławskich; część zajęć jest bezpłatna, obozy i kółka są odpłatne.
++
++   [Fundacja Matematyków Wrocławskich](https://fmw.math.uni.wroc.pl/)
++
++3. **Przyjdź do Instytutu**
++
++   pl. Grunwaldzki 2/4, Wrocław. Kółka, wykłady i część zawodów odbywają się w salach Instytutu.
++
++## Dla rodziców
++
++> **Warto wiedzieć**
++>
++> Na kółka i obozy nie trzeba mieć olimpijskich wyników — wystarczy ciekawość. Najmłodsze grupy zaczynają od 3. klasy szkoły podstawowej. Zapisy, opłaty i stypendia prowadzi Fundacja Matematyków Wrocławskich.
+diff --git a/src/content/strony/popularyzacja/wszyscy.md b/src/content/strony/popularyzacja/wszyscy.md
+new file mode 100644
+index 0000000..4c0bc89
+--- /dev/null
++++ b/src/content/strony/popularyzacja/wszyscy.md
+@@ -0,0 +1,90 @@
++---
++tytul: "Dla wszystkich"
++haslo: "Wykłady, festiwal, zawody"
++opis: "Wrocławskie Spotkania, Dolnośląski Festiwal Nauki, zawody dla dorosłych i rodzin."
++bloki: true
++---
++
++## Matematyka bez egzaminów
++
++Wykłady, festiwal i zawody dla każdego, kto jest ciekawy — w każdym wieku, sam, z rodziną albo z drużyną.
++
++- **Wrocławskie Spotkania Matematyczne**
++
++  Popularne wykłady w Instytucie, najczęściej w soboty. Wykładają pracownicy i doktoranci Instytutu oraz goście z innych uczelni.
++
++  Kiedy: w roku szkolnym
++
++  Gdzie: Instytut, pl. Grunwaldzki 2/4
++
++  [Program Spotkań](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/spotkania-matematyczne/wroc%C5%82awskie-spotkania-matematyczne)
++
++- **Dolnośląski Festiwal Nauki**
++
++  Co roku we wrześniu wykłady, pokazy i warsztaty, także na Wydziale Matematyki i Informatyki.
++
++  Kiedy: wrzesień
++
++  [Festiwal](http://www.festiwal.wroc.pl)
++
++- **Wykłady online**
++
++  Nagrania wykładów otwartych i popularnych na kanale Instytutu.
++
++  [YouTube](https://www.youtube.com/channel/UCO0NMxdgMe2ZISJAbEcKH4w)
++
++- **Gry miejskie**
++
++  Matematyczne gry miejskie i terenowe we Wrocławiu, organizowane okazjonalnie.
++
++  [Gry miejskie](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/gry-miejskie/matematyczne-gry-miejskie-i-terenowe)
++
++## Rok w skrócie
++
++| Kiedy | Co | Dla kogo |
++| --- | --- | --- |
++| wrzesień | [Dolnośląski Festiwal Nauki](http://www.festiwal.wroc.pl) i finał [Maratonu Matematycznego](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/maraton-matematyczny/maraton-matematyczny) | wszyscy; Maraton: też dorośli |
++| początek października | [Matematyczne Marsze na Orientację](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/marsz-na-orientacj%C4%99/wroc%C5%82awskie-matematyczne-marsze-na-orientacj%C4%99-0) | kategoria „nauczyciele i rodziny” |
++| w roku szkolnym | [Wrocławskie Spotkania Matematyczne](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/spotkania-matematyczne/wroc%C5%82awskie-spotkania-matematyczne) | wszyscy |
++| w ciągu roku | [Mistrzostwa Polski w Geometrii Elementarnej](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/geometria-elementarna/mistrzostwa-polski-w-geometrii-elementarnej), [origami „Żuraw”](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/matorigami-%C5%BCuraw/konkurs-matematycznego-origami-%C5%BCuraw) | kategorie Open i dla dorosłych |
++| pierwsza sobota wakacji | [Wings for Maths](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/wings-maths/wings-maths): charytatywny konkurs drużynowy w Instytucie | drużyny w każdym wieku |
++
++## Zawody, w których startują dorośli i rodziny
++
++- **Marsze na Orientację**
++
++  Z mapą, kompasem i cyrklem: dwa punkty trzeba wyznaczyć samemu. Bezpłatnie.
++
++  [Marsze](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/marsz-na-orientacj%C4%99/wroc%C5%82awskie-matematyczne-marsze-na-orientacj%C4%99-0)
++
++- **Wings for Maths**
++
++  Drużyny w dowolnym składzie i wieku, w szczytnym celu.
++
++  [Wings for Maths](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/wings-maths/wings-maths)
++
++- **Maraton Matematyczny**
++
++  Kategorie „Dorośli profesjonaliści” i „Dorośli amatorzy”; gra trwa, aż zostanie jeden zawodnik.
++
++  [Maraton](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/maraton-matematyczny/maraton-matematyczny)
++
++- **Geometria i origami**
++
++  Kategoria Open w Mistrzostwach Polski w Geometrii Elementarnej i kategorie dorosłych w konkursie „Żuraw”.
++
++  [Geometria Elementarna](https://fmw.math.uni.wroc.pl/dla-uczni%C3%B3w/geometria-elementarna/mistrzostwa-polski-w-geometrii-elementarnej)
++
++## Do czytania
++
++- **Wrocławski Portal Matematyczny**
++
++  Artykuły, ciekawostki i zapowiedzi wydarzeń.
++
++  [Portal](https://www.matematyka.wroc.pl/)
++
++- **„Kalejdoskop matematyczny”**
++
++  Książka Hugona Steinhausa z 1938 roku, w której rysunki niemal zastępują dowody.
++
++[Wydarzenia w kalendarzu Instytutu](/kalendarz)
 diff --git a/src/data/popularyzacja.json b/src/data/popularyzacja.json
 index 8d1bd71..1c5422d 100644
 --- a/src/data/popularyzacja.json
