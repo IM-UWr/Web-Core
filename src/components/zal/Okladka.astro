@@ -61,6 +61,14 @@ const FORMY: Record<'wyd' | 'sem' | 'akt', { pl: [string, string, string]; en: [
 const liczby = (['wyd', 'sem', 'akt'] as const).filter((k) => ile[k] > 0).map((k) => ({
   key: k, n: ile[k], tekst: lang === 'en' ? FORMY[k].en[ile[k] === 1 ? 0 : 1] : odm(ile[k], FORMY[k].pl),
 }));
+// Zalecenie 28 (zlecenie 14): każde pokazanie strony głównej zeruje „pierwsze wejście” do działów — czyści
+// sessionStorage „im-wizyta-dzialy” (NaglowekZ.astro), więc następne wejście do działu znowu rysuje szkic i podpis.
+// Dopiero gdy strona jest naprawdę pokazana: w czasie wczytywania z wyprzedzeniem (prerender po najechaniu na link)
+// czekamy na prerenderingchange; także powrót „wstecz” z pamięci przeglądarki (pageshow z persisted). Zestaw ciekawostek
+// wizyty („im-ciek-zestaw”) zostaje.
+const ZERUJ = `(function(){function z(){try{sessionStorage.removeItem('im-wizyta-dzialy')}catch(e){}}` +
+  `if(document.prerendering)document.addEventListener('prerenderingchange',z,{once:true});else z();` +
+  `addEventListener('pageshow',function(e){if(e.persisted)z()})})();`;
 // Blok tytułu i skos (komputer), w linii na końcu okładki — zanim strona się narysuje (zlecenie 13, punkt 5: dawniej w module
 // okladka.ts, więc zdjęcie przesuwało się po pierwszej klatce), potem przy zmianie rozmiaru i po wczytaniu krojów.
 // „Instytut” i „Matematyczny” zaczynają się od lewej, a ich prawe końce leżą na jednej prostej o nachyleniu S (px w prawo na
@@ -133,5 +141,6 @@ const rozmiarOkl = (p: number) =>
   )}
   <a class="z-strzalka" href={cel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>{lang === 'en' ? 'Quick access' : 'Szybki dostęp'}{licznik && ` · ${licznik}`}</a>
   <script is:inline set:html={ULOZ} />
+  <script is:inline set:html={ZERUJ} />
 </section>
 <script>import '../../scripts/zal/okladka'; import '../../scripts/zal/menu'; import '../../scripts/zal/przejazd';</script>

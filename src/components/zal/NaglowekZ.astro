@@ -102,6 +102,7 @@ const tytulBanera = rodzaj === 'dzial' && P ? ((zMenu && (wybierz(zMenu, 'etykie
 // rysowania stąd, bez czekania na moduł (zlecenie 13, punkt 2): .z-czeka przy pierwszym wejściu w dział w tej wizycie
 // (zapis w sessionStorage „im-wizyta-dzialy” potwierdzony odczytem), gdy szkic widać — dwie klatki i .z-rysuj, czas startu
 // w data-z-start, zdarzenie „z-rysuj” dla modułu (tempo podpisu). Ograniczony ruch, powrót albo brak zapisu: .z-gotowe.
+// Strona główna czyści ten zapis (Okladka.astro, zlecenie 14, zalecenie 28) — po okładce dział znowu się rysuje.
 // Wczytywanie z wyprzedzeniem (prerender, punkt 4): w tle tylko odczyt (szkic czeka niewidoczny), zapis i rysowanie po
 // pokazaniu strony (prerenderingchange).
 const STAN = `(function(b){var k='im-wizyta-dzialy',dz=b.getAttribute('data-z-baner-dzialu'),sz=b.querySelector('.z-szkic');` +
