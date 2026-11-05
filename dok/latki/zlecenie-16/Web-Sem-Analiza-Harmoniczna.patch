@@ -1,0 +1,21 @@
+diff --git a/.pages.yml b/.pages.yml
+index b0eaa93..a22aaf0 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -96,6 +96,16 @@ content:
+     label: Tytuł referatu
+     type: string
+     required: true
++  - name: jezyk
++    label: Język referatu
++    description: Gdy polski, na stronie angielskiej po tytule pojawi się „(talk in Polish)”. Tytułu się nie tłumaczy.
++    type: select
++    options:
++      values:
++      - name: pl
++        label: polski
++      - name: en
++        label: angielski
+   - name: prelegent
+     label: Prelegent
+     type: string

@@ -1,0 +1,227 @@
+diff --git a/src/content/strony/studia/egzaminy-i-dyplom.md b/src/content/strony/studia/egzaminy-i-dyplom.md
+index 42449c1..6b17fb8 100644
+--- a/src/content/strony/studia/egzaminy-i-dyplom.md
++++ b/src/content/strony/studia/egzaminy-i-dyplom.md
+@@ -132,7 +132,7 @@ tresc_en: |
+   | [16, 18) | 3.0 |
+   | below 16 | 2.0 |
+ 
+-  The committee may lower the thresholds. Results are available in USOS (course "Pisemny egzamin magisterski").
++  The committee may lower the thresholds. Results are available in USOS (course "Pisemny egzamin magisterski", in English Written Master's Examination).
+ 
+   ### Master's exam syllabi
+ 
+@@ -171,12 +171,12 @@ tresc_en: |
+ 
+   | Step | February 2026 | June 2026 | September 2026 |
+   | --- | --- | --- | --- |
+-  | Exam registration and uploading the thesis to APD | 7.01–2.02 | 1.06–14.06 | 19.08–29.08 |
+-  | Supervisor approves the thesis in APD | 4.02 | 15.06 | 31.08 |
+-  | Reviews and grades in APD | 11.02 (bachelor's), 16.02 (master's) | 22.06 | 4.09 |
+-  | Written bachelor's exam (9:00–13:20) | 13.02, resit 20.02 | 29.06 | 10.09 |
+-  | Written master's exam (9:00–11:00) | 18.02 | 26.06 | 9.09 |
+-  | Oral master's exams | 20.02 | 30.06 | 11.09 |
++  | Exam registration and uploading the thesis to APD | 7 Jan – 2 Feb | 1–14 Jun | 19–29 Aug |
++  | Supervisor approves the thesis in APD | 4 Feb | 15 Jun | 31 Aug |
++  | Reviews and grades in APD | 11 Feb (bachelor's), 16 Feb (master's) | 22 Jun | 4 Sep |
++  | Written bachelor's exam (9:00–13:20) | 13 Feb, resit 20 Feb | 29 Jun | 10 Sep |
++  | Written master's exam (9:00–11:00) | 18 Feb | 26 Jun | 9 Sep |
++  | Oral master's exams | 20 Feb | 30 Jun | 11 Sep |
+ 
+   ## Past exam papers
+ 
+diff --git a/src/content/strony/studia/pierwszy-rok.md b/src/content/strony/studia/pierwszy-rok.md
+index 8fa6e2f..7052738 100644
+--- a/src/content/strony/studia/pierwszy-rok.md
++++ b/src/content/strony/studia/pierwszy-rok.md
+@@ -23,7 +23,7 @@ tresc_en: |
+   3. **Submit your oath and declaration in USOSweb.** After logging in to your student account you submit, electronically, the student oath and a statement that you have read the basic documents on your studies. This is the basis for the Faculty Office to issue your student ID card. The Faculty Office sees the submitted oath only on the following day. Failing to submit the oath in USOS within 14 days of the start of the semester is grounds for removal from the list of students (§ 56 of the [Study Regulations](https://uwr.edu.pl/wp-content/uploads/2024/09/Uchwala-Nr-68_2024-Senatu-UWr-z-2024-04-24-w-sprawie-regulaminu-studiow-na-Uniwersytecie-Wroclawskim-1.pdf)).
+   4. **Collect your student ID card** at the Faculty Office (dziekanat WMI, Mon–Thu 11:00–14:00), bringing your identity card. This applies to those who paid for the card in time. Certificates of student status are also issued there.
+   5. **Complete the BHP training** — an online course, available in 2026 from 15 September to 31 October. It is compulsory.
+-  6. **Check your groups** in USOSweb: *Mój USOSweb* → *Grupy zajęciowe*.
++  6. **Check your groups** in USOSweb: *Mój USOSweb* (My USOSweb) → *Grupy zajęciowe* (Class groups).
+   7. **Connect to eduroam Wi-Fi** — login `student_ID_number@uwr.edu.pl` and your Office 365 password; instructions: [Wireless network access](/en/instytut/infrastruktura-informatyczna/siec-bezprzewodowa).
+   8. **Get a library account** — complete the [library training](https://wmi.uwr.edu.pl/biblioteka-wydzialowa-szkolenie/) (an online course and a test; the access key is given on the training page).
+   9. **Get a locker key** from the porter's desk. There is usually one locker for two students.
+@@ -56,22 +56,22 @@ tresc_en: |
+ 
+   | Date | What |
+   | --- | --- |
+-  | 29.09.2026 | orientation day and matriculation (held) |
+-  | 1.10.2026 | inauguration of the academic year |
+-  | 2.10.2026 | classes begin |
++  | 29 Sep 2026 | orientation day and matriculation (held) |
++  | 1 Oct 2026 | inauguration of the academic year |
++  | 2 Oct 2026 | classes begin |
+   | within 14 days of the start of the semester | oath and declaration in USOSweb |
+   | by the end of the 2nd week of classes | lecturers announce the deadline for switching from an extended to a standard course (form B3) |
+-  | 19.10.2026 | the tutoring room opens |
+-  | **31.10.2026** | **end of the BHP training** |
+-  | 12.11 and 13.11.2026 | Rector's days (13.11 — University Day) |
+-  | 30.11.2026 | deadline for withdrawing from a course (form A1, once per degree) |
+-  | 18.12.2026 (Friday) | Wednesday classes are held |
+-  | 21.12.2026 – 6.01.2027 | Christmas break |
+-  | 31.12.2026 | declaration of the teaching specialisation (form C1) |
+-  | 5.02.2027 | last day of classes |
+-  | 6.02 – 16.02.2027 | exam session |
+-  | 17.02 – 23.02.2027 | resit session |
+-  | 24.02.2027 | summer semester begins (registration for semester 2 opens 2–4 days earlier) |
++  | 19 Oct 2026 | the tutoring room opens |
++  | **31 Oct 2026** | **end of the BHP training** |
++  | 12 and 13 Nov 2026 | Rector's days (13 Nov — University Day) |
++  | 30 Nov 2026 | deadline for withdrawing from a course (form A1, once per degree) |
++  | 18 Dec 2026 (Friday) | Wednesday classes are held |
++  | 21 Dec 2026 – 6 Jan 2027 | Christmas break |
++  | 31 Dec 2026 | declaration of the teaching specialisation (form C1) |
++  | 5 Feb 2027 | last day of classes |
++  | 6–16 Feb 2027 | exam session |
++  | 17–23 Feb 2027 | resit session |
++  | 24 Feb 2027 | summer semester begins (registration for semester 2 opens 2–4 days earlier) |
+ 
+   The full calendar of the year: [Academic year](/en/studia/rok-akademicki).
+ 
+@@ -81,13 +81,13 @@ tresc_en: |
+ 
+   | Course | Main session | Resit session |
+   | --- | --- | --- |
+-  | Analiza matematyczna 1 | Mon 8.02, 8:30–13:00, HS, WS | Wed 17.02, 9:00–13:30, HS |
+-  | Analiza matematyczna I | Wed 10.02, 9:00–13:00, HS | Wed 17.02, 9:00–13:00, WS |
+-  | Analiza matematyczna 1 (AI) | Tue 9.02, 9:00–13:00, WS | Wed 17.02, 9:00–13:00, EM |
+-  | Wstęp do matematyki R | Thu 11.02, 9:00–12:00, WS | Tue 23.02, 9:00–12:00, 601 |
+-  | Wstęp do matematyki | Fri 12.02, 9:00–12:00, HS, WS, EM | Tue 23.02, 9:00–12:00, HS |
+-  | Algebra liniowa 1R | Mon 15.02, 14:30–17:30, HS | Fri 19.02, 9:00–12:00, WS |
+-  | Algebra liniowa 1 and Algebra liniowa 1 (AI) | Tue 16.02, 9:00–12:30, HS, WS, EM | Algebra liniowa 1: Fri 19.02, 9:00–12:30, HS |
++  | Analiza matematyczna 1 (Advanced calculus 1) | Mon 8 Feb, 8:30–13:00, HS, WS | Wed 17 Feb, 9:00–13:30, HS |
++  | Analiza matematyczna I (Advanced calculus I) | Wed 10 Feb, 9:00–13:00, HS | Wed 17 Feb, 9:00–13:00, WS |
++  | Analiza matematyczna 1 (AI) | Tue 9 Feb, 9:00–13:00, WS | Wed 17 Feb, 9:00–13:00, EM |
++  | Wstęp do matematyki R (Introduction to abstract mathematics R) | Thu 11 Feb, 9:00–12:00, WS | Tue 23 Feb, 9:00–12:00, 601 |
++  | Wstęp do matematyki (Introduction to abstract mathematics) | Fri 12 Feb, 9:00–12:00, HS, WS, EM | Tue 23 Feb, 9:00–12:00, HS |
++  | Algebra liniowa 1R (Linear algebra 1R) | Mon 15 Feb, 14:30–17:30, HS | Fri 19 Feb, 9:00–12:00, WS |
++  | Algebra liniowa 1 (Linear algebra 1) and Algebra liniowa 1 (AI) | Tue 16 Feb, 9:00–12:30, HS, WS, EM | Algebra liniowa 1: Fri 19 Feb, 9:00–12:30, HS |
+ 
+   The label (AI) in the timetable marks the versions of courses for the SIAD programme.
+ 
+@@ -106,15 +106,15 @@ tresc_en: |
+   Common to everyone:
+ 
+   - **Wstęp do kombinatoryki** (Introduction to combinatorics) — compulsory for everyone except students of the *theoretical mathematics* specialisation. Everyone is enrolled in it, but those who already declare that they plan to take the theoretical specialisation may drop it.
+-  - **Warsztat informatyczny matematyka** (Computer skills workshop) — teaches the basic tools for using the Institute's computer network efficiently; held remotely in two groups.
++  - **Warsztat informatyczny matematyka** (Computing Workshop for Mathematicians) — teaches the basic tools for using the Institute's computer network efficiently; held remotely in two groups.
+ 
+   The lectures Analiza matematyczna I and Algebra liniowa 1R are shared with ISIM students; mathematics students have separate exercise groups.
+ 
+   ### Semester 2 (mathematics)
+ 
+-  - Analiza matematyczna 2 or Analiza matematyczna II
+-  - Algebra liniowa 2 or Algebra liniowa 2R
+-  - Programowanie 1 (Python) — compulsory for everyone
++  - Analiza matematyczna 2 (Advanced calculus 2) or Analiza matematyczna II (Advanced calculus II)
++  - Algebra liniowa 2 (Linear algebra 2) or Algebra liniowa 2R (Linear algebra 2R)
++  - Programowanie 1 (Python) (Programming 1 in Python) — compulsory for everyone
+   - Topologia or Topologia R — compulsory except for those who have declared the teaching specialisation (they have a different list of courses) and those who choose the general module (a humanities course is recommended for them, though they can also take Topology)
+   - Przegląd aktuarialno-finansowy (actuarial and financial overview, as workshops) — compulsory for the actuarial and financial specialisation, an elective for everyone else
+ 
+@@ -122,7 +122,7 @@ tresc_en: |
+ 
+   ### SIAD and ISIM
+ 
+-  - **SIAD:** in semesters 1–2 — mathematical analysis and linear algebra (in a version for this programme), introduction to mathematics, Python programming and data visualisation, and the basic AI workshop. Classes are in the Institute's timetable (groups marked "tylko dla SIAD"). In the first semester you are enrolled by the teaching office. More: [AI in Data Science](/en/studia/siad).
++  - **SIAD:** in semesters 1–2 — mathematical analysis and linear algebra (in a version for this programme), introduction to mathematics, Python programming and data visualisation, and the basic AI workshop. Classes are in the Institute's timetable (groups marked "tylko dla SIAD", i.e. SIAD students only). In the first semester you are enrolled by the teaching office. More: [AI in Data Science](/en/studia/siad).
+   - **ISIM:** the compulsory courses are Logic for Computer Science and Analiza matematyczna I; recommended ones include Algebra liniowa 1R. In the first semester you register for the Institute's courses yourself in USOSweb, and the tutors review your choices. Students admitted to both ISIM and mathematics did not take the qualifying test. More: [ISIM](/en/studia/isim).
+ 
+   ## Standard or extended level?
+@@ -150,7 +150,7 @@ tresc_en: |
+   - Changes made by the teaching office (limits, new groups, manual enrolment) appear in USOSweb only on the next day — the data are migrated once a day, around midnight.
+   - After round II you can withdraw only by switching from an extended to a standard course (B3) or, **once per degree**, via form A1 — by 30 November (winter) or 30 April (summer).
+   - To take a course without meeting its prerequisites, submit form B1 before the semester; to join a full group — form B2 (from round II). Forms: [Classes and office hours](/en/studia/zajecia).
+-  - Plan your timetable in *Mój USOSweb* → *Plany użytkownika*, check the prerequisites of courses (in USOS, section *Założenia*) and do not take on too much.
++  - Plan your timetable in *Mój USOSweb* → *Plany użytkownika* (User timetables), check the prerequisites of courses (in USOS, section *Założenia*) and do not take on too much.
+   - First-year students do not register for physical education in the first semester. Foreign language courses in the mathematics programme start in semester 3.
+ 
+   Rules: [Course registration rules at the Mathematical Institute (PDF, Polish)](https://www.math.uni.wroc.pl/sites/default/files/zasady-rejestracji.pdf).
+diff --git a/src/content/strony/studia/sprawy-studenckie.md b/src/content/strony/studia/sprawy-studenckie.md
+index 8bd7a10..115e3e4 100644
+--- a/src/content/strony/studia/sprawy-studenckie.md
++++ b/src/content/strony/studia/sprawy-studenckie.md
+@@ -43,7 +43,7 @@ tresc_en: |
+   | First-year coordinator | Dr Jan Kraszewski | [Jan.Kraszewski@math.uni.wroc.pl](mailto:Jan.Kraszewski@math.uni.wroc.pl), [First year](/en/studia/pierwszy-rok) |
+   | Specialisation coordinators | — | see [Specialisations](/en/studia/matematyka#specjalnosci) |
+   | Erasmus+ coordinator | Dr Motiejus Valiunas | room 306, [Motiejus.Valiunas@math.uni.wroc.pl](mailto:Motiejus.Valiunas@math.uni.wroc.pl) |
+-  | MOST coordinator | Prof. dr hab. Wojciech Młotkowski | [Wojciech.Mlotkowski@math.uni.wroc.pl](mailto:Wojciech.Mlotkowski@math.uni.wroc.pl) |
++  | MOST coordinator | Prof. Wojciech Młotkowski | [Wojciech.Mlotkowski@math.uni.wroc.pl](mailto:Wojciech.Mlotkowski@math.uni.wroc.pl) |
+   | Doctoral College of Mathematics | Ewa Lamch | phone 71 375 7494, [Ewa.Lamch@math.uni.wroc.pl](mailto:Ewa.Lamch@math.uni.wroc.pl) |
+   | Dean's Plenipotentiary for the Safety of Students and PhD Students | Dr hab. Ziemowit Rzeszotnik | room 706, [Ziemowit.Rzeszotnik@math.uni.wroc.pl](mailto:Ziemowit.Rzeszotnik@math.uni.wroc.pl) |
+   | Dean's Plenipotentiary for Equal Treatment and Anti-Discrimination | Dr Paweł Laskoś-Grabowski | see [Faculty authorities](https://wmi.uwr.edu.pl/wladze-wydzialu/) |
+@@ -154,7 +154,7 @@ tresc_en: |
+ 
+   ### MOST
+ 
+-  Exchange with Polish universities for one semester or a full year, free of charge. Recruitment: 15 April – 15 May (winter semester or full year) and **31 October – 30 November** (summer semester). Coordinator: Prof. dr hab. Wojciech Młotkowski. Details: [MOST programme](/en/studia/program-most).
++  Exchange with Polish universities for one semester or a full year, free of charge. Recruitment: 15 April – 15 May (winter semester or full year) and **31 October – 30 November** (summer semester). Coordinator: Prof. Wojciech Młotkowski. Details: [MOST programme](/en/studia/program-most).
+ 
+   ### ISEP and other programmes
+ 
+@@ -163,7 +163,7 @@ tresc_en: |
+   ## Careers and jobs
+ 
+   - **Job, internship and traineeship offers** are published in the [news](/en/aktualnosci) (type "Career").
+-  - **Employers** wishing to publish an offer should send it to Dr Jan Kraszewski ([Jan.Kraszewski@math.uni.wroc.pl](mailto:Jan.Kraszewski@math.uni.wroc.pl)). Business contact coordinators of the Institute: Prof. dr hab. Ewa Damek ([Ewa.Damek@math.uni.wroc.pl](mailto:Ewa.Damek@math.uni.wroc.pl)), Dr inż. Przemysław Klusik ([Przemyslaw.Klusik@math.uni.wroc.pl](mailto:Przemyslaw.Klusik@math.uni.wroc.pl)), Dr hab. Krzysztof Topolski ([Krzysztof.Topolski@math.uni.wroc.pl](mailto:Krzysztof.Topolski@math.uni.wroc.pl)).
++  - **Employers** wishing to publish an offer should send it to Dr Jan Kraszewski ([Jan.Kraszewski@math.uni.wroc.pl](mailto:Jan.Kraszewski@math.uni.wroc.pl)). Business contact coordinators of the Institute: Prof. Ewa Damek ([Ewa.Damek@math.uni.wroc.pl](mailto:Ewa.Damek@math.uni.wroc.pl)), Dr Przemysław Klusik ([Przemyslaw.Klusik@math.uni.wroc.pl](mailto:Przemyslaw.Klusik@math.uni.wroc.pl)), Dr hab. Krzysztof Topolski ([Krzysztof.Topolski@math.uni.wroc.pl](mailto:Krzysztof.Topolski@math.uni.wroc.pl)).
+   - [UWr Career Office](https://biurokarier.uwr.edu.pl/) (ul. Kuźnicza 49A) — [job offers](https://biurokarier.uwr.edu.pl/jobs), [traineeship programmes](https://biurokarier.uwr.edu.pl/programy-stazowe/), [career counselling](https://biurokarier.uwr.edu.pl/doradztwo-konsultacje/).
+ 
+   ## Student government and student clubs
+@@ -176,7 +176,7 @@ tresc_en: |
+   ## Support
+ 
+   - **Tutoring room** (room 202) — senior students help with mathematical problems, especially first-year students ([details](/en/aktualnosci/2026-10-17-rusza-tutornia)).
+-  - **Academic ombudspersons of WMI** — students, PhD students and staff can turn to them with problems concerning the institute/faculty community. The ombudsperson listens, diagnoses the problem and gives advice or help, acting confidentially, impartially, informally and independently of the university authorities. Prof. dr hab. Ewa Damek — [edamek@math.uni.wroc.pl](mailto:edamek@math.uni.wroc.pl), room 901 (Mathematical Institute); Jarosław Byrka — [jaroslaw.byrka@cs.uni.wroc.pl](mailto:jaroslaw.byrka@cs.uni.wroc.pl), room 244 (Institute of Computer Science). It is best to arrange contact by e-mail first ([details](https://wmi.uwr.edu.pl/wladze-wydzialu/)).
++  - **Academic ombudspersons of WMI** — students, PhD students and staff can turn to them with problems concerning the institute/faculty community. The ombudsperson listens, diagnoses the problem and gives advice or help, acting confidentially, impartially, informally and independently of the university authorities. Prof. Ewa Damek — [edamek@math.uni.wroc.pl](mailto:edamek@math.uni.wroc.pl), room 901 (Mathematical Institute); Jarosław Byrka — [jaroslaw.byrka@cs.uni.wroc.pl](mailto:jaroslaw.byrka@cs.uni.wroc.pl), room 244 (Institute of Computer Science). It is best to arrange contact by e-mail first ([details](https://wmi.uwr.edu.pl/wladze-wydzialu/)).
+   - **Student Rights Ombudsperson** (UWr Student Government): [rps@uwr.edu.pl](mailto:rps@uwr.edu.pl); **anti-discrimination ombudsperson** of UWr: [rownosc@uwr.edu.pl](mailto:rownosc@uwr.edu.pl).
+   - **[Support and Accessibility Office](https://uwr.edu.pl/pomocny-uwr/osoby-z-niepelnosprawnosciami/biuro-wsparcia-i-dostepnosci/)** — for students with disabilities and special needs: ul. Kuźnicza 49/55, rooms 19 and 20, open 9:00–14:00, [niepelnosprawni@uwr.edu.pl](mailto:niepelnosprawni@uwr.edu.pl), phone 71 375 2664 (please arrange a meeting in advance). Forms of support include a teaching assistant, transport within Wrocław, individual foreign language classes, adapted teaching materials, temporary loan of specialist equipment and psychological consultations (Rector's Order No. 68/2026).
+   - **[Psychological support](https://uwr.edu.pl/pomocny-uwr/pomoc-psychologiczna/)** — psychological consultations at the Support and Accessibility Office for members of the UWr community, in particular students with a certified disability and anyone in a mental health crisis (registration from your @uwr.edu.pl address: [poradnia.psychologiczna@uwr.edu.pl](mailto:poradnia.psychologiczna@uwr.edu.pl)) and free help at the [Psychological Consultation and Counselling Unit](https://uwr.edu.pl/pomocny-uwr/pomoc-psychologiczna/pracownia-konsultacji-i-poradnictwa-psychologicznego/) run by psychology students.
+diff --git a/src/content/strony/studia/zajecia.md b/src/content/strony/studia/zajecia.md
+index 3708379..09f91fd 100644
+--- a/src/content/strony/studia/zajecia.md
++++ b/src/content/strony/studia/zajecia.md
+@@ -100,10 +100,10 @@ tresc_en: |
+ 
+   ## Standard and extended versions
+ 
+-  The key compulsory courses of the first semesters are taught at two levels: a **standard** and an **extended version** (marked with the letter R or a Roman numeral, e.g. *Algebra liniowa 1R*, *Analiza matematyczna I*). Both cover a comparable range of material, but the extended version treats it in more depth — with complete proofs of most theorems and more emphasis on harder problems.
++  The key compulsory courses of the first semesters are taught at two levels: a **standard** and an **extended version** (marked with the letter R or a Roman numeral, e.g. *Algebra liniowa 1R* (Linear algebra 1R), *Analiza matematyczna I* (Advanced calculus I)). Both cover a comparable range of material, but the extended version treats it in more depth — with complete proofs of most theorems and more emphasis on harder problems.
+ 
+   - **1st semester (mathematics):** students are assigned to a version on the basis of their secondary-school final exam results and the qualification test, also taking into account the preferences given during the test.
+-  - **From the 2nd semester:** you choose the version yourself, separately for each course. Choosing the extended version of a course in the *Analiza matematyczna* or *Algebra liniowa* sequence after completing the standard version of the previous course requires consulting the lecturer of the extended version first.
++  - **From the 2nd semester:** you choose the version yourself, separately for each course. Choosing the extended version of a course in the *Analiza matematyczna* (Advanced calculus) or *Algebra liniowa* (Linear algebra) sequence after completing the standard version of the previous course requires consulting the lecturer of the extended version first.
+   - Choosing the standard version of the compulsory courses of semesters 1–3 does not close any path, but the standard version of some later courses may limit your choice of specialisation. Recommendations of the specialisation coordinators: Table 7 in the [Guide to the bachelor's curriculum (PDF, Polish)](/pliki/studia/przewodnik-mt-lic.pdf) (curriculum from 2026/27).
+   - You cannot receive ECTS credits for both versions of the same course.
+ 
+@@ -131,7 +131,7 @@ tresc_en: |
+ 
+   1. switching from the extended to the standard version — Form B3 (see above);
+   2. withdrawal from an e-learning course run with Hasselt University — Form H2 (see [E-learning](#e-learning));
+-  3. **one-time withdrawal from a course** — once per degree (once in the bachelor's and once in the master's programme), by **30 November** (winter semester) or **30 April** (summer semester): Form A1 (bachelor's) or A2 (master's). For courses with a team project (e.g. *Zespołowy projekt specjalnościowy*) the lecturer's consent is also required. This right is independent of the corresponding right at the Institute of Computer Science.
++  3. **one-time withdrawal from a course** — once per degree (once in the bachelor's and once in the master's programme), by **30 November** (winter semester) or **30 April** (summer semester): Form A1 (bachelor's) or A2 (master's). For courses with a team project (e.g. *Zespołowy projekt specjalnościowy*, in English Specialisation team project) the lecturer's consent is also required. This right is independent of the corresponding right at the Institute of Computer Science.
+ 
+   ## Repeating a course
+ 
+@@ -183,8 +183,8 @@ tresc_en: |
+ 
+   Every course includes online Q&A (Questions & Answers) sessions, and attendance is compulsory. Q&A sessions in the winter semester 2026/27:
+ 
+-  - *Computer Intensive Methods*: Thu 22.10 (18:00–19:00), Thu 19.11 (18:00–19:00), Thu 26.11 (19:00–20:00), Thu 17.12 (19:30–21:00)
+-  - *Bayesian Data Analysis*: Mon 19.10 (20:00–21:30), Fri 20.11 (19:00–20:00), Tue 1.12 (20:00–21:30), Mon 21.12 (20:00–21:30)
++  - *Computer Intensive Methods*: Thu 22 Oct (18:00–19:00), Thu 19 Nov (18:00–19:00), Thu 26 Nov (19:00–20:00), Thu 17 Dec (19:30–21:00)
++  - *Bayesian Data Analysis*: Mon 19 Oct (20:00–21:30), Fri 20 Nov (19:00–20:00), Tue 1 Dec (20:00–21:30), Mon 21 Dec (20:00–21:30)
+ 
+   Details: [E-learning courses (PDF)](/pliki/studia/zajecia/e-learnings.pdf).
+ 
+@@ -231,7 +231,7 @@ tresc_en: |
+   | Matter | Who | Contact |
+   | --- | --- | --- |
+   | Registration and withdrawals, timetable | Teaching office of the Mathematical Institute — Justyna Jędrzejewska-Idczak | room 315, phone 71 375 7436, [Justyna.Jedrzejewska-Idczak@uwr.edu.pl](mailto:Justyna.Jedrzejewska-Idczak@uwr.edu.pl) |
+-  | Consent to enrol without meeting the prerequisites (B1) | Deputy Director for Teaching — dr Tomasz Elsner | room 305, [Tomasz.Elsner@math.uni.wroc.pl](mailto:Tomasz.Elsner@math.uni.wroc.pl) |
++  | Consent to enrol without meeting the prerequisites (B1) | Deputy Director for Teaching — Dr Tomasz Elsner | room 305, [Tomasz.Elsner@math.uni.wroc.pl](mailto:Tomasz.Elsner@math.uni.wroc.pl) |
+   | Validity of credits, passing the semester, requests to the Dean | Faculty Office (WMI) | [Student affairs](/en/studia/sprawy-studenckie) |
+ opublikowany: true
+ ---

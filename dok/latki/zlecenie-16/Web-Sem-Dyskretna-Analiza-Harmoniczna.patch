@@ -1,0 +1,32 @@
+diff --git a/.pages.yml b/.pages.yml
+index dc21ca3..f9d1f55 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -96,6 +96,16 @@ content:
+     label: Tytuł referatu
+     type: string
+     required: true
++  - name: jezyk
++    label: Język referatu
++    description: Gdy polski, na stronie angielskiej po tytule pojawi się „(talk in Polish)”. Tytułu się nie tłumaczy.
++    type: select
++    options:
++      values:
++      - name: pl
++        label: polski
++      - name: en
++        label: angielski
+   - name: prelegent
+     label: Prelegent
+     type: string
+diff --git a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md
+index 0de7ee7..a0bd579 100644
+--- a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md
++++ b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md
+@@ -1,5 +1,6 @@
+ ---
+ tytul: "Kwantowe grafy Knesera"
++jezyk: pl
+ prelegent: "Igor Chełstowski"
+ afiliacja: "Uniwersytet Warszawski"
+ afiliacja_en: "University of Warsaw"

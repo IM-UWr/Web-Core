@@ -1,0 +1,43 @@
+diff --git a/.pages.yml b/.pages.yml
+index 24eab17..c275fd9 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -96,6 +96,16 @@ content:
+     label: Tytuł referatu
+     type: string
+     required: true
++  - name: jezyk
++    label: Język referatu
++    description: Gdy polski, na stronie angielskiej po tytule pojawi się „(talk in Polish)”. Tytułu się nie tłumaczy.
++    type: select
++    options:
++      values:
++      - name: pl
++        label: polski
++      - name: en
++        label: angielski
+   - name: prelegent
+     label: Prelegent
+     type: string
+diff --git a/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md b/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md
+index 07405c2..1d8b09e 100644
+--- a/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md
++++ b/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md
+@@ -1,5 +1,6 @@
+ ---
+ tytul: "Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji"
++jezyk: pl
+ prelegent: "Grzegorz Karch"
+ afiliacja: "Uniwersytet Wrocławski"
+ afiliacja_en: "University of Wrocław"
+diff --git a/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md b/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md
+index 8f9f51e..6118f40 100644
+--- a/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md
++++ b/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md
+@@ -1,5 +1,6 @@
+ ---
+ tytul: "Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji"
++jezyk: pl
+ prelegent: "Grzegorz Karch"
+ afiliacja: "Uniwersytet Wrocławski"
+ afiliacja_en: "University of Wrocław"

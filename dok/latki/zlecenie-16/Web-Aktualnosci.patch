@@ -1,0 +1,412 @@
+diff --git a/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md b/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md
+index c595d95..f63b1f7 100644
+--- a/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md
++++ b/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md
+@@ -5,11 +5,11 @@ rodzaj: "sukces"
+ zajawka: "Dr inż. Błażej Wróbel otrzymał nagrodę Polskiego Towarzystwa Matematycznego dla Młodych Matematyków za cykl sześciu prac."
+ zdjecie: "/pliki/aktualnosci/b_wrobel.jpg"
+ zdjecie_opis: "Dr inż. Błażej Wróbel"
+-zdjecie_opis_en: "Dr inż. Błażej Wróbel"
++zdjecie_opis_en: "Dr Błażej Wróbel"
+ tytul_en: "Błażej Wróbel receives the Polish Mathematical Society Prize"
+-zajawka_en: "Dr inż. Błażej Wróbel has received the Polish Mathematical Society Prize for Young Mathematicians for a series of six papers."
++zajawka_en: "Dr Błażej Wróbel has received the Polish Mathematical Society Prize for Young Mathematicians for a series of six papers."
+ tresc_en: |
+-  Dr inż. **Błażej Wróbel** of the Mathematical Institute of the University of Wrocław has received the [Polish Mathematical Society Prize for Young Mathematicians](http://www.ptm.org.pl/zawartosc/b%C5%82a%C5%BCej-wr%C3%B3bel-laureatem-nagrody-ptm-dla-m%C5%82odych-matematyk%C3%B3w-za-2014) for a series of six papers in harmonic analysis and operator theory.
++  Dr **Błażej Wróbel** of the Mathematical Institute of the University of Wrocław has received the [Polish Mathematical Society Prize for Young Mathematicians](http://www.ptm.org.pl/zawartosc/b%C5%82a%C5%BCej-wr%C3%B3bel-laureatem-nagrody-ptm-dla-m%C5%82odych-matematyk%C3%B3w-za-2014) for a series of six papers in harmonic analysis and operator theory.
+ 
+   The awarded papers make a significant contribution to the theory of multivariate multipliers for commuting operators and of general Riesz transforms. Particularly noteworthy is the solution of open problems concerning the validity of Marcinkiewicz-type theorems for systems of commuting operators, including those related to the system of Ornstein–Uhlenbeck operators.
+ zaklad: "analiza-funkcjonalna"
+diff --git a/src/content/aktualnosci/2016-06-09-nasze-studia-na-4-miejscu-w-polsce.md b/src/content/aktualnosci/2016-06-09-nasze-studia-na-4-miejscu-w-polsce.md
+index e9a2c07..0a235a0 100644
+--- a/src/content/aktualnosci/2016-06-09-nasze-studia-na-4-miejscu-w-polsce.md
++++ b/src/content/aktualnosci/2016-06-09-nasze-studia-na-4-miejscu-w-polsce.md
+@@ -7,9 +7,9 @@ dla:
+   - "studenci"
+ zajawka: "W rankingu Perspektyw kierunek matematyka na Wydziale Matematyki i Informatyki UWr zajął 4. miejsce, awansując o dwie pozycje."
+ tytul_en: "Our programme ranked 4th in Poland"
+-zajawka_en: "In the Perspektywy ranking, the mathematics programme at the Faculty of Mathematics and Computer Science took 4th place, moving up two positions."
++zajawka_en: "In the Perspektywy (Perspectives) ranking, the mathematics programme at the Faculty of Mathematics and Computer Science took 4th place, moving up two positions."
+ tresc_en: |
+-  The [*Perspektywy*](http://perspektywy.pl) Education Foundation has prepared its university ranking for the 17th time, assessing public and private universities and higher vocational schools. The ranking is intended mainly for secondary school students choosing their studies. The **mathematics** programme run by the Faculty of Mathematics and Computer Science of the University of Wrocław achieved a high fourth place, moving up two positions.
++  The [*Perspektywy*](http://perspektywy.pl) (Perspectives) Education Foundation has prepared its university ranking for the 17th time, assessing public and private universities and higher vocational schools. The ranking is intended mainly for secondary school students choosing their studies. The **mathematics** programme run by the Faculty of Mathematics and Computer Science of the University of Wrocław achieved a high fourth place, moving up two positions.
+ 
+   The detailed ranking and methodology are available on the [*Perspektywy*](http://perspektywy.pl/RSW2016/ranking-kierunkow-studiow/kierunki-scisle/matematyka) website.
+ opublikowany: true
+diff --git a/src/content/aktualnosci/2016-09-20-barbara-jasiulis-goldyn-laureatka-konkursu-powroty.md b/src/content/aktualnosci/2016-09-20-barbara-jasiulis-goldyn-laureatka-konkursu-powroty.md
+index 0496a0c..bc405d6 100644
+--- a/src/content/aktualnosci/2016-09-20-barbara-jasiulis-goldyn-laureatka-konkursu-powroty.md
++++ b/src/content/aktualnosci/2016-09-20-barbara-jasiulis-goldyn-laureatka-konkursu-powroty.md
+@@ -8,10 +8,10 @@ zajawka: "Dr Barbara Jasiulis-Gołdyn została laureatką pierwszej edycji konku
+ zdjecie: "/pliki/aktualnosci/jasiulis-goldyn.jpg"
+ zdjecie_opis: "Dr Barbara Jasiulis-Gołdyn"
+ zdjecie_opis_en: "Dr Barbara Jasiulis-Gołdyn"
+-tytul_en: "Barbara Jasiulis-Gołdyn wins the POWROTY competition"
++tytul_en: "Barbara Jasiulis-Gołdyn wins the POWROTY (Homing) competition"
+ zajawka_en: "Dr Barbara Jasiulis-Gołdyn has won the first edition of the Foundation for Polish Science POWROTY (Homing) competition."
+ tresc_en: |
+-  Dr **Barbara Jasiulis-Gołdyn** has won the first edition of the POWROTY competition organised by the Foundation for Polish Science.
++  Dr **Barbara Jasiulis-Gołdyn** has won the first edition of the POWROTY (Homing) competition organised by the Foundation for Polish Science.
+ 
+   Her project [*Pierwszego rzędu maksymalne procesy autoregresji typu Kendalla i ich zastosowania*](/pliki/aktualnosci/opis-popularnonukowy_bjasiulis-goldyn_2.pdf) (First order Kendall maximal autoregressive processes and their applications; popular-science description in Polish) was selected.
+ 
+diff --git a/src/content/aktualnosci/2017-06-13-matematyka-na-uwr-czwarta-w-polsce-w-rankingu-perspektywy-2017.md b/src/content/aktualnosci/2017-06-13-matematyka-na-uwr-czwarta-w-polsce-w-rankingu-perspektywy-2017.md
+index d06db14..04f8c80 100644
+--- a/src/content/aktualnosci/2017-06-13-matematyka-na-uwr-czwarta-w-polsce-w-rankingu-perspektywy-2017.md
++++ b/src/content/aktualnosci/2017-06-13-matematyka-na-uwr-czwarta-w-polsce-w-rankingu-perspektywy-2017.md
+@@ -3,10 +3,10 @@ tytul: "Matematyka na UWr czwarta w Polsce w rankingu Perspektywy 2017"
+ data: "2017-06-13"
+ rodzaj: "sukces"
+ zajawka: "W Rankingu Kierunków Studiów Perspektywy 2017 matematyka na UWr utrzymała 4. miejsce w Polsce."
+-tytul_en: "Mathematics at the University of Wrocław fourth in Poland in the Perspektywy 2017 ranking"
+-zajawka_en: "In the Perspektywy 2017 ranking of study programmes, mathematics at the University of Wrocław kept 4th place in Poland."
++tytul_en: "Mathematics at the University of Wrocław fourth in Poland in the Perspektywy (Perspectives) 2017 ranking"
++zajawka_en: "In the Perspektywy (Perspectives) 2017 ranking of study programmes, mathematics at the University of Wrocław kept 4th place in Poland."
+ tresc_en: |
+-  The latest [Perspektywy 2017 ranking of study programmes](http://www.perspektywy.pl/RSW2017/ranking-kierunkow-studiow/kierunki-scisle/matematyka) has just been announced. We are pleased to report that our Institute kept 4th place (after the University of Warsaw, Warsaw University of Technology and the Jagiellonian University).
++  The latest [Perspektywy (Perspectives) 2017 ranking of study programmes](http://www.perspektywy.pl/RSW2017/ranking-kierunkow-studiow/kierunki-scisle/matematyka) has just been announced. We are pleased to report that our Institute kept 4th place (after the University of Warsaw, Warsaw University of Technology and the Jagiellonian University).
+ 
+   We are particularly pleased with second place in the category of graduates' economic outcomes.
+ opublikowany: true
+diff --git a/src/content/aktualnosci/2018-04-10-agnieszka-hejna-laureatka-konkursu-krok-w-przyszlosc.md b/src/content/aktualnosci/2018-04-10-agnieszka-hejna-laureatka-konkursu-krok-w-przyszlosc.md
+index 01784b3..13c5722 100644
+--- a/src/content/aktualnosci/2018-04-10-agnieszka-hejna-laureatka-konkursu-krok-w-przyszlosc.md
++++ b/src/content/aktualnosci/2018-04-10-agnieszka-hejna-laureatka-konkursu-krok-w-przyszlosc.md
+@@ -1,5 +1,5 @@
+ ---
+-tytul: "Agnieszka Hejna laureatką konkursu „Krok w przyszłość”"
++tytul: "Agnieszka Hejna laureatką konkursu „Krok w Przyszłość”"
+ data: "2018-04-10"
+ rodzaj: "sukces"
+ dla:
+@@ -8,10 +8,10 @@ zajawka: "Doktorantka mgr Agnieszka Hejna zdobyła nagrodę główną konkursu F
+ zdjecie: "/pliki/aktualnosci/hejna5.jpg"
+ zdjecie_opis: "Mgr Agnieszka Hejna"
+ zdjecie_opis_en: "Agnieszka Hejna, MSc"
+-tytul_en: "Agnieszka Hejna wins the “Krok w przyszłość” competition"
++tytul_en: "Agnieszka Hejna wins the “Krok w Przyszłość” (Step into the Future) competition"
+ zajawka_en: "PhD student Agnieszka Hejna has won the main prize of the mBank Foundation competition for the best student paper in mathematics."
+ tresc_en: |
+-  We are pleased to announce that our PhD student **Agnieszka Hejna** has won the **main prize** of the [“Krok w przyszłość” (Step into the Future) competition for the best student paper in mathematics](https://www.mbank.pl/mfundacja/krok-w-przyszlosc/), organised by the mBank Foundation and currently the most prestigious competition of its kind in Poland.
++  We are pleased to announce that our PhD student **Agnieszka Hejna** has won the **main prize** of the [“Krok w Przyszłość” (Step into the Future) competition for the best student paper in mathematics](https://www.mbank.pl/mfundacja/krok-w-przyszlosc/), organised by the mBank Foundation and currently the most prestigious competition of its kind in Poland.
+ 
+   For her master's thesis “O zlokalizowanych sharp funkcjach” (On localised sharp functions), supervised by Prof. **Jacek Dziubański**, she received a PLN 20,000 prize and the “STEFCIO” statuette.
+ 
+@@ -20,7 +20,7 @@ zaklad: "analiza-funkcjonalna"
+ opublikowany: true
+ ---
+ 
+-Z przyjemnością informujemy, że nasza doktorantka mgr **Agnieszka Hejna** została laureatką **nagrody głównej** [konkursu na najlepszą pracę studencką z matematyki „Krok w przyszłość”](https://www.mbank.pl/mfundacja/krok-w-przyszlosc/), organizowanego przez Fundację mBanku, obecnie najbardziej prestiżowego konkursu tego typu w Polsce.
++Z przyjemnością informujemy, że nasza doktorantka mgr **Agnieszka Hejna** została laureatką **nagrody głównej** [konkursu na najlepszą pracę studencką z matematyki „Krok w Przyszłość”](https://www.mbank.pl/mfundacja/krok-w-przyszlosc/), organizowanego przez Fundację mBanku, obecnie najbardziej prestiżowego konkursu tego typu w Polsce.
+ 
+ Laureatka za pracę magisterską pt. „O zlokalizowanych sharp funkcjach”, napisaną pod opieką prof. **Jacka Dziubańskiego**, otrzymała nagrodę pieniężną w wysokości 20 tys. zł oraz statuetkę „STEFCIO”.
+ 
+diff --git a/src/content/aktualnosci/2018-05-29-ranking-kierunkow-studiow-perspektywy-2018-jestesmy-na-podium.md b/src/content/aktualnosci/2018-05-29-ranking-kierunkow-studiow-perspektywy-2018-jestesmy-na-podium.md
+index 885261c..071f851 100644
+--- a/src/content/aktualnosci/2018-05-29-ranking-kierunkow-studiow-perspektywy-2018-jestesmy-na-podium.md
++++ b/src/content/aktualnosci/2018-05-29-ranking-kierunkow-studiow-perspektywy-2018-jestesmy-na-podium.md
+@@ -6,10 +6,10 @@ dla:
+   - "pracownicy"
+   - "studenci"
+ zajawka: "W Rankingu Kierunków Studiów Perspektywy 2018 matematyka na Uniwersytecie Wrocławskim zajęła trzecie miejsce."
+-tytul_en: "Perspektywy 2018 ranking of study programmes – we are on the podium!"
+-zajawka_en: "In the Perspektywy 2018 ranking of study programmes, mathematics at the University of Wrocław took third place."
++tytul_en: "Perspektywy (Perspectives) 2018 ranking of study programmes – we are on the podium!"
++zajawka_en: "In the Perspektywy (Perspectives) 2018 ranking of study programmes, mathematics at the University of Wrocław took third place."
+ tresc_en: |
+-  The [**Perspektywy 2018 ranking of study programmes**](http://www.perspektywy.pl/RSW2018/ranking-kierunkow-studiow/kierunki-scisle/matematyka) has just been published. We are pleased to announce that in the mathematics ranking the University of Wrocław has moved up to the podium, taking **third place**!
++  The [**Perspektywy (Perspectives) 2018 ranking of study programmes**](http://www.perspektywy.pl/RSW2018/ranking-kierunkow-studiow/kierunki-scisle/matematyka) has just been published. We are pleased to announce that in the mathematics ranking the University of Wrocław has moved up to the podium, taking **third place**!
+ 
+   [Full ranking](http://www.perspektywy.pl/RSW2018/tables/RKS/show.php?subject=matematyka)
+ opublikowany: true
+diff --git a/src/content/aktualnosci/2018-12-21-mariusz-mirek-laureatem-nagrody-iuvenes-wratislaviae.md b/src/content/aktualnosci/2018-12-21-mariusz-mirek-laureatem-nagrody-iuvenes-wratislaviae.md
+index fffa189..41b3a03 100644
+--- a/src/content/aktualnosci/2018-12-21-mariusz-mirek-laureatem-nagrody-iuvenes-wratislaviae.md
++++ b/src/content/aktualnosci/2018-12-21-mariusz-mirek-laureatem-nagrody-iuvenes-wratislaviae.md
+@@ -8,10 +8,10 @@ zajawka: "Dr hab. Mariusz Mirek otrzymał Nagrodę Wrocławskiego Oddziału PAN
+ zdjecie: "/pliki/aktualnosci/dyplom_laureata_mariusz_mirek.jpg"
+ zdjecie_opis: "Dyplom laureata nagrody „Iuvenes Wratislaviae”"
+ zdjecie_opis_en: "“Iuvenes Wratislaviae” award diploma"
+-tytul_en: "Mariusz Mirek receives the “Iuvenes Wratislaviae” award"
+-zajawka_en: "Dr hab. Mariusz Mirek has received the “Iuvenes Wratislaviae” award of the Wrocław Branch of the Polish Academy of Sciences in life, exact and technical sciences."
++tytul_en: "Mariusz Mirek receives the “Iuvenes Wratislaviae” (Young People of Wrocław) award"
++zajawka_en: "Dr hab. Mariusz Mirek has received the “Iuvenes Wratislaviae” (Young People of Wrocław) award of the Wrocław Branch of the Polish Academy of Sciences in life, exact and technical sciences."
+ tresc_en: |
+-  We are pleased to announce that our colleague Dr hab. **Mariusz Mirek** has received the **“Iuvenes Wratislaviae” award of the Wrocław Branch of the Polish Academy of Sciences**.
++  We are pleased to announce that our colleague Dr hab. **Mariusz Mirek** has received the **“Iuvenes Wratislaviae” (Young People of Wrocław) award of the Wrocław Branch of the Polish Academy of Sciences**.
+ 
+   The award is given to young residents of Wrocław for outstanding scientific or artistic achievement. Dr hab. Mariusz Mirek was recognised in the area of life, exact and technical sciences.
+ 
+diff --git a/src/content/aktualnosci/2019-03-30-sukces-w-konkursie-mbanku.md b/src/content/aktualnosci/2019-03-30-sukces-w-konkursie-mbanku.md
+index 7364e28..d4e5355 100644
+--- a/src/content/aktualnosci/2019-03-30-sukces-w-konkursie-mbanku.md
++++ b/src/content/aktualnosci/2019-03-30-sukces-w-konkursie-mbanku.md
+@@ -10,7 +10,7 @@ zdjecie: "/pliki/aktualnosci/dscf3404.jpg"
+ zdjecie_opis: "Ogłoszenie wyników konkursu „Krok w Przyszłość” w Warszawie"
+ zdjecie_opis_en: "Announcement of the results of the “Krok w Przyszłość” competition in Warsaw"
+ tytul_en: "Success in the mBank competition"
+-zajawka_en: "Three of our graduates were among the six finalists of the “Krok w Przyszłość” competition; Katarzyna Siejek received an honourable mention."
++zajawka_en: "Three of our graduates were among the six finalists of the “Krok w Przyszłość” (Step into the Future) competition; Katarzyna Siejek received an honourable mention."
+ tresc_en: |
+   Yesterday in Warsaw the results of the latest edition of mBank's “Krok w Przyszłość” (Step into the Future) competition were announced.
+ 
+diff --git a/src/content/aktualnosci/2019-05-17-sukcesy-w-konkursie-ncn.md b/src/content/aktualnosci/2019-05-17-sukcesy-w-konkursie-ncn.md
+index 6edc383..7c10ff5 100644
+--- a/src/content/aktualnosci/2019-05-17-sukcesy-w-konkursie-ncn.md
++++ b/src/content/aktualnosci/2019-05-17-sukcesy-w-konkursie-ncn.md
+@@ -12,7 +12,7 @@ tresc_en: |
+ 
+   - Prof. **Krzysztof Dębicki**, [*Wycieczki wielowymiarowych procesów gaussowskich: dokładne asymptotyki*](https://www.ncn.gov.pl/sites/default/files/listy-rankingowe/2018-09-14/streszczenia/431713-pl.pdf) (Excursions of multidimensional Gaussian processes: exact asymptotics),
+   - Dr hab. **Piotr Kowalski**, [*Działania grup i teoria modeli*](https://www.ncn.gov.pl/sites/default/files/listy-rankingowe/2018-09-14/streszczenia/428373-pl.pdf) (Group actions and model theory),
+-  - Dr inż. **Błażej Wróbel**, [*Ciągłe i dyskretne perspektywy w analizie harmonicznej*](https://www.ncn.gov.pl/sites/default/files/listy-rankingowe/2018-09-14/streszczenia/429555-pl.pdf) (Continuous and discrete perspectives in harmonic analysis).
++  - Dr **Błażej Wróbel**, [*Ciągłe i dyskretne perspektywy w analizie harmonicznej*](https://www.ncn.gov.pl/sites/default/files/listy-rankingowe/2018-09-14/streszczenia/429555-pl.pdf) (Continuous and discrete perspectives in harmonic analysis).
+ 
+   [Full results of the competition](https://www.ncn.gov.pl/konkursy/wyniki/2019-05-15-opus16-preludium16-sonata14) – panel ST1.
+ opublikowany: true
+diff --git a/src/content/aktualnosci/2019-09-27-konkurs-na-najlepsze-prace-dyplomowe.md b/src/content/aktualnosci/2019-09-27-konkurs-na-najlepsze-prace-dyplomowe.md
+index f4a683d..de425c8 100644
+--- a/src/content/aktualnosci/2019-09-27-konkurs-na-najlepsze-prace-dyplomowe.md
++++ b/src/content/aktualnosci/2019-09-27-konkurs-na-najlepsze-prace-dyplomowe.md
+@@ -16,13 +16,13 @@ tresc_en: |
+ 
+   The committee selected the following theses for the second stage of the competition for the best bachelor's thesis in mathematics:
+ 
+-  1. **Kajetan Jastrzębski**, *Symetria jądra ciepła operatorów nielokalnych* (supervisor: Prof. Krzysztof Bogdan),
++  1. **Kajetan Jastrzębski**, *Symetria jądra ciepła operatorów nielokalnych* (Symmetry of the heat kernel of nonlocal operators; supervisor: Prof. Krzysztof Bogdan),
+   2. **Katarzyna Kulon**, *Modelling health insurances using non-homogeneous Markov processes* (supervisor: Prof. Tomasz Rolski),
+-  3. **Aleksandra Steiner**, *Regresja logistyczna – asymptotyczne własności estymatorów największej wiarygodności* (supervisor: Dr hab. Małgorzata Bogdan),
++  3. **Aleksandra Steiner**, *Regresja logistyczna – asymptotyczne własności estymatorów największej wiarygodności* (Logistic regression – asymptotic properties of maximum likelihood estimators; supervisor: Dr hab. Małgorzata Bogdan),
+   4. **Bartosz Sójka**, *Explanation of connection between Hopf algebras and Markov chains* (supervisor: Prof. Dariusz Buraczewski),
+-  5. **Michał Szachniewicz**, *O pewnych własnościach topologii logicznej* (supervisor: Prof. Krzysztof Krupiński),
+-  6. **Kamil Szubiński**, *Analiza niestandardowa i jej zastosowania* (supervisor: Prof. Ludomir Newelski),
+-  7. **Szymon Czop**, *Cumulants and χ2-conjecture* (supervisor: Dr inż. Wiktor Ejsmont).
++  5. **Michał Szachniewicz**, *O pewnych własnościach topologii logicznej* (On some properties of the logic topology; supervisor: Prof. Krzysztof Krupiński),
++  6. **Kamil Szubiński**, *Analiza niestandardowa i jej zastosowania* (Nonstandard analysis and its applications; supervisor: Prof. Ludomir Newelski),
++  7. **Szymon Czop**, *Cumulants and χ2-conjecture* (supervisor: Dr Wiktor Ejsmont).
+ 
+   Congratulations to all winners, finalists and their supervisors.
+ 
+diff --git a/src/content/aktualnosci/2019-10-04-konkurs-na-najlepsza-prace-dyplomowa-wyniki-finalu.md b/src/content/aktualnosci/2019-10-04-konkurs-na-najlepsza-prace-dyplomowa-wyniki-finalu.md
+index 569cbf8..6d29052 100644
+--- a/src/content/aktualnosci/2019-10-04-konkurs-na-najlepsza-prace-dyplomowa-wyniki-finalu.md
++++ b/src/content/aktualnosci/2019-10-04-konkurs-na-najlepsza-prace-dyplomowa-wyniki-finalu.md
+@@ -21,7 +21,7 @@ tresc_en: |
+   1. **Aleksandra Steiner** for the thesis *Regresja logistyczna – asymptotyczne własności estymatorów największej wiarygodności* (Logistic regression – asymptotic properties of maximum likelihood estimators; supervisor: Dr hab. Małgorzata Bogdan),
+   2. **Michał Szachniewicz** for the thesis *O pewnych własnościach topologii logicznej* (On some properties of the logic topology; supervisor: Prof. Krzysztof Krupiński).
+ 
+-  As announced earlier, the winners of the competition for the best master's thesis in mathematics are **Daniel Danielski** for the thesis *Prostokątne grupy Coxetera o brzegu homeomorficznym z krzywą Mengera* (supervisor: Prof. Jacek Świątkowski) and **Michał Makowski** for the thesis *Precision matrix estimation in Gaussian graphical models* (supervisor: Dr hab. Małgorzata Bogdan).
++  As announced earlier, the winners of the competition for the best master's thesis in mathematics are **Daniel Danielski** for the thesis *Prostokątne grupy Coxetera o brzegu homeomorficznym z krzywą Mengera* (Right-angled Coxeter groups with boundary homeomorphic to the Menger curve; supervisor: Prof. Jacek Świątkowski) and **Michał Makowski** for the thesis *Precision matrix estimation in Gaussian graphical models* (supervisor: Dr hab. Małgorzata Bogdan).
+ 
+   Congratulations!
+ 
+diff --git a/src/content/aktualnosci/2020-01-24-maciej-kucharski-laureatem-nagrody-im-jozefa-marcinkiewicza.md b/src/content/aktualnosci/2020-01-24-maciej-kucharski-laureatem-nagrody-im-jozefa-marcinkiewicza.md
+index b4293b3..288c53a 100644
+--- a/src/content/aktualnosci/2020-01-24-maciej-kucharski-laureatem-nagrody-im-jozefa-marcinkiewicza.md
++++ b/src/content/aktualnosci/2020-01-24-maciej-kucharski-laureatem-nagrody-im-jozefa-marcinkiewicza.md
+@@ -14,7 +14,7 @@ zajawka_en: "Our student Maciej Kucharski won second prize in the 63rd Józef Ma
+ tresc_en: |
+   We are pleased to announce that our student **Maciej Kucharski** has won the **second prize** in the [63rd Józef Marcinkiewicz competition for the best student paper in mathematics](https://www.ptm.org.pl/konkursy/wyniki-kolejnych-edycji-konkursu-im-jozefa-marcinkiewicza-na-najlepsza-prace-studencka-z-ma).
+ 
+-  The award recognises his paper *Dimension-free estimates for Riesz transforms related to the harmonic oscillator*, supervised by Dr hab. inż. **Błażej Wróbel**.
++  The award recognises his paper *Dimension-free estimates for Riesz transforms related to the harmonic oscillator*, supervised by Dr hab. **Błażej Wróbel**.
+ zaklad: "analiza-funkcjonalna"
+ opublikowany: true
+ ---
+diff --git a/src/content/aktualnosci/2020-04-11-sukces-w-konkursie-mbanku.md b/src/content/aktualnosci/2020-04-11-sukces-w-konkursie-mbanku.md
+index fa7bab7..db4705b 100644
+--- a/src/content/aktualnosci/2020-04-11-sukces-w-konkursie-mbanku.md
++++ b/src/content/aktualnosci/2020-04-11-sukces-w-konkursie-mbanku.md
+@@ -7,7 +7,7 @@ dla:
+   - "studenci"
+ zajawka: "Daniel Danielski otrzymał wyróżnienie i nagrodę 10 tys. zł w czwartej edycji konkursu „Krok w Przyszłość”."
+ tytul_en: "Success in the mBank competition"
+-zajawka_en: "Daniel Danielski received an honourable mention and a PLN 10,000 prize in the fourth edition of the “Krok w Przyszłość” competition."
++zajawka_en: "Daniel Danielski received an honourable mention and a PLN 10,000 prize in the fourth edition of the “Krok w Przyszłość” (Step into the Future) competition."
+ tresc_en: |
+   The results of the fourth edition of mBank's “Krok w Przyszłość” (Step into the Future) competition for the best student paper in mathematics were announced in Warsaw.
+ 
+diff --git a/src/content/aktualnosci/2020-05-28-grant-preludium-bis-dla-dr-hab-blazeja-wrobla.md b/src/content/aktualnosci/2020-05-28-grant-preludium-bis-dla-dr-hab-blazeja-wrobla.md
+index 222d9f9..2e82d32 100644
+--- a/src/content/aktualnosci/2020-05-28-grant-preludium-bis-dla-dr-hab-blazeja-wrobla.md
++++ b/src/content/aktualnosci/2020-05-28-grant-preludium-bis-dla-dr-hab-blazeja-wrobla.md
+@@ -7,9 +7,9 @@ dla:
+   - "studenci"
+ zajawka: "Projekt dr. hab. inż. Błażeja Wróbla otrzymał dofinansowanie w konkursie PRELUDIUM BIS 1."
+ tytul_en: "PRELUDIUM BIS grant for Dr hab. Błażej Wróbel"
+-zajawka_en: "A project by Dr hab. inż. Błażej Wróbel has received funding in the PRELUDIUM BIS 1 competition."
++zajawka_en: "A project by Dr hab. Błażej Wróbel has received funding in the PRELUDIUM BIS 1 competition."
+ tresc_en: |
+-  The National Science Centre (NCN) has published the list of projects funded in the PRELUDIUM BIS 1 competition. We are pleased to announce that they include the project of Dr hab. inż. **Błażej Wróbel**, [*Oszacowania norm transformat Riesza*](https://www.ncn.gov.pl/sites/default/files/listy-rankingowe/2019-09-16/streszczenia/459556-pl.pdf) (Norm estimates for Riesz transforms).
++  The National Science Centre (NCN) has published the list of projects funded in the PRELUDIUM BIS 1 competition. We are pleased to announce that they include the project of Dr hab. **Błażej Wróbel**, [*Oszacowania norm transformat Riesza*](https://www.ncn.gov.pl/sites/default/files/listy-rankingowe/2019-09-16/streszczenia/459556-pl.pdf) (Norm estimates for Riesz transforms).
+ 
+   PRELUDIUM BIS is a new type of NCN competition funding a four-year scholarship and research of a doctoral student in a doctoral school.
+ zaklad: "analiza-funkcjonalna"
+diff --git a/src/content/aktualnosci/2021-04-01-sukces-w-konkursie-mbanku.md b/src/content/aktualnosci/2021-04-01-sukces-w-konkursie-mbanku.md
+index 470290d..419f7e6 100644
+--- a/src/content/aktualnosci/2021-04-01-sukces-w-konkursie-mbanku.md
++++ b/src/content/aktualnosci/2021-04-01-sukces-w-konkursie-mbanku.md
+@@ -7,11 +7,11 @@ dla:
+   - "studenci"
+ zajawka: "Maciej Kucharski otrzymał wyróżnienie i nagrodę 10 tys. zł w piątej edycji konkursu „Krok w Przyszłość”."
+ tytul_en: "Success in the mBank competition"
+-zajawka_en: "Maciej Kucharski received an honourable mention and a PLN 10,000 prize in the fifth edition of the “Krok w Przyszłość” competition."
++zajawka_en: "Maciej Kucharski received an honourable mention and a PLN 10,000 prize in the fifth edition of the “Krok w Przyszłość” (Step into the Future) competition."
+ tresc_en: |
+   The results of the fifth edition of mBank's “Krok w Przyszłość” (Step into the Future) competition for the best student paper in mathematics were announced in Warsaw.
+ 
+-  We are pleased to report that **Maciej Kucharski** of our Institute received an honourable mention and a PLN 10,000 prize for his master's thesis “Dimension-free estimates for Riesz transforms related to the harmonic oscillator”, supervised by Dr hab. inż. Błażej Wróbel.
++  We are pleased to report that **Maciej Kucharski** of our Institute received an honourable mention and a PLN 10,000 prize for his master's thesis “Dimension-free estimates for Riesz transforms related to the harmonic oscillator”, supervised by Dr hab. Błażej Wróbel.
+ 
+   Our graduate **Oliwier Biernacki**, with his master's thesis “Random walks in random environment: ruin probability in ballistic regime” (supervisor: Prof. Dariusz Buraczewski), was also among the finalists, together with 8 other people.
+ 
+diff --git a/src/content/aktualnosci/2022-04-03-sukces-w-konkursie-krok-w-przyszlosc.md b/src/content/aktualnosci/2022-04-03-sukces-w-konkursie-krok-w-przyszlosc.md
+index 534c259..11afcbd 100644
+--- a/src/content/aktualnosci/2022-04-03-sukces-w-konkursie-krok-w-przyszlosc.md
++++ b/src/content/aktualnosci/2022-04-03-sukces-w-konkursie-krok-w-przyszlosc.md
+@@ -1,15 +1,15 @@
+ ---
+-tytul: "Sukces w konkursie „Krok w przyszłość”"
++tytul: "Sukces w konkursie „Krok w Przyszłość”"
+ data: "2022-04-03"
+ rodzaj: "sukces"
+ dla:
+   - "pracownicy"
+   - "studenci"
+ zajawka: "Nasz absolwent Wojciech Fica otrzymał wyróżnienie w szóstej edycji konkursu Fundacji mBanku na najlepsze prace studenckie z matematyki."
+-tytul_en: "Success in the “Krok w przyszłość” competition"
++tytul_en: "Success in the “Krok w Przyszłość” (Step into the Future) competition"
+ zajawka_en: "Our graduate Wojciech Fica received an honourable mention in the sixth edition of the mBank Foundation competition for the best student papers in mathematics."
+ tresc_en: |
+-  The results of the sixth edition of the mBank Foundation's **Krok w przyszłość** (Step into the Future) competition for the best student papers in mathematics have been announced. We are pleased to report that one of the two honourable mentions (with a PLN 10,000 prize) went to our graduate **Wojciech Fica** for his master's thesis *On the favourite points of a random walk in a random environment*, supervised by Prof. Dariusz Buraczewski. Another of our graduates, **Mikołaj Czapp**, was also a finalist (for his master's thesis *A constructive approach to Markov compacta*, supervised by Prof. Jacek Świątkowski).
++  The results of the sixth edition of the mBank Foundation's **Krok w Przyszłość** (Step into the Future) competition for the best student papers in mathematics have been announced. We are pleased to report that one of the two honourable mentions (with a PLN 10,000 prize) went to our graduate **Wojciech Fica** for his master's thesis *On the favourite points of a random walk in a random environment*, supervised by Prof. Dariusz Buraczewski. Another of our graduates, **Mikołaj Czapp**, was also a finalist (for his master's thesis *A constructive approach to Markov compacta*, supervised by Prof. Jacek Świątkowski).
+ 
+   It is worth adding that the main prize (and the STEFCIO statuette) went to **Michał Szachniewicz**, who wrote his master's thesis at the University of Warsaw (and is now doing a PhD at the University of Oxford), but whom we remember well as a mathematics student at our Institute.
+ 
+@@ -17,7 +17,7 @@ tresc_en: |
+ opublikowany: true
+ ---
+ 
+-Ogłoszono wyniki szóstej edycji konkursu **Krok w przyszłość** Fundacji mBanku na najlepsze prace studenckie z matematyki. Miło nam poinformować, że jedno z dwóch wyróżnień (i nagrodę 10 tys. zł) otrzymał nasz absolwent **Wojciech Fica** za pracę magisterską *On the favourite points of a random walk in a random environment*, napisaną pod kierunkiem prof. Dariusza Buraczewskiego. Finalistą został też nasz inny absolwent **Mikołaj Czapp** (za pracę magisterską *A constructive approach to Markov compacta*, napisaną pod kierunkiem prof. Jacka Świątkowskiego).
++Ogłoszono wyniki szóstej edycji konkursu **Krok w Przyszłość** Fundacji mBanku na najlepsze prace studenckie z matematyki. Miło nam poinformować, że jedno z dwóch wyróżnień (i nagrodę 10 tys. zł) otrzymał nasz absolwent **Wojciech Fica** za pracę magisterską *On the favourite points of a random walk in a random environment*, napisaną pod kierunkiem prof. Dariusza Buraczewskiego. Finalistą został też nasz inny absolwent **Mikołaj Czapp** (za pracę magisterską *A constructive approach to Markov compacta*, napisaną pod kierunkiem prof. Jacka Świątkowskiego).
+ 
+ Warto dodać, że główną nagrodę (i statuetkę STEFCIA) otrzymał w tym konkursie **Michał Szachniewicz**, który pracę magisterską napisał na Uniwersytecie Warszawskim (a obecnie robi doktorat na Uniwersytecie Oksfordzkim), ale którego doskonale pamiętamy jako studenta matematyki w naszym Instytucie.
+ 
+diff --git a/src/content/aktualnosci/2022-11-18-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md b/src/content/aktualnosci/2022-11-18-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md
+index 739c297..60a991a 100644
+--- a/src/content/aktualnosci/2022-11-18-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md
++++ b/src/content/aktualnosci/2022-11-18-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md
+@@ -28,7 +28,7 @@ tresc_en: |
+ 
+   - the **first** to **Dominik Gdesz** for the thesis [*Przestrzeń wielomianów właściwych*](/pliki/aktualnosci/gdesz.pdf) (The space of proper polynomials), supervised by Prof. Tadeusz Januszkiewicz,
+   - the **second** to **Mateusz Kandybo** for the thesis [*CAT(0)-boundaries of free products are dense amalgams*](/pliki/aktualnosci/kandybo_mateusz_praca.pdf), supervised by Prof. Jacek Świątkowski,
+-  - the **third** to **Jakub Niksiński** for the thesis [*Rozwiązanie problemu Waringa ze szczególnym uwzględnieniem zależności od wymiaru w oszacowania błędu. Znalezienie jawnych oszacowań dla błędów wyższego rzędu w pracy Vaughan-Wooley*](/pliki/aktualnosci/niksinski.pdf) (on Waring's problem, with emphasis on the dimension dependence of the error estimates), supervised by Dr hab. inż. Błażej Wróbel,
++  - the **third** to **Jakub Niksiński** for the thesis [*Rozwiązanie problemu Waringa ze szczególnym uwzględnieniem zależności od wymiaru w oszacowania błędu. Znalezienie jawnych oszacowań dla błędów wyższego rzędu w pracy Vaughan-Wooley*](/pliki/aktualnosci/niksinski.pdf) (Solving Waring's problem with particular attention to the dependence of the error estimates on the dimension. Finding explicit estimates for higher-order errors in the work of Vaughan and Wooley), supervised by Dr hab. Błażej Wróbel,
+ 
+   and an honourable mention to
+ 
+diff --git a/src/content/aktualnosci/2024-04-03-sukcesy-w-konkursie-krok-w-przyszlosc.md b/src/content/aktualnosci/2024-04-03-sukcesy-w-konkursie-krok-w-przyszlosc.md
+index 83a32e3..c0d1457 100644
+--- a/src/content/aktualnosci/2024-04-03-sukcesy-w-konkursie-krok-w-przyszlosc.md
++++ b/src/content/aktualnosci/2024-04-03-sukcesy-w-konkursie-krok-w-przyszlosc.md
+@@ -1,20 +1,20 @@
+ ---
+-tytul: "Sukcesy w konkursie „Krok w przyszłość”"
++tytul: "Sukcesy w konkursie „Krok w Przyszłość”"
+ data: "2024-04-03"
+ rodzaj: "sukces"
+ dla:
+   - "pracownicy"
+   - "studenci"
+ zajawka: "Dwa z trzech wyróżnień w ósmej edycji konkursu Fundacji mBanku otrzymali nasi absolwenci: Tamara Frączek i Bartosz Sójka."
+-tytul_en: "Successes in the “Krok w przyszłość” competition"
++tytul_en: "Successes in the “Krok w Przyszłość” (Step into the Future) competition"
+ zajawka_en: "Two of the three honourable mentions in the eighth edition of the mBank Foundation competition went to our graduates Tamara Frączek and Bartosz Sójka."
+ tresc_en: |
+-  The results of the eighth edition of the mBank Foundation's **Krok w przyszłość** (Step into the Future) competition for the best student papers in mathematics have been announced. We are pleased to report that two of the three honourable mentions went to our graduates: **Tamara Frączek** (now our PhD student) for her master's thesis *Branching-selection particle system with semiexponential increments*, supervised by Dr Piotr Dyszewski, and **Bartosz Sójka** for his master's thesis *Areas of two dimensional hyperbolic orbifolds*, supervised by Prof. Tadeusz Januszkiewicz. Another of our graduates, **Artsiom Ranchynski**, was also a finalist (for his master's thesis *On ultrafilters avoiding measures*, supervised by Dr hab. Piotr Borodulin-Nadzieja).
++  The results of the eighth edition of the mBank Foundation's **Krok w Przyszłość** (Step into the Future) competition for the best student papers in mathematics have been announced. We are pleased to report that two of the three honourable mentions went to our graduates: **Tamara Frączek** (now our PhD student) for her master's thesis *Branching-selection particle system with semiexponential increments*, supervised by Dr Piotr Dyszewski, and **Bartosz Sójka** for his master's thesis *Areas of two dimensional hyperbolic orbifolds*, supervised by Prof. Tadeusz Januszkiewicz. Another of our graduates, **Artsiom Ranchynski**, was also a finalist (for his master's thesis *On ultrafilters avoiding measures*, supervised by Dr hab. Piotr Borodulin-Nadzieja).
+ 
+   [Results of the competition](https://www.mbank.pl/mfundacja/krok-w-przyszlosc/)
+ opublikowany: true
+ ---
+ 
+-Ogłoszono wyniki ósmej edycji konkursu **Krok w przyszłość** Fundacji mBanku na najlepsze prace studenckie z matematyki. Miło nam poinformować, że dwa z trzech wyróżnień otrzymali nasi absolwenci: **Tamara Frączek** (obecnie nasza doktorantka) za pracę magisterską *Branching-selection particle system with semiexponential increments*, napisaną pod kierunkiem dr. Piotra Dyszewskiego, oraz **Bartosz Sójka** za pracę magisterską *Areas of two dimensional hyperbolic orbifolds*, napisaną pod kierunkiem prof. Tadeusza Januszkiewicza. Finalistą został też nasz inny absolwent **Artsiom Ranchynski** (za pracę magisterską *On ultrafilters avoiding measures*, napisaną pod kierunkiem dr. hab. Piotra Borodulina-Nadziei).
++Ogłoszono wyniki ósmej edycji konkursu **Krok w Przyszłość** Fundacji mBanku na najlepsze prace studenckie z matematyki. Miło nam poinformować, że dwa z trzech wyróżnień otrzymali nasi absolwenci: **Tamara Frączek** (obecnie nasza doktorantka) za pracę magisterską *Branching-selection particle system with semiexponential increments*, napisaną pod kierunkiem dr. Piotra Dyszewskiego, oraz **Bartosz Sójka** za pracę magisterską *Areas of two dimensional hyperbolic orbifolds*, napisaną pod kierunkiem prof. Tadeusza Januszkiewicza. Finalistą został też nasz inny absolwent **Artsiom Ranchynski** (za pracę magisterską *On ultrafilters avoiding measures*, napisaną pod kierunkiem dr. hab. Piotra Borodulina-Nadziei).
+ 
+ [Wyniki konkursu](https://www.mbank.pl/mfundacja/krok-w-przyszlosc/)
+diff --git a/src/content/aktualnosci/2024-05-29-blazej-wrobel-profesorem.md b/src/content/aktualnosci/2024-05-29-blazej-wrobel-profesorem.md
+index 27b09e7..093a730 100644
+--- a/src/content/aktualnosci/2024-05-29-blazej-wrobel-profesorem.md
++++ b/src/content/aktualnosci/2024-05-29-blazej-wrobel-profesorem.md
+@@ -11,7 +11,7 @@ zdjecie_opis: "Prof. Błażej Wróbel"
+ zdjecie_opis_en: "Prof. Błażej Wróbel"
+ tytul_en: "Błażej Wróbel becomes a full professor!"
+ zajawka_en: "The President of Poland has conferred on Błażej Wróbel the title of Professor of Exact and Natural Sciences in mathematics."
+-tresc_en: "We are pleased to announce that the President of the Republic of Poland has conferred the title of Professor of Exact and Natural Sciences in the discipline of mathematics on Dr hab. inż. **Błażej Wróbel**, a member of staff of the Institute of Mathematics of the Polish Academy of Sciences and of our Institute."
++tresc_en: "We are pleased to announce that the President of the Republic of Poland has conferred the title of Professor of Exact and Natural Sciences in the discipline of mathematics on Dr hab. **Błażej Wróbel**, a member of staff of the Institute of Mathematics of the Polish Academy of Sciences and of our Institute."
+ zaklad: "analiza-funkcjonalna"
+ opublikowany: true
+ ---
+diff --git a/src/content/aktualnosci/2024-12-01-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md b/src/content/aktualnosci/2024-12-01-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md
+index 420b652..0c9c2c4 100644
+--- a/src/content/aktualnosci/2024-12-01-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md
++++ b/src/content/aktualnosci/2024-12-01-wyniki-konkursu-na-najlepsza-prace-dyplomowa.md
+@@ -29,27 +29,27 @@ tresc_en: |
+   Two **honourable mentions** were awarded to
+ 
+   - **Katarzyna Hasal** for the thesis *Williamson transforms of probability distributions and their inversions*, supervised by Dr Marek Arendarczyk,
+-  - **Rafał Łyżwa** for the thesis *O reprezentacji w teorii operatorów Dunkla funkcji harmonicznych z warunkiem Carlesona*, supervised by Prof. Jacek Dziubański.
++  - **Rafał Łyżwa** for the thesis *O reprezentacji w teorii operatorów Dunkla funkcji harmonicznych z warunkiem Carlesona* (On the representation of harmonic functions satisfying the Carleson condition in Dunkl theory), supervised by Prof. Jacek Dziubański.
+ 
+   ## Bachelor's theses
+ 
+   The winners of the competition for the best bachelor's thesis in mathematics were chosen during the final held on **6 December 2024**. Three **prizes** were awarded:
+ 
+   - the **first** to **Jadwiga Świerczyńska** for the thesis *Finitely additive measures on ω*, supervised by Dr hab. Piotr Borodulin-Nadzieja (this thesis also received the **audience award**),
+-  - two equal **second** prizes to **Weronika Jakimowicz** for the thesis *Knot colorings and homological invariants*, supervised by Prof. Lech Januszkiewicz, and to **Zuzanna Nogala** for the thesis *Zastosowanie operatora Steina do testowania zgodności z rozkładem Weibulla w obecności prawostronnego cenzurowania*, supervised by Dr Grzegorz Wyłupek,
++  - two equal **second** prizes to **Weronika Jakimowicz** for the thesis *Knot colorings and homological invariants*, supervised by Prof. Lech Januszkiewicz, and to **Zuzanna Nogala** for the thesis *Zastosowanie operatora Steina do testowania zgodności z rozkładem Weibulla w obecności prawostronnego cenzurowania* (Applying the Stein operator to goodness-of-fit testing for the Weibull distribution under right censoring), supervised by Dr Grzegorz Wyłupek,
+ 
+   and an **honourable mention** to
+ 
+-  - **Antoni Bieniasz** for the thesis *Charakterystyka dominacji oraz krzywych Lorenza z zastosowaniem do testów ilorazu wiarogodności*, supervised by Dr Grzegorz Wyłupek.
++  - **Antoni Bieniasz** for the thesis *Charakterystyka dominacji oraz krzywych Lorenza z zastosowaniem do testów ilorazu wiarogodności* (Characterising dominance and Lorenz curves, with applications to likelihood ratio tests), supervised by Dr Grzegorz Wyłupek.
+ 
+   In addition, the **Wrocław Mathematicians Foundation Prize** was awarded to
+ 
+-  - **Mateusz Padarz** for the thesis *Dekompozycje grafów na grafy regularne*, supervised by Dr hab. Piotr Borodulin-Nadzieja.
++  - **Mateusz Padarz** for the thesis *Dekompozycje grafów na grafy regularne* (Decompositions of graphs into regular graphs), supervised by Dr hab. Piotr Borodulin-Nadzieja.
+ 
+   The other finalists were:
+ 
+   - **Dominik Bargieła**, *Topological Stäckel Hypothesis* (supervisor: Dr hab. Piotr Borodulin-Nadzieja),
+-  - **Filip Gaj**, *Zastosowanie ukrytych modeli Markowa do klasyfikacji szeregów czasowych* (supervisor: Dr hab. Paweł Lorek).
++  - **Filip Gaj**, *Zastosowanie ukrytych modeli Markowa do klasyfikacji szeregów czasowych* (Applying hidden Markov models to time series classification; supervisor: Dr hab. Paweł Lorek).
+ 
+   The results in computer science are available on the [Faculty website](https://wmi.uwr.edu.pl/konkurs-na-prace-dyplomowa/wyniki-edycji-2024/). A recording of the final is available on the [Faculty's YouTube channel](https://www.youtube.com/watch?v=z3L_xP7R_9w&t=23s).
+ 
+diff --git a/src/content/aktualnosci/2026-04-20-konkurs-prac-dyplomowych.md b/src/content/aktualnosci/2026-04-20-konkurs-prac-dyplomowych.md
+index 6c72b01..001aec6 100644
+--- a/src/content/aktualnosci/2026-04-20-konkurs-prac-dyplomowych.md
++++ b/src/content/aktualnosci/2026-04-20-konkurs-prac-dyplomowych.md
+@@ -19,18 +19,18 @@ tresc_en: |
+     - **Aleksander Pogoda**, *Round and Advice Complexity of Local Broadcast in Radio Networks*, supervisor: Prof. Tomasz Jurdziński
+     - **Łukasz Galas, Wojciech Pawlik**, *Regular Games compiler*, supervisors: Dr Marek Szykuła, Dr Jakub Kowalski
+   - **honourable mention**:
+-    - **Paweł Patreucha**, *Modelowanie wariantywności wewnątrzgatunkowej w mailach generowanych przez LLM*, supervisor: Dr hab. Krzysztof Topolski
++    - **Paweł Patreucha**, *Modelowanie wariantywności wewnątrzgatunkowej w mailach generowanych przez LLM* (Modelling intra-genre variation in LLM-generated emails), supervisor: Dr hab. Krzysztof Topolski
+     - **Mateusz Rzepecki**, *Implementing superhuman AI for Azul board game with a variation of NNUE*, supervisor: Dr Jakub Kowalski
+ 
+   ## Engineering and bachelor's theses
+ 
+-  - **1st place** (PLN 1500): **Jakub Janeczko**, *Akcelerator graficzny fixed-pipeline oparty na FPGA*, supervisor: Dr Marek Materzok
++  - **1st place** (PLN 1500): **Jakub Janeczko**, *Akcelerator graficzny fixed-pipeline oparty na FPGA* (An FPGA-based fixed-pipeline graphics accelerator), supervisor: Dr Marek Materzok
+   - **2nd place** (PLN 1000):
+-    - **Zuzanna Kurnicka**, *Implementacja systemu dystrybucji powiadomień na platformie MS Teams w oparciu o architekturę chmurową MS Azure*, supervisor: Paweł Rzechonek, MSc
++    - **Zuzanna Kurnicka**, *Implementacja systemu dystrybucji powiadomień na platformie MS Teams w oparciu o architekturę chmurową MS Azure* (Implementing a notification distribution system on the MS Teams platform using the MS Azure cloud architecture), supervisor: Paweł Rzechonek, MSc
+     - **Kacper Misiaszek**, *But: Infrastructure Automation for Programming Contests*, supervisor: Tomasz Wierzbicki, MSc
+   - **3rd place** (PLN 500):
+     - **Agnieszka Grala**, *Self-Supervised Learning in Deep Switching Kalman Filters*, supervisors: Dr hab. Piotr Wnuk-Lipiński, Mikołaj Słupiński, MSc
+-    - **Michał Siwiec**, *Maszyna do rozwiązywania Sudoku*, supervisor: Prof. Krzysztof Loryś
++    - **Michał Siwiec**, *Maszyna do rozwiązywania Sudoku* (A Sudoku-solving machine), supervisor: Prof. Krzysztof Loryś
+     - **Wiktor Zoga**, *Generations in self-similar fragmentation of positive index*, supervisor: Dr Piotr Dyszewski
+ 
+   Congratulations to the winners and their supervisors.
