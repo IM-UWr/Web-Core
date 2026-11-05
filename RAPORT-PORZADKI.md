@@ -220,7 +220,8 @@ Strony nieprzeniesione: **brak** (wszystkie 16 z listy, w tym Kalendarz i zamian
   Zmienione — strony z etapu 3 i strony tekstowe (zamierzone). Przykłady: `raport-zrzuty/etap3-*.png`.
 
 ## Etap 4: usunięcie starego kodu — zrobione
-Gałąź: `wyglad/porzadki` (końcowa). Commity: `67e9849`, `446b864`, `ef67ad3`, `9a8c99a`, `27b923e`, `412aae7`, `738d34b`.
+Gałąź: `wyglad/porzadki` (końcowa). Commity: `67e9849`, `446b864`, `ef67ad3`, `9a8c99a`, `27b923e`, `412aae7`, `738d34b`;
+poprawki po przeglądzie: `bf54e21` (spis „Na tej stronie”), `12c01c6` (fakty w banerze Kierunku).
 
 **Jak usuwałem.** Skrypt (Playwright + postcss) ładował wszystkie 748 zbudowanych stron i sprawdzał każdy selektor starych
 plików CSS (`global.css`, `tlo.css`, `telefon.css`, `portal.css`, `uklad-zwarta.css`, `uklad-portal.css`, `przejscia.css`)
