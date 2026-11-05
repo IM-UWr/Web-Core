@@ -89,7 +89,7 @@ const spis = [
   .pusto { font-style: italic; color: var(--muted); }
   /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
   .klik { position: relative; }
-  .klik h4 a::after { content: ''; position: absolute; inset: 0; }
+  .klik h4 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
   .klik:hover h4 a { color: var(--d-a); }
   .klik h4 a:focus-visible { outline: none; }
   .klik:has(h4 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }

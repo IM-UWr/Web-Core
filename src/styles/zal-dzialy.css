@@ -76,7 +76,7 @@
 
   /* karta lub wiersz z linkiem w tytule: cały element klikalny, fokus rysowany na całym elemencie */
   .z-dz-klik { position: relative; }
-  .z-dz-klik h3 a::after { content: ''; position: absolute; inset: 0; }
+  .z-dz-klik h3 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
   .z-dz-klik h3 a:focus-visible { outline: none; }
   .z-dz-klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
 

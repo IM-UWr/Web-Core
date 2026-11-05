@@ -37,7 +37,7 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
   .wa h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; letter-spacing: normal; color: var(--ink); }
   .wa h3 a { color: inherit; text-decoration: none; }
   /* cały wiersz klikalny; fokus rysowany na całym wierszu */
-  .wa h3 a::after { content: ''; position: absolute; inset: 0; }
+  .wa h3 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
   .wa h3 a:focus-visible { outline: none; }
   .wa:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; }
   .wa:hover h3 a { color: var(--d-a); }

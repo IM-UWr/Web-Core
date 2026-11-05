@@ -72,7 +72,7 @@ const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-d
   .wiersz .rozprawa { font-size: 15.5px; line-height: 1.55; color: var(--text); }
   /* cały wiersz klikalny (link w nazwisku), fokus na całym wierszu */
   .klik { position: relative; }
-  .klik h3 a::after { content: ''; position: absolute; inset: 0; }
+  .klik h3 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
   .klik:hover h3 a { color: var(--d-a); }
   .klik h3 a:focus-visible { outline: none; }
   .klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
