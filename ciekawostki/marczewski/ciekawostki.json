@@ -1019,5 +1019,1184 @@
         "gruba": true
       }
     ]
+  },
+  {
+    "id": "hewitt-marczewski-pondiczery",
+    "nazwa": "Twierdzenie z fikcyjnym współautorem",
+    "rok": "1947",
+    "zdanie": "Iloczyn continuum przestrzeni ośrodkowych jest ośrodkowy; współodkrywca, E. S. Pondiczery, nigdy nie istniał.",
+    "notka": "Twierdzenie Hewitta–Marczewskiego–Pondiczery: iloczyn co najwyżej continuum przestrzeni ośrodkowych jest ośrodkowy. Marczewski ogłosił je w „Séparabilité et multiplication cartésienne des espaces topologiques” (Fundamenta Mathematicae 34, 1947, s. 127–143), Pondiczery w „Power problems in abstract spaces” (Duke Math. J. 11, 1944, s. 835–837). „E. S. Pondiczery” to zmyślona postać Ralpha Boasa i Franka Smithiesa, autorów słynnej parodii o polowaniu na lwy; prawdziwa praca wyszła spod pióra Boasa. Rysunek: przestrzeń funkcji na odcinku; otwarty zbiór bazowy to skończenie wiele „bramek”, a przez wszystkie przechodzi funkcja schodkowa o wymiernych progach i wartościach; takich funkcji jest przeliczalnie wiele.",
+    "rodzaj": "twierdzenie",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://eudml.org/doc/213121",
+      "https://en.wikipedia.org/wiki/Ralph_P._Boas_Jr.",
+      "https://en.wikipedia.org/wiki/Separable_space",
+      "https://arxiv.org/pdf/1701.00356"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: ogólnie do działu; dobry przykład, że wynik Instytutu żyje pod nazwą z trzema nazwiskami, a jedno z nich jest żartem.",
+    "sciezki": [
+      {
+        "d": "M22,52 L178,52 178,208 22,208Z"
+      },
+      {
+        "d": "M49.6,52 L49.6,155.7 M49.6,179.1 L49.6,208 M42.6,155.7 L56.6,155.7 M42.6,179.1 L56.6,179.1"
+      },
+      {
+        "d": "M66.6,52 L66.6,87.1 M66.6,110.5 L66.6,208 M59.6,87.1 L73.6,87.1 M59.6,110.5 L73.6,110.5"
+      },
+      {
+        "d": "M76.5,52 L76.5,130.8 M76.5,154.2 L76.5,208 M69.5,130.8 L83.5,130.8 M69.5,154.2 L83.5,154.2"
+      },
+      {
+        "d": "M95.1,52 L95.1,65.3 M95.1,88.7 L95.1,208 M88.1,65.3 L102.1,65.3 M88.1,88.7 L102.1,88.7"
+      },
+      {
+        "d": "M113.9,52 L113.9,168.2 M113.9,191.6 L113.9,208 M106.9,168.2 L120.9,168.2 M106.9,191.6 L120.9,191.6"
+      },
+      {
+        "d": "M136,52 L136,108.9 M136,132.3 L136,208 M129,108.9 L143,108.9 M129,132.3 L143,132.3"
+      },
+      {
+        "d": "M157.1,52 L157.1,55.9 M157.1,79.3 L157.1,208 M150.1,55.9 L164.1,55.9 M150.1,79.3 L164.1,79.3"
+      },
+      {
+        "d": "M168.2,52 L168.2,143.3 M168.2,166.7 L168.2,208 M161.2,143.3 L175.2,143.3 M161.2,166.7 L175.2,166.7"
+      },
+      {
+        "d": "M22,169L57.8,169L57.8,97.5L70.8,97.5L70.8,143L87,143L87,78L103.3,78L103.3,178.8L126,178.8L126,120.3L145.5,120.3L145.5,68.3L161.8,68.3L161.8,156L178,156",
+        "gruba": true
+      }
+    ]
+  },
+  {
+    "id": "pierwsze-prace-1930",
+    "nazwa": "Pierwsze prace w wieku 22 lat",
+    "rok": "1930",
+    "zdanie": "Pierwsze prace ogłosił w 1930 r., mając 22 lata; jedna dotyczy hipotezy Borela o zbiorach „mocno miary zero”.",
+    "notka": "W 1930 r., jeszcze przed doktoratem (1932), E. Szpilrajn ogłosił w Fundamenta Mathematicae m.in. „Sur une hypothèse de M. Borel” (t. 15, s. 126–127), „Sur un problème de M. Banach” (t. 15, s. 212–214) i słynne „Sur l’extension de l’ordre partiel” (t. 16). Borel przypuszczał w 1919 r., że każdy zbiór mocno miary zero (dający się przykryć odcinkami o dowolnie zadanych z góry długościach) jest przeliczalny; Sierpiński (1928) pokazał kontrprzykład przy hipotezie continuum, a Laver (1976) model, w którym hipoteza zachodzi. Treści noty Szpilrajna nie widzieliśmy (PDF niedostępny), więc to, że chodzi właśnie o tę hipotezę, wnioskujemy z tytułu i daty: stąd „do sprawdzenia”. Rysunek: pod osią zadane długości, nad osią przykrywające odcinki tych długości (łuki).",
+    "rodzaj": "historia",
+    "pewnosc": "do sprawdzenia",
+    "zrodla": [
+      "https://impan.pl/en/publishing-house/journals-and-series/fundamenta-mathematicae/all/15/0/92814/sur-une-hypothese-de-m-borel",
+      "https://www.impan.pl/shop/media/wysiwyg/83-86806-00-1/mar-cont.pdf",
+      "https://en.wikipedia.org/wiki/Strong_measure_zero_set",
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: początek drogi patrona działu; ogólnie do Instytutu.",
+    "sciezki": [
+      {
+        "d": "M14,106 L186,106"
+      },
+      {
+        "d": "M100,102 L100,110"
+      },
+      {
+        "d": "M140,106L139.5,99.7L138.9,96.7L137,90.7L134.1,85.1L132.4,82.5L128.3,77.7L123.5,73.6L120.9,71.9L115.3,69L112.4,68L106.3,66.5L100,66L93.7,66.5L87.6,68L84.7,69L79.1,71.9L74,75.6L71.7,77.7L67.6,82.5L65.9,85.1L63,90.7L61.1,96.7L60.5,99.7L60,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,128 L106,128",
+        "gruba": true
+      },
+      {
+        "d": "M63,102 L63,110"
+      },
+      {
+        "d": "M88.2,106L87.9,102.1L87.5,100.1L86.3,96.4L85.5,94.6L83.4,91.2L80.8,88.2L77.8,85.6L74.4,83.5L72.6,82.7L68.9,81.5L66.9,81.1L63,80.8L59.1,81.1L55.2,82L53.4,82.7L49.8,84.5L46.6,86.8L45.2,88.2L42.6,91.2L40.5,94.6L39.7,96.4L39,98.2L38.1,102.1L37.8,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,139.5 L76.4,139.5",
+        "gruba": false
+      },
+      {
+        "d": "M137,102 L137,110"
+      },
+      {
+        "d": "M152.9,106L152.7,103.5L151.7,99.9L150.5,97.7L148.2,94.8L145.3,92.5L143.1,91.3L139.5,90.3L137,90.1L133.3,90.6L130.9,91.3L128.7,92.5L125.8,94.8L123.5,97.7L122.3,99.9L121.3,103.5L121.1,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,151 L57.8,151",
+        "gruba": false
+      },
+      {
+        "d": "M44.5,102 L44.5,110"
+      },
+      {
+        "d": "M54.5,106L54.4,104.4L53.7,102.2L53,100.8L51.6,98.9L50.4,97.9L48.3,96.8L46.8,96.3L44.5,96L42.2,96.3L40.7,96.8L38.6,97.9L37.4,98.9L36,100.8L35.3,102.2L34.8,103.7L34.5,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,162.5 L46,162.5",
+        "gruba": false
+      },
+      {
+        "d": "M118.5,102 L118.5,110"
+      },
+      {
+        "d": "M124.8,106L124.3,103.6L123,101.5L120.9,100.2L118.5,99.7L116.1,100.2L114,101.5L112.7,103.6L112.2,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,174 L38.6,174",
+        "gruba": false
+      },
+      {
+        "d": "M81.5,102 L81.5,110"
+      },
+      {
+        "d": "M85.5,106L85.2,104.5L84.3,103.2L83,102.3L81.5,102L80,102.3L78.7,103.2L77.8,104.5L77.5,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,185.5 L33.9,185.5",
+        "gruba": false
+      },
+      {
+        "d": "M155.5,102 L155.5,110"
+      },
+      {
+        "d": "M158,106L157.8,105L157.3,104.2L156.5,103.7L155.5,103.5L154.5,103.7L153.7,104.2L153.2,105L153,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,197 L31,197",
+        "gruba": false
+      },
+      {
+        "d": "M35.3,102 L35.3,110"
+      },
+      {
+        "d": "M36.8,106L36.4,104.9L35.3,104.4L34.1,104.9L33.7,106",
+        "gruba": true
+      },
+      {
+        "d": "M26,208.5 L29.2,208.5",
+        "gruba": false
+      }
+    ]
+  },
+  {
+    "id": "miara-i-kategoria",
+    "nazwa": "Miara i kategoria",
+    "rok": "1932",
+    "zdanie": "Już w doktoracie porównywał zbiory mierzalne ze zbiorami o własności Baire’a: dwa sposoby mówienia o „małości”.",
+    "notka": "Doktorat u Sierpińskiego (1932) nosił tytuł „On measures and the Baire property” (w tłumaczeniu z Collected Mathematical Papers); temat zapowiadał referat z I Kongresu Matematyków Krajów Słowiańskich („On measurability and the Baire property”, 1929). MacTutor wymienia wśród jego ważnych wyników dualność między zbiorami pierwszej kategorii a zbiorami miary zero, a przedmowa do dzieł zebranych: głębokie porównanie obu σ-algebr. Później wrócił do tego z R. Sikorskim („Remarks on measure and category”, Colloquium Mathematicum 2, 1949). Rysunek: u góry gruby zbiór Cantora, nigdzie gęsty (mały dla kategorii), choć o mierze 1/2 (duży dla miary; długość graniczna pod spodem). U dołu odwrotnie: otoczenia punktów wymiernych, zbiór gęsty i otwarty o coraz mniejszej mierze (tu 31 punktów; odcinki krótsze niż 3 jednostki pokazane jako kreski długości 3).",
+    "rodzaj": "pojęcie",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/",
+      "https://mathshistory.st-andrews.ac.uk/Biographies/Marczewski/",
+      "https://www.impan.pl/shop/media/wysiwyg/83-86806-00-1/mar-pref.pdf",
+      "https://www.impan.pl/shop/media/wysiwyg/83-86806-00-1/mar-cont.pdf"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: główny temat młodego Szpilrajna; ogólnie do Instytutu.",
+    "sciezki": [
+      {
+        "d": "M18,44 L182,44",
+        "gruba": false
+      },
+      {
+        "d": "M18,57 L79.5,57 M120.5,57 L182,57",
+        "gruba": false
+      },
+      {
+        "d": "M18,70 L43.6,70 M53.9,70 L79.5,70 M120.5,70 L146.1,70 M156.4,70 L182,70",
+        "gruba": false
+      },
+      {
+        "d": "M18,83 L29.5,83 M32.1,83 L43.6,83 M53.9,83 L65.4,83 M68,83 L79.5,83 M120.5,83 L132,83 M134.6,83 L146.1,83 M156.4,83 L167.9,83 M170.5,83 L182,83",
+        "gruba": false
+      },
+      {
+        "d": "M18,96 L23.4,96 M24.1,96 L29.5,96 M32.1,96 L37.5,96 M38.2,96 L43.6,96 M53.9,96 L59.3,96 M60,96 L65.4,96 M68,96 L73.4,96 M74.1,96 L79.5,96 M120.5,96 L125.9,96 M126.6,96 L132,96 M134.6,96 L140,96 M140.7,96 L146.1,96 M156.4,96 L161.8,96 M162.5,96 L167.9,96 M170.5,96 L175.9,96 M176.6,96 L182,96",
+        "gruba": true
+      },
+      {
+        "d": "M18,109 L100,109"
+      },
+      {
+        "d": "M21.6,146 L24.6,146 M26.8,146 L29.8,146 M31.9,146 L149.2,146 M149.8,146 L152.8,146 M154.9,146 L157.9,146 M160,146 L163,146 M165.1,146 L168.1,146 M170.3,146 L173.3,146 M175.4,146 L178.4,146",
+        "gruba": false
+      },
+      {
+        "d": "M21.6,159 L24.6,159 M26.8,159 L29.8,159 M31.9,159 L34.9,159 M36.5,159 L40.6,159 M42.1,159 L45.1,159 M47.3,159 L50.3,159 M50.8,159 L67.2,159 M67.8,159 L70.8,159 M72.9,159 L75.9,159 M78,159 L81,159 M83.1,159 L116.9,159 M119,159 L122,159 M124.1,159 L127.1,159 M129.3,159 L132.3,159 M134.4,159 L147.6,159 M149.8,159 L152.8,159 M154.9,159 L157.9,159 M160,159 L163,159 M165.1,159 L168.1,159 M170.3,159 L173.3,159 M175.4,159 L178.4,159",
+        "gruba": false
+      },
+      {
+        "d": "M21.6,172 L24.6,172 M26.8,172 L29.8,172 M31.9,172 L34.9,172 M37,172 L40,172 M42.1,172 L45.1,172 M47.3,172 L50.3,172 M52.4,172 L65.6,172 M67.8,172 L70.8,172 M72.9,172 L75.9,172 M78,172 L81,172 M83.1,172 L86.1,172 M88.3,172 L91.3,172 M91.8,172 L108.2,172 M108.8,172 L111.8,172 M113.9,172 L116.9,172 M119,172 L122,172 M124.1,172 L127.1,172 M129.3,172 L132.3,172 M134.4,172 L137.4,172 M139,172 L143.1,172 M144.6,172 L147.6,172 M149.8,172 L152.8,172 M154.9,172 L157.9,172 M160,172 L163,172 M165.1,172 L168.1,172 M170.3,172 L173.3,172 M175.4,172 L178.4,172",
+        "gruba": false
+      },
+      {
+        "d": "M21.6,185 L24.6,185 M26.8,185 L29.8,185 M31.9,185 L34.9,185 M37,185 L40,185 M42.1,185 L45.1,185 M47.3,185 L50.3,185 M52.4,185 L55.4,185 M57,185 L61.1,185 M62.6,185 L65.6,185 M67.8,185 L70.8,185 M72.9,185 L75.9,185 M78,185 L81,185 M83.1,185 L86.1,185 M88.3,185 L91.3,185 M93.4,185 L106.6,185 M108.8,185 L111.8,185 M113.9,185 L116.9,185 M119,185 L122,185 M124.1,185 L127.1,185 M129.3,185 L132.3,185 M134.4,185 L137.4,185 M139.5,185 L142.5,185 M144.6,185 L147.6,185 M149.8,185 L152.8,185 M154.9,185 L157.9,185 M160,185 L163,185 M165.1,185 L168.1,185 M170.3,185 L173.3,185 M175.4,185 L178.4,185",
+        "gruba": false
+      },
+      {
+        "d": "M21.6,198 L24.6,198 M26.8,198 L29.8,198 M31.9,198 L34.9,198 M37,198 L40,198 M42.1,198 L45.1,198 M47.3,198 L50.3,198 M52.4,198 L55.4,198 M57.5,198 L60.5,198 M62.6,198 L65.6,198 M67.8,198 L70.8,198 M72.9,198 L75.9,198 M78,198 L81,198 M83.1,198 L86.1,198 M88.3,198 L91.3,198 M93.4,198 L96.4,198 M98,198 L102.1,198 M103.6,198 L106.6,198 M108.8,198 L111.8,198 M113.9,198 L116.9,198 M119,198 L122,198 M124.1,198 L127.1,198 M129.3,198 L132.3,198 M134.4,198 L137.4,198 M139.5,198 L142.5,198 M144.6,198 L147.6,198 M149.8,198 L152.8,198 M154.9,198 L157.9,198 M160,198 L163,198 M165.1,198 L168.1,198 M170.3,198 L173.3,198 M175.4,198 L178.4,198",
+        "gruba": true
+      },
+      {
+        "d": "M18,211 L182,211"
+      }
+    ]
+  },
+  {
+    "id": "kierst-szpilrajn",
+    "nazwa": "Funkcje, których nie da się przedłużyć",
+    "rok": "1933",
+    "zdanie": "Z S. Kierstem pokazał, że „typowa” funkcja holomorficzna na kole nie przedłuża się przez żaden punkt jego brzegu.",
+    "notka": "S. Kierst, E. Szpilrajn, „Sur certaines singularités des fonctions analytiques uniformes” (Fundamenta Mathematicae 21, 1933, s. 276–294): zbiór funkcji holomorficznych na kole jednostkowym, dla których samo koło jest obszarem holomorficzności, jest rezydualny, czyli „typowy” w sensie Baire’a. Kierst był jego przyjacielem z warszawskiej szkoły (wspomnienie J. Łosia). Rysunek: klasyczny przykład tego typu, szereg z lukami f(z) = Σ z^(2^n), nie wynik z pracy. Trzy krzywe pokazują część rzeczywistą f na okręgach o promieniach 0,7, 0,9 i 0,985 (wykres biegunowy): im bliżej brzegu, tym bardziej poszarpana.",
+    "rodzaj": "twierdzenie",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://eudml.org/doc/212670",
+      "https://mortini.perso.math.cnrs.fr/Mainz/Calderon.pdf",
+      "https://www.impan.pl/shop/media/wysiwyg/83-86806-00-1/mar-cont.pdf",
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_friend/"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: przykład, jak daleko sięgały zainteresowania patrona; ogólnie do Instytutu.",
+    "sciezki": [
+      {
+        "d": "M13,129 a87,87 0 1,0 174,0 a87,87 0 1,0 -174,0"
+      },
+      {
+        "d": "M109.2,125.2 L180.4,95.7"
+      },
+      {
+        "d": "M103.8,119.8 L133.3,48.6"
+      },
+      {
+        "d": "M96.2,119.8 L66.7,48.6"
+      },
+      {
+        "d": "M90.8,125.2 L19.6,95.7"
+      },
+      {
+        "d": "M90.8,132.8 L19.6,162.3"
+      },
+      {
+        "d": "M96.2,138.2 L66.7,209.4"
+      },
+      {
+        "d": "M103.8,138.2 L133.3,209.4"
+      },
+      {
+        "d": "M109.2,132.8 L180.4,162.3"
+      },
+      {
+        "d": "M128.7,129L128.6,127.4L128.1,125.6L126.3,122.2L123.4,118.7L118.8,114.6L115.2,112.2L104.8,107.4L102.3,106.4L100,106.1L97.7,106.4L95.2,107.4L84.8,112.2L81.2,114.6L76.6,118.7L73.7,122.2L71.9,125.6L71.4,127.4L71.3,129L71.4,130.6L71.9,132.4L73.7,135.8L76.6,139.3L81.2,143.4L84.8,145.8L95.2,150.6L97.7,151.6L100,151.9L102.3,151.6L104.8,150.6L115.2,145.8L118.8,143.4L123.4,139.3L126.3,135.8L128.1,132.4L128.6,130.6Z",
+        "gruba": false
+      },
+      {
+        "d": "M154.6,129L154.3,127.3L153.1,125.2L149.3,120.5L145.7,116.4L142.8,112L141.4,110.7L137.6,108.1L136.2,106.7L134.3,103.8L132.5,99.6L131.4,98.1L129.3,97.2L123.5,96.6L119.4,95.5L118.1,94.6L115.4,92L110.8,90L102.9,83.6L101.2,82.7L100,82.5L98.8,82.7L97.1,83.6L89.2,90L84.6,92L81.9,94.6L80.6,95.5L76.5,96.6L70.7,97.2L68.6,98.1L67.5,99.6L65.7,103.8L63.8,106.7L62.4,108.1L58.6,110.7L57.2,112L54.3,116.4L50.7,120.5L46.9,125.2L45.7,127.3L45.4,129L45.7,130.7L46.9,132.8L50.7,137.5L54.3,141.6L57.2,146L58.6,147.3L62.4,149.9L63.8,151.3L65.7,154.2L67.5,158.4L68.6,159.9L70.7,160.8L76.5,161.4L80.6,162.5L81.9,163.4L84.6,166L89.2,168L97.1,174.4L98.8,175.3L100,175.5L101.2,175.3L102.9,174.4L110.8,168L115.4,166L118.1,163.4L119.4,162.5L123.5,161.4L129.3,160.8L131.4,159.9L132.5,158.4L134.3,154.2L136.2,151.3L137.6,149.9L141.4,147.3L142.8,146L145.7,141.6L149.3,137.5L153.1,132.8L154.3,130.7Z",
+        "gruba": false
+      },
+      {
+        "d": "M184.1,129L183.7,128.4L179.9,126.5L178.2,125.1L176.2,124L175.7,123.2L175.9,122L175.7,121.5L172.7,120.3L171.6,119.6L171.3,117.2L173.2,114.9L173.1,114.4L168.1,113.1L165.3,111.4L165.4,110.6L166.6,108.8L166.4,108.6L164.9,107.8L164.6,107.1L165.5,105.6L165.9,104.3L168.2,101.3L168.3,100.7L167.2,100.4L163,100.4L161.3,100L159.2,99.9L158.6,99.3L158.6,98L158.4,97.8L155.7,97.7L154.7,97.3L154.8,94.9L156.8,91.1L156.4,90.9L152.9,91.1L152.1,90.4L151.1,90.1L151,89.7L152.2,86.2L152,85.8L150.9,85.3L150.6,84.6L151.2,82.6L151.4,80.7L152.7,77L152.6,76.4L151.9,76.4L148,77.9L146,78.3L143.8,79L143,78.9L142.4,77.9L142,77.8L139.3,79.1L138.1,79.4L136.7,77.8L136.7,74.7L136.5,74.3L132.6,76.7L129.9,77.1L129.6,76.3L129.5,73.9L129.3,73.7L127.9,73.9L127.4,73.4L127.2,71.5L126.8,70L126.8,66L126.5,65L125.9,65.2L123,67.8L121.7,68.3L120.3,69.4L119.6,69.2L118.8,67.8L118.6,67.7L116.8,69L116.1,69.2L114.5,66.6L113.4,61.9L113,61.9L110.8,63.9L108.5,63.7L107.9,62.7L106.9,59.8L106.4,59.6L105.3,59.8L104.5,59.3L103.5,57.3L102.3,55.6L100.5,51.9L100,51.5L99.5,51.9L97.7,55.6L96.5,57.3L95.5,59.3L94.7,59.8L93.6,59.6L93.1,59.8L92.1,62.7L91.5,63.7L89.2,63.9L87,61.9L86.6,61.9L85.5,66.6L83.9,69.2L83.2,69L81.4,67.7L81.2,67.8L80.4,69.2L79.7,69.4L78.3,68.3L77,67.8L74.1,65.2L73.5,65L73.2,66L73.2,70L72.8,71.5L72.6,73.4L72.1,73.9L70.7,73.7L70.5,73.9L70.4,76.3L70.1,77.1L67.4,76.7L63.5,74.3L63.3,74.7L63.3,77.8L61.9,79.4L60.7,79.1L58,77.8L57.6,77.9L57,78.9L56.2,79L54,78.3L52,77.9L48.1,76.4L47.4,76.4L47.3,77L48.6,80.7L48.8,82.6L49.4,84.6L49.1,85.3L48,85.8L47.8,86.2L49,89.7L48.9,90.1L47.9,90.4L47.1,91.1L43.6,90.9L43.2,91.1L45.2,94.9L45.3,97.3L44.3,97.7L41.6,97.8L41.4,98L41.4,99.3L40.8,99.9L38.7,100L37,100.4L32.8,100.4L31.7,100.7L31.8,101.3L34.1,104.3L34.5,105.6L35.4,107.1L35.1,107.8L33.6,108.6L33.4,108.8L34.6,110.6L34.7,111.4L31.9,113.1L26.9,114.4L26.8,114.9L28.7,117.2L28.4,119.6L27.3,120.3L24.3,121.5L24.1,122L24.3,123.2L23.8,124L21.8,125.1L20.1,126.5L16.3,128.4L15.9,129L16.3,129.6L20.1,131.5L21.8,132.9L23.8,134L24.3,134.8L24.1,136L24.3,136.5L27.3,137.7L28.4,138.4L28.7,140.8L26.8,143.1L26.9,143.6L31.9,144.9L34.7,146.6L34.6,147.4L33.4,149.2L33.6,149.4L35.1,150.2L35.4,150.9L34.5,152.4L34.1,153.7L31.8,156.7L31.7,157.3L32.8,157.6L37,157.6L38.7,158L40.8,158.1L41.4,158.7L41.4,160L41.6,160.2L44.3,160.3L45.3,160.7L45.2,163.1L43.2,166.9L43.6,167.1L47.1,166.9L47.9,167.6L48.9,167.9L49,168.3L47.8,171.8L48,172.2L49.1,172.7L49.4,173.4L48.8,175.4L48.6,177.3L47.3,181L47.4,181.6L48.1,181.6L52,180.1L54,179.7L56.2,179L57,179.1L57.6,180.1L58,180.2L60.7,178.9L61.9,178.6L63.3,180.2L63.3,183.3L63.5,183.7L67.4,181.3L70.1,180.9L70.4,181.7L70.5,184.1L70.7,184.3L72.1,184.1L72.6,184.6L72.8,186.5L73.2,188L73.2,192L73.5,193L74.1,192.8L77,190.2L78.3,189.7L79.7,188.6L80.4,188.8L81.2,190.2L81.4,190.3L83.2,189L83.9,188.8L85.5,191.4L86.6,196.1L87,196.1L89.2,194.1L91.5,194.3L92.1,195.3L93.1,198.2L93.6,198.4L94.7,198.2L95.5,198.7L96.5,200.7L97.7,202.4L99.5,206.1L100,206.5L100.5,206.1L102.3,202.4L103.5,200.7L104.5,198.7L105.3,198.2L106.4,198.4L106.9,198.2L107.9,195.3L108.5,194.3L110.8,194.1L113,196.1L113.4,196.1L114.5,191.4L116.1,188.8L116.8,189L118.6,190.3L118.8,190.2L119.6,188.8L120.3,188.6L121.7,189.7L123,190.2L125.9,192.8L126.5,193L126.8,192L126.8,188L127.2,186.5L127.4,184.6L127.9,184.1L129.3,184.3L129.5,184.1L129.6,181.7L129.9,180.9L132.6,181.3L136.5,183.7L136.7,183.3L136.7,180.2L138.1,178.6L139.3,178.9L142,180.2L142.4,180.1L143,179.1L143.8,179L146,179.7L148,180.1L151.9,181.6L152.6,181.6L152.7,181L151.4,177.3L151.2,175.4L150.6,173.4L150.9,172.7L152,172.2L152.2,171.8L151,168.3L151.1,167.9L152.1,167.6L152.9,166.9L156.4,167.1L156.8,166.9L154.8,163.1L154.7,160.7L155.7,160.3L158.4,160.2L158.6,160L158.6,158.7L159.2,158.1L161.3,158L163,157.6L167.2,157.6L168.3,157.3L168.2,156.7L165.9,153.7L165.5,152.4L164.6,150.9L164.9,150.2L166.4,149.4L166.6,149.2L165.4,147.4L165.3,146.6L168.1,144.9L173.1,143.6L173.2,143.1L171.3,140.8L171.6,138.4L172.7,137.7L175.7,136.5L175.9,136L175.7,134.8L176.2,134L178.2,132.9L179.9,131.5L183.7,129.6Z",
+        "gruba": true
+      }
+    ]
+  },
+  {
+    "id": "marczewski-sikorski",
+    "nazwa": "Miary na ogromnych przestrzeniach",
+    "rok": "1948",
+    "zdanie": "Z Romanem Sikorskim: miara na przestrzeni metrycznej, nawet ogromnej, zwykle skupia się na małej części ośrodkowej.",
+    "notka": "E. Marczewski, R. Sikorski, „Measures in non-separable metric spaces” (Colloquium Mathematicum 1, 1948, s. 133–139): miara probabilistyczna na przestrzeni metrycznej, której gęstość nie jest liczbą mierzalną w sensie rzeczywistym, ma ośrodkowy nośnik. Wynik cytowany jest jako klasyczny do dziś, m.in. przy badaniu przestrzeni funkcji ciągłych. Słowo „zwykle” w zdaniu oznacza to zastrzeżenie. Rysunek: „jeż”, klasyczny przykład nieośrodkowej przestrzeni metrycznej: kolce wychodzą ze wspólnego środka, a droga między punktami dwóch kolców idzie przez środek. Prawdziwy jeż ma nieprzeliczalnie wiele kolców (tu 36); miara żyje na przeliczalnie wielu (pogrubione).",
+    "rodzaj": "twierdzenie",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://eudml.org/doc/209895",
+      "https://arxiv.org/pdf/1103.0247",
+      "https://www.impan.pl/shop/media/wysiwyg/83-86806-00-1/mar-cont.pdf"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: praca z pierwszego tomu wrocławskiego „Colloquium Mathematicum”; ogólnie do Instytutu.",
+    "sciezki": [
+      {
+        "d": "M104.6,127.1 L179.2,95.5",
+        "gruba": true
+      },
+      {
+        "d": "M95.3,127.3 L19,100.2",
+        "gruba": false
+      },
+      {
+        "d": "M102.3,133.4 L140.3,205",
+        "gruba": true
+      },
+      {
+        "d": "M101.3,124.2 L121.6,45.8",
+        "gruba": false
+      },
+      {
+        "d": "M95.8,131.7 L27.8,175.8",
+        "gruba": false
+      },
+      {
+        "d": "M104.9,129.8 L184.8,143.3",
+        "gruba": false
+      },
+      {
+        "d": "M96.9,125.1 L47.1,61.2",
+        "gruba": false
+      },
+      {
+        "d": "M99.6,134 L93.2,214.7",
+        "gruba": true
+      },
+      {
+        "d": "M103.7,125.6 L162.9,70.4",
+        "gruba": false
+      },
+      {
+        "d": "M95,129 L14,129.7",
+        "gruba": false
+      },
+      {
+        "d": "M103.7,132.3 L163.9,186.5",
+        "gruba": false
+      },
+      {
+        "d": "M99.5,124 L91.8,43.4",
+        "gruba": true
+      },
+      {
+        "d": "M97,133 L48.3,197.7",
+        "gruba": false
+      },
+      {
+        "d": "M104.9,128.1 L184.6,113.3",
+        "gruba": false
+      },
+      {
+        "d": "M95.8,126.4 L27,83.5",
+        "gruba": false
+      },
+      {
+        "d": "M101.3,133.8 L123,211.9",
+        "gruba": false
+      },
+      {
+        "d": "M102.3,124.5 L139,52.3",
+        "gruba": true
+      },
+      {
+        "d": "M95.3,130.8 L19.5,159.2",
+        "gruba": false
+      },
+      {
+        "d": "M104.6,130.9 L179.8,161.1",
+        "gruba": false
+      },
+      {
+        "d": "M97.8,124.5 L62.9,51.4",
+        "gruba": false
+      },
+      {
+        "d": "M98.5,133.8 L75,211.3",
+        "gruba": false
+      },
+      {
+        "d": "M104.3,126.5 L174,85.2",
+        "gruba": false
+      },
+      {
+        "d": "M95.1,128 L15.9,111.3",
+        "gruba": false
+      },
+      {
+        "d": "M102.9,133.1 L150.1,198.9",
+        "gruba": true
+      },
+      {
+        "d": "M100.6,124 L110.3,43.6",
+        "gruba": false
+      },
+      {
+        "d": "M96.2,132.3 L34.7,185",
+        "gruba": false
+      },
+      {
+        "d": "M105,129.2 L186,131.8",
+        "gruba": false
+      },
+      {
+        "d": "M96.4,125.5 L38.5,68.9",
+        "gruba": false
+      },
+      {
+        "d": "M100.3,134 L104.7,214.9",
+        "gruba": false
+      },
+      {
+        "d": "M103.2,125.1 L154.5,62.5",
+        "gruba": false
+      },
+      {
+        "d": "M95.1,129.7 L14.9,141.2",
+        "gruba": true
+      },
+      {
+        "d": "M104.1,131.8 L171,177.5",
+        "gruba": false
+      },
+      {
+        "d": "M98.9,124.1 L80.4,45.3",
+        "gruba": false
+      },
+      {
+        "d": "M97.6,133.4 L57.9,204",
+        "gruba": false
+      },
+      {
+        "d": "M104.8,127.4 L181.7,102.2",
+        "gruba": false
+      },
+      {
+        "d": "M95.4,126.9 L21.6,93.6",
+        "gruba": false
+      },
+      {
+        "d": "M170.6,97.3 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M131.6,197 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M89.8,201.3 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M89,61.3 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M124.3,72.4 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M129.8,177 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M41.6,136.7 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      }
+    ]
+  },
+  {
+    "id": "suma-plonki",
+    "nazwa": "Suma Płonki",
+    "rok": "1967",
+    "zdanie": "Jego doktorant Jerzy Płonka wymyślił sklejanie algebr wzdłuż półkraty; metoda żyje dziś w algebrze i logice.",
+    "notka": "J. Płonka (doktorat u Marczewskiego 1964), „On a method of construction of abstract algebras” (Fundamenta Mathematicae 61, 1967, s. 183–189). Suma Płonki powstaje z rodziny algebr indeksowanej półkratą, z homomorfizmami między nimi; działanie na elementach z różnych włókien wykonuje się we włóknie ich supremum. Praca z 2026 r. nazywa ją naturalnym językiem algebraicznym tzw. logik zawierania zmiennych. To jedna z dróg, którymi idee wrocławskiej grupy algebr ogólnych Marczewskiego żyją do dziś. Rysunek: półkrata z czterema elementami, włókna Z₄, Z₂, Z₄, Z₂; pogrubione: 1 ∈ Z₂ i 2 ∈ Z₄ przechodzą do górnego włókna, gdzie dają wynik działania (przemienność diagramu sprawdzona w generatorze).",
+    "rodzaj": "pojęcie",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://eudml.org/doc/213988",
+      "https://arxiv.org/html/2602.06188",
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/"
+    ],
+    "podstrona": "Struktura i zakłady",
+    "dlaczego_tu": "Budowanie całości z części połączonych homomorfizmami: struktura w najczystszej postaci.",
+    "sciezki": [
+      {
+        "d": "M142.5,201L142.3,202.4L141.6,203.7L140.4,205L138.8,206.3L136.8,207.5L134.4,208.6L131.6,209.7L128.4,210.7L121.3,212.3L117.3,212.9L108.8,213.7L100,214L91.2,213.7L82.7,212.9L78.8,212.3L71.6,210.7L68.4,209.7L65.6,208.6L63.2,207.5L61.2,206.3L59.6,205L58.4,203.7L57.7,202.4L57.5,201L57.7,199.6L58.4,198.3L59.6,197L61.2,195.7L63.2,194.5L65.6,193.4L68.4,192.3L71.6,191.3L78.7,189.7L86.9,188.6L95.6,188.1L100,188L108.8,188.3L117.3,189.1L125,190.5L128.4,191.3L131.6,192.3L134.4,193.4L136.8,194.5L138.8,195.7L140.4,197L141.6,198.3L142.3,199.6Z"
+      },
+      {
+        "d": "M71.5,129L71.3,130.4L70.9,131.7L70.2,133L69.1,134.3L67.8,135.5L66.2,136.6L62.4,138.7L57.8,140.3L55.2,140.9L49.7,141.7L44,142L38.3,141.7L32.8,140.9L30.3,140.3L25.6,138.7L21.8,136.6L20.2,135.5L18.9,134.3L17.8,133L17.1,131.7L16.7,130.4L16.5,129L16.7,127.6L17.1,126.3L17.8,125L18.9,123.7L20.2,122.5L21.8,121.4L25.6,119.3L27.8,118.5L32.8,117.1L38.3,116.3L44,116L49.7,116.3L52.5,116.6L57.8,117.7L62.4,119.3L66.2,121.4L67.8,122.5L69.1,123.7L70.2,125L70.9,126.3L71.3,127.6Z"
+      },
+      {
+        "d": "M185.5,129L185.3,130.4L184.6,131.7L183.4,133L181.8,134.3L179.8,135.5L177.4,136.6L174.6,137.7L171.4,138.7L164.3,140.3L160.3,140.9L151.8,141.7L143,142L134.2,141.7L125.7,140.9L121.8,140.3L114.6,138.7L111.4,137.7L108.6,136.6L106.2,135.5L104.2,134.3L102.6,133L101.4,131.7L100.7,130.4L100.5,129L100.7,127.6L101.4,126.3L102.6,125L104.2,123.7L106.2,122.5L108.6,121.4L111.4,120.3L114.6,119.3L121.7,117.7L129.9,116.6L134.2,116.3L143,116L151.8,116.3L156.1,116.6L164.3,117.7L171.4,119.3L174.6,120.3L177.4,121.4L179.8,122.5L181.8,123.7L183.4,125L184.6,126.3L185.3,127.6Z"
+      },
+      {
+        "d": "M127.5,57L127.3,58.4L126.9,59.7L126.2,61L125.1,62.3L123.8,63.5L122.2,64.6L118.4,66.7L113.8,68.3L108.5,69.4L105.7,69.7L100,70L94.3,69.7L88.8,68.9L83.8,67.5L79.6,65.7L77.8,64.6L76.2,63.5L74.9,62.3L73.8,61L73.1,59.7L72.7,58.4L72.5,57L72.7,55.6L73.1,54.3L73.8,53L74.9,51.7L76.2,50.5L77.8,49.4L79.6,48.3L83.8,46.5L88.8,45.1L94.3,44.3L100,44L105.7,44.3L111.2,45.1L116.2,46.5L120.4,48.3L122.2,49.4L123.8,50.5L125.1,51.7L126.2,53L126.9,54.3L127.3,55.6Z"
+      },
+      {
+        "d": "M74.8,196.2 L39.2,133.8",
+        "gruba": false
+      },
+      {
+        "d": "M89.8,196.2 L54.2,133.8",
+        "gruba": false
+      },
+      {
+        "d": "M103.6,197.1 L40.4,132.9",
+        "gruba": false
+      },
+      {
+        "d": "M118.6,197.1 L55.4,132.9",
+        "gruba": false
+      },
+      {
+        "d": "M80.3,196.3 L117.7,133.7",
+        "gruba": false
+      },
+      {
+        "d": "M95.3,196.3 L132.7,133.7",
+        "gruba": false
+      },
+      {
+        "d": "M110.3,196.3 L147.7,133.7",
+        "gruba": false
+      },
+      {
+        "d": "M125.3,196.3 L162.7,133.7",
+        "gruba": false
+      },
+      {
+        "d": "M39.9,124.7 L89.1,61.3",
+        "gruba": false
+      },
+      {
+        "d": "M54.9,124.7 L104.1,61.3",
+        "gruba": true
+      },
+      {
+        "d": "M118.5,123.9 L94.5,62.1",
+        "gruba": false
+      },
+      {
+        "d": "M133.5,123.9 L109.5,62.1",
+        "gruba": false
+      },
+      {
+        "d": "M147,124.7 L96,61.3",
+        "gruba": true
+      },
+      {
+        "d": "M162,124.7 L111,61.3",
+        "gruba": false
+      },
+      {
+        "d": "M73,201 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M88,201 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M103,201 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M118,201 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M32,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M47,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M116,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M131,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M146,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M161,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M88,57 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M103,57 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      }
+    ]
+  },
+  {
+    "id": "graffiti-fajtlowicz",
+    "nazwa": "Graffiti: program stawiający hipotezy",
+    "rok": "lata 80.",
+    "zdanie": "Jego doktorant Siemion Fajtlowicz napisał Graffiti, program, który sam wysuwa hipotezy w teorii grafów.",
+    "notka": "S. Fajtlowicz (doktorat u Marczewskiego, 1967 lub 1968) napisał Graffiti w połowie lat 80. na Uniwersytecie w Houston. Program buduje bazę grafów, liczy ich niezmienniki, zestawia proste nierówności i odrzuca te fałszywe albo nieciekawe. Hipotezy Graffiti zainspirowały ok. 80 prac m.in. Alona, Bollobása, Chung, Erdősa i Lovásza; pisał o tym New York Times (1989). Jedną z nich, że średnia odległość w grafie spójnym nie przekracza liczby niezależności, udowodniła F. Chung w 1988 r. Rysunek: graf Petersena, średnia odległość 5/3, liczba niezależności 4; pogrubione cztery wierzchołki, z których żadne dwa nie są sąsiadami (przegląd zupełny w generatorze).",
+    "rodzaj": "zastosowanie",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://en.wikipedia.org/wiki/Siemion_Fajtlowicz",
+      "https://www.uhd.edu/documents/academics/sciences/history.pdf"
+    ],
+    "podstrona": "Infrastruktura informatyczna",
+    "dlaczego_tu": "Komputer jako współpracownik matematyka, i to wnuka naukowego Instytutu.",
+    "sciezki": [
+      {
+        "d": "M104,55.9 L172,105.3"
+      },
+      {
+        "d": "M100,58 L100,91"
+      },
+      {
+        "d": "M101.5,100.8 L120.2,158.2"
+      },
+      {
+        "d": "M174.5,113 L148.6,193"
+      },
+      {
+        "d": "M171.3,109.8 L139.9,120"
+      },
+      {
+        "d": "M131.1,124.5 L82.3,160"
+      },
+      {
+        "d": "M142,197.7 L58,197.7"
+      },
+      {
+        "d": "M144.1,193.7 L124.7,167"
+      },
+      {
+        "d": "M117.7,160 L68.9,124.5"
+      },
+      {
+        "d": "M51.4,193 L25.5,113"
+      },
+      {
+        "d": "M55.9,193.7 L75.3,167"
+      },
+      {
+        "d": "M79.8,158.2 L98.5,100.8"
+      },
+      {
+        "d": "M28,105.3 L96,55.9"
+      },
+      {
+        "d": "M28.7,109.8 L60.1,120"
+      },
+      {
+        "d": "M69.8,121.6 L130.2,121.6"
+      },
+      {
+        "d": "M95.5,53 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M171.6,108.3 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M142.5,197.7 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M138.5,197.7 a8.5,8.5 0 1,0 17,0 a8.5,8.5 0 1,0 -17,0",
+        "gruba": true
+      },
+      {
+        "d": "M48.5,197.7 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M19.4,108.3 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M15.4,108.3 a8.5,8.5 0 1,0 17,0 a8.5,8.5 0 1,0 -17,0",
+        "gruba": true
+      },
+      {
+        "d": "M95.5,96 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M91.5,96 a8.5,8.5 0 1,0 17,0 a8.5,8.5 0 1,0 -17,0",
+        "gruba": true
+      },
+      {
+        "d": "M130.7,121.6 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M126.7,121.6 a8.5,8.5 0 1,0 17,0 a8.5,8.5 0 1,0 -17,0",
+        "gruba": true
+      },
+      {
+        "d": "M117.2,162.9 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M73.8,162.9 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      },
+      {
+        "d": "M60.3,121.6 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": false
+      }
+    ]
+  },
+  {
+    "id": "biblioteka-1945",
+    "nazwa": "Zaczęło się od zbierania książek",
+    "rok": "1945",
+    "zdanie": "Od 10 maja 1945 r. zbierał ocalałe książki matematyczne; jesienią było już kilkaset tomów, zalążek biblioteki.",
+    "notka": "Niemiecki instytut matematyczny i jego biblioteka zostały zniszczone. J. Łoś wspomina, że Marczewski zaczął zbierać książki na przyszłą bibliotekę już 10 maja 1945 r.; według nekrologu (R. Duda, S. Hartman) jesienią 1945 r. istniał zalążek liczący kilkaset tomów. Duda i Weron piszą o książkach „rozproszonych po domach i mieszkaniach profesorów” i o wcześnie uruchomionej bibliotece Seminarium Matematycznego Uniwersytetu i Politechniki. Rysunek (z przymrużeniem oka): stos książek z największym wysunięciem. Górna książka wystaje poza krawędź stołu o (L/2)(1 + 1/2 + … + 1/8), czyli więcej niż o własną długość; równowagę na każdym poziomie sprawdza generator.",
+    "rodzaj": "historia",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/",
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_friend/",
+      "https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf"
+    ],
+    "podstrona": "Biblioteka",
+    "dlaczego_tu": "Początek matematycznej biblioteki we Wrocławiu.",
+    "przypiecie": true,
+    "sciezki": [
+      {
+        "d": "M110.7,95 L176.7,95 176.7,82 110.7,82Z",
+        "gruba": true
+      },
+      {
+        "d": "M116.7,95 L116.7,82"
+      },
+      {
+        "d": "M77.7,108 L143.7,108 143.7,95 77.7,95Z",
+        "gruba": false
+      },
+      {
+        "d": "M83.7,108 L83.7,95"
+      },
+      {
+        "d": "M61.2,121 L127.2,121 127.2,108 61.2,108Z",
+        "gruba": false
+      },
+      {
+        "d": "M67.2,121 L67.2,108"
+      },
+      {
+        "d": "M50.2,134 L116.2,134 116.2,121 50.2,121Z",
+        "gruba": false
+      },
+      {
+        "d": "M56.2,134 L56.2,121"
+      },
+      {
+        "d": "M41.9,147 L107.9,147 107.9,134 41.9,134Z",
+        "gruba": false
+      },
+      {
+        "d": "M47.9,147 L47.9,134"
+      },
+      {
+        "d": "M35.3,160 L101.3,160 101.3,147 35.3,147Z",
+        "gruba": false
+      },
+      {
+        "d": "M41.3,160 L41.3,147"
+      },
+      {
+        "d": "M29.8,173 L95.8,173 95.8,160 29.8,160Z",
+        "gruba": false
+      },
+      {
+        "d": "M35.8,173 L35.8,160"
+      },
+      {
+        "d": "M25.1,186 L91.1,186 91.1,173 25.1,173Z",
+        "gruba": false
+      },
+      {
+        "d": "M31.1,186 L31.1,173"
+      },
+      {
+        "d": "M14,186 L87,186",
+        "gruba": true
+      },
+      {
+        "d": "M87,186 L87,220",
+        "gruba": true
+      },
+      {
+        "d": "M87,76 L87,186"
+      }
+    ]
+  },
+  {
+    "id": "etos-szkoly",
+    "nazwa": "Autorzy w porządku alfabetycznym",
+    "rok": "po 1945",
+    "zdanie": "Spisał etos szkoły wrocławskiej: autorzy zawsze alfabetycznie, a liczy się talent i wynik, nie stopień czy tytuł.",
+    "notka": "Duda i Weron („Wrocławska szkoła matematyczna”, Wiad. Mat. 42, 2006): Marczewski „podjął się trudu” sformułowania wspólnego etosu, wyrastającego z przedwojennej szkoły warszawskiej. Wśród zasad wymieniają „pisanie nazwisk autorów zawsze w porządku alfabetycznym” i „wtórność stopni i tytułów naukowych”, a także wczesny start w pracy naukowej, dzielenie się problemami, opiekę nad młodymi. Autorzy nie podają daty ani miejsca tego tekstu, stąd rok przybliżony. Rysunek: skoro alfabetycznie, to sortowanie: sieć Batchera z 19 porównaniami, poprawna dla każdego ustawienia (sprawdzone dla wszystkich ciągów zero-jedynkowych, zasada 0–1); pogrubiona droga nazwiska, które idzie na pierwsze miejsce.",
+    "rodzaj": "historia",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf"
+    ],
+    "podstrona": "Pracownicy",
+    "dlaczego_tu": "Kim chcemy być jako zespół: zasady współpracy spisane przez patrona działu.",
+    "sciezki": [
+      {
+        "d": "M16,44 L184,44"
+      },
+      {
+        "d": "M16,68 L184,68"
+      },
+      {
+        "d": "M16,92 L184,92"
+      },
+      {
+        "d": "M16,116 L184,116"
+      },
+      {
+        "d": "M16,140 L184,140"
+      },
+      {
+        "d": "M16,164 L184,164"
+      },
+      {
+        "d": "M16,188 L184,188"
+      },
+      {
+        "d": "M16,212 L184,212"
+      },
+      {
+        "d": "M32.7,44 L32.7,68 M29.7,44 L35.7,44 M29.7,68 L35.7,68"
+      },
+      {
+        "d": "M32.7,92 L32.7,116 M29.7,92 L35.7,92 M29.7,116 L35.7,116"
+      },
+      {
+        "d": "M46.2,44 L46.2,92 M43.2,44 L49.2,44 M43.2,92 L49.2,92"
+      },
+      {
+        "d": "M59.6,68 L59.6,116 M56.6,68 L62.6,68 M56.6,116 L62.6,116"
+      },
+      {
+        "d": "M73.1,68 L73.1,92 M70.1,68 L76.1,68 M70.1,92 L76.1,92"
+      },
+      {
+        "d": "M32.7,140 L32.7,164 M29.7,140 L35.7,140 M29.7,164 L35.7,164"
+      },
+      {
+        "d": "M32.7,188 L32.7,212 M29.7,188 L35.7,188 M29.7,212 L35.7,212"
+      },
+      {
+        "d": "M46.2,140 L46.2,188 M43.2,140 L49.2,140 M43.2,188 L49.2,188"
+      },
+      {
+        "d": "M59.6,164 L59.6,212 M56.6,164 L62.6,164 M56.6,212 L62.6,212"
+      },
+      {
+        "d": "M73.1,164 L73.1,188 M70.1,164 L76.1,164 M70.1,188 L76.1,188"
+      },
+      {
+        "d": "M86.5,44 L86.5,140 M83.5,44 L89.5,44 M83.5,140 L89.5,140"
+      },
+      {
+        "d": "M100,92 L100,188 M97,92 L103,92 M97,188 L103,188"
+      },
+      {
+        "d": "M113.5,92 L113.5,140 M110.5,92 L116.5,92 M110.5,140 L116.5,140"
+      },
+      {
+        "d": "M126.9,68 L126.9,164 M123.9,68 L129.9,68 M123.9,164 L129.9,164"
+      },
+      {
+        "d": "M140.4,116 L140.4,212 M137.4,116 L143.4,116 M137.4,212 L143.4,212"
+      },
+      {
+        "d": "M153.8,116 L153.8,164 M150.8,116 L156.8,116 M150.8,164 L156.8,164"
+      },
+      {
+        "d": "M140.4,68 L140.4,92 M137.4,68 L143.4,68 M137.4,92 L143.4,92"
+      },
+      {
+        "d": "M167.3,116 L167.3,140 M164.3,116 L170.3,116 M164.3,140 L170.3,140"
+      },
+      {
+        "d": "M167.3,164 L167.3,188 M164.3,164 L170.3,164 M164.3,188 L170.3,188"
+      },
+      {
+        "d": "M16,212L32.7,212L32.7,188L46.2,188L46.2,140L86.5,140L86.5,44L184,44",
+        "gruba": true
+      }
+    ]
+  },
+  {
+    "id": "katedra-numeryczna-1962",
+    "nazwa": "Katedra Metod Numerycznych",
+    "rok": "1962",
+    "zdanie": "Z jego inicjatywy powstała w Instytucie Katedra Metod Numerycznych; objął ją jego wychowanek Stefan Paszkowski.",
+    "notka": "Duda i Weron: „Z jego inicjatywy, jako dyrektora Instytutu Matematycznego Uniwersytetu Wrocławskiego, w 1962 r. została w tym Instytucie utworzona Katedra Metod Numerycznych”. Kierownikiem został S. Paszkowski (doktorat u Marczewskiego 1958), po studiach uzupełniających w Moskwie. W tym samym roku ukazała się monografia Paszkowskiego „The theory of uniform approximation I” (IM PAN, Warszawa). Rysunek: przybliżenie jednostajne, jego temat: u góry x⁵ i najlepsze przybliżenie wielomianem stopnia 3, u dołu błąd, czyli wielomian Czebyszewa T₅/16, który sześć razy osiąga maksimum na przemian z góry i z dołu.",
+    "rodzaj": "historia",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf",
+      "https://eudml.org/doc/268542",
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/"
+    ],
+    "podstrona": "Infrastruktura informatyczna",
+    "dlaczego_tu": "Początek obliczeń numerycznych w Instytucie: przodek dzisiejszej infrastruktury.",
+    "przypiecie": true,
+    "sciezki": [
+      {
+        "d": "M22,82 L178,82"
+      },
+      {
+        "d": "M22,122L24.6,115.8L27.2,110.3L29.8,105.6L33.7,99.7L36.3,96.5L40.2,92.6L44.1,89.6L48,87.3L51.9,85.6L55.8,84.3L61,83.3L66.2,82.6L71.4,82.3L79.2,82.1L116.9,82L128.6,81.7L133.8,81.4L139,80.8L142.9,80L146.8,78.9L149.4,77.9L152,76.7L155.9,74.4L159.8,71.4L163.7,67.5L167.6,62.4L171.5,56.1L175.4,48.2L178,42"
+      },
+      {
+        "d": "M22,119.5L25.9,113L31.1,105.4L35,100.5L40.2,94.9L45.4,90.4L50.6,86.8L55.8,84L61,82L64.9,80.9L70.1,80L75.3,79.6L80.5,79.7L89.6,80.5L106.5,83L113,83.9L119.5,84.3L124.7,84.4L129.9,84L135.1,83.1L140.3,81.6L145.5,79.4L150.7,76.4L154.6,73.6L158.5,70.3L162.4,66.4L166.3,61.9L170.2,56.8L174.1,51L178,44.5",
+        "gruba": true
+      },
+      {
+        "d": "M22,172 L178,172"
+      },
+      {
+        "d": "M22,136 L178,136"
+      },
+      {
+        "d": "M22,208 L178,208"
+      },
+      {
+        "d": "M22,208L24.6,181.8L25.9,171.4L27.2,162.6L28.5,155.2L29.8,149.2L31.1,144.5L32.4,140.9L33.7,138.4L35,136.8L36.3,136.1L37.6,136.1L38.9,136.8L40.2,138.1L41.5,139.9L44.1,144.9L48,154.5L58.4,183.6L62.3,192.9L64.9,198L67.5,202.2L70.1,205.2L71.4,206.3L72.7,207.2L74,207.7L75.3,208L76.6,208L77.9,207.7L79.2,207.1L80.5,206.3L83.1,204L84.4,202.4L87,198.7L89.6,194.3L93.5,186.6L105.2,160.2L109.1,152.1L111.7,147.4L114.3,143.3L115.6,141.6L118.2,138.7L119.5,137.7L120.8,136.9L122.1,136.3L123.4,136L124.7,136L126,136.3L127.3,136.8L128.6,137.7L129.9,138.8L131.2,140.2L132.5,141.8L135.1,146L137.7,151.1L141.6,160.4L152,189.5L155.9,199.1L158.5,204.1L159.8,205.9L161.1,207.2L162.4,207.9L163.7,207.9L165,207.2L166.3,205.6L167.6,203.1L168.9,199.5L170.2,194.8L171.5,188.8L172.8,181.4L174.1,172.6L175.4,162.2L178,136",
+        "gruba": true
+      },
+      {
+        "d": "M173.5,136 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M158.6,208 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M119.6,136 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M71.4,208 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M32.4,136 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      },
+      {
+        "d": "M17.5,208 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0",
+        "gruba": true
+      }
+    ]
+  },
+  {
+    "id": "dyrektor-instytutu",
+    "nazwa": "Dyrektor od pierwszego dnia",
+    "rok": "1952–1967",
+    "zdanie": "Instytut tworzyły cztery katedry; od początku kierował nim Marczewski, wybrany na dyrektora przez kolegów.",
+    "notka": "Nekrolog pióra R. Dudy i S. Hartmana: katedry Knastera, Marczewskiego, Steinhausa i Ślebodzińskiego tworzyły Instytut najpierw nieoficjalnie, od 1952 r. oficjalnie; Marczewski był dyrektorem od początku, wybrany przez kolegów, a zrezygnował w 1967 r. Duda i Weron (Wiad. Mat. 2006) podają lata 1951–1968, stąd „do sprawdzenia”. Rysunek: cztery równe koła w okręgu i koło w środku, wszystkie styczne (promień R/(1 + √2); błąd styczności sprawdza generator).",
+    "rodzaj": "historia",
+    "pewnosc": "do sprawdzenia",
+    "zrodla": [
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/",
+      "https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf"
+    ],
+    "podstrona": "Władze",
+    "dlaczego_tu": "Pierwszy dyrektor Instytutu: wprost o tym jest ta podstrona.",
+    "przypiecie": true,
+    "sciezki": [
+      {
+        "d": "M14,129 a86,86 0 1,0 172,0 a86,86 0 1,0 -172,0",
+        "gruba": true
+      },
+      {
+        "d": "M100,93.4 a35.6,35.6 0 1,0 71.2,0 a35.6,35.6 0 1,0 -71.2,0"
+      },
+      {
+        "d": "M28.8,93.4 a35.6,35.6 0 1,0 71.2,0 a35.6,35.6 0 1,0 -71.2,0"
+      },
+      {
+        "d": "M28.8,164.6 a35.6,35.6 0 1,0 71.2,0 a35.6,35.6 0 1,0 -71.2,0"
+      },
+      {
+        "d": "M100,164.6 a35.6,35.6 0 1,0 71.2,0 a35.6,35.6 0 1,0 -71.2,0"
+      },
+      {
+        "d": "M85.2,129 a14.8,14.8 0 1,0 29.5,0 a14.8,14.8 0 1,0 -29.5,0",
+        "gruba": true
+      },
+      {
+        "d": "M95.5,93.4 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0"
+      },
+      {
+        "d": "M59.9,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0"
+      },
+      {
+        "d": "M95.5,164.6 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0"
+      },
+      {
+        "d": "M131.1,129 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0"
+      }
+    ]
+  },
+  {
+    "id": "norwid-archytas",
+    "nazwa": "Platon i Archytas według Norwida",
+    "rok": "1967",
+    "zdanie": "Kochał Norwida: w 1967 r. omawiał publicznie jego wiersz „Platon i Archytas”, o dwóch postawach wobec matematyki.",
+    "notka": "Norwid był jego ulubionym poetą (nekrolog). W kwietniu 1967 r. na publicznej sesji Wrocławskiego Towarzystwa Naukowego odczytano wiersz i dyskutowali o nim Marczewski i hellenista Jerzy Łanowski; esej „Platon et Archytas de Norwid” ukazał się w Zastosowaniach Matematyki 10 (1969), s. 9–15. Wiersz zestawia postawę idealistyczną Platona i praktyczną Archytasa. Marczewski wspomina tam, że latem 1945 r. kupił w antykwariacie zbiór wierszy Norwida i że była to pierwsza polska książka jego powojennej biblioteki. Rysunek: podwojenie sześcianu, zadanie, które Archytas rozwiązał, sprowadzając je (za Hipokratesem) do dwóch średnich proporcjonalnych: a : x = x : y = y : 2a. Krawędź większego sześcianu to x; pod spodem odcinki a, x, y, 2a.",
+    "rodzaj": "anegdota",
+    "pewnosc": "pewne",
+    "zrodla": [
+      "https://bcc.impan.pl/shop/media/wysiwyg/83-86806-00-1/mar-edw.pdf",
+      "https://eudml.org/doc/267343",
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_obituary/",
+      "https://mathshistory.st-andrews.ac.uk/Biographies/Archytas/"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: matematyk humanista; dobre do działu jako całości.",
+    "sciezki": [
+      {
+        "d": "M100,164 L143.3,139",
+        "gruba": false
+      },
+      {
+        "d": "M100,164 L56.7,139",
+        "gruba": false
+      },
+      {
+        "d": "M100,164 L100,114",
+        "gruba": false
+      },
+      {
+        "d": "M143.3,139 L143.3,89",
+        "gruba": false
+      },
+      {
+        "d": "M56.7,139 L56.7,89",
+        "gruba": false
+      },
+      {
+        "d": "M100,114 L143.3,89",
+        "gruba": false
+      },
+      {
+        "d": "M100,114 L56.7,89",
+        "gruba": false
+      },
+      {
+        "d": "M143.3,89 L100,64",
+        "gruba": false
+      },
+      {
+        "d": "M56.7,89 L100,64",
+        "gruba": false
+      },
+      {
+        "d": "M100,164 L154.6,132.5",
+        "gruba": true
+      },
+      {
+        "d": "M100,164 L45.4,132.5",
+        "gruba": true
+      },
+      {
+        "d": "M100,164 L100,101",
+        "gruba": true
+      },
+      {
+        "d": "M154.6,132.5 L154.6,69.5",
+        "gruba": true
+      },
+      {
+        "d": "M45.4,132.5 L45.4,69.5",
+        "gruba": true
+      },
+      {
+        "d": "M100,101 L154.6,69.5",
+        "gruba": true
+      },
+      {
+        "d": "M100,101 L45.4,69.5",
+        "gruba": true
+      },
+      {
+        "d": "M154.6,69.5 L100,38",
+        "gruba": true
+      },
+      {
+        "d": "M45.4,69.5 L100,38",
+        "gruba": true
+      },
+      {
+        "d": "M50,178 L100,178 M50,175 L50,181 M100,175 L100,181",
+        "gruba": false
+      },
+      {
+        "d": "M50,190.5 L113,190.5 M50,187.5 L50,193.5 M113,187.5 L113,193.5",
+        "gruba": true
+      },
+      {
+        "d": "M50,203 L129.4,203 M50,200 L50,206 M129.4,200 L129.4,206",
+        "gruba": false
+      },
+      {
+        "d": "M50,215.5 L150,215.5 M50,212.5 L50,218.5 M150,212.5 L150,218.5",
+        "gruba": false
+      }
+    ]
+  },
+  {
+    "id": "zachowanie-miary",
+    "nazwa": "O zachowaniu miary we wszystkim",
+    "rok": "1953",
+    "zdanie": "W żartobliwej bibliografii z 1953 r. przypisano mu pracę „O zachowaniu miary we wszystkim”; śmiał się z innymi.",
+    "notka": "J. Łoś („Wiadomości Matematyczne” 22, 1980; przekład angielski w MacTutor): na spotkaniu w 1953 r. koledzy układali zabawną bibliografię polskich matematyków, a hasło o Marczewskim, specjaliście od miary, brzmiało „On preserving measure in everything”. Polski tytuł to nasz przekład z angielskiego: dosłowne brzmienie trzeba sprawdzić w polskim oryginale, stąd „do sprawdzenia”. Łoś wspomina też, że patron był człowiekiem umiarkowanym i pozbawionym zawiści. Rysunek: przekształcenie piekarza; koło po 0, 1, 2 i 3 krokach rozciąga się w coraz cieńsze paski, a jego pole się nie zmienia (policzone na siatce w generatorze).",
+    "rodzaj": "anegdota",
+    "pewnosc": "do sprawdzenia",
+    "zrodla": [
+      "https://mathshistory.st-andrews.ac.uk/Extras/Marczewski_friend/"
+    ],
+    "podstrona": "zapas",
+    "dlaczego_tu": "Zapas: gra słów na miarę dla działu Instytut.",
+    "sciezki": [
+      {
+        "d": "M12,38 L96,38 96,122 12,122Z"
+      },
+      {
+        "d": "M63.2,80L62.8,75.9L61.6,72L59.7,68.3L57.1,65.2L53.9,62.5L50.3,60.6L46.3,59.4L42.2,59L38.1,59.4L34.2,60.6L30.6,62.5L27.4,65.2L24.8,68.3L22.8,72L21.6,75.9L21.2,80L21.6,84.1L22.8,88L24.8,91.7L27.4,94.8L30.6,97.5L34.2,99.4L38.1,100.6L42.2,101L46.3,100.6L50.3,99.4L53.9,97.5L57.1,94.8L59.7,91.7L61.6,88L62.8,84.1L63.2,80",
+        "gruba": true
+      },
+      {
+        "d": "M104,38 L188,38 188,122 104,122Z"
+      },
+      {
+        "d": "M122.5,59L122.2,57.7L121.2,56.5L119.7,55.3L117.6,54.1L115,53L111.8,52L104.1,50.3 M188,92.3L177.9,91L166.8,90.5L155.5,90.7L144.8,91.7L135.6,93.4L131.7,94.4L128.5,95.6L125.9,96.9L124,98.2L122.9,99.6L122.5,101L122.9,102.4L124,103.8L125.9,105.1L128.5,106.4L131.8,107.6L135.6,108.6L144.8,110.3L155.4,111.3L166.7,111.5L177.8,111L188,109.7 M104.1,67.7L111.8,66L115,65L117.6,63.9L119.7,62.7L121.2,61.5L122.2,60.3L122.5,59",
+        "gruba": true
+      },
+      {
+        "d": "M12,130 L96,130 96,214 12,214Z"
+      },
+      {
+        "d": "M49,182.5L48.3,181.9L46.5,181.2L39.2,180L27.5,179L12.2,178.2 M96,157.2L76.4,156.5L54.9,156.3L33,156.3L12,156.8 M95.8,198.8L76.6,199.6L61.7,200.7L56.2,201.4L52.2,202.1L49.8,202.8L49.2,203.1L49,203.5L49.2,203.9L49.8,204.2L52.2,204.9L56.2,205.6L61.7,206.3L76.6,207.4L95.8,208.2 M12,166.2L32.8,166.7L54.7,166.7L76.4,166.5L96,165.8 M12.2,186.8L27.5,186L39.2,185L46.5,183.8L48.3,183.1L49,182.5",
+        "gruba": true
+      },
+      {
+        "d": "M104,130 L188,130 188,214 104,214Z"
+      },
+      {
+        "d": "M177.9,198.3L176.7,197.9L173,197.6L158.4,197L104.4,196.1 M188,143.6L104,143.1 M187.6,185.1L104,185.4 M187.6,164.4L136.8,165L104,165.9 M187.9,207.9L180.4,208.3L177.9,208.8L180.4,209.2L187.9,209.6 M104,167.6L136.8,168.5L187.6,169.1 M104,190.1L187.6,190.4 M104,148.4L188,147.9 M104.4,200.4L158.4,199.5L173,198.9L176.7,198.6L177.9,198.3",
+        "gruba": true
+      }
+    ]
   }
 ]

@@ -376,7 +376,310 @@ function rysProblemMarczewskiego() {
 }
 
 /* ---------- składanie ---------- */
+/* ================ Dopisane 5.11: rysunki nowych ciekawostek ================ */
+const PI = Math.PI;
+function rdp(p, eps) { // uproszczenie łamanej (Ramer–Douglas–Peucker)
+  if (p.length < 3) return p.slice();
+  const a = p[0], b = p[p.length - 1], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+  let iM = 0, dM = -1;
+  for (let i = 1; i < p.length - 1; i++) {
+    const d = L > 1e-9 ? Math.abs(dy * (p[i][0] - a[0]) - dx * (p[i][1] - a[1])) / L : Math.hypot(p[i][0] - a[0], p[i][1] - a[1]);
+    if (d > dM) { dM = d; iM = i; }
+  }
+  if (dM <= eps) return [a, b];
+  return rdp(p.slice(0, iM + 1), eps).slice(0, -1).concat(rdp(p.slice(iM), eps));
+}
+const gladko = (p, eps = 0.15) => lamana(rdp(p, eps));
+const gladkoZ = (p, eps = 0.15) => { const m = Math.floor(p.length / 2); return lamana(rdp(p.slice(0, m + 1), eps).slice(0, -1).concat(rdp(p.slice(m).concat([p[0]]), eps).slice(0, -1)), true); };
+const vdc = (k) => { let x = 0, f = 0.5; for (let m = k; m > 0; m >>= 1, f /= 2) if (m & 1) x += f; return x; }; // ciąg van der Corputa: 1/2, 1/4, 3/4, 1/8, …
+
+/* 13. Hewitt–Marczewski–Pondiczery: funkcje na [0, 1] z topologią produktową; otwarty zbiór bazowy = skończenie wiele „bramek”; schodkowa funkcja o wymiernych wartościach i progach przechodzi przez wszystkie */
+function rysHMP() {
+  const X0 = 22, X1 = 178, Y0 = 52, Y1 = 208, bx = (u) => X0 + (X1 - X0) * u, by = (v) => Y1 - (Y1 - Y0) * v, w = 0.075;
+  const bramki = [[Math.SQRT2 / 8, 0.26], [PI / 11, 0.7], [Math.sqrt(5) / 6.4, 0.42], [Math.E / 5.8, 0.84], [Math.SQRT2 / 2.4, 0.18], [PI / 4.3, 0.56], [Math.sqrt(3) / 2, 0.9], [Math.E / 2.9, 0.34]].sort((a, b) => a[0] - b[0]);
+  const out = [{ d: `M${X0},${Y0} L${X1},${Y0} ${X1},${Y1} ${X0},${Y1}Z` }];
+  bramki.forEach(([u, v]) => {
+    const x = bx(u), g = by(v + w), d = by(v - w);
+    out.push({ d: `${odcinek([x, Y0], [x, g])} ${odcinek([x, d], [x, Y1])} ${odcinek([x - 7, g], [x + 7, g])} ${odcinek([x - 7, d], [x + 7, d])}` });
+  });
+  // funkcja schodkowa: progi i wartości wymierne (mianownik 48), pośrodku między bramkami
+  const q = (t) => Math.round(t * 48) / 48;
+  const schod = [];
+  let uPocz = 0, ok = true;
+  bramki.forEach(([u, v], i) => {
+    const uKon = i < bramki.length - 1 ? q((u + bramki[i + 1][0]) / 2) : 1, wart = q(v);
+    if (Math.abs(wart - v) >= w) ok = false;
+    schod.push([bx(uPocz), by(wart)], [bx(uKon), by(wart)]);
+    uPocz = uKon;
+  });
+  out.push({ d: lamana(schod), gruba: true });
+  log(`bramek ${bramki.length}; funkcja schodkowa (progi i wartości k/48) przechodzi przez wszystkie: ${ok}`);
+  return out;
+}
+
+/* 14. Hipoteza Borela: zbiór mocno miary zero. Dla zadanego z góry ciągu długości punkty x_k przykrywamy odcinkami tych długości */
+function rysBorel() {
+  const y0 = 106, out = [{ d: odcinek([14, y0], [186, y0]) }], eps = Array.from({ length: 8 }, (_, k) => 80 * 0.63 ** k);
+  eps.forEach((e, k) => {
+    const x = 26 + 148 * vdc(k + 1), r = e / 2;
+    out.push({ d: odcinek([x, y0 - 4], [x, y0 + 4]) });
+    out.push({ d: gladko(Array.from({ length: 41 }, (_, i) => { const a = PI * i / 40; return [x + r * Math.cos(a), y0 - r * Math.sin(a)]; })), gruba: true });
+    out.push({ d: odcinek([26, 128 + k * 11.5], [26 + e, 128 + k * 11.5]), gruba: k === 0 });
+  });
+  log(`długości ε_k = 80·0,63^k: ${eps.map((e) => e.toFixed(1)).join(', ')}; ich suma ${eps.reduce((s, e) => s + e, 0).toFixed(0)}`);
+  return out;
+}
+
+/* 15. Miara i kategoria: u góry gruby zbiór Cantora (nigdzie gęsty, miara 1/2), u dołu otoczenia punktów wymiernych (gęste, a miara coraz mniejsza) */
+function rysMiaraKategoria() {
+  const X0 = 18, X1 = 182, S = X1 - X0, out = [];
+  const pasek = (y, odc, gr) => ({ d: odc.map(([a, b]) => odcinek([X0 + S * a, y], [X0 + S * b, y])).join(' '), gruba: gr });
+  // Smith–Volterra–Cantor: krok n usuwa ze środka każdego z 2^(n−1) kawałków odcinek długości 1/4^n
+  let odc = [[0, 1]];
+  for (let n = 0; n <= 4; n++) {
+    if (n) {
+      const g = 1 / 4 ** n; odc = odc.flatMap(([a, b]) => { const m = (a + b) / 2; return [[a, m - g / 2], [m + g / 2, b]]; });
+    }
+    out.push(pasek(44 + n * 13, odc, n === 4));
+  }
+  const miara = odc.reduce((s, [a, b]) => s + b - a, 0);
+  out.push({ d: odcinek([X0, 44 + 5 * 13], [X0 + S * 0.5, 44 + 5 * 13]) }); // odcinek długości granicznej miary 1/2
+  // otoczenia wymiernych: rząd n: odcinki długości L_n / 2^(k+1) wokół k-tego punktu
+  const zlicz = (lista) => { const s = lista.map((p) => p.slice()).sort((a, b) => a[0] - b[0]); let w = 0, kon = -1; s.forEach(([a, b]) => { if (a > kon) { w += b - a; kon = b; } else if (b > kon) { w += b - kon; kon = b; } }); return w; };
+  const dl = [];
+  [0.8, 0.4, 0.2, 0.1, 0.05].forEach((L, n) => {
+    const lista = [];
+    for (let k = 0; k < 31; k++) {
+      const q = vdc(k + 1), l = L / 2 ** (k + 1);
+      lista.push([Math.max(0, q - l / 2), Math.min(1, q + l / 2)]);
+    }
+    dl.push(zlicz(lista).toFixed(3));
+    // odcinki krótsze niż 3 jednostki rysujemy jako kreski 3 jednostek, żeby było widać, że są przy każdym punkcie
+    const rys = lista.map(([a, b]) => (b - a) * S >= 3 ? [a, b] : [(a + b) / 2 - 1.5 / S, (a + b) / 2 + 1.5 / S]).sort((a, b) => a[0] - b[0]);
+    const scal = []; rys.forEach(([a, b]) => { const o = scal[scal.length - 1]; if (o && a <= o[1]) o[1] = Math.max(o[1], b); else scal.push([a, b]); });
+    out.push(pasek(146 + n * 13, scal, n === 4));
+  });
+  out.push({ d: `M${X0},${146 + 5 * 13} L${X1},${146 + 5 * 13}` });
+  log(`gruby Cantor: po 4 krokach miara ${miara.toFixed(4)} (w granicy 1/2); otoczenia 31 punktów dwójkowo wymiernych zajmują ${dl.join(', ')} odcinka (krótsze niż 3 jedn. rysowane jako kreski 3 jedn.)`);
+  return out;
+}
+
+/* 16. Kierst–Szpilrajn: f(z) = Σ z^(2^n) (brzeg koła jest granicą naturalną); wykresy biegunowe Re f na okręgach coraz bliżej brzegu */
+function rysKierst() {
+  const c = [100, 129], fRe = (r, t) => { let s = 0; for (let n = 1; n <= 8; n++) { const m = 2 ** n; s += r ** m * Math.cos(m * t); } return s; };
+  const pier = (r, rho, sk, gr, N = 1400) => {
+    const p = Array.from({ length: N }, (_, i) => { const t = 2 * PI * i / N, q = rho + sk * fRe(r, t); return [c[0] + q * Math.cos(t), c[1] - q * Math.sin(t)]; });
+    return { d: gladkoZ(p, 0.15), gruba: gr };
+  };
+  const out = [{ d: okrag(c, 87) }];
+  for (let k = 0; k < 8; k++) { const t = 2 * PI * k / 8 + PI / 8; out.push({ d: odcinek([c[0] + 10 * Math.cos(t), c[1] - 10 * Math.sin(t)], [c[0] + 87 * Math.cos(t), c[1] - 87 * Math.sin(t)]) }); }
+  out.push(pier(0.7, 24, 6, false, 1000), pier(0.9, 44, 5, false, 1400), pier(0.985, 68, 3.4, true, 2800));
+  const zakres = (r) => { const v = Array.from({ length: 2000 }, (_, i) => fRe(r, 2 * PI * i / 2000)); return `${Math.min(...v).toFixed(2)}…${Math.max(...v).toFixed(2)}`; };
+  log(`Re f na okręgach: r = 0,7: ${zakres(0.7)}; r = 0,9: ${zakres(0.9)}; r = 0,985: ${zakres(0.985)}; w z = 1 suma rośnie bez granic`);
+  return out;
+}
+
+/* 17. Marczewski–Sikorski: „jeż” (przestrzeń metryczna z wieloma kolcami, tu reprezentowanymi przez 36); miara żyje na przeliczalnie wielu z nich */
+function rysJez() {
+  const c = [100, 129], R = 86, zl = PI * (3 - Math.sqrt(5)), out = [];
+  const kier = (k) => [Math.cos(k * zl + 0.4), -Math.sin(k * zl + 0.4)];
+  const nosne = [0, 2, 7, 11, 16, 23, 30];
+  for (let k = 0; k < 36; k++) {
+    const u = kier(k);
+    out.push({ d: odcinek([c[0] + 5 * u[0], c[1] + 5 * u[1]], [c[0] + R * u[0], c[1] + R * u[1]]), gruba: nosne.includes(k) });
+  }
+  nosne.forEach((k, i) => { const u = kier(k), r = R - 4.5 - i * 4.5; out.push({ d: kropka([c[0] + r * u[0], c[1] + r * u[1]]), gruba: true }); });
+  log(`36 kolców (kąt złoty), 7 nośnych; rysunek symbolizuje nieprzeliczalnie wiele`);
+  return out;
+}
+
+/* 18. Suma Płonki: układ prosty algebr nad półkratą {0 < a, b < c}; włókna Z4 → Z2, Z4 → Z4, Z2 → Z2, Z4 → Z2 */
+function rysPlonka() {
+  const W = { o: { poz: [100, 201], n: 4 }, a: { poz: [44, 129], n: 2 }, b: { poz: [143, 129], n: 4 }, c: { poz: [100, 57], n: 2 } };
+  const hom = [['o', 'a'], ['o', 'b'], ['a', 'c'], ['b', 'c']];
+  const f = { 'o>a': (x) => x % 2, 'o>b': (x) => x, 'a>c': (x) => x, 'b>c': (x) => x % 2 };
+  const kr = (w, i) => { const dx = 15, x0 = w.poz[0] - dx * (w.n - 1) / 2; return [x0 + i * dx, w.poz[1]]; };
+  const out = [];
+  Object.values(W).forEach((w) => { const rx = 8 + 7.5 * w.n + 4.5; out.push({ d: gladkoZ(Array.from({ length: 60 }, (_, i) => { const t = 2 * PI * i / 60; return [w.poz[0] + rx * Math.cos(t), w.poz[1] + 13 * Math.sin(t)]; }), 0.1) }); });
+  const pochw = (a, b) => { const u = [b[0] - a[0], b[1] - a[1]], L = Math.hypot(...u), n = [u[0] / L, u[1] / L]; return [[a[0] + 5.5 * n[0], a[1] + 5.5 * n[1]], [b[0] - 5.5 * n[0], b[1] - 5.5 * n[1]]]; };
+  hom.forEach(([s, t]) => {
+    const fn = f[`${s}>${t}`];
+    for (let x = 0; x < W[s].n; x++) {
+      const [a, b] = pochw(kr(W[s], x), kr(W[t], fn(x)));
+      const gruby = (s === 'a' && t === 'c' && x === 1) || (s === 'b' && t === 'c' && x === 2);
+      out.push({ d: odcinek(a, b), gruba: gruby });
+    }
+  });
+  Object.entries(W).forEach(([k, w]) => { for (let x = 0; x < w.n; x++) { const g = (k === 'a' && x === 1) || (k === 'b' && x === 2) || (k === 'c' && x === 1); out.push({ d: kropka(kr(w, x)), gruba: g }); } });
+  // kontrola: układ prosty komutuje (o → a → c = o → b → c) i homomorfizmy zachowują dodawanie
+  const kom = [0, 1, 2, 3].every((x) => f['a>c'](f['o>a'](x)) === f['b>c'](f['o>b'](x)));
+  log(`o→a→c = o→b→c: ${kom}; w sumie Płonki 1 ∈ Z2(a) i 2 ∈ Z4(b) dają w włóknie c = a ∨ b: 1 + 0 = ${(f['a>c'](1) + f['b>c'](2)) % 2}`);
+  return out;
+}
+
+/* 19. Graffiti: graf Petersena; średnia odległość 5/3 ≤ liczba niezależności 4 (hipoteza Graffiti 2, dowód Chung 1988) */
+function rysPetersen() {
+  const c = [100, 133], Rz = 80, Rw = 37, pos = [];
+  for (let i = 0; i < 5; i++) { const a = PI / 2 - 2 * PI * i / 5; pos.push([c[0] + Rz * Math.cos(a), c[1] - Rz * Math.sin(a)]); }
+  for (let i = 0; i < 5; i++) { const a = PI / 2 - 2 * PI * i / 5; pos.push([c[0] + Rw * Math.cos(a), c[1] - Rw * Math.sin(a)]); }
+  const kr = [];
+  for (let i = 0; i < 5; i++) { kr.push([i, (i + 1) % 5], [i, i + 5], [i + 5, ((i + 2) % 5) + 5]); }
+  const sas = (i, j) => kr.some(([a, b]) => (a === i && b === j) || (a === j && b === i));
+  // największy zbiór niezależny (przegląd zupełny)
+  let naj = [];
+  for (let m = 0; m < 1 << 10; m++) { const z = []; for (let i = 0; i < 10; i++) if (m & (1 << i)) z.push(i); if (z.length > naj.length && z.every((a, i) => z.slice(i + 1).every((b) => !sas(a, b)))) naj = z; }
+  // odległości (BFS)
+  let suma = 0;
+  for (let s = 0; s < 10; s++) { const d = Array(10).fill(-1); d[s] = 0; const q = [s]; while (q.length) { const u = q.shift(); for (let v = 0; v < 10; v++) if (d[v] < 0 && sas(u, v)) { d[v] = d[u] + 1; q.push(v); } } d.forEach((x) => { suma += x; }); }
+  const sr = suma / 90;
+  const skrot = (a, b) => { const L = dist(a, b), u = [(b[0] - a[0]) / L, (b[1] - a[1]) / L]; return [[a[0] + 5 * u[0], a[1] + 5 * u[1]], [b[0] - 5 * u[0], b[1] - 5 * u[1]]]; };
+  const out = kr.map(([a, b]) => { const [p, q] = skrot(pos[a], pos[b]); return { d: odcinek(p, q) }; });
+  pos.forEach((p, i) => { out.push({ d: kropka(p), gruba: naj.includes(i) }); if (naj.includes(i)) out.push({ d: okrag(p, 8.5), gruba: true }); });
+  log(`graf Petersena: liczba niezależności ${naj.length} (wierzchołki ${naj.join(', ')}), średnia odległość ${sr.toFixed(4)} = 5/3`);
+  return out;
+}
+
+/* 20. Biblioteka: stos książek z największym wysunięciem (L/2)·H_n; każda górna część ma środek masy nad krawędzią książki niżej */
+function rysKsiazki() {
+  const n = 8, L = 66, h = 13, E = 87, y0 = 186, out = [];
+  // prawe końce: książka k (1 = górna): prawy koniec = E + (L/2)(1/k + … + 1/n)
+  const prawy = Array.from({ length: n + 1 }, () => 0);
+  for (let k = n; k >= 1; k--) prawy[k] = (k === n ? E : prawy[k + 1]) + L / (2 * k);
+  let ok = true;
+  for (let k = 1; k <= n; k++) {
+    // środek masy k górnych książek nie może wystawać poza prawy koniec książki k+1 (lub krawędź stołu)
+    let sm = 0; for (let j = 1; j <= k; j++) sm += prawy[j] - L / 2; sm /= k;
+    const kraw = k === n ? E : prawy[k + 1];
+    if (Math.abs(sm - kraw) > 1e-9) ok = false;
+    const x1 = prawy[k], x0 = x1 - L, yd = y0 - (n - k) * h, yg = yd - h;
+    out.push({ d: `M${f1(x0)},${f1(yd)} L${f1(x1)},${f1(yd)} ${f1(x1)},${f1(yg)} ${f1(x0)},${f1(yg)}Z`, gruba: k === 1 });
+    out.push({ d: odcinek([x0 + 6, yd], [x0 + 6, yg]) });
+  }
+  out.push({ d: odcinek([14, y0], [E, y0]), gruba: true });
+  out.push({ d: odcinek([E, y0], [E, y0 + 34]), gruba: true });
+  out.push({ d: odcinek([E, y0 - n * h - 6], [E, y0]) });
+  const wys = prawy[1] - E;
+  log(`${n} książek długości ${L}: wysunięcie górnej ${wys.toFixed(1)} = ${(wys / L).toFixed(3)} L (poza stołem jest cała górna książka); równowaga na każdym poziomie: ${ok}`);
+  return out;
+}
+
+/* 21. Etos: autorzy alfabetycznie, czyli sortowanie; sieć Batchera (19 komparatorów), sprawdzona dla wszystkich 2^8 ciągów zero-jedynkowych */
+function rysSortowanie() {
+  const n = 8, kp = [];
+  const merge = (lo, m, r) => { const st = r * 2; if (st < m) { merge(lo, m, st); merge(lo + r, m, st); for (let i = lo + r; i + r < lo + m; i += st) kp.push([i, i + r]); } else kp.push([lo, lo + r]); };
+  const sort = (lo, m) => { if (m > 1) { const k = m / 2; sort(lo, k); sort(lo + k, k); merge(lo, m, 1); } };
+  sort(0, n);
+  let ok = true;
+  for (let m = 0; m < 1 << n; m++) { const a = Array.from({ length: n }, (_, i) => (m >> i) & 1); kp.forEach(([i, j]) => { if (a[i] > a[j]) [a[i], a[j]] = [a[j], a[i]]; }); for (let i = 0; i + 1 < n; i++) if (a[i] > a[i + 1]) ok = false; }
+  // rozkład na kolumny: komparatory w jednej kolumnie nie mogą się nakładać na siebie
+  const kol = []; const zaj = Array(n).fill(-1);
+  kp.forEach(([i, j]) => { let c = 0; for (let t = i; t <= j; t++) c = Math.max(c, zaj[t] + 1); for (let t = i; t <= j; t++) zaj[t] = c; kol.push(c); });
+  const lk = Math.max(...kol) + 1, X = (c) => 26 + (c + 0.5) * 148 / lk, Y = (i) => 44 + i * 24;
+  const out = [];
+  for (let i = 0; i < n; i++) out.push({ d: odcinek([16, Y(i)], [184, Y(i)]) });
+  kp.forEach(([i, j], q) => { const x = X(kol[q]); out.push({ d: `${odcinek([x, Y(i)], [x, Y(j)])} ${odcinek([x - 3, Y(i)], [x + 3, Y(i)])} ${odcinek([x - 3, Y(j)], [x + 3, Y(j)])}` }); });
+  // droga elementu „pierwszego w alfabecie”, startującego z dolnego przewodu
+  const wej = [5, 2, 7, 3, 6, 1, 4, 0], a = wej.slice(); let poz = a.indexOf(0);
+  const dr = [[16, Y(poz)]];
+  kp.map((k, q) => [k, q]).sort((u, v) => kol[u[1]] - kol[v[1]]).forEach(([[i, j], q]) => {
+    const x = X(kol[q]);
+    if (a[i] > a[j]) { [a[i], a[j]] = [a[j], a[i]]; }
+    const nowa = a.indexOf(0);
+    if (nowa !== poz) { dr.push([x, Y(poz)], [x, Y(nowa)]); poz = nowa; }
+  });
+  dr.push([184, Y(poz)]);
+  out.push({ d: lamana(dr), gruba: true });
+  log(`Batcher, ${kp.length} komparatorów, ${lk} kolumn; poprawność dla wszystkich 2^${n} ciągów 0-1: ${ok}; wynik dla przykładu: ${a.join(' ')}`);
+  return out;
+}
+
+/* 22. Katedra Metod Numerycznych: najlepsze przybliżenie jednostajne x⁵ wielomianem stopnia 3; błąd T₅/16 osiąga maksimum z naprzemiennymi znakami w 6 punktach (Czebyszew) */
+function rysCzebyszew() {
+  const X = (x) => 100 + 78 * x, T5 = (x) => 16 * x ** 5 - 20 * x ** 3 + 5 * x, f = (x) => x ** 5, p = (x) => f(x) - T5(x) / 16;
+  const Y1 = (v) => 82 - 40 * v, E0 = 172, A = 36, Y2 = (v) => E0 - A * 16 * v;
+  const wyk = (g, Y) => Array.from({ length: 121 }, (_, i) => { const x = -1 + i / 60; return [X(x), Y(g(x))]; });
+  const out = [
+    { d: odcinek([X(-1), Y1(0)], [X(1), Y1(0)]) },
+    { d: gladko(wyk(f, Y1), 0.1) },
+    { d: gladko(wyk(p, Y1), 0.1), gruba: true },
+    { d: odcinek([X(-1), Y2(0)], [X(1), Y2(0)]) },
+    { d: odcinek([X(-1), Y2(1 / 16)], [X(1), Y2(1 / 16)]) },
+    { d: odcinek([X(-1), Y2(-1 / 16)], [X(1), Y2(-1 / 16)]) },
+    { d: gladko(wyk((x) => f(x) - p(x), Y2), 0.1), gruba: true }
+  ];
+  const wart = [];
+  for (let k = 0; k <= 5; k++) { const x = Math.cos(k * PI / 5), e = f(x) - p(x); wart.push(e); out.push({ d: kropka([X(x), Y2(e)]), gruba: true }); }
+  log(`błąd w punktach cos(kπ/5): ${wart.map((e) => (16 * e).toFixed(6)).join(', ')} (w jednostkach 1/16)`);
+  return out;
+}
+
+/* 23. Dyrektor: cztery równe koła wewnątrz okręgu i koło w środku, wszystkie styczne: r = R/(1+√2) */
+function rysKola() {
+  const c = [100, 129], R = 86, r = R / (1 + Math.SQRT2), d = R - r, w = (Math.SQRT2 - 1) * r, kola = [];
+  const out = [{ d: okrag(c, R), gruba: true }];
+  for (let k = 0; k < 4; k++) { const a = PI / 4 + k * PI / 2; kola.push([c[0] + d * Math.cos(a), c[1] - d * Math.sin(a)]); out.push({ d: okrag(kola[k], r) }); }
+  out.push({ d: okrag(c, w), gruba: true });
+  const st = [];
+  kola.forEach((k, i) => { const m = kola[(i + 1) % 4]; st.push(dist(k, m) - 2 * r); out.push({ d: kropka([(k[0] + m[0]) / 2, (k[1] + m[1]) / 2]) }); });
+  kola.forEach((k) => st.push(dist(k, c) - (r + w), R - dist(k, c) - r));
+  log(`R = ${R}, r = ${r.toFixed(2)}, środkowe ${w.toFixed(2)}; największy błąd styczności ${Math.max(...st.map(Math.abs)).toExponential(1)}`);
+  return out;
+}
+
+/* 24. Norwid i Archytas: podwojenie sześcianu; sześciany o krawędziach a i a·∛2 oraz dwie średnie proporcjonalne a : x = x : y = y : 2a */
+function rysSzesciany() {
+  const O = [100, 164], cs = Math.cos(PI / 6), ex = [cs, -0.5], ey = [-cs, -0.5], ez = [0, -1];
+  const P3 = (s, i, j, k) => [O[0] + s * (i * ex[0] + j * ey[0] + k * ez[0]), O[1] + s * (i * ex[1] + j * ey[1] + k * ez[1])];
+  const szesc = (s, gr) => {
+    // widoczne krawędzie w rzucie izometrycznym, ściany przy wierzchołku (0,0,0) z przodu
+    const kr = [[[0, 0, 0], [1, 0, 0]], [[0, 0, 0], [0, 1, 0]], [[0, 0, 0], [0, 0, 1]], [[1, 0, 0], [1, 0, 1]], [[0, 1, 0], [0, 1, 1]], [[0, 0, 1], [1, 0, 1]], [[0, 0, 1], [0, 1, 1]], [[1, 0, 1], [1, 1, 1]], [[0, 1, 1], [1, 1, 1]]];
+    return kr.map(([a, b]) => ({ d: odcinek(P3(s, ...a), P3(s, ...b)), gruba: gr }));
+  };
+  const a = 50, x = a * 2 ** (1 / 3), y = a * 2 ** (2 / 3);
+  const out = [...szesc(a, false), ...szesc(x, true)];
+  [[a, false], [x, true], [y, false], [2 * a, false]].forEach(([d, g], i) => { const yy = 178 + i * 12.5; out.push({ d: `${odcinek([50, yy], [50 + d, yy])} ${odcinek([50, yy - 3], [50, yy + 3])} ${odcinek([50 + d, yy - 3], [50 + d, yy + 3])}`, gruba: g }); });
+  log(`a = ${a}, x = ${x.toFixed(2)}, y = ${y.toFixed(2)}, 2a = ${2 * a}; (x/a)³ = ${(x / a) ** 3}; a/x = ${(a / x).toFixed(5)}, x/y = ${(x / y).toFixed(5)}, y/2a = ${(y / (2 * a)).toFixed(5)}`);
+  return out;
+}
+
+/* 25. „O zachowaniu miary we wszystkim”: przekształcenie piekarza, zachowuje pole; koło po kolejnych krokach */
+function rysPiekarz() {
+  const ramki = [[12, 38], [104, 38], [12, 130], [104, 130]], B = 84, T = (p) => { const k = Math.floor(2 * p[0]); return [2 * p[0] - k, (p[1] + k) / 2]; };
+  const Tinv = (p) => { const k = Math.floor(2 * p[1]); return [(p[0] + k) / 2, 2 * p[1] - k]; };
+  const start = (t) => [0.36 + 0.25 * Math.cos(t), 0.5 + 0.25 * Math.sin(t)];
+  const N = 2400, pkt = Array.from({ length: N + 1 }, (_, i) => start(2 * PI * i / N)), out = [];
+  const pola = [];
+  ramki.forEach(([x0, y0], it) => {
+    const S = (p) => [x0 + B * p[0], y0 + B * (1 - p[1])];
+    out.push({ d: `M${x0},${y0} L${x0 + B},${y0} ${x0 + B},${y0 + B} ${x0},${y0 + B}Z` });
+    const obr = pkt.map((p) => { let q = p; for (let k = 0; k < it; k++) q = T(q); return q; });
+    const kaw = []; let cur = [obr[0]];
+    for (let i = 1; i < obr.length; i++) { if (Math.hypot(obr[i][0] - obr[i - 1][0], obr[i][1] - obr[i - 1][1]) > 0.1) { kaw.push(cur); cur = [obr[i]]; } else cur.push(obr[i]); }
+    kaw.push(cur);
+    out.push({ d: kaw.map((k) => gladko(k.map(S), 0.12)).join(' '), gruba: true });
+    // pole obrazu: liczone przez odwrotność na siatce
+    let lic = 0; const G = 500;
+    for (let i = 0; i < G; i++) for (let j = 0; j < G; j++) { let q = [(i + 0.5) / G, (j + 0.5) / G]; for (let k = 0; k < it; k++) q = Tinv(q); if ((q[0] - 0.36) ** 2 + (q[1] - 0.5) ** 2 <= 0.0625) lic++; }
+    pola.push((lic / (G * G)).toFixed(4));
+  });
+  log(`pole koła π/16 = ${(PI / 16).toFixed(4)}; pola obrazów po 0, 1, 2, 3 krokach (siatka 500²): ${pola.join(', ')}`);
+  return out;
+}
+
 const RYSUNKI = {
+  'hewitt-marczewski-pondiczery': rysHMP,
+  'pierwsze-prace-1930': rysBorel,
+  'miara-i-kategoria': rysMiaraKategoria,
+  'kierst-szpilrajn': rysKierst,
+  'marczewski-sikorski': rysJez,
+  'suma-plonki': rysPlonka,
+  'graffiti-fajtlowicz': rysPetersen,
+  'biblioteka-1945': rysKsiazki,
+  'etos-szkoly': rysSortowanie,
+  'katedra-numeryczna-1962': rysCzebyszew,
+  'dyrektor-instytutu': rysKola,
+  'norwid-archytas': rysSzesciany,
+  'zachowanie-miary': rysPiekarz,
   'szpilrajn-porzadek': rysPorzadek,
   'uczniowie': rysUczniowie,
   'niezaleznosc-w-algebrach': rysNiezaleznoscAlgebr,

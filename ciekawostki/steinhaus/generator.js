@@ -1,5 +1,5 @@
 // Ciekawostki o Hugonie Steinhausie (dział Popularyzacja): rysunki liczone, nie „na oko”.
-// Uruchomienie: node generator.js  →  ciekawostki.json, rysunki.html (zrzut: NODE_PATH=$(npm root -g) node generator.js --png → rysunki.png)
+// Uruchomienie: node generator.js  →  ciekawostki.json, rysunki.html
 // Układ: viewBox 0 0 200 240, rysunek w polu x 12–188, y 34–224; tylko linie; kropki to okręgi r = 4.5 (gruba).
 'use strict';
 const fs = require('fs');
@@ -99,12 +99,12 @@ const log = (...a) => console.log(...a);
    1. Twierdzenie o kanapce z szynką (1938): kromka i plaster szynki, prosta dzieli pole każdej figury na pół
    ===================================================================================== */
 function rysKanapka() {
-  // kromka chleba: prostokątny dół i szersza „czapa” z dwoma garbami (krzywa Catmulla–Roma), wyraźnie osobno od plastra szynki
-  const kromkaK = [[-38, 50], [0, 52], [38, 50], [46, 40], [45, 6], [47, -10], [57, -24], [55, -44], [36, -58], [12, -56], [0, -50],
-    [-12, -56], [-36, -58], [-55, -44], [-57, -24], [-47, -10], [-45, 6], [-46, 40]];
-  const kromka = przeksztalc(catmull(kromkaK, 14), -0.14, 0.86, 72, 166);
-  const skorka = offset(kromka, 6);                         // linia skórki, 6 jedn. do środka
-  // plaster szynki: owal z lekką falą; tłuszczyk: półksiężyc wzdłuż części brzegu
+  // kromka chleba (kontur „tostowy”: prostokątny dół, szersza czapa z dwoma garbami), krzywa Catmulla–Roma
+  const kromkaK = [[-40, 54], [0, 56], [40, 54], [47, 44], [46, 2], [48, -10], [60, -22], [62, -40], [46, -56], [20, -60], [0, -58],
+    [-20, -60], [-46, -56], [-62, -40], [-60, -22], [-48, -10], [-46, 2], [-47, 44]];
+  const kromka = przeksztalc(catmull(kromkaK, 14), -0.06, 0.92, 76, 164);
+  const skorka = offset(kromka, 6.5);                       // linia skórki, 6,5 jedn. do środka
+  // plaster szynki: owal z lekką falą; tłuszczyk — półksiężyc wzdłuż części brzegu
   const N = 220, szynka = [];
   for (let i = 0; i < N; i++) { const t = 2 * Math.PI * i / N, r = 1 + 0.05 * Math.sin(3 * t + 0.6) + 0.035 * Math.cos(5 * t); szynka.push([37 * r * Math.cos(t), 27 * r * Math.sin(t)]); }
   const sz = przeksztalc(szynka, 0.42, 1, 139, 74);
@@ -303,9 +303,10 @@ function rysWisla() {
       }
       pts = nn;
     }
-    return pts;
-  };
-  const H = 42, kopia = (pts, yc) => { const ys = pts.map((q) => q[1]), y0 = Math.min(...ys), y1 = Math.max(...ys); return pts.map(([x, y]) => [16 + 168 * x, yc - H / 2 + H * (y - y0) / (y1 - y0)]); };
+    pts = nn;
+  }
+  const ys = pts.map((q) => q[1]), yMin = Math.min(...ys), yMax = Math.max(...ys), Hp = 54;   // krzywa ściśnięta w pionie do pasa 54 jedn.
+  const kopia = (yc) => pts.map(([x, y]) => [16 + 168 * x, yc - Hp / 2 + Hp * (y - yMin) / (yMax - yMin)]);
   // pomiar cyrklem o rozstawie s: kolejny punkt na krzywej w odległości s od poprzedniego (pierwsze przecięcie dalej po krzywej)
   const cyrkiel = (c, s) => {
     const o = [c[0]];
@@ -324,13 +325,7 @@ function rysWisla() {
       o.push(zn.p); q = zn.p; i = zn.j;
     }
   };
-  const kroki = [60, 24, 8], wys = [58, 122, 186];
-  let pts = null, bz = 0, bw = 0;
-  for (let z = 1; z < 600; z++) {
-    const p = krzywa(z), a = kopia(p, 100), u = dl(cyrkiel(a, kroki[2])) / dl(cyrkiel(a, kroki[0]));
-    if (u > bw) { bw = u; pts = p; bz = z; }
-  }
-  const out = [], dl0 = kroki.map((s) => dl(cyrkiel(kopia(pts, 100), s))), mx = Math.max(...dl0), sk = 168 / mx;
+  const out = [], kroki = [56, 18.7, 6.2], wys = [66, 129, 192];
   kroki.forEach((s, k) => {
     const c = kopia(pts, wys[k]), l = cyrkiel(c, s), y = wys[k] + 26;
     out.push({ d: lam(c) });
@@ -634,7 +629,374 @@ function rysDendryt() {
 }
 
 /* =====================================================================================
-   15. Rzuty monetą jako miara (1923): drzewo rzutów; każdy rzut połowi przedział, prawdopodobieństwo = długość przedziału
+   14. Permutacje przez zamiany sąsiadów (Steinhaus–Johnson–Trotter, n = 4): 24 ustawienia, 23 zamiany; nić 4 idzie zygzakiem
+   ===================================================================================== */
+function rysSJT() {
+  // klasyczna rekurencja: permutacje n powstają z permutacji n − 1 przez wędrówkę n tam i z powrotem
+  const perm = (n) => { if (n === 1) return [[1]]; const o = []; perm(n - 1).forEach((p, i) => { const pos = i % 2 === 0 ? [...Array(n).keys()].reverse() : [...Array(n).keys()]; for (const k of pos) o.push([...p.slice(0, k), n, ...p.slice(k)]); }); return o; };
+  const L = perm(4);
+  // kontrola: każde kolejne dwie różnią się zamianą dwóch sąsiadów, wszystkie różne
+  const zn = new Set(L.map((p) => p.join('')));
+  for (let i = 1; i < L.length; i++) { const r = L[i].map((v, j) => (v !== L[i - 1][j] ? j : -1)).filter((j) => j >= 0); if (r.length !== 2 || r[1] - r[0] !== 1) throw new Error('nie sąsiedzi'); }
+  log('permutacje: ustawień', L.length, ' różnych', zn.size);
+  const X = (j) => 34 + j * (132 / 3), Y = (i) => 38 + i * (182 / 23), out = [];
+  for (let v = 1; v <= 4; v++) {
+    const s = L.map((p, i) => [X(p.indexOf(v)), Y(i)]);
+    // gładzimy tylko wizualnie: pionowe odcinki łączone skosami (każdy krok po jednym wierszu)
+    out.push({ d: lam(s), gruba: v === 4 });
+  }
+  // rzędy ustawień: krótkie kreski po bokach co cztery ustawienia (blok przejścia nici 4)
+  const zn2 = []; for (let i = 0; i <= 23; i += 4) zn2.push(lam([[14, Y(i)], [22, Y(i)]]), lam([[178, Y(i)], [186, Y(i)]]));
+  out.push({ d: zn2.join(' ') });
+  out.push({ d: L[0].map((v, j) => kropka(X(j), Y(0), 3.2)).join(' '), gruba: true });
+  return out;
+}
+
+/* =====================================================================================
+   15. Notacja Steinhausa–Mosera: mega = 2 w kole = 2 w dwóch kwadratach; 2 w kwadracie = 2 w dwóch trójkątach = 256
+   ===================================================================================== */
+function rysMoser() {
+  const trojkat = (cx, cy, r) => { const o = []; for (let k = 0; k < 3; k++) { const a = -Math.PI / 2 + 2 * Math.PI * k / 3; o.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return o; };
+  const kwadrat = (cx, cy, r) => [[cx - r, cy - r], [cx + r, cy - r], [cx + r, cy + r], [cx - r, cy + r]];
+  const dwie = (cx, cy, d = 6.5) => `${kropka(cx - d, cy, 3)} ${kropka(cx + d, cy, 3)}`;
+  // n w trójkącie = n^n; n w kwadracie = n w n trójkątach; n w kole = n w n kwadratach
+  const tr = (n) => n ** n, kw2 = tr(tr(2));
+  log('moser: 2 w trójkącie =', tr(2), ' 2 w dwóch trójkątach =', kw2, ' czyli 2 w kwadracie = 256; mega = 256 w 256 trójkątach');
+  const out = [];
+  // A: koło z dwiema kropkami
+  out.push({ d: okr(56, 78, 36), gruba: true }, { d: dwie(56, 78), gruba: true });
+  // B: dwa zagnieżdżone kwadraty
+  out.push({ d: lam(kwadrat(144, 78, 34), true) }, { d: lam(kwadrat(144, 78, 23), true) }, { d: dwie(144, 78) });
+  // C: kwadrat, w nim dwa trójkąty
+  out.push({ d: lam(kwadrat(56, 172, 34), true) }, { d: lam(trojkat(56, 176, 28), true) }, { d: lam(trojkat(56, 176, 19), true) }, { d: dwie(56, 178, 4.5) });
+  // D: 256 w 256 trójkątach: zagnieżdżone trójkąty (narysowane pierwsze, promień maleje geometrycznie)
+  const d = [];
+  for (let k = 0; k < 8; k++) d.push(lam(trojkat(144, 180, 44 * 0.76 ** k), true));
+  out.push({ d: d.join(' ') });
+  return out;
+}
+
+/* =====================================================================================
+   16. Twierdzenie o odległościach (1920): zbiór A o dodatniej mierze (gruby zbiór Cantora) i jego przesunięcia: A ∩ (A + t) ≠ ∅ dla małych t
+   ===================================================================================== */
+function rysRoznice() {
+  // zbiór Smitha–Volterry–Cantora: na poziomie k usuwamy z każdego kawałka środek długości 4^(−k); miara granicy 1/2
+  const etap = (Lv) => { let A = [[0, 1]]; for (let k = 1; k <= Lv; k++) { const dl = 4 ** -k, n = []; for (const [a, b] of A) { const m = (a + b) / 2; n.push([a, m - dl / 2], [m + dl / 2, b]); } A = n; } return A; };
+  const A4 = etap(4), A = etap(6), X = (x) => 16 + 168 * x;
+  const miara = (S) => S.reduce((s, [a, b]) => s + b - a, 0);
+  const przec = (S, t) => { let s = 0, i = 0, j = 0; const T = S.map(([a, b]) => [a + t, b + t]); while (i < S.length && j < T.length) { const u = Math.max(S[i][0], T[j][0]), v = Math.min(S[i][1], T[j][1]); if (v > u) s += v - u; if (S[i][1] < T[j][1]) i++; else j++; } return s; };
+  log('różnice: miara etapu 6', miara(A).toFixed(4));
+  const rysuj = (S, y, g) => ({ d: S.filter(([a, b]) => X(b) - X(a) >= 3).map(([a, b]) => lam([[X(a), y], [X(b), y]])).join(' '), gruba: g });
+  const t0 = 0.045, B4 = A4.map(([a, b]) => [a + t0, Math.min(1, b + t0)]).filter(([a, b]) => b > a), W4 = [];
+  for (const [a, b] of A4) for (const [c, d] of B4) { const u = Math.max(a, c), v = Math.min(b, d); if (v > u) W4.push([u, v]); }
+  const out = [rysuj(A4, 42, false), rysuj(B4, 54, false), rysuj(W4, 66, true)];
+  // f(t) = |A ∩ (A + t)| dla t ∈ [−1, 1]: ciągła, f(0) = |A| > 0, więc dodatnia na otoczeniu zera
+  const Xt = (t) => 100 + 84 * t, Y0 = 208, H = 118 / przec(A, 0), s = [];
+  for (let i = 0; i <= 600; i++) { const t = -1 + 2 * i / 600; s.push([Xt(t), Y0 - H * przec(A, t)]); }
+  out.push({ d: lam([[Xt(-1), Y0], [Xt(1), Y0]]) }, { d: lam([[Xt(0), Y0 + 8], [Xt(0), Y0 - 124]]) }, { d: lam(s), gruba: true });
+  let d = 0; while (d < 1 && przec(A, d + 0.002) > 1e-9) d += 0.002;
+  log('różnice: f(0) =', przec(A, 0).toFixed(4), ' f > 0 co najmniej na |t| <', d.toFixed(3));
+  return out;
+}
+
+/* =====================================================================================
+   17. Koło z dokładnie n punktami kratowymi (Steinhaus, 1957): środek (√2, 1/3), każdy punkt kratowy ma inną odległość
+   ===================================================================================== */
+function rysKolo() {
+  const S = 24, Ox = 16, Oy = 46, K = 7;       // kratka: punkty (i, j), i, j = 0…7; 24 jedn. między punktami
+  const c = [Math.SQRT2 + 2, 1 / 3 + 3];       // środek: (√2, 1/3) przesunięty o wektor kratowy (2, 3), więc odległości dalej parami różne
+  const pk = [];
+  for (let i = 0; i <= K; i++) for (let j = 0; j <= K; j++) pk.push({ i, j, d: Math.hypot(i - c[0], j - c[1]) });
+  pk.sort((a, b) => a.d - b.d);
+  for (let m = 1; m < pk.length; m++) if (Math.abs(pk[m].d - pk[m - 1].d) < 1e-9) throw new Error('równe odległości');
+  log('koło: najbliższe odległości', pk.slice(0, 6).map((p) => p.d.toFixed(3)).join(', '));
+  const P_ = (x, y) => [Ox + S * x, Oy + S * y];
+  const promien = (n) => (pk[n - 1].d + pk[n].d) / 2;     // koło o tym promieniu zawiera dokładnie n punktów
+  const C = P_(c[0], c[1]), out = [];
+  for (const n of [2, 7]) out.push({ d: okr(C[0], C[1], f1(S * promien(n))) });
+  const N = 18;
+  out.push({ d: okr(C[0], C[1], f1(S * promien(N))), gruba: true });
+  // kontrola: liczba punktów kratowych wewnątrz grubego okręgu
+  const wew = pk.filter((p) => p.d < promien(N)).length; if (wew !== N) throw new Error('liczba punktów');
+  out.push({ d: pk.slice(0, N).map((p) => { const [x, y] = P_(p.i, p.j); return kropka(x, y, 3.2); }).join(' '), gruba: true });
+  out.push({ d: pk.slice(N).map((p) => { const [x, y] = P_(p.i, p.j); return `M${P([x - 3, y])} L${P([x + 3, y])} M${P([x, y - 3])} L${P([x, y + 3])}`; }).join(' ') });
+  out.push({ d: `M${P([C[0] - 3.5, C[1]])} L${P([C[0] + 3.5, C[1]])} M${P([C[0], C[1] - 3.5])} L${P([C[0], C[1] + 3.5])}` });
+  log('koło: w grubym okręgu', wew, 'punktów, promień w krokach kratki', promien(N).toFixed(3));
+  return out;
+}
+
+/* =====================================================================================
+   18. Kieszeń „Kalejdoskopu” (1938): dwie płaskie połówki dwunastościanu (po 6 pięciokątów), składane gumką
+   ===================================================================================== */
+function rysDwunastoscian() {
+  const s = 23, Rp = s / (2 * Math.sin(Math.PI / 5)), ap = s / (2 * Math.tan(Math.PI / 5));
+  const pieciokat = (cx, cy, obr) => Array.from({ length: 5 }, (_, k) => { const a = obr + 2 * Math.PI * k / 5; return [cx + Rp * Math.cos(a), cy + Rp * Math.sin(a)]; });
+  const kwiat = (cx, cy, obr) => {
+    const srodek = pieciokat(cx, cy, obr), scianki = [];
+    for (let k = 0; k < 5; k++) {
+      // środek krawędzi k i kierunek na zewnątrz; sąsiedni pięciokąt ma wierzchołek naprzeciw tej krawędzi
+      const a = obr + 2 * Math.PI * (k + 0.5) / 5, ox = cx + 2 * ap * Math.cos(a), oy = cy + 2 * ap * Math.sin(a);
+      scianki.push(pieciokat(ox, oy, a));
+    }
+    return { srodek, scianki };
+  };
+  // kontrola: krawędź wspólna ma długość s
+  const A = kwiat(65, 90, -Math.PI / 2), B = kwiat(135, 168, Math.PI / 2);
+  log('dwunastościan: bok pięciokąta', dl([A.srodek[0], A.srodek[1]]).toFixed(2), ' odległość wierzchołków sąsiedniej ścianki od środka', Math.hypot(A.scianki[0][0][0] - 65, A.scianki[0][0][1] - 90).toFixed(2));
+  const out = [];
+  for (const { srodek, scianki } of [A, B]) {
+    out.push({ d: lam(srodek, true), gruba: true });
+    for (const p of scianki) out.push({ d: lam(p, true) });
+  }
+  return out;
+}
+
+/* =====================================================================================
+   19. „Czem jest a czem nie jest matematyka” (1923): pewniki są do wyboru; dysk Poincarégo: przez punkt P wiele prostych nie przecina prostej l
+   ===================================================================================== */
+function rysPewniki() {
+  const cx = 100, cy = 130, R = 84;
+  const mob = (p) => (z) => { // f(z) = (z + p)/(1 + conj(p) z)
+    const n = [z[0] + p[0], z[1] + p[1]], m = [1 + p[0] * z[0] + p[1] * z[1], p[0] * z[1] - p[1] * z[0]], d = m[0] * m[0] + m[1] * m[1];
+    return [(n[0] * m[0] + n[1] * m[1]) / d, (n[1] * m[0] - n[0] * m[1]) / d];
+  };
+  const naEkran = (z) => [cx + R * z[0], cy + R * z[1]];
+  // prosta l: geodezyjna o końcach pod kątami a, b (łuk okręgu prostopadłego do brzegu)
+  const luk = (a, b) => { const mid = (a + b) / 2, del = (b - a) / 2, r = Math.tan(del), c = [Math.cos(mid) / Math.cos(del), Math.sin(mid) / Math.cos(del)]; const start = Math.atan2(Math.sin(a) - c[1], Math.cos(a) - c[0]); let end = Math.atan2(Math.sin(b) - c[1], Math.cos(b) - c[0]); let d = end - start; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return Array.from({ length: 61 }, (_, i) => { const t = start + d * i / 60; return [c[0] + r * Math.cos(t), c[1] + r * Math.sin(t)]; }); };
+  const a0 = 0.35 * Math.PI, b0 = 0.85 * Math.PI, Pz = [0.08, -0.34], f = mob(Pz);
+  const out = [{ d: okr(cx, cy, R) }, { d: lam(luk(a0, b0).map(naEkran)), gruba: true }, { d: kropka(...naEkran(Pz)), gruba: true }];
+  // proste przez P: obrazy średnic; końce na brzegu to f(±e^{iθ})
+  const kat = (z) => { let t = Math.atan2(z[1], z[0]); while (t < 0) t += 2 * Math.PI; return t; };
+  const przecina = (th) => { const u = kat(f([Math.cos(th), Math.sin(th)])), v = kat(f([-Math.cos(th), -Math.sin(th)])), a = kat([Math.cos(a0), Math.sin(a0)]), b = kat([Math.cos(b0), Math.sin(b0)]); const wUku = (t) => t > Math.min(a, b) && t < Math.max(a, b); return wUku(u) !== wUku(v); };
+  let ile = 0, nieP = 0;
+  for (let k = 0; k < 13; k++) {
+    const th = Math.PI * (k + 0.5) / 13, punkty = []; for (let i = -40; i <= 40; i++) { const t = i / 40, z = [t * Math.cos(th), t * Math.sin(th)]; punkty.push(naEkran(f(z))); }
+    if (!przecina(th)) { out.push({ d: lam(punkty) }); nieP++; } ile++;
+  }
+  log('pewniki: kierunków', ile, ' prostych przez P nieprzecinających l', nieP);
+  return out;
+}
+
+/* =====================================================================================
+   20. Nowa Księga Szkocka (1946): funkcje Rademachera (temat problemów Steinhausa: funkcje niezależne); iloczyn dwóch na dole
+   ===================================================================================== */
+function rysRademacher() {
+  const X = (x) => 16 + 168 * x, wys = 11, out = [];
+  const r = (k, x) => (Math.floor(x * 2 ** k) % 2 === 0 ? 1 : -1);
+  const fala = (k, y0, g) => { const n = 2 ** k, s = []; for (let j = 0; j < n; j++) { const yy = y0 - wys * (j % 2 === 0 ? 1 : -1); s.push([X(j / n), yy], [X((j + 1) / n), yy]); } return { d: lam(s), gruba: g }; };
+  const rzedy = [1, 2, 3, 4];
+  rzedy.forEach((k, i) => { const y0 = 56 + i * 34; out.push({ d: lam([[16, y0], [184, y0]]) }); out.push(fala(k, y0, false)); });
+  // iloczyn r2 · r3: też przyjmuje ±1 i ma średnią 0 (niezależność)
+  const y0 = 206, m = 8, iloczyn = []; let srednia = 0;
+  for (let j = 0; j < m; j++) { const x = (j + 0.5) / m, w = r(2, x) * r(3, x); srednia += w / m; iloczyn.push([X(j / m), y0 - wys * w], [X((j + 1) / m), y0 - wys * w]); }
+  log('rademacher: średnia iloczynu r2·r3 =', srednia, ' (powinno być 0 = iloczyn średnich)');
+  out.push({ d: lam([[16, y0], [184, y0]]) }, { d: lam(iloczyn), gruba: true });
+  return out;
+}
+
+/* =====================================================================================
+   21. Dochodzenie ojcostwa (1954): wzór Bayesa; prawdopodobieństwo po badaniu jako funkcja prawdopodobieństwa a priori, dla kilku ilorazów wiarygodności
+   ===================================================================================== */
+function rysBayes() {
+  const X = (p) => 28 + 144 * p, Y = (p) => 208 - 144 * p;
+  const post = (p, L) => (p * L) / (p * L + 1 - p);
+  const out = [{ d: lam([[X(0), Y(0)], [X(1), Y(0)], [X(1), Y(1)], [X(0), Y(1)]], true) }];
+  const iloraz = [1 / 16, 1 / 4, 1, 4, 16];
+  for (const L of iloraz) { const s = []; for (let i = 0; i <= 80; i++) { const p = i / 80; s.push([X(p), Y(post(p, L))]); } out.push({ d: lam(s) }); }
+  // a priori 1/2 (założenie używane w sądowych obliczeniach): pionowa prosta i wartości a posteriori
+  out.push({ d: lam([[X(0.5), Y(0)], [X(0.5), Y(1)]]), gruba: true });
+  out.push({ d: iloraz.map((L) => kropka(X(0.5), Y(post(0.5, L)), 3.4)).join(' '), gruba: true });
+  log('bayes: a posteriori dla a priori 1/2:', iloraz.map((L) => post(0.5, L).toFixed(3)).join(', '));
+  return out;
+}
+
+/* =====================================================================================
+   22. Introwizor (patent 1938/1948): lampa i ekran na obrotowym pręcie; obiekt leży na osi obrotu, gdy jego cień nie schodzi z punktu na ekranie
+   ===================================================================================== */
+function rysIntrowizor() {
+  const O = [100, 130], dL = 78, dE = 62, pol = 26, out = [];
+  // przekrój ciała: krzywa zamknięta wokół obiektu
+  const cialo = []; for (let i = 0; i < 120; i++) { const t = 2 * Math.PI * i / 120, r = 1 + 0.05 * Math.cos(3 * t + 1) + 0.03 * Math.sin(5 * t); cialo.push([O[0] + 62 * r * Math.cos(t), O[1] + 4 + 40 * r * Math.sin(t)]); }
+  out.push({ d: lam(cialo, true) });
+  const polozenia = [-0.48, 0.48];
+  polozenia.forEach((a) => {
+    const u = [Math.sin(a), -Math.cos(a)], v = [Math.cos(a), Math.sin(a)];
+    const L = [O[0] + dL * u[0], O[1] + dL * u[1]], E = [O[0] - dE * u[0], O[1] - dE * u[1]];
+    const e1 = [E[0] + pol * v[0], E[1] + pol * v[1]], e2 = [E[0] - pol * v[0], E[1] - pol * v[1]];
+    // stożek promieni z ogniska lampy (cienki), ekran i główny promień przez obiekt (gruby)
+    out.push({ d: `${lam([L, e1])} ${lam([L, e2])}` });
+    out.push({ d: lam([[e1[0], e1[1]], [e2[0], e2[1]]]) });
+    out.push({ d: lam([L, E]), gruba: true });
+    out.push({ d: okr(L[0], L[1], 5) });
+    out.push({ d: kropka(E[0], E[1], 3), gruba: true });
+    log('introwizor: ognisko', P(L), ' punkt na ekranie', P(E));
+  });
+  out.push({ d: kropka(O[0], O[1], 4.5), gruba: true });
+  return out;
+}
+
+/* =====================================================================================
+   23. Kwadratowa taryfa (1939): ta sama energia ∫P, inna opłata √∫P²: równy pobór płaci mniej niż szczyty
+   ===================================================================================== */
+function rysTaryfa() {
+  const X = (t) => 26 + 148 * t / 24, Y0 = 210, K = 9.8;
+  const surowy = (t) => 1.2 + 6.5 * Math.exp(-(((t - 8) / 1.5) ** 2)) + 9 * Math.exp(-(((t - 18.5) / 1.7) ** 2));
+  const M = 480, srednia = Array.from({ length: M }, (_, i) => surowy(24 * (i + 0.5) / M)).reduce((a, b) => a + b, 0) / M;
+  const P0 = 5, skala = P0 / srednia, Pt = (t) => surowy(t) * skala;
+  const calka = (f) => { let s = 0; for (let i = 0; i < M; i++) s += f(24 * (i + 0.5) / M) * 24 / M; return s; };
+  const E1 = calka(Pt), E0 = calka(() => P0), T1 = Math.sqrt(calka((t) => Pt(t) ** 2)), T0 = Math.sqrt(calka(() => P0 * P0));
+  log('taryfa: energia', E0.toFixed(1), E1.toFixed(1), ' opłata √∫P²: równy', T0.toFixed(1), ' szczyty', T1.toFixed(1), ' stosunek', (T1 / T0).toFixed(3));
+  const out = [{ d: lam([[X(0), Y0], [X(24), Y0]]) }, { d: lam([[X(0), Y0], [X(0), 42]]) }];
+  const zn = []; for (let t = 4; t <= 24; t += 4) zn.push(lam([[X(t), Y0], [X(t), Y0 + 7]])); out.push({ d: zn.join(' ') });
+  const s = []; for (let i = 0; i <= 192; i++) { const t = 24 * i / 192; s.push([X(t), Y0 - K * Pt(t)]); }
+  out.push({ d: lam(s) });
+  out.push({ d: lam([[X(0), Y0 - K * P0], [X(24), Y0 - K * P0]]), gruba: true });
+  // poziom równoważny: stały pobór, za który zapłacono by tyle co za szczyty (√(∫P²/24))
+  const Pr = T1 / Math.sqrt(24), kw = []; for (let t = 0; t < 24; t += 2) kw.push(lam([[X(t), Y0 - K * Pr], [X(t + 1.1), Y0 - K * Pr]]));
+  out.push({ d: kw.join(' ') });
+  log('taryfa: poziom równoważny', Pr.toFixed(2), ' przy P0 =', P0, ' szczyt', Math.max(...s.map((q) => (Y0 - q[1]) / K)).toFixed(2));
+  return out;
+}
+
+/** izolinie pola f na siatce (marching squares, ze sklejaniem odcinków w łamane) */
+function izolinie(F, nx, ny, X, Y, poziom) {
+  const odc = [], kl = (p) => `${Math.round(p[0] * 50)},${Math.round(p[1] * 50)}`;
+  for (let i = 0; i + 1 < nx; i++) for (let j = 0; j + 1 < ny; j++) {
+    const v = [F[i][j], F[i + 1][j], F[i + 1][j + 1], F[i][j + 1]];
+    if (v.some((q) => q === null)) continue;
+    const r = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]], pk = [];
+    for (let e = 0; e < 4; e++) { const a = v[e], b = v[(e + 1) % 4]; if ((a < poziom) !== (b < poziom)) { const t = (poziom - a) / (b - a), A = r[e], B = r[(e + 1) % 4]; pk.push([X(A[0] + t * (B[0] - A[0])), Y(A[1] + t * (B[1] - A[1]))]); } }
+    if (pk.length === 2) odc.push(pk); else if (pk.length === 4) odc.push([pk[0], pk[1]], [pk[2], pk[3]]);
+  }
+  const uzyte = odc.map(() => false), przy = new Map();
+  odc.forEach((o, i) => { for (const p of o) { const k = kl(p); if (!przy.has(k)) przy.set(k, []); przy.get(k).push(i); } });
+  const lamane = [];
+  for (let i = 0; i < odc.length; i++) {
+    if (uzyte[i]) continue;
+    uzyte[i] = true; const l = [odc[i][0], odc[i][1]];
+    for (const koniec of [1, 0]) {
+      for (;;) {
+        const p = koniec ? l[l.length - 1] : l[0], nast = (przy.get(kl(p)) || []).find((j) => !uzyte[j]);
+        if (nast === undefined) break;
+        uzyte[nast] = true; const q = kl(odc[nast][0]) === kl(p) ? odc[nast][1] : odc[nast][0];
+        if (koniec) l.push(q); else l.unshift(q);
+      }
+    }
+    lamane.push(l);
+  }
+  return lamane;
+}
+
+/* =====================================================================================
+   24. Doktorat u Hilberta (1911): zasada Dirichleta; funkcja harmoniczna w obszarze o zadanych wartościach na brzegu (relaksacja) i jej poziomice
+   ===================================================================================== */
+function rysDirichlet() {
+  const brzeg = catmull([[52, 62], [110, 48], [168, 70], [182, 128], [150, 176], [168, 214], [96, 216], [34, 200], [48, 150], [20, 112]], 20);
+  const h = 2, nx = Math.round(176 / h) + 1, ny = Math.round(190 / h) + 1, X = (i) => 12 + i * h, Y = (j) => 34 + j * h;
+  const g = (x, y) => { const t = Math.atan2(y - 130, x - 100); return Math.cos(2 * t + 0.5) + 0.35 * Math.sin(5 * t); };
+  const F = [], W = [];
+  for (let i = 0; i < nx; i++) { F.push([]); W.push([]); for (let j = 0; j < ny; j++) { const w = wSrodku([X(i), Y(j)], brzeg); W[i].push(w); F[i].push(w ? 0 : g(X(i), Y(j))); } }
+  // relaksacja (SOR): wewnątrz średnia czterech sąsiadów; na zewnątrz obszaru wartości brzegowe g
+  const om = 1.9;
+  let zm = 1, it = 0;
+  for (; it < 4000 && zm > 1e-6; it++) { zm = 0; for (let i = 1; i + 1 < nx; i++) for (let j = 1; j + 1 < ny; j++) if (W[i][j]) { const n = (F[i - 1][j] + F[i + 1][j] + F[i][j - 1] + F[i][j + 1]) / 4, d = n - F[i][j]; F[i][j] += om * d; zm = Math.max(zm, Math.abs(d)); } }
+  log('dirichlet: iteracji', it, ' zmiana', zm.toExponential(1));
+  const out = [{ d: lam(brzeg, true), gruba: true }];
+  const obc = (l) => kawalki(l, (q) => wSrodku(q, brzeg));
+  for (let k = -5; k <= 5; k++) {
+    const lv = k * 0.2 + 0.03, kaw = [];
+    for (const l of izolinie(F, nx, ny, X, Y, lv)) for (const o of obc(l)) if (dl(o) >= 8) kaw.push(lam(o));
+    if (kaw.length) out.push({ d: kaw.join(' ') });
+  }
+  return out;
+}
+
+/* =====================================================================================
+   25. Znaczek pocztowy (Kac, lata 30.): 150 funtów × 1/5000 prawdopodobieństwa = trochę mniej niż znaczek
+   ===================================================================================== */
+function rysZnaczek() {
+  // znaczek: prostokąt z ząbkami (półokręgi co 12 jedn.), współrzędne liczone wzdłuż boków
+  const x0 = 22, x1 = 178, y0 = 44, y1 = 214, zab = 12, r = 3.6;
+  const bok = (A, B) => { const L = Math.hypot(B[0] - A[0], B[1] - A[1]), n = Math.round(L / zab), o = [], ux = (B[0] - A[0]) / L, uy = (B[1] - A[1]) / L, nx = uy, ny = -ux, kr = L / n; for (let k = 0; k < n; k++) { const s = k * kr + (kr - 2 * r) / 2; o.push([A[0] + ux * (k * kr), A[1] + uy * (k * kr)]); for (let i = 0; i <= 8; i++) { const t = Math.PI * i / 8, w = s + r - r * Math.cos(t), g = r * Math.sin(t); o.push([A[0] + ux * w - nx * g, A[1] + uy * w - ny * g]); } } return o; };
+  const krawedz = [...bok([x0, y0], [x1, y0]), ...bok([x1, y0], [x1, y1]), ...bok([x1, y1], [x0, y1]), ...bok([x0, y1], [x0, y0])];
+  const out = [{ d: lam(krawedz, true) }];
+  // wartość oczekiwana E(p) = 150·p [funtów] i koszt znaczka: osie p ∈ [0, 1/1500], E ∈ [0, 0,1]
+  const X = (p) => 46 + 112 * p * 1500, Y = (e) => 188 - 118 * e * 10;
+  out.push({ d: `${lam([[X(0), Y(0)], [X(1 / 1500), Y(0)]])} ${lam([[X(0), Y(0)], [X(0), Y(0.1)]])}` });
+  out.push({ d: lam([[X(0), Y(0)], [X(1 / 1500), Y(150 / 1500)]]), gruba: true });
+  const p = 1 / 5000, E = 150 * p, K = 0.032;   // koszt znaczka: tylko poziom „trochę więcej niż 0,03 funta” (MacTutor nie podaje kwoty)
+  out.push({ d: lam([[X(0), Y(K)], [X(1 / 1500), Y(K)]]) });
+  out.push({ d: lam([[X(p), Y(0)], [X(p), Y(E)]]) });
+  out.push({ d: kropka(X(p), Y(E), 4), gruba: true });
+  log('znaczek: E =', E.toFixed(3), 'funta przy p = 1/5000');
+  return out;
+}
+
+/* =====================================================================================
+   26. Konkurs PTM (od 1967, inicjator Łukaszewicz, uczeń Steinhausa): rachunek prawdopodobieństwa: deska Galtona, rozkład dwumianowy
+   ===================================================================================== */
+function rysGalton() {
+  const N = 8, dx = 17, dy = 12, cx = 100, y0 = 46, out = [];
+  const Pk = (w, k) => [cx + (k - w / 2) * dx, y0 + w * dy];
+  const kol = []; for (let w = 0; w < N; w++) for (let k = 0; k <= w; k++) { const [x, y] = Pk(w, k); kol.push(okr(x, y, 1.9)); }
+  out.push({ d: kol.join(' ') });
+  // przegródki i rozkład (wysokości ∝ C(N, k))
+  const C = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
+  const yd = y0 + N * dy + 6, yk = 222, H = yk - yd, sc = []; const wysKol = (k) => H * C(N, k) / C(N, N / 2);
+  for (let k = 0; k <= N + 1; k++) { const x = cx + (k - (N + 1) / 2) * dx; sc.push(lam([[x, yd], [x, yk]])); }
+  sc.push(lam([[cx - (N + 1) / 2 * dx, yk], [cx + (N + 1) / 2 * dx, yk]]));
+  out.push({ d: sc.join(' ') });
+  const slup = []; for (let k = 0; k <= N; k++) { const a = cx + (k - (N + 1) / 2) * dx + 3, b = a + dx - 6, y = yk - wysKol(k); if (wysKol(k) >= 3) slup.push(lam([[a, yk], [a, y], [b, y], [b, yk]])); else slup.push(lam([[a, y], [b, y]])); }
+  out.push({ d: slup.join(' ') });
+  // jedna droga kulki (ziarno stałe)
+  const R = los(1967); let k = 0; const dr = [[cx, y0 - 8], Pk(0, 0)]; for (let w = 0; w < N; w++) { if (R() < 0.5) k++; dr.push(Pk(w + 1, k)); }
+  dr[dr.length - 1] = [dr[dr.length - 1][0], yd + 2];
+  out.push({ d: lam(dr), gruba: true });
+  out.push({ d: kropka(cx, y0 - 8, 4), gruba: true });
+  log('galton: kulka do przegródki', k, ' rozkład', Array.from({ length: N + 1 }, (_, j) => C(N, j)).join(','));
+  return out;
+}
+
+/* =====================================================================================
+   27. Z ławki do towarzystwa (1916–1919): trzech na ławce i szesnastu na zebraniu założycielskim
+   ===================================================================================== */
+function rysTowarzystwo() {
+  const cx = 100, cy = 130, R = 76, r = 20, out = [];
+  const krag = Array.from({ length: 16 }, (_, k) => { const a = -Math.PI / 2 + 2 * Math.PI * k / 16; return [cx + R * Math.cos(a), cy + R * Math.sin(a)]; });
+  const trzy = Array.from({ length: 3 }, (_, k) => { const a = -Math.PI / 2 + 2 * Math.PI * k / 3; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; });
+  // cienkie: każdy z szesnastu połączony z najbliższym z trzech, co szósty krok gwiazdki {16/5} w tle
+  const gw = []; for (let k = 0; k < 16; k++) gw.push(lam([krag[k], krag[(k + 5) % 16]]));
+  out.push({ d: gw.join(' ') });
+  const lacz = krag.map((p) => { const q = trzy.reduce((m, t) => (Math.hypot(t[0] - p[0], t[1] - p[1]) < Math.hypot(m[0] - p[0], m[1] - p[1]) ? t : m), trzy[0]); return lam([q, p]); });
+  out.push({ d: lacz.join(' ') });
+  out.push({ d: lam(krag, true) });
+  out.push({ d: krag.map((p) => kropka(p[0], p[1], 3.4)).join(' '), gruba: true });
+  out.push({ d: lam(trzy, true), gruba: true });
+  out.push({ d: trzy.map((p) => kropka(p[0], p[1], 4.5)).join(' '), gruba: true });
+  return out;
+}
+
+/* =====================================================================================
+   28. Między duchem a materią (1980): od gładkiej fali do twardej fali prostokątnej: sumy częściowe szeregu Fouriera (rzędy 1, 3, 5, …)
+   ===================================================================================== */
+function rysDuchMateria() {
+  const rzedy = [1, 3, 5, 9, 21], out = [];
+  const X = (t) => 16 + 168 * t;
+  const S = (m, x) => { let s = 0; for (let k = 1; k <= m; k += 2) s += Math.sin(k * x) / k; return 4 / Math.PI * s; };
+  const A = 15, y0 = 57, dy = 30;
+  rzedy.forEach((m, i) => {
+    const s = []; for (let j = 0; j <= 400; j++) { const t = j / 400; s.push([X(t), y0 + i * dy - A * S(m, t * 4 * Math.PI)]); }
+    out.push({ d: lam(s), gruba: i === 2 });
+  });
+  // na dole sama fala prostokątna (granica)
+  const yk = y0 + rzedy.length * dy, kw = []; for (let k = 0; k < 4; k++) { const v = k % 2 === 0 ? 1 : -1; kw.push([X(k / 4), yk - A * v], [X((k + 1) / 4), yk - A * v]); }
+  out.push({ d: lam(kw) });
+  log('duch–materia: efekt Gibbsa, max S_21 =', Math.max(...Array.from({ length: 2000 }, (_, j) => S(21, j / 2000 * Math.PI))).toFixed(3));
+  return out;
+}
+
+/* =====================================================================================
+   29. Rzuty monetą (1923): ciąg orłów i reszek jako punkt odcinka; drzewo podziałów dwójkowych
    ===================================================================================== */
 function rysMoneta() {
   const G = 4, X0 = 16, Y0 = 42, dX = 168, dY = 38, Yd = Y0 + G * dY + 18;
@@ -688,21 +1050,24 @@ function rysKolo() {
 }
 
 /* =====================================================================================
-   17. Tres faciunt collegium (opowiadał M. Kac): sala w rzucie z góry, wykładowca i dwóch słuchaczy
+   31. Uczniowie (Mathematics Genealogy Project): 20 doktorów; długość promienia ∝ log(1 + liczba potomków); grube: Wrocław
    ===================================================================================== */
-function rysTres() {
-  const cx = 100, cy = 212, out = [], st = Math.PI / 180;
-  const A0 = -120 * st, A1 = -60 * st;
-  const luk = (r) => { const s = []; for (let k = 0; k <= 48; k++) { const u = A0 + (A1 - A0) * k / 48; s.push([cx + r * Math.cos(u), cy + r * Math.sin(u)]); } return lam(s); };
-  const rzedy = [62, 84, 106, 128, 150, 172];
-  for (const r of rzedy) out.push({ d: luk(r) });
-  for (const u of [A0, A1]) out.push({ d: lam([[cx + 62 * Math.cos(u), cy + 62 * Math.sin(u)], [cx + 172 * Math.cos(u), cy + 172 * Math.sin(u)]]) });
-  out.push({ d: lam([[62, 220], [138, 220]]) });
-  // wykładowca przy tablicy i dwaj słuchacze: siedzą w rzędach r = 106 i r = 150
-  const W = [100, 205], S1 = [cx + 106 * Math.cos(-106 * st), cy + 106 * Math.sin(-106 * st)], S2 = [cx + 150 * Math.cos(-72 * st), cy + 150 * Math.sin(-72 * st)];
-  out.push({ d: lam([W, S1, S2], true), gruba: true });
-  for (const q of [W, S1, S2]) out.push({ d: kropka(q[0], q[1]), gruba: true });
-  log('tres: rzędów', rzedy.length, ', osób 3');
+function rysUczniowie() {
+  const dane = [['Banach', 1920, 346, 0], ['Rajchman', 1921, 1976, 0], ['Schauder', 1923, 0, 0], ['Weinlös', 1927, 0, 0], ['Orlicz', 1928, 371, 0], ['Birnbaum', 1929, 168, 0], ['Kac', 1937, 408, 0],
+    ['Warmus', 1949, 1, 1], ['Fisz', 1950, 22, 1], ['Perkal', 1950, 31, 1], ['Oderfeld', 1951, 1, 1], ['Zubrzycki', 1954, 0, 1], ['Łukaszewicz', 1957, 27, 1], ['Fast', 1958, 0, 1], ['Zięba', 1959, 17, 1], ['Lysik', 1960, 8, 1], ['Trybuła', 1960, 42, 1], ['Cheng', 1961, 34, 1], ['Kotlarski', 1961, 3, 1], ['Plucińska', 1961, 6, 1]];
+  const cx = 100, cy = 130, R0 = 22, Rm = 84, Lm = Math.log10(1 + 1976);
+  const Rr = (d) => R0 + 8 + (Rm - R0 - 8) * Math.log10(1 + d) / Lm;
+  const out = [{ d: okr(cx, cy, R0) }];
+  for (const d of [10, 100, 1000]) out.push({ d: okr(cx, cy, f1(Rr(d))) });
+  const cien = [], gr = [], kr1 = [], kr2 = [];
+  dane.forEach(([, , d, w], i) => {
+    const a = -Math.PI / 2 + 2 * Math.PI * i / dane.length, u = [Math.cos(a), Math.sin(a)], A = [cx + R0 * u[0], cy + R0 * u[1]], r = Rr(d), B = [cx + r * u[0], cy + r * u[1]];
+    (w ? gr : cien).push(lam([A, B]));
+    (w ? kr2 : kr1).push(kropka(B[0], B[1], 3));
+  });
+  out.push({ d: cien.join(' ') }, { d: kr1.join(' ') }, { d: gr.join(' '), gruba: true }, { d: kr2.join(' '), gruba: true });
+  out.push({ d: kropka(cx, cy, 4.5), gruba: true });
+  log('uczniowie: doktorów', dane.length, ' suma potomków w tabeli', dane.reduce((s, q) => s + q[2], 0), ' (MGP: 3409 łącznie, liczone bez powtórzeń)');
   return out;
 }
 
@@ -728,197 +1093,293 @@ function kontrola(id, sc) {
   return ok;
 }
 
-module.exports = { rysKanapka, rysLebesgue, rys18, rysLongimetr, rysTort, rysWisla, rysTrzy, rysKalejdoskop, rysSzachownica, rysZapalki, rysBanachSteinhaus, rysKSrednich, rysMega, rysDendryt, rysMoneta, rysKolo, rysTres, kontrola };
 
 /* =====================================================================================
-   Teksty ciekawostek (źródła i rozbieżności: RAPORT.md). Sprawdzone 4–5.11.2026.
+   FAKTY (treść sprawdzona w źródłach, patrz RAPORT.md)
    ===================================================================================== */
+const W = 'https://en.wikipedia.org/wiki/';
+const MT = 'https://mathshistory.st-andrews.ac.uk/Biographies/Steinhaus/';
 const FAKTY = [
-  {
-    rys: 'rysSzachownica', id: 'twierdzenie-o-szachownicy', nazwa: 'Twierdzenie o szachownicy', rok: '1954',
-    zdanie: 'Na szachownicy z minami albo król przejdzie w poprzek bez min, albo wieża z góry na dół po samych minach.',
-    notka: 'Twierdzenie nosi imię Steinhausa. Kulpa, Socha i Turzański (2000) przytaczają je za „Kalejdoskopem matematycznym” w wydaniu PWN z 1954 r.; nie ustalono, czy było już w wydaniu z 1938 r. To kombinatoryczny odpowiednik faktów topologicznych: wariant sześciokątny, jak w grze Hex, i związek z twierdzeniem Brouwera o punkcie stałym opisał Gale (1979), a wersję wielowymiarową Tkacz i Turzański (2008). Rysunek: 27 min na polach 8×8, gruba linia to droga wieży po minach; program sprawdza przeszukiwaniem, że król nie ma drogi w poprzek bez min.',
-    rodzaj: 'twierdzenie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Steinhaus_chessboard_theorem', 'https://dml.cz/bitstream/handle/10338.dmlcz/702068/ActaCarolinae_041-2000-2_7.pdf'],
-    podstrona: 'Dla uczniów', dlaczego_tu: 'Szachy i miny: treść rozumie każdy uczeń, a własną planszę można narysować w zeszycie w kratkę.',
-  },
-  {
-    rys: 'rysLongimetr', id: 'longimetr', nazwa: 'Longimetr Steinhausa', rok: '1930',
-    zdanie: 'Przezrocze z trzema siatkami mierzy długość krzywej: liczba przecięć to długość w milimetrach.',
-    notka: 'Pomysł przyszedł Steinhausowi, gdy jego córka dostała zadanie zmierzenia Wisły na mapie (jego Autobiografia, Wiadomości Matematyczne 1973, za Gądek-Moszczak i Matusiewiczem 2017). Metodę opisał w 1930 r. („Zur Praxis der Rektifikation und zum Längenbegriff”, Lipsk), a po polsku w 1932 r. („W sprawie mierzenia długości linij krzywych płaskich”, Polski Przegląd Kartograficzny 10). Przezrocze to trzy siatki kwadratowe obrócone o 30°, z liniami co 3,82 mm; ta liczba to 12/π, więc liczba przecięć w przybliżeniu równa się długości w milimetrach (wzór Croftona). Rysunek: sześć kierunków co 30°, kropki to przecięcia; odstęp linii powiększony dla czytelności, a długość policzona z przecięć różni się od prawdziwej o ok. 1%.',
-    rodzaj: 'zastosowanie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Steinhaus_longimeter', 'https://ias-iss.org/ojs/IAS/article/download/1808/1056'],
-    podstrona: 'Dla nauczycieli', dlaczego_tu: 'Zaczęło się od zadania córki (zmierzyć Wisłę na mapie), a metodę opisał w piśmie dla nauczycieli geografii i kartografów; takie przezrocze można zrobić na lekcję.',
-  },
-  {
-    rys: 'rysKalejdoskop', id: 'kalejdoskop-matematyczny', nazwa: 'Kalejdoskop matematyczny', rok: '1938',
-    zdanie: 'Książka o matematyce do oglądania; pierwsze wydanie miało w kieszonce okulary do obrazków 3D.',
-    notka: 'Steinhaus napisał ją w 1937 r. (MacTutor). W 1938 r. ukazała się jako „Kalejdoskop matematyczny” i „Mathematical Snapshots”; według strony Centrum im. Hugona Steinhausa na Politechnice Wrocławskiej po polsku i po angielsku tego samego dnia. W pierwszym wydaniu wiele rysunków to anaglify oglądane przez czerwono-zielone okulary schowane w kieszonce na końcu książki (Linda Hall Library). Drugie wydanie: Oxford, 1950–1951. Mark Kac pisał, że książka ma przemawiać do „naukowca w dziecku i dziecka w naukowcu” (przekład nasz). Angielska Wikipedia podaje dla polskiego tytułu rok 1939; pozostałe źródła 1938. Rysunek: trzy lustra tworzą trójkąt, a motyw z jego wnętrza (gruby) odbija się w całym polu; każde odbicie to złożenie symetrii względem boków.',
-    rodzaj: 'historia', pewnosc: 'pewne',
-    zrodla: ['https://mathshistory.st-andrews.ac.uk/Biographies/Steinhaus/', 'https://hsc.pwr.edu.pl/steinhaus', 'https://www.lindahall.org/about/news/scientist-of-the-day/hugo-steinhaus/', 'https://www.wroclaw.pl/dla-mieszkanca/hugo-steinhaus-w-galerii-slawnych', 'https://mathshistory.st-andrews.ac.uk/Strick/steinhaus.pdf'],
-    podstrona: 'Dla wszystkich', dlaczego_tu: 'Najbardziej znana książka popularna Steinhausa, pisana dla czytelnika w każdym wieku.',
-  },
-  {
-    rys: 'rysTort', id: 'sprawiedliwy-podzial', nazwa: 'Sprawiedliwy podział', rok: '1948',
-    zdanie: 'Jak podzielić tort między trzy osoby, by każda dostała co najmniej 1/3 według własnej oceny?',
-    notka: 'Steinhaus postawił to pytanie w czasie wojny (MacTutor podaje 1944 r.) i znalazł sposób dla trzech osób: jedna kroi tort na trzy części równe w swojej ocenie, dwie pozostałe wskazują części, które uważają za wystarczające. Jeśli któraś wskaże co najmniej dwie, każdy dostaje część dla siebie dobrą; jeśli obie wskażą tylko jedną, dzielący bierze część niewskazaną, a one dzielą resztę metodą „dzielę i wybieram”. Opublikował to w „The problem of fair division” (Econometrica 16, 1948, s. 101–104). To podział proporcjonalny, nie wolny od zazdrości: taki dla trzech osób podali Conway i Selfridge (1962), a dla dowolnej liczby osób Brams i Taylor (1995). Rysunek: tort z siedmioma owocami i trzy wycinki równej wartości w ocenie dzielącego (ciasto plus owoce), choć ich kąty to 110°, 110° i 140°.',
-    rodzaj: 'zastosowanie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Lone_divider', 'https://mathshistory.st-andrews.ac.uk/Biographies/Steinhaus/', 'https://en.wikipedia.org/wiki/Fair_cake-cutting'],
-    podstrona: 'Organizatorzy', dlaczego_tu: 'Każdy, kto dzieli zadania przy wydarzeniu, rozwiązuje zadanie Steinhausa (z przymrużeniem oka).',
-  },
-  {
-    rys: 'rysKanapka', id: 'kanapka-z-szynka', nazwa: 'Twierdzenie o kanapce z szynką', rok: '1938',
-    zdanie: 'Trzy bryły zawsze da się przepołowić jednym płaskim cięciem; na rysunku wersja płaska: dwie figury i prosta.',
-    notka: 'Pytanie postawił Steinhaus; to zagadnienie 123 Księgi Szkockiej, a w jednym ze sformułowań chodzi o kawałek szynki pod krajalnicą: czy mięso, kość i tłuszcz da się przeciąć naraz na połowy. Rozwiązanie ukazało się w 1938 r. w notatce „Z topologii” w piśmie Mathesis Polska; dowód, oparty na twierdzeniu Borsuka–Ulama, pochodzi od Banacha. Na dowolny wymiar uogólnili to Stone i Tukey (1942). Wersja na płaszczyźnie to tzw. twierdzenie o naleśniku. Rysunek: kromka i plaster szynki; prosta policzona bisekcją, każda figura dzieli się na połowy co do 0,0001 pola. To obecny znak działu, tu w wersji z kromką.',
-    rodzaj: 'twierdzenie', pewnosc: 'pewne',
-    zrodla: ['https://mathshistory.st-andrews.ac.uk/Miller/mathword/h/', 'https://en.wikipedia.org/wiki/Ham_sandwich_theorem', 'https://arxiv.org/pdf/2010.00478v2'],
-    podstrona: 'zapas', dlaczego_tu: 'Obecny znak całego działu (strona główna Popularyzacji), więc nie dublujemy go na podstronie.',
-  },
-  {
-    rys: 'rysLebesgue', id: 'banach-na-plantach', nazwa: 'Odkrycie Banacha na Plantach', rok: '1916',
-    zdanie: 'Steinhaus usłyszał na krakowskich Plantach słowa „miara Lebesgue’a” i tak poznał Stefana Banacha.',
-    notka: 'Wiosną 1916 r., podczas spaceru po Plantach, usłyszał te słowa i podszedł do rozmawiających: byli to Stefan Banach i Otto Nikodym (wspomnienie Steinhausa w MacTutor). Za swoje największe odkrycie uważał właśnie Banacha (H.-K. Strick, Wikipedia). Rysunek: wykres funkcji i zbiory, na których przekracza ona kolejne poziomy; miara tych zbiorów to punkt wyjścia całki Lebesgue’a.',
-    rodzaj: 'historia', pewnosc: 'pewne',
-    zrodla: ['https://mathshistory.st-andrews.ac.uk/Biographies/Banach/', 'https://mathshistory.st-andrews.ac.uk/Biographies/Steinhaus/', 'https://mathshistory.st-andrews.ac.uk/Strick/steinhaus.pdf', 'https://en.wikipedia.org/wiki/Hugo_Steinhaus'],
-    podstrona: 'zapas', dlaczego_tu: 'Dobre na wydarzenia dla szerokiej publiczności: wielkie odkrycie zaczęte od rozmowy usłyszanej w parku.',
-  },
-  {
-    rys: 'rys18', id: 'zadanie-o-18-punktach', nazwa: 'Zadanie o 18 punktach', rok: '1958',
-    zdanie: 'Stawiaj punkty na odcinku tak, by pierwsze n leżało w różnych n-tych częściach: da się 17, ale 18 już nie.',
-    notka: 'Zadanie ze „Stu zadań” Steinhausa (1958; po angielsku „One Hundred Problems in Elementary Mathematics”, 1964, zadania 6–7). Steinhaus pytał o 10 punktów i o to, czy można więcej. Granicę 17 wykazał Warmus, który doliczył się 768 układów przedziałów (1536 z odbiciami); zob. też Berlekamp i Graham (1970), Warmus (1976). Generator sprawdza to przeszukiwaniem wyczerpującym: dla 17 punktów wychodzi 1536 układów, dla 18 żaden. Rysunek: n-ty wiersz to odcinek podzielony na n części; kółko to punkt dodany w tym kroku, a pionowa kreska pokazuje jego miejsce w kolejnych wierszach.',
-    rodzaj: 'twierdzenie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Irregularity_of_distributions', 'https://mathworld.wolfram.com/18-PointProblem.html', 'https://www.cut-the-knot.org/Curriculum/Algebra/SteinhausProblem.shtml'],
-    podstrona: 'zapas', dlaczego_tu: 'Zadanie na kółko: pierwsze kilka punktów można sprawdzić na kartce, a odpowiedź „17” zaskakuje.',
-  },
-  {
-    rys: 'rysWisla', id: 'dlugosc-brzegu-wisly', nazwa: 'Długość brzegu Wisły', rok: '1954',
-    zdanie: 'Im dokładniej mierzysz brzeg Wisły, tym jest dłuższy: 10, 100, nawet 1000 razy dłuższy niż na szkolnej mapie.',
-    notka: 'W pracy „Length, shape and area” (Colloquium Mathematicum 3, 1954, s. 1–13) Steinhaus zauważył w przypisie, że lewy brzeg Wisły mierzony z większą dokładnością dałby długość dziesięć, sto, a nawet tysiąc razy większą niż odczytana ze szkolnej mapy, a większość łuków spotykanych w przyrodzie lepiej uważać za nieprostowalne. To ten sam paradoks, który badał L. F. Richardson i który spopularyzował B. Mandelbrot w 1967 r. („How Long Is the Coast of Britain?”). Rysunek: losowa krzywa Kocha (nie prawdziwa Wisła) mierzona cyrklem o coraz mniejszym rozstawie; paski pokazują zmierzoną długość w tej samej skali.',
-    rodzaj: 'pojęcie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Coastline_paradox', 'https://eudml.org/doc/210004'],
-    podstrona: 'zapas', dlaczego_tu: 'Mapa i rzeka, którą zna każdy we Wrocławiu (choć tu płynie Odra).',
-  },
-  {
-    rys: 'rysTrzy', id: 'trzy-odleglosci', nazwa: 'Twierdzenie o trzech odległościach', rok: '1957',
-    zdanie: 'Punkty stawiane na okręgu co stały kąt dzielą go na łuki co najwyżej trzech długości.',
-    notka: 'Hipotezę postawił Steinhaus, a dowody ogłosili Vera T. Sós (1957), János Surányi (1958) i Stanisław Świerczkowski (1959). Gdy długości są trzy, największa równa się sumie dwóch pozostałych. Rysunek: 18 punktów co złoty kąt; nad każdym łukiem garb o wysokości proporcjonalnej do jego długości, grube garby to największe łuki (długości 0,0344, 0,0557 i 0,0902 okręgu).',
-    rodzaj: 'twierdzenie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Three-gap_theorem'],
-    podstrona: 'zapas', dlaczego_tu: 'Zapas; podobny motyw ma animacja Kalendarza (dok/przekazanie.md), więc lepiej go tu nie powtarzać.',
-  },
-  {
-    rys: 'rysZapalki', id: 'pudelka-zapalek', nazwa: 'Zadanie o pudełkach zapałek', rok: '1941',
-    zdanie: 'Dwa pudełka zapałek w kieszeniach: ile zostało w drugim, gdy pierwsze okaże się puste?',
-    notka: 'Ostatnie, 193. zagadnienie Księgi Szkockiej podpisał Steinhaus; ostatnia data w księdze to 31 maja 1941 r. Dziś znane jest jako zadanie Banacha o pudełkach zapałek, ale według W. Fellera Banach go nie postawił: nazwa wzięła się z żartobliwej aluzji Steinhausa do palenia Banacha w przemówieniu na jego cześć. Rysunek: jedna losowa historia wyjmowania zapałek jako droga po kratce (7 zapałek w pudełku), krzyżyk to sięgnięcie do pustego pudełka; w drugim zostały 2 zapałki.',
-    rodzaj: 'historia', pewnosc: 'pewne',
-    zrodla: ['https://mathshistory.st-andrews.ac.uk/HistTopics/Scottish_Book/', 'https://en.wikipedia.org/wiki/Scottish_Book', 'https://en.wikipedia.org/wiki/Banach%27s_matchbox_problem'],
-    podstrona: 'zapas', dlaczego_tu: 'Rachunek prawdopodobieństwa z kieszeni palacza: na lekcję albo wykład popularny.',
-  },
-  {
-    rys: 'rysBanachSteinhaus', id: 'banach-steinhaus', nazwa: 'Twierdzenie Banacha–Steinhausa', rok: '1927',
-    zdanie: 'Operatory liniowe ograniczone w każdym punkcie z osobna są też ograniczone wspólną stałą.',
-    notka: 'Banach i Steinhaus, „Sur le principe de la condensation de singularités”, Fundamenta Mathematicae 9 (1927), s. 50–61; niezależnie udowodnił to Hans Hahn. Twierdzenie dotyczy ciągłych operatorów liniowych na przestrzeni Banacha. Klasyczne zastosowanie: istnieją funkcje ciągłe, których szereg Fouriera jest rozbieżny w danym punkcie. Rysunek: jądra Dirichleta D₃, D₆ i D₁₂ o szczytach 7, 13 i 25; ich normy (stałe Lebesgue’a: 1,78, 2,03, 2,29) rosną bez ograniczenia.',
-    rodzaj: 'twierdzenie', pewnosc: 'pewne',
-    zrodla: ['https://en.wikipedia.org/wiki/Uniform_boundedness_principle', 'https://mathshistory.st-andrews.ac.uk/Biographies/Steinhaus/'],
-    podstrona: 'zapas', dlaczego_tu: 'Najbardziej znane twierdzenie patrona, ale za trudne na stronę dla szerokiego odbiorcy.',
-  },
-  {
-    rys: 'rysKSrednich', id: 'k-srednich', nazwa: 'Metoda k-średnich', rok: '1956',
-    zdanie: 'Steinhaus dzielił bryłę na części wokół ich środków ciężkości: to dzisiejsza metoda k-średnich.',
-    notka: 'W „Sur la division des corps matériels en parties” (Bulletin de l’Académie Polonaise des Sciences, Cl. III, 4, 1956, s. 801–804) Steinhaus szukał podziału niejednorodnej bryły na k części o najmniejszej sumie momentów bezwładności. Według H.-H. Bocka (2008) to pierwsze jawne ujęcie algorytmu k-średnich w wielu wymiarach. Nazwę „k-means” wprowadził J. MacQueen (1967), a wersję dyskretną dla danych E. Forgy (1965). Angielska Wikipedia podaje dla pracy Steinhausa rok 1957 w przypisie, a 1956 w tekście; Bock: 1956. Rysunek: iteracja do zbieżności dla pięciu części; kółka to środki ciężkości, grube linie to granice.',
-    rodzaj: 'zastosowanie', pewnosc: 'pewne',
-    zrodla: ['https://emis.univie.ac.at/journals/JEHPS/Decembre2008/Bock.pdf', 'https://en.wikipedia.org/wiki/K-means_clustering'],
-    podstrona: 'zapas', dlaczego_tu: 'Dziś to jeden z najpopularniejszych algorytmów analizy danych: dobry przykład, że matematyka bryły wraca w informatyce.',
-  },
-  {
-    rys: 'rysMega', id: 'mega', nazwa: 'Mega: liczba w kole', rok: '1951',
-    zdanie: 'Trójkąt: n do potęgi n. Kwadrat: n w n trójkątach. Koło: n w n kwadratach. Dwójka w kole to Mega.',
-    notka: 'Notacja wielokątów Steinhausa z „Mathematical Snapshots”: liczba w trójkącie, kwadracie i kole; dwójka w kole nosi nazwę Mega, a dziesiątka w kole Megiston. Leo Moser rozszerzył to na dowolne wielokąty (notacja Steinhausa–Mosera). Rok niepewny: strona R. Munafo podaje wydanie z 1951 r., a Wikipedia cytuje wydanie z 1969 r., s. 28–29; nie sprawdzono wydania z 1938 r. Rysunek (bez cyfr, dwójka to dwie kropki): dwójka w kole; dwójka w dwóch kwadratach; kwadrat, a w nim dwójka w dwóch trójkątach; kwadrat, a w nim czwórka w trójkącie, bo dwójka w trójkącie to 2² = 4. A czwórka w trójkącie to już 256.',
-    rodzaj: 'pojęcie', pewnosc: 'do sprawdzenia',
-    zrodla: ['https://en.wikipedia.org/wiki/Steinhaus%E2%80%93Moser_notation', 'https://mrob.com/pub/math/largenum-5.html'],
-    podstrona: 'zapas', dlaczego_tu: 'Zabawa dla uczniów, którzy lubią wielkie liczby: reguły mieszczą się w jednym zdaniu.',
-  },
-  {
-    rys: 'rysDendryt', id: 'dendryt-wroclawski', nazwa: 'Dendryt wrocławski', rok: '1951',
-    zdanie: 'Najkrótsza sieć łącząca punkty pozwala je pogrupować: to taksonomia wrocławska.',
-    notka: 'Florek, Łukaszewicz, Perkal, Steinhaus i Zubrzycki, „Sur la liaison et la division des points d’un ensemble fini”, Colloquium Mathematicum 2 (1951), s. 282–285. Duda i Weron (2006) opisują taksonomię wrocławską jako metodę opisu i klasyfikacji indywiduów. Sam problem najkrótszej sieci rozwiązał wcześniej O. Borůvka (1926); późniejsze algorytmy to Kruskal (1956) i Prim (1957). Rysunek: 26 punktów, sieć policzona algorytmem Kruskala i sprawdzona algorytmem Prima; cienkie krawędzie to trzy najdłuższe, po ich usunięciu punkty rozpadają się na grupy.',
-    rodzaj: 'zastosowanie', pewnosc: 'pewne',
-    zrodla: ['https://eudml.org/doc/209969', 'https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf', 'https://geodesic.mathdoc.fr/item/ARM_1997_33_1-2_a3'],
-    podstrona: 'zapas', dlaczego_tu: 'Lokalna, wrocławska historia, która trafiła do informatyki; dział Instytut ma podobny motyw w animacji banera (dok/przekazanie.md).',
-  },
-  {
-    rys: 'rysMoneta', id: 'rzuty-moneta', nazwa: 'Rzuty monetą jako miara', rok: '1923',
-    zdanie: 'Nieskończone rzucanie monetą opisał językiem miary: prawdopodobieństwo to długość przedziału.',
-    notka: 'H. Steinhaus, „Les probabilités dénombrables et leur rapport à la théorie de la mesure”, Fundamenta Mathematicae 4 (1923), s. 286–310. Podał aksjomatyczną definicję miary prawdopodobieństwa na ciągach zero-jedynkowych; T. Bednarski (2018) stawia tezę, że praca mogła mieć znaczenie dla aksjomatyki Kołmogorowa z 1933 r. Rysunek: drzewo czterech rzutów; każdy rzut połowi przedział, więc ciąg orzeł, reszka, orzeł, orzeł prowadzi do przedziału o długości 1/16, a to właśnie jego prawdopodobieństwo.',
-    rodzaj: 'pojęcie', pewnosc: 'pewne',
-    zrodla: ['https://eudml.org/doc/213613', 'https://czasopisma.uni.lodz.pl/foe/article/view/2433', 'https://en.wikipedia.org/wiki/Hugo_Steinhaus'],
-    podstrona: 'zapas', dlaczego_tu: 'Moneta to najprostszy przykład na lekcji rachunku prawdopodobieństwa, a tu dostaje poważną matematykę.',
-  },
-  {
-    rys: 'rysKolo', id: 'kolo-z-n-punktami', nazwa: 'Koło z n punktami kratowymi', rok: '1957',
-    zdanie: 'Dla każdego n istnieje koło, w którym leży dokładnie n punktów kratki.',
-    notka: 'Pytanie przypisywane Steinhausowi; w „One Hundred Problems” to zadanie 24. W. Sierpiński opisał rozwiązanie w 1958 r. („Sur quelques problèmes concernant les points aux coordonnées entières”, L’Enseignement Mathématique 4): wystarczy środek (√2, 1/3), bo wtedy wszystkie punkty kratki są od niego w różnych odległościach i rosnące koło „połyka” je po jednym. Steinhaus wykazał nawet, że można wybrać koło o polu n (MathWorld, za Honsbergerem). Rok 1957 podaje tylko cut-the-knot. Rysunek: środek (√2, 1/3), koła z 4 i 12 punktami (kółka w środku, krzyżyki na zewnątrz).',
-    rodzaj: 'twierdzenie', pewnosc: 'do sprawdzenia',
-    zrodla: ['https://www.cut-the-knot.org/do_you_know/diffDist.shtml', 'https://arxiv.org/html/2505.06234v1', 'https://mathworld.wolfram.com/CircleLatticePoints.html'],
-    podstrona: 'zapas', dlaczego_tu: 'Dowód mieści się na jednej stronie zeszytu: dobre na kółko matematyczne.',
-  },
-  {
-    rys: 'rysTres', id: 'tres-faciunt-collegium', nazwa: 'Tres faciunt collegium', rok: '',
-    zdanie: 'Steinhaus do dwóch słuchaczy: „Troje czyni kolegium”. Do jednego, na następnym wykładzie: „Bóg jest zawsze obecny”.',
-    notka: 'Anegdotę opowiadał Marek Kac; zapisał ją P. Pragacz w „Humorze w matematyce” (Konspekt 1/2007, s. 106–115), a w wersji skróconej podaje ją też wroclaw.pl z okazji odsłonięcia popiersia Steinhausa w Galerii Sławnych Wrocławian (2013). Źródła nie podają roku ani miejsca, więc pole roku jest puste. Rysunek: sala w rzucie z góry, wykładowca przy tablicy i dwaj słuchacze; to nie plan żadnej konkretnej sali.',
-    rodzaj: 'anegdota', pewnosc: 'pewne',
-    zrodla: ['https://www.impan.pl/~pragacz/download/konspekt-humor.pdf', 'https://www.wroclaw.pl/dla-mieszkanca/hugo-steinhaus-w-galerii-slawnych'],
-    podstrona: 'zapas', dlaczego_tu: 'Dobre pocieszenie dla wykładowcy, gdy na wykład otwarty przyjdzie mało osób.',
-  },
+  { id: 'kanapka-z-szynka', rys: rysKanapka, nazwa: 'Kanapka z szynką', rok: '1938',
+    zdanie: 'Trzy dowolnie położone bryły da się przepołowić naraz jednym cięciem płaszczyzną.',
+    notka: 'Problem postawił Steinhaus; pierwsza znana publikacja to notatka „Z topologii” w „Mathesis Polska” 11 (1938), s. 26–28, która pierwsze rozwiązanie przypisuje Banachowi (dowód przez twierdzenie Borsuka–Ulama). Wersję n-wymiarową podali Stone i Tukey (1942). Notatka ma też wersję żartobliwą: szynka pod krajalnicą. Rysunek: płaski odpowiednik (dwie figury, jedna prosta); prosta wyliczona bisekcją, dzieli pole kromki i plastra na połowy z dokładnością do czterech miejsc po przecinku. To obecny znak działu.',
+    rodzaj: 'twierdzenie', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: [W + 'Ham_sandwich_theorem', 'https://mathshistory.st-andrews.ac.uk/Strick/steinhaus.pdf', 'https://maa.org/press/maa-reviews/mathematical-snapshots'],
+    dlaczego_tu: 'Zadanie, które da się opowiedzieć każdemu przy śniadaniu, a dowód prowadzi do topologii.' },
+  { id: 'banach-na-plantach', rys: rysLebesgue, nazwa: 'Banach na krakowskich Plantach', rok: '1916',
+    zdanie: 'Na wieczornym spacerze usłyszał słowa o całce Lebesgue’a i tak poznał Banacha, swoje największe odkrycie.',
+    notka: 'Latem 1916 r. Steinhaus usłyszał z ławki na Plantach słowa „całka Lebesgue’a” (MacTutor pisze „miara Lebesgue’a”) i dosiadł się do Banacha i Nikodyma. Podał im zadanie o zbieżności w średniej sum częściowych szeregu Fouriera; po kilku dniach Banach przyszedł z rozwiązaniem, a wspólna praca ukazała się w 1918 r. Że Banach to jego największe odkrycie, potwierdzają MacTutor, Ciesielscy i Strick („My discovery of Stefan Banach”), ale tylko w przekazie, bez polskiego oryginału, więc zdanie nie jest cytatem. Na Plantach stoi od 14 października 2016 r. ławka z rzeźbami Banacha i Nikodyma. Rysunek: pomysł Lebesgue’a: wykres dzielony poziomo, zbiory {f > t} na kolejnych poziomach.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://ems.press/content/serial-article-files/9616', MT, 'https://mathshistory.st-andrews.ac.uk/Strick/steinhaus.pdf', 'https://hsc.pwr.edu.pl/steinhaus'],
+    dlaczego_tu: 'Rozmowa o matematyce na ławce w parku: popularyzacja w najczystszej postaci.' },
+  { id: 'osiemnascie-punktow', rys: rys18, nazwa: 'Zadanie o 18 punktach', rok: '1958', przypiecie: true,
+    zdanie: 'Punkty stawiamy po kolei tak, by n pierwszych leżało w różnych n-tych częściach odcinka; 18 już się nie da.',
+    notka: 'Zadania 6 i 7 ze „Stu zadań” (wyd. polskie 1958, angielskie 1964, s. 12–13). Steinhaus podał przykład dla 14 punktów; Berlekamp i Graham (1970) oraz Warmus (1976) wykazali, że 17 to maksimum; Warmus, doktorant Steinhausa, naliczył 768 wzorów rozwiązań z dokładnością do symetrii. Rysunek: układ 17 punktów znaleziony przeszukaniem z nawrotami (ten sam program dla 18 punktów nie znajduje niczego); wiersz n to odcinek podzielony na n części, kropka to n-ty punkt, pionowa linia pokazuje go w niższych wierszach.',
+    rodzaj: 'twierdzenie', pewnosc: 'pewne', podstrona: 'Dla uczniów',
+    zrodla: [W + 'Irregularity_of_distributions', 'https://mathworld.wolfram.com/18-PointProblem.html', 'https://openlibrary.org/works/OL460252W', 'https://www.mathgenealogy.org/id.php?id=7383'],
+    dlaczego_tu: 'Zadanie wystarczy przeczytać, by zacząć próbować z ołówkiem, a odpowiedź „dokładnie siedemnaście” zaskakuje.' },
+  { id: 'longimetr', rys: rysLongimetr, nazwa: 'Longimetr', rok: '1930',
+    zdanie: 'Przezroczysta płytka z siatkami: policz przecięcia krzywej z liniami, a dostaniesz jej długość w milimetrach.',
+    notka: 'Metodę Steinhaus opisał w 1930 r. („Zur Praxis der Rektifikation und zum Längenbegriff”), a przyrząd w 1932 r. w „Polskim Przeglądzie Kartograficznym”: trzy siatki obrócone o 30°, linie co 3,82 mm. Sprawdzenie: trzy siatki kwadratowe to sześć kierunków, a ze wzoru Croftona na każdy kierunek wypada 2L/(πd) przecięć, więc d = 12/π ≈ 3,82 mm daje liczbę przecięć równą długości w mm. Źródła opisują siatki różnie („równoległe” lub „kwadratowe”); wartość 3,82 mm pasuje tylko do sześciu kierunków. Rysunek: te trzy siatki (rzadsze niż w przyrządzie, dla czytelności) i krzywa z przecięciami.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Dla nauczycieli',
+    zrodla: [W + 'Steinhaus_longimeter', 'https://ias-iss.org/ojs/IAS/article/download/1808/1056'],
+    dlaczego_tu: 'Kalka, ołówek i mapa wystarczą, by na lekcji zmierzyć rzekę i dojść do liczby π tam, gdzie nikt się jej nie spodziewa.' },
+  { id: 'sprawiedliwy-podzial', rys: rysTort, nazwa: 'Sprawiedliwy podział tortu', rok: '1948',
+    zdanie: 'Jak podzielić tort między trzy osoby o różnych gustach, by każda dostała według siebie co najmniej 1/3?',
+    notka: 'Dla dwóch osób wystarczy „jeden dzieli, drugi wybiera”. Steinhaus postawił problem w 1944 r. (MacTutor), a w „The problem of fair division” (Econometrica 16, 1948, s. 101–104) podał sposób dla trzech: jeden dzieli na trzy równe według siebie, pozostali wskazują kawałki dla nich dobre. Uogólnienie na dowolną liczbę osób przypisuje Banachowi i Knasterowi (ta procedura jest w puli Knastera). Rysunek: pierwszy krok: dzielący uważa, że owoce są warte więcej niż ciasto, więc jego trzy równe części mają kąty 158°, 109° i 93°; wartości wyliczone numerycznie.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Dla uczniów',
+    zrodla: [W + 'Lone_divider', 'https://arxiv.org/pdf/0901.2360', MT],
+    dlaczego_tu: 'Każdy kiedyś dzielił tort z rodzeństwem, a tu z tego robi się matematyka.' },
+  { id: 'dlugosc-wisly', rys: rysWisla, nazwa: 'Jak długa jest Wisła?', rok: '1954',
+    zdanie: 'Lewy brzeg Wisły mierzony coraz dokładniej dałby długość nawet tysiąc razy większą niż z mapy szkolnej.',
+    notka: 'Steinhaus w „Length, shape and area” (Colloquium Mathematicum 3, 1954, s. 1–13): „The left bank of the Vistula, when measured with increased precision would furnish lengths ten, hundred and even thousand times as great as the length read off the school map”. To jedna z pierwszych wzmianek o paradoksie długości brzegu, później badanym przez Richardsona, a rozsławionym przez Mandelbrota (1967). Rysunek: ta sama losowa krzywa Kocha mierzona cyrklem o rozstawie 56, 18,7 i 6,2 jedn.: łamane mają długość 170, 216 i 271.',
+    rodzaj: 'pojęcie', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: [W + 'Coastline_paradox', 'https://eudml.org/doc/210004'],
+    dlaczego_tu: 'Pytanie, na które każdy zna „szkolną” odpowiedź, a która okazuje się zależeć od linijki.' },
+  { id: 'trzy-odleglosci', rys: rysTrzy, nazwa: 'Twierdzenie o trzech odległościach', rok: '1957–1959',
+    zdanie: 'Kolejne obroty o ten sam kąt dzielą okrąg na łuki najwyżej trzech długości; największa to suma dwóch innych.',
+    notka: 'Hipotezę postawił Steinhaus, a pierwsze dowody podali Vera T. Sós (1957/58), János Surányi (1958) i Stanisław Świerczkowski (Fundamenta Mathematicae 46, 1959). Twierdzenie mówi o co najwyżej trzech długościach; gdy jest ich trzy, największa jest sumą dwóch pozostałych. Rysunek: 11 punktów przy kącie złotego podziału; łuk nad odstępem ma wysokość proporcjonalną do jego długości, a program sprawdza, że długości są trzy (0,056; 0,090; 0,146) i że największa jest sumą dwóch mniejszych.',
+    rodzaj: 'twierdzenie', pewnosc: 'pewne', podstrona: 'Dla nauczycieli',
+    zrodla: [W + 'Three-gap_theorem'],
+    dlaczego_tu: 'Można to sprawdzić na lekcji kalkulatorem albo cyrklem, zanim padnie słowo „dowód”.' },
+  { id: 'kalejdoskop-matematyczny', rys: rysKalejdoskop, nazwa: 'Kalejdoskop matematyczny', rok: '1938', przypiecie: true,
+    zdanie: 'Książka z samych niemal obrazków, bez dowodów, od razu po polsku i angielsku, potem w wielu innych językach.',
+    notka: 'Po angielsku „Mathematical Snapshots” (Stechert 1938; Oxford 1950, 1969; Dover 1999). MAA liczy 391 szkiców i zdjęć na 295 stronach (późniejsze wydanie). MacTutor przytacza, że ma trafiać do „the scientist in the child and the child in the scientist”. Daty w źródłach: MacTutor i MAA piszą, że książka powstała w 1937 r., en.wikipedia podaje 1939, a Centrum Steinhausa PWr, Linda Hall i recenzja w Mathematical Gazette 1938. Rysunek nawiązuje do tytułu (nie jest ilustracją z książki): trójkąt luster i odbicia motywu, liczone złożeniami symetrii.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://hsc.pwr.edu.pl/steinhaus', 'https://www.lindahall.org/about/news/scientist-of-the-day/hugo-steinhaus/', 'https://maa.org/press/maa-reviews/mathematical-snapshots', 'https://mathshistory.st-andrews.ac.uk/Strick/steinhaus.pdf', MT],
+    dlaczego_tu: 'Najbardziej znana popularna książka patrona, pisana dla każdego wieku.' },
+  { id: 'kieszen-ksiazki', rys: rysDwunastoscian, nazwa: 'Co było w kieszeni książki', rok: '1938',
+    zdanie: 'Książka miała kieszeń: okulary do obrazów 3D, karty do kartkowania i dwie połówki dwunastościanu do złożenia.',
+    notka: 'Biblioteka Linda Hall opisuje egzemplarz „Mathematical Snapshots” z 1938 r.: okulary czerwono-zielone do 15 anaglifów w książce, talia 31 kart, które po przekartkowaniu pokazują m.in. punkt kreślący cykloidę, oraz dwie płaskie połówki dwunastościanu foremnego, które gumka składa w bryłę. Nie sprawdzono, czy polskie wydanie miało to samo. Rysunek: dwie połówki po sześć pięciokątów (siatka dokładna, kontrola długości boków).',
+    rodzaj: 'anegdota', pewnosc: 'pewne', podstrona: 'Dla uczniów',
+    zrodla: ['https://www.lindahall.org/about/news/scientist-of-the-day/hugo-steinhaus-2/', 'https://www.lindahall.org/about/news/scientist-of-the-day/hugo-steinhaus/'],
+    dlaczego_tu: 'Matematyka do wzięcia do ręki: można odtworzyć ten model z kartonu i gumki.' },
+  { id: 'krol-wieza-miny', rys: rysSzachownica, nazwa: 'Król, wieża i miny', rok: '1954',
+    zdanie: 'Albo król przejdzie szachownicę w poprzek, omijając miny, albo wieża przejedzie z góry na dół po samych minach.',
+    notka: 'Twierdzenie Steinhausa o szachownicy. Kulpa, Socha i Turzański (2000) cytują jako źródło „Kalejdoskop matematyczny” w wydaniu PWN z 1954 r. Rok do sprawdzenia: to najwcześniejsze wydanie, które znalazłem w cytowaniu; nie wiem, czy twierdzenie było już w wydaniu z 1938 r. Wariant na planszy heksagonalnej to gra Hex (Gale 1979). Rysunek: 8×8, 27 min (kółka) i droga wieży; program przeszukaniem grafu sprawdza, że król nie przechodzi w poprzek.',
+    rodzaj: 'twierdzenie', pewnosc: 'do sprawdzenia', podstrona: 'Dla uczniów',
+    zrodla: ['https://dml.cz/bitstream/handle/10338.dmlcz/702068/ActaCarolinae_041-2000-2_7.pdf', W + 'Steinhaus_chessboard_theorem'],
+    dlaczego_tu: 'Twierdzenie o szachownicy, które da się sprawdzić na prawdziwej planszy z pionkami.' },
+  { id: 'zapalki-banacha', rys: rysZapalki, nazwa: 'Zapałki Banacha', rok: '1941',
+    zdanie: 'Ostatni wpis w Księdze Szkockiej: ile zapałek zostaje w jednym pudełku, gdy drugie okazuje się puste?',
+    notka: 'Pozycję 193, z datą 31 maja 1941 r., podpisał Steinhaus; Ulam nazywa ją „dość tajemniczym zestawem wyników liczbowych” o rozkładzie liczby zapałek w pudełku. Znana postać zadania (matematyk z dwoma pudełkami po N zapałek sięga do losowej kieszeni) pochodzi od Fellera, który wiąże ją z żartem Steinhausa o paleniu Banacha. Rysunek: historia wyjmowania zapałek jako droga po kratce dla N = 7: krok w prawo to lewa kieszeń, krok w górę to prawa; krzyżyk: sięgnięcie do pustego pudełka, gdy w drugim są jeszcze dwie. Prawdopodobieństwa: C(2N − k, N)/2^(2N − k).',
+    rodzaj: 'anegdota', pewnosc: 'pewne', podstrona: 'Dla nauczycieli',
+    zrodla: ['https://mathshistory.st-andrews.ac.uk/HistTopics/Scottish_Book/', W + 'Scottish_Book', W + 'Banach%27s_matchbox_problem'],
+    dlaczego_tu: 'Gotowe zadanie na lekcję rachunku prawdopodobieństwa, z historią w tle.' },
+  { id: 'banach-steinhaus', rys: rysBanachSteinhaus, nazwa: 'Twierdzenie Banacha–Steinhausa', rok: '1927',
+    zdanie: 'Rodzina operatorów liniowych ograniczona w każdym punkcie jest ograniczona jedną wspólną stałą.',
+    notka: 'Banach i Steinhaus, „Sur le principe de la condensation de singularités”, Fundamenta Mathematicae 9 (1927), s. 50–61; niezależnie Hans Hahn. Twierdzenie wymaga przestrzeni Banacha i operatorów ciągłych. Wniosek: istnieje funkcja ciągła, której szereg Fouriera jest rozbieżny w punkcie. Rysunek: jądra Dirichleta dla n = 2, 4, 7, 12; szczyt to 2n + 1, a norma funkcjonału sumy częściowej (stała Lebesgue’a) rośnie: 1,64; 1,88; 2,09; 2,29.',
+    rodzaj: 'twierdzenie', pewnosc: 'pewne', podstrona: 'zapas',
+    zrodla: ['https://encyclopediaofmath.org/wiki/Banach-Steinhaus_theorem', W + 'Uniform_boundedness_principle'],
+    dlaczego_tu: 'Najważniejszy wynik patrona, ale wymaga wykładu z analizy funkcjonalnej; dobry raczej dla studentów.' },
+  { id: 'k-srednich', rys: rysKSrednich, nazwa: 'Metoda k-średnich', rok: '1956',
+    zdanie: 'Jak podzielić bryłę na k części, by suma ich momentów bezwładności była najmniejsza? Dziś tak grupuje się dane.',
+    notka: 'Steinhaus, „Sur la division des corps matériels en parties”, Bull. Acad. Polon. Sci. 4 (1956), s. 801–804. Według przeglądu Bocka (2008) to pierwsze jawne sformułowanie, z ciągłą wersją algorytmu i przykładami z antropologii i przemysłu; Lloyd zapisał jednowymiarowy wariant w 1957 r., a nazwę „k-means” dał MacQueen (1967). Rysunek: płaska bryła podzielona iteracją na pięć części, kółka to środki ciężkości, granice to komórki Woronoja.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://emis.univie.ac.at/journals/JEHPS/Decembre2008/Bock.pdf'],
+    dlaczego_tu: 'Algorytm z każdego kursu analizy danych wyrósł z pytania o bryły i momenty bezwładności.' },
+  { id: 'dendryt', rys: rysDendryt, nazwa: 'Dendryt: taksonomia wrocławska', rok: '1951',
+    zdanie: 'Najkrótsze drzewo łączące punkty, po usunięciu najdłuższych krawędzi, rozpada się na naturalne grupy.',
+    notka: 'Florek, Łukaszewicz, Perkal, Steinhaus i Zubrzycki: „Sur la liaison et la division des points d’un ensemble fini”, Colloquium Mathematicum 2 (1951), s. 282–285, oraz „Taksonomia wrocławska”, Przegląd Antropologiczny 17 (1951), s. 193–210. Mielniczuk (2013): metoda najkrótszego dendrytu jest dotąd stosowana przez praktyków. Rysunek: 43 punkty, najkrótsze drzewo wyliczone algorytmem Prima; dwie najdłuższe krawędzie są przerwane, zostają trzy grupy.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Organizatorzy',
+    zrodla: ['https://eudml.org/doc/209969', 'https://dbc.wroc.pl//Content/141514/Dudek_Metoda_taksonomii_wroclawskiej.pdf', 'https://home.ipipan.waw.pl/j.mielniczuk/J-MielniczukPS2013.pdf'],
+    dlaczego_tu: 'Pięciu autorów z jednego miasta: wynik wspólnej pracy wrocławskiego środowiska.' },
+  { id: 'zamiany-sasiadow', rys: rysSJT, nazwa: 'Zamiany sąsiadów', rok: '1958',
+    zdanie: 'Wszystkie ustawienia n elementów można obejść, zamieniając za każdym razem tylko dwa sąsiednie.',
+    notka: 'Algorytm Steinhausa–Johnsona–Trottera. W „Stu zadaniach” (1958; angielskie wyd. 1964, s. 49–50) Steinhaus opisuje pokrewną zagadkę o cząstkach, które mijają się na prostej; książkę długo uważano za pierwszą publikację algorytmu, co Ruskey (1989) zakwestionował. Jawnie podali go Trotter (1962) i Johnson (1963), a angielscy dzwonnicy znali tę metodę już w XVII w. Rysunek: n = 4, 24 ustawienia i 23 zamiany (program sprawdza, że każda dotyczy sąsiadów); gruba nić to element 4, idzie zygzakiem.',
+    rodzaj: 'pojęcie', pewnosc: 'pewne', podstrona: 'Dla uczniów',
+    zrodla: [W + 'Steinhaus%E2%80%93Johnson%E2%80%93Trotter_algorithm'],
+    dlaczego_tu: 'Da się to odtworzyć kartami na ławce albo dzwonkami, a to już algorytm.' },
+  { id: 'liczby-w-figurach', rys: rysMoser, nazwa: 'Liczby w kole i w kwadracie', rok: '1969',
+    zdanie: 'Olbrzymie liczby zapisywał figurami: 2 w kole to mega, czyli 256 w 256 zagnieżdżonych trójkątach.',
+    notka: 'Notacja Steinhausa–Mosera. n w trójkącie to n do potęgi n; n w kwadracie to n w n trójkątach; n w kole to n w n kwadratach. Stąd 2 w kwadracie = 256, a mega = 256 w 256 trójkątach. Leo Moser rozszerzył zapis na dowolne wielokąty. Rok do sprawdzenia: en.wikipedia podaje tylko wydanie „Mathematical Snapshots” z 1969 r., s. 28–29; nie sprawdziłem, od którego wydania zapis tam jest. Rysunek: 2 w kole; 2 w dwóch kwadratach; kwadrat z 2 w dwóch trójkątach; trójkąty zagnieżdżone (narysowane tylko pierwsze).',
+    rodzaj: 'pojęcie', pewnosc: 'do sprawdzenia', podstrona: 'Dla uczniów',
+    zrodla: [W + 'Steinhaus%E2%80%93Moser_notation'],
+    dlaczego_tu: 'Rysunki w miejsce cyfr: zabawa, od której łatwo dojść do liczb większych, niż da się zapisać.' },
+  { id: 'twierdzenie-o-odleglosciach', rys: rysRoznice, nazwa: 'Twierdzenie o odległościach', rok: '1920',
+    zdanie: 'W każdym zbiorze na prostej o dodatniej mierze są dwa różne punkty odległe o liczbę wymierną.',
+    notka: 'Steinhaus, „Sur les distances des points dans les ensembles de mesure positive”, Fundamenta Mathematicae 1 (1920), s. 93–104, czyli pierwszy tom tego pisma. Ogólniej: różnice punktów takiego zbioru wypełniają przedział wokół zera. Rysunek: u góry gruby zbiór Cantora A, jego przesunięcie i część wspólna; niżej wykres t ↦ |A ∩ (A + t)|, liczony na szóstym etapie konstrukcji: jest ciągły i dodatni wokół zera, a na tym opiera się dowód.',
+    rodzaj: 'twierdzenie', pewnosc: 'pewne', podstrona: 'zapas',
+    zrodla: ['https://eudml.org/doc/212590', W + 'Steinhaus_theorem'],
+    dlaczego_tu: 'Ładne, ale wymaga pojęcia miary; raczej dla studentów niż na stronę popularyzacji.' },
+  { id: 'kolo-n-punktow', rys: rysKolo, nazwa: 'Koło z n punktami kratki', rok: '1957', przypiecie: true,
+    zdanie: 'Dla każdego n istnieje koło, w którego wnętrzu leży dokładnie n punktów o współrzędnych całkowitych.',
+    notka: 'Pytanie Steinhausa z 1957 r., opublikowane w czasopiśmie dla nauczycieli szkół średnich (cut-the-knot; tytułu pisma nie ustaliłem); to też zadania 23 i 24 w „Stu zadaniach”. Rozwiązanie jest piękne: ze środka (√2, 1/3) (pomysł Sierpińskiego z 1958 r.) każdy punkt kratowy jest w innej odległości, więc rosnące koło zgarnia je po jednym. Schinzel opracował pokrewne zagadnienie punktów na okręgu. Rysunek: ten środek (przesunięty o wektor kratowy), koła z dokładnie 2, 7 i 18 punktami; program sprawdza liczbę punktów.',
+    rodzaj: 'twierdzenie', pewnosc: 'pewne', podstrona: 'Dla nauczycieli',
+    zrodla: ['https://www.cut-the-knot.org/do_you_know/diffDist.shtml', 'https://mathworld.wolfram.com/CircleLatticePoints.html'],
+    dlaczego_tu: 'Steinhaus zadał to pytanie właśnie nauczycielom; dowód mieści się w jednym akapicie.' },
+  { id: 'czem-jest-matematyka', rys: rysPewniki, nazwa: 'Czem jest, a czem nie jest matematyka', rok: '1923',
+    zdanie: '„Żadna nauka nie wzmacnia tak wiary w potęgę umysłu ludzkiego, jak matematyka”: pisał w popularnej książce.',
+    notka: 'Książka wydana przez Księgarnię H. Altenberga we Lwowie w 1923 r.; Murawski (2011) nazywa ją popularną i cytuje to zdanie z jej zakończenia (s. 169). Stamtąd też: „Charakterystyczną cechą matematyki jest jej metoda” oraz myśl, że pewniki i definicje „mają w dużej mierze cechę dowolności”. Rysunek jest ilustracją tej myśli, nie rycina z książki (nie miałem jej w ręku): dysk Poincarégo, w którym przez punkt P przechodzi wiele prostych niespotykających prostej grubej; liczone jako obrazy średnic.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Dla nauczycieli',
+    zrodla: ['https://czasopisma.pan.pl/Content/93495', W + 'Hugo_Steinhaus'],
+    dlaczego_tu: 'Pierwsza popularna książka patrona, o tym, po co się tego uczyć.' },
+  { id: 'nowa-ksiega-szkocka', rys: rysRademacher, nazwa: 'Nowa Księga Szkocka', rok: '1946',
+    zdanie: 'Wrocławska kontynuacja lwowskiej księgi problemów: pierwszy wpis zrobił Steinhaus w lipcu 1946 r.',
+    notka: 'Biler, Krupski, Plebanek i Woyczyński (Pamięć i Przyszłość 3/2015) podają jako datę pierwszego wpisu 2 lipca 1946 r.; wcześniejsze notatki w tym projekcie wskazywały 1 lipca (Duda, Weron), czego nie sprawdziłem, więc w zdaniu jest tylko miesiąc. Problemy pojawiały się regularnie do 1979 r., sporadycznie do 1987 r.; już w 1946 r. wpisali się Choquet i Jarník. Księga to zeszyty z biblioteki Instytutu Matematycznego, od 2014 r. oprawione w skórę. Rysunek: temat problemów Steinhausa, które wiązały się z serią „Sur les fonctions indépendantes”: funkcje Rademachera i iloczyn dwóch z nich o średniej zero.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Organizatorzy',
+    zrodla: ['https://wmi.uwr.edu.pl/wp-content/uploads/sites/288/2024/05/11-BKPW-PiP-3-2015.pdf', MT],
+    dlaczego_tu: 'Własna księga problemów Instytutu: tak wrocławscy matematycy zaczęli organizować wspólne życie naukowe.' },
+  { id: 'ojcostwo-i-bayes', rys: rysBayes, nazwa: 'Ojcostwo i wzór Bayesa', rok: '1954',
+    zdanie: 'Do sporów o ojcostwo zastosował wyniki badań krwi i rachunek prawdopodobieństwa.',
+    notka: '„O dochodzeniu ojcostwa”, Zastosowania Matematyki 1 (1953–54), s. 67–82. Mielniczuk (2013) nazywa te prace nowatorskimi. Szczotkowa i Szczotka (1976) powołują się na Steinhausa (1954) przy prawdopodobieństwie a priori 1/2 we wzorze Bayesa i ostrzegają, że same grupy krwi w przedziale 55–90% nie wystarczają do wyroku. Rysunek jest ogólny, nie z pracy Steinhausa (nie czytałem pełnego tekstu): prawdopodobieństwo po badaniu w zależności od a priori, dla ilorazów wiarygodności 1/16, 1/4, 1, 4, 16; pionowa linia: a priori 1/2.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://geodesic.mathdoc.fr/articles/10.4064/am-1-2-67-82', 'https://home.ipipan.waw.pl/j.mielniczuk/J-MielniczukPS2013.pdf', 'https://czasopisma.uni.lodz.pl/ar/article/download/20398/19983/47916', 'https://sztetl.org.pl/en/biographies/192717-steinhaus-hugo-dyonizy'],
+    dlaczego_tu: 'Matematyka w sądzie, opowiedziana bez wzorów: pokazuje, po co jest prawdopodobieństwo warunkowe.' },
+  { id: 'introwizor', rys: rysIntrowizor, nazwa: 'Introwizor', rok: '1938',
+    zdanie: 'Przyrząd rentgenowski wskazujący chirurgowi miejsce odłamka w ciele: lusterko pokazuje tam świecący znacznik.',
+    notka: 'Patent USA nr 2 441 538 („Method of and apparatus for localizing and visualizing foreign bodies”): pierwszeństwo w Polsce 8 marca 1938 r., udzielony 11 maja 1948 r. Lampa i ekran stoją na obrotowym pręcie; gdy cień obiektu nie schodzi z punktu na ekranie w dwóch położeniach pręta, obiekt leży na osi obrotu. Półprzezroczyste lusterko pokazuje wtedy znacznik w miejscu obiektu. Centrum Steinhausa podaje pokaz w USA w 1947 r. Rysunek: przekrój ciała, dwa położenia lampy i ekranu, promienie przecinają się w obiekcie; geometria według patentu, wymiary dobrane.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://patents.google.com/patent/US2441538', 'https://hsc.pwr.edu.pl/steinhaus', 'https://sztetl.org.pl/en/biographies/192717-steinhaus-hugo-dyonizy'],
+    dlaczego_tu: 'Geometria dwóch prostych, która trafia na salę operacyjną.' },
+  { id: 'taryfa-kwadratowa', rys: rysTaryfa, nazwa: 'Kwadratowa taryfa za prąd', rok: '1939',
+    zdanie: 'Płacić według pierwiastka z całki kwadratu mocy: przy tej samej energii równy pobór wychodzi wtedy taniej.',
+    notka: 'Centrum Hugona Steinhausa PWr: propozycja z 1939 r. (Bulletin of the Swiss Electrotechnical Society), a prototyp licznika wyprodukowała 16 stycznia 1948 r. fabryka w Świdnicy, dziś „Pafal”. Takie rozliczenie premiuje stały pobór, wygodny dla producenta prądu. Jedno źródło, ale to wyspecjalizowany ośrodek noszący imię Steinhausa. Rysunek: dwa pobory o tej samej energii na dobę: stały (gruby) i ze szczytami; przy tej taryfie szczyty są o 33% droższe (przerywana: stały pobór w tej samej cenie).',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://hsc.pwr.edu.pl/steinhaus'],
+    dlaczego_tu: 'Rachunek za prąd: całka, którą każdy widział na liczniku, choć o tym nie wie.' },
+  { id: 'doktorat-u-hilberta', rys: rysDirichlet, nazwa: 'Doktorat u Hilberta', rok: '1911',
+    zdanie: 'W Getyndze obronił u Hilberta pracę o nowych zastosowaniach zasady Dirichleta.',
+    notka: 'Rozprawa „Neue Anwendungen des Dirichlet’schen Prinzips”, Getynga 1911, obroniona z wyróżnieniem. Rysunek: sama zasada, nie treść rozprawy: spośród funkcji o zadanych wartościach na brzegu obszaru najmniejszą energię ma funkcja harmoniczna; tu policzona relaksacją, z poziomicami wewnątrz obszaru.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'zapas',
+    zrodla: [MT, 'https://www.mathgenealogy.org/id.php?id=7383'],
+    dlaczego_tu: 'Ciekawostka biograficzna, luźno związana z popularyzacją; do użycia, gdy zabraknie innych.' },
+  { id: 'rachunek-za-znaczek', rys: rysZnaczek, nazwa: 'Rachunek za znaczek', rok: 'ok. 1937',
+    zdanie: 'Szansa 1 do 5000 razy pensja 150 funtów: tak Steinhaus radził Kacowi, czy warto wysłać podanie do Londynu.',
+    notka: 'Kac wspomina, że po doktoracie (czerwiec 1937) zapytał Steinhausa o podanie na posadę młodszego wykładowcy w Imperial College. Steinhaus, po części żartem, ocenił szanse na 1 do 5000 i kazał porównać iloczyn z rocznym wynagrodzeniem z ceną znaczka. „It turned out to be a little bit less than the cost of the stamp, so I wrote.” Posady nie dostał; w 1938 r. pojechał na stypendium do Johns Hopkins. Rysunek: wartość oczekiwana jako funkcja szansy; 150/5000 = 0,03 funta. Poziomą linię znaczka dobrano orientacyjnie, bo MacTutor nie podaje jego ceny.',
+    rodzaj: 'anegdota', pewnosc: 'pewne', podstrona: 'Dla uczniów',
+    zrodla: ['https://mathshistory.st-andrews.ac.uk/Biographies/Kac/', W + 'Mark_Kac'],
+    dlaczego_tu: 'Wartość oczekiwana w codziennej decyzji, z uśmiechem.' },
+  { id: 'konkurs-ptm', rys: rysGalton, nazwa: 'Konkurs od ucznia Steinhausa', rok: '1967',
+    zdanie: 'Konkurs na prace studenckie w Wrocławskim Oddziale PTM zainicjował Józef Łukaszewicz, uczeń Steinhausa.',
+    notka: 'Strona Oddziału: historia konkursu sięga 1967 r.; to jeden z najstarszych wciąż odbywających się konkursów na prace studenckie w Polsce; edycja z 2024 r. ma numer LVIII. Kategorie w zestawieniach to rachunek prawdopodobieństwa i zastosowania matematyki. Łukaszewicz doktoryzował się u Steinhausa w 1957 r. (Mathematics Genealogy). Rysunek jest symbolem tematyki, nie dotyczy konkursu wprost: deska Galtona, jedna droga kulki i rozkład dwumianowy dla 8 rzędów.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Organizatorzy',
+    zrodla: ['https://ptm.math.uni.wroc.pl/konkurs/historia-konkursu', 'https://www.mathgenealogy.org/id.php?id=7383'],
+    dlaczego_tu: 'Bezpośrednia nić od patrona do jednego z organizatorów wymienionych na tej stronie.' },
+  { id: 'z-lawki-do-towarzystwa', rys: rysTowarzystwo, nazwa: 'Z ławki do towarzystwa', rok: '1919', przypiecie: true,
+    zdanie: 'Po rozmowach na Plantach postanowili założyć towarzystwo; od 1919 r. działało w Krakowie, dziś to PTM.',
+    notka: 'Steinhaus wspomina rozmowy z 1916 r. z Banachem i Nikodymem: „we decided to establish a mathematical society”. Formalnie Towarzystwo Matematyczne ukonstytuowało się w Krakowie 2 kwietnia 1919 r.; wśród szesnastu obecnych MacTutor wymienia Banacha, Nikodyma, Zarembę i Żorawskiego (o obecności samego Steinhausa nic nie pisze). Nazwę Polskie Towarzystwo Matematyczne przyjęto 21 kwietnia 1920 r. W październiku 1945 r. przyjęto delegatów nowej sekcji wrocławskiej. Rysunek jest symbolem: trzy kropki z ławki i krąg szesnastu.',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Organizatorzy',
+    zrodla: ['https://mathshistory.st-andrews.ac.uk/Societies/Polish/', MT],
+    dlaczego_tu: 'Wrocławski Oddział PTM wywodzi się z towarzystwa, które zaczęło się od tej rozmowy.' },
+  { id: 'miedzy-duchem-a-materia', rys: rysDuchMateria, nazwa: 'Między duchem a materią', rok: '1980',
+    zdanie: '„Między duchem a materią pośredniczy matematyka”: aforyzm Steinhausa wyryty też na jego nagrobku.',
+    notka: 'Zdanie przytacza Murawski (2011) za „Słownikiem racjonalnym” (Ossolineum 1980, s. 54), z przypisem, że wyryto je na nagrobku; to też tytuł wyboru pism (PWN 2000). Steinhaus zmarł w 1972 r., więc rok 1980 to rok druku książki, nie powstania zdania. MacTutor podaje po angielsku „Between spirit and matter, there is mathematics”, POLIN „Mathematics mediates between spirit and matter”; polskie brzmienie napisu znam tylko z Murawskiego. Rysunek jest moją ilustracją: sumy częściowe szeregu Fouriera (rzędy 1, 3, 5, 9, 21) prowadzą od gładkiej fali do twardej fali prostokątnej.',
+    rodzaj: 'anegdota', pewnosc: 'pewne', podstrona: 'Dla wszystkich',
+    zrodla: ['https://czasopisma.pan.pl/Content/93495', MT, 'https://kolekcje.polin.pl/en/hugo-steinhaus-1970', 'https://sztetl.org.pl/en/biographies/192717-steinhaus-hugo-dyonizy', 'https://digilab.uwr.edu.pl/en/dlibra/publication/109789/slownik-racjonalny-steinhaus-hugo'],
+    dlaczego_tu: 'Dewiza patrona; jedyny udokumentowany aforyzm, który pasuje na nagłówek całego działu.' },
+  { id: 'rzuty-moneta', rys: rysMoneta, nazwa: 'Nieskończone rzuty monetą', rok: '1923',
+    zdanie: 'Ciągi orłów i reszek opisał jak punkty odcinka: krok ku dzisiejszym aksjomatom rachunku prawdopodobieństwa.',
+    notka: 'Steinhaus, „Les probabilités dénombrables et leur rapport à la théorie de la mesure”, Fundamenta Mathematicae 4 (1923), s. 286–310. Bednarski (2018): przestrzenią są nieskończone ciągi zero-jedynkowe, ich odpowiednikiem rozwinięcia dwójkowe liczb z [0, 1], a miara odpowiada niezależnym rzutom monetą i służy do dowodu mocnego prawa wielkich liczb; praca zawiera kluczowe elementy późniejszej aksjomatyki Kołmogorowa. Rysunek: drzewo podziałów dwójkowych; ciąg 1, 0, 1, 1, 0 wyznacza przedział długości 1/32.',
+    rodzaj: 'pojęcie', pewnosc: 'pewne', podstrona: 'zapas',
+    zrodla: ['https://czasopisma.uni.lodz.pl/foe/article/download/2433/pdf/9990'],
+    dlaczego_tu: 'Mocne, ale specjalistyczne; dobre w zapasie, gdy potrzebny będzie wątek prawdopodobieństwa.' },
+  { id: 'kontrola-jakosci', rys: rysKontrola, nazwa: 'Kontrola jakości z próbki', rok: '1951',
+    zdanie: 'Ile sztuk sprawdzić, by przyjąć partię? Steinhaus bronił tu wzoru Bayesa i współtworzył polskie normy.',
+    notka: 'MacTutor wymienia pracę „Quality control by sampling (a plea for Bayes’ rule)” z 1951 r. Mielniczuk (2013): ze Steinhausem, Oderfeldem i Wiśniewskim wiążą się pierwsze polskie normy statystyczne kontroli jakości (bez daty). Rysunek jest ogólny: krzywe operacyjne planów odbioru (n, c) = (10, 0), (20, 1), (50, 3), (200, 12), czyli szansa przyjęcia partii w zależności od odsetka braków.',
+    rodzaj: 'zastosowanie', pewnosc: 'pewne', podstrona: 'zapas',
+    zrodla: [MT, 'https://home.ipipan.waw.pl/j.mielniczuk/J-MielniczukPS2013.pdf'],
+    dlaczego_tu: 'Dobry przykład zastosowań, ale temat techniczny; w zapasie.' },
+  { id: 'uczniowie-steinhausa', rys: rysUczniowie, nazwa: 'Uczniowie i ich uczniowie', rok: '1920–1968',
+    zdanie: 'Według bazy MGP wypromował 20 doktorów, m.in. Banacha, Orlicza i Kaca, a ma ponad 3400 akademickich potomków.',
+    notka: 'Dane z Mathematics Genealogy Project (stan z 5.11.2026, baza bywa niepełna i się zmienia): 20 studentów, 3409 potomków, od Banacha (Lwów 1920) po Trybułę (Wrocław 1960, 1968). Ulam nie jest na tej liście (w przedmowie do Księgi Szkockiej nazywa Steinhausa „moim nauczycielem i przyjacielem”). Infobox w en.wikipedii nie ma przypisu i podaje tylko siedem nazwisk. Rysunek: promień na ucznia, długość zależna od logarytmu liczby jego potomków (okręgi: 10, 100, 1000), grube: 13 promocji powojennych (w bazie: 9 UWr, 1 PWr, 3 IMPAN).',
+    rodzaj: 'historia', pewnosc: 'pewne', podstrona: 'Organizatorzy',
+    zrodla: ['https://www.mathgenealogy.org/id.php?id=7383', 'https://www.osti.gov/servlets/purl/7218289'],
+    dlaczego_tu: 'Dobrze pokazuje, że organizowanie matematyki to przede wszystkim ludzie.' },
 ];
 
-/* ---------- wyjście: ciekawostki.json, rysunki.html, rysunki.png ---------- */
-function main() {
-  const zapis = [], raport = [];
-  for (const { rys, ...f } of FAKTY) {
-    const sc = module.exports[rys]();
-    const ok = kontrola(f.id, sc);
-    if (!ok) throw new Error('kontrola nie przeszła: ' + f.id);
-    if ([...f.nazwa].length > 40) log('  uwaga: długa nazwa', f.id, [...f.nazwa].length);
-    if ([...f.zdanie].length > 115) log('  uwaga: długie zdanie', f.id, [...f.zdanie].length);
-    zapis.push({ ...f, sciezki: sc.map((p) => (p.gruba ? { d: p.d, gruba: true } : { d: p.d, gruba: false })) });
-    raport.push({ id: f.id, sciezek: sc.length, grubych: sc.filter((p) => p.gruba).length });
+/* ---------- porządkowanie ścieżek: upraszczanie łamanych (Douglas–Peucker, tolerancja 0,12 jedn.) ---------- */
+function dp(pts, tol) {
+  if (pts.length < 3) return pts;
+  const [a, b] = [pts[0], pts[pts.length - 1]], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  let m = -1, md = 0;
+  for (let i = 1; i < pts.length - 1; i++) { const d = L < 1e-9 ? Math.hypot(pts[i][0] - a[0], pts[i][1] - a[1]) : Math.abs((b[0] - a[0]) * (a[1] - pts[i][1]) - (a[0] - pts[i][0]) * (b[1] - a[1])) / L; if (d > md) { md = d; m = i; } }
+  if (md <= tol) return [a, b];
+  return dp(pts.slice(0, m + 1), tol).slice(0, -1).concat(dp(pts.slice(m), tol));
+}
+function uprosc(d) {
+  return d.split(/(?=M)/).map((sub) => {
+    if (/[a]/.test(sub)) return sub.trim();
+    const zamk = /Z/.test(sub), l = (sub.match(/-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?/g) || []).map((q) => q.split(',').map(Number));
+    if (l.length < 3) return sub.trim();
+    // zamknięta: tniemy na dwie połowy, żeby końce algorytmu nie zlały się w jeden punkt
+    let w;
+    if (zamk) { const m = Math.floor(l.length / 2); w = dp(l.slice(0, m + 1), 0.12).slice(0, -1).concat(dp(l.slice(m).concat([l[0]]), 0.12).slice(0, -1)); } else w = dp(l, 0.12);
+    return 'M' + w.map(P).join(' L') + (zamk ? ' Z' : '');
+  }).join(' ');
+}
+
+/* ---------- budowa wyniku ---------- */
+const WYNIK = FAKTY.map(({ rys, ...f }) => ({ ...f, sciezki: rys().map((p) => ({ d: uprosc(p.d), gruba: !!p.gruba })) }));
+const WSZYSTKIE = () => WYNIK.map((f) => ({ id: f.id, sciezki: f.sciezki }));
+
+function sprawdz() {
+  const bledy = [], ID = new Set(), POD = ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy', 'zapas'], rodz = ['twierdzenie', 'pojęcie', 'historia', 'anegdota', 'zastosowanie'];
+  for (const f of WYNIK) {
+    const e = (m) => bledy.push(`${f.id}: ${m}`);
+    if (ID.has(f.id)) e('powtórzone id'); ID.add(f.id);
+    if ([...f.nazwa].length > 40) e(`nazwa ${[...f.nazwa].length} znaków`);
+    if ([...f.zdanie].length > 118) e(`zdanie ${[...f.zdanie].length} znaków`);
+    if (!f.zrodla || !f.zrodla.length) e('brak źródeł');
+    if (!f.notka || !f.dlaczego_tu) e('brak notki');
+    if (!POD.includes(f.podstrona)) e('zła podstrona ' + f.podstrona);
+    if (!rodz.includes(f.rodzaj)) e('zły rodzaj');
+    if (!['pewne', 'do sprawdzenia'].includes(f.pewnosc)) e('zła pewność');
+    if (f.sciezki.length < 5 || f.sciezki.length > 60) e(`ścieżek ${f.sciezki.length}`);
+    if (!f.sciezki.some((s) => s.gruba)) e('brak grubej ścieżki');
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const { d } of f.sciezki) {
+      const tok = d.match(/[MLZa]|-?\d+(?:\.\d+)?/g); let i = 0, cx = 0, cy = 0;
+      if (/NaN|undefined/.test(d)) e('NaN w ścieżce');
+      while (i < tok.length) {
+        const t = tok[i++];
+        if (t === 'M' || t === 'L') { cx = +tok[i++]; cy = +tok[i++]; x0 = Math.min(x0, cx); x1 = Math.max(x1, cx); y0 = Math.min(y0, cy); y1 = Math.max(y1, cy); }
+        else if (t === 'a') { const r = +tok[i], dx = +tok[i + 5]; i += 7; if (dx > 0) { x1 = Math.max(x1, cx + 2 * r); y0 = Math.min(y0, cy - r); y1 = Math.max(y1, cy + r); } cx += dx; }
+      }
+    }
+    if (x0 < POLE.x0 - 0.05 || x1 > POLE.x1 + 0.05 || y0 < POLE.y0 - 0.05 || y1 > POLE.y1 + 0.05) e(`poza polem x ${f1(x0)}–${f1(x1)}, y ${f1(y0)}–${f1(y1)}`);
+    f._box = `x ${f1(x0)}–${f1(x1)}, y ${f1(y0)}–${f1(y1)}`;
   }
-  fs.writeFileSync(path.join(KAT, 'ciekawostki.json'), JSON.stringify(zapis, null, 2) + '\n');
+  if (WYNIK.filter((f) => f.przypiecie).length > 4) bledy.push('za dużo przypięć');
+  return bledy;
+}
+
+if (require.main === module && !process.argv.includes('--test')) {
+  const bledy = sprawdz();
+  for (const f of WYNIK) console.log(`${bledy.some((b) => b.startsWith(f.id + ':')) ? '!!' : 'ok'} ${f.id}: ${f.sciezki.length} ścieżek, ${f._box}, zdanie ${[...f.zdanie].length}, nazwa ${[...f.nazwa].length}`);
+  if (bledy.length) { console.log('BŁĘDY:\n' + bledy.join('\n')); process.exitCode = 1; }
+  const czyste = WYNIK.map(({ _box, ...f }) => f);
+  fs.writeFileSync(path.join(KAT, 'ciekawostki.json'), JSON.stringify(czyste, null, 2) + '\n');
   const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const svg = (ps, w, h) => `<svg viewBox="0 0 200 240" width="${w}" height="${h}" aria-hidden="true">${ps.map((p) => `<path d="${p.d}"${p.gruba ? ' class="gruba"' : ''}/>`).join('')}</svg>`;
-  const karty = zapis.map((c, i) => `
+  const karty = czyste.map((c, i) => `
   <article class="karta">
-    <div class="baner">
-      <div class="podpis"><b>${esc(c.nazwa)}${c.rok ? ', ' + esc(c.rok) : ''}</b>${esc(c.zdanie)}</div>
-      ${svg(c.sciezki, 145, 170)}
-    </div>
+    <div class="baner"><div class="podpis"><b>${esc(c.nazwa)}, ${esc(c.rok)}</b>${esc(c.zdanie)}</div>${svg(c.sciezki, 145, 170)}</div>
     <div class="opis">
       <div class="duzy">${svg(c.sciezki, 200, 240)}</div>
       <div>
-        <p class="meta"><span class="nr">${i + 1}</span> <span class="pod">${esc(c.podstrona)}</span> · ${esc(c.rodzaj)} · <span class="${c.pewnosc === 'pewne' ? 'ok' : 'spr'}">${esc(c.pewnosc)}</span></p>
+        <p class="meta"><span class="nr">${i + 1}</span> <span class="pod">${esc(c.podstrona)}${c.przypiecie ? ' · przypięcie' : ''}</span> · ${esc(c.rodzaj)} · <span class="${c.pewnosc === 'pewne' ? 'ok' : 'spr'}">${esc(c.pewnosc)}</span></p>
         <h2>${esc(c.nazwa)} <small>${esc(c.rok)}</small></h2>
         <p class="zd">${esc(c.zdanie)} <small>(${[...c.zdanie].length} zn.)</small></p>
         <p class="nt">${esc(c.notka)}</p>
         <p class="dl"><i>Dlaczego tu:</i> ${esc(c.dlaczego_tu)}</p>
-        <p class="rys">${raport[i].sciezek} ścieżek, ${raport[i].grubych} grubych · źródła: ${c.zrodla.map((u) => `<a href="${esc(u)}">${esc(new URL(u).hostname.replace(/^www\./, ''))}</a>`).join(', ')}</p>
+        <p class="rys">${c.sciezki.length} ścieżek · źródła: ${c.zrodla.map((u) => `<a href="${esc(u)}">${esc(new URL(u).hostname.replace(/^www\./, ''))}</a>`).join(', ')}</p>
       </div>
     </div>
   </article>`).join('');
-  const przyp = zapis.filter((c) => c.podstrona !== 'zapas').length, zap = zapis.length - przyp, pew = zapis.filter((c) => c.pewnosc === 'pewne').length;
   const html = `<!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Steinhaus: ciekawostki i rysunki</title>
 <style>
 :root { --granat: #0d1830; --j: #a991f7; --g: #30216a; --a: #5b3fc4; --t: #eeeafd; --tekst: #1d2433; --szary: #5b6475; }
 * { box-sizing: border-box; }
-body { margin: 0; padding: 28px 24px 40px; background: #f2f0f7; color: var(--tekst); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+body { margin: 0; padding: 28px 24px 40px; background: #f2f1f6; color: var(--tekst); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
 h1 { margin: 0 0 4px; font-size: 24px; } .lead { margin: 0 0 22px; color: var(--szary); max-width: 900px; }
-.siatka { display: grid; grid-template-columns: repeat(auto-fill, minmax(560px, 1fr)); gap: 18px; }
+.siatka { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 18px; }
 .karta { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
 .baner { position: relative; height: 190px; color: #fff; background: linear-gradient(100deg, var(--granat) 0, var(--granat) 42%, color-mix(in srgb, var(--granat) 55%, var(--g)) 72%, var(--g) 100%); }
 .baner svg { position: absolute; right: 18px; top: 10px; }
-.baner .podpis { position: absolute; right: 178px; top: 54px; width: 240px; text-align: right; font-size: 12.5px; line-height: 1.45; color: rgb(255 255 255 / .72); }
+.baner .podpis { position: absolute; right: 178px; top: 54px; width: min(230px, calc(100% - 190px)); text-align: right; font-size: 12.5px; line-height: 1.45; color: rgb(255 255 255 / .72); }
 .baner .podpis b { display: block; font-style: italic; font-weight: 500; font-size: 15px; color: #fff; font-family: Georgia, serif; }
 svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .baner svg path { stroke: color-mix(in srgb, var(--j) 55%, transparent); stroke-width: 1.3; vector-effect: non-scaling-stroke; }
@@ -931,31 +1392,15 @@ h2 { margin: 2px 0 6px; font-size: 17px; } h2 small { font-weight: 500; color: v
 .meta { margin: 0; font-size: 12px; color: var(--szary); } .nr { display: inline-block; min-width: 20px; padding: 0 5px; border-radius: 9px; background: var(--granat); color: #fff; text-align: center; }
 .pod { font-weight: 700; color: var(--a); } .ok { color: #23753a; font-weight: 600; } .spr { color: #a35b00; font-weight: 600; }
 .zd { margin: 0 0 6px; font-weight: 600; } .zd small, .rys { color: var(--szary); font-weight: 400; font-size: 12px; }
-.nt, .dl { margin: 0 0 6px; font-size: 13px; } .rys { margin: 0; } a { color: var(--a); }
+.nt, .dl { margin: 0 0 6px; font-size: 13px; } .rys { margin: 0; }
 </style></head><body>
 <h1>Hugo Steinhaus: ciekawostki do podstron działu Popularyzacja</h1>
-<p class="lead">${zapis.length} ciekawostek (${przyp} przypisane do podstron, ${zap} w zapasie; ${pew} pewnych, ${zapis.length - pew} do sprawdzenia). U góry każdej karty: podgląd w niskim nagłówku (rysunek 145×170 px, kreska 1,3 i 2 px, kolor działu). Pod spodem: ten sam rysunek na jasnym tle, notka i źródła.</p>
+<p class="lead">${czyste.length} ciekawostek (${czyste.filter((c) => c.pewnosc === 'pewne').length} pewnych, ${czyste.filter((c) => c.pewnosc !== 'pewne').length} do sprawdzenia; ${czyste.filter((c) => c.przypiecie).length} propozycje przypięcia, ${czyste.filter((c) => c.podstrona === 'zapas').length} w zapasie). U góry każdej karty podgląd w niskim nagłówku (rysunek 145×170 px, kreski 1,3 i 2 px, kolor działu); niżej mały rysunek na jasnym tle. Współrzędne policzone w <code>generator.js</code>.</p>
 <div class="siatka">${karty}</div>
 </body></html>
 `;
   fs.writeFileSync(path.join(KAT, 'rysunki.html'), html);
-  log(`zapisano ${zapis.length} ciekawostek (${pew} pewnych)`);
-  if (process.argv.includes('--png')) {
-    (async () => {
-      const { chromium } = require('playwright');
-      const b = await chromium.launch();
-      const p = await b.newPage({ viewport: { width: 1200, height: 900 }, deviceScaleFactor: 1.5 });
-      await p.goto('file://' + path.join(KAT, 'rysunki.html'));
-      await p.screenshot({ path: path.join(KAT, 'rysunki.png'), fullPage: true });
-      await b.close();
-      log('rysunki.png zapisany');
-    })();
-  }
+  console.log(`zapisano: ciekawostki.json (${czyste.length}), rysunki.html`);
 }
 
-if (require.main === module) {
-  if (process.argv.includes('--test')) {
-    const fn = process.argv[process.argv.indexOf('--test') + 1];
-    kontrola(fn, module.exports[fn]());
-  } else main();
-}
+module.exports = { WSZYSTKIE, FAKTY };

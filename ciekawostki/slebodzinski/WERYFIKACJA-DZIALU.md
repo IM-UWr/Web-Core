@@ -1,6 +1,6 @@
 # Weryfikacja tekstów działu Nauka (patron: Władysław Ślebodziński)
 
-Stan na 5 listopada 2026. Sprawdzone pliki: `proto/zalozyciele.src.html` (obiekt `nauka`, `IN_NOTA`, `SALE`, karty w `htmlReszta`), `proto/zasoby/dane-dzialow.json` (`nauka`) i strona działająca `im-uwr.github.io/Web-Core/nauka/`. W `Web-Nauka` nie ma plików działu: `git ls-files | grep -i dzial` nie zwraca nic, także w pozostałych trzech repozytoriach treści. Według `dok/przekazanie.md` (sekcja 6) teksty działów są w `Web-Ustawienia` (`dzialy/*.json`), którego nie ma w kontenerze.
+Stan na 5.11.2026. Dane: `wz` gałąź `wyglad/zalozyciele` (`d12c994`) z nałożonymi treściami Web-* (Web-Nauka `271c818`, Web-Ustawienia `bbebd7f`, oba z 30.10.2026). Okna czasowe liczone od 5.11.2026. Prototyp: `proto/zalozyciele.src.html`, czytany o 00:37. Prototyp jest równolegle edytowany, więc numery linii się przesuwają (o 01:03 `D.instytut` był już w linii 1835); treść `D` była wtedy bez zmian. Szukaj `const D`, `IN_INST`, `IN_DANE`, `rysujInstytut`.
 
 ## 1. Werdykt
 
@@ -95,17 +95,9 @@ WebFetch zwraca wyciągi modelu pomocniczego, a nie pełny tekst. Przy cytatach 
 
 **Patron**
 
-- Lata 1884–1972 → [MacTutor](https://mathshistory.st-andrews.ac.uk/Biographies/Slebodzinski/) (ur. 6.02.1884, Pysznica; zm. 3.01.1972, Wrocław), [Wikipedia](https://en.wikipedia.org/wiki/W%C5%82adys%C5%82aw_%C5%9Alebodzi%C5%84ski), [PWr](https://weny.pwr.edu.pl/fcp/zGBUKOQtTKlQhbx08SlkTUAxQX2o8DAoHNiwFE1xVSX1RFVZpCFghUHcKVigEQUw/38/public/o_wydziale/profil_wydzialu/pionierzy/wladyslaw-slebodzinski.pdf) (same lata).
-- „Geometra różniczkowy” → [Duda, Weron 2006](https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf): wykłady od 1946, seminarium od 1948.
-- Rok i praca → „Sur les équations canoniques de Hamilton”, Bull. Cl. Sci. Acad. Roy. Belgique (5) 17 (1931), s. 864–870; przekład w GRG 42 (2010), s. 2529–2535 ([Springer](https://link.springer.com/article/10.1007/s10714-010-1057-6)). Rozbieżność: [Trautman 2008](https://users.fuw.edu.pl/~amt/4Krupka.pdf) ma tytuł bez „canoniques”.
-- „Wprowadził pochodną Liego” → [Trautman 2008](https://users.fuw.edu.pl/~amt/4Krupka.pdf): jawny wzór dla pola tensorowego dowolnej walencji, reguła Leibniza, przemienność z kontrakcją; priorytet uznali van Dantzig („Der Operator wurde zum ersten Mal von W. Slebodziński eingeführt”) i Schouten (Ricci-Calculus, s. 102); tak samo [MacTutor](https://mathshistory.st-andrews.ac.uk/Biographies/Slebodzinski/).
-- Co było wcześniej → Lie (funkcje, nawias pól), Hilbert 1915, Cartan ok. 1920–22 (formy zewnętrzne), De Donder 1927; u fizyków Rosenfeld 1940 ([Trautman 2008](https://users.fuw.edu.pl/~amt/4Krupka.pdf)) i Pauli 1921 ([Wikipedia](https://en.wikipedia.org/wiki/Lie_derivative)). Ślebodziński podał przypadek ogólny, ale operatora nie nazwał.
-- Skąd nazwa → D. van Dantzig 1932, „Liesche Ableitung”, Proc. Amsterdam 35, przypis na s. 536; tenże dodał obraz przeciągania wzdłuż pola ([Trautman 2008](https://users.fuw.edu.pl/~amt/4Krupka.pdf), [MacTutor](https://mathshistory.st-andrews.ac.uk/Biographies/Slebodzinski/)).
-- Rozbieżność → Duda i Weron w ogóle nie wspominają pochodnej Liego; to brak, nie sprzeczność.
-- „Dziś jedno z podstawowych narzędzi geometrii” → osobne hasło w [Encyclopedia of Mathematics](https://encyclopediaofmath.org/wiki/Lie_differentiation), wzór Cartana i uogólnienia w [Wikipedii](https://en.wikipedia.org/wiki/Lie_derivative); to ocena, nie fakt mierzalny.
-- Sala WS istnieje → [Wydarzenia IM](https://math.uni.wroc.pl/wydarzenia?page=1), `proto/zasoby/plan-zimowy.json` (nazwa od patrona: sekcja 3).
+Uzasadnienie: pierwszy akapit obejmuje wszystkie trzy obszary badań z `struktura_tekst` i zgadza się z liczbą zakładów; drugi łączy seminaria z patronem. Odpada zdanie o tradycji analizy i o prelegentach; zostają w CMS. Dopisanie Pracowni to ok. 20 znaków ponad limit.
 
-**Kategoria**
+**Wariant bez patrona, jeśli wystarczy sam znak (drugi akapit, 140 znaków):**
 
 - A+ to najwyższa kategoria (skala A+, A, B+, B, C) → [Gazeta Prawna](https://www.gazetaprawna.pl/urzad/oswiata/artykuly/11279388,minister-opublikowal-wyniki-ewaluacji-2026-sprawdz-jak-oceniono-twoja-uczelnie.html).
 - Za 2017–2021 A+, po odwołaniu → [UWr, 16.02.2023](https://uwr.edu.pl/en/mathematics-at-uwr-with-an-a-grade/).

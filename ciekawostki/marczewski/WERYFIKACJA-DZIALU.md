@@ -1,6 +1,6 @@
 # Weryfikacja tekstów działu Instytut (patron: Edward Marczewski)
 
-Stan na 5.11.2026. Sprawdzono: `proto/zalozyciele.src.html` (obiekt `instytut`, `IN_INST`, `IN_NOTA`, `SALE`), podgląd strony (`im-uwr.github.io/Web-Podglad/instytut/`), `Web-Ustawienia/src/data/dzialy/instytut.json`, `Web-Core/src/lib/patroni.ts` i `src/lib/widoki/dzialInstytut.ts` (gałąź `wyglad/zalozyciele`), repozytoria `tresci/Web-*`.
+Stan na 5.11.2026. Dane: `wz` gałąź `wyglad/zalozyciele` (`d12c994`) z nałożonymi treściami Web-* (ostatnie commity 29–30.10.2026: Web-Pracownicy `48a9e24`, Web-Ustawienia `bbebd7f`, Web-Instytut `4259ed2`, Web-Nauka `271c818`). Prototyp: `proto/zalozyciele.src.html`, czytany o 00:37. Prototyp jest równolegle edytowany, więc numery linii się przesuwają (o 01:03 `D.instytut` był już w linii 1835); treść `D` była wtedy bez zmian. Szukaj `const D`, `IN_INST`, `IN_DANE`, `rysujInstytut`.
 
 ## 1. Werdykt
 
@@ -64,24 +64,7 @@ Tekst działu w większości trzyma się publikacji o wrocławskiej matematyce, 
 - Lotnisko na dzisiejszym pl. Grunwaldzkim w Festung Breslau → [Wikipedia](https://en.wikipedia.org/wiki/Grunwald_Square_(town_square_in_Wroc%C5%82aw)), [Wrocław.pl](https://www.wroclaw.pl/plac-grunwaldzki-wroclaw-wystawa-wroclawskie-metamorfozy).
 - Twierdzenie Szpilrajna, 1930 → [„Sur l’extension de l’ordre partiel”, Fund. Math. 16 (1930), 386–389](https://eudml.org/doc/212499).
 
-### Historia
-- Tradycja szkół lwowskiej i warszawskiej → Duda, Weron, s. 75 („ducha przedwojennej szkoły warszawskiej i lwowskiej”).
-- Wykłady od 15.11.1945 → [MacTutor](https://mathshistory.st-andrews.ac.uk/Biographies/Marczewski/); Duda, Weron; DBC.
-- Czterech pionierów: Steinhaus, Marczewski, Knaster, Ślebodziński → Duda, Weron, s. 75 („Na początku tych matematyków było czterech”); Biler, Buraczewski.
-- Steinhaus wpisał pierwsze zagadnienie do Nowej Księgi Szkockiej w 1946 → Duda, Weron; Biler i in. 2015. **Rozbieżność:** 1 lipca (Duda, Weron; DBC) a 2 lipca 1946 (Biler i in.); angielska Wikipedia podaje „1945 to 1958”, bez przypisu do tego roku. Tekst podaje tylko rok, więc nic nie trzeba zmieniać.
-- Nowa Księga jako kontynuacja lwowskiej → Biler i in. 2015.
-- Założyciele Colloquium Mathematicum: Knaster, Marczewski, Steinhaus, Ślebodziński → [IMPAN](https://impan.pl/en/publishing-house/journals-and-series/colloquium-mathematicum). **Rozbieżność co do roku:** 1946 (MacTutor), 1947 ([IMPAN: t. 1 z. 1](https://www.impan.pl/en/publishing-house/journals-and-series/colloquium-mathematicum/all/1); Duda, Hartman), 1948 (Duda, Weron; Biler i in.; Biler, Buraczewski). Tekst działu nie podaje roku; tekst Nauki ma „od 1947”, co zgadza się z IMPAN.
-- Redakcja Colloquium w Instytucie → [IMPAN](https://impan.pl/en/publishing-house/journals-and-series/colloquium-mathematicum): Institute of Mathematics, University of Wrocław, Pl. Grunwaldzki 2/4; redaktorzy G. Karch, A. Nowak.
-- W 1948 we Wrocławiu wznowiono lwowskie Studia Mathematica → Duda, Weron, s. 82; [Wikipedia](https://en.wikipedia.org/wiki/Studia_Mathematica) (t. 10, 1948).
-- Wrocławska szkoła matematyczna → Duda, Weron, s. 75–76.
-- Taksonomia wrocławska z seminarium zastosowań → Duda, Weron, s. 82, 87.
-- Autorzy i rok taksonomii → [Colloq. Math. 2 (1951), 282–285](https://eudml.org/doc/209969); „Taksonomia wrocławska”, Przegląd Antropologiczny 17 (1951), 193–211.
-- Jedno z wczesnych, niezależnych rozwiązań MST → [Graham, Hell](https://math.ucdavis.edu/~saito/data/acha.read.w12/graham-hell-mst.pdf) („Another independent discovery”; praca zgłoszona w 1950, po Borůvce 1926, Jarníku 1930, Choquecie 1938).
-- Aksjomat determinacji, Mycielski i Steinhaus, 1962 → Bull. Acad. Polon. Sci. 10 (1962), 1–3; [Wikipedia](https://en.wikipedia.org/wiki/Axiom_of_determinacy); Duda, Weron, s. 86.
-- PMS założone w 1980 → Duda, Weron, s. 82; [Biler, Buraczewski](https://wmi.uwr.edu.pl/wp-content/uploads/sites/288/2022/07/historiamat.pdf).
-- Rektorzy Marczewski, Urbanik, Duda: lata jak w sekcji 2 → Biler, Buraczewski; lista rektorów.
-- Żywa gęś: nagroda Mazura za problem 153 z 6.11.1936 → [Wikipedia](https://en.wikipedia.org/wiki/Scottish_Book), [Per Enflo](https://www.wikiwand.com/en/articles/Per_Enflo).
-- Enflo odebrał gęś w 1972 → [MacTutor: Mazur](https://mathshistory.st-andrews.ac.uk/Biographies/Mazur/) (rozwiązanie 1972, gęś w Warszawie przy okazji wykładu; bez roku wręczenia); Wikipedia: 1972, transmisja w całej Polsce. Rok wręczenia ma więc słabsze oparcie niż rok rozwiązania.
+**Tekst, pełne akapity (424 znaki, dziś 428):**
 
 ### Instytut dziś
 - Osiem zakładów, nazwy zgodne → `Web-Instytut/src/content/zaklady/` (8 zakładów + Pracownia).
