@@ -1,6 +1,6 @@
 # Raport: zlecenie 16 — wersja angielska (5.11.2026)
 
-Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów zlecenia, 2 commity decyzji o obronach (`4fe03c13`, `ac7855c2`), commit zalecenia 22 ze zlecenia 14 (`8f0019b2`), commit naprawy układu (`775aa7bf`) i 3 commity raportu, **bez pushowania**. Repozytoria treści: 36 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
+Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów zlecenia, 2 commity decyzji o obronach (`4fe03c13`, `ac7855c2`), commit zalecenia 22 ze zlecenia 14 (`8f0019b2`), commit naprawy układu (`775aa7bf`), commit naprawy paska i okładki (`f6c64acf`) i 4 commity raportu, **bez pushowania**. Repozytoria treści: 36 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
 
 **Do Twojej decyzji albo działania**
 
@@ -18,7 +18,8 @@ Stan sprawdzenia:
 - Wszystkie łatki weszły czysto, na klony i na nakładkę: bez `git apply -3` i bez konfliktów.
 - Sprawdzane w Edge (Playwright) na zbudowanej stronie: 20 stron `/en` na 1440 i 390 px przed i po, 3 strony na 1920 px w ciemnym motywie, otwarte menu na 390, 1024, 1280 i 1440 px. Żadna z tych stron nie ma poziomego przewijania.
 - Zalecenie 22, też w Edge na zbudowanej stronie: główna na 1920, 1440, 1280, 1024 i 390 px, Aktualności na 1920, 1440, 1024, 800 i 390 px, PL i EN, jasny i ciemny motyw. Bez błędów JavaScriptu i bez poziomego przewijania.
-- Naprawa układu, też w Edge: główna na 15 szerokościach od 761 do 2560 px, lista na 11 od 761 do 1920 px, do tego granice nowych reguł, PL i EN. Poziome przewijanie ma tylko główna poniżej 944 px, tak samo jak przed tym zleceniem (pytanie 8).
+- Naprawa układu, też w Edge: główna na 15 szerokościach od 761 do 2560 px, lista na 11 od 761 do 1920 px, do tego granice nowych reguł, PL i EN. Główna poniżej 944 px przewijała się wtedy w poziomie; naprawione w następnym punkcie.
+- Naprawa paska i okładki, też w Edge: 7 stron na 8 szerokościach od 761 do 1280 px (główna PL także na wysokościach 700, 900 i 1080), do tego granice 760/761, 1023/1024, 1119/1120 i panel z burgera, PL i EN. Bez poziomego przewijania, burger zawsze w oknie, nazwy działów w oknie. Tej naprawy nie sprawdzałem osobno w ciemnym motywie, bo nie zmienia kolorów; nie sprawdzałem też Firefoksa, Safari ani prawdziwych urządzeń.
 - **Czego nie sprawdzałem:** Firefoksa, Safari, prawdziwych telefonów, czytnika ekranu (`lang="pl"` z D14 sprawdzony tylko w HTML), formularzy w samym Pages CMS. Skryptu `Code.gs` nie uruchamiałem w Google: strony potwierdzania i wypisywania testowałem z podstawionymi odpowiedziami serwera.
 
 ## Podsumowanie
@@ -46,6 +47,7 @@ Stan sprawdzenia:
 | Polskie obrony: tekst z danych (Twoja decyzja po raporcie) | zrobione | `ac7855c2` | Web-Aktualnosci |
 | Zalecenie 22 ze zlecenia 14 (osobne polecenie) | zrobione, telefon do oceny | `8f0019b2` | — |
 | Układ przy węższych oknach (Twoja decyzja po raporcie) | zrobione | `775aa7bf` | — |
+| Pasek nawigacji i okładka przy węższych oknach (Twoja decyzja po raporcie) | zrobione | `f6c64acf` | — |
 | Łatki tego zlecenia | zapisane | `ec0b0a4a` | `dok/latki/zlecenie-16/` |
 
 ## Kryteria odbioru
@@ -137,10 +139,39 @@ Co jeszcze warto wiedzieć o tej naprawie:
 - **Pasek Studia jest wyższy:** 219 zamiast 158 px przy 1280 i 238 zamiast 161 px przy 1024. Długa kolumna sama dopasowuje liczbę wierszy.
 - **Jedno słowo przy 1366 px:** „popularnonaukowych” wchodzi 14 px w odstęp 28 px między kolumnami, ale niczego nie dotyka.
 
-**Znalezione przy sprawdzaniu, nie zmieniałem (pytanie 8).** Oba problemy były już na budowie ze zlecenia 15:
+**Pasek nawigacji i okładka przy węższych oknach (Twoja decyzja „Tak, napraw”, commit `f6c64acf`).** Problem z paskiem był poważniejszy, niż pisałem: na podstronach przy oknie 761–971 px (EN 761–906 px) burger i przełączniki były poza ekranem i nie dało się do nich dojść, bo pasek jest przypięty i strona się nie przewijała. Wszystkie te usterki były już na budowie ze zlecenia 15.
 
-- **Główna, okno poniżej 944 px (EN poniżej 881 px):** poziome przewijanie. Okładka ma cztery kolumny i „Popularyzacja” kończy się na 1022 px przy oknie 800, a pasek nawigacji też jest szerszy od okna.
-- **Pasek nawigacji, okno 1024 px i węższe:** nazwa instytutu łamie się na cztery wiersze i wystaje 5 px nad pasek i 3 px pod niego. Dotyczy głównej i listy; innych podstron nie mierzyłem.
+| Miejsce | Było | Jest |
+|---|---|---|
+| Podstrony, okno 761–971 px (EN 761–906 px) | burger, język i tryb ciemny poza ekranem | w pasku nazwa, tryb, język i burger; linki w panelu z burgera |
+| Główna, okno poniżej 944 px (EN poniżej 881 px) | poziome przewijanie | bez przewijania |
+| Pasek, okno 1024 px i węższe | nazwa i podpis na 4–5 wierszach, wystawały z paska do 13 px | co najmniej 11 px zapasu nad nazwą i pod nią |
+| Okładka, wąskie okno | „Popularyzacja” ucięta na prawej krawędzi, np. kończyła się na 998 px przy oknie 820 | nazwy działów maleją z oknem: 31 px przy 761, 35 px przy 820, 48 px przy 1024; po prawej 48 px marginesu, tyle co po lewej |
+
+Pasek na podstronie przed i po:
+
+![Pasek na podstronie przy 820 i 1024 px: przed i po](raport-zrzuty/z16-pasek-podstrona.jpg)
+
+Okładka przy 820 px przed i po (liczby nad „Szybki dostęp” różnią się przez datę budowania, nie przez tę zmianę):
+
+![Główna przy 820 px: przed i po](raport-zrzuty/z16-okladka-820.jpg)
+
+Co jeszcze warto wiedzieć o tej naprawie:
+
+- **Poniżej 1024 px w pasku nie ma linków do działów.** To mój wybór, bo pięć linków i nazwa instytutu się nie mieszczą. Wszystkie są w panelu z burgera, który ma też Rekrutację. Otwieranie i zamykanie panelu sprawdziłem na 5 stronach przy 761, 800 i 1023 px.
+- **Przy 1024–1119 px** znika podpis „Wydział Matematyki i Informatyki”, a linki są trochę ciaśniej (9 zamiast 11 px po bokach).
+- **Panel z burgera ma teraz co najmniej 360 px**, dotąd 40% okna. Przy węższym panelu strzałka przy „Popularyzacja” wychodziła poza kolumnę.
+- **Działy na okładce poniżej 1024 px** mają miejsce na trzy wiersze hasła, więc stoją nieco wyżej.
+- **Bez zmian:** pasek od 1120 px, okładka od 1125 px i telefon. Przy oknach 1024–1124 px nazwy na okładce są czasem trochę mniejsze, np. 47,75 zamiast 50,4 px przy 1024×900.
+
+**Znalezione przy sprawdzaniu, nie zmieniałem (pytanie 8): ciekawostka w banerze nachodzi na tytuł.** Widać to na zrzucie paska przy 820 px. Tytuł ma zawsze co najmniej 240 px, nawet gdy obok nie ma tyle miejsca. Było już na budowie ze zlecenia 15. Pomiar na czterech podstronach, po 4 wczytania, bo ciekawostka jest losowana:
+
+| Okno | Wczytania z nachodzeniem | Najwięcej |
+|---|---|---|
+| 761 px | 16 z 16 | 248 px |
+| 820 px | 16 z 16 | 200 px |
+| 900 px | 9 z 16 | 120 px |
+| 1024, 1100, 1180, 1280, 1366 i 1440 px | 0 z 16 przy każdej | — |
 
 ## Co warto wiedzieć o wykonaniu
 
@@ -408,7 +439,7 @@ Ciemny motyw (1920 px), po zmianach:
 5. **USOSweb:** bez dopisku, bo system ma wersję angielską, ale automatyczne pobranie się nie udało. Sprawdzisz po zalogowaniu?
 6. **Wpisy testowe** („Testowe: …”, „Mister Test”) nadal są w danych i dostają tłumaczenia z łatek. Usunięcie należy do redakcji. Dziś to wpis testowy jest powiększony na głównej i na liście.
 7. **Zalecenie 22 na telefonie:** na głównej widać powiększony wpis i jeden zwykły. Czy zostawić tak, czy pokazać trzy wiersze, jak przed zmianą?
-8. **Główna i pasek nawigacji przy węższych oknach** (sekcja o zaleceniu 22): poziome przewijanie głównej poniżej 944 px i nazwa instytutu wystająca z paska przy oknie 1024 px i węższym. Czy naprawić?
+8. **Ciekawostka w banerze przy wąskim oknie** (sekcja o zaleceniu 22): przy oknach 761–900 px nachodzi na tytuł, od 1024 px nie. Czy chować ją przy takich oknach?
 
 ## Załącznik: 31 nazw przedmiotów bez angielskiej nazwy w USOS
 
