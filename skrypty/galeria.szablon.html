@@ -81,6 +81,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ram img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .brak { position: absolute; inset: 0; display: grid; place-items: center; padding: 14px; text-align: center; font-size: 13.5px; color: var(--mut); }
 .karta h3 { margin: 8px 0 3px; font: 500 17.5px/1.28 var(--f-d); color: var(--ink); }
+.pol { margin: 0 0 6px; font-size: 14px; color: var(--ink); }
+.pol b { color: var(--d-a, var(--ok)); }
 .dane { margin: 0 0 6px; font-size: 13px; color: var(--mut); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .zn { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 6px; padding: 0; list-style: none; font-size: 12.5px; font-weight: 700; }
 .zn .dob { color: var(--ok); } .zn .uw { color: var(--uwaga); } .zn .zl { color: var(--zle); }
@@ -146,7 +148,7 @@ dialog::backdrop { background: rgb(6 11 22 / .8); }
 <div class="kol gora">
   <h1>Galeria zdjęć: Instytut Matematyczny UWr</h1>
   <p>Kandydaci na okładkę i banery czterech działów. Klatki łączą wyniki trzech poszukiwań: archiwum strony, otwarte licencje i źródła UWr. Kliknij zdjęcie, żeby je powiększyć i przymierzyć do okładki albo dowolnego działu.</p>
-  <p class="wazne">Oceny i opisy kadrów przygotowali agenci bez oglądania zdjęć, z podpisów i nazw plików, więc są wstępne. Decyduje Twoje oko. Miniatury mają do 640 px, więc przymiarki są poglądowe, a ostrość oceniaj w pełnym pliku.</p>
+  <p class="wazne">Przejrzałem miniatury: najlepsze w każdej sekcji stoją na początku i mają znacznik „Polecam” z krótkim uzasadnieniem. Oceny „wstępnie x/5” i opisy kadrów pochodzą od agentów, którzy zdjęć nie widzieli. Miniatury mają do 640 px, więc ostrość oceniaj w pełnym pliku.</p>
 </div>
 <div class="narz" id="narz">
   <div class="kol">
@@ -178,7 +180,7 @@ dialog::backdrop { background: rgb(6 11 22 / .8); }
 
 <script>
 const DANE = /*DANE*/null;
-const SEK = [['okladka', 'Okładka', 'Zdjęcie na cały ekran. Lewa część i dół są zakryte, więc temat powinien stać z prawej lub w prawym górnym rogu. Bez przebarwiania. Co najmniej 2400 px.'],
+const SEK = [['okladka', 'Okładka', 'Decyzja z 5.11: okładka zostaje przy obecnym zdjęciu, dopracujemy tylko jego ułożenie. Reszta klatek to zapas. Wymagania: zdjęcie na cały ekran. Lewa część i dół są zakryte, więc temat powinien stać z prawej lub w prawym górnym rogu. Bez przebarwiania. Co najmniej 2400 px.'],
   ['instytut', 'Instytut', 'Instytucja, historia, budynek, ludzie. Szeroki pas w dwóch kolorach, zdjęcie zaczyna się od ok. 1/3 szerokości; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
   ['nauka', 'Nauka', 'Badania, seminaria, tablica z wzorami, konferencje, biblioteka. Szeroki pas w dwóch kolorach; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
   ['studia', 'Studia', 'Studenci, sale wykładowe, kampus, zajęcia. Szeroki pas w dwóch kolorach; lepsze są jasne, spokojne kadry z wyraźną strukturą.'],
@@ -241,6 +243,7 @@ function karta(c) {
     <header><span class="nr">${esc(c.nr)}</span><span class="oc">wstępnie ${c.oc}/5</span></header>
     <div class="med" role="button" tabindex="0" data-duze="${esc(klucz(c))}" aria-label="Powiększ: ${esc(c.t)}">${med}</div>
     <h3>${esc(c.t)}</h3>
+    ${c.pol ? `<p class="pol"><b>Polecam.</b> ${esc(c.pol)}</p>` : ''}
     <p class="dane">${esc(rozmiar(c))} · ${esc(c.l)}${c.a ? ' · ' + esc(c.a) : ''}</p>
     ${znaczniki(c)}
     <details><summary>Opis agenta</summary>${opis}</details>

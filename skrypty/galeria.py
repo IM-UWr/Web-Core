@@ -151,6 +151,13 @@ for L in karty.values():
             c['w'], c['h'], c['wp'] = st['w'], st['h'], True
         c['m'] = f'min/{nr}.jpg'
 
+POL = json.load(open(f'{KORZEN}/zdjecia/min/polecane.json', encoding='utf-8'))
+for s_, L in karty.items():
+    for c in L:
+        n = POL.get(c['s'] + '|' + c['k'])
+        if n:
+            c['pol'] = n
+    L.sort(key=lambda c: 0 if c.get('pol') else 1)  # numery klatek zostają, polecane na początku
 dane = {'karty': karty, 'tropy': tr, 'obecne': OBECNE}
 js = json.dumps(dane, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 html = open(SZABLON, encoding='utf-8').read().replace('/*DANE*/null', js)
