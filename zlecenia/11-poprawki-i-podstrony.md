@@ -256,3 +256,45 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
 - **Kliknięcie** w pozycję przewija do drugiego ekranu i krótko podświetla odpowiadającą kolumnę (ok. 1,6 s); przy ograniczonym ruchu bez przewijania z animacją, podświetlenie jako obrys.
 - Telefon: bez tej linii (chyba że zlecenie telefonu mówi inaczej).
 
+### 16. Baner działu: ciemna plama pod szkicem patrona (decyzja 5.11, 01:37; wariant A; wzór: prototyp v78)
+- Szkic patrona ginął na tle zdjęcia, najbardziej Ślebodziński na tłumie w banerze Nauki. Pod szkicem stoi miękka, ciemna plama w granacie. Dotyczy **banerów wszystkich czterech działów**.
+- CSS z prototypu:
+  ```css
+  .in-b4 .szkic::before { content: ''; position: absolute; inset: -12% -22%; z-index: -1;
+    background: radial-gradient(closest-side, rgb(13 24 48 / .86) 0, rgb(13 24 48 / .72) 60%, rgb(13 24 48 / 0) 100%); }
+  ```
+- Bez konturu, grubszej kreski i rozmycia zdjęcia (warianty B–D odrzucone). Na nagłówkach podstron plamy nie ma.
+- **Odbiór:** zrzuty 4 banerów przy 1920 px, jasny i ciemny motyw. Kreska szkicu i podpis nie zmieniają koloru ani grubości.
+
+### 17. Studia: nowe zdjęcie z sali HS, przypięte do szkicu (decyzje 5.11, 01:27–01:46; wzór: prototyp v79)
+- **Plik:** `zdjecia/wybrane/studia-hs.jpg` na gałęzi kopii (4800×2703). Sala HS od tyłu: tablice, mężczyzna przy tablicy, studenci w ławkach. Oryginał WMI `Kopia-20230104_123847`, wyostrzony i wyretuszowany przez właściciela w ChatGPT. Na stronę dać wersję o szerokości 3200 px jako `public/pliki/naglowki/studia.jpg`. Tekst alternatywny: „Sala wykładowa HS: wykład przy tablicach, studenci w ławkach od tyłu”. Filtr dwóch kolorów domyślny, bez rozjaśnienia używanego dotąd na Studiach.
+- **Strona działu:** zdjęcie jest przypięte do szkicu, a nie do szerokości okna, żeby twarz Knastera wypadała między głowami w ławkach na każdym ekranie. Szkic stoi w kolumnie liczonej od środka ekranu, więc zwykłe `object-fit: cover` rozjeżdżałoby się względem niego. CSS z prototypu:
+  ```css
+  [data-dzial="studia"] .in-b4 .in-foto { left: 0; }
+  [data-dzial="studia"] .in-b4 .in-foto img {
+    --sz: max(1454px, calc((var(--marg) + 155px) / .4025));
+    position: absolute; top: calc(50% - .2951 * var(--sz));
+    right: calc(var(--marg) + 155px - .5575 * var(--sz));
+    width: var(--sz); max-width: none; height: calc(.5631 * var(--sz)); object-fit: fill; }
+  ```
+  - `155px` to odległość środka szkicu od prawej krawędzi kolumny (40 px odstępu i połowa z 230 px szerokości). Jeśli szkic stoi inaczej, zmienić tę liczbę.
+  - `.4425` (czyli `1 − .5575`) to miejsce zdjęcia pod środkiem szkicu, liczone od lewej. `.4025` pilnuje, żeby z prawej nie wszedł baner z portretem Steinhausa. `.2951` ustawia wysokość kadru.
+  - Procenty w `--marg` muszą się liczyć względem szerokości banera, dlatego `.in-foto` ma `left: 0`.
+- **Podstrony Studiów:** same tablice, kadr bez ściany i portretu:
+  ```css
+  [data-dzial="studia"] .pd-b.pd-foto .in-foto img { position: absolute; left: 0; top: calc(50% - 18.55cqw);
+    width: 122cqw; max-width: none; height: 68.7cqw; object-fit: fill; }
+  ```
+  `cqw` liczy się względem kontenera strony (`.in-strona`, `container-type: inline-size`).
+- **Telefon:** bez przypinania, zwykłe `object-fit: cover`. Kadr pokazać właścicielowi na zrzucie.
+- **Odbiór:** zrzuty banera i podstrony przy 1366, 1536, 1920, 2560 i 3440 px. Środek szkicu ma wypadać w 44,25% szerokości zdjęcia przy każdej szerokości okna (sprawdzić pomiarem). Baner z portretem ani ściana z napisem nie mogą wejść w kadr; na stronie działu przy bardzo szerokich oknach dopuszczalny jest skrawek jasnej ściany przy prawym brzegu, jeśli nie widać napisu.
+- **Przed publikacją właściciel porównuje wzory na tablicach z oryginałem**, bo zdjęcie przeszło przez ChatGPT. Autor zdjęcia do uzupełnienia.
+
+### 18. Okładka: to samo zdjęcie, nowe ułożenie (decyzja 5.11, 01:05–01:08) — **CZEKA, nie wykonywać przed potwierdzeniem właściciela**
+- **Decyzja:** zdjęcie główne zostaje (nocne ujęcie budynku z lotu ptaka), ale do dopracowania jest jego ułożenie. Kadr ma trzymać budynek i pokazywać też fragment mostu. **Powiększenie zależy od proporcji okna: płasko większy zoom, kwadratowo dalszy kadr.**
+- **Stan dziś:** `object-position: 2% 50%` przykleja kadr do lewej strony pliku, więc mostu nie widać.
+- **Źródło:** `kampus-2000.jpg` (2000×880) to wycięty i wyostrzony w ChatGPT fragment zdjęcia https://fotopolska.eu/1158570 (plik https://fotopolska.eu/foto/1158/1158570.jpg, 3500×2623). Wycinek leży w oryginale ok. x 1504–3495, y 891–1766. Oryginał ma zapas w górę, w dół i w lewo, ale nie w prawo, bo tam się kończy, razem z mostem.
+- **Potrzebny nowy plik:** obecny wycinek jest za niski, już przy Full HD nie mieści całego budynku razem z mostem. Właściciel przygotuje wyższy wycinek, np. x 1200–3500, y 350–2450, wyostrzony tak samo.
+- **Szkic kadrów w pikselach oryginału, do dopracowania z właścicielem w prototypie:** płasko 21:9: x 1825–3500, y 810–1740; Full HD: x 1825–3500, y 760–1848; 4:3: x 1400–3500, y 350–2430. Dół kadru przykrywa ciemny pas z działami, więc budynek musi stać w górnej połowie.
+- **Licencja:** według fotopolska.eu autorem jest Corvus monedula, a licencja to CC BY-SA 3.0. To nie jest zdjęcie UWr, więc potrzebny jest podpis autora i informacja o zmianach (kadr, wyostrzenie), a przeróbka powinna mieć tę samą licencję. Właściciel potwierdzi to na stronie zdjęcia albo u autora i wskaże, gdzie umieścić podpis.
+
