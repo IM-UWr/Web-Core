@@ -3,7 +3,9 @@
 // w prototypie: zbudujSpis / odswiezSpis, .spis-p, [data-bok="A"]). Jedna wersja HTML (style: src/styles/zal-podstrona.css):
 // - komputer: kolumna z prawej (236 px), przyklejona; nad listą „Na tej stronie” w kolorze działu, lista z cienką linią
 //   po lewej, bieżąca sekcja pogrubiona, a na linii odcinek 3 px w kolorze działu, który przesuwa się między pozycjami;
-// - telefon (≤ 760 px): zwijany blok nad treścią (przycisk „Na tej stronie”; bez JS lista rozwinięta).
+// - telefon (≤ 760 px): zwijany blok nad treścią (przycisk „Na tej stronie”; bez JS lista rozwinięta). Stan zwinięty od
+//   pierwszej klatki z klasy html.js (ustawianej w <head>), nie z modułu — bez skoku treści o wysokość listy, gdy moduł
+//   przychodzi po pierwszym narysowaniu (zlecenie 13, punkt 5).
 // Bieżąca sekcja: ostatnia, której początek minął ok. 30% wysokości okna (aria-current="location"). Kliknięcie — płynne
 // przewinięcie (20 px zapasu; przy „ogranicz ruch” od razu). Zwykłe linki #kotwica, więc działają też bez JS.
 // Sekcje schowane (filtr planu, inny semestr) znikają ze spisu; widok może poprosić o odświeżenie zdarzeniem `z-spis`.
@@ -18,7 +20,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
 {spis.length >= 2 && (
   <nav class="z-spis" aria-labelledby="z-spis-h" data-pagefind-ignore data-z-spis>
     <p class="z-spis-h" id="z-spis-h">{tytul}</p>
-    <button type="button" class="z-spis-przelacz" aria-expanded="false" aria-controls="z-spis-lista" hidden>
+    <button type="button" class="z-spis-przelacz" aria-expanded="false" aria-controls="z-spis-lista">
       {tytul}<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
     </button>
     <ul class="z-spis-lista" id="z-spis-lista">
@@ -37,9 +39,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
     const telefon = matchMedia('(max-width: 760px)');
     const bezRuchu = matchMedia('(prefers-reduced-motion: reduce)');
 
-    // telefon: lista zwinięta pod przyciskiem, po kliknięciu linku zwija się z powrotem
-    przycisk.hidden = false;
-    spis.classList.add('z-spis-js');
+    // telefon: lista zwinięta pod przyciskiem (CSS: html.js), po kliknięciu linku zwija się z powrotem
     const ustawOtwarty = (otwarty: boolean) => {
       przycisk.setAttribute('aria-expanded', String(otwarty));
       spis.classList.toggle('z-spis-otwarty', otwarty);

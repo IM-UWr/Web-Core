@@ -51,14 +51,15 @@
   /* spis „Na tej stronie”: zwijany nad treścią, lista z cienką kreską po lewej */
   .z-spis { margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
   .z-spis-h { margin: 12px 0 6px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-  .z-spis-js .z-spis-h { display: none; }
+  html.js .z-spis-h { display: none; }
+  html:not(.js) .z-spis-przelacz { display: none; }
   .z-spis-przelacz { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; margin: 0; padding: 0;
     border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; }
   .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform .2s; }
   .z-spis-otwarty .z-spis-przelacz svg { transform: rotate(180deg); }
   .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
   .z-spis-lista { list-style: none; margin: 0 0 14px; padding: 0; border-left: 1px solid var(--line); }
-  .z-spis-js:not(.z-spis-otwarty) .z-spis-lista { display: none; }
+  html.js .z-spis:not(.z-spis-otwarty) .z-spis-lista { display: none; }
   .z-spis-lista li[hidden], .z-spis-znacznik { display: none; }
   .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; }
   .z-spis-lista a:hover, .z-spis-lista a[aria-current] { color: var(--ink); }

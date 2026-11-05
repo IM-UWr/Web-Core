@@ -60,6 +60,24 @@ const FORMY: Record<'wyd' | 'sem' | 'akt', { pl: [string, string, string]; en: [
 const liczby = (['wyd', 'sem', 'akt'] as const).filter((k) => ile[k] > 0).map((k) => ({
   key: k, n: ile[k], tekst: lang === 'en' ? FORMY[k].en[ile[k] === 1 ? 0 : 1] : odm(ile[k], FORMY[k].pl),
 }));
+// Blok tytułu i skos (komputer), w linii na końcu okładki — zanim strona się narysuje (zlecenie 13, punkt 5: dawniej w module
+// okladka.ts, więc zdjęcie przesuwało się po pierwszej klatce), potem przy zmianie rozmiaru i po wczytaniu krojów.
+// „Instytut” i „Matematyczny” zaczynają się od lewej, a ich prawe końce leżą na jednej prostej o nachyleniu S (px w prawo na
+// px w dół): stopień „Matematyczny” dobrany do „Instytut” (po angielsku drugie słowo krótsze — wtedy stopnie z CSS, a skos od
+// końca pierwszej linii). Prosta (plus odstęp) to granica ciemnego pola po skosie (--skos), za nią krótki gradient
+// w zdjęcie; zdjęcie zaczyna się tak, żeby jego lewa krawędź była schowana w pełnym ciemnym polu (--foto-x).
+const ULOZ = `(function(ok){var S=.32;function uloz(){if(!ok.offsetHeight||matchMedia('(max-width: 760px)').matches)return;` +
+  `var tyt=ok.querySelector('.z-okl-tytul'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2');if(!tyt||!w1||!w2)return;` +
+  `var H=ok.clientHeight,W=ok.clientWidth,i,A,M,f2;tyt.style.removeProperty('--f2');var f1=parseFloat(getComputedStyle(w1).fontSize),o=ok.getBoundingClientRect();` +
+  `function b(el){var r=el.getBoundingClientRect();return{x2:r.right-o.left,yc:(r.top+r.bottom)/2-o.top}}` +
+  `var lewa=tyt.getBoundingClientRect().left-o.left,wyr=(w2.textContent||'').trim().length>=(w1.textContent||'').trim().length;` +
+  `for(i=0;wyr&&i<4;i++){A=b(w1);M=b(w2);f2=parseFloat(getComputedStyle(w2).fontSize);tyt.style.setProperty('--f2',Math.max(24,f2*(A.x2+S*(M.yc-A.yc)-lewa)/(M.x2-lewa))+'px')}` +
+  `A=b(w1);var od=Math.max(24,f1*.34),zanik=Math.max(90,W*.06),x0=A.x2-S*A.yc+od*Math.sqrt(1+S*S),nl=Math.hypot(1,S),n=[1/nl,-S/nl],` +
+  `kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],` +
+  `g='rgb(9 16 34',k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
+  `ok.style.setProperty('--skos','linear-gradient('+kat.toFixed(2)+'deg, '+g+' / .97) 0px, '+k.map(function(p){return g+' / '+p[1]+') '+(t1+p[0]*zanik).toFixed(1)+'px'}).join(', ')+')');` +
+  `ok.style.setProperty('--foto-x',Math.max(0,x0-150)+'px');ok.classList.add('z-ulozona')}` +
+  `uloz();if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 ---
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {baner.zdjecie && <img class="z-okl-foto" src={u(baner.zdjecie)} alt={wybierz(baner, 'opis', lang) || ''} decoding="async" fetchpriority="high" />}
@@ -104,5 +122,6 @@ const liczby = (['wyd', 'sem', 'akt'] as const).filter((k) => ile[k] > 0).map((k
     </div>
   )}
   <a class="z-strzalka" href={cel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>{lang === 'en' ? 'Quick access' : 'Szybki dostęp'}{licznik && ` · ${licznik}`}</a>
+  <script is:inline set:html={ULOZ} />
 </section>
 <script>import '../../scripts/zal/okladka'; import '../../scripts/zal/menu'; import '../../scripts/zal/przejazd';</script>
