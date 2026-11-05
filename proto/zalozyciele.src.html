@@ -1092,6 +1092,33 @@ section:has(.gr-w.maly) .os-lat { grid-template-columns: minmax(0, 1fr) 240px; }
 /* tytuł ciekawostki (znaku) w nagłówku podstrony zawsze w jednej linii; wychodzi w lewo poza kolumnę opisu (5.11, 00:25) */
 .pd-b .znak-podpis b { white-space: nowrap; margin-left: -160px; }
 
+/* porównanie czwórek kolorów działów (5.11, 10:25) */
+.kp-w { padding: 40px 56px 80px; }
+.kp-w > h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 36px; color: var(--m-ink); }
+.kp-w > p { margin: 0 0 30px; max-width: 900px; font-size: 15.5px; line-height: 1.6; color: var(--m-muted); }
+.kp { margin: 0 0 34px; }
+.kp-g { display: flex; align-items: baseline; gap: 16px; margin: 0 0 10px; }
+.kp-g h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 24px; color: var(--m-ink); }
+.kp-g span { font-size: 13.5px; color: var(--m-muted); }
+.kp-g button { margin-left: auto; padding: 6px 14px; border: 1px solid var(--m-line); background: none; font: inherit; font-size: 13.5px; font-weight: 700; color: var(--m-ink); cursor: pointer; }
+.kp-g button[aria-pressed="true"] { background: var(--m-ink); color: var(--m-bg); border-color: var(--m-ink); }
+.kp-ciem { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--granat); }
+.kp-ciem > div { position: relative; height: 150px; padding: 22px 22px 0; color: #fff; overflow: hidden;
+  background: linear-gradient(100deg, var(--granat) 0, var(--granat) 18%, color-mix(in srgb, var(--granat) 50%, var(--d-g)) 60%, var(--d-g) 100%); }
+.kp-ciem b { display: inline-block; font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.1; padding-bottom: 6px; border-bottom: 2px solid var(--d-j); }
+.kp-ciem small { display: block; max-width: calc(100% - 90px); margin-top: 10px; font-size: 13.5px; font-weight: 500; color: var(--d-j); }
+.kp-ciem svg { position: absolute; right: 14px; top: 16px; width: 74px; height: 89px; }
+.kp-ciem svg path { fill: none; stroke: var(--d-j); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.kp-jas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--m-line); border-top: 0; }
+.kp-jas > div { padding: 16px 22px 18px; background: var(--m-bg); }
+.kp-jas > div + div { border-left: 1px solid var(--m-line); }
+.kp-jas .e { font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+.kp-jas .t { margin: 2px 0 10px; font-family: var(--f-display); font-size: 19px; line-height: 1.3; color: var(--m-ink); }
+.kp-jas .d { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.kp-jas .d i { font-style: normal; padding: 6px 12px; font-size: 13px; font-weight: 700; background: var(--d-a); color: #fff; }
+.kp-jas .d u { font-size: 13px; color: var(--d-a); text-underline-offset: 3px; }
+.kp-jas .d em { font-style: normal; padding: 6px 10px; font-size: 13px; background: var(--d-t); color: var(--m-ink); }
+
 /* overflow: clip zamiast hidden na ramce podglądu, żeby przyklejone elementy (spis, boczna nawigacja) działały */
 #okno { overflow: clip; }
 /* „Na tej stronie” z prawej (propozycje 4.11): bez listy podstron działu, tylko spis sekcji ze znacznikiem bieżącej */
@@ -1500,14 +1527,20 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="w-telefon" class="ustalone" data-v="telefon" aria-pressed="false">Telefon</button>
       <button type="button" id="w-przyciski" class="ustalone" data-v="przyciski" aria-pressed="false">Przyciski</button>
       <button type="button" id="w-ciekawostki" data-v="ciekawostki" aria-pressed="false">Ciekawostki</button>
+      <button type="button" id="w-kolory" data-v="kolory" aria-pressed="false">Kolory działów</button>
     </div></div>
     <div class="grupa ustalone"><span>Szkic</span><div class="seg" data-ustaw="szkic">
       <button type="button" id="s-twarz" data-v="twarz" aria-pressed="true">Twarz</button>
       <button type="button" id="s-znak" data-v="znak" aria-pressed="false">Znak matematyczny</button>
     </div></div>
-    <div class="grupa ustalone"><span>Paleta</span><div class="seg" data-ustaw="paleta">
+    <div class="grupa" id="wybor-palety"><span>Kolory działów</span><div class="seg" data-ustaw="paleta">
       <button type="button" id="p-atramenty" data-v="atramenty" aria-pressed="true">Atramenty</button>
       <button type="button" id="p-stonowana" data-v="stonowana" aria-pressed="false">Stonowana</button>
+      <button type="button" id="p-wyrownane" data-v="wyrownane" aria-pressed="false">Atramenty wyrównane</button>
+      <button type="button" id="p-terakota" data-v="terakota" aria-pressed="false">Z terakotą</button>
+      <button type="button" id="p-lazur" data-v="lazur" aria-pressed="false">Lazur i malina</button>
+      <button type="button" id="p-fiolet" data-v="fiolet" aria-pressed="false">Fiolet dla Studiów</button>
+      <button type="button" id="p-ziemia" data-v="ziemia" aria-pressed="false">Ziemia i niebo</button>
     </div></div>
     <div class="grupa" id="wybor-motywu"><span>Motyw</span><div class="seg" data-ustaw="motyw">
       <button type="button" id="m-auto" data-v="auto" aria-pressed="true">jak w systemie</button>
@@ -1784,6 +1817,8 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
 
       <!-- ============ CIEKAWOSTKI PATRONÓW (5.11): galeria + nagłówek podstrony ============ -->
       <div class="widok" id="v-ciekawostki" hidden></div>
+      <!-- ============ KOLORY DZIAŁÓW (5.11, 10:25): wszystkie czwórki obok siebie ============ -->
+      <div class="widok m" id="v-kolory" hidden></div>
 
       <!-- ============ PRZYCISKI: dziś (okrągłe) i po zmianie (styl z Planu zajęć) ============ -->
       <div class="widok m" id="v-przyciski" hidden>
@@ -1914,10 +1949,23 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       studia: ['#f07d5e', '#5e1f14', '#b03a1f', '#fbe8e2'], popularyzacja: ['#a991f7', '#30216a', '#5b3fc4', '#eeeafd'] },
     stonowana: {
       instytut: ['#d9ac62', '#4a3519', '#7a5718', '#f6efe2'], nauka: ['#86bba6', '#1f3d36', '#2d6656', '#e8f1ed'],
-      studia: ['#d8917a', '#4b241b', '#9a4630', '#f7ece6'], popularyzacja: ['#b7a6dc', '#2f2748', '#5d4e90', '#efecf6'] }
+      studia: ['#d8917a', '#4b241b', '#9a4630', '#f7ece6'], popularyzacja: ['#b7a6dc', '#2f2748', '#5d4e90', '#efecf6'] },
+    /* zestawy do testów (5.11, 10:25): w OKLCH ta sama jasność i nasycenie dla każdej roli, różne odcienie */
+    wyrownane: {"instytut": ["#e5a452", "#533200", "#865400", "#fbefe1"], "nauka": ["#31ccbd", "#00453f", "#017067", "#e1f6f3"], "studia": ["#f7947b", "#5d291c", "#9c3f28", "#feece8"], "popularyzacja": ["#b4a3fc", "#3c3160", "#634fa3", "#f1eeff"]},
+    terakota: {"instytut": ["#f2a33a", "#5c3a0e", "#8a5300", "#fbf1e1"], "nauka": ["#4cc3b2", "#0a4a47", "#0a6b63", "#e2f3f0"], "studia": ["#df997b", "#542b1d", "#924e33", "#fcede5"], "popularyzacja": ["#a991f7", "#30216a", "#5b3fc4", "#eeeafd"]},
+    lazur: {"instytut": ["#e4a550", "#523300", "#845502", "#faefe1"], "nauka": ["#61cb97", "#00472c", "#03734a", "#e5f6ec"], "studia": ["#50c0f4", "#004059", "#00698f", "#e3f4fd"], "popularyzacja": ["#ef90bb", "#59273f", "#953c68", "#feebf2"]},
+    fiolet: {"instytut": ["#e4a550", "#523300", "#845502", "#faefe1"], "nauka": ["#31ccbd", "#00453f", "#017067", "#e1f6f3"], "studia": ["#b8a2fa", "#3e315f", "#674ea1", "#f1eeff"], "popularyzacja": ["#ef90bb", "#59273f", "#953c68", "#feebf2"]},
+    ziemia: {"instytut": ["#cbae79", "#47381a", "#775c24", "#f5f0e7"], "nauka": ["#99bf90", "#2c4128", "#476c3f", "#ecf3eb"], "studia": ["#7dbdda", "#1b404f", "#236984", "#e8f3f8"], "popularyzacja": ["#d2a0c6", "#4b3045", "#7d4e73", "#f7eef4"]},
   };
   const NAZWY_KOLOROW = { atramenty: { instytut: 'bursztyn', nauka: 'zieleń morska', studia: 'cynober', popularyzacja: 'fiolet atramentu' },
-    stonowana: { instytut: 'ochra', nauka: 'patyna', studia: 'terakota', popularyzacja: 'wrzos' } };
+    stonowana: { instytut: 'ochra', nauka: 'patyna', studia: 'terakota', popularyzacja: 'wrzos' },
+    wyrownane: {"instytut": "bursztyn", "nauka": "zieleń morska", "studia": "cynober", "popularyzacja": "fiolet"},
+    terakota: {"instytut": "bursztyn", "nauka": "zieleń morska", "studia": "terakota", "popularyzacja": "fiolet atramentu"},
+    lazur: {"instytut": "bursztyn", "nauka": "szmaragd", "studia": "lazur", "popularyzacja": "malina"},
+    fiolet: {"instytut": "bursztyn", "nauka": "zieleń morska", "studia": "fiolet", "popularyzacja": "malina"},
+    ziemia: {"instytut": "ochra", "nauka": "szałwia", "studia": "szary błękit", "popularyzacja": "śliwka"},
+  };
+  const TYTULY_PALET = { atramenty: 'Atramenty (obecna)', stonowana: 'Stonowana', wyrownane: "Atramenty wyrównane", terakota: "Z terakotą", lazur: "Lazur i malina", fiolet: "Fiolet dla Studiów", ziemia: "Ziemia i niebo" };
 
   /* ---------- szkice: twarze (ogólne, zastępcze) ---------- */
   const TWARZ_BAZA = [
@@ -3061,10 +3109,29 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   document.getElementById('ck-losuj').addEventListener('click', (e) => { e.stopPropagation(); ckLosujNowy(); });
   ckStart();
 
+
+  /* ---------- porównanie czwórek kolorów (5.11, 10:25) ---------- */
+  function rysujKolory() {
+    const HASLA = { instytut: 'Wrocławska szkoła matematyczna', nauka: 'Poznaj nasze badania na A+', studia: 'Studiuj matematykę we Wrocławiu', popularyzacja: 'Matematyka dla uczniów i nauczycieli' };
+    const PRZ = { instytut: ['Władze', 'Kontakt'], nauka: ['Seminaria', 'Konferencje'], studia: ['Plan zajęć', 'Rekrutacja'], popularyzacja: ['Dla uczniów', 'Wykłady'] };
+    const zm = (p, dz) => { const [j, g, a, t] = PALETY[p][dz]; return `--d-j:${j};--d-g:${g};--d-a:${a};--d-t:${t}`; };
+    $('#v-kolory').innerHTML = `<div class="kp-w"><h2>Kolory działów: czwórki do porównania</h2>
+      <p>Każdy wiersz to jeden komplet czterech kolorów: na górze baner działu na granacie (kreska, hasło, sygnet patrona), pod spodem kolor na białym (etykieta, przycisk, link, jasne tło). Nowe zestawy mają w każdej roli tę samą jasność i nasycenie, różnią się tylko odcieniem, więc z założenia trzymają się razem. „Użyj” włącza komplet w całym prototypie (okładka, strony działów, menu) — przełącznik „Kolory działów” u góry robi to samo.</p>
+      ${Object.keys(PALETY).map((p) => `<section class="kp"><div class="kp-g"><h3>${TYTULY_PALET[p] || p}</h3><span>${KOLEJ.map((dz) => NAZWY_KOLOROW[p][dz]).join(' · ')}</span><button type="button" data-kp="${p}" aria-pressed="${p === paleta}">Użyj</button></div>
+        <div class="kp-ciem">${KOLEJ.map((dz) => `<div style="${zm(p, dz)}">${svgSygnet(dz)}<b>${D[dz].nazwa}</b><small>${HASLA[dz]}</small></div>`).join('')}</div>
+        <div class="kp-jas">${KOLEJ.map((dz) => `<div style="${zm(p, dz)}"><div class="e">${D[dz].nazwa} · ${NAZWY_KOLOROW[p][dz]}</div><div class="t">${PRZ[dz][0]}</div><div class="d"><i>${PRZ[dz][1]}</i><u>Wszystkie →</u><em>Nowe</em></div></div>`).join('')}</div></section>`).join('')}</div>`;
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-kp]'); if (!b) return;
+    paleta = b.dataset.kp; ustawPalete();
+    document.querySelectorAll('#wybor-palety button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.v === paleta)));
+    rysujKolory(); skaluj();
+  });
+
   /* ---------- przełączniki ---------- */
   let widok = 'okladka';
   function pokaz() {
-    ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski', 'ciekawostki'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
+    ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski', 'ciekawostki', 'kolory'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
     $('#wybor-inst').hidden = widok !== 'instytut';
     $('#wybor-wersja').hidden = widok !== 'instytut';
     $('#wybor-baner').hidden = widok !== 'instytut';
@@ -3087,11 +3154,12 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#wybor-barwy').hidden = widok !== 'okladka';
     $('#wybor-proby').hidden = widok !== 'okladka';
     $('#wybor-prel').hidden = widok !== 'okladka';
-    $('#wybor-dzialu').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki';
-    $('#wybor-przejscia').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki';
+    $('#wybor-dzialu').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki' || widok === 'kolory';
+    $('#wybor-przejscia').hidden = widok === 'glowna' || widok === 'okladka' || widok === 'przyciski' || widok === 'ciekawostki' || widok === 'kolory';
     $('#podpowiedz').textContent = widok === 'okladka' ? 'Najedź na dział. Strzałka na dole albo kółko myszy przewija w dół, jak w prawdziwym oknie.' : widok === 'glowna' ? 'Najedź myszką na nazwę działu pod zdjęciem.' : widok === 'dzial' ? 'Tusz szkicu rysuje się przy wejściu na stronę działu.' : 'Telefon nie ma najechania, więc szkice są w menu.';
     if (widok === 'dzial') rysujDzial();
     if (widok === 'telefon') rysujTelefon();
+    if (widok === 'kolory') { rysujKolory(); $('#podpowiedz').textContent = 'Wszystkie komplety obok siebie. „Użyj” włącza komplet w całym prototypie; potem obejrzyj okładkę i strony działów.'; }
     if (widok === 'ciekawostki') { rysujCiekawostki(); $('#podpowiedz').textContent = '„Losuj zestaw” pokazuje, co dostanie nowa wizyta. Kliknij wiersz albo kartę: ciekawostka pojawi się w nagłówku podstrony.'; }
     if (widok === 'przyciski') { rysujPrzyciski(); $('#podpowiedz').textContent = 'Górny rząd: jak jest dziś. Dolny: po zmianie. Kliknij, żeby zobaczyć wybrany przycisk.'; }
     skaluj();
@@ -3126,7 +3194,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'indz') { dzInst = v; rysujInstytut(); skaluj(); }
     if (co === 'inst') { wariantInst = v; rysujInstytut(); skaluj(); }
     if (co === 'barwa') { $('#scena').classList.toggle('bez-barwy', v === 'nie'); }
-    if (co === 'paleta') { paleta = v; ustawPalete(); }
+    if (co === 'paleta') { paleta = v; ustawPalete(); if (widok === 'kolory') { rysujKolory(); skaluj(); } }
     if (co === 'dzial') { dzial = v; pokaz(); }
     if (co === 'przejscie') { $('#scena').classList.toggle('przejscie-kreska', v === 'kreska'); skaluj(); }
   }));
