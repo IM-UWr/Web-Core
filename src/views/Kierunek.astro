@@ -83,7 +83,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
 <Podstrona lang={lang} tytul={nazwa} opis={w(d, 'opis')} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
   lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo} wstecz={{ etykieta: T('Studia', 'Study'), adres: '/studia' }}
   dzial="studia" spis={spis} klasa="tresc" atrybuty={{ 'data-kierunek': '' }}>
-  {/* Baner: fakty kierunku w jednym wierszu (na telefonie bez liczb, jak dotąd — reguła .kh-liczby niżej). */}
+  {/* Baner: fakty kierunku w jednym wierszu (na telefonie trzy pierwsze — reguła .kh-liczby niżej). */}
   <Fragment slot="baner">
     {d.fakty.length > 0 && (
       <ul class="pt-liczby kh-liczby">
@@ -317,8 +317,9 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
 </script>
 
 <style>
-  /* baner: fakty kierunku tylko na komputerze (na telefonie baner bez liczb — jak dotąd; cztery fakty nie mieszczą się w trzech kolumnach) */
-  @media (max-width: 760px) { :global(.z-nagl .z-slot .pt-liczby.kh-liczby) { display: none !important; } }
+  /* baner na telefonie: trzy pierwsze fakty w trzech kolumnach (zal-telefon.css), wartości mniejsze, bo bywają słowami („6 semestrów”);
+     bez liczb nie byłoby też hasła (zlecenie 11, zalecenie 2: hasło i liczby razem albo wcale) */
+  @media (max-width: 760px) { :global(.z-nagl .z-slot .pt-liczby.kh-liczby .n) { font-size: 21px; } }
   [hidden] { display: none !important; }
   /* bez JS: bez przełącznika i wyboru roku, wszystkie programy z podpisami; z JS podpis tylko dla czytników ekranu */
   :global(html:not(.js)) :is(.tresc-taby, .kier-rok) { display: none; }
@@ -344,9 +345,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
   .faq summary { min-height: 0; align-items: flex-start; font-weight: 400; }
 
   @media (min-width: 761px) {
-    .kh-liczby { margin-top: 6px; max-width: none; }
-    /* fakty nie wchodzą pod opis znaku patrona: rząd kończy się 24 px przed lewą krawędzią opisu (zalozyciele.css:
-       .z-nagl-pod.z-liczbami .z-znak-opis — right: znak-p + 216 px, szerokość 210 px), dalsze fakty w następnym rzędzie */
-    :global(.z-nagl-pod:has(.z-znak-opis) .z-slot:has(> .kh-liczby)) { max-width: calc(100% - 450px + var(--marg) - var(--znak-p)); }
+    /* szerokość rzędu faktów (do ciekawostki z prawej, bez drugiego rzędu) ustawia skrypt w NaglowekZ.astro */
+    .kh-liczby { margin-top: 6px; }
   }
 </style>
