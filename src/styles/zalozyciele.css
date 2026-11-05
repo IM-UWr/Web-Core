@@ -340,7 +340,7 @@
   .z-narz svg:not(.z-flaga) { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
   /* panel z hamburgera (PanelMenu.astro; zlecenie 11, zalecenie 6): z prawej, na granacie (w ciemnym motywie --panel);
      na okładce w obrębie okładki, przy pasku stały na całą wysokość okna; przy jasnym pasku jasny (.z-menu-jasny) */
-  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; width: min(460px, 40%); padding: 76px 36px 28px; overflow-y: auto; text-align: left;
+  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; width: min(460px, max(40%, 360px)); padding: 76px 36px 28px; overflow-y: auto; text-align: left;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
     transform: translateX(100%); visibility: hidden; transition: transform var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi), background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
   .z-menu.otwarte { transform: none; visibility: visible; transition: transform var(--t-dlugi) var(--rytm), visibility 0s, background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
@@ -438,14 +438,15 @@
     opacity: 0; transition: opacity .6s var(--rytm); pointer-events: none; }
   .z-okl-dz:hover::before, .z-okl-dz:focus-visible::before { opacity: 1; }
   .z-okl-dz > * { position: relative; }
-  .z-okl-szkic { --sz: clamp(84px, calc(var(--h) * .18), 176px); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto clamp(4px, calc(var(--h) * .01), 10px); }
+  .z-okl-szkic { --sz: clamp(84px, min(calc(var(--h) * .18), 20vw), 176px); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto clamp(4px, calc(var(--h) * .01), 10px); }
   .z-okl-szkic .duch path { stroke: rgb(255 255 255 / .2); stroke-width: 1.25; }
   .z-okl-szkic .tusz path { stroke: var(--d-j); stroke-width: 1.25; stroke-dashoffset: 1; opacity: 0; }
   .z-okl-szkic .detale path { stroke: var(--d-j); stroke-width: 1.05; }
   .z-okl-szkic .detale { opacity: 0; }
   .z-okl-dz:is(:hover, :focus-visible) .tusz path { stroke-dashoffset: 0; opacity: 1; }
   .z-okl-dz:is(:hover, :focus-visible) .detale { opacity: 1; }
-  .z-okl-nazwa { display: block; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(30px, calc(var(--h) * .056), 54px); line-height: 1.05; letter-spacing: -.01em; }
+  /* suma szerokości czterech nazw to około 16 × czcionka: przy węższym oknie czcionka maleje, żeby „Popularyzacja” nie wychodziła poza okno */
+  .z-okl-nazwa { display: block; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(30px, min(calc(var(--h) * .056), calc((100vw - 260px) / 16)), 54px); line-height: 1.05; letter-spacing: -.01em; }
   /* po najechaniu: kreska pod nazwą wysuwa się od lewej i nazwa lekko świeci kolorem działu — kreska (::after) przez
      transform: scaleX, poświata (::before: ten sam tekst, przezroczysty, z cieniem, pod właściwym) przez opacity
      (zlecenie 13, punkt 8: animacje tylko transform i opacity; dawniej background-size i text-shadow) */
@@ -505,6 +506,22 @@
   :root[data-theme="dark"] :is(.z-pasek-jasny, .z-pasek.jasny) nav a[data-dzial]::after { background: var(--d-j); }
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz::before { background: var(--line); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a:focus-visible { outline-color: var(--ink); }
+  /* węższe okna: pasek mieści się w oknie (burger uciekał poza ekran przy 761–971 px, główna przewijała się w poziomie),
+     a nazwa Instytutu nie wystaje z paska. Najpierw znika podpis Wydziału, potem linki: wszystkie są w panelu hamburgera. */
+  @media (min-width: 1024px) and (max-width: 1119px) {
+    .z-marka small { display: none; }
+    .z-pasek nav > a { padding-inline: 9px; }
+    .z-pasek nav > a[data-dzial]::after { left: 9px; }
+  }
+  @media (max-width: 1023px) {
+    .z-pasek nav > a { display: none; }
+    .z-pasek-narz { margin-left: 0; }
+    .z-pasek-narz::before { display: none; }
+    /* okładka: działy ciaśniej, lewa krawędź nazw zostaje na 48 px; w wąskich kolumnach hasło ma do trzech wierszy */
+    .z-okl-dzialy { left: 36px; right: 36px; }
+    .z-okl-dz { padding-inline: 12px; }
+    .z-okl-dz .slot { height: 4.2em; }
+  }
 
 
   /* ---------- podstrona działu: treść bez kafelków (układ ze spisem z prawej — zal-podstrona.css) ---------- */
