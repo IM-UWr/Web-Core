@@ -1,0 +1,53 @@
+---
+// Kroje strony (zlecenie 13, punkt 3): Brygada 1918 (nagłówki) i Manrope (tekst) z pakietów @fontsource-variable, ale tylko
+// potrzebne podzbiory — latin i latin-ext (polskie litery) z wczytywaniem z wyprzedzeniem (preload) oraz greek bez preload
+// (pojedyncze greckie litery w publikacjach i aktualnościach; plik pobiera się tylko na stronach, które go używają).
+// Cyrylica i wietnamski — pominięte (brak w treściach 5.11.2026; gdyby się pojawiły, wezmą je kroje systemowe).
+// Kroje zastępcze („… zast”) z dopasowanymi metrykami: do chwili podmiany tekst ma tę samą szerokość i położenie linii co
+// w docelowym kroju, więc podmiana niczego nie przesuwa. Wartości zmierzone w Edge (Windows) na akapicie polskiego tekstu
+// (400 akapitów i 400 nagłówków ze strony) — opis i pomiar w RAPORT-ZLECENIE-13.md. Na systemach bez Arial / Georgia (np. Android) kroje zastępcze się nie wczytują
+// i zostaje dalsza część listy (--f-text, --f-display w zalozyciele.css).
+import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+import manropeLatinExt from '@fontsource-variable/manrope/files/manrope-latin-ext-wght-normal.woff2?url';
+import manropeGreek from '@fontsource-variable/manrope/files/manrope-greek-wght-normal.woff2?url';
+import brygadaLatin from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-normal.woff2?url';
+import brygadaLatinExt from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-ext-wght-normal.woff2?url';
+import brygadaGreek from '@fontsource-variable/brygada-1918/files/brygada-1918-greek-wght-normal.woff2?url';
+import brygadaLatinI from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-wght-italic.woff2?url';
+import brygadaLatinExtI from '@fontsource-variable/brygada-1918/files/brygada-1918-latin-ext-wght-italic.woff2?url';
+import brygadaGreekI from '@fontsource-variable/brygada-1918/files/brygada-1918-greek-wght-italic.woff2?url';
+
+// zakresy znaków jak w @fontsource-variable (wght.css)
+const LATIN = 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+const LATIN_EXT = 'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF';
+const GREEK = 'U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF';
+
+const kroj = (rodzina: string, plik: string, zakres: string, waga: string, styl = 'normal') =>
+  `@font-face{font-family:'${rodzina}';font-style:${styl};font-display:swap;font-weight:${waga};` +
+  `src:url(${plik}) format('woff2-variations');unicode-range:${zakres}}`;
+// kroje zastępcze: size-adjust z szerokości akapitu, ascent/descent/line-gap tak, żeby po size-adjust dały metryki
+// docelowego kroju (wzór jak w next/font i fontaine: wartość / size-adjust); tylko w zakresach docelowego kroju — znaki
+// spoza nich (strzałki →, symbole) biorą dalsze kroje z listy, jak przed zmianą
+const zastepczy = (rodzina: string, zrodla: string, sa: number, asc: number, desc: number, gap: number) =>
+  `@font-face{font-family:'${rodzina}';src:${zrodla};size-adjust:${sa}%;ascent-override:${asc}%;descent-override:${desc}%;` +
+  `line-gap-override:${gap}%;unicode-range:${LATIN},${LATIN_EXT},${GREEK}}`;
+
+const css = [
+  kroj('Manrope Variable', manropeLatin, LATIN, '200 800'),
+  kroj('Manrope Variable', manropeLatinExt, LATIN_EXT, '200 800'),
+  kroj('Manrope Variable', manropeGreek, GREEK, '200 800'),
+  kroj('Brygada 1918 Variable', brygadaLatin, LATIN, '400 700'),
+  kroj('Brygada 1918 Variable', brygadaLatinExt, LATIN_EXT, '400 700'),
+  kroj('Brygada 1918 Variable', brygadaGreek, GREEK, '400 700'),
+  kroj('Brygada 1918 Variable', brygadaLatinI, LATIN, '400 700', 'italic'),
+  kroj('Brygada 1918 Variable', brygadaLatinExtI, LATIN_EXT, '400 700', 'italic'),
+  kroj('Brygada 1918 Variable', brygadaGreekI, GREEK, '400 700', 'italic'),
+  zastepczy('Manrope zast', "local('Arial'),local('ArialMT')", 102.6, 104.3, 29.2, 0),
+  zastepczy('Brygada zast', "local('Georgia')", 105.5, 87.2, 23.7, 0),
+].join('');
+---
+<link rel="preload" as="font" type="font/woff2" href={brygadaLatin} crossorigin />
+<link rel="preload" as="font" type="font/woff2" href={brygadaLatinExt} crossorigin />
+<link rel="preload" as="font" type="font/woff2" href={manropeLatin} crossorigin />
+<link rel="preload" as="font" type="font/woff2" href={manropeLatinExt} crossorigin />
+<style is:inline set:html={css}></style>

@@ -49,7 +49,7 @@
   /* ---------- tekst działu i „W skrócie” ---------- */
   .z-dz-tresc { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 72px; padding: 30px var(--marg) 50px; }
   .z-dz-tresc h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 34px; color: var(--ink); }
-  .z-dz-tresc p { margin: 0 0 14px; max-width: 70ch; font-size: 17px; line-height: 1.68; color: var(--text); }
+  .z-dz-tresc p { margin: 0 0 14px; max-width: 42.7em; font-size: 17px; line-height: 1.68; color: var(--text); }
   /* lead: ten sam stopień i interlinia co reszta tekstu, wyróżniony tylko kolorem nagłówków (zlecenie 11, zalecenie 11) */
   .z-dz-tresc p.wst { color: var(--ink); }
   .z-dz-skrot { align-self: start; border-top: 2px solid var(--rule); padding-top: 8px; }

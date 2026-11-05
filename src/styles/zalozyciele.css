@@ -17,8 +17,8 @@
   /* kolor mocny działu (zlecenie 11, zalecenie 16): jasny (-j) w OKLCH — nasycenie ×1,45, jasność +0,02 (najwyżej 0,86), przycięty
      do sRGB; szkic patrona i podpis na banerze działu. Paleta „Lazur i malina” (na później): #faa401, #03da91, #4cc7ff, #ff8fc3 */
   --instytut-jm: #ffa625; --nauka-jm: #0aceba; --studia-jm: #ff7d5b; --popularyzacja-jm: #af97ff;
-  --f-display: 'Brygada 1918 Variable', 'Brygada 1918', 'Iowan Old Style', Georgia, serif;
-  --f-text: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-display: 'Brygada 1918 Variable', 'Brygada zast', 'Brygada 1918', 'Iowan Old Style', Georgia, serif;
+  --f-text: 'Manrope Variable', 'Manrope zast', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --kol: 1240px;
   --gora: 66px;
   /* kolory poza działami: neutralnie (bursztyn jest tylko kolorem Instytutu) */
@@ -459,7 +459,7 @@
   .z-pd-tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
   .z-pd-tresc h2 { margin: 0 0 16px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -.005em; color: var(--ink); }
   .z-pd-tresc .wst { margin: 0 0 26px; font-size: 17px; color: var(--text); }
-  .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 72ch; }
+  .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 43.92em; }
   .z-pd-tresc a { color: var(--d-a); }
   .z-nast { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
     margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--rule); }

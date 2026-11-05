@@ -1,6 +1,7 @@
 ---
 // Wspólny szkielet każdej strony: <head>, nagłówek, stopka.
-import '@fontsource-variable/manrope';
+// Kroje (Brygada 1918, Manrope): tylko potrzebne podzbiory, preload i kroje zastępcze z dopasowanymi metrykami — Fonty.astro
+// (zlecenie 13, punkt 3; dawniej import całych arkuszy @fontsource-variable).
 import 'katex/dist/katex.min.css';
 // Podstawy (tokeny, typografia, .prose) i resztki dawnego wyglądu, które nowy wygląd jeszcze wykorzystuje (pliki przycięte
 // do reguł trafiających w elementy stron — zlecenie 12, etap 4; opis w nagłówkach plików).
@@ -13,11 +14,9 @@ import '../styles/portal.css';
 import '../styles/telefon.css';
 // Cała strona: przejścia między stronami i łagodne wejście treści (bez ruchu przy „ogranicz ruch”).
 import '../styles/przejscia.css';
-// Kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource), paleta „Atramenty”,
+// Kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource; Fonty.astro), paleta „Atramenty”,
 // pasek menu, nagłówki, stopka (src/styles/zalozyciele.css, src/components/zal/), szablon podstrony i spis (zal-podstrona.css),
 // wzorzec treści (zal-tresc.css; zlecenie 11, zalecenie 14), telefon ≤ 760 px (zal-telefon.css i końce plików bloków).
-import '@fontsource-variable/brygada-1918/wght.css';
-import '@fontsource-variable/brygada-1918/wght-italic.css';
 import '../styles/zalozyciele.css';
 import '../styles/zal-przejscia.css';
 import '../styles/zal-podstrona.css';
@@ -28,6 +27,7 @@ import StopkaZ from '../components/zal/StopkaZ.astro';
 import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 import { dzialZeSciezki } from '../lib/patroni';
 import Naglowek from '../components/Naglowek.astro';
+import Fonty from '../components/Fonty.astro';
 import { u, absolute, stripBase } from '../lib/url';
 import { t, jezykZeSciezki, drugiJezyk } from '../lib/i18n';
 import ustawienia from '../data/ustawienia.json';
@@ -83,6 +83,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pelnyTytul}</title>
+    <Fonty />
     <meta name="description" content={opisMeta} />
     {wIndeksie && <link rel="canonical" href={kanoniczny} />}
     {(!wIndeksie || testowa) && <meta name="robots" content="noindex, nofollow" />}
