@@ -8,6 +8,7 @@
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
+import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { t } from '../lib/i18n';
 import { longWithDay, short, dayNum, monthShort, parse, type Lang } from '../lib/daty';
@@ -50,7 +51,7 @@ const typPliku = (a: string) => {
     </div>
     {d.zdjecie && (
       <figure class="foto">
-        <img src={u(d.zdjecie)} alt={opisZdjecia} />
+        <ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes="(min-width: 780px) 720px, calc(100vw - 32px)" />
         {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
       </figure>
     )}
@@ -79,7 +80,7 @@ const typPliku = (a: string) => {
   .termin .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
   .termin dl { padding-top: 2px; font-size: 15.5px; }
   .foto { margin: 28px 0 0; max-width: 720px; }
-  .foto img { display: block; width: 100%; height: auto; }
+  .foto :global(img) { display: block; width: 100%; height: auto; }
   .foto figcaption { margin-top: 6px; font-size: 13.5px; color: var(--muted); }
   .opis { margin-top: 24px; }
   .opis > :global(:last-child) { margin-bottom: 0; }

@@ -1,6 +1,8 @@
 ---
 // Osoba w schemacie Władz (komputer): zdjęcie, rola, imię i nazwisko (link do strony domowej), zakład, zakres, kontakt.
 import { u, isExternal } from '../../lib/url';
+import ZdjecieZ from '../ZdjecieZ.astro';
+import { rozmiarPola } from '../../lib/zdjecia';
 import { wJezyku } from '../../lib/i18n';
 import type { Lang } from '../../lib/daty';
 
@@ -14,7 +16,8 @@ const mail = (e: string) => esc(e).replace('@', '<wbr>@');
 const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
 ---
 <div class:list={['z-os', klasa]}>
-  {o.zdjecie && <img class="fot" src={u(o.zdjecie)} alt="" loading="lazy" decoding="async" />}
+  {/* największe pole zdjęcia w schemacie Władz: 120 × 150 (dyrektor; zalozyciele-strony.css) */}
+  {o.zdjecie && <ZdjecieZ class="fot" src={o.zdjecie} sizes={rozmiarPola([null, 120, 150])} />}
   {o.rola && <div class="rola">{o.rola}</div>}
   <div class="imie">{o.strona ? <a href={o.strona}>{o.nazwa}</a> : o.nazwa}</div>
   {o.zaklad && <div class="zakl"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></div>}

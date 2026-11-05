@@ -1,0 +1,53 @@
+---
+// Zdjęcie z public/pliki przez astro:assets (zlecenie 13, punkty 5 i 6): <picture> z AVIF i WebP w kilku szerokościach
+// (srcset; przeglądarka bierze najmniejsze wystarczające do `sizes` — na telefonie mniejsze pliki) i <img> z width/height
+// (miejsce zarezerwowane, bez skoku po wczytaniu). Element <picture> ma display: contents, więc dotychczasowe style
+// (np. `.z-foto img`, `.z-okl-foto`) działają bez zmian.
+// zastepczy — malutka rozmyta wersja w linii (ok. 1 KB, src/lib/zdjecia.ts) pod pełnym zdjęciem, które łagodnie na nią
+//   wchodzi (0,3 s, tylko z JS; bez JS — od razu pełne). Banery i okładka.
+// Plik spoza public/pliki albo zewnętrzny — zwykły <img> jak dotąd.
+import { Picture } from 'astro:assets';
+import { zdjecie, zastepczy as malutka } from '../lib/zdjecia';
+import { u } from '../lib/url';
+
+interface Props {
+  src: string;
+  alt?: string;
+  // szerokość wyświetlania (atrybut sizes), np. '(min-width: 761px) 64vw, 100vw'; albo funkcja proporcji zdjęcia
+  // (szerokość / wysokość) — dla zdjęć kadrowanych przez object-fit: cover, gdzie potrzebna szerokość zależy od wysokości pola
+  sizes: string | ((proporcje: number) => string);
+  // szerokości w srcset (px); większe od pliku są pomijane (zamiast nich sam plik). Domyślnie: przy sizes tylko w px
+  // (miniatury) — 1×, 2× i 3× każdej szerokości z sizes (gęstości ekranów), w pozostałych — szereg 400–3200
+  szerokosci?: number[];
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  decoding?: 'async' | 'sync' | 'auto';
+  class?: string;
+  style?: string;
+  zastepczy?: boolean;
+  // jakość AVIF/WebP (1–100); domyślne 50 z sharp gubi drobne szczegóły (liście, światła na nocnym zdjęciu okładki) —
+  // 60 daje obraz nieodróżnialny od JPG przy ok. 40% jego wagi (pomiar 5.11.2026: kampus-zmierzch 1280 px — 213 KB, JPG 2400 px — 561 KB)
+  jakosc?: number;
+}
+const { src, alt = '', sizes: rozmiar, szerokosci: szer, loading = 'lazy', fetchpriority, decoding = 'async', class: klasa, style, zastepczy = false, jakosc = 60 } = Astro.props;
+const meta = await zdjecie(src);
+const sizes = typeof rozmiar === 'function' ? rozmiar(meta ? meta.width / meta.height : 1.5) : rozmiar;
+const piks = /\d(vw|vh|svh|%|em|rem)/.test(sizes) ? [] : [...sizes.matchAll(/(\d+(?:\.\d+)?)px/g)].map((m) => +m[1]);
+const szerokosci = szer ?? (piks.length ? piks.flatMap((x) => [1, 2, 3].map((k) => Math.ceil(x * k))) : [400, 640, 960, 1280, 1600, 1920, 2560, 3200]);
+// szerokości rosnąco, bez prawie powtórzonych (różnica poniżej 10% — np. 240 i 243 z dwóch pól miniatury); sam plik na końcu
+// tylko wtedy, gdy któraś szerokość go przekracza (miniatura nie potrzebuje pełnego zdjęcia)
+const mniejsze = meta ? szerokosci.filter((w) => w < meta.width).sort((a, b) => a - b) : [];
+const widths = meta
+  ? [...mniejsze, ...(mniejsze.length < szerokosci.length || !mniejsze.length ? [meta.width] : [])]
+      .filter((w, i, t) => i === t.length - 1 || !t.slice(i + 1).some((v) => v <= w * 1.1))
+  : [];
+const maly = zastepczy && meta ? await malutka(src) : undefined;
+---
+{maly && <img class:list={['z-lqip', klasa]} src={maly} alt="" aria-hidden="true" style={style} decoding="sync" />}
+{meta ? (
+  <Picture src={meta} alt={alt} formats={['avif', 'webp']} widths={widths} sizes={sizes} quality={jakosc} loading={loading} decoding={decoding}
+    fetchpriority={fetchpriority} class:list={[klasa, maly && 'z-pelne']} style={style} pictureAttributes={{ class: 'z-obraz' }}
+    {...(maly ? { onload: "this.classList.add('z-wczytane')" } : {})} />
+) : (
+  <img src={u(src)} alt={alt} loading={loading} decoding={decoding} fetchpriority={fetchpriority} class={klasa} style={style} />
+)}

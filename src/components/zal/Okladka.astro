@@ -11,6 +11,7 @@
 //   zalecenie 15); okładka ↔ Szybki dostęp bez zatrzymywania w połowie (src/scripts/zal/przejazd.ts, zalecenie 20).
 // Telefon (≤ 760 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez skosu.
 import Szkic from './Szkic.astro';
+import ZdjecieZ from '../ZdjecieZ.astro';
 import Flaga from './Flaga.astro';
 import PanelMenu from './PanelMenu.astro';
 import ustawienia from '../../data/ustawienia.json';
@@ -78,9 +79,16 @@ const ULOZ = `(function(ok){var S=.32;function uloz(){if(!ok.offsetHeight||match
   `ok.style.setProperty('--skos','linear-gradient('+kat.toFixed(2)+'deg, '+g+' / .97) 0px, '+k.map(function(p){return g+' / '+p[1]+') '+(t1+p[0]*zanik).toFixed(1)+'px'}).join(', ')+')');` +
   `ok.style.setProperty('--foto-x',Math.max(0,x0-150)+'px');ok.classList.add('z-ulozona')}` +
   `uloz();if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
+
+// szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6): zdjęcie wypełnia okładkę przez object-fit: cover, a okładka jest
+// wyższa niż szeroka w proporcjach zdjęcia (p), więc liczy się wysokość — na komputerze max(600px, 100svh), na telefonie
+// zdjęcie zajmuje ok. 52% wysokości ekranu (zal-telefon.css)
+const rozmiarOkl = (p: number) =>
+  `(min-width: 761px) max(85vw, ${Math.ceil(600 * p)}px, ${Math.ceil(100 * p)}vh), max(100vw, ${Math.ceil(52 * p)}vh)`;
 ---
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
-  {baner.zdjecie && <img class="z-okl-foto" src={u(baner.zdjecie)} alt={wybierz(baner, 'opis', lang) || ''} decoding="async" fetchpriority="high" />}
+  {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
+  {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy />}
   {/* zalecenie 1: po najechaniu na dział zdjęcie lekko barwi się na jasny kolor działu (okladka.ts) */}
   <span class="z-barwa" aria-hidden="true"></span>
   <div class="z-skos" aria-hidden="true"></div>

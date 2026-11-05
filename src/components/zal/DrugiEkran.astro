@@ -11,6 +11,8 @@
 // Telefon (≤ 760 px): kolumny jedna pod drugą, po 3 pozycje, „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
 import '../../styles/zalozyciele-strony.css';
 import Szkic from './Szkic.astro';
+import ZdjecieZ from '../ZdjecieZ.astro';
+import { rozmiarPola } from '../../lib/zdjecia';
 import ustawienia from '../../data/ustawienia.json';
 import skroty from '../../data/skroty.json';
 import plan from '../../data/plan/plan.json';
@@ -152,7 +154,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
             <span class="t">{o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
           </span>
           {'min' in k && (o.min
-            ? <span class="min"><img src={u(o.min)} alt="" loading="lazy" decoding="async" /></span>
+            ? <span class="min"><ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 72, 54])} /></span>
             : <span class="min zastepcza">{o.dzial && <Szkic dzial={o.dzial} rodzaj="sygnet" />}</span>)}
         </a>
       ));

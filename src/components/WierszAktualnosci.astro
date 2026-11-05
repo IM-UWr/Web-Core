@@ -6,6 +6,8 @@
 // Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px, węższa kolumna daty i mniejsza miniatura).
 // data-wa, data-rodzaj, data-dla — filtr i szukanie listy (skrypt w ListaAktualnosci.astro).
 import { u, isExternal } from '../lib/url';
+import ZdjecieZ from './ZdjecieZ.astro';
+import { rozmiarPola } from '../lib/zdjecia';
 import { wJezyku, RODZAJE, odbiorcyMalymi } from '../lib/i18n';
 import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
 import type { PozycjaListy } from '../lib/tresci';
@@ -23,7 +25,7 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
     {p.wydarzenie && <p class="wa-kiedy"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</p>}
     {p.zajawka && <p class="wa-zaj">{p.zajawka}</p>}
   </div>
-  {p.zdjecie && <span class="wa-fot" aria-hidden="true"><img src={u(p.zdjecie)} alt="" loading="lazy" /></span>}
+  {p.zdjecie && <span class="wa-fot" aria-hidden="true"><ZdjecieZ src={p.zdjecie} sizes={rozmiarPola(['(max-width: 760px)', 54, 54], [null, 120, 80])} /></span>}
 </article>
 
 <style>
@@ -43,7 +45,7 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
   .wa .wa-kiedy { margin-bottom: 2px; font-size: 14px; color: var(--muted); }
   .wa .wa-kiedy strong { font-weight: 700; color: var(--ink); }
   .wa-fot { display: block; width: 120px; aspect-ratio: 3 / 2; overflow: hidden; background: var(--d-t); }
-  .wa-fot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .wa-fot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
 
   @media (max-width: 760px) {
     /* miniatura pod datą (kolumna daty), żeby tekst miał całą szerokość */

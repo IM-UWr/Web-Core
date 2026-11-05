@@ -8,6 +8,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
+import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku } from '../lib/i18n';
 import { slugOf } from '../lib/tresci';
@@ -44,7 +45,7 @@ const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: z
     {zajawka && <p class="wst">{zajawka}</p>}
     {d.obraz && (
       <figure class="ww-foto">
-        <img src={u(d.obraz)} alt={opisObrazu} />
+        <ZdjecieZ src={d.obraz} alt={opisObrazu} sizes="(min-width: 820px) 760px, calc(100vw - 32px)" loading="eager" />
         {opisObrazu && <figcaption>{opisObrazu}</figcaption>}
       </figure>
     )}
@@ -69,7 +70,7 @@ const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: z
   .ww-meta a:hover { text-decoration: underline; text-underline-offset: 3px; }
   /* zdjęcie pozycji: bez zaokrągleń i cieni, podpis przygaszony */
   .ww-foto { margin: 6px 0 22px; }
-  .ww-foto img { display: block; width: 100%; max-width: 760px; height: auto; }
+  .ww-foto :global(img) { display: block; width: 100%; max-width: 760px; height: auto; }
   .ww-foto figcaption { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   /* treść z Markdown: listy jak lista z kreskami wzorca (ul.kreski), tabele jak tabela wzorca */
   .ww-tresc :global(ul) { list-style: none; max-width: 42.7em; margin: 0 0 16px; padding: 0; }

@@ -8,6 +8,7 @@ import TrescDzialu from '../components/zal/TrescDzialu.astro';
 import Sekcja from '../components/zal/dzial/Sekcja.astro';
 import Kontakt from '../components/zal/dzial/Kontakt.astro';
 import Szkic from '../components/zal/Szkic.astro';
+import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, bezSierotek } from '../lib/i18n';
 import { long, type Lang } from '../lib/daty';
@@ -19,6 +20,12 @@ const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed } = await daneDzialuInstytut(lang);
+// zdjęcie karty sukcesu (pole 3 : 2, object-fit: cover): na komputerze trzy kolumny po ok. 390 px, na telefonie jedna kolumna;
+// zdjęcie szersze niż 3 : 2 wypełnia pole wysokością, więc potrzebna szerokość rośnie o p / 1,5 (zlecenie 13, punkt 6)
+const kartaSukcesu = (p: number) => {
+  const k = Math.max(1, p / 1.5);
+  return `(max-width: 760px) calc((100vw - 32px) * ${k.toFixed(3)}), ${Math.ceil(390 * k)}px`;
+};
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
@@ -38,7 +45,7 @@ const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukce
             return (
               <article class="z-dz-klik">
                 <div class="z-dz-fot">
-                  {a.data.zdjecie ? <img src={u(a.data.zdjecie)} alt="" loading="lazy" decoding="async" /> : <Szkic dzial="instytut" rodzaj="sygnet" />}
+                  {a.data.zdjecie ? <ZdjecieZ src={a.data.zdjecie} sizes={kartaSukcesu} /> : <Szkic dzial="instytut" rodzaj="sygnet" />}
                 </div>
                 <time datetime={a.data.data.slice(0, 10)}>{long(a.data.data, lang, false)}</time>
                 <h3><a href={href(`/aktualnosci/${slugOf(a.id)}`)}>{(lang === 'en' && a.data.tytul_en) || a.data.tytul}</a></h3>

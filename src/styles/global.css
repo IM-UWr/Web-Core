@@ -94,6 +94,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 img { max-width: 100%; height: auto; }
+/* zdjęcia z astro:assets (src/components/ZdjecieZ.astro; zlecenie 13, punkt 6): <picture> nie tworzy własnego pudełka, więc
+   style dla img działają jak dotąd; pełne zdjęcie łagodnie wchodzi na malutką rozmytą wersję (tylko z JS) */
+picture.z-obraz { display: contents; }
+/* <source> bez pudełka — inaczej w siatce (np. wiersz z miniaturą) zajmowałby komórkę zamiast zdjęcia */
+picture.z-obraz > source { display: none; }
+html.js img.z-pelne:not(.z-wczytane) { opacity: 0; }
+img.z-pelne { transition: opacity .3s cubic-bezier(.22, .8, .2, 1); }
+@media (prefers-reduced-motion: reduce) { img.z-pelne { transition: none; } }
 a { color: var(--ink); }
 a:hover { color: var(--primary); }
 :root[data-theme='dark'] a:hover { color: var(--accent); }

@@ -10,6 +10,8 @@
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); własne style (na końcu pliku)
 // tylko dla wierszy z datą. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Podstrona from '../components/zal/Podstrona.astro';
+import ZdjecieZ from '../components/ZdjecieZ.astro';
+import { rozmiarPola } from '../lib/zdjecia';
 import dzialNauka from '../data/dzialy/nauka.json';
 import { u, isExternal } from '../lib/url';
 import { odmiana, wJezyku, wybierz } from '../lib/i18n';
@@ -59,7 +61,7 @@ const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
                 <h4><a href={href(a)}>{tytul(a)}</a></h4>
                 {zajawka(a) && <p>{zajawka(a)}</p>}
               </div>
-              {zdjecie(a) && <img class="min" src={zdjecie(a)} alt="" loading="lazy" />}
+              {a.data.zdjecie && <ZdjecieZ class="min" src={a.data.zdjecie} sizes={rozmiarPola([null, 112, 112])} />}
             </li>
           ))}
         </ul>
@@ -81,7 +83,7 @@ const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
   .wiersz p { margin: 0; max-width: 42.7em; font-size: 15.5px; line-height: 1.55; color: var(--text); }
   .wiersz h4 { margin: 0 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .wiersz h4 a { color: inherit; text-decoration: none; }
-  .wiersz .min { display: block; width: 112px; height: 112px; object-fit: cover; object-position: center top; background: var(--d-t); }
+  .wiersz :global(.min) { display: block; width: 112px; height: 112px; object-fit: cover; object-position: center top; background: var(--d-t); }
   .pusto { font-style: italic; color: var(--muted); }
   /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
   .klik { position: relative; }
@@ -100,6 +102,6 @@ const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
     .wiersz h4 { font-size: 18px; }
     .wiersz p { font-size: 15px; }
-    .wiersz .min { display: none; }
+    .wiersz :global(.min) { display: none; }
   }
 </style>

@@ -13,6 +13,7 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import WierszWydarzenia from '../components/WierszWydarzenia.astro';
 import Galeria from '../components/Galeria.tsx';
+import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, type Lang } from '../lib/daty';
@@ -56,7 +57,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
 
     {d.zdjecie && (
       <figure class="akt-fot">
-        <img src={u(d.zdjecie)} alt={opisZdjecia} />
+        <ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes="(min-width: 860px) 800px, calc(100vw - 32px)" loading="eager" />
         {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
       </figure>
     )}
@@ -130,7 +131,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   .akt-wyd .akt-stan { margin: 2px 0 0; color: var(--muted); }
 
   .akt-fot { margin: 0 0 22px; max-width: 800px; }
-  .akt-fot img { display: block; width: 100%; height: auto; }
+  .akt-fot :global(img) { display: block; width: 100%; height: auto; }
   .akt-fot figcaption { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   .akt-uwaga { font-style: italic; color: var(--muted); }
   .akt-galeria :global(.gallery button) { border-radius: 0; }
