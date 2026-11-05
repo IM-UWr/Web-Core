@@ -1744,10 +1744,10 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     <div class="grupa" id="wybor-panelu"><span>Hamburger</span><div class="seg" data-ustaw="panel">
       <button type="button" data-v="skrot" aria-pressed="false">Skrót (dotąd)</button>
       <button type="button" data-v="bez" aria-pressed="false">Bez nagłówków</button>
-      <button type="button" data-v="male" aria-pressed="true">Małe nagłówki</button>
+      <button type="button" data-v="male" aria-pressed="false">Małe nagłówki</button>
       <button type="button" data-v="kolor" aria-pressed="false">W kolorze działu</button>
       <button type="button" data-v="obok" aria-pressed="false">Nagłówek z lewej</button>
-      <button type="button" data-v="zwijane" aria-pressed="false">Zwijane działy</button>
+      <button type="button" data-v="zwijane" aria-pressed="true">Zwijane działy ✓</button>
     </div></div>
     <div class="grupa" id="wybor-wyr"><span>Pierwsza aktualność</span><div class="seg" data-ustaw="wyr">
       <button type="button" id="wy-nie" data-v="nie" aria-pressed="true">Zwykła</button>
@@ -3010,7 +3010,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     h.appendChild(m); h.querySelector('.pasek-burger').setAttribute('aria-controls', m.id);
   });
   /* panel z pełnymi listami (5.11, 12:00): grupy jak w menu działu (IN_GRUPY), linki poza stronę z ↗ (zalecenie 23) */
-  let panelNagl = 'male';
+  let panelNagl = 'zwijane'; /* decyzja 5.11, 12:05: „Hamburger na zwijanych działach. Wygląda bardzo dobrze” */
   const PANEL_ZEW = new Set(['Biblioteka', 'Rada Dyscypliny Matematyka']);
   const PANEL_SKROT = { instytut: ['Władze', 'Pracownicy', 'Struktura i zakłady', 'Kontakt', 'Infrastruktura', 'Biblioteka', 'Warto wiedzieć'], nauka: ['Seminaria', 'Konferencje', 'Obrony doktorskie', 'Projekty i granty', 'Publikacje', 'Sukcesy', 'Szkoła doktorska'], studia: ['Kierunki', 'Specjalności', 'Plan zajęć', 'Rok akademicki', 'Sprawy studenckie', 'MOST'], popularyzacja: ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich'] };
   const panelLink = (x) => { const n = x.split('|')[0].replace(/\s*↗$/, ''), zew = x.endsWith('↗') || PANEL_ZEW.has(n); return `<li><a href="#">${n}${zew ? '<span class="zew" aria-hidden="true">&nbsp;↗</span><span class="sr-only"> (inna strona)</span>' : ''}</a></li>`; };
