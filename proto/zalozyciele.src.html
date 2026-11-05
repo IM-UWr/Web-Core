@@ -645,6 +645,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-b4 .szkic { top: calc(50% - 138px + var(--gora) / 2); }
 /* ciemna plama pod szkicem patrona (5.11, 01:37, wariant A): szkic odcina się od zdjęcia, np. od tłumu na Nauce */
 .in-b4 .szkic::before { content: ''; position: absolute; inset: -12% -22%; z-index: -1; background: radial-gradient(closest-side, rgb(13 24 48 / .86) 0, rgb(13 24 48 / .72) 60%, rgb(13 24 48 / 0) 100%); }
+/* Studia (5.11, 01:42): zdjęcie przypięte do szkicu, nie do szerokości okna: twarz Knastera wypada między głowami w ławkach na każdym ekranie */
+[data-dzial="studia"] .in-b4 .in-foto { left: 0; }
+[data-dzial="studia"] .in-b4 .in-foto img { --sz: max(1454px, calc((var(--marg) + 155px) / .4025)); position: absolute; top: calc(50% - .2951 * var(--sz)); right: calc(var(--marg) + 155px - .5575 * var(--sz)); width: var(--sz); max-width: none; height: calc(.5631 * var(--sz)); object-fit: fill; }
+/* podstrony Studiów: same tablice, kadr bez ściany i portretu */
+[data-dzial="studia"] .pd-b.pd-foto .in-foto img { position: absolute; left: 0; top: calc(50% - 18.55cqw); width: 122cqw; max-width: none; height: 68.7cqw; object-fit: fill; }
 .in-tytul .lead { display: none; }
 .z-opisem .in-tytul .lead { display: block; }
 .in-tytul .lead { margin: 10px 0 0; max-width: 540px; font-size: 15.5px; line-height: 1.55; color: var(--na-ciemnym-2); }
@@ -2559,7 +2564,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       </div></section>`;
   }
   const IN_FOTO = { instytut: ['{{INSTNAG}}', 'Gmach Instytutu Matematycznego', '50% 42%'], nauka: ['{{NAUKANAG}}', 'Sala wykładowa pełna słuchaczy', '50% 30%', 'grayscale(1) contrast(1.15) brightness(1.45)'],
-    studia: ['{{STUDIANAG}}', 'Studenci na zajęciach', '50% 40%', 'grayscale(1) contrast(1.15) brightness(1.25)'],
+    studia: ['{{STUDIANAG}}', 'Sala wykładowa HS: wykład przy tablicach, studenci w ławkach od tyłu', '50% 44%'],
     popularyzacja: ['{{POPNAG}}', 'Wydarzenie popularyzatorskie', '50% 40%'] };
   const IN_GRUPY = {
     instytut: [['Ludzie', ['Władze', 'Pracownicy']], ['Organizacja', ['Struktura i zakłady', 'Kontakt']], ['Więcej', ['Infrastruktura informatyczna', 'Biblioteka']]],
