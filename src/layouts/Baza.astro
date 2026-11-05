@@ -104,6 +104,8 @@ const dzialStrony = dzialZeSciezki(sciezka);
       (function () {
         var d = document.documentElement, m;
         d.classList.add('js');
+        // stan :active także po dotknięciu na iOS (bez nasłuchu touchstart Safari go nie zgłasza; zlecenie 13, punkt 10)
+        document.addEventListener('touchstart', function () {}, { passive: true });
         try { m = localStorage.getItem('motyw'); } catch (e) {}
         // Domyślnie tryb jasny (także na telefonach z ciemnym motywem systemu); ciemny tylko po wybraniu przyciskiem.
         if (m !== 'dark' && m !== 'light') m = 'light';
