@@ -616,9 +616,10 @@ function rysCzebyszew() {
 /* 23. Dyrektor: cztery równe koła wewnątrz okręgu i koło w środku, wszystkie styczne: r = R/(1+√2) */
 function rysKola() {
   const c = [100, 129], R = 86, r = R / (1 + Math.SQRT2), d = R - r, w = (Math.SQRT2 - 1) * r, kola = [];
-  const out = [{ d: okrag(c, R), gruba: true }];
-  for (let k = 0; k < 4; k++) { const a = PI / 4 + k * PI / 2; kola.push([c[0] + d * Math.cos(a), c[1] - d * Math.sin(a)]); out.push({ d: okrag(kola[k], r) }); }
-  out.push({ d: okrag(c, w), gruba: true });
+  const kolo = (o, q) => { const q1 = f1(q); return `M${f1(o[0] - q1)},${f1(o[1])} a${q1},${q1} 0 1,0 ${f1(2 * q1)},0 a${q1},${q1} 0 1,0 ${f1(-2 * q1)},0`; }; // promień i cięciwa z tego samego zaokrąglenia, żeby łuki były prawdziwymi półokręgami
+  const out = [{ d: kolo(c, R), gruba: true }];
+  for (let k = 0; k < 4; k++) { const a = PI / 4 + k * PI / 2; kola.push([c[0] + d * Math.cos(a), c[1] - d * Math.sin(a)]); out.push({ d: kolo(kola[k], r) }); }
+  out.push({ d: kolo(c, w), gruba: true });
   const st = [];
   kola.forEach((k, i) => { const m = kola[(i + 1) % 4]; st.push(dist(k, m) - 2 * r); out.push({ d: kropka([(k[0] + m[0]) / 2, (k[1] + m[1]) / 2]) }); });
   kola.forEach((k) => st.push(dist(k, c) - (r + w), R - dist(k, c) - r));

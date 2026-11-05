@@ -537,7 +537,247 @@ function znakPrzedluzenie() {
   return { sciezki: out, opis: `poziom 3 zbioru Cantora; h = [${h.join(', ')}]; zadane na kawałkach 0, 3, 5 (grubo), reszta to przedłużenie` };
 }
 
+/* ================ Dopisane 5.11: rysunki nowych ciekawostek ================ */
+const PI = Math.PI;
+function rdp(p, eps) { // uproszczenie łamanej (Ramer–Douglas–Peucker)
+  if (p.length < 3) return p.slice();
+  const a = p[0], b = p[p.length - 1], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+  let iM = 0, dM = -1;
+  for (let i = 1; i < p.length - 1; i++) {
+    const d = L > 1e-9 ? Math.abs(dy * (p[i][0] - a[0]) - dx * (p[i][1] - a[1])) / L : Math.hypot(p[i][0] - a[0], p[i][1] - a[1]);
+    if (d > dM) { dM = d; iM = i; }
+  }
+  if (dM <= eps) return [a, b];
+  return rdp(p.slice(0, iM + 1), eps).slice(0, -1).concat(rdp(p.slice(iM), eps));
+}
+const linia = (P, gruba = false, eps = 0.12) => new Sciezka(gruba).lamana(rdp(P, eps)).koniec();
+const petla = (P, gruba = false, eps = 0.12) => linia(P.concat([P[0]]), gruba, eps);
+const kolo = (c, r, gruba = false, n = 180) => petla(Array.from({ length: n }, (_, i) => { const a = 2 * PI * i / n; return [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]; }), gruba, 0.08);
+
+/* 15. Problem Knastera–Kuratowskiego (1920): trzy typy jednorodnych kontinuów płaskich (Hoehn, Oversteegen 2016), schematycznie */
+function znakJednorodne() {
+  const g = (t) => t <= 0.4 ? 1.5 * t : t <= 0.6 ? 0.6 - (t - 0.4) : 0.4 + 1.5 * (t - 0.6); // przekształcenie „pokręcone”: w górę do 0,6, w dół do 0,4, w górę do 1
+  const gn = (t, n) => { let x = t; for (let i = 0; i < n; i++) x = g(x); return x; };
+  const out = [];
+  // 1. okrąg
+  out.push(kolo([58, 84], 41, true));
+  // 2. pseudołuk: wykres trzykrotnego złożenia g
+  const N = 1600, x0 = 113, y0 = 124, B = 75;
+  const wyk = Array.from({ length: N + 1 }, (_, i) => { const t = i / N; return [x0 + B * t, y0 - 80 * gn(t, 3)]; });
+  out.push(linia(wyk, true, 0.05));
+  const ram = new Sciezka(false); ram.M(x0, y0 - 80).L(x0 + B, y0 - 80).L(x0 + B, y0).L(x0, y0).L(x0, y0 - 80); out.push(ram.koniec());
+  // 3. okrąg pseudołuków: ten sam wzorzec zawinięty dookoła pierścienia
+  const c = [100, 173], R0 = 38, D = 7.5, ile = 12, wz = [];
+  for (let k = 0; k < ile; k++) {
+    for (let i = 0; i < 90; i++) {
+      const t = i / 90, a = 2 * PI * (k + gn(t, 2)) / ile - PI / 2, r = R0 + D * Math.sin(2 * PI * t);
+      wz.push([c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]);
+    }
+  }
+  out.push(petla(wz, true, 0.08));
+  out.push(kolo(c, R0 - D - 3.5), kolo(c, R0 + D + 3.5));
+  const nadal = [0, 0.4, 0.6, 1].map((t) => g(t));
+  return { sciezki: out, opis: `okrąg; wykres złożenia g³ (g przyjmuje w 0; 0,4; 0,6; 1 wartości ${nadal.map((v) => v.toFixed(1)).join('; ')}, ${3 ** 3} monotonicznych kawałków); ten sam wzór zawinięty ${ile} razy dookoła pierścienia` };
+}
+
+/* 16. Podkowa Smale'a: F na kwadracie i na czapkach; obraz poziomego odcinka to coraz dłuższy wąż, którego poziomy leżą w zbiorze Cantora */
+function znakPodkowa() {
+  const F = (p) => {
+    const [x, y] = p;
+    if (x < 0) return [x, y / 3];
+    if (x <= 1 / 3) return [3 * x, y / 3];
+    if (x < 2 / 3) { const u = 3 * (x - 1 / 3), r = 0.5 - y / 3, a = -PI / 2 + PI * u; return [1 + r * Math.cos(a), 0.5 + r * Math.sin(a)]; }
+    if (x <= 1) return [3 - 3 * x, 1 - y / 3];
+    return [-(x - 1) / 3, 1 - y / 3];
+  };
+  const S = 104, X0 = 32, Y0 = 77, E = (p) => [X0 + S * p[0], Y0 + S * (1 - p[1])];
+  const obraz = (n) => {
+    let P = Array.from({ length: 243 * 12 + 1 }, (_, i) => [i / (243 * 12), 0.5]);
+    for (let k = 0; k < n; k++) P = P.map(F);
+    return P;
+  };
+  const out = [];
+  const ram = new Sciezka(false); ram.M(X0, Y0).L(X0 + S, Y0).L(X0 + S, Y0 + S).L(X0, Y0 + S).L(X0, Y0); out.push(ram.koniec());
+  [2, 3].forEach((n) => out.push(linia(obraz(n).map(E), false, 0.08)));
+  out.push(linia(obraz(1).map(E), true, 0.08));
+  out.push(kropka(...E([0, 0])));
+  const poz = [...new Set(obraz(3).filter((p) => p[0] > 0.2 && p[0] < 0.8).map((p) => p[1].toFixed(6)))].length;
+  return { sciezki: out, opis: `F(x, y) = (3x, y/3) i (3 − 3x, 1 − y/3) na paskach, czapka między nimi; obraz odcinka po 1 (pogrubiony), 2 i 3 krokach; po 3 krokach ${poz} poziomych przejść na poziomach z konstrukcji zbioru Cantora; punkt stały (0, 0)` };
+}
+
+/* 17. Wachlarz Lelka (schematycznie): odcinki z wierzchołka do punktów zbioru Cantora, różne długości, końce gęste */
+function znakLelek() {
+  const A = [100, 40], E = konce(4), Rm = 182;
+  const vdc = (k) => { let x = 0, f = 0.5; for (let m = k; m > 0; m >>= 1, f /= 2) if (m & 1) x += f; return x; };
+  const kat = (u) => PI / 2 + (u - 0.5) * 0.92; // ekranowo: w dół, rozpiętość ok. 53°
+  const out = [];
+  const wyr = new Set([1, 6, 10, 15, 18, 22, 27, 30]);
+  E.forEach((u, i) => {
+    const dl = 0.42 + 0.58 * vdc(i + 1), a = kat(u), p = [A[0] + Rm * dl * Math.cos(a), A[1] + Rm * dl * Math.sin(a)];
+    const s = new Sciezka(false); s.M(A[0], A[1]).L(p[0], p[1]); out.push(s.koniec());
+    if (wyr.has(i)) out.push(kropka(p[0], p[1]));
+  });
+  return { sciezki: out, opis: `${E.length} odcinków do końców 4. kroku zbioru Cantora (na łuku), długości 0,42–1 z ciągu van der Corputa; kropki: wybrane końce (w prawdziwym wachlarzu końce są gęste)` };
+}
+
+/* 18. Praca czytana na głos: krzywa y = sin(1/x) i jej odcinek graniczny; spójne, a jednak bez drogi: luka, której na pierwszy rzut oka nie widać */
+function znakSinus() {
+  const X0 = 22, X1 = 181, Yc = 129, A = 66, xM = 0.13, S = (X1 - X0) / xM, P = (x) => [X0 + S * x, Yc - A * Math.sin(1 / x)];
+  // próbkowanie równe w 1/x; kończymy, gdy fala ma ok. 3,5 jednostki szerokości
+  const xMin = (() => { let x = xM; while (S * 2 * PI * x * x > 3.6) x *= 0.995; return x; })();
+  const pts = []; for (let u = 1 / xM; u <= 1 / xMin; u += 0.03) pts.push(P(1 / u));
+  const trzy = [0, 1, 2].map((k) => pts.slice(Math.floor(pts.length * k / 3), Math.floor(pts.length * (k + 1) / 3) + 1));
+  const out = trzy.map((p) => linia(p, false, 0.1));
+  const gr = new Sciezka(true); gr.M(X0, Yc - A).L(X0, Yc + A); out.push(gr.koniec());
+  const os = new Sciezka(false); os.M(X0, Yc + A + 16).L(X1, Yc + A + 16); out.push(os.koniec());
+  const k = P(xM); out.push(kropka(k[0], k[1]));
+  return { sciezki: out, opis: `y = sin(1/x), x ∈ (${xMin.toFixed(3)}, ${xM}]; fale węższe niż 3,6 jedn. pominięte; pogrubiony odcinek graniczny x = 0` };
+}
+
+/* 19. Seria B: krzywa smoka, czyli wielokrotnie złożony pasek papieru (rząd 9) */
+function znakSmok() {
+  const n = 9; let zw = [];
+  for (let k = 0; k < n; k++) zw = zw.concat([1], zw.slice().reverse().map((v) => -v)); // ciąg zgięć
+  const pkt = [[0, 0]]; let dx = 1, dy = 0;
+  pkt.push([dx, dy]);
+  zw.forEach((v) => { [dx, dy] = [-v * dy, v * dx]; const o = pkt[pkt.length - 1]; pkt.push([o[0] + dx, o[1] + dy]); });
+  const xs = pkt.map((p) => p[0]), ys = pkt.map((p) => p[1]);
+  const sk = Math.min(172 / (Math.max(...xs) - Math.min(...xs)), 186 / (Math.max(...ys) - Math.min(...ys)));
+  const sx = (Math.min(...xs) + Math.max(...xs)) / 2, sy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const E = (p) => [100 + sk * (p[0] - sx), 129 + sk * (p[1] - sy)];
+  const kaw = 8, dl = (pkt.length - 1) / kaw, out = [];
+  for (let k = 0; k < kaw; k++) out.push(new Sciezka(k === 0).lamana(pkt.slice(k * dl, (k + 1) * dl + 1).map(E)).koniec());
+  return { sciezki: out, opis: `rząd ${n}: ${pkt.length - 1} odcinków po ${sk.toFixed(1)} jedn.; ciąg zgięć papieru; pogrubiona pierwsza z ${kaw} części` };
+}
+
+/* 20. Zermelo: dobry porządek typu ω², porządkowa „zapałczana”: każdy blok to kolejna kopia ω */
+function znakPorzadek() {
+  const X0 = 16, Y0 = 212, H0 = 170, out = [];
+  const pod = new Sciezka(false); pod.M(14, Y0).L(186, Y0); out.push(pod.koniec());
+  let x = X0, W = 88, H = H0, ileBl = 0, kresek = 0;
+  const graniczne = new Sciezka(true);
+  for (let b = 0; b < 6 && W > 5; b++) {
+    const s = new Sciezka(false);
+    graniczne.M(x, Y0).L(x, Y0 - H);
+    let puste = true;
+    for (let k = 1; ; k++) {
+      const xk = x + W * (1 - 1 / (k + 1)), xn = x + W * (1 - 1 / (k + 2)), hk = H * 0.88 ** k;
+      if (xn - xk < 2.2 || hk < 6) break;
+      s.M(xk, Y0).L(xk, Y0 - hk); kresek++; puste = false;
+    }
+    if (!puste) out.push(s.koniec());
+    x += W; W *= 0.52; H *= 0.72; ileBl++;
+  }
+  out.push(graniczne.koniec());
+  return { sciezki: out, opis: `${ileBl} kopii ω (grube kreski: ω·k, liczby graniczne), ${kresek} cienkich; każdy niepusty podzbiór ma element najmniejszy` };
+}
+
+/* 21. Referat Borsuka: na płaszczyźnie dwie części nie wystarczą, trzy tak */
+function znakBorsuk() {
+  const R = 45, c1 = [100, 83], c2 = [100, 176], out = [];
+  out.push(kolo(c1, R), kolo(c2, R));
+  const cie = new Sciezka(true); cie.M(c1[0] - R, c1[1]).L(c1[0] + R, c1[1]); out.push(cie.koniec());
+  out.push(kropka(c1[0] - R, c1[1]), kropka(c1[0] + R, c1[1]));
+  const kp = [0, 1, 2].map((k) => { const a = -PI / 2 + k * 2 * PI / 3; return [c2[0] + R * Math.cos(a), c2[1] + R * Math.sin(a)]; });
+  kp.forEach((q) => { const s = new Sciezka(true); s.M(c2[0], c2[1]).L(q[0], q[1]); out.push(s.koniec()); });
+  // średnica każdego wycinka to cięciwa łącząca końce łuku 120°: R√3 < 2R
+  kp.forEach((q, i) => { const r = kp[(i + 1) % 3]; const s = new Sciezka(false); s.M(q[0], q[1]).L(r[0], r[1]); out.push(s.koniec()); });
+  const srednica = Math.hypot(kp[0][0] - kp[1][0], kp[0][1] - kp[1][1]);
+  return { sciezki: out, opis: `u góry przecięcie na 2: punkty antypodyczne w tej samej części, średnica 2R = ${2 * R}; u dołu 3 wycinki o średnicy R√3 = ${srednica.toFixed(1)} < ${2 * R}` };
+}
+
+/* 22. Banach po francusku: kule jednostkowe przestrzeni ℓp na płaszczyźnie */
+function znakKule() {
+  const c = [100, 129], R = 84, out = [];
+  const piln = (p) => Array.from({ length: 360 }, (_, i) => {
+    const a = 2 * PI * i / 360, x = Math.cos(a), y = Math.sin(a);
+    const n = p === Infinity ? Math.max(Math.abs(x), Math.abs(y)) : (Math.abs(x) ** p + Math.abs(y) ** p) ** (1 / p);
+    return [c[0] + R * x / n, c[1] + R * y / n];
+  });
+  [1, 1.4, 3, Infinity].forEach((p) => out.push(petla(piln(p), false, 0.1)));
+  out.push(petla(piln(2), true, 0.08));
+  const os = new Sciezka(false); os.M(c[0] - R - 2, c[1]).L(c[0] + R + 2, c[1]).M(c[0], c[1] - R - 2).L(c[0], c[1] + R + 2); out.push(os.koniec());
+  return { sciezki: out, opis: 'kule jednostkowe ℓp dla p = 1; 1,4; 2 (pogrubiona, przestrzeń Hilberta); 3; ∞' };
+}
+
+/* 23. Róże: krzywe różane (Grandi) r = cos(kθ) */
+function znakRoza() {
+  const c = [100, 129], out = [];
+  const roza = (R, n, d, gruba) => {
+    const obr = d % 2 === 1 && n % 2 === 1 ? d : 2 * d, N = 1400;
+    const P = Array.from({ length: N }, (_, i) => { const t = obr * PI * i / N, r = R * Math.cos(n * t / d); return [c[0] + r * Math.cos(t - PI / 2), c[1] + r * Math.sin(t - PI / 2)]; });
+    return petla(P, gruba, 0.1);
+  };
+  out.push(kolo(c, 86), roza(86, 7, 2, false), roza(58, 5, 1, false), roza(34, 3, 1, false), roza(86, 5, 3, true));
+  return { sciezki: out, opis: 'krzywe różane r = R·cos(kθ): k = 5/3 (pogrubiona), 7/2, 5 i 3' };
+}
+
+/* 24. Akademia Medyczna: kardioida jako obwiednia cięciw k ↦ 2k na okręgu */
+function znakKardioida() {
+  const c = [100, 129], R = 86, n = 54, out = [kolo(c, R)];
+  const P = (k) => { const a = 2 * PI * k / n + PI; return [c[0] + R * Math.cos(a), c[1] + R * Math.sin(a)]; };
+  let ile = 0;
+  for (let k = 1; k < n; k++) {
+    const q = (2 * k) % n;
+    if (q === k || Math.hypot(P(k)[0] - P(q)[0], P(k)[1] - P(q)[1]) < 3) continue;
+    const s = new Sciezka(false); s.M(...P(k)).L(...P(q)); out.push(s.koniec()); ile++;
+  }
+  // obwiednia: dla cięciw (θ, 2θ) jest to kardioida o wierzchołku w punkcie 0
+  const K = Array.from({ length: 300 }, (_, i) => { const t = 2 * PI * i / 300; const x = (2 * Math.cos(t) + Math.cos(2 * t)) / 3, y = (2 * Math.sin(t) + Math.sin(2 * t)) / 3; return [c[0] + R * x * Math.cos(PI) - R * y * Math.sin(PI), c[1] + R * x * Math.sin(PI) + R * y * Math.cos(PI)]; });
+  out.push(petla(K, true, 0.1));
+  return { sciezki: out, opis: `${ile} cięciw k ↦ 2k (n = ${n}), obwiednia to kardioida (2 cos t + cos 2t, 2 sin t + sin 2t)/3` };
+}
+
+/* 25. Katedra Topologii: twierdzenie Jordana; promień z punktu wewnątrz krzywej przecina ją nieparzyście wiele razy, z punktu na zewnątrz parzyście */
+function znakJordan() {
+  const c = [100, 129], N = 900;
+  const K = Array.from({ length: N }, (_, i) => { const t = 2 * PI * i / N, r = 58 + 26 * Math.cos(3 * t + 0.6) + 11 * Math.cos(5 * t - 1); return [c[0] + r * Math.cos(t), c[1] + r * Math.sin(t)]; });
+  const krzyz = (p, u) => { // punkty przecięcia promienia p + s·u z krzywą
+    const w = [];
+    for (let i = 0; i < N; i++) {
+      const a = K[i], b = K[(i + 1) % N], d = [b[0] - a[0], b[1] - a[1]], det = u[0] * -d[1] + d[0] * u[1];
+      if (Math.abs(det) < 1e-12) continue;
+      const r = [a[0] - p[0], a[1] - p[1]], s = (r[0] * -d[1] + d[0] * r[1]) / det, q = (u[0] * r[1] - u[1] * r[0]) / det;
+      if (s > 0 && q >= 0 && q < 1) w.push(s);
+    }
+    return w.sort((x, y) => x - y);
+  };
+  const wind = (p) => { let s = 0; for (let i = 0; i < N; i++) { const a = K[i], b = K[(i + 1) % N]; s += Math.atan2((a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0]), (a[0] - p[0]) * (b[0] - p[0]) + (a[1] - p[1]) * (b[1] - p[1])); } return Math.round(s / (2 * PI)); };
+  const w = [74, 176], z = [160, 56];
+  // promień wyróżniony: 3 przecięcia, jak największe odstępy; promień zwykły: 2 przecięcia, blisko i z dużym odstępem
+  let kw = null, kz = null, bW = -1, bZ = -1e9;
+  for (let a = 0; a < 1440; a++) {
+    const t = 2 * PI * a / 1440, u = [Math.cos(t), Math.sin(t)], lw = krzyz(w, u), lz = krzyz(z, u);
+    if (lw.length === 3) {
+      const m = Math.min(lw[0], lw[1] - lw[0], lw[2] - lw[1]), kon = [w[0] + u[0] * (lw[2] + 12), w[1] + u[1] * (lw[2] + 12)];
+      if (m > bW && kon[0] > 14 && kon[0] < 186 && kon[1] > 36 && kon[1] < 222) { bW = m; kw = u; }
+    }
+    if (lz.length === 2) {
+      const kon = [z[0] + u[0] * (lz[1] + 10), z[1] + u[1] * (lz[1] + 10)], oc = lz[1] - lz[0] - 0.4 * lz[0];
+      if (oc > bZ && kon[0] > 14 && kon[0] < 186 && kon[1] > 36 && kon[1] < 222) { bZ = oc; kz = u; }
+    }
+  }
+  const out = [petla(K, false, 0.1)];
+  const pw = krzyz(w, kw), pz = krzyz(z, kz);
+  const r1 = new Sciezka(true); r1.M(...w).L(w[0] + kw[0] * (pw[2] + 12), w[1] + kw[1] * (pw[2] + 12)); out.push(r1.koniec());
+  const r2 = new Sciezka(false); r2.M(...z).L(z[0] + kz[0] * (pz[1] + 10), z[1] + kz[1] * (pz[1] + 10)); out.push(r2.koniec());
+  out.push(kropka(...w), kropka(...z));
+  pw.forEach((s) => { const q = [w[0] + kw[0] * s, w[1] + kw[1] * s]; out.push(kolo(q, 3, true, 24)); });
+  return { sciezki: out, opis: `indeks punktu wewnętrznego ${wind(w)}, zewnętrznego ${wind(z)}; przecięcia promieni: ${pw.length} (nieparzyście) i ${pz.length} (parzyście)` };
+}
+
 const RYSUNKI = {
+  'jednorodne-kontinua': znakJednorodne,
+  'podkowa-smalea': znakPodkowa,
+  'wachlarz-lelka': znakLelek,
+  'praca-na-glos': znakSinus,
+  'seria-b-wtn': znakSmok,
+  'gosc-zermelo': znakPorzadek,
+  'referat-borsuka': znakBorsuk,
+  'banach-po-francusku': znakKule,
+  'roze-i-skamander': znakRoza,
+  'doktorat-am-1961': znakKardioida,
+  'katedra-topologii': znakJordan,
   'kontinuum-knastera': znakKontinuum,
   'najpierw-medycyna': znakPoczatek,
   'knaster-tarski': znakKnasterTarski,
