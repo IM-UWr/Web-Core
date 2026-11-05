@@ -1,7 +1,7 @@
 ---
 // Sukcesy (/nauka/sukcesy), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: aktualności z rodzajem „sukces”
-// według lat (najnowsze na górze; rok jako podsekcja h3 z liczbą wpisów, kotwice #rok-RRRR bez zmian) i „Wcześniejsze
-// sukcesy” (zestawienie historyczne, archiwum starej strony). Spis „Na tej stronie”: lata i wcześniejsze sukcesy.
+// według lat (najnowsze na górze; rok jako podsekcja h3 z liczbą wpisów, kotwice #rok-RRRR bez zmian). Spis „Na tej
+// stronie”: lata. Ramka „Wcześniejsze sukcesy” usunięta (zlecenie 11, zalecenie 4).
 // Tekst wprowadzający pod banerem (src/data/dzialy/nauka.json, pola sukcesy_tekst / _en; puste = brak).
 // Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”;
 // tytuł Brygadą (cały wiersz prowadzi do wpisu), zajawka, z prawej miniatura zdjęcia wpisu (jeśli jest; na telefonie bez).
@@ -25,16 +25,13 @@ const zajawka = (a: Aktualnosc) => (lang === 'en' && a.data.zajawka_en) || a.dat
 const href = (a: Aktualnosc) => u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang));
 const zdjecie = (a: Aktualnosc) => (a.data.zdjecie ? (isExternal(a.data.zdjecie) ? a.data.zdjecie : u(a.data.zdjecie)) : undefined);
 
-const { sukcesy, lata, naglowek, lead, archiwumStarejStrony, liczby, haslo } = await daneListySukcesow(lang);
+const { sukcesy, lata, naglowek, lead, liczby, haslo } = await daneListySukcesow(lang);
 // tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
 const wstep = ((wybierz(dzialNauka as Record<string, any>, 'sukcesy_tekst', lang) as string) || '')
   .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 const ileWpisow = (n: number) => `${n} ${odmiana(n, ['wpis', 'wpisy', 'wpisów'], ['post', 'posts'], lang)}`;
-const tytulWczesniej = T('Wcześniejsze sukcesy', 'Earlier achievements');
-const spis = [
-  ...lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok })),
-  { id: 'z-wczesniej', etykieta: tytulWczesniej },
-];
+// bez ramki „Wcześniejsze sukcesy” (zlecenie 11, zalecenie 4); strona /nauka/sukcesy/historia zostaje — decyzja właściciela
+const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
 ---
 <Podstrona lang={lang} tytul={naglowek} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
   okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} dzial="nauka" spis={spis} klasa="tresc z-suk">
@@ -70,17 +67,6 @@ const spis = [
     ))}
   </section>
 
-  <section id="z-wczesniej" aria-labelledby="h-wczesniej">
-    <h2 id="h-wczesniej">{tytulWczesniej}</h2>
-    <p>{T(
-      'Wybrane wyróżnienia pracowników i absolwentów Instytutu do 2014 roku zebraliśmy w zestawieniu historycznym.',
-      'Selected distinctions of the Institute’s staff and graduates up to 2014 are listed in a historical overview.',
-    )}</p>
-    <ul class="linki">
-      <li><a href={u(wJezyku('/nauka/sukcesy/historia', lang))}>{T('Zestawienie historyczne', 'Historical overview')}</a></li>
-      <li><a class="zew" href={archiwumStarejStrony}>{T('Archiwum starej strony', 'Archive of the old website')}</a></li>
-    </ul>
-  </section>
 </Podstrona>
 
 <style>
@@ -105,7 +91,6 @@ const spis = [
   .klik:has(h4 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
   /* rok (podsekcja): liczba wpisów małym krojem tekstu */
   h3 small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
-  .linki { margin-top: 8px !important; }
 
   /* ---------- telefon (≤ 760 px): mniejszy dzień, bez miniatur (jak dotąd na telefonie; obok dnia za mało miejsca) ---------- */
   @media (max-width: 760px) {

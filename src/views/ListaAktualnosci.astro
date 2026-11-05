@@ -6,7 +6,7 @@
 // (z przyciskiem „Pokaż wszystkie”), ?rodzaj=… wybiera rodzaj. Wpisy po miesiącach: nagłówek miesiąca Brygadą, wiersze
 // z cienkimi liniami i datą jak na stronach działów (WierszAktualnosci.astro, wzór: zal/dzial/Wiersz.astro).
 // Jedna wersja HTML: komputer (≥ 761 px) — przyklejony pasek: przyciski rodzajów i pole szukania w jednym wierszu (jak pasek
-// Planu zajęć); telefon (≤ 760 px) — rodzaje w dwóch rzędach po trzy, pole szukania pod nimi, pasek nieprzyklejony.
+// Planu zajęć); telefon (≤ 760 px) — rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
 // Bez JS: pasek schowany, widać całą listę.
 import Podstrona from '../components/zal/Podstrona.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
@@ -30,6 +30,15 @@ const tytul = t(lang, 'aktualnosci');
       <button type="button" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
       {rodzaje.map((r) => <button type="button" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
     </div>
+    {/* telefon: rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), zsynchronizowana z przyciskami */}
+    <label class="z-pole-wyboru ak-rodzaj-lista">
+      <span class="sr-only">{filtrEtykieta}</span>
+      <select data-rodzaj-lista autocomplete="off">
+        <option value="">{t(lang, 'wszystkie')}</option>
+        {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
+      </select>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+    </label>
     <input type="search" class="ak-szukaj" placeholder={szukajDlugo} aria-label={szukajDlugo} autocomplete="off" data-szukaj />
   </div>
   <p class="ak-dla" data-dla-info data-pagefind-ignore hidden>
@@ -58,6 +67,7 @@ const tytul = t(lang, 'aktualnosci');
   const szukaj = document.querySelector<HTMLInputElement>('[data-szukaj]');
   const rodzajBtn = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
   const dlaInfo = document.querySelector<HTMLElement>('[data-dla-info]');
+  const rodzajLista = document.querySelector<HTMLSelectElement>('[data-rodzaj-lista]');
   let rodzaj = '';
   let dla = '';
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
@@ -77,9 +87,11 @@ const tytul = t(lang, 'aktualnosci');
   function ustawRodzaj(r: string) {
     rodzaj = znanyRodzaj(r) ? r : '';
     rodzajBtn.forEach((o) => o.setAttribute('aria-pressed', String((o.dataset.rodzaj ?? '') === rodzaj)));
+    if (rodzajLista) rodzajLista.value = rodzaj;
     filtruj();
   }
   rodzajBtn.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
+  rodzajLista?.addEventListener('change', () => ustawRodzaj(rodzajLista.value));
   // ?dla=… z linku (np. „Aktualności dla studentów”): zawężenie z informacją i przyciskiem „Pokaż wszystkie”
   const ustawDla = (d: string) => {
     const znane = !!d && !!dlaInfo?.querySelector(`[data-dla-etykieta="${CSS.escape(d)}"]`);
@@ -124,9 +136,10 @@ const tytul = t(lang, 'aktualnosci');
 
   .ak-dla { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 14px 0 0; color: var(--text); }
   .ak-dla strong { color: var(--ink); }
-  .ak-dla button { margin: 0; padding: 4px 12px; font: inherit; font-size: 14px; font-weight: 600; border: 1px solid var(--line); border-radius: 0;
-    background: transparent; color: var(--d-a); cursor: pointer; }
-  .ak-dla button:hover { border-color: var(--d-a); }
+  .ak-dla button { margin: 0; padding: 7px 14px; font: inherit; font-size: 14px; font-weight: 600; border: 1px solid var(--line); border-radius: 0;
+    background: transparent; color: var(--ink); cursor: pointer; }
+  /* „Pokaż wszystkie” jako przycisk-link (zlecenie 11, zalecenie 4): po najechaniu ramka i tekst w kolorze */
+  .ak-dla button:hover { border-color: var(--d-a); color: var(--d-a); }
   .ak-dla button:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
 
   /* miesiąc: nagłówek Brygadą, wiersze z cienkimi liniami (bez kreski i odstępów sekcji szablonu) */
@@ -139,6 +152,7 @@ const tytul = t(lang, 'aktualnosci');
 
   /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   @media (min-width: 761px) {
+    .ak-rodzaj-lista { display: none; }
     .ak-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
       background: var(--bg); border-bottom: 2px solid var(--rule); }
     .ak-rodzaje button { font-size: 14px; padding: 7px 12px; }
@@ -149,10 +163,9 @@ const tytul = t(lang, 'aktualnosci');
   /* ---------- telefon (≤ 760 px): rodzaje w dwóch rzędach, pole szukania pod nimi ---------- */
   @media (max-width: 760px) {
     .ak-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
-    .ak-rodzaje { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .ak-rodzaje button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
-    .ak-rodzaje button:nth-child(3n + 1) { border-left: 0; }
-    .ak-rodzaje button:nth-child(n + 4) { border-top: 1px solid var(--line); }
+    /* rodzaje jako lista wyboru (zlecenie 11, zalecenie 4: na telefonie lista zamiast paska, w stylu pola) */
+    .ak-rodzaje { display: none; }
+    .ak-rodzaj-lista { display: flex; width: 100%; }
     .ak-szukaj { width: 100%; padding: 8px 10px; font-size: 16px; }
     .ak-dla { font-size: 14.5px; }
     .ak-mies h2 { margin-top: 22px; font-size: 20px; }

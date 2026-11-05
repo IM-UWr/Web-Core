@@ -50,12 +50,12 @@ const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: z
     )}
     {tylkoPolski && <div class="uwaga"><p lang="en">{t('en', 'wersjaPolska')}</p></div>}
     {poczatek && <div class="ww-tresc" lang={jezykTresci} set:html={poczatek} />}
-    {przycisk && sekcje.length === 0 && <p class="akcja"><a class="przycisk" href={przycisk.adres}>{przycisk.etykieta}<span aria-hidden="true">{przycisk.zew ? ' ↗' : ' →'}</span></a></p>}
+    {przycisk && sekcje.length === 0 && <p class="akcja glowny"><a class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}<span aria-hidden="true">{przycisk.zew ? ' ↗' : ' →'}</span></a></p>}
   </section>
   {sekcje.map((s, i) => (
     <section>
       <div class="ww-tresc" lang={jezykTresci} set:html={s.html} />
-      {przycisk && i === sekcje.length - 1 && <p class="akcja"><a class="przycisk" href={przycisk.adres}>{przycisk.etykieta}<span aria-hidden="true">{przycisk.zew ? ' ↗' : ' →'}</span></a></p>}
+      {przycisk && i === sekcje.length - 1 && <p class="akcja glowny"><a class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}<span aria-hidden="true">{przycisk.zew ? ' ↗' : ' →'}</span></a></p>}
     </section>
   ))}
   <section id="zobacz-tez" aria-labelledby="zobacz-tez-h" data-pagefind-ignore>

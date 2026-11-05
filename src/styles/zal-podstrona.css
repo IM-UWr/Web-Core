@@ -10,6 +10,12 @@
     padding: 40px var(--marg) 30px; }
   .z-pd > .z-pd-tresc { grid-column: 1; grid-row: 1; min-width: 0; }
   .z-pd > .z-spis { grid-column: 2; grid-row: 1; }
+  /* prawa kolumna ze spisem i blokiem pod nim (slot „bok” w Podstrona.astro): przyklejona jako całość */
+  .z-pd > .z-pd-prawa { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--gora) + 24px); align-self: start;
+    max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; overscroll-behavior: contain; }
+  .z-pd-prawa > .z-spis { position: static; max-height: none; overflow: visible; }
+  /* (między spisem a blokiem stoi skrypt spisu — stąd ~, nie +) */
+  .z-spis ~ .z-pd-bok { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
   /* sekcje przewijane spisem: 20 px zapasu nad nagłówkiem */
   .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: 20px; }
 
@@ -37,6 +43,10 @@
 @media (max-width: 760px) {
   /* rama podstrony: jedna kolumna */
   .z-pd { display: block; padding: 18px 16px 24px; }
+  /* blok z prawej kolumny (slot „bok”) na telefonie pod treścią */
+  .z-pd:has(> .z-pd-prawa) { display: flex; flex-direction: column; }
+  .z-pd-prawa { display: contents; }
+  .z-pd-bok { order: 1; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
 
   /* spis „Na tej stronie”: zwijany nad treścią, lista z cienką kreską po lewej */
   .z-spis { margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }

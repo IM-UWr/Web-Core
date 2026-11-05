@@ -4,7 +4,7 @@
 // etap 3) i wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc; wzór: prototyp
 // „wzorzec treści (Szkoła doktorska)”, trescWzor). Sekcje w kolejności wzoru, kreski między sekcjami, spis „Na tej stronie”
 // z prawej (na telefonie zwijany nad treścią):
-//   O kierunku (Markdown) → strony powiązane (pole `przyciski`, ul.linki) → Dlaczego warto (ul.dwa) → przebieg studiów
+//   O kierunku (Markdown) → strony powiązane (pole `przyciski`, ul.linki; tylko szkoła doktorska) → Dlaczego warto (ul.dwa) → przebieg studiów
 //   (ol.etapy; na kierunkach I i II stopnia w podsekcjach) → Specjalności → Terminy (table.tab) → Program (przełącznik
 //   roczników .tresc-taby i wybór roku rozpoczęcia, pliki ul.pliki) → Praktyki → Po studiach → Pytania (.faq) → Kontakt
 //   (.kontakty) → Akty prawne (ul.pliki).
@@ -57,9 +57,13 @@ const K: Partial<Record<keyof typeof H, string>> = doktorat
   ? { o: T('O Kolegium', 'About'), faq: T('Pytania', 'FAQ'), akty: T('Akty prawne', 'Regulations') }
   : {};
 const formularze = d.terminy.some((x) => x.formularz);
+// pole `przyciski` (zlecenie 11, zalecenie 4): na kierunkach już nie wyświetlane (Rekrutacja, Plan zajęć, Katalog przedmiotów
+// pod opisem — decyzja właściciela; pola w CMS nie ruszamy); na szkole doktorskiej zostaje jako „Strony szkoły doktorskiej”
+// (wzorzec treści z prototypu — jedyne linki do części jej podstron)
+const strony = doktorat && d.przyciski.length > 0;
 const sekcje: [keyof typeof H, string, boolean][] = [
   ['o', 'o-kierunku', true],
-  ['strony', 'strony', d.przyciski.length > 0],
+  ['strony', 'strony', strony],
   ['dlaczego', 'dlaczego', d.dlaczego.length > 0],
   ['przebieg', 'przebieg', d.etapy.length > 0],
   ['specjalnosci', 'specjalnosci', specjalnosci.length > 0],
@@ -97,7 +101,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
     <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
   </section>
 
-  {d.przyciski.length > 0 && (
+  {strony && (
     <section id="strony" aria-labelledby="strony-h">
       <h2 id="strony-h">{H.strony}</h2>
       <ul class="linki">
@@ -196,10 +200,13 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
             : T('Program zależy od roku rozpoczęcia studiów. Wybierz swój rocznik:', 'The curriculum depends on the year you started. Choose your cohort:')}</p>
           <label class="kier-rok">
             <span>{doktorat ? T('Rozpocząłem / rozpoczęłam kształcenie w roku', 'I started my doctoral training in') : T('Rozpocząłem / rozpoczęłam studia w roku', 'I started my studies in')}</span>
-            <select data-rok>
-              <option value="">—</option>
-              {lata.map((r) => <option value={r}>{r}/{String(r + 1).slice(2)}</option>)}
-            </select>
+            <span class="z-pole-wyboru">
+              <select data-rok>
+                <option value="">—</option>
+                {lata.map((r) => <option value={r}>{r}/{String(r + 1).slice(2)}</option>)}
+              </select>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </span>
           </label>
           <div class="tresc-taby" role="tablist" aria-label={H.program}>
             {d.programy.map((p, i) => (
@@ -327,11 +334,8 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
   .kier-podpis { margin: 18px 0 4px; font-size: 13px; font-weight: 700; color: var(--d-a); }
   .kier-dalej { margin: 14px 0 0; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
 
-  /* wybór roku rozpoczęcia studiów: etykieta i lista rozwijana jak przyciski przełącznika (obwódka, bez zaokrągleń) */
+  /* wybór roku rozpoczęcia studiów: etykieta i lista wyboru (.z-pole-wyboru w src/styles/zal-tresc.css — zlecenie 11, zalecenie 4) */
   .kier-rok { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 12px; font-size: 15.5px; line-height: 1.55; }
-  .kier-rok select { margin: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 0; background: var(--bg); color: var(--ink);
-    font: inherit; font-size: 14px; font-weight: 600; }
-  .kier-rok select:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
 
   /* specjalności (ul.dwa): etykieta skrótu, nazwa, opis i pary; nazwa-link jak tytuł, bez podkreślenia */
   .kier-spec li > b a { color: inherit; text-decoration: none; }

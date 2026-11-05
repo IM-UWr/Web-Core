@@ -4,6 +4,8 @@
 // „Następna strona w dziale” i „Zgłoś błąd” (wstawia Baza.astro pod <main> na podstronach z menu działu).
 // Jedna wersja HTML: komputer — treść i kolumna spisu 236 px; telefon — jedna kolumna, spis zwijany nad treścią
 // (src/styles/zal-podstrona.css). Strona z mniej niż 2 sekcjami nie ma spisu, treść ma tę samą szerokość.
+// Slot „bok” (opcjonalny; zlecenie 11, zalecenie 4 — np. powiadomienia e-mail seminarium): blok w prawej kolumnie pod
+// spisem, oddzielony kreską, przyklejony razem ze spisem; na telefonie pod treścią.
 // Sloty: domyślny — treść; „baner” — to, co ma stać w nagłówku pod tytułem (liczby .pt-liczby, plakietki, linki).
 // Właściwości: jak Baza (tytul, opis, obraz, uklad…) i NaglowekStrony (lead, haslo, okruszki, wstecz) oraz
 // dzial (kolory działu treści), spis ({ id, etykieta, krotka? }), klasa i atrybuty elementu treści.
@@ -43,7 +45,9 @@ const naglowek = { tytul, lead, haslo, lang, okruszki, wstecz };
     ? <NaglowekStrony {...naglowek}><slot name="baner" /></NaglowekStrony>
     : <NaglowekStrony {...naglowek} />}
   <div class:list={['z-pd', klasaRamy]} data-dzial={dzial}>
-    <SpisStrony spis={spis} lang={lang} />
+    {Astro.slots.has('bok')
+      ? <div class="z-pd-prawa"><SpisStrony spis={spis} lang={lang} /><div class="z-pd-bok"><slot name="bok" /></div></div>
+      : <SpisStrony spis={spis} lang={lang} />}
     <div class:list={['z-pd-tresc', klasa]} {...atrybuty}><slot /></div>
   </div>
 </Baza>

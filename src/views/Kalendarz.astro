@@ -6,7 +6,7 @@
 // Widok „Nadchodzące” / „Archiwum” (w adresie #archiwum), filtr rodzaju (w adresie także ?rodzaj=…) i szukanie po tekście
 // pozycji działają razem. Pozycje po miesiącach: nagłówek miesiąca Brygadą, wiersze z cienkimi liniami i datą jak na
 // stronach działów (WierszWydarzenia.astro). Jedna wersja HTML: komputer (≥ 761 px) — przyklejony pasek: widok, rodzaje
-// i pole szukania w jednym wierszu (jak w Planie zajęć); telefon (≤ 760 px) — widok, rodzaje (po trzy w rzędzie) i pole
+// i pole szukania w jednym wierszu (jak w Planie zajęć); telefon (≤ 760 px) — widok, rodzaje (lista wyboru) i pole
 // szukania jedno pod drugim, pasek nieprzyklejony. Bez JS: pasek schowany, widać oba widoki jeden pod drugim (z podpisami).
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -35,6 +35,15 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
       <button type="button" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
       {rodzaje.map((r) => <button type="button" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
     </div>
+    {/* telefon: rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), zsynchronizowana z przyciskami */}
+    <label class="z-pole-wyboru kal-rodzaj-lista">
+      <span class="sr-only">{filtrEtykieta}</span>
+      <select data-rodzaj-lista autocomplete="off">
+        <option value="">{t(lang, 'wszystkie')}</option>
+        {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
+      </select>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+    </label>
     <input type="search" class="kal-szukaj" placeholder={szukajDlugo} aria-label={szukajDlugo} autocomplete="off" data-szukaj />
   </div>
 
@@ -59,6 +68,7 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
   const kal = document.querySelector<HTMLElement>('[data-kalendarz]');
   if (kal) {
     const btnRodzaj = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
+    const rodzajLista = kal.querySelector<HTMLSelectElement>('[data-rodzaj-lista]');
     const btnWidok = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
     const widoki = Array.from(kal.querySelectorAll<HTMLElement>('[data-widok]'));
     const szukaj = kal.querySelector<HTMLInputElement>('[data-szukaj]');
@@ -70,6 +80,7 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
       const q = norm(szukaj?.value.trim() ?? '');
       btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
       btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
+      if (rodzajLista) rodzajLista.value = rodzaj;
       widoki.forEach((v) => {
         v.toggleAttribute('data-aktywny', v.dataset.widok === widok);
         v.querySelectorAll<HTMLElement>('[data-ww]').forEach((p) => {
@@ -87,6 +98,7 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
     };
     const ustawRodzaj = (r: string) => { rodzaj = znanyRodzaj(r) ? r : ''; pokaz(); };
     btnRodzaj.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
+    rodzajLista?.addEventListener('change', () => ustawRodzaj(rodzajLista.value));
     szukaj?.addEventListener('input', pokaz);
     btnWidok.forEach((b) => b.addEventListener('click', () => {
       widok = b.dataset.widokBtn ?? 'nadchodzace';
@@ -123,6 +135,7 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
 
   /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   @media (min-width: 761px) {
+    .kal-rodzaj-lista { display: none; }
     .kal-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
       background: var(--bg); border-bottom: 2px solid var(--rule); }
     .kal-narz button { font-size: 14px; padding: 7px 12px; }
@@ -134,9 +147,9 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
     .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     .kal-narz button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
     .kal-widok, .kal-rodzaje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .kal-rodzaje { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .kal-rodzaje button:nth-child(3n + 1) { border-left: 0; }
-    .kal-rodzaje button:nth-child(n + 4) { border-top: 1px solid var(--line); }
+    /* rodzaje jako lista wyboru (zlecenie 11, zalecenie 4: na telefonie lista zamiast paska, w stylu pola) */
+    .kal-rodzaje { display: none; }
+    .kal-rodzaj-lista { display: flex; width: 100%; }
     .kal-szukaj { width: 100%; padding: 8px 10px; font-size: 16px; }
     .kal-mies h2 { margin-top: 22px; font-size: 20px; }
   }

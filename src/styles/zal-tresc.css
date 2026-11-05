@@ -61,6 +61,9 @@
   color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.6; text-decoration: none; transition: border-color .15s, color .15s; }
 .tresc .akcja a:hover, .tresc a.przycisk:hover { border-color: var(--d-a); color: var(--d-a); }
 .tresc .akcja a:focus-visible, .tresc a.przycisk:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+/* główny przycisk-link (zlecenie 11, zalecenie 4: „Strona projektu ↗”, link pod wpisem Warto wiedzieć): wypełniony kolorem działu */
+.tresc .akcja.glowny a, .tresc a.przycisk.glowny { border-color: var(--d-a); background: var(--d-a); color: var(--bg); }
+.tresc .akcja.glowny a:hover, .tresc a.przycisk.glowny:hover { border-color: color-mix(in srgb, var(--d-a) 85%, #000); background: color-mix(in srgb, var(--d-a) 85%, #000); color: var(--bg); }
 /* pary etykieta–wartość */
 .tresc dl.para { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 12px; margin: 0; font-size: 14.5px; line-height: 1.5; }
 .tresc dl.para dt { font-weight: 700; color: var(--muted); }
@@ -169,3 +172,17 @@ body .tresc .prose :is(img, code) { border-radius: 0; }
   body .tresc .prose td { padding: 0; border: 0; }
   body .tresc .prose td:first-child { font-weight: 700; }
 }
+
+/* Lista wyboru (zlecenie 11, zalecenie 4): jak pole szukania na Planie zajęć — ramka 1 px, bez zaokrągleń, 15 px, 8 px 12 px,
+   fokus: obrys 2 px w kolorze działu; strzałka w dół w kolorze działu (jak na stronie Pracownicy). Poza .tresc — używają jej
+   też paski narzędzi (Aktualności i Kalendarz na telefonie, wybór roku na stronie kierunku).
+   Znaczniki: <label|span class="z-pole-wyboru"><select>…</select><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></…> */
+.z-pole-wyboru { position: relative; display: inline-flex; align-items: center; min-width: 0; border: 1px solid var(--line); background: var(--bg); }
+.z-pole-wyboru select { appearance: none; -webkit-appearance: none; width: 100%; min-width: 0; margin: 0; padding: 8px 36px 8px 12px; border: 0; border-radius: 0;
+  background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; line-height: 1.6; cursor: pointer; }
+.z-pole-wyboru svg { position: absolute; right: 11px; width: 16px; height: 16px; pointer-events: none; fill: none; stroke: var(--d-a); stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.z-pole-wyboru:focus-within { outline: 2px solid var(--d-a); outline-offset: -1px; }
+.z-pole-wyboru select:focus { outline: none; }
+/* telefon: 16 px, żeby iOS nie powiększał strony przy wyborze */
+@media (max-width: 760px) { .z-pole-wyboru select { font-size: 16px; } }

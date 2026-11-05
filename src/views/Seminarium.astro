@@ -1,6 +1,7 @@
 ---
 // Strona seminarium (/seminaria/<id>), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: opis seminarium,
-// nadchodzące referaty (ze streszczeniami), zapis na powiadomienia e-mail, minione referaty (streszczenie zwinięte)
+// nadchodzące referaty (ze streszczeniami), minione referaty (streszczenie zwinięte); zapis na powiadomienia e-mail w prawej
+// kolumnie pod spisem (slot „bok”, na telefonie pod treścią)
 // i link do archiwum. Spis „Na tej stronie” z sekcji; na telefonie zwijany nad treścią.
 // Baner: hasło, liczby i — pod nimi — koordynatorzy, e-mail i zakład (na każdej szerokości; opis przy `haslo`
 // w src/lib/widoki/seminarium.ts). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
@@ -37,7 +38,6 @@ const typPliku = (a: string) => {
 };
 const spis = [
   { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
-  { id: 'powiadomienia', etykieta: tytulPow },
   ...(minione.length > 0 ? [{ id: 'z-minione', etykieta: t(lang, 'minione') }] : []),
 ];
 ---
@@ -64,6 +64,29 @@ const spis = [
     )}
   </Fragment>
 
+  {/* powiadomienia e-mail: w prawej kolumnie pod spisem „Na tej stronie” (zlecenie 11, zalecenie 4), na telefonie pod treścią */}
+  <aside slot="bok" class="sem-pow" id="powiadomienia" aria-labelledby="h-pow" data-pagefind-ignore>
+    <h2 class="sem-pow-h" id="h-pow">{tytulPow}</h2>
+    <p class="pw-opis">{T('Zostaw adres, a o każdym nowym referacie tego seminarium dostaniesz wiadomość (po angielsku). Z listy wypiszesz się jednym kliknięciem w każdej wiadomości.', 'Leave your address to get an email about every new talk in this seminar. Every message has a one-click unsubscribe link.')}</p>
+    {adresListy ? (
+      <form class="pw-form" data-zapis action={adresListy} method="post" data-ok={T('Sprawdź skrzynkę — wysłaliśmy link potwierdzający zapis (jeśli nie widzisz wiadomości, zajrzyj do spamu).', 'Check your inbox — we have sent a confirmation link (look in the spam folder if you cannot see it).')} data-blad={T('Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.', 'Something went wrong. Please try again in a moment.')}>
+        <input type="hidden" name="akcja" value="zapisz" />
+        <input type="hidden" name="seminarium" value={seminarium.id} />
+        <input type="hidden" name="jezyk" value={lang} />
+        <label class="sr-only" for="zapis-email">{T('Adres e-mail', 'Email address')}</label>
+        <div class="pw-wiersz">
+          <input id="zapis-email" type="email" name="email" required autocomplete="email" inputmode="email" placeholder={T('twój@adres.pl', 'you@example.com')} />
+          <button type="submit"><Ikona nazwa="mail" rozmiar={16} />{T('Zapisz mnie', 'Subscribe')}</button>
+        </div>
+        <div class="pw-hp" aria-hidden="true"><label>Nie wypełniaj / leave empty <input type="text" name="www" tabindex="-1" autocomplete="off" /></label></div>
+        <p class="pw-stan" role="status" aria-live="polite"></p>
+      </form>
+    ) : (
+      <p class="pusto">{T('Zapisy na listę ruszą wkrótce.', 'Sign-up will open soon.')}</p>
+    )}
+    <p class="pw-uwaga">{T('Adres służy wyłącznie do tych powiadomień —', 'Your address is used only for these notifications —')} <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{T('polityka prywatności', 'privacy policy')}</a>.</p>
+  </aside>
+
   <section class="opis">
     <div class="prose">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
   </section>
@@ -87,27 +110,6 @@ const spis = [
     ))}
   </section>
 
-  <section id="powiadomienia" aria-labelledby="h-pow" data-pagefind-ignore>
-    <h2 id="h-pow">{tytulPow}</h2>
-    <p class="pw-opis">{T('Zostaw adres, a o każdym nowym referacie tego seminarium dostaniesz wiadomość (po angielsku). Z listy wypiszesz się jednym kliknięciem w każdej wiadomości.', 'Leave your address to get an email about every new talk in this seminar. Every message has a one-click unsubscribe link.')}</p>
-    {adresListy ? (
-      <form class="pw-form" data-zapis action={adresListy} method="post" data-ok={T('Sprawdź skrzynkę — wysłaliśmy link potwierdzający zapis (jeśli nie widzisz wiadomości, zajrzyj do spamu).', 'Check your inbox — we have sent a confirmation link (look in the spam folder if you cannot see it).')} data-blad={T('Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę.', 'Something went wrong. Please try again in a moment.')}>
-        <input type="hidden" name="akcja" value="zapisz" />
-        <input type="hidden" name="seminarium" value={seminarium.id} />
-        <input type="hidden" name="jezyk" value={lang} />
-        <label class="sr-only" for="zapis-email">{T('Adres e-mail', 'Email address')}</label>
-        <div class="pw-wiersz">
-          <input id="zapis-email" type="email" name="email" required autocomplete="email" inputmode="email" placeholder={T('twój@adres.pl', 'you@example.com')} />
-          <button type="submit"><Ikona nazwa="mail" rozmiar={16} />{T('Zapisz mnie', 'Subscribe')}</button>
-        </div>
-        <div class="pw-hp" aria-hidden="true"><label>Nie wypełniaj / leave empty <input type="text" name="www" tabindex="-1" autocomplete="off" /></label></div>
-        <p class="pw-stan" role="status" aria-live="polite"></p>
-      </form>
-    ) : (
-      <p class="pusto">{T('Zapisy na listę ruszą wkrótce.', 'Sign-up will open soon.')}</p>
-    )}
-    <p class="pw-uwaga">{T('Adres służy wyłącznie do tych powiadomień —', 'Your address is used only for these notifications —')} <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{T('polityka prywatności', 'privacy policy')}</a>.</p>
-  </section>
 
   {(minione.length > 0 || d.archiwum) && (
     <section id="z-minione" aria-labelledby="h-min">
@@ -185,23 +187,30 @@ const spis = [
   /* kotwice referatów: zapas nad wpisem */
   .ref[id] { scroll-margin-top: 20px; }
 
-  /* powiadomienia e-mail: pole i przycisk w jednym rzędzie, bez kafelka */
-  #powiadomienia .pw-opis { margin: 0 0 14px; }
+  /* powiadomienia e-mail w prawej kolumnie pod spisem (zlecenie 11, zalecenie 4): nagłówek jak nagłówek spisu, tekst 13,5 px,
+     pole e-mail na całą szerokość kolumny, „Zapisz mnie” jako główny przycisk (wypełniony kolorem działu), notka 13 px */
+  .sem-pow { font-size: 13.5px; line-height: 1.5; color: var(--text); }
+  .sem-pow .sem-pow-h { margin: 0 0 8px; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; line-height: 1.35; color: var(--d-a); }
+  .sem-pow p { margin: 0; }
+  .sem-pow .pw-opis { margin: 0 0 12px; }
   .pw-form { position: relative; margin: 0; }
-  .pw-wiersz { display: flex; flex-wrap: wrap; gap: 8px; max-width: 560px; }
-  .pw-wiersz input { flex: 1 1 240px; min-width: 0; min-height: 44px; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 0;
-    background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; }
+  .pw-wiersz { display: grid; gap: 8px; justify-items: start; }
+  .pw-wiersz input { box-sizing: border-box; width: 100%; min-width: 0; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 0;
+    background: var(--bg); color: var(--ink); font: inherit; font-size: 15px; }
   .pw-wiersz input::placeholder { color: var(--muted); opacity: 1; }
   .pw-wiersz input:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
-  .pw-wiersz button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; padding: 8px 18px; border: 0; border-radius: 0;
-    background: var(--d-a); color: var(--bg); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .pw-wiersz button:hover { background: var(--ink); }
+  .pw-wiersz button { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 7px 14px; border: 1px solid var(--d-a); border-radius: 0;
+    background: var(--d-a); color: var(--bg); font: inherit; font-size: 14px; font-weight: 600; line-height: 1.6; cursor: pointer; transition: background-color .15s, border-color .15s; }
+  .pw-wiersz button:hover { background: color-mix(in srgb, var(--d-a) 85%, #000); border-color: color-mix(in srgb, var(--d-a) 85%, #000); }
   .pw-wiersz button:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
   .pw-wiersz button:disabled { opacity: .6; cursor: wait; }
   .pw-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  .pw-stan { margin: 10px 0 0; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+  .pw-stan { margin: 10px 0 0; font-size: 13.5px; font-weight: 600; color: var(--ink); }
   .pw-stan:empty { display: none; }
-  #powiadomienia .pw-uwaga { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); }
+  .sem-pow .pusto { color: var(--muted); }
+  .sem-pow .pw-uwaga { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+  .sem-pow .pw-uwaga a { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); text-underline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .pw-wiersz button { transition: none; } }
 
   /* ---------- telefon (≤ 760 px) ---------- */
   @media (max-width: 760px) {

@@ -21,7 +21,8 @@ interface Props {
 }
 const { semestry, aktywny, lang, lustro = false } = Astro.props;
 const etykieta = Astro.props.etykieta ?? (lustro ? (lang === 'en' ? 'Semester shown' : 'Pokazany semestr') : lang === 'en' ? 'Semesters' : 'Semestry');
-// Na wąskim ekranie krótsza etykieta, żeby dwa przyciski zmieściły się obok siebie: „Zimowy 2026/27”, „Winter 2026/27”.
+// Krótkie etykiety na każdej szerokości, jak przełącznik semestrów Planu zajęć (zlecenie 11, zalecenie 4):
+// „Zimowy 2026/27”, „Winter 2026/27” (pełna nazwa semestru jest w nagłówku panelu pod przełącznikiem).
 const krotka = (e: string) => {
   const k = e.replace(/^semestr\s+/i, '').replace(/\s+semester\b/i, '');
   return k.charAt(0).toUpperCase() + k.slice(1);
@@ -31,7 +32,7 @@ const krotka = (e: string) => {
   <div class="tresc-taby ps-tabs ps-lustro" role="group" aria-label={etykieta} data-ps-lustro>
     {semestry.map((s) => (
       <button type="button" aria-pressed={s.id === aktywny ? 'true' : 'false'} data-ps-cel={s.id}>
-        {krotka(s.etykieta) === s.etykieta ? s.etykieta : <><span class="ps-pelna">{s.etykieta}</span><span class="ps-krotka">{krotka(s.etykieta)}</span></>}
+        {krotka(s.etykieta)}
       </button>
     ))}
   </div>
@@ -48,7 +49,7 @@ const krotka = (e: string) => {
         tabindex={s.id === aktywny ? 0 : -1}
         data-od={s.od ?? ''}
         data-do={s.do ?? ''}
-      >{krotka(s.etykieta) === s.etykieta ? s.etykieta : <><span class="ps-pelna">{s.etykieta}</span><span class="ps-krotka">{krotka(s.etykieta)}</span></>}</button>
+      >{krotka(s.etykieta)}</button>
     ))}
   </div>
 )}
@@ -162,10 +163,5 @@ const krotka = (e: string) => {
   /* html ma scroll-padding-top = wysokość nagłówka; margines panelu = wysokość przełącznika nad nim */
   html.js [data-ps-panel] { scroll-margin-top: var(--ps-h, 56px); }
   .ps-tabs { margin: 0 0 18px; }
-  .ps-krotka { display: none; }
-  @media (max-width: 479px) {
-    .ps-pelna { display: none; }
-    .ps-krotka { display: inline; }
-  }
   @media print { .ps-tabs { display: none !important; } }
 </style>

@@ -1,7 +1,8 @@
-// Spis pracowników z wyszukiwarką i filtrami (grupa, zakład) — kierunek „Założyciele”, szablon podstrony (Pracownicy.astro,
+// Spis pracowników z wyszukiwarką i filtrem zakładu — kierunek „Założyciele”, szablon podstrony (Pracownicy.astro,
 // blok .z-prac; style w widoku). Komponent renderuje się już na serwerze, więc bez JavaScriptu pokazuje pełną, pogrupowaną
 // listę (pasek filtrów jest wtedy schowany, bo bez skryptu nie działa).
-// Jedna wersja HTML na każdą szerokość: pasek — pole szukania, lista grup i lista zakładów (filtry można łączyć); pod nim
+// Jedna wersja HTML na każdą szerokość: pasek — pole szukania i lista zakładów (filtry można łączyć; bez wyboru grupy —
+// zlecenie 11, zalecenie 4: grupy są sekcjami i są w spisie „Na tej stronie”); pod nim
 // licznik („Liczba osób: N”, po przefiltrowaniu „Znaleziono N osób”, aria-live). Grupy to sekcje z nagłówkiem h2 (id
 // „zp-<grupa>” — do nich prowadzi spis „Na tej stronie”; po filtrowaniu spis dostaje zdarzenie `z-spis` i chowa puste).
 // Każda osoba to wiersz listy: gdy ma stronę domową, link na imieniu i nazwisku obejmuje cały wiersz (e-mail i zakład
@@ -71,7 +72,6 @@ function wedlugRoku(osoby: Osoba[], napisy: Record<string, string>): Podsekcja[]
 
 export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Props) {
   const [q, setQ] = useState('');
-  const [grupa, setGrupa] = useState('');
   const [zaklad, setZaklad] = useState('');
   const nazwyZakladow = useMemo(() => Object.fromEntries(zaklady.map((z) => [z.id, z.nazwa])), [zaklady]);
   const linkiZakladow = useMemo(() => Object.fromEntries(zaklady.map((z) => [z.id, z.href])), [zaklady]);
@@ -80,16 +80,15 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     const nq = norm(q.trim());
     return osoby.filter(
       (o) =>
-        (!grupa || o.grupa === grupa) &&
         (!zaklad || o.zaklad === zaklad) &&
         (!nq || norm([o.imie_nazwisko, o.stopien, o.funkcja, o.zaklad && nazwyZakladow[o.zaklad], o.email, o.pokoj].filter(Boolean).join(' ')).includes(nq))
     );
-  }, [osoby, q, grupa, zaklad, nazwyZakladow]);
+  }, [osoby, q, zaklad, nazwyZakladow]);
 
   // spis „Na tej stronie” (zal/SpisStrony.astro) chowa grupy, których po filtrowaniu nie ma na stronie
   useEffect(() => {
     document.dispatchEvent(new Event('z-spis'));
-  }, [q, grupa, zaklad]);
+  }, [q, zaklad]);
 
   const sekcje = grupy
     .map((g) => {
@@ -153,7 +152,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     );
   };
 
-  const przefiltrowane = !!(q.trim() || grupa || zaklad);
+  const przefiltrowane = !!(q.trim() || zaklad);
   const n = widoczne.length;
   const licznik = !przefiltrowane
     ? `${napisy.osob}: ${n}`
@@ -168,16 +167,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
           <span className="sr-only">{napisy.szukaj}</span>
           <input type="search" value={q} placeholder={napisy.szukaj} autoComplete="off" onChange={(e) => setQ(e.target.value)} />
         </label>
-        <label className="zp-wybor">
-          <span className="sr-only">{napisy.grupa}</span>
-          <select value={grupa} autoComplete="off" onChange={(e) => setGrupa(e.target.value)}>
-            <option value="">{napisy.wszyscy}</option>
-            {grupy.map((g) => (
-              <option key={g.id} value={g.id}>{g.nazwa}</option>
-            ))}
-          </select>
-          {strzalka}
-        </label>
+        {/* bez wyboru grupy (zlecenie 11, zalecenie 4): grupy są sekcjami listy, prowadzi do nich spis „Na tej stronie” */}
         {zaklady.length > 0 && (
           <label className="zp-wybor">
             <span className="sr-only">{napisy.zaklad}</span>

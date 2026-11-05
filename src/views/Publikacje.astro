@@ -120,8 +120,13 @@ const spis = [
   .ile { order: 3; flex-basis: 100%; font-size: 14px; line-height: 1.5; color: var(--muted); }
   .nowy { margin-left: 8px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .uw { order: 4; flex-basis: 100%; font-size: 13px; line-height: 1.45; color: var(--muted); }
-  .lata .pdf { order: 2; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--d-a); text-decoration: none; }
-  .lata .pdf:hover { text-decoration: underline; text-underline-offset: 3px; }
+  /* „PDF” jako przycisk-link (zlecenie 11, zalecenie 4): ramka 1 px, bez zaokrągleń, 14 px; po najechaniu ramka i tekst w kolorze */
+  .lata .pdf { order: 2; align-self: center; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border: 1px solid var(--line);
+    font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--ink); text-decoration: none; transition: border-color .15s, color .15s; }
+  .lata .pdf:hover { border-color: var(--d-a); color: var(--d-a); }
+  .lata .pdf:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .lata .pdf :global(svg) { color: var(--d-a); }
+  @media (prefers-reduced-motion: reduce) { .lata .pdf { transition: none; } }
   /* czasopisma: podsekcje h3 (wzorzec), opis i pary etykieta–wartość */
   .cz-o { font-size: 15.5px; line-height: 1.55; }
   .czas dl { margin-top: 10px; }
