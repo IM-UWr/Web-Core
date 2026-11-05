@@ -10,10 +10,11 @@
 //   Znak i opis (ciekawostka) tylko na podstronach z menu działu; strony głębiej mają sygnet i tytuł. Hasło i liczby — gdy są.
 //   Strony bez działu (Aktualności, Kalendarz, strony ogólne) — granat, bez sygnetu i znaku.
 import Szkic from './Szkic.astro';
-import { u } from '../../lib/url';
+import { u, stripBase } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
 import { menuGlowne } from '../../lib/menu';
-import { PATRONI, pole, znakDzialu, ramkaZnaku, type Dzial } from '../../lib/patroni';
+import { PATRONI, pole, znakDzialu, ramkaZnaku, dzialZeSciezki, type Dzial } from '../../lib/patroni';
+import { pulaDzialu, stronyDzialu, ukladStaly, pulaDoSkryptu, tytulCiekawostki, zdanieCiekawostki, type Ciekawostka } from '../../lib/ciekawostki';
 import type { Lang } from '../../lib/daty';
 
 interface Props {
@@ -26,7 +27,7 @@ interface Props {
   slot?: string;
   // link „← …” (podstrona: dział albo poziom wyżej)
   wstecz: { etykieta: string; adres: string };
-  // ciekawostka: znak patrona z opisem (podstrony z menu działu)
+  // ciekawostka patrona: znak z opisem, losowana na wizytę (podstrony z menu działu; zlecenie 11, zalecenie 19)
   znak?: boolean;
 }
 const { rodzaj, dzial, tytul, lang, slot: slotWidoku = '', wstecz, znak = false } = Astro.props;
@@ -60,8 +61,24 @@ const f = FOTO[dzial ?? 'granat'];
 const altFoto = f.alt ? f.alt[lang] : '';
 const styl = `object-position:${rodzaj === 'podstrona' ? '50% 40%' : f.kadr}${f.filtr ? `;filter:${f.filtr}` : ''}`;
 
-const kreski = P && znak ? znakDzialu(P.dzial, true) : [];
-const ramka = kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
+// Ciekawostka patrona (zalecenie 19): każda podstrona z menu działu dostaje inną ciekawostkę patrona, losowaną raz na wizytę
+// (sessionStorage „im-ciek-zestaw”: {dział: {strona: id}}) skryptem w linii za znakiem, zanim strona się narysuje; pula działu
+// w linii (tylko to, co widać). Bez JS albo bez sessionStorage: ciekawostka stała z budowania (ukladStaly). Pusta pula:
+// dawny stały znak działu.
+const strona = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
+const pulaCk = P && znak ? pulaDzialu(P.dzial) : [];
+let ck: Ciekawostka | undefined;
+let ckDane = '';
+if (P && pulaCk.length) {
+  const strony = stronyDzialu(await menuGlowne(), P.adres, (a) => dzialZeSciezki(a) === P.dzial);
+  if (!strony.includes(strona)) strony.push(strona);
+  const idStaly = ukladStaly(pulaCk, strony)[strona];
+  ck = pulaCk.find((c) => c.id === idStaly) ?? pulaCk[0];
+  ckDane = JSON.stringify(pulaDoSkryptu(pulaCk, strony, lang)).replace(/</g, '\\u003c');
+}
+const kreski = ck ? ck.sciezki : P && znak ? znakDzialu(P.dzial, true) : [];
+const ramka = !ck && kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
+const opisZnaku = P && ck ? [tytulCiekawostki(ck, lang), zdanieCiekawostki(ck, lang)] : P ? [pole(P, 'znakNazwa', lang), pole(P, 'znakFakt', lang)] : [];
 const patronDzialu = lang === 'en' ? 'patron of the section' : 'patron działu';
 // Baner działu: tytułem jest nazwa działu z menu (np. „Popularyzacja”), a nie tytuł strony z danych („Popularyzacja
 // matematyki” zostaje w <title> i na telefonie).
@@ -74,6 +91,28 @@ const STAN = `(function(b){var s='z-gotowe',k='im-wizyta-dzialy',dz=b.getAttribu
   `if(JSON.parse(sessionStorage.getItem(k)||'[]').indexOf(dz)>=0)s='z-czeka';}}}catch(e){}` +
   `b.classList.add(s);})(document.currentScript.parentElement);`;
 const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
+// Losowanie ciekawostki (wzór: prototyp, ckUloz / ckStart): 1) przypięte na swoich stronach, 2) zestaw tej wizyty (ważne
+// pozycje zostają), 3) reszta stron dostaje ciekawostki w kolejności ważonej Math.random() ** (1 / waga), waga 3 dla
+// ulubionych; bez powtórzeń w dziale. Wczytywanie z wyprzedzeniem (prerender, zlecenie 13): pokaz bez zapisu, po pokazaniu
+// strony uzgodnienie z zestawem wizyty (gdy go nie ma — ten wybór staje się zestawem). Do końca skryptu znak i opis
+// niewidoczne (klasa z-ck-losuje), więc stała ciekawostka z budowania nie mignie.
+// Dane: D = {s: strony działu, p: {strona: id} przypięte, c: [[id, tytuł, zdanie, waga, [[d, gruba?], …]], …]}.
+const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.length;i++)ids[D.c[i][0]]=D.c[i];` +
+  `function uloz(pop){var u={},uz={},s,j,k=0,r;` +
+  `for(s in D.p)if(ids[D.p[s]]&&!uz[D.p[s]]){u[s]=D.p[s];uz[D.p[s]]=1}` +
+  `if(pop)for(j=0;j<D.s.length;j++){s=D.s[j];if(!u[s]&&ids[pop[s]]&&!uz[pop[s]]){u[s]=pop[s];uz[pop[s]]=1}}` +
+  `r=D.c.filter(function(c){return!uz[c[0]]}).map(function(c){return[Math.pow(Math.random(),1/c[3]),c[0]]}).sort(function(a,b){return b[0]-a[0]});` +
+  `for(j=0;j<D.s.length;j++){s=D.s[j];if(!u[s])u[s]=r.length?r[k++%r.length][1]:D.c[j%D.c.length][0]}return u}` +
+  `function czytaj(){try{return JSON.parse(sessionStorage.getItem(K)||'{}')||{}}catch(e){return null}}` +
+  `function zapisz(z,u){try{z[dz]=u;sessionStorage.setItem(K,JSON.stringify(z));return!!(JSON.parse(sessionStorage.getItem(K))[dz]||{})[st]}catch(e){return false}}` +
+  `function pokaz(id){var c=ids[id],v=n.querySelector('.z-znak'),o=n.querySelector('.z-znak-opis'),p,j;if(!c||!v||!o||n.getAttribute('data-ck')===id)return;` +
+  `while(v.firstChild)v.removeChild(v.firstChild);for(j=0;j<c[4].length;j++){p=document.createElementNS('http://www.w3.org/2000/svg','path');` +
+  `p.setAttribute('d',c[4][j][0]);p.setAttribute('pathLength','1');if(c[4][j][1])p.setAttribute('class','gruba');v.appendChild(p)}` +
+  `o.querySelector('b').textContent=c[1];o.querySelector('span').textContent=c[2];n.setAttribute('data-ck',id)}` +
+  `try{var z=czytaj(),u;if(z){u=uloz(z[dz]);` +
+  `if(document.prerendering)document.addEventListener('prerenderingchange',function(){var z2=czytaj(),u2;if(!z2)return;u2=uloz(z2[dz]||u);` +
+  `if(zapisz(z2,u2)&&u2[st]!==u[st]){pokaz(u2[st]);dispatchEvent(new Event('resize'))}},{once:true});` +
+  `if(document.prerendering||zapisz(z,u))pokaz(u[st])}}catch(e){}finally{n.classList.remove('z-ck-losuje')}})`;
 // Dopasowanie nagłówka (zlecenie 11, zalecenia 2 i 9), w linii na końcu nagłówka — zanim strona się narysuje, potem przy
 // zmianie rozmiaru okna i po wczytaniu krojów:
 // - granica z prawej: lewa krawędź ciekawostki (znak z opisem) albo notki o patronie; odstęp tytułu 40 px (zalecenie 9),
@@ -85,9 +124,12 @@ const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
 const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   `function dopasuj(){var tel=innerWidth<761,h1=n.querySelector('h1'),ul=n.querySelector('.z-slot .pt-liczby'),g=n.querySelector('.z-tyt-g'),` +
   `ty=n.querySelector('.z-tyt,.z-tytul'),nr=n.getBoundingClientRect(),gr=Infinity;` +
-  // granica z prawej: lewy brzeg tekstu ciekawostki (nie jej pudełka — tekst jest wyrównany do prawej) i znaku
-  `n.querySelectorAll('.z-ciek,.z-ciek-opis,.z-znak,.z-znak-opis,.z-patron').forEach(function(e){var rs;` +
-  `if(e instanceof SVGElement||!e.textContent.trim())rs=[e.getBoundingClientRect()];else{var g=document.createRange();g.selectNodeContents(e);rs=g.getClientRects()}` +
+  // granica z prawej: lewy brzeg tekstu ciekawostki (nie jej pudełka — tekst jest wyrównany do prawej) i znaku; w opisie
+  // znaku tylko linie tekstu (tytuł ciekawostki ma pudełko wysunięte o 160 px w lewo, zalecenie 19)
+  `n.querySelectorAll('.z-ciek,.z-ciek-opis,.z-znak,.z-znak-opis,.z-patron').forEach(function(e){var rs,g,w,t;` +
+  `if(e instanceof SVGElement||!e.textContent.trim())rs=[e.getBoundingClientRect()];` +
+  `else if(e.classList.contains('z-znak-opis')){rs=[];w=document.createTreeWalker(e,4);while(t=w.nextNode()){g=document.createRange();g.selectNodeContents(t);rs.push.apply(rs,[].slice.call(g.getClientRects()))}}` +
+  `else{g=document.createRange();g.selectNodeContents(e);rs=g.getClientRects()}` +
   `for(var i=0;i<rs.length;i++)if(rs[i].width&&rs[i].height)gr=Math.min(gr,rs[i].left)});` +
   `var gl=gr===Infinity?nr.right-(ty?ty.getBoundingClientRect().left-nr.left:64):gr-20;gr=gr===Infinity?gl:gr-40;` +
   `if(h1&&n.classList.contains('z-nagl-pod')){h1.style.fontSize='';h1.style.maxWidth='';var lin=1;` +
@@ -121,7 +163,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   </div>
 )}
 {rodzaj === 'podstrona' && (
-  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', !P && 'z-granat']} data-dzial={P?.dzial} data-pagefind-ignore>
+  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', !P && 'z-granat', ck && 'z-ck-losuje']} data-dzial={P?.dzial} data-ck={ck?.id} data-pagefind-ignore>
     <div class="z-foto"><img src={u(f.zdjecie)} alt={altFoto} fetchpriority="high" style={styl} /></div>
     <div class="z-tyt">
       <div class="z-tyt-g">
@@ -136,9 +178,10 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
     {P && kreski.length > 0 && (
       <>
         <svg class="z-znak" viewBox={ramka} aria-hidden="true" focusable="false">
-          {kreski.map((k) => <path d={k.d} class={k.gruba ? 'gruba' : undefined} />)}
+          {kreski.map((k) => <path d={k.d} pathLength="1" class={k.gruba ? 'gruba' : undefined} />)}
         </svg>
-        <p class="z-znak-opis"><b>{pole(P, 'znakNazwa', lang)}</b>{pole(P, 'znakFakt', lang)}</p>
+        <p class="z-znak-opis"><b>{opisZnaku[0]}</b><span>{opisZnaku[1]}</span></p>
+        {ck && <script is:inline set:html={`${CK}(document.currentScript.parentElement,${ckDane},${JSON.stringify(P.dzial)},${JSON.stringify(strona)});`} />}
       </>
     )}
     <script is:inline set:html={DOPASUJ} />

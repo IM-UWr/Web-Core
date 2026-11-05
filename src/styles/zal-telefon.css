@@ -159,6 +159,8 @@
   .z-nagl.z-nagl-pod .z-podpis-maly, .z-nagl.z-nagl-pod .z-znak-opis { display: none; }
   .z-nagl.z-nagl-pod .z-znak { position: absolute; right: -14px; top: 4px; width: 112px; height: 130px; z-index: 0; opacity: .4; pointer-events: none; }
   .z-nagl.z-nagl-pod .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.3; stroke-linecap: round; }
+  /* ciekawostka (zalecenie 19): na telefonie sam rysunek, do końca losowania niewidoczny */
+  html.js .z-nagl.z-nagl-pod.z-ck-losuje .z-znak { visibility: hidden; }
   .z-nagl.z-nagl-pod .z-haslo { max-width: none; }
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .lead { margin: 8px 0 0; font-size: 14px; color: var(--na-ciemnym-2); }
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }

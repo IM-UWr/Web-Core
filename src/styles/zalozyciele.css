@@ -242,7 +242,7 @@
   .z-tyt { position: relative; z-index: 1; margin-left: var(--marg); max-width: calc(100% - 2 * var(--marg)); }
   /* tytuł nie wchodzi pod opis znaku; liczby pod nim mogą iść dalej w prawo (jak w prototypie) */
   /* bez JS; z JS szerokość tytułu do ciekawostki (minus 40 px) liczy skrypt w nagłówku */
-  html:not(.js) .z-nagl-pod:has(.z-znak) .z-tyt-g { max-width: calc(100% - 440px); }
+  html:not(.js) .z-nagl-pod:has(.z-znak) .z-tyt-g { max-width: calc(100% - max(570px, 676px - var(--marg))); }
   /* w wąskim oknie (mały margines) rząd liczb łamie się przed znakiem, zamiast na niego wchodzić */
   html:not(.js) .z-nagl-pod:has(.z-znak) .z-slot { max-width: calc(100% - max(0px, 200px - var(--marg) + var(--znak-p))); }
   .z-tyt-g { position: relative; }
@@ -262,14 +262,27 @@
   .z-podpis-maly svg { display: block; width: 56px; height: auto; }
   /* znak patrona z opisem: grafika na zewnątrz (wysunięta ok. 90 px w prawy margines), tekst do środka */
   .z-nagl-pod { --znak-p: max(16px, calc(var(--marg) - 90px)); }
-  .z-znak { position: absolute; right: var(--znak-p); top: calc(var(--gora) + 10px); width: 145px; height: 170px; }
-  .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 60%, #fff); stroke-opacity: .7; stroke-width: 1.3; stroke-linecap: round; }
-  .z-znak path.gruba { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-opacity: 1; stroke-width: 2; filter: drop-shadow(0 0 4px rgb(13 24 48 / .8)); }
-  .z-znak-opis { position: absolute; z-index: 1; right: calc(var(--znak-p) + 160px); top: calc(var(--gora) + 62px); width: 205px; margin: 0; text-align: right;
+  /* nad blokiem tytułu (.z-tyt, z-index 1, pełna szerokość kolumny), żeby kursor trafiał w znak (rysowanie po najechaniu) */
+  .z-znak { position: absolute; z-index: 2; right: var(--znak-p); top: calc(var(--gora) + 10px); width: 145px; height: 170px; }
+  .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 60%, #fff); stroke-opacity: .7; stroke-width: 1.3px; vector-effect: non-scaling-stroke;
+    stroke-linecap: round; stroke-linejoin: round; }
+  .z-znak path.gruba { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-opacity: 1; stroke-width: 2px; filter: drop-shadow(0 0 4px rgb(13 24 48 / .8)); }
+  /* ciekawostka (zalecenie 19): zdanie w kolumnie 300 px, tytuł (nazwa, rok) zawsze w jednej linii — wychodzi w lewo poza
+     kolumnę, jak .pd-b .znak-podpis b w prototypie; granicę tytułu strony i liczb liczy skrypt w nagłówku */
+  .z-znak-opis { position: absolute; z-index: 1; right: calc(var(--znak-p) + 160px); top: calc(var(--gora) + 62px); width: 300px; margin: 0; text-align: right;
     font-size: 12.5px; line-height: 1.45; color: rgb(255 255 255 / .85); text-shadow: 0 1px 8px rgb(13 24 48 / .9); }
-  .z-znak-opis b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 15px; color: #fff; }
+  .z-znak-opis b { display: block; margin-left: -160px; white-space: nowrap; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 15px; color: #fff; }
   .z-liczby-pod, .z-nagl-pod.z-liczbami .z-znak { width: 200px; height: 200px; top: calc(var(--gora) + 34px); }
-  .z-nagl-pod.z-liczbami .z-znak-opis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + 216px); width: 210px; }
+  .z-nagl-pod.z-liczbami .z-znak-opis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + 216px); }
+  /* ciekawostka losowana na wizytę: do końca skryptu za znakiem niewidoczna (bez mignięcia stałej z budowania) */
+  html.js .z-nagl-pod.z-ck-losuje :is(.z-znak, .z-znak-opis) { visibility: hidden; }
+  /* po najechaniu znak rysuje się od nowa (~1 s): cienkie linie, na końcu gruba; sam CSS (pathLength="1"); bez animacji przy
+     ograniczonym ruchu i bez kursora */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .z-znak:hover path { stroke-dasharray: 1 1; animation: z-ck-rysuj .7s cubic-bezier(.22, .8, .2, 1) both; }
+    .z-znak:hover path.gruba { animation-duration: .35s; animation-delay: .65s; }
+  }
+  @keyframes z-ck-rysuj { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
   /* wąskie okno (np. laptop 1366 px): margines za mały na sygnet — sygnet z podpisem wchodzi do kolumny, tytuł przesuwa się w prawo */
   @media (max-width: 1499px) {
