@@ -1,8 +1,8 @@
 ---
 // Strona działu na komputerze (≥ 761 px; kierunek „Założyciele”, dok/estetyka.md): blok pod banerem działu.
 // Podstrony (zlecenie 11, zalecenie 5 — wariant E prototypu): pas w jasnym kolorze działu tuż pod banerem, po jednym wierszu
-// na grupę z menu (nazwa grupy z lewej, strony jako zwykłe linki Brygadą), nic się nie rozwija. Popularyzacja bez zmian
-// (trzy kolumny z liniami i strzałkami). Studia (zalecenie 13): z prawej przycisk „Rekrutacja RRRR/RR ↗”, bez USOSweb w pasie.
+// na grupę z menu (nazwa grupy z lewej, strony jako zwykłe linki Brygadą), nic się nie rozwija. Popularyzacja tak samo (zlecenie 15,
+// punkt 3), partnerzy z domeną jako podpisem. Studia (zalecenie 13): z prawej przycisk „Rekrutacja RRRR/RR ↗”, bez USOSweb w pasie.
 // Kolejność jak w prototypie: podstrony w grupach jak w menu, tekst działu
 // z „W skrócie” (wartości Brygadą w kolorze działu, pierwszy akapit większy) i sekcje działu (slot; src/components/zal/dzial/).
 // Wstawiany na końcu <main> (za dotychczasową treścią, która na komputerze znika — src/styles/zal-dzialy.css).
@@ -16,8 +16,7 @@ import { rekrutacja, rokRekrutacji, jestUsos } from '../../lib/menu';
 import type { Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-// Grupa podstron: grupa z menu działu (src/lib/menu.ts) albo zbudowana w widoku (Popularyzacja: „Na tej stronie”).
-// podpis — mały tekst przed strzałką (np. adres strony partnera).
+// Grupa podstron: grupa z menu działu (src/lib/menu.ts). podpis — mały tekst przed strzałką (np. adres strony partnera).
 export type LinkPod = { etykieta: string; etykieta_en?: string; adres: string; podpis?: string };
 export type GrupaPod = { nazwa: string; nazwa_en?: string; linki: LinkPod[] };
 export type Fakt = { w: string; o?: string };
@@ -32,17 +31,15 @@ interface Props {
 const { dzial, lang, grupy, tekst } = Astro.props;
 const en = lang === 'en';
 const href = (a: string) => (isExternal(a) || a.startsWith('#') ? a : u(wJezyku(a, lang)));
-// pas z wierszami (wariant E) na działach z grupami z menu; Popularyzacja (grupy budowane w widoku) w dotychczasowym układzie
-const pas = dzial !== 'popularyzacja';
 // Studia: USOSweb pominięty w pasie, żeby wiersze były krótsze (ten sam filtr w panelu hamburgera — PanelMenu.astro)
 const bezUsos = (l: LinkPod) => !(dzial === 'studia' && jestUsos(l.adres));
-const zGrupami = grupy.map((g) => (pas ? { ...g, linki: g.linki.filter(bezUsos) } : g)).filter((g) => g.linki.length > 0);
+const zGrupami = grupy.map((g) => ({ ...g, linki: g.linki.filter(bezUsos) })).filter((g) => g.linki.length > 0);
 const fakty = tekst?.fakty ?? [];
 const rek = dzial === 'studia' ? await rekrutacja(lang) : undefined;
 const rokRek = rokRekrutacji();
 ---
 <div class="z-dz" data-dzial={dzial}>
-  {pas && zGrupami.length > 0 && (
+  {zGrupami.length > 0 && (
     <nav class="z-dz-pas" aria-labelledby="z-dz-pod-h" data-pagefind-ignore>
       <h2 class="sr-only" id="z-dz-pod-h">{en ? 'In this section' : 'W tym dziale'}</h2>
       <div class="z-dz-rzedy">
@@ -54,7 +51,7 @@ const rokRek = rokRekrutacji();
                 const e = wybierz(l, 'etykieta', lang) as string;
                 const sk = skrotNazwy(e);
                 return (
-                  <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}</Link></li>
+                  <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}{l.podpis && <small>{l.podpis}</small>}</Link></li>
                 );
               })}
             </ul>
@@ -69,31 +66,6 @@ const rokRek = rokRekrutacji();
       )}
     </nav>
   )}
-  {!pas && zGrupami.length > 0 && (
-    <nav class="z-dz-pod" aria-labelledby="z-dz-pod-h" data-pagefind-ignore>
-      <h2 class="sr-only" id="z-dz-pod-h">{en ? 'In this section' : 'W tym dziale'}</h2>
-      {zGrupami.map((g) => (
-        <section>
-          <h3>{wybierz(g, 'nazwa', lang)}</h3>
-          <ul>
-            {g.linki.map((l) => {
-              const e = wybierz(l, 'etykieta', lang) as string;
-              const sk = skrotNazwy(e);
-              return (
-                <li>
-                  <Link href={href(l.adres)} title={sk ? e : undefined}>
-                    <span>{sk ?? e}</span>
-                    {l.podpis && <small>{l.podpis}</small>}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
-    </nav>
-  )}
-
   {tekst && tekst.akapity.length > 0 && (
     <section class="z-dz-tresc" aria-labelledby="z-dz-tresc-h">
       <div>

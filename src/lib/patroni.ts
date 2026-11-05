@@ -73,7 +73,7 @@ export const PATRONI: Record<Dzial, Patron> = {
     notka: 'Współtwórca szkoły lwowskiej i wrocławskiej, mistrz matematycznego aforyzmu i popularyzacji.',
     notka_en: 'A co-founder of the Lwów and Wrocław schools of mathematics, and a master of the mathematical aphorism and of popularisation.',
     fakt: '„Między duchem a materią pośredniczy matematyka”.', fakt_en: '“Mathematics mediates between mind and matter.”',
-    haslo: 'Matematyka dla uczniów i nauczycieli', haslo_en: 'Mathematics for students and teachers',
+    haslo: 'Matematyka dla wszystkich ciekawych', haslo_en: 'Mathematics for the curious',
     znakNazwa: 'Kanapka z szynką, 1938', znakNazwa_en: 'Ham sandwich theorem, 1938',
     znakFakt: 'Jedna prosta przepoławia naraz obie figury.',
     znakFakt_en: 'A single line bisects both shapes at once.',
