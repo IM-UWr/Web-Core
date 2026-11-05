@@ -54,10 +54,10 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
   .z-prac .zp-klik .zp-imie:focus-visible { outline: none; }
   .z-prac .zp-klik:has(.zp-imie:focus-visible) { outline: 2px solid var(--d-a); outline-offset: 2px; }
   /* pasek filtrów: pole szukania i dwie listy (grupa, zakład) w cienkich ramkach, jak przełączniki we wzorcu i w Planie zajęć */
-  .z-prac .zp-szukaj { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0 12px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); }
+  .z-prac .zp-szukaj { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0 12px; border: 1px solid var(--line-ui); background: var(--bg); color: var(--muted); }
   .z-prac .zp-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 8px 0; border: 0; border-radius: 0; background: transparent; font: inherit; color: var(--ink); outline: none; }
   .z-prac .zp-szukaj input::placeholder { color: var(--muted); opacity: 1; }
-  .z-prac .zp-wybor { position: relative; display: flex; align-items: center; min-width: 0; margin: 0; border: 1px solid var(--line); background: var(--bg); }
+  .z-prac .zp-wybor { position: relative; display: flex; align-items: center; min-width: 0; margin: 0; border: 1px solid var(--line-ui); background: var(--bg); }
   .z-prac .zp-wybor select { appearance: none; -webkit-appearance: none; width: 100%; min-width: 0; margin: 0; padding: 8px 34px 8px 12px; border: 0; border-radius: 0;
     background: transparent; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; text-overflow: ellipsis; }
   .z-prac .zp-wybor svg { position: absolute; right: 10px; pointer-events: none; color: var(--d-a); }

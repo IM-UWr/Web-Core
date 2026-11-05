@@ -59,7 +59,7 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc ol.etapy p { font-size: 15.5px; line-height: 1.55; margin-bottom: 8px; }
 .tresc ol.etapy .akcja { margin: 10px 0 0; }
 /* przycisk-link (np. formularz przy etapie): obwódka jak przyciski Planu zajęć */
-.tresc .akcja a, .tresc a.przycisk { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--line); background: transparent;
+.tresc .akcja a, .tresc a.przycisk { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--line-ui); background: transparent;
   color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.6; text-decoration: none; transition: border-color .15s, color .15s; }
 .tresc .akcja a:hover, .tresc a.przycisk:hover { border-color: var(--d-a); color: var(--d-a); }
 .tresc .akcja a:focus-visible, .tresc a.przycisk:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
@@ -77,10 +77,10 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc table.tab td:first-child { color: var(--ink); }
 .tresc table.tab td:last-child { white-space: normal; min-width: 14em; }
 /* przełącznik wariantów (np. roczniki programu): pasek przycisków jak na Planie zajęć, pod nim panel */
-.tresc .tresc-taby { display: inline-flex; flex-wrap: wrap; margin: 4px 0 16px; border: 1px solid var(--line); }
+.tresc .tresc-taby { display: inline-flex; flex-wrap: wrap; margin: 4px 0 16px; border: 1px solid var(--line-ui); }
 .tresc .tresc-taby button { margin: 0; padding: 7px 12px; border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.6;
   color: var(--text); cursor: pointer; }
-.tresc .tresc-taby button + button { border-left: 1px solid var(--line); }
+.tresc .tresc-taby button + button { border-left: 1px solid var(--line-ui); }
 .tresc .tresc-taby button:hover { color: var(--d-a); }
 .tresc .tresc-taby button[aria-pressed="true"], .tresc .tresc-taby button[aria-selected="true"] { background: var(--d-a); color: var(--bg); }
 .tresc .tresc-taby button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
@@ -179,7 +179,7 @@ body .tresc .prose :is(img, code) { border-radius: 0; }
    fokus: obrys 2 px w kolorze działu; strzałka w dół w kolorze działu (jak na stronie Pracownicy). Poza .tresc — używają jej
    też paski narzędzi (Aktualności i Kalendarz na telefonie, wybór roku na stronie kierunku).
    Znaczniki: <label|span class="z-pole-wyboru"><select>…</select><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></…> */
-.z-pole-wyboru { position: relative; display: inline-flex; align-items: center; min-width: 0; border: 1px solid var(--line); background: var(--bg); }
+.z-pole-wyboru { position: relative; display: inline-flex; align-items: center; min-width: 0; border: 1px solid var(--line-ui); background: var(--bg); }
 .z-pole-wyboru select { appearance: none; -webkit-appearance: none; width: 100%; min-width: 0; margin: 0; padding: 8px 36px 8px 12px; border: 0; border-radius: 0;
   background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; line-height: 1.6; cursor: pointer; }
 .z-pole-wyboru svg { position: absolute; right: 11px; width: 16px; height: 16px; pointer-events: none; fill: none; stroke: var(--d-a); stroke-width: 2;
