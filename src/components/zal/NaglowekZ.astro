@@ -44,15 +44,20 @@ const slot = zLiczbami ? slotWidoku : slotWidoku.replace(LISTA_LICZB, '').trim()
 // do uzupełnienia w CMS: ostrzeżenie przy budowaniu (lista stron w RAPORT-ZLECENIE-11.md)
 if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola hasła w CMS): ${Astro.url.pathname}`);
 
-// Zdjęcia działów (na razie z public/pliki/naglowki): kadr i jasność dobrane w prototypie.
-const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string }> = {
+// Zdjęcia działów (na razie z public/pliki/naglowki, repozytorium treści Web-Ustawienia): kadr i jasność dobrane w prototypie.
+// Studia (zlecenie 11, zalecenie 17): sala HS od tyłu (3200 px), domyślny filtr bez rozjaśnienia; na komputerze zdjęcie przypięte
+// do szkicu patrona (zalozyciele.css), na telefonie zwykłe object-fit: cover.
+const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?: { pl: string; en: string } }> = {
   instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: '50% 42%' },
   nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: '50% 30%', filtr: 'grayscale(1) contrast(1.15) brightness(1.45)' },
-  studia: { zdjecie: '/pliki/naglowki/studia.jpg', kadr: '50% 40%', filtr: 'grayscale(1) contrast(1.15) brightness(1.25)' },
+  studia: { zdjecie: '/pliki/naglowki/studia.jpg', kadr: '50% 40%', alt: {
+    pl: 'Sala wykładowa HS: wykład przy tablicach, studenci w ławkach od tyłu',
+    en: 'Lecture room HS: a lecture at the blackboards, students in the benches seen from behind' } },
   popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: '50% 40%' },
   granat: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: '50% 40%' },
 };
 const f = FOTO[dzial ?? 'granat'];
+const altFoto = f.alt ? f.alt[lang] : '';
 const styl = `object-position:${rodzaj === 'podstrona' ? '50% 40%' : f.kadr}${f.filtr ? `;filter:${f.filtr}` : ''}`;
 
 const kreski = P && znak ? znakDzialu(P.dzial, true) : [];
@@ -97,7 +102,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
 ---
 {rodzaj === 'dzial' && P && (
   <div class="z-nagl z-baner-dzialu" data-dzial={P.dzial} data-z-baner-dzialu={P.dzial} data-pagefind-ignore>
-    <div class="z-foto"><img src={u(f.zdjecie)} alt="" fetchpriority="high" style={styl} /></div>
+    <div class="z-foto"><img src={u(f.zdjecie)} alt={altFoto} fetchpriority="high" style={styl} /></div>
     <div class="z-szkic-ramka"><Szkic dzial={P.dzial} rodzaj="pelny" /></div>
     <div class="z-tytul">
       <a class="z-wstecz" href={u(wJezyku('/', lang))}>← {t(lang, 'stronaGlowna')}</a>
@@ -117,7 +122,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
 )}
 {rodzaj === 'podstrona' && (
   <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', !P && 'z-granat']} data-dzial={P?.dzial} data-pagefind-ignore>
-    <div class="z-foto"><img src={u(f.zdjecie)} alt="" fetchpriority="high" style={styl} /></div>
+    <div class="z-foto"><img src={u(f.zdjecie)} alt={altFoto} fetchpriority="high" style={styl} /></div>
     <div class="z-tyt">
       <div class="z-tyt-g">
         {P && <Szkic dzial={P.dzial} rodzaj="sygnet" class="z-sygnet-nagl" />}
