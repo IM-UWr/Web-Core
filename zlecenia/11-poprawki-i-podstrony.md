@@ -277,15 +277,22 @@ Specyfikacja wyglądu: `dok/estetyka.md` i prototyp `proto/zalozyciele.src.html`
 - **Kliknięcie** w pozycję przewija do drugiego ekranu i krótko podświetla odpowiadającą kolumnę (ok. 1,6 s); przy ograniczonym ruchu bez przewijania z animacją, podświetlenie jako obrys.
 - Telefon: bez tej linii (chyba że zlecenie telefonu mówi inaczej).
 
-### 16. Baner działu: ciemna plama pod szkicem patrona (decyzja 5.11, 01:37; wariant A; wzór: prototyp v78)
-- Szkic patrona ginął na tle zdjęcia, najbardziej Ślebodziński na tłumie w banerze Nauki. Pod szkicem stoi miękka, ciemna plama w granacie. Dotyczy **banerów wszystkich czterech działów**.
-- CSS z prototypu:
+### 16. Baner działu: szkic patrona w mocniejszym kolorze z cieniem kreski, **bez plamy** (decyzja 5.11, 10:35; zastępuje wariant „plama” z 01:37; wzór: prototyp v82+, przełącznik „Szkic na banerze” → „mocniejszy + cień kreski”)
+- Problem bez zmian: szkic patrona ginął na tle zdjęcia (najbardziej Ślebodziński na tłumie w banerze Nauki). **Rozwiązanie zmienione:** zamiast ciemnej plamy pod twarzą kreski szkicu (kontur i detale) oraz podpis mają **ten sam odcień co kolor działu, ale mocniej nasycony**, a wzdłuż kresek biegnie wąski ciemny cień. Dotyczy **banerów wszystkich czterech działów** (strona działu). Na nagłówkach podstron (sygnet) bez zmian.
+- **Kolor mocny (`--<dział>-jm`)** = kolor jasny działu (`-j`) przeliczony w OKLCH: nasycenie ×1,45, jasność +0,02 (najwyżej 0,86), przycięty do sRGB. Dodaj go jako token obok `-j/-g/-a/-t` (stałe wartości, bez liczenia w przeglądarce):
+  - Atramenty (obecna paleta): instytut `#ffa625`, nauka `#0aceba`, studia `#ff7d5b`, popularyzacja `#af97ff`;
+  - Lazur i malina (wybrana na później, osobna poprawka): instytut `#faa401`, nauka `#03da91`, studia `#4cc7ff`, popularyzacja `#ff8fc3`.
+- CSS (wzór z prototypu, selektory dopasuj do kodu):
   ```css
-  .in-b4 .szkic::before { content: ''; position: absolute; inset: -12% -22%; z-index: -1;
-    background: radial-gradient(closest-side, rgb(13 24 48 / .86) 0, rgb(13 24 48 / .72) 60%, rgb(13 24 48 / 0) 100%); }
+  /* baner strony działu */
+  .baner-dzialu .szkic :is(.tusz, .detale) path { stroke: var(--d-jm); }
+  .baner-dzialu .szkic .tusz path { stroke-width: 2px; }
+  .baner-dzialu .szkic { filter: drop-shadow(0 0 1.5px rgb(9 16 34 / .95)) drop-shadow(0 0 4px rgb(9 16 34 / .7))
+                                 drop-shadow(0 0 10px color-mix(in srgb, var(--d-jm) 40%, transparent)); }
+  .baner-dzialu .podpis { color: var(--d-jm); }
   ```
-- Bez konturu, grubszej kreski i rozmycia zdjęcia (warianty B–D odrzucone). Na nagłówkach podstron plamy nie ma.
-- **Odbiór:** zrzuty 4 banerów przy 1920 px, jasny i ciemny motyw. Kreska szkicu i podpis nie zmieniają koloru ani grubości.
+- **Bez plamy** (`::before` z radialnym granatem — nie dodawaj; jeśli już dodana, usuń). Animacja rysowania szkicu i podpisu bez zmian.
+- **Odbiór:** zrzuty 4 banerów przy 1920 px, jasny i ciemny motyw; szkic czytelny na każdym zdjęciu (szczególnie Nauka na tłumie i Studia na zdjęciu z sali HS).
 
 ### 17. Studia: nowe zdjęcie z sali HS, przypięte do szkicu (decyzje 5.11, 01:27–01:46; wzór: prototyp v79)
 - **Plik:** `zdjecia/wybrane/studia-hs.jpg` na gałęzi kopii (4800×2703). Sala HS od tyłu: tablice, mężczyzna przy tablicy, studenci w ławkach. Oryginał WMI `Kopia-20230104_123847`, wyostrzony i wyretuszowany przez właściciela w ChatGPT. Na stronę dać wersję o szerokości 3200 px jako `public/pliki/naglowki/studia.jpg`. Tekst alternatywny: „Sala wykładowa HS: wykład przy tablicach, studenci w ławkach od tyłu”. Filtr dwóch kolorów domyślny, bez rozjaśnienia używanego dotąd na Studiach.
