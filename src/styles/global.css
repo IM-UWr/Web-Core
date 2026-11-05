@@ -160,12 +160,8 @@ body > main { flex: 1 0 auto; }
 .brand-txt { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .brand-name { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink); }
 .brand-sub { font-size: 13px; font-weight: 500; color: var(--muted); }
-.nav { display: flex; align-items: stretch; gap: 2px; align-self: stretch; }
-.nav > a { align-self: center; }
 /* pozycja działu: napis = link do strony działu, strzałka = rozwinięcie; lista także po najechaniu myszką */
-.nav > a { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; padding: 0 8px; border-radius: 999px; font-size: 15px; font-weight: 600; text-decoration: none; color: var(--ink); }
-.nav > a:hover, .nav-item.open > .nav-pill { background: var(--surface); color: var(--ink); }
-.nav > a[aria-current='page'], .nav .is-current > .nav-pill { background: var(--tint); color: var(--tint-ink); }
+.nav-item.open > .nav-pill { background: var(--surface); color: var(--ink); }
 .nav-item.open > .dropdown { visibility: visible; opacity: 1; pointer-events: auto; transition: opacity .12s, visibility 0s; }
 .nav-item:not(.bez-hover):hover .nav-arrow .chev, .nav-item.open .nav-arrow .chev { transform: rotate(180deg); }
 .hdr-row { position: relative; }
@@ -204,7 +200,6 @@ html.menu-otwarte { overflow: hidden; }
 .chev { transition: transform .15s; }
 details[open] > summary .chev { transform: rotate(180deg); }
 @media (max-width: 1180px) {
-  .nav { display: none; }
   .burger { display: inline-flex; }
 }
 @media (max-width: 560px) {
@@ -262,10 +257,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
    przechodzi do nowej linii, kropka wypada poza lewą krawędź kontenera i jest ucinana (clip-path tylko z lewej), tekst
    zaczyna się równo z krawędzią, a para „· sala” nigdy się nie rozrywa. Kontener nie może mieć lewego wypełnienia.
    Przycięcie 1 px na lewo od krawędzi: wygładzone brzegi pierwszego elementu (np. plakietki) zostają, kropka i tak znika. */
-.kropki { --kropka: .427em; clip-path: inset(-100vh -100vw -100vh -1px); }
-.kropki > .kropka { position: relative; margin-left: calc(-1 * var(--kropka)); padding-left: var(--kropka); }
-.kropki > .kropka::before { content: '·'; content: '·' / ''; position: absolute; top: 0; left: 0; }
-.kropki > :has(+ .kropka) { margin-right: var(--kropka); }
 .news-card.featured .img { flex: 1 1 260px; min-height: 240px; background: var(--photo); }
 .news-card.featured .img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
 .news-card.featured .body { flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px; padding: 24px; }
@@ -282,7 +273,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 /* miesiąc na nadchodzącym kafelku: własny kolor tylko z tokenem --znacznik-miesiac (ciemny motyw na telefonie — bursztyn);
    bez tokenu currentColor = kolor kafelka, jak dotąd */
 :is(.datebox, .pt-dbox):not(.minione) .m { color: var(--znacznik-miesiac, currentColor); }
-.datebox.small { flex-basis: 56px; height: 62px; border-radius: 12px; }
 .datebox.small .d { font-size: 22px; }
 /* Kafelek daty — jedna zasada na całej stronie: granatowy (domyślny) = nadchodzące lub trwające, szary (.minione) = już się
    odbyło (liczone przy budowaniu strony, funkcja trwaLubBedzie; ten sam szary w kafelkach .pt-dbox wyglądu „Portal”). */
@@ -304,8 +294,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 
 /* ---------- studia ---------- */
 .studia { border-top: 1px solid var(--line); }
-.prog { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; }
-.prog:hover { border-color: var(--ink); color: var(--ink); }
 .prog .l { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .prog .n { font-size: 20px; font-weight: 800; line-height: 1.25; }
 .prog .o { font-size: 15px; line-height: 1.5; color: var(--text); }
@@ -329,7 +317,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .page-head .wrap { padding-top: clamp(24px, 4vw, 44px); padding-bottom: clamp(20px, 3vw, 32px); display: flex; flex-direction: column; gap: 12px; }
 .page-head h1 { margin: 0; font-size: clamp(32px, 5vw, 50px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.06; }
 .page-head .lead { margin: 0; max-width: 760px; font-size: 18px; color: var(--muted); }
-.wstecz { margin-bottom: 10px; }
 /* Seminarium: termin, prowadzący, kontakt i strona pod tytułem (zamiast osobnej ramki) */
 .sem-koord { margin: 16px 0 0; }
 .sem-koord-osoby { margin: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -341,11 +328,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .sem-meta li { display: inline-flex; align-items: center; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
 .sem-meta svg { flex: none; color: var(--primary); }
 :root[data-theme='dark'] .sem-meta svg { color: var(--accent); }
-.wstecz a { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; font-size: 15px; font-weight: 700; color: var(--ink); text-decoration: none; }
-.wstecz a:hover { color: var(--primary); }
-.wstecz a:hover svg { transform: translateX(-3px); }
-.wstecz svg { transition: transform .15s; }
-:root[data-theme='dark'] .wstecz a:hover { color: var(--accent); }
 .layout > .main { flex: 999 1 560px; min-width: 0; }
 .side-box { display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: var(--radius-l); background: var(--surface); min-width: 0; overflow-wrap: anywhere; }
 .side-box h2 { margin: 0; font-size: 20px; font-weight: 800; }
@@ -413,9 +395,6 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .lightbox .lb-next { right: 16px; top: 50%; transform: translateY(-50%); }
 
 /* nawigacja nowszy / starszy */
-.pn { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-.pn a { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); text-decoration: none; }
-.pn a:hover { border-color: var(--ink); }
 .pn .l { font-size: 13px; font-weight: 700; color: var(--muted); }
 .pn .t { font-size: 16px; font-weight: 800; color: var(--ink); }
 /* przyciski grup i licznik osób (dotąd style w atrybucie w TabelaPracownikow.tsx — tu, żeby wygląd „Zwarta” mógł je zmienić) */
@@ -458,13 +437,9 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 /* duże ekrany: luźniej (po regułach podstawowych, żeby je nadpisać) */
 @media (min-width: 1400px) {
   .hdr-row { gap: 20px; }
-  .nav { gap: 2px; }
-  .nav > a { padding: 0 10px; }
 }
 @media (min-width: 1600px) {
   .hdr-row { gap: 24px; }
-  .nav { gap: 4px; }
-  .nav > a { padding: 0 12px; }
   .brand-name { font-size: 18px; }
 }
 :root[data-theme='dark'] .when-light, :root:not([data-theme='dark']) .when-dark { display: none; }
@@ -526,7 +501,6 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 .step .when { font-size: 13px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 .step .deadline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; align-self: flex-start; margin-top: 4px; padding: 5px 10px; border-radius: 10px; background: var(--tint); color: var(--tint-ink); font-size: 13px; font-weight: 700; }
 .step .deadline a { color: inherit; }
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .tabpanel { padding-top: 4px; }
 .faq details { border-top: 1px solid var(--line); }
 .faq details:last-child { border-bottom: 1px solid var(--line); }
@@ -569,21 +543,9 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
    zakład) leżą nad nim i działają osobno. Po najechaniu: tło --tint, ciemna ramka, podkreślone nazwisko
    (jak .spec-link). Osoby bez strony nie mają tej klasy — bez podświetlenia i bez linku. */
 .person { border: 1px solid transparent; }
-.os-link { position: relative; transition: border-color .15s, box-shadow .15s, background-color .15s; }
-.os-link .os-a { color: var(--ink); text-decoration: none; }
-.os-link .os-a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
-.os-link a:not(.os-a) { position: relative; z-index: 1; }
-.os-link:hover, .os-link:focus-within { border-color: var(--ink); background: var(--tint); box-shadow: 0 6px 20px rgb(0 0 0 / .08); }
-.os-link:hover .os-a { text-decoration: underline; text-underline-offset: 4px; }
-.staff-row.os-link:hover::before, .staff-row.os-link:focus-within::before { opacity: 0; }
 /* ikona „strona zewnętrzna” w prawym górnym rogu karty — znak, że całe pole jest linkiem (także na telefonie) */
 .person.os-link { padding-right: 36px; }
 .person.os-link .os-a .ico { position: absolute; top: 14px; right: 12px; color: var(--muted); }
-@supports selector(:has(a)) {
-  .os-link .os-a:focus-visible { outline: none; }
-  .os-link:has(.os-a:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
-}
-@media (prefers-reduced-motion: reduce) { .os-link { transition: none; } }
 
 /* ---------- Karty na komputerze (≥ 761 px): białe tło strony zamiast szarego --surface ----------
    Większość kart (.tile, .stat, .side-box, .event-box, .why, .person, .dz-card, .cz …) jest biała dzięki tłu strony
@@ -592,6 +554,3 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
    konferencje na „Nauce”) — tam, w @media (min-width: 761px).
    Szare zostają: podświetlenia po najechaniu, menu, wyszukiwarka, nagłówki tabel, weekendy w kalendarzu, liczniki,
    notki i nieaktywne specjalności (.spec-off). Telefon (≤ 760 px) bez zmian — wygląd „Portal”. */
-@media (min-width: 761px) {
-  .prog { background: var(--bg); border: 1px solid var(--line); }
-}

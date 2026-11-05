@@ -11,7 +11,6 @@
 /* ---------- bloki tylko na jeden rodzaj ekranu ----------
    Gdy telefonowy układ wymaga innych znaczników (inna kolejność lub liczba pozycji), strona ma oba bloki:
    .tylko-komputer (dotychczasowy) i .tylko-telefon (portalowy, z data-pagefind-ignore, bez powtórzonych id). */
-@media (max-width: 760px) { .tylko-komputer { display: none !important; } }
 
 @media (max-width: 760px) {
   /* ---------- podstawy ---------- */
@@ -33,7 +32,6 @@
   .event { gap: 14px; padding: 14px; }
 
   /* ---------- studia (strona główna) ---------- */
-  .prog { gap: 4px; padding: 12px 14px; }
   .prog .l { font-size: 12px; }
   .prog .n { font-size: 17px; }
   .prog .o { font-size: 14px; }
@@ -45,8 +43,6 @@
   .page-head .wrap { padding-top: clamp(16px, 2.2vw, 26px); padding-bottom: clamp(16px, 2.2vw, 24px); gap: 8px; }
   .page-head h1 { font-size: clamp(28px, 3.4vw, 42px); }
   .page-head .lead { max-width: 820px; font-size: 16px; line-height: 1.55; }
-  .wstecz { margin-bottom: 0; }
-  .wstecz a { min-height: 40px; font-size: 14px; }
   .side-box { gap: 8px; padding: 14px 16px; }
   .side-box h2 { font-size: 18px; }
   .side-box .event { padding: 10px; gap: 12px; border-radius: 12px; }

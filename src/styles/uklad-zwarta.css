@@ -43,12 +43,10 @@
   :where([data-uklad~='zwarta'] main) .event { gap: 12px; padding: 12px; }
   :where([data-uklad~='zwarta'] main) .datebox .d { font-size: 23px; }
   :where([data-uklad~='zwarta'] main) .datebox .m { font-size: 12px; }
-  :where([data-uklad~='zwarta'] main) .datebox.small { flex-basis: 46px; height: 50px; border-radius: 9px; }
   :where([data-uklad~='zwarta'] main) .datebox.small .d { font-size: 19px; }
   :where([data-uklad~='zwarta'] main) .event .t { font-size: 16px; line-height: 1.25; }
 
   /* ---------- studia ---------- */
-  :where([data-uklad~='zwarta'] main) .prog { gap: 3px; padding: 12px 16px; }
   :where([data-uklad~='zwarta'] main) .prog .l { font-size: 12px; }
   :where([data-uklad~='zwarta'] main) .prog .n { font-size: 17px; }
   :where([data-uklad~='zwarta'] main) .prog .o { line-height: 1.4; }
@@ -83,9 +81,6 @@
   :where([data-uklad~='zwarta'] main) .files li { min-width: 0; }
   :where([data-uklad~='zwarta'] main) .files a { gap: 10px; height: 100%; min-height: 40px; padding: 7px 12px; border-radius: 10px; }
 
-  /* nawigacja nowszy / starszy */
-  :where([data-uklad~='zwarta'] main) .pn a { gap: 2px; padding: 10px 14px; border-radius: 10px; }
-
   /* tabela pracowników */
   :where([data-uklad~='zwarta'] main) .search { height: 40px; }
   :where([data-uklad~='zwarta'] main) .staff th { padding: 6px 10px; }
@@ -98,8 +93,6 @@
 
   /* artykuł (aktualność): nagłówek w treści, zdjęcie, bloki, udostępnianie, „← Wszystkie aktualności” */
   :where([data-uklad~='zwarta'] main) .article-head .lead { font-size: 17px; }
-  :where([data-uklad~='zwarta'] main .crumbs-inline) .wstecz { margin-bottom: 0; }
-  :where([data-uklad~='zwarta'] main .crumbs-inline) .wstecz a { min-height: 32px; font-size: 14px; }
 
   /* granty */
   :where([data-uklad~='zwarta'] main) .grant { padding: 10px 0; }
@@ -121,7 +114,6 @@
   :where([data-uklad~='zwarta'] main) .step .deadline { display: block; margin-top: 2px; padding: 3px 9px; flex-wrap: nowrap; align-items: normal; gap: normal; }
   :where([data-uklad~='zwarta'] main) .step .deadline a { margin-left: 6px; }
   :where([data-uklad~='zwarta'] main) .step .deadline svg { display: inline-block; vertical-align: -2px; margin-right: 6px; }
-  :where([data-uklad~='zwarta'] main) .tabs { gap: 6px; margin-bottom: 10px; }
   :where([data-uklad~='zwarta'] main) .faq summary { min-height: 44px; }
   :where([data-uklad~='zwarta'] main) .faq .prose { padding-bottom: 8px; }
 
