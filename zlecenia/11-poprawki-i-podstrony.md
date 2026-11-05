@@ -319,3 +319,17 @@ Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, 
 - **Telefon:** ciekawostka tam, gdzie nagłówek podstrony na telefonie ma miejsce na znak; jeśli nie ma — bez ciekawostki (nie dokładaj miejsca).
 - Wyszukiwarka: ciekawostki poza indeksem (`data-pagefind-ignore`); rysunek `aria-hidden`, opis zwykłym tekstem.
 - **Kryteria odbioru:** zrzuty kilku podstron każdego działu (1440, 1920, telefon) w dwóch losowaniach; dowód, że w obrębie wizyty zestaw stały i bez powtórzeń, a nowa wizyta losuje inaczej; brak mignięcia przy wejściu; ukryte karty nigdy się nie pokazują.
+
+### 20. Strona główna: okładka ↔ Szybki dostęp bez zatrzymywania w połowie (decyzja 5.11, 02:07)
+- **Zasada:** między okładką a Szybkim dostępem (drugi ekran) strona nigdy nie zatrzymuje się w połowie. Są dwa położenia: **okładka w całości** albo **Szybki dostęp od swojej górnej krawędzi**.
+  - kliknięcie „⌄ Szybki dostęp” (i liczb nad nim, zalecenie 15) → płynny przejazd w całości na Szybki dostęp;
+  - **zdecydowany** ruch w dół na okładce (kółko myszy, gładzik, przesunięcie palcem, klawisze PgDn / spacja / ↓ / End) → przejazd w całości na Szybki dostęp;
+  - zdecydowany ruch w górę, gdy Szybki dostęp jest u swojej górnej krawędzi (PgUp / ↑ / Home też) → przejazd w całości na okładkę;
+  - **drobny, przypadkowy ruch** (np. jeden słaby ruch gładzika) nic nie robi: strona zostaje, gdzie była (bez „podskoku” do połowy).
+- **Niżej swobodnie:** Szybki dostęp razem z tym, co pod nim (Studia, Warto wiedzieć, stopka), przewija się normalnie, jeśli jest wyższy niż okno. Powrót na okładkę dopiero, gdy użytkownik jest u górnej krawędzi Szybkiego dostępu i wykona **nowy** zdecydowany ruch w górę (nie ten sam rozpęd, którym dojechał do krawędzi — histereza ok. 300–500 ms po zatrzymaniu).
+- **Sposób (propozycja):**
+  - kółko / gładzik / klawiatura: skrypt sumuje `deltaY` w krótkim oknie czasu (ok. 200 ms); po przekroczeniu progu (orientacyjnie 50–80 px, do dostrojenia na gładziku i myszy) uruchamia przejazd (`scrollTo` z `behavior: 'smooth'`, ok. 0,6–0,8 s, ta sama krzywa co reszta, zlecenie 13 pkt 9) i na czas przejazdu oraz wygasania rozpędu (ok. 0,8 s) ignoruje kolejne zdarzenia; poniżej progu `preventDefault`, żeby strona nie przesuwała się o kawałek;
+  - dotyk (telefon, tablet): CSS `scroll-snap-type: y mandatory` z dwoma punktami (`scroll-snap-align: start` na okładce i na bloku „Szybki dostęp + reszta strony” jako jednym obszarze, żeby niżej przewijało się swobodnie) — przeglądarka sama dociąga płynnie i naturalnie; sprawdź na iOS Safari i Chrome Android (pasek adresu zmienia wysokość okna);
+  - `prefers-reduced-motion`: przejście natychmiastowe, bez animacji;
+  - nie blokuj zaznaczania tekstu, kotwic (`#...`), wyszukiwania w stronie (Ctrl+F) ani powrotu „wstecz” (przywrócone położenie ma być jednym z dwóch).
+- **Kryteria odbioru:** nagranie lub seria zrzutów: mysz z kółkiem, gładzik (krótki i długi ruch), klawiatura, dotyk; ani razu zatrzymanie w połowie; drobny ruch nie przewija; przejazd w obie strony płynny; po dojechaniu do stopki i powrocie w górę strona zatrzymuje się na Szybkim dostępie, a dopiero kolejny zdecydowany ruch prowadzi na okładkę.
