@@ -171,9 +171,15 @@ export function miejsce(s: string | null | undefined, lang: Lang = 'pl'): string
 }
 
 // Wspólny format pozycji kalendarza.
+// Referat po polsku na stronie angielskiej (pole jezyk; decyzja D10, zlecenie 16).
+export const DOPISEK_PO_POLSKU = '(talk in Polish)';
+export const poPolskuNaEn = (jezyk: string | undefined, lang: Lang) => lang === 'en' && jezyk === 'pl';
+
 export interface Wydarzenie {
   rodzaj: 'wydarzenie' | 'obrona' | 'referat' | 'konferencja' | 'termin';
   tytul: string;
+  // referat: język (pole jezyk w CMS)
+  jezyk?: string;
   podtytul?: string;
   poczatek: string;
   // koniec podany przez redaktora (wyświetlany na stronie)
@@ -221,7 +227,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
     const semId = seminariumReferatu(r);
     if (!nazwy.has(semId)) continue;
     out.push({
-      rodzaj: 'referat', tytul: r.data.tytul, podtytul: `${r.data.prelegent}${afiliacjaReferatu(r.data, lang) ? ` (${afiliacjaReferatu(r.data, lang)})` : ''}`,
+      rodzaj: 'referat', tytul: r.data.tytul, jezyk: r.data.jezyk, podtytul: `${r.data.prelegent}${afiliacjaReferatu(r.data, lang) ? ` (${afiliacjaReferatu(r.data, lang)})` : ''}`,
       poczatek: r.data.termin, koniecIcs: koniecDomyslny(r.data.termin, 90), miejsce: sala(salaReferatu(r.data, lang), lang),
       href: `/seminaria/${semId}#${slugOf(r.id)}`, uid: `ref-${semId}-${slugOf(r.id)}`, opis: `${lang === 'en' ? 'Seminar' : 'Seminarium'}: ${nazwy.get(semId)}`,
     });
@@ -311,7 +317,7 @@ export function tydzienSeminariow(): { od: string; do: string; przyszly: boolean
   return { od, do: addDays(od, 6), przyszly: false };
 }
 
-export interface ReferatWLiscie { termin: string; sala?: string; seminarium: string; seminariumId: string; tytul: string; prelegent: string; href: string }
+export interface ReferatWLiscie { termin: string; sala?: string; seminarium: string; seminariumId: string; jezyk?: string; tytul: string; prelegent: string; href: string }
 
 export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLiscie[]> {
   const [ref, sem] = await Promise.all([referaty(), seminaria()]);
@@ -322,7 +328,7 @@ export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLisc
     .map((r) => {
       const semId = seminariumReferatu(r);
       return {
-        termin: r.data.termin, sala: salaReferatu(r.data, lang), seminarium: nazwy.get(semId)!, seminariumId: semId, tytul: r.data.tytul,
+        termin: r.data.termin, sala: salaReferatu(r.data, lang), seminarium: nazwy.get(semId)!, seminariumId: semId, tytul: r.data.tytul, jezyk: r.data.jezyk,
         prelegent: r.data.prelegent, href: `/seminaria/${semId}#${slugOf(r.id)}`,
       };
     });

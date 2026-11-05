@@ -23,7 +23,7 @@ import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { listaKierunkow } from '../../lib/menu';
 import { tekstDnia } from '../../lib/kolory-dni';
-import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf } from '../../lib/tresci';
+import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU } from '../../lib/tresci';
 import { dzialZeSciezki, skrotNazwy, type Dzial } from '../../lib/patroni';
 
 interface Props { lang: Lang }
@@ -41,7 +41,7 @@ const krotkaSala = (s?: string) => (s ? (/^[\w.\-]{1,6}$/.test(s) ? `${en ? 'roo
 const dzialZ = (adres?: string): Dzial | undefined => (adres && !isExternal(adres) ? dzialZeSciezki(adres) : undefined);
 const NAZWY_DZ: Record<Dzial, [string, string]> = { instytut: ['Instytut', 'Institute'], nauka: ['Nauka', 'Research'], studia: ['Studia', 'Studies'], popularyzacja: ['Popularyzacja', 'Outreach'] };
 
-type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean };
+type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; polski?: boolean; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean };
 
 // Dział wpisu (aktualności nie mają jeszcze pola „Dział” — reguła z dok/estetyka.md, „CMS: dział przy aktualnościach”):
 // „dla” studenci lub kandydaci → Studia; sukces, obrona albo wpisany zakład → Nauka; pozostałe → Instytut.
@@ -73,7 +73,7 @@ const zakres = (() => {
 })();
 const seminaria: Wiersz[] = (await referatyWTygodniu(lang)).map((r) => ({
   dzial: 'nauka', ...data(r.termin), gdzie: r.seminarium, co: [godzina(r.termin), krotkaSala(r.sala)].filter(Boolean).join(' · '),
-  tytul: r.tytul, kto: r.prelegent, adres: r.href,
+  tytul: r.tytul, polski: poPolskuNaEn(r.jezyk, lang), kto: r.prelegent, adres: r.href,
 }));
 
 // Aktualności: miniatura 72×54, bez zdjęcia — sygnet działu wpisu
@@ -152,7 +152,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           <span class="kiedy"><b>{o.d}</b>{o.m}</span>
           <span class="tr">
             <span class="gdzie">{o.gdzie}{o.co && <i> · {o.co}</i>}</span>
-            <span class="t">{o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
+            <span class="t">{o.polski ? <><span lang="pl">{o.tytul}</span> {DOPISEK_PO_POLSKU}</> : o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
           </span>
           {'min' in k && (o.min
             ? <span class="min"><ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 72, 54])} /></span>

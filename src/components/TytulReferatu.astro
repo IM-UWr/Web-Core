@@ -2,10 +2,16 @@
 // Tytuł referatu w treści strony: wzory w $…$ przez KaTeX — ten sam renderer co treść, w trybie inline, bez <p>
 // (src/lib/markdown.ts, renderTytulZWzorami; decyzja 31.10.2026). Tytuł bez wzorów — zwykły tekst, jak dotąd.
 // Tylko do treści strony: w atrybutach (title, alt), meta, .ics i e-mailach tytuł zostaje zwykłym tekstem.
+// Referat po polsku na /en (pole jezyk = pl; decyzja D10, zlecenie 16): tytuł w oryginale z lang="pl", po nim „(talk in Polish)”.
 import { renderTytulZWzorami } from '../lib/markdown';
+import { poPolskuNaEn, DOPISEK_PO_POLSKU } from '../lib/tresci';
+import type { Lang } from '../lib/daty';
 
-interface Props { tekst: string }
-const { tekst } = Astro.props;
+interface Props { tekst: string; jezyk?: string; lang?: Lang }
+const { tekst, jezyk, lang = 'pl' } = Astro.props;
 const html = await renderTytulZWzorami(tekst);
+const poPolsku = poPolskuNaEn(jezyk, lang);
 ---
-{html ? <Fragment set:html={html} /> : tekst}
+{poPolsku
+  ? <><span lang="pl">{html ? <Fragment set:html={html} /> : tekst}</span> {DOPISEK_PO_POLSKU}</>
+  : html ? <Fragment set:html={html} /> : tekst}

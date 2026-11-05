@@ -133,6 +133,8 @@ const referaty = defineCollection({
     // afiliacja, sala i streszczenie (Markdown) po angielsku — opcjonalne; puste = na /en wartość polska (sala: jak dotąd,
     // „605” → „room 605”). Tytuł referatu zostaje w języku oryginału (zlecenie 11, zalecenie 12).
     afiliacja_en: optStr,
+    // język referatu: „pl” = na /en po tytule dopisek „(talk in Polish)” (decyzja D10, zlecenie 16); puste = bez dopisku
+    jezyk: z.preprocess(empty, z.enum(['pl', 'en']).optional()),
     termin: date,
     sala: optStr,
     sala_en: optStr,

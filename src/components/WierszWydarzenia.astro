@@ -27,8 +27,8 @@ const etykieta = [RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce].filter(Boolean).j
     <div class="ww-rodz">{etykieta}</div>
     <H class="ww-t">
       {adres
-        ? <Link href={adres}>{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : w.tytul}</Link>
-        : w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : w.tytul}
+        ? <Link href={adres}>{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}</Link>
+        : w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}
     </H>
     {w.podtytul && <p lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</p>}
     {w.rodzaj === 'referat' && w.opis && <p class="ww-opis">{w.opis}</p>}

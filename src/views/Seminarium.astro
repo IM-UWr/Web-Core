@@ -100,7 +100,7 @@ const spis = [
         <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
         <div>
           <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), true)}</p>
-          <h3><TytulReferatu tekst={r.data.tytul} /></h3>
+          <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
           <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
           {(en || r.body?.trim()) && <div class="prose streszcz">{en ? <Fragment set:html={en} /> : <C />}</div>}
           {r.data.pliki.length > 0 && (
@@ -120,7 +120,7 @@ const spis = [
           <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
           <div>
             {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
-            <h3><TytulReferatu tekst={r.data.tytul} /></h3>
+            <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
             <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
             {(en || r.body?.trim()) && (
               <details>

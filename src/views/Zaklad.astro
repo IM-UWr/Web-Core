@@ -110,7 +110,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
             <li>
               <p class="t"><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{wybierz(s.data, 'nazwa', lang)}</a></p>
               {r ? (
-                <p><strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(salaReferatu(r.data, lang), lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="zk-kto">({r.data.prelegent})</span></p>
+                <p><strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(salaReferatu(r.data, lang), lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /> <span class="zk-kto">({r.data.prelegent})</span></p>
               ) : (
                 <p class="zk-brak">{t(lang, 'brakNadchodzacych')}</p>
               )}
