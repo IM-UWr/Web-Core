@@ -4,7 +4,7 @@ Względem stanu po łatkach z `dok/en/latki/` (a w repozytoriach, których dotyc
 
 | Łatka | Co zmienia |
 |---|---|
-| `Web-Aktualnosci.patch` | 21 wpisów: D4 (tytuły w nawiasach), D8 (nazwy konkursów, pisownia „Krok w Przyszłość” także w polu polskim), stopnie z D1 |
+| `Web-Aktualnosci.patch` | 21 wpisów: D4 (tytuły w nawiasach), D8 (nazwy konkursów, pisownia „Krok w Przyszłość” także w polu polskim), stopnie z D1. Osiem obron: usuwa `tresc_en` dodane przez `dok/en/latki` (decyzja właściciela; tekst angielski składa widok i sam dobiera czas) |
 | `Web-Nauka.patch` | D11: „Szklarska Poręba” w `2020-model-theory-conference.md` |
 | `Web-Sem-*.patch` (9) | D10: pole `jezyk` w `.pages.yml`; w Dyskretnej Analizie Harmonicznej i Równaniach Różniczkowych także `jezyk: pl` przy trzech referatach |
 | `Web-Spec-Nauczycielska.patch` | D8: „Krok w Przyszłość” (Step into the Future) |

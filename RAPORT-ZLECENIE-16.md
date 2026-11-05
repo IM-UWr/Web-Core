@@ -1,13 +1,12 @@
 # Raport: zlecenie 16 — wersja angielska (5.11.2026)
 
-Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów + commit raportu, **bez pushowania**. Repozytoria treści: 34 commity w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
+Gałąź: `wyglad/zlecenie-16` (z `9fd255ee`, ostatniego commita zlecenia 15), 12 commitów + 2 commity raportu (drugi z decyzją o obronach), **bez pushowania**. Repozytoria treści: 35 commitów w 20 klonach, też bez pushowania. Zlecenie: `.przekazanie/zlecenia/16-wersja-angielska.md`.
 
 **Do Twojej decyzji albo działania**
 
-1. **Minione obrony: zdecyduj, czy zostawić „You are cordially invited”.** Łatka z `dok/en/latki` dodaje `tresc_en` do ośmiu obron (5 prawdziwych, 3 testowe), które do tej pory dostawały tekst z kodu w poprawnym czasie („… took place on …”). Teraz siedem minionych obron zaprasza na wydarzenie, a tuż obok widać „This event has taken place”. Tłumaczenie jest wierne, bo po polsku też stoi „Zapraszamy”. Łatkę nałożyłem zgodnie ze zleceniem. **Zalecam usunięcie tych ośmiu pól `tresc_en` przed pushem:** wtedy wraca tekst z kodu, który sam dobiera czas. Napisz „usuń” albo „zostaw”.
-2. **Wklej nowy skrypt e-maili do Google (D16).** Zmiana w repozytorium nie wdraża się sama. Otwórz projekt na https://script.google.com, zastąp zawartość `Code.gs` plikiem `skrypty/powiadomienia/Code.gs`, zapisz i wybierz **Wdróż → Zarządzaj wdrożeniami → Edytuj → Nowa wersja → Wdróż**. Adres `/exec` się nie zmienia. Dopóki tego nie zrobisz, e-maile linkują do `/powiadomienia/`, a ta strona działa dalej i jest dwujęzyczna.
-3. **Przejrzyj tłumaczenia:** D4, D6, D8 (tabele niżej) oraz 31 nazw przedmiotów i notki patronów (załączniki na końcu). Tych dwóch ostatnich nie zatwierdziłeś od zalecenia 12.
-4. **Push czeka na Twoje słowo.** 20 repozytoriów treści i Web-Core; lista niżej.
+1. **Wklej nowy skrypt e-maili do Google (D16).** Zmiana w repozytorium nie wdraża się sama. Otwórz projekt na https://script.google.com, zastąp zawartość `Code.gs` plikiem `skrypty/powiadomienia/Code.gs`, zapisz i wybierz **Wdróż → Zarządzaj wdrożeniami → Edytuj → Nowa wersja → Wdróż**. Adres `/exec` się nie zmienia. Dopóki tego nie zrobisz, e-maile linkują do `/powiadomienia/`, a ta strona działa dalej i jest dwujęzyczna.
+2. **Przejrzyj tłumaczenia:** D4, D6, D8 (tabele niżej) oraz 31 nazw przedmiotów i notki patronów (załączniki na końcu). Tych dwóch ostatnich nie zatwierdziłeś od zalecenia 12.
+3. **Push czeka na Twoje słowo.** 20 repozytoriów treści i Web-Core; lista niżej.
 
 Stan sprawdzenia:
 
@@ -40,6 +39,7 @@ Stan sprawdzenia:
 | D19 daty po angielsku | zrobione | — | Web-Studia |
 | D20 „(in Polish)” w menu | zrobione | `bf562674` | Web-Ustawienia |
 | 17 łatek z `dok/en/latki` i łatki 14, 15 | nałożone | — | 20 repozytoriów |
+| Obrony bez `tresc_en` (Twoja decyzja po raporcie) | zrobione | ten commit (łatka) | Web-Aktualnosci |
 | Łatki tego zlecenia | zapisane | `ec0b0a4a` | `dok/latki/zlecenie-16/` |
 
 ## Kryteria odbioru
@@ -48,12 +48,14 @@ Stan sprawdzenia:
 |---|---|
 | `/en` bez polskich stopni przy nazwiskach (poza „Dr hab.”) | skan całego `/en`: zostały 3 trafienia, wszystkie w cytowaniach bibliograficznych na `/en/nauka/publikacje/2006` i `/2018` („prof. E. Wirsinga”, „ks. dr hab. Adam Olszewski, prof. UP JPII”). To cytaty, więc ich nie ruszałem |
 | Poprawne tytuły stron | „Study · Mathematical Institute, University of Wrocław”; `og:site_name` tak samo; polskie strony bez zmian („Instytut · Instytut Matematyczny UWr”) |
-| Łatki w klonach (commity bez pushu) i na nakładce | 34 commity w 20 klonach, wszystkie klony czyste; każda łatka z `dok/latki/zlecenie-16/` zgadza się z ostatnim commitem klonu |
+| Łatki w klonach (commity bez pushu) i na nakładce | 35 commitów w 20 klonach, wszystkie klony czyste; każda łatka z `dok/latki/zlecenie-16/` zgadza się ze stanem klonu |
 | Kopia oryginałów nakładki | `.przekazanie/robocze/nakladka-przed-16/` |
 | Build, `astro check`, `sprawdz_tresci.py` | bez nowych błędów, OK (wyżej) |
 | Zrzuty `/en` przed/po | niżej; `dok/en/POSTEP.md` nie zawiera nazwanej listy stron, więc wybrałem 20 reprezentatywnych |
 
 ## Co warto wiedzieć o wykonaniu
+
+**Obrony (Twoja decyzja „Usuń”, 5.11).** Łatka z `dok/en/latki` dodawała `tresc_en` do ośmiu obron (5 prawdziwych, 3 testowe), przez co minione obrony zapraszały „You are cordially invited”, a obok było „This event has taken place”. Pola usunąłem, więc tekst składa widok z danych obrony. W zbudowanej stronie siedem minionych obron ma „… took place on …”, a jedna przyszła (testowa, 27.11) nadal zaprasza. Pole `tresc_en` zostaje w formularzu CMS, ale wpisany tam tekst znów zastąpi ten z kodu.
 
 **D1.** Osobna reguła dla „dr, prof. UWr”, której zlecenie nie wymienia: daję „Dr” (pytanie 2). Na stronie obrony „X, MSc” stoi w tekście, a nagłówek to samo nazwisko, bo tak wygląda on po polsku.
 
@@ -112,7 +114,7 @@ Z 380 polskich stron zmieniło się 17, wszystkie zgodnie ze zleceniem, i doszł
 
 | Repozytorium | Commity (od najstarszego) | Co zawierają |
 |---|---|---|
-| Web-Aktualnosci | `c803e95`, `6b42382` | tłumaczenia z `dok/en/latki`; D4 (tytuły w nawiasach), D8 (nazwy konkursów, pisownia „Krok w Przyszłość” także w polu polskim), stopnie z D1 |
+| Web-Aktualnosci | `c803e95`, `6b42382`, `feeacb9` | tłumaczenia z `dok/en/latki`; D4 (tytuły w nawiasach), D8 (nazwy konkursów, pisownia „Krok w Przyszłość” także w polu polskim), stopnie z D1; obrony bez `tresc_en` z tamtej łatki |
 | Web-Instytut | `dc44f49` | tylko łatka z `dok/en/latki`: naprawiony martwy link w „Wykładzie Terence’a Tao” (PL i EN) |
 | Web-Nauka | `13745e4` | D11: „Szklarska Poręba” w polu `miejsce` |
 | Web-Popularyzacja | `53f6556` | tylko łatka ze zlecenia 15: dane działu, cztery strony, formularz CMS |
@@ -137,7 +139,7 @@ Commity mają opis „Wersja angielska: tłumaczenia (zlecenie 16)”, osobno dl
 
 ## Łatki i nakładka
 
-- `dok/latki/zlecenie-16/`: 14 łatek względem stanu po `dok/en/latki`, opis w `README.md`.
+- `dok/latki/zlecenie-16/`: 14 łatek względem stanu po `dok/en/latki`, opis w `README.md`. Łatka Web-Aktualnosci cofa też `tresc_en` obron dodane przez `dok/en/latki`, więc kolejność nakładania ma znaczenie. Samego `dok/en/latki` nie zmieniałem.
 - Nakładka zawiera łatki 14, 15, `dok/en/latki` i 16 (tylko `src/`).
 - **Przywracanie nakładki:** skopiuj zawartość `.przekazanie/robocze/nakladka-przed-16/src/` na `src/`. Plik z końcówką `.BRAK.txt` oznacza, że przed zleceniem pliku nie było, więc przywrócenie to usunięcie (dotyczy `src/content/strony/o-stronie.md`).
 - Nowe pole `jezyk` jest opisane w `.przekazanie/pola-do-cms.md`.
@@ -306,7 +308,7 @@ Ciemny motyw (1920 px), po zmianach:
 
 ## Pytania
 
-1. **Minione obrony** (punkt 1 na górze): usunąć osiem pól `tresc_en`? Po polsku jest ten sam problem („Zapraszamy” po terminie), ale tego zlecenie nie obejmuje.
+1. **Minione obrony po polsku:** na polskich stronach nadal stoi „Zapraszamy na publiczną obronę” po terminie. Ten tekst pochodzi z treści wpisów, nie z kodu, i zlecenie go nie obejmuje. Czy zrobić dla wersji polskiej to samo, co dla angielskiej (tekst z danych, dobierający czas)?
 2. **„dr, prof. UWr”:** zlecenie opisuje tylko „dr hab. X, prof. UWr → Prof. X”. Daję „Dr X”. Czy tak zostawić?
 3. **„Mathematical Analysis” czy „Advanced calculus”:** USOS używa „Advanced calculus” i tak jest teraz w nawiasach z D6, a strona skryptów i tabela struktury w „First year” mają „Mathematical Analysis”. Czy ujednolicić? Na razie zostawiłem, bo D6 każe trzymać nazwę z USOS przy nazwie polskiej, a tamte miejsca to nie są nazwy z USOS.
 4. **„Iuvenes Wratislaviae”:** przetłumaczyłem jako „Young People of Wrocław”. To moje tłumaczenie; nie sprawdzałem, czy istnieje oficjalna angielska nazwa. Zostawić je czy samą nazwę łacińską?
