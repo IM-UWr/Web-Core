@@ -2,7 +2,7 @@
 // Strona działu na komputerze (≥ 761 px; kierunek „Założyciele”, dok/estetyka.md): blok pod banerem działu.
 // Podstrony (zlecenie 11, zalecenie 5 — wariant E prototypu): pas w jasnym kolorze działu tuż pod banerem, po jednym wierszu
 // na grupę z menu (nazwa grupy z lewej, strony jako zwykłe linki Brygadą), nic się nie rozwija. Popularyzacja tak samo (zlecenie 15,
-// punkt 3), partnerzy z domeną jako podpisem. Studia (zalecenie 13): z prawej przycisk „Rekrutacja RRRR/RR ↗”, bez USOSweb w pasie.
+// punkt 3). Studia (zalecenie 13): z prawej przycisk „Rekrutacja RRRR/RR ↗”, bez USOSweb w pasie.
 // Kolejność jak w prototypie: podstrony w grupach jak w menu, tekst działu
 // z „W skrócie” (wartości Brygadą w kolorze działu, pierwszy akapit większy) i sekcje działu (slot; src/components/zal/dzial/).
 // Wstawiany na końcu <main> (za dotychczasową treścią, która na komputerze znika — src/styles/zal-dzialy.css).
@@ -16,8 +16,8 @@ import { rekrutacja, rokRekrutacji, jestUsos } from '../../lib/menu';
 import type { Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-// Grupa podstron: grupa z menu działu (src/lib/menu.ts). podpis — mały tekst przed strzałką (np. adres strony partnera).
-export type LinkPod = { etykieta: string; etykieta_en?: string; adres: string; podpis?: string };
+// Grupa podstron: grupa z menu działu (src/lib/menu.ts).
+export type LinkPod = { etykieta: string; etykieta_en?: string; adres: string };
 export type GrupaPod = { nazwa: string; nazwa_en?: string; linki: LinkPod[] };
 export type Fakt = { w: string; o?: string };
 
@@ -54,7 +54,7 @@ const etykietaRek = rek?.etykieta.replace(DOPISEK_RE, '');
                 const e = wybierz(l, 'etykieta', lang) as string;
                 const sk = skrotNazwy(e);
                 return (
-                  <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}{l.podpis && <small>{l.podpis}</small>}</Link></li>
+                  <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}</Link></li>
                 );
               })}
             </ul>

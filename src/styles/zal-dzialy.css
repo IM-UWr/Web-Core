@@ -32,8 +32,6 @@
   .z-dz-rzad a:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
   @media (prefers-reduced-motion: no-preference) { .z-dz-rzad a:active { transform: translateY(1px); } }
   @media (prefers-reduced-motion: reduce) { .z-dz-rzad a { transition: none; } }
-  /* podpis: domena partnera (Popularyzacja, zlecenie 15), przed strzałką */
-  .z-dz-rzad a small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 500; color: var(--muted); }
   .z-dz-rzad a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: .8em; color: var(--muted); }
   .z-dz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display);
     font-weight: 500; font-size: 22px; line-height: 1.2; white-space: nowrap; position: relative; isolation: isolate; }
@@ -151,7 +149,7 @@
   .z-dz .z-dz-rzad { display: block; padding: 9px 0; }
   .z-dz .z-dz-rzad h3 { margin-bottom: 2px; font-size: 13px; }
   .z-dz .z-dz-rzad ul { gap: 2px 18px; }
-  .z-dz .z-dz-rzad a { font-size: 19px; white-space: normal; } /* długie nazwy partnerów z domeną nie mieszczą się w jednej linii */
+  .z-dz .z-dz-rzad a { font-size: 19px; white-space: normal; } /* długie nazwy nie mieszczą się w jednej linii */
   .z-dz .z-dz-rekr { display: inline-flex; margin-top: 10px; padding: 12px 18px; font-size: 20px; }
   .z-dz .z-dz-pas + .z-dz-tresc { padding-top: 22px; }
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }

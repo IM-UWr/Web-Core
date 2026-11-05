@@ -16,11 +16,6 @@ type Dane = {
   o_popularyzacji?: Tekst; o_popularyzacji_en?: Tekst; o_popularyzacji_fakty?: Fakt[] | null; tradycja?: Tradycja[] | null;
 };
 
-// Domena strony bez „www.” (podpis linku do partnera, np. „fmw.math.uni.wroc.pl”).
-const domena = (a: string) => {
-  try { return new URL(a).hostname.replace(/^www\./, ''); } catch { return ''; }
-};
-
 // polska odmiana: 1 rok, 2–4 lata, 5+ lat (22 lata, ale 12 lat)
 const lata = (n: number) => (n === 1 ? 'rok' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'lata' : 'lat');
 
@@ -41,11 +36,9 @@ export async function danePopularyzacji(lang: Lang) {
     .filter((x) => x.n > 0)
     .map(({ n, nazwa }) => ({ n, l: en ? `${n === 1 ? 'year' : 'years'} of ${nazwa}` : `${lata(n)} ${nazwa}` }));
 
-  // Grupy z menu „Popularyzacja”: linki poza stronę z domeną jako podpisem.
+  // Grupy z menu „Popularyzacja”: same nazwy, linki poza stronę dostają strzałkę ↗.
   const pozycja = (await menuGlowne()).find((m) => m.adres === '/popularyzacja');
-  const grupy = (pozycja?.grupy ?? [])
-    .filter((g) => g.linki.length > 0)
-    .map((g) => ({ ...g, linki: g.linki.map((l) => ({ ...l, podpis: domena(l.adres) || undefined })) }));
+  const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
   // „O popularyzacji”: akapity z CMS (oddzielone pustą linią) i „W skrócie” obok, jak „O studiach”.
   const akapity = (w(d, 'o_popularyzacji') || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
