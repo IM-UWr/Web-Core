@@ -132,8 +132,24 @@ def obecne(nazwa, szer=1000):
     return 'data:image/jpeg;base64,' + base64.b64encode(b.getvalue()).decode()
 
 
-OBECNE = {'okladka': obecne('kampus-2000.jpg', 1100), 'instytut': obecne('inst-naglowek.jpg'), 'nauka': obecne('nauka-naglowek.jpg'),
-          'studia': obecne('studia-naglowek.jpg'), 'popularyzacja': obecne('popularyzacja-naglowek.jpg')}
+OBECNE = {}
+for s_, f_ in [('okladka', 'kampus-2000.jpg'), ('instytut', 'inst-naglowek.jpg'), ('nauka', 'nauka-naglowek.jpg'), ('studia', 'studia-naglowek.jpg'), ('popularyzacja', 'popularyzacja-naglowek.jpg')]:
+    open(f'{KORZEN}/zdjecia/min/obecne-{s_}.jpg', 'wb').write(base64.b64decode(obecne(f_).split(',', 1)[1]))
+    OBECNE[s_] = f'min/obecne-{s_}.jpg'
+
+# miniatury pobrane przez przeglądarkę użytkownika: zdjecia/min/<nr>.jpg + zdjecia/min/indeks.json {adres miniatury: nr} i stan.json {nr: {w, h}}
+IDX = json.load(open(f'{KORZEN}/zdjecia/min/indeks.json'))
+STAN = json.load(open(f'{KORZEN}/zdjecia/min/stan.json'))
+for L in karty.values():
+    for c in L:
+        nr = IDX.get(c['m'])
+        st = STAN.get(str(nr)) if nr is not None else None
+        if not st or 'e' in st:
+            c['m'] = None
+            continue
+        if not c['w']:
+            c['w'], c['h'], c['wp'] = st['w'], st['h'], True
+        c['m'] = f'min/{nr}.jpg'
 
 dane = {'karty': karty, 'tropy': tr, 'obecne': OBECNE}
 js = json.dumps(dane, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')

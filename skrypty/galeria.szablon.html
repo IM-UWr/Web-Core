@@ -1,10 +1,5 @@
-<!doctype html>
-<html lang="pl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="referrer" content="no-referrer">
 <title>Galeria zdjęć IM UWr</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Brygada+1918:ital,wght@0,400..700;1,400..700&family=Manrope:wght@400..800&display=swap">
@@ -148,12 +143,10 @@ dialog::backdrop { background: rgb(6 11 22 / .8); }
 .kopia-pole { width: 100%; min-height: 150px; margin-top: 8px; padding: 8px; border: 1px solid var(--linia); background: var(--pow); color: var(--tekst); font: 13px/1.45 ui-monospace, Consolas, monospace; }
 @media (prefers-reduced-motion: no-preference) { .biore, .karta { transition: background-color .15s, border-color .15s; } }
 </style>
-</head>
-<body>
 <div class="kol gora">
   <h1>Galeria zdjęć: Instytut Matematyczny UWr</h1>
   <p>Kandydaci na okładkę i banery czterech działów. Klatki łączą wyniki trzech poszukiwań: archiwum strony, otwarte licencje i źródła UWr. Kliknij zdjęcie, żeby je powiększyć i przymierzyć do okładki albo dowolnego działu.</p>
-  <p class="wazne">Agenci nie widzieli żadnego zdjęcia. Opisy kadrów i oceny pochodzą z podpisów i nazw plików, więc są wstępne. Decyduje Twoje oko.</p>
+  <p class="wazne">Oceny i opisy kadrów przygotowali agenci bez oglądania zdjęć, z podpisów i nazw plików, więc są wstępne. Decyduje Twoje oko. Miniatury mają do 640 px, więc przymiarki są poglądowe, a ostrość oceniaj w pełnym pliku.</p>
 </div>
 <div class="narz" id="narz">
   <div class="kol">
@@ -203,8 +196,21 @@ const zapisz = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } c
 const WSZYSTKIE = Object.values(DANE.karty).flat();
 const stan = { sek: 'okladka', widok: 'zdjecie', prawa: '', duze: false, osoby: false, wyb: new Set(czytaj('galeria-wybor', [])) };
 const klucz = (c) => c.s + '|' + c.k;
+let bazaWyboru = null;
+async function zapiszWybor() {
+  zapisz('galeria-wybor', [...stan.wyb]);
+  try { await bazaWyboru?.doc('wybor/lista').set({ klucze: [...stan.wyb] }); } catch { /* lista zostaje w tej przeglądarce; „Kopiuj wybór” działa dalej */ }
+}
+(async () => {
+  try {
+    const db = await window.claude?.use?.('db'); if (!db) return;
+    bazaWyboru = db;
+    const d = await db.doc('wybor/lista').get();
+    if (d.exists && Array.isArray(d.data().klucze)) { stan.wyb = new Set(d.data().klucze); rysuj(); }
+  } catch { /* bez bazy galeria działa na pamięci przeglądarki */ }
+})();
 
-const img = (c, alt) => `<img src="${esc(c.m)}" alt="${esc(alt ?? c.t)}" loading="lazy" referrerpolicy="no-referrer">`;
+const img = (c, alt) => c.m ? `<img src="${esc(c.m)}" alt="${esc(alt ?? c.t)}" loading="lazy">` : '<div class="brak">Brak podglądu. Otwórz stronę źródłową.</div>';
 const tytSym = {
   okladka: () => `<div class="skos"></div><div class="t"><b>Instytut</b><i>Matematyczny</i></div><div class="dz"><span>Instytut</span><span>Nauka</span><span>Studia</span><span>Popularyzacja</span></div>`,
 };
@@ -216,9 +222,8 @@ function przymiarka(c, dz) {
 }
 function rozmiar(c) {
   if (!c.w) return 'rozmiar nieznany';
-  const gcd = (a, b) => (b ? gcd(b, a % b) : a); const g = gcd(c.w, c.h || c.w);
   const r = c.h ? ` · ${(c.w / c.h).toFixed(2).replace('.', ',')}:1` : '';
-  return `${c.w}×${c.h ?? '?'} px${r}`;
+  return `${c.wp ? 'co najmniej ' : ''}${c.w}×${c.h ?? '?'} px${r}`;
 }
 function znaczniki(c) {
   const [kl, op] = PRAWA[c.pr]; const z = [`<li class="${kl}">${op}</li>`];
@@ -271,7 +276,7 @@ function rysuj() {
   }
   if (stan.sek === 'wybrane') {
     const L = WSZYSTKIE.filter((c) => stan.wyb.has(klucz(c)));
-    T.innerHTML = `<div class="opis"><h2>Wybrane</h2><p>Gdy skończysz, naciśnij „Kopiuj wybór” i wklej listę do rozmowy.</p></div>` +
+    T.innerHTML = `<div class="opis"><h2>Wybrane</h2><p>Wybór zapisuje się sam. Gdy skończysz, napisz w rozmowie „wybrałem”, a odczytam listę. „Kopiuj wybór” to zapas, gdyby zapis nie zadziałał.</p></div>` +
       (L.length ? `<div class="siatka">${L.map(karta).join('')}</div>` : '<p class="pusto">Nic jeszcze nie wybrano. Przy każdym zdjęciu jest przycisk „Wybieram”.</p>');
     return;
   }
@@ -286,8 +291,8 @@ function rysujDl() {
   $('#dl').innerHTML = `<div class="dl-gora"><h3>${esc(c.nr)}. ${esc(c.t)}</h3>
       <span class="seg" role="group" aria-label="Przymierz">${opcje.map(([v, n]) => `<button type="button" data-miara="${v}" aria-pressed="${dlMiar === v}">${n}</button>`).join('')}</span>
       <button type="button" class="gl drugi" data-zamknij>Zamknij</button></div>
-    <div>${dlMiar === 'zdjecie' ? `<img class="dl-duze" src="${esc(c.m)}" alt="${esc(c.t)}" referrerpolicy="no-referrer">` : przymiarka(c, dlMiar).replace(/ loading="lazy"/g, '')}</div>
-    <p class="dane" style="margin-top:8px">${esc(rozmiar(c))} · ${esc(c.l)}${c.a ? ' · ' + esc(c.a) : ''}</p>`;
+    <div>${dlMiar === 'zdjecie' ? `${c.m ? `<img class="dl-duze" src="${esc(c.m)}" alt="${esc(c.t)}">` : '<p class="pusto">Brak podglądu.</p>'}` : przymiarka(c, dlMiar).replace(/ loading="lazy"/g, '')}</div>
+    <p class="dane" style="margin-top:8px">${esc(rozmiar(c))} · ${esc(c.l)}${c.a ? ' · ' + esc(c.a) : ''}${c.o ? ` · <a href="${esc(c.o)}" target="_blank" rel="noopener">Pełny plik</a>` : ''}${c.p ? ` · <a href="${esc(c.p)}" target="_blank" rel="noopener">Strona źródłowa</a>` : ''}</p>`;
 }
 document.addEventListener('click', (e) => {
   const t = e.target;
@@ -295,7 +300,7 @@ document.addEventListener('click', (e) => {
   const w = t.closest('[data-w]'); if (w) { stan.widok = w.dataset.w; rysuj(); return; }
   const b = t.closest('[data-biore]'); if (b) {
     const k = b.dataset.biore; if (stan.wyb.has(k)) stan.wyb.delete(k); else stan.wyb.add(k);
-    zapisz('galeria-wybor', [...stan.wyb]); const on = stan.wyb.has(k);
+    zapiszWybor(); const on = stan.wyb.has(k);
     b.setAttribute('aria-pressed', on); b.textContent = on ? 'Wybrane' : 'Wybieram'; b.closest('.karta').classList.toggle('wybrana', on); rysujZakladki(); return; }
   const d = t.closest('[data-duze]'); if (d) { dlK = d.dataset.duze; const c = WSZYSTKIE.find((x) => klucz(x) === dlK); dlMiar = stan.widok === 'strona' ? (c.s === 'ogolne' ? 'okladka' : c.s) : 'zdjecie'; rysujDl(); $('#dl').showModal(); return; }
   const m = t.closest('[data-miara]'); if (m) { dlMiar = m.dataset.miara; rysujDl(); return; }
@@ -307,11 +312,8 @@ document.addEventListener('keydown', (e) => {
 $('#f-prawa').addEventListener('change', (e) => { stan.prawa = e.target.value; rysuj(); });
 $('#f-duze').addEventListener('change', (e) => { stan.duze = e.target.checked; rysuj(); });
 $('#f-osoby').addEventListener('change', (e) => { stan.osoby = e.target.checked; rysuj(); });
-let wczytane = 0, nieudane = 0;
-document.addEventListener('load', (e) => { const i = e.target; if (i.tagName === 'IMG' && /^http/.test(i.src)) wczytane++; }, true);
 document.addEventListener('error', (e) => {
   const i = e.target; if (i.tagName !== 'IMG' || i.dataset.zle) return; i.dataset.zle = '1'; i.style.visibility = 'hidden';
-  nieudane++; if (nieudane >= 5 && !wczytane) komunikat('Zdjęcia się nie wczytują, bo ten podgląd blokuje obce adresy. Zapisz plik na komputerze i otwórz go w zwykłej przeglądarce.');
   const r = i.closest('.ram'); if (r) r.insertAdjacentHTML('beforeend', '<div class="brak">Zdjęcie się nie wczytało. Otwórz stronę źródłową albo pełny plik.</div>');
 }, true);
 function tekstWyboru() {
@@ -326,8 +328,6 @@ $('#kopiuj').addEventListener('click', () => {
   if (!navigator.clipboard) { awaryjnie(); return; }
   navigator.clipboard.writeText(t).then(() => { pole.hidden = true; komunikat('Skopiowano. Wklej listę do rozmowy.'); }, awaryjnie);
 });
-$('#czysc').addEventListener('click', () => { stan.wyb.clear(); zapisz('galeria-wybor', []); $('#kopia-pole').hidden = true; $('#kom').hidden = true; rysuj(); });
+$('#czysc').addEventListener('click', () => { stan.wyb.clear(); zapiszWybor(); $('#kopia-pole').hidden = true; $('#kom').hidden = true; rysuj(); });
 rysuj();
 </script>
-</body>
-</html>

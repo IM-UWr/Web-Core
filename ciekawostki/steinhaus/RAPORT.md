@@ -15,3 +15,14 @@ Potwierdzone do tej pory (5.11.2026, WebFetch):
 - FMW: historia https://fmw.math.uni.wroc.pl/o-fundacji/historia/historia-fundacji-matematyk%C3%B3w-wroc%C5%82awskich (FMW 2007; poprzedniczka FSMW 1989/1992; WSM od 1991; portal 2006).
 - Sala HS: treść repo Web-Studia pierwszy-rok.md: „audytorium im. Prof. Hugona Steinhausa”.
 - WebFetch odmówił: www.matematyka.wroc.pl (robots_disallowed); pl.wikipedia Hugo_Steinhaus (url_not_found); MacTutor /Steinhaus/books/ (client_error); zenodo PDF Beyer–Zardecki (binarny).
+
+Dalsze notatki (5.11.2026):
+- Kac: „the scientist in the child and the child in the scientist” dotyczy Mathematical Snapshots (MacTutor Steinhaus). „written in 1937”.
+- Kalejdoskop 1938: wroclaw.pl (galeria sławnych), Strick/MacTutor, HSC PWr (PL i EN tego samego dnia), Linda Hall (1. wyd.: anaglify, okulary w kieszonce); en wiki podaje 1939.
+- Tres faciunt collegium: Pragacz, Humor w matematyce, Konspekt 1/2007 (opowiadał M. Kac), https://www.impan.pl/~pragacz/download/konspekt-humor.pdf ; także wroclaw.pl.
+- NKS: 1 VII 1946 (Duda–Weron 2006) vs 2 VII 1946 (Biler i in., Pamięć i Przyszłość 3/2015).
+- Koło z n punktami: cut-the-knot do_you_know/diffDist (Steinhaus 1957, Sierpiński (√2,1/3)); arXiv 2505.06234 (Problem 24, s. 17 One Hundred Problems); MathWorld CircleLatticePoints (area n).
+- Moneta: EuDML 213613; Bednarski 2018 https://czasopisma.uni.lodz.pl/foe/article/view/2433; en wiki Hugo_Steinhaus.
+- Dendryt: EuDML 209969; Duda–Weron 2006; Nešetřil 1997.
+- FMW o fundacji: czerwiec 2007; poprzedniczka FSMW 1991–2007 (strona „o fundacji”) vs 1989/1992–2007 (strona „historia”).
+- LIMIT WebFetch: wyczerpany godzinowy limit pobrań (ok. poł. pracy); zaległe strony: FMW NMNM, KOMA, ZSM, obóz OM, OLM, Matematyka bez granic; Dudek taksonomia.
