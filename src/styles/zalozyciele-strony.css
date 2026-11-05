@@ -13,7 +13,7 @@
   .z-druga a:hover .t, .z-druga a.t:hover { text-decoration: underline; text-underline-offset: 3px; }
   .z-druga h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.15; color: var(--ink); }
   /* Szybki dostęp: jeden pasek, cztery pozycje rozdzielone kreskami */
-  .z-skr { display: grid; grid-template-columns: auto repeat(4, minmax(0, 1fr)); align-items: stretch; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+  .z-skr { display: grid; grid-template-columns: auto repeat(4, minmax(0, 1fr)); align-items: stretch; border-top: 2px solid var(--rule); border-bottom: 1px solid var(--line); }
   .z-skr h2 { padding: 10px 22px 10px 0; align-self: center; white-space: nowrap; }
   .z-skr a { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; padding: 9px 16px; border-left: 1px solid var(--line); }
   .z-skr a b { font-weight: 700; color: var(--ink); font-size: 15px; }
@@ -37,7 +37,7 @@
   .z-kolumna[data-slot="2"] .pozycje { flex: 0 1 auto; min-height: 0; overflow: hidden; }
   .z-kolumna .reszta { flex: none; display: block; padding: 9px 0 0; font-size: 13px; font-weight: 700; color: var(--ink); }
   .z-kolumna .reszta:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .z-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
+  .z-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--rule); }
   .z-h h2:focus { outline: none; }
   .z-h h2:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .z-h h2 small { margin-left: 8px; font-family: var(--f-text); font-size: 12.5px; font-weight: 600; color: var(--muted); }
@@ -64,7 +64,7 @@
   .z-wiecej:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .z-wiecej .kropki3 { letter-spacing: .12em; color: var(--ink); }
   /* Studia: klikalny nagłówek ze znakiem linku zewnętrznego, kierunki w pięciu kolumnach */
-  .z-studia { grid-column: 1 / span 2; grid-row: 2; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 0 36px; padding: 10px 0 0; border-top: 2px solid var(--ink); }
+  .z-studia { grid-column: 1 / span 2; grid-row: 2; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 0 36px; padding: 10px 0 0; border-top: 2px solid var(--rule); }
   .z-studia .gdzie { display: block; font-size: 12px; font-weight: 700; color: var(--d-a); }
   .z-studia .h-link:hover { color: var(--d-a); }
   .z-studia .zew-ikona { margin-left: 6px; font-family: var(--f-text); font-size: .7em; font-weight: 600; color: var(--d-a); vertical-align: .15em; }

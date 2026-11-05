@@ -36,7 +36,7 @@
 
   /* ---------- Plan zajęć: przyklejony pasek (semestr, wyszukiwarka, dni) i zajęcia w równych kolumnach ---------- */
   .z-pl .pl-narz { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
-    background: var(--bg); border-bottom: 2px solid var(--ink); }
+    background: var(--bg); border-bottom: 2px solid var(--rule); }
   /* bez JS: bez paska, wszystkie semestry jeden pod drugim; z JS widać tylko wybrany semestr */
   html:not(.js) .z-pl .pl-narz { display: none; }
   html.js .z-pl [data-z-panel]:not([data-z-aktywny]) { display: none; }
@@ -82,7 +82,7 @@
   .z-gr, .z-pl { line-height: 1.6; }
 
   .z-pl .pl-narz { position: sticky; top: var(--hdr-h); z-index: 5; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px;
-    margin: 0 -16px; padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--ink); }
+    margin: 0 -16px; padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--rule); }
   html:not(.js) .z-pl .pl-narz { display: none; }
   html.js .z-pl [data-z-panel]:not([data-z-aktywny]) { display: none; }
   .z-pl .pl-narz:not(:has(.pl-sem)) .pl-szukaj { grid-column: 1 / -1; }

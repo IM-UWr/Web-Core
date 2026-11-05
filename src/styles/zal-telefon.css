@@ -18,12 +18,7 @@
     --znacznik: var(--granat); --znacznik-ink: #fff;
     --font: var(--f-text);
   }
-  :root[data-theme="dark"] {
-    --bg: #0a1020; --surface: #111a2e; --line: #243049;
-    --ink: #ecf0f7; --text: #d3d9e6; --muted: #98a3b8;
-    --tint: #16213a; --tint-ink: #ecf0f7;
-    --primary: #c9d0de; --accent: var(--d-a); --accent-ink: #0a1020;
-  }
+  /* ciemny motyw „Nocny granat”: tokeny wspólne z komputerem (zalozyciele.css, poza @media) */
   [data-dzial] { --accent: var(--d-a); }
   body { font-family: var(--f-text); }
   main :is(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; letter-spacing: -.005em; }
@@ -142,11 +137,11 @@
   .z-nagl.z-baner-dzialu .z-patron p { margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: rgb(255 255 255 / .82); }
 
   /* ---------- nagłówek podstrony: głęboki kolor działu na zdjęciu, sygnet przy tytule, znak w tle ---------- */
-  .z-nagl.z-nagl-pod { position: relative; overflow: hidden; isolation: isolate; min-height: 0; padding: 16px 16px 18px; color: #fff; background: var(--d-g); }
+  .z-nagl.z-nagl-pod { position: relative; overflow: hidden; isolation: isolate; min-height: 0; padding: 16px 16px 18px; color: #fff; background: var(--g-pod); }
   .z-nagl.z-nagl-pod.z-granat { --d-g: var(--granat); --d-j: #c9d0de; }
-  .z-nagl.z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--d-g) 70%, var(--granat)); }
+  .z-nagl.z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--g-pod) 70%, var(--granat)); }
   .z-nagl.z-nagl-pod::before { content: ''; position: absolute; inset: 0; z-index: -1;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--d-g) 92%, transparent) 0, color-mix(in srgb, var(--d-g) 70%, transparent) 60%, color-mix(in srgb, var(--d-g) 55%, transparent) 100%); }
+    background: linear-gradient(90deg, color-mix(in srgb, var(--g-pod) 92%, transparent) 0, color-mix(in srgb, var(--g-pod) 70%, transparent) 60%, color-mix(in srgb, var(--g-pod) 55%, transparent) 100%); }
   .z-nagl.z-nagl-pod .z-tyt { position: relative; z-index: 1; margin: 0; max-width: none; padding: 0; }
   .z-nagl.z-nagl-pod .z-tyt-g { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: end; max-width: none; }
   .z-nagl.z-nagl-pod:not(:has(.z-sygnet-nagl)) .z-tyt-g { display: block; }

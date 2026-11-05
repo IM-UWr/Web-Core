@@ -15,7 +15,7 @@
 
   /* ---------- podstrony w trzech grupach jak w menu: linie, Brygada, strzałki, bez kafelków ---------- */
   .z-dz-pod { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 36px; padding: 26px var(--marg) 8px; }
-  .z-dz-pod section { border-top: 2px solid var(--ink); padding-top: 8px; }
+  .z-dz-pod section { border-top: 2px solid var(--rule); padding-top: 8px; }
   .z-dz-pod h3 { margin: 0 0 4px; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .z-dz-pod a { display: flex; justify-content: space-between; align-items: baseline; column-gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line);
     font-family: var(--f-display); font-weight: 500; font-size: 21px; color: var(--ink); }
@@ -29,7 +29,7 @@
   .z-dz-tresc h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 34px; color: var(--ink); }
   .z-dz-tresc p { margin: 0 0 14px; max-width: 70ch; font-size: 17px; line-height: 1.68; color: var(--text); }
   .z-dz-tresc p.wst { font-size: 20px; line-height: 1.6; color: var(--ink); }
-  .z-dz-skrot { align-self: start; border-top: 2px solid var(--ink); padding-top: 8px; }
+  .z-dz-skrot { align-self: start; border-top: 2px solid var(--rule); padding-top: 8px; }
   .z-dz-skrot h3 { margin: 0 0 8px; font-family: var(--f-text); font-size: 13px; font-weight: 700; color: var(--muted); }
   .z-dz-skrot dl { margin: 0; }
   .z-dz-skrot dl > div { padding: 12px 0; border-bottom: 1px solid var(--line); }

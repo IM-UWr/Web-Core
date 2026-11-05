@@ -67,7 +67,7 @@
 .tresc dl.para dd { margin: 0; }
 /* tabela: nagłówki przygaszone, pod nimi kreska 2 px, wiersze oddzielone 1 px */
 .tresc table.tab { width: 100%; border-collapse: collapse; font-size: 15.5px; line-height: 1.5; }
-.tresc table.tab th { padding: 0 18px 8px 0; border-bottom: 2px solid var(--ink); text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
+.tresc table.tab th { padding: 0 18px 8px 0; border-bottom: 2px solid var(--rule); text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
 .tresc table.tab td { padding: 11px 18px 11px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
 .tresc table.tab td:first-child { color: var(--ink); }
 .tresc table.tab td:last-child { white-space: normal; min-width: 14em; }
@@ -101,7 +101,7 @@
 .tresc .faq details > :not(summary) { margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; }
 /* kontakt: kolumny po 3, kreska 2 px nad każdą, etykieta roli, nazwisko Brygadą, pary e-mail / tel. / pokój */
 .tresc .kontakty { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; }
-.tresc .kontakty > div { padding-top: 12px; border-top: 2px solid var(--ink); }
+.tresc .kontakty > div { padding-top: 12px; border-top: 2px solid var(--rule); }
 .tresc .kontakty b { display: block; margin: 2px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .tresc a, .tresc .akcja a, .tresc a.przycisk { transition: none; }
@@ -155,7 +155,7 @@ body .tresc .prose a { color: var(--ink); text-decoration: underline; text-decor
   text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); }
 body .tresc .prose a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
 body .tresc .prose table { display: table; width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15.5px; line-height: 1.5; }
-body .tresc .prose th { padding: 0 18px 8px 0; border: 0; border-bottom: 2px solid var(--ink); background: none; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
+body .tresc .prose th { padding: 0 18px 8px 0; border: 0; border-bottom: 2px solid var(--rule); background: none; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
 body .tresc .prose td { padding: 11px 18px 11px 0; border: 0; border-bottom: 1px solid var(--line); vertical-align: top; }
 body .tresc .prose td:first-child { color: var(--ink); }
 body .tresc .prose :is(img, code) { border-radius: 0; }

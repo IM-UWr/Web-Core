@@ -124,14 +124,14 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
   /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   @media (min-width: 761px) {
     .kal-narz { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
-      background: var(--bg); border-bottom: 2px solid var(--ink); }
+      background: var(--bg); border-bottom: 2px solid var(--rule); }
     .kal-narz button { font-size: 14px; padding: 7px 12px; }
     .kal-szukaj { flex: 1; min-width: 200px; font-size: 15px; padding: 8px 12px; }
   }
 
   /* ---------- telefon (≤ 760 px): widok, rodzaje po trzy w rzędzie i pole szukania jedno pod drugim ---------- */
   @media (max-width: 760px) {
-    .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+    .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     .kal-narz button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
     .kal-widok, .kal-rodzaje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .kal-rodzaje { grid-template-columns: repeat(3, minmax(0, 1fr)); }

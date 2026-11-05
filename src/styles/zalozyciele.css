@@ -25,11 +25,43 @@
 [data-dzial="nauka"] { --d-j: var(--nauka-j); --d-g: var(--nauka-g); --d-a: var(--nauka-a); --d-t: var(--nauka-t); }
 [data-dzial="studia"] { --d-j: var(--studia-j); --d-g: var(--studia-g); --d-a: var(--studia-a); --d-t: var(--studia-t); }
 [data-dzial="popularyzacja"] { --d-j: var(--popularyzacja-j); --d-g: var(--popularyzacja-g); --d-a: var(--popularyzacja-a); --d-t: var(--popularyzacja-t); }
-/* w ciemnym motywie tekst w kolorze działu bierze odcień jasny, tło — przyciemniony głęboki */
-:root[data-theme="dark"] { --d-a: #ecf0f7; --d-t: #111a2e; }
-:root[data-theme="dark"] [data-dzial]:is([data-dzial="instytut"], [data-dzial="nauka"], [data-dzial="studia"], [data-dzial="popularyzacja"]) {
-  --d-a: var(--d-j); --d-t: color-mix(in srgb, var(--d-g) 55%, #0a1020);
+/* kolor nagłówka podstrony (głęboki kolor działu; w ciemnym motywie z domieszką granatu) — na elemencie nagłówka, po --d-g */
+.z-nagl-pod { --g-pod: var(--d-g); }
+/* Zmienne interfejsu (zlecenie 11, zalecenie 10): --line-ui — ramki przycisków i pól; --rule — grube kreski 2 px;
+   --panel — panel menu z hamburgera. W jasnym motywie bez zmian względem dotychczasowych kolorów (ramki przycisków
+   = --line; propozycja ≥ 3:1 także w jasnym czeka na decyzję — RAPORT-ZLECENIE-11.md). */
+:root { --line-ui: var(--line); --rule: var(--ink); --panel: rgb(9 16 34); }
+
+/* ---------- ciemny motyw „Nocny granat” (zlecenie 11, zalecenie 10; wariant A z dok/ciemny/RAPORT-CIEMNY.md) ----------
+   Głęboki granat zamiast czerni: banery, stopka i okładka w granacie marki są o ton ciemniejsze od treści (jak w jasnym),
+   powierzchnie pół tonu jaśniejsze, panel menu jeszcze jaśniejszy. Jedna definicja dla komputera i telefonu.
+   Tylko forma [data-theme="dark"]: skrypt w <head> zawsze ustawia data-theme (domyślnie jasny, także przy ciemnym
+   systemie — decyzja z Baza.astro), więc forma z prefers-color-scheme nie miałaby kiedy zadziałać. */
+:root[data-theme="dark"] {
+  --bg: #18243b; --surface: #222e46; --line: #3a465c;
+  --ink: #e4eaf5; --text: #ced5e3; --muted: #a5afc1;
+  --line-ui: #727c8f; --rule: #7d8697; --panel: #24324f;
+  --tint: #222e46; --tint-ink: #e4eaf5;
+  --primary: #ced5e3; --accent: var(--d-a); --accent-ink: #18243b;
+  --uwr: #e4eaf5;
+  /* kolory poza działami: wybrany przycisk i akcenty w kolorze tekstu (jasnym) */
+  --d-a: #e4eaf5; --d-t: #222e46;
 }
+/* kolor działu: jasny kolor działu z 22% koloru nagłówków (pastel, nie neon, ≥ 4,5:1 na tle, powierzchni i --d-t);
+   tło działu: 11% koloru działu w powierzchni (zamiast przyciemnionego głębokiego, który dawał brudny brąz) */
+:root[data-theme="dark"] [data-dzial]:is([data-dzial="instytut"], [data-dzial="nauka"], [data-dzial="studia"], [data-dzial="popularyzacja"]) {
+  --d-a: color-mix(in oklab, var(--d-j) 78%, #e4eaf5); --d-t: color-mix(in oklab, var(--d-j) 11%, #222e46);
+}
+/* zdjęcia w dwóch kolorach: światła w kolorze działu przygaszonym granatem (cienie bez zmian — bez szwu z granatem z lewej) */
+:root[data-theme="dark"] .z-nagl .z-foto { background: color-mix(in oklab, var(--d-j) 55%, var(--granat)); }
+/* nagłówek podstrony: głęboki kolor działu z domieszką granatu zamiast jaskrawej cegły / ochry (gradienty te same) */
+:root[data-theme="dark"] .z-nagl.z-nagl-pod { --g-pod: color-mix(in oklab, var(--d-g) 72%, var(--granat)); }
+/* zwykłe zdjęcia: lekko przygaszone (okładka, portrety, miniatury) */
+:root[data-theme="dark"] .z-okl-foto { filter: brightness(.92) saturate(.92); }
+:root[data-theme="dark"] :is(.z-os .fot, .z-dz-fot img, .z-w .min img, .z-min img, .tresc .fot img, .galeria img) { filter: brightness(.88) saturate(.94); }
+/* „W skrócie” na stronie działu: powierzchnia pół tonu nad tłem (w ciemnym kreska 2 px nie wystarcza) */
+:root[data-theme="dark"] .z-dz-skrot { padding: 10px 20px 6px; background: var(--surface); }
+:root[data-theme="dark"] .z-dz-skrot dl > div:last-child { border-bottom: 0; }
 
 @media (min-width: 761px) {
   /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
@@ -42,12 +74,7 @@
     --radius-s: 4px; --radius: 6px; --radius-l: 8px;
     --shadow: none;
   }
-  :root[data-theme="dark"] {
-    --bg: #0a1020; --surface: #111a2e; --line: #243049;
-    --ink: #ecf0f7; --text: #d3d9e6; --muted: #98a3b8;
-    --tint: #16213a; --tint-ink: #ecf0f7;
-    --primary: #c9d0de; --accent: var(--d-a); --accent-ink: #0a1020;
-  }
+  /* ciemny motyw: tokeny poza @media (na górze pliku), wspólne z telefonem */
   [data-dzial] { --accent: var(--d-a); }
   body { font-family: var(--f-text); font-size: 16px; }
   main :is(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; letter-spacing: -0.005em; }
@@ -154,14 +181,14 @@
   @keyframes z-rozjasnij { from { opacity: 0; } }
 
   /* ---------- nagłówek podstrony: głęboki kolor działu na zdjęciu działu ---------- */
-  .z-nagl-pod { min-height: calc(190px + var(--gora)); padding: calc(52px + var(--gora)) 0 34px; background: var(--d-g); }
+  .z-nagl-pod { min-height: calc(190px + var(--gora)); padding: calc(52px + var(--gora)) 0 34px; background: var(--g-pod); }
   .z-nagl-pod.z-liczbami { min-height: calc(268px + var(--gora)); padding-top: calc(30px + var(--gora)); }
   .z-nagl-pod .z-foto { left: 0; }
-  .z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--d-g) 70%, var(--granat)); }
+  .z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--g-pod) 70%, var(--granat)); }
   .z-nagl-pod::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
     linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
-    radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--d-g) 70%, transparent), transparent 100%),
-    linear-gradient(90deg, color-mix(in srgb, var(--d-g) 90%, transparent) 0, color-mix(in srgb, var(--d-g) 72%, transparent) 45%, color-mix(in srgb, var(--d-g) 56%, transparent) 100%); }
+    radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--g-pod) 70%, transparent), transparent 100%),
+    linear-gradient(90deg, color-mix(in srgb, var(--g-pod) 90%, transparent) 0, color-mix(in srgb, var(--g-pod) 72%, transparent) 45%, color-mix(in srgb, var(--g-pod) 56%, transparent) 100%); }
   .z-nagl-pod.z-granat { --d-g: var(--granat); --d-j: #c9d0de; }
   .z-tyt { position: relative; z-index: 1; margin-left: var(--marg); max-width: calc(100% - 2 * var(--marg)); }
   /* tytuł nie wchodzi pod opis znaku; liczby pod nim mogą iść dalej w prawo (jak w prototypie) */
@@ -299,7 +326,7 @@
   .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 72ch; }
   .z-pd-tresc a { color: var(--d-a); }
   .z-nast { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
-    margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--ink); }
+    margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--rule); }
   .z-nast-link { font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
   .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
