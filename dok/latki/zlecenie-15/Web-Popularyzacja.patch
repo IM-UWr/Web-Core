@@ -1,0 +1,220 @@
+diff --git a/.pages.yml b/.pages.yml
+index d0b77c1..99569eb 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -27,78 +27,65 @@ content:
+   - name: wstep_en
+     label: 'EN: tekst pod tytułem'
+     type: text
+-  - name: linki
+-    label: Linki nad sekcjami (np. Fundacja, Portal, PTM)
++  - name: haslo
++    label: Hasło (okładka, baner działu, menu telefonu)
++    type: string
++  - name: haslo_en
++    label: 'EN: hasło'
++    type: string
++  - name: o_popularyzacji
++    label: O popularyzacji (akapity oddzielone pustą linią)
++    type: text
++  - name: o_popularyzacji_en
++    label: 'EN: o popularyzacji (akapity oddzielone pustą linią)'
++    type: text
++  - name: o_popularyzacji_fakty
++    label: W skrócie (obok tekstu „O popularyzacji”)
+     type: object
+     list: true
+     fields:
+-    - name: nazwa
+-      label: Nazwa
++    - name: wartosc
++      label: Wartość (np. 4 miasta)
+       type: string
+       required: true
+-    - name: nazwa_en
+-      label: 'EN: nazwa'
++    - name: wartosc_en
++      label: 'EN: wartość'
+       type: string
+-    - name: adres
+-      label: Adres strony (https://… albo /ścieżka na naszej stronie)
++    - name: opis
++      label: Opis
+       type: string
+-      required: true
+-  - name: grupy
+-    label: Grupy (sekcje strony, np. Dla uczniów; bez kart pokazują „To be announced”)
++    - name: opis_en
++      label: 'EN: opis'
++      type: string
++  - name: tradycja
++    label: Lata tradycji (liczby w banerze; liczba lat liczona przy budowie strony)
+     type: object
+     list: true
+     fields:
++    - name: rok
++      label: Rok założenia
++      type: number
++      required: true
+     - name: nazwa
+-      label: Nazwa grupy
++      label: Nazwa w dopełniaczu (np. Zimowych Szkół → „37 lat Zimowych Szkół”)
+       type: string
+       required: true
+     - name: nazwa_en
+-      label: 'EN: nazwa grupy'
++      label: 'EN: nazwa (np. Winter Schools → „37 years of Winter Schools”)'
+       type: string
+-    - name: opis
+-      label: Jedno zdanie pod nazwą grupy (opcjonalnie)
++  - name: linki
++    label: Linki nad sekcjami (np. Fundacja, Portal, PTM)
++    type: object
++    list: true
++    fields:
++    - name: nazwa
++      label: Nazwa
+       type: string
+-    - name: opis_en
+-      label: 'EN: zdanie pod nazwą'
++      required: true
++    - name: nazwa_en
++      label: 'EN: nazwa'
+       type: string
+-    - name: pozycje
+-      label: Inicjatywy (karty)
+-      type: object
+-      list: true
+-      fields:
+-      - name: nazwa
+-        label: Nazwa
+-        type: string
+-        required: true
+-      - name: opis
+-        label: Opis (2–3 zdania)
+-        type: text
+-      - name: dla
+-        label: Dla kogo (np. uczniowie szkół średnich)
+-        type: string
+-      - name: adres
+-        label: Adres strony (https://… albo /ścieżka na naszej stronie)
+-        type: string
+-      - name: przycisk
+-        label: Napis przycisku (np. Strona olimpiady)
+-        type: string
+-      - name: zdjecie
+-        label: Zdjęcie (opcjonalnie, poziome)
+-        type: image
+-        options:
+-          path: public/pliki/popularyzacja
+-      - name: archiwalne
+-        label: Archiwum (inicjatywa zakończona — plakietka „archiwum”)
+-        type: boolean
+-      - name: nazwa_en
+-        label: 'EN: nazwa'
+-        type: string
+-      - name: opis_en
+-        label: 'EN: opis'
+-        type: text
+-      - name: dla_en
+-        label: 'EN: dla kogo'
+-        type: string
+-      - name: przycisk_en
+-        label: 'EN: napis przycisku'
+-        type: string
++    - name: adres
++      label: Adres strony (https://… albo /ścieżka na naszej stronie)
++      type: string
++      required: true
+diff --git a/src/data/popularyzacja.json b/src/data/popularyzacja.json
+index 8d1bd71..1c5422d 100644
+--- a/src/data/popularyzacja.json
++++ b/src/data/popularyzacja.json
+@@ -1,8 +1,55 @@
+ {
+-  "tytul": "Popularyzacja matematyki",
+-  "tytul_en": "Mathematics outreach",
+-  "wstep": "Matematycy z Instytutu — razem z Fundacją Matematyków Wrocławskich, Wydziałem Matematyki i Informatyki UWr i Wrocławskim Oddziałem PTM — prowadzą kółka i obozy dla uczniów, konkursy, wykłady popularnonaukowe oraz szkolenia dla nauczycieli. Poniżej najważniejsze inicjatywy i linki do ich stron.",
+-  "wstep_en": "Together with the Wrocław Mathematicians Foundation, the Faculty of Mathematics and Computer Science and the Wrocław Branch of the Polish Mathematical Society, mathematicians from the Institute run maths circles and camps for pupils, competitions, popular science lectures and training for teachers. Below are the main initiatives, with links to their websites.",
++  "tytul": "Popularyzacja",
++  "tytul_en": "Outreach",
++  "wstep": "Kółka, obozy i konkursy dla uczniów, wykłady popularne oraz kształcenie i szkolenia nauczycieli — prowadzone przez Instytut razem z partnerami.",
++  "wstep_en": "Maths circles, camps and competitions for pupils, popular lectures, and education and training for teachers — run by the Institute together with its partners.",
++  "haslo": "Matematyka dla wszystkich ciekawych",
++  "haslo_en": "Mathematics for the curious",
++  "o_popularyzacji": "Pewien niematematyk zapytał kiedyś Hugona Steinhausa, co właściwie matematyk robi przez cały dzień. Steinhaus wziął patyk i zaczął mu rysować krzywe na parkowej alejce, a z tej rozmowy — jak pisał we wstępie — wyrósł „Kalejdoskop matematyczny” (1938): książka, w której rysunki i zdjęcia niemal zastępują dowody, a w kieszeni pierwszego wydania czekały czerwono-zielone okulary do oglądania przestrzennych ilustracji. Matematycy z Instytutu i ich partnerzy wciąż tak opowiadają o matematyce — w salach wykładowych, na obozach, a czasem w terenie, z mapą i kompasem.\n\nNajmłodsi mogą zacząć od kółek. Międzyszkolne kółka matematyczne, które Fundacja Matematyków Wrocławskich prowadzi razem z Instytutem, spotykają się w soboty, przyjmują dzieci już od trzeciej klasy szkoły podstawowej, a starszych uczniów przygotowują do olimpiad. Od 1989 roku studenci, doktoranci i pracownicy Instytutu prowadzą Zimowe Szkoły Matematyki — obozy naukowe dla uzdolnionej młodzieży z Dolnego Śląska i Opolszczyzny, które kończy Wielki Test Wiadomości. Od początku lat 90. w salach Instytutu odbywają się Wrocławskie Spotkania Matematyczne — popularne wykłady w roku szkolnym, na które przychodzą uczniowie, nauczyciele i studenci; na ich wzór podobne spotkania powstały w Legnicy, Lubinie, Wałbrzychu i Poznaniu.\n\nMatematyka bywa też sportem. We Wrocławskim Maratonie Matematycznym gra trwa, aż w kategorii zostanie jeden zawodnik — zwykle od 11 do 15 godzin. W Matematycznych Marszach na Orientację, organizowanych od 2003 roku, patrole szukają punktów kontrolnych z mapą i kompasem, a dwa punkty muszą wyznaczyć same, rozwiązując rebus i konstrukcję geometryczną. Są też konkurs matematycznego origami i Olimpiada Lingwistyki Matematycznej, w której reguły nieznanych języków odkrywa się samym rozumowaniem. W wielu z tych zawodów startują także dorośli, a w marszach — całe rodziny.\n\nDużą część tej pracy kierujemy do nauczycieli, bo to oni na co dzień pokazują uczniom, czym jest matematyka. Pracownia Dydaktyki i Popularyzacji Matematyki kształci przyszłych nauczycieli na specjalności nauczycielskiej i opiekuje się ich praktykami w szkołach, a czynni nauczyciele mogą zdobyć kwalifikacje na studiach podyplomowych. Od 2004 roku w Instytucie spotyka się seminarium dla nauczycieli matematyki I³ — od słów inspiracja, indywidualizacja, interdyscyplinarność — a Fundacja organizuje lub wspiera dla nich kursy, szkolenia i wyjazdy.\n\nOd czego zacząć? Kółka, obozy, konkursy i szkolenia znajdziesz na stronie Fundacji, a artykuły, ligi zadaniowe i zapowiedzi wydarzeń — na Wrocławskim Portalu Matematycznym. Studentów do pisania własnych prac zachęca konkurs Wrocławskiego Oddziału PTM, zainicjowany w 1967 roku przez Józefa Łukaszewicza — jeden z najstarszych takich konkursów w Polsce. Zapraszamy każdego, kto chce się przekonać, czym właściwie zajmuje się matematyk.",
++  "o_popularyzacji_en": "A non-mathematician once asked Hugo Steinhaus what a mathematician actually does all day. Steinhaus picked up a stick and began drawing curves for him on a park path, and from that conversation — as he wrote in the preface — grew “Mathematical Snapshots” (“Kalejdoskop matematyczny”, 1938): a book in which drawings and photographs all but replace proofs, and whose first edition had red-and-green glasses waiting in a pocket for viewing its three-dimensional illustrations. Mathematicians from the Institute and their partners still talk about mathematics this way — in lecture rooms, at camps, and sometimes out in the field with a map and compass.\n\nThe youngest can start with maths circles. The inter-school maths circles, run by the Wrocław Mathematicians Foundation together with the Institute, meet on Saturdays, welcome children from the third year of primary school and prepare older pupils for the olympiads. Since 1989 the Institute’s students, doctoral students and staff have run the Winter Schools of Mathematics — residential camps for gifted young people from Lower Silesia and the Opole region, which end with the Great Knowledge Test. Since the early 1990s the Institute’s lecture rooms have hosted the Wrocław Mathematical Meetings — popular lectures during the school year, attended by pupils, teachers and students; similar meetings modelled on them have started in Legnica, Lubin, Wałbrzych and Poznań.\n\nMathematics can also be a sport. In the Wrocław Mathematical Marathon play continues until one competitor is left in a category — usually for 11 to 15 hours. In the Mathematical Orienteering Marches, held since 2003, patrols look for checkpoints with a map and compass, and have to locate two of the points themselves by solving a rebus and a geometric construction. There is also a mathematical origami competition and the Olympiad in Mathematical Linguistics, in which the rules of unfamiliar languages are worked out by reasoning alone. Adults take part in many of these competitions too, and whole families in the marches.\n\nA large part of this work is aimed at teachers, because they are the ones who show pupils every day what mathematics is. The Laboratory of Mathematics Education and Outreach trains future teachers in the teaching specialisation and supervises their school placements, and practising teachers can gain qualifications through postgraduate studies. Since 2004 the I³ seminar for mathematics teachers — from the words inspiration, individualisation, interdisciplinarity — has met at the Institute, and the Foundation organises or supports courses, training and trips for them.\n\nWhere to start? You will find circles, camps, competitions and training on the Foundation’s website, and articles, problem leagues and event announcements on the Wrocław Mathematical Portal. Students are encouraged to write their own papers by the competition of the Wrocław Branch of the Polish Mathematical Society, started in 1967 by Józef Łukaszewicz — one of the oldest such competitions in Poland. We invite anyone who wants to find out what a mathematician actually does.",
++  "o_popularyzacji_fakty": [
++    {
++      "wartosc": "Okulary 3D",
++      "wartosc_en": "3D glasses",
++      "opis": "w kieszeni pierwszego wydania „Kalejdoskopu matematycznego” Steinhausa (1938), do rysunków przestrzennych",
++      "opis_en": "in a pocket of the first edition of Steinhaus’s “Mathematical Snapshots” (1938), for viewing the three-dimensional drawings"
++    },
++    {
++      "wartosc": "Od 3. klasy",
++      "wartosc_en": "From year 3",
++      "opis": "kółka matematyczne przyjmują dzieci już od trzeciej klasy szkoły podstawowej",
++      "opis_en": "maths circles welcome children from the third year of primary school"
++    },
++    {
++      "wartosc": "4 miasta",
++      "wartosc_en": "4 cities",
++      "opis": "Legnica, Lubin, Wałbrzych i Poznań poszły śladem Wrocławskich Spotkań Matematycznych",
++      "opis_en": "Legnica, Lubin, Wałbrzych and Poznań have followed the example of the Wrocław Mathematical Meetings"
++    },
++    {
++      "wartosc": "11–15 godzin",
++      "wartosc_en": "11–15 hours",
++      "opis": "tyle zwykle trwa finał Wrocławskiego Maratonu Matematycznego: gra toczy się, aż zostanie jeden zawodnik",
++      "opis_en": "the usual length of the Wrocław Mathematical Marathon final: play goes on until one competitor is left"
++    }
++  ],
++  "tradycja": [
++    {
++      "rok": 1989,
++      "nazwa": "Zimowych Szkół",
++      "nazwa_en": "Winter Schools"
++    },
++    {
++      "rok": 1991,
++      "nazwa": "Spotkań Matematycznych",
++      "nazwa_en": "Mathematical Meetings"
++    },
++    {
++      "rok": 2003,
++      "nazwa": "Marszy na Orientację",
++      "nazwa_en": "Orienteering Marches"
++    }
++  ],
+   "linki": [
+     {
+       "nazwa": "Fundacja Matematyków Wrocławskich",
+@@ -19,27 +66,5 @@
+       "nazwa_en": "Polish Mathematical Society, Wrocław Branch",
+       "adres": "https://ptm.math.uni.wroc.pl/"
+     }
+-  ],
+-  "grupy": [
+-    {
+-      "nazwa": "Dla uczniów",
+-      "nazwa_en": "For pupils",
+-      "pozycje": []
+-    },
+-    {
+-      "nazwa": "Dla nauczycieli",
+-      "nazwa_en": "For teachers",
+-      "pozycje": []
+-    },
+-    {
+-      "nazwa": "Dla wszystkich",
+-      "nazwa_en": "For everyone",
+-      "pozycje": []
+-    },
+-    {
+-      "nazwa": "Organizatorzy",
+-      "nazwa_en": "Organisers",
+-      "pozycje": []
+-    }
+   ]
+ }
