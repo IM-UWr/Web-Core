@@ -178,10 +178,11 @@ body .tresc .prose ol.etapy > li:last-child { padding-bottom: 0; }
 body .tresc .prose ol.etapy .t { margin: 0 0 4px; font-size: 21px; line-height: 1.3; }
 body .tresc .prose ol.etapy p:not(.t) { margin: 0 0 8px; font-size: 15.5px; line-height: 1.55; }
 body .tresc .prose ol.etapy p.akcja { margin: 10px 0 0; }
-body .tresc .prose .akcja a { text-decoration: none; }
+/* link pod pozycją jak w prototypie (5.11): zwykły podkreślony link, nie przycisk .akcja z widoków */
+body .tresc .prose .akcja a { display: inline; padding: 0; border: 0; font-size: inherit; font-weight: inherit; line-height: inherit; }
 body .tresc .prose .kontakty { margin: 0 0 16px; }
 body .tresc .prose .kontakty p { margin: 0 0 8px; font-size: 15px; line-height: 1.55; }
-body .tresc .prose :is(.kontakty, ul.dwa) .akcja a { color: var(--d-a); font-size: 14.5px; }
+body .tresc .prose :is(.kontakty, ul.dwa) .akcja a { color: var(--d-a); font-weight: 600; font-size: 14.5px; }
 body .tresc .prose blockquote .etyk { margin-bottom: 4px; }
 @media (max-width: 760px) {
   body .tresc .prose h2 { margin-top: 30px; padding-top: 28px; font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
