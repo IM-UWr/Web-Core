@@ -345,7 +345,7 @@ module.exports = [
     "id": "etos-szkoly",
     "nazwa": "Autorzy w porządku alfabetycznym",
     "rok": "po 1945",
-    "zdanie": "Spisał etos szkoły wrocławskiej: autorzy zawsze alfabetycznie, a liczy się talent i wynik, nie stopień czy tytuł.",
+    "zdanie": "Sformułował etos szkoły: autorzy zawsze alfabetycznie, a liczy się talent i wynik, nie stopień czy tytuł.",
     "notka": "Duda i Weron („Wrocławska szkoła matematyczna”, Wiad. Mat. 42, 2006): Marczewski „podjął się trudu” sformułowania wspólnego etosu, wyrastającego z przedwojennej szkoły warszawskiej. Wśród zasad wymieniają „pisanie nazwisk autorów zawsze w porządku alfabetycznym” i „wtórność stopni i tytułów naukowych”, a także wczesny start w pracy naukowej, dzielenie się problemami, opiekę nad młodymi. Autorzy nie podają daty ani miejsca tego tekstu, stąd rok przybliżony. Rysunek: skoro alfabetycznie, to sortowanie: sieć Batchera z 19 porównaniami, poprawna dla każdego ustawienia (sprawdzone dla wszystkich ciągów zero-jedynkowych, zasada 0–1); pogrubiona droga nazwiska, które idzie na pierwsze miejsce.",
     "rodzaj": "historia",
     "pewnosc": "pewne",

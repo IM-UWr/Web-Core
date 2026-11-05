@@ -246,8 +246,7 @@ module.exports = [
     "pewnosc": "pewne",
     "zrodla": [
       "https://arxiv.org/pdf/1603.03887",
-      "https://en.wikipedia.org/wiki/Indecomposable_continuum",
-      "https://www.impan.pl/en/publishing-house/journals-and-series/fundamenta-mathematicae/all/144/3/108349/composants-of-the-horseshoe"
+      "https://en.wikipedia.org/wiki/Indecomposable_continuum"
     ],
     "podstrona": "zapas",
     "dlaczego_tu": "Zapas: pokazuje, że najbardziej abstrakcyjny przykład może wrócić w zupełnie innej dziedzinie; mogłoby pójść na kierunek Matematyka."
@@ -288,7 +287,7 @@ module.exports = [
     "nazwa": "Redaktor 131 tomów",
     "rok": "1949–1978",
     "zdanie": "Współtworzył Wrocławskie Towarzystwo Naukowe, zredagował 131 tomów jego serii B i zorganizował drukarnię naukową.",
-    "notka": "MacTutor: współzałożyciel Wrocławskiego Towarzystwa Naukowego (1946), w latach 1949–1978 przygotował 131 tomów jego serii B. Duda i Weron nazywają go wybitnym edytorem: zorganizował Wrocławską Drukarnię Naukową, a jesienią 1945 r. kursował między Krakowem a Wrocławiem, doprowadzając do wydania w grudniu tomu XXXIII Fundamenta Mathematicae, „ważnego symbolu odrodzenia polskiej matematyki” (MacTutor). Był też redaktorem Monografii Matematycznych od ich powstania w 1931 r. Rysunek nawiązuje do składania arkuszy: krzywa smoka to pasek papieru złożony dziewięć razy na pół i rozłożony pod kątami prostymi.",
+    "notka": "MacTutor: współzałożyciel Wrocławskiego Towarzystwa Naukowego (1946), w latach 1949–1978 przygotował 131 tomów jego serii B. Duda i Weron nazywają go wybitnym edytorem: zorganizował Wrocławską Drukarnię Naukową, a jesienią 1945 r. kursował między Krakowem a Wrocławiem, doprowadzając do wydania w grudniu tomu XXXIII Fundamenta Mathematicae, ważnego symbolu odrodzenia polskiej matematyki (MacTutor). Był też redaktorem Monografii Matematycznych, założonych w 1931 r. Rysunek nawiązuje do składania arkuszy: krzywa smoka to pasek papieru złożony dziewięć razy na pół i rozłożony pod kątami prostymi.",
     "rodzaj": "historia",
     "pewnosc": "pewne",
     "zrodla": [
@@ -305,7 +304,7 @@ module.exports = [
     "nazwa": "Zermelo w mieszkaniu Knastera",
     "rok": "1929",
     "zdanie": "W 1929 r. zorganizował warszawską wizytę Ernsta Zermela, który zamieszkał u niego; korespondowali potem do 1932 r.",
-    "notka": "MacTutor: Knaster zorganizował całą wizytę twórcy aksjomatów teorii mnogości w Warszawie i zaproponował mu mieszkanie u siebie; Zermelo chwalił w sprawozdaniu z 1930 r. jego gościnność i dyskusje, a w liście pisał, że bardzo polubił jego naukowy punkt widzenia. Sam Knaster wykładał w Brnie, Pradze i Wiedniu („Wrocławska szkoła matematyczna”, s. 336) i był zwolennikiem współpracy polsko-czeskiej. Rysunek: twierdzenie Zermela mówi, że każdy zbiór można dobrze uporządkować. Tu dobry porządek typu ω²: kolejne kopie ciągu liczb naturalnych, pogrubione kreski to liczby graniczne.",
+    "notka": "MacTutor: Knaster zorganizował całą wizytę twórcy aksjomatów teorii mnogości w Warszawie i zaproponował mu mieszkanie u siebie; Zermelo chwalił w sprawozdaniu z 1930 r. jego gościnność i dyskusje, a w liście pisał, że bardzo polubił jego naukowy punkt widzenia. Sam Knaster wykładał w Brnie, Pradze i Wiedniu („Wrocławska szkoła matematyczna”, s. 336). Rysunek: twierdzenie Zermela mówi, że każdy zbiór można dobrze uporządkować. Tu dobry porządek typu ω²: kolejne kopie ciągu liczb naturalnych, pogrubione kreski to liczby graniczne.",
     "rodzaj": "anegdota",
     "pewnosc": "pewne",
     "zrodla": [
@@ -320,7 +319,7 @@ module.exports = [
     "nazwa": "Referat za Borsuka",
     "rok": "1932",
     "zdanie": "W Zurychu wygłosił też referat Borsuka o dzieleniu kuli; dlaczego, skoro autor był na miejscu, nie wiadomo.",
-    "notka": "Na Międzynarodowym Kongresie Matematyków w Zurychu (wrzesień 1932) Knaster mówił o kontinuach unikoherentnych („Über unikohärente Kontinua”) i odczytał referat Karola Borsuka „Über die Zerlegung einer euklidischen n-dimensionalen Vollkugel in n Mengen”; MacTutor: „We do not know why”, bo Borsuk był na kongresie. W 1933 r. Borsuk zapytał, czy każdy ograniczony zbiór w przestrzeni n-wymiarowej da się podzielić na n + 1 części mniejszej średnicy; Kahn i Kalai (1993) pokazali, że w dużych wymiarach nie. Rysunek: koło przecięte na dwie części: jedna zawsze ma punkty antypodyczne i pełną średnicę; trzy wycinki mają średnicę mniejszą (√3 R < 2R).",
+    "notka": "Na Międzynarodowym Kongresie Matematyków w Zurychu (wrzesień 1932) Knaster mówił o kontinuach unikoherentnych („Über unikohärente Kontinua”) i odczytał referat Karola Borsuka „Über die Zerlegung einer euklidischen n-dimensionalen Vollkugel in n Mengen”; MacTutor: „We do not know why”, bo Borsuk był na kongresie. W 1933 r. Borsuk zapytał, czy każdy ograniczony zbiór w przestrzeni n-wymiarowej da się podzielić na n + 1 części mniejszej średnicy; Kahn i Kalai (1993) pokazali, że w dużych wymiarach nie. Rysunek: koło podzielone na dwie części: średnica jednej z nich zawsze równa się średnicy koła; trzy wycinki mają średnicę mniejszą (√3 R < 2R).",
     "rodzaj": "anegdota",
     "pewnosc": "pewne",
     "zrodla": [

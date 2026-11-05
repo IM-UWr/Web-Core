@@ -1321,8 +1321,8 @@
     "id": "toczenie-1923",
     "nazwa": "Toczenie się powierzchni",
     "rok": "1923",
-    "zdanie": "Jedna z jego wczesnych prac, „Kilka twierdzeń o toczeniu się powierzchni”, ukazała się po polsku w 1923 r.",
-    "notka": "MacTutor wymienia tę pracę (ang. „Several theorems on the rolling of surfaces”) wśród publikacji poprzedzających doktorat; nie podaje czasopisma, a treści nie widzieliśmy, więc o twierdzeniach nic tu nie mówimy. Rysunek to płaski, klasyczny odpowiednik, nie wynik z pracy: elipsa toczona bez poślizgu po prostej; jej ognisko kreśli krzywą, której obrót wokół prostej daje undoloid Delaunaya (1841), powierzchnię o stałej krzywiźnie średniej. Odległość ogniska od prostej waha się od a − c do a + c, co sprawdza generator.js.",
+    "zdanie": "Jedna z jego wczesnych prac, ogłoszona po polsku w 1923 r., zawiera kilka twierdzeń o toczeniu się powierzchni.",
+    "notka": "MacTutor wymienia tę pracę wśród publikacji poprzedzających doktorat, jako „Several theorems on the rolling of surfaces” (po polsku, 1923); nie podaje polskiego tytułu ani czasopisma, a treści nie widzieliśmy, więc o twierdzeniach nic tu nie mówimy. Rysunek to płaski, klasyczny odpowiednik, nie wynik z pracy: elipsa toczona bez poślizgu po prostej; jej ognisko kreśli krzywą, której obrót wokół prostej daje undoloid Delaunaya (1841), powierzchnię o stałej krzywiźnie średniej. Odległość ogniska od prostej waha się od a − c do a + c, co sprawdza generator.js.",
     "rodzaj": "historia",
     "pewnosc": "pewne",
     "zrodla": [
@@ -1474,7 +1474,7 @@
     "nazwa": "Doktorat w wieku 44 lat",
     "rok": "1928",
     "zdanie": "Doktorat obronił w wieku 44 lat, mając już dorobek; zachęcił go Sierpiński, który załatwił wsparcie finansowe.",
-    "notka": "Doktorat „O pewnej klasie przestrzeni Riemanna” uzyskał na Uniwersytecie Warszawskim 20 czerwca 1928 r. (urodzony 6 lutego 1884 r.), choć publikował już wcześniej na wysokim poziomie; zachęcali go koledzy, a Sierpiński załatwił wsparcie finansowe (MacTutor). Wikipedia podaje tytuł z „powierzchni” zamiast „przestrzeni”; rozprawy nie widzieliśmy. Rysunek to tylko ilustracja pojęcia, nie treść rozprawy: płaszczyzna hiperboliczna, najprostsza przestrzeń Riemanna o stałej ujemnej krzywiźnie, z teselacją Fareya; łuki to jej „proste” (geodezyjne).",
+    "notka": "Doktorat uzyskał na Uniwersytecie Warszawskim 20 czerwca 1928 r. (urodzony 6 lutego 1884 r.), choć publikował już wcześniej na wysokim poziomie; zachęcali go koledzy, a Sierpiński załatwił wsparcie finansowe (MacTutor). Tytuł rozprawy: MacTutor „On a Certain Class of Riemann Space”, Wikipedia „O pewnej klasie powierzchni Riemanna”; rozprawy nie widzieliśmy. Rysunek to tylko ilustracja pojęcia, nie treść rozprawy: płaszczyzna hiperboliczna, najprostsza przestrzeń Riemanna o stałej ujemnej krzywiźnie, z teselacją Fareya; łuki to jej „proste” (geodezyjne).",
     "rodzaj": "anegdota",
     "pewnosc": "pewne",
     "zrodla": [

@@ -567,7 +567,7 @@ function znakJednorodne() {
   out.push(linia(wyk, true, 0.05));
   const ram = new Sciezka(false); ram.M(x0, y0 - 80).L(x0 + B, y0 - 80).L(x0 + B, y0).L(x0, y0).L(x0, y0 - 80); out.push(ram.koniec());
   // 3. okrąg pseudołuków: ten sam wzorzec zawinięty dookoła pierścienia
-  const c = [100, 173], R0 = 38, D = 7.5, ile = 12, wz = [];
+  const c = [100, 174], R0 = 38, D = 7.5, ile = 12, wz = [];
   for (let k = 0; k < ile; k++) {
     for (let i = 0; i < 90; i++) {
       const t = i / 90, a = 2 * PI * (k + gn(t, 2)) / ile - PI / 2, r = R0 + D * Math.sin(2 * PI * t);
@@ -683,7 +683,7 @@ function znakBorsuk() {
   // średnica każdego wycinka to cięciwa łącząca końce łuku 120°: R√3 < 2R
   kp.forEach((q, i) => { const r = kp[(i + 1) % 3]; const s = new Sciezka(false); s.M(q[0], q[1]).L(r[0], r[1]); out.push(s.koniec()); });
   const srednica = Math.hypot(kp[0][0] - kp[1][0], kp[0][1] - kp[1][1]);
-  return { sciezki: out, opis: `u góry przecięcie na 2: punkty antypodyczne w tej samej części, średnica 2R = ${2 * R}; u dołu 3 wycinki o średnicy R√3 = ${srednica.toFixed(1)} < ${2 * R}` };
+  return { sciezki: out, opis: `u góry podział na 2: średnica jednej części zawsze 2R = ${2 * R}; u dołu 3 wycinki o średnicy R√3 = ${srednica.toFixed(1)} < ${2 * R}` };
 }
 
 /* 22. Banach po francusku: kule jednostkowe przestrzeni ℓp na płaszczyźnie */

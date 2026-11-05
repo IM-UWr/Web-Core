@@ -39,6 +39,7 @@ Było 11 ciekawostek, jest 25 (nowych 14). Pewnych: 22 z 25 (nowych 12 z 14). Pi
 ### Świadome ograniczenia
 
 - Nie widzieliśmy treści prac z 1923, 1926 i 1928 ani książki Yano; notki mówią to wprost, a rysunki są podpisane jako ilustracje pojęcia, nie jako wyniki z tych prac.
+- `toczenie-1923`: polskiego tytułu tej pracy nie znamy (MacTutor podaje tylko angielski z dopiskiem „Polish”), dlatego zdanie opisuje ją, a nie cytuje.
 - `pionier-elektryki`: rok objęcia Katedry Matematyki PWr jest niezgodny (1951: strona PWr o patronie, MacTutor, Duda i Weron; 1952: strona Wydziału Elektrycznego). Dlatego roku nie ma w zdaniu; rozbieżność opisana w notce.
 - Z rozmysłem pominąłem dobrze udokumentowane, ale obozowe wątki (nauczanie matematyki współwięźnia, zapowiedź profesury we Wrocławiu, napis na nagrobku); brief każe raczej je pomijać. Pominąłem też aulę i ulicę jego imienia: strona Instytutu nie mówi o auli, a źródłem jest tylko MacTutor.
 - Nie dopisałem ciekawostki o pierwszym doktorancie S. Droboście (doktorat o równaniach sprężystości, PWr 1947, MGP), bo jest już na liście w `jedenastu-doktorow`, i o szkole Rotera i Deszcza (Roter jest w `seminarium-1948`).

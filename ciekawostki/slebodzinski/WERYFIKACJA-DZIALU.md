@@ -84,7 +84,7 @@ Liczenie: pliki w `src/content/`, te same filtry co `src/lib/widoki/dzialNauka.t
 | „Pole wektorów przenoszone wzdłuż przepływu” jako opis | niedokładne | To opis rysunku, nie pojęcia. Encyclopedia of Mathematics: pochodna mierzy, jak obiekt zmienia się wzdłuż grupy przekształceń generowanej przez pole |
 | Seminarium z geometrii różniczkowej, 1948 | potwierdzone | Duda, Weron, Wiad. Mat. 2006, s. 82: „wczesną wiosną 1948 r. ruszyło seminarium z geometrii różniczkowej”: https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-bc45390f-a74e-48aa-80c4-7d6fec3d7108/c/WiadMat_2006_1_6.pdf ; MacTutor wymienia to seminarium |
 | Ślebodziński po 1951 na Politechnice | potwierdzone | Duda, Weron, s. 76; MacTutor |
-| Lata 1884–1972 | niepotwierdzone dokładnie | Przyjęte z `BRIEF.md`. Nie odczytałem dat wprost. Streszczenie MacTutor łączyło doktorat Matuszczyk z 10.11.1971 ze śmiercią „około sześć tygodni później”, co nie zgadza się z rokiem 1972 ani z ciekawostką `jedenastu-doktorow`. To może być błąd streszczenia; limit WebFetch nie pozwolił sprawdzić |
+| Lata 1884–1972 | potwierdzone | MacTutor: ur. 6 lutego 1884, zm. 3 stycznia 1972 we Wrocławiu (sprawdzone przez rozmowę główną 5.11; nie ma sprzeczności z ciekawostką `jedenastu-doktorow`) |
 | „sala WS” = Ślebodziński | niepotwierdzone | Sala WS jest w CMS, ale jej pełnej nazwy nie ma. `estetyka.md` to założenie |
 | CMS: Medal Sierpińskiego, Nagroda Kuratowskiego (2026), ICCM, zaproszenie Mirka na ICM | potwierdzone w CMS | Aktualności 2026-05-29, 2026-05-21, 2023-11-25, 2025-07-09. Że wykład się odbył, nie sprawdzano |
 | CMS: „Eksperci oceniający … podkreślili jakość publikacji” | niepotwierdzone | Nie ma tego w treściach CMS ani w widocznej części decyzji |
@@ -143,4 +143,3 @@ Uzasadnienie: zdania o ekspertach nie da się potwierdzić, a brzmi jak reklama.
 6. **Zdanie o ekspertach:** usunąć czy podać źródło?
 7. **Hasło „Poznaj nasze badania na A+”:** zostaje gra słów? Fakt prawdziwy, ale kategoria dotyczy dyscypliny na Uniwersytecie, nie samego Instytutu.
 8. **„sala WS”** w notce: zostawić bez potwierdzenia nazwy?
-9. **Data śmierci Ślebodzińskiego:** ktoś z dostępem do MacTutor powinien porównać ją z ciekawostką `jedenastu-doktorow`.
