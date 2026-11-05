@@ -28,7 +28,8 @@
   .z-dz-tresc { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 72px; padding: 30px var(--marg) 50px; }
   .z-dz-tresc h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 34px; color: var(--ink); }
   .z-dz-tresc p { margin: 0 0 14px; max-width: 70ch; font-size: 17px; line-height: 1.68; color: var(--text); }
-  .z-dz-tresc p.wst { font-size: 20px; line-height: 1.6; color: var(--ink); }
+  /* lead: ten sam stopień i interlinia co reszta tekstu, wyróżniony tylko kolorem nagłówków (zlecenie 11, zalecenie 11) */
+  .z-dz-tresc p.wst { color: var(--ink); }
   .z-dz-skrot { align-self: start; border-top: 2px solid var(--rule); padding-top: 8px; }
   .z-dz-skrot h3 { margin: 0 0 8px; font-family: var(--f-text); font-size: 13px; font-weight: 700; color: var(--muted); }
   .z-dz-skrot dl { margin: 0; }
@@ -142,7 +143,6 @@
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
   .z-dz .z-dz-tresc h2 { font-size: 28px; }
   .z-dz .z-dz-tresc p { font-size: 15.5px; line-height: 1.62; }
-  .z-dz .z-dz-tresc p.wst { font-size: 17px; }
   .z-dz .z-dz-skrot dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
   .z-dz .z-dz-skrot dt { font-size: 26px; }
   .z-dz .z-dz-skrot dd { font-size: 13px; }
