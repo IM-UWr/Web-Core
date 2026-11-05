@@ -7,8 +7,8 @@
  *  1. Na stronie każdego seminarium jest formularz „Powiadomienia e-mail”. Wysyła on adres do tego skryptu
  *     (doPost, akcja „zapisz”). Skrypt zapisuje adres w arkuszu Google i wysyła link potwierdzający
  *     (podwójne potwierdzenie — nikt nie zapisze cudzego adresu).
- *  2. Link z wiadomości prowadzi na stronę Instytutu /powiadomienia?a=potwierdz&t=…, która przekazuje
- *     potwierdzenie do skryptu. Tak samo działa wypisanie (/powiadomienia?a=wypisz&t=…).
+ *  2. Link z wiadomości prowadzi na stronę Instytutu /en/powiadomienia?a=potwierdz&t=…, która przekazuje
+ *     potwierdzenie do skryptu. Tak samo działa wypisanie (/en/powiadomienia?a=wypisz&t=…).
  *  3. Co 10 minut skrypt pobiera ze strony plik /seminaria/powiadomienia.json. Gdy pojawi się nowy
  *     (przyszły) referat, wysyła do zapisanych na listę tego seminarium elegancki e-mail po angielsku
  *     z linkiem do wypisania się.
@@ -295,11 +295,11 @@ function esc(s) {
 }
 
 function linkWypisania(strona, token) {
-  return String(strona || '').replace(/\/$/, '') + '/powiadomienia/?a=wypisz&t=' + encodeURIComponent(token);
+  return String(strona || '').replace(/\/$/, '') + '/en/powiadomienia/?a=wypisz&t=' + encodeURIComponent(token);
 }
 
 function linkPotwierdzenia(strona, token) {
-  return String(strona || '').replace(/\/$/, '') + '/powiadomienia/?a=potwierdz&t=' + encodeURIComponent(token);
+  return String(strona || '').replace(/\/$/, '') + '/en/powiadomienia/?a=potwierdz&t=' + encodeURIComponent(token);
 }
 
 /** Wspólny szablon HTML wiadomości (tabele i style w linii — działa w Gmailu, Outlooku i Apple Mail). */

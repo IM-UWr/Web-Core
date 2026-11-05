@@ -4,14 +4,12 @@
 // i później pod domeną UWr.
 // Opcja lang: 'en' (teksty na stronach /en — src/lib/markdown.ts): linki wewnętrzne do stron dostają też /en, jak
 // w wJezyku() (src/lib/i18n.ts) — redaktor pisze w polu angielskim „/studia/…”, a link prowadzi do „/en/studia/…”.
-// Bez zmian: pliki (/pliki/, /grafiki/, adresy z rozszerzeniem, np. .pdf, .ics, .xml, .json), adresy już z /en i strony
-// bez wersji angielskiej (BEZ_EN). Kotwica (#…) i zapytanie (?…) zostają.
-const BEZ_EN = ['/powiadomienia'];
+// Bez zmian: pliki (/pliki/, /grafiki/, adresy z rozszerzeniem, np. .pdf, .ics, .xml, .json) i adresy już z /en.
+// Kotwica (#…) i zapytanie (?…) zostają.
 const zEn = (value) => {
   const sciezka = value.split(/[?#]/)[0];
   if (/^\/(pliki|grafiki|pagefind|_astro)\//.test(sciezka) || /\.[a-z0-9]{2,5}$/i.test(sciezka)) return value;
   if (/^\/en(\/|$)/.test(sciezka)) return value;
-  if (BEZ_EN.some((b) => sciezka === b || sciezka.startsWith(b + '/'))) return value;
   return sciezka === '/' ? '/en/' + value.slice(1) : '/en' + value;
 };
 export default function rehypeBase(options = {}) {
