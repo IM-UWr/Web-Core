@@ -378,7 +378,22 @@
   .z-menu section.duza h2 a::after { content: none; }
   .z-menu section.duza h2 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
   .z-menu ul a.zew::after { font-size: .85em; opacity: .7; }
-  .z-menu section.duza a.zew::after { font-family: var(--f-text); font-size: 18px; opacity: .7; }
+  /* zwijane działy (zlecenie 14, zalecenie 24; prototyp v90): grupy jak w menu działu — mały nagłówek, pod nim linki;
+     przycisk ze strzałką z prawej przy nazwie działu (30×30, strzałka obraca się o 180°). Bez JS grupy widoczne,
+     przycisk schowany; zwijanie włącza skrypt (.zwijane, src/scripts/zal/menu.ts). */
+  .z-menu section[data-dzial] h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: 7px; }
+  .z-menu .z-menu-grupa h3 { margin: 0; font-family: var(--f-text); font-size: 12px; font-weight: 600; line-height: 1.6; color: rgb(255 255 255 / .5); }
+  .z-menu-rozwin { display: none; flex: none; place-items: center; width: 30px; height: 30px; margin-top: -1px; padding: 0; border: 0; border-radius: 3px; background: none; color: #fff; cursor: pointer;
+    transition: background-color var(--t-krotki) var(--rytm); }
+  .z-menu.zwijane .z-menu-rozwin { display: inline-grid; }
+  .z-menu-rozwin svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s var(--rytm); }
+  .z-menu-rozwin[aria-expanded='true'] svg { transform: rotate(180deg); }
+  .z-menu-rozwin:hover { background: rgb(255 255 255 / .1); }
+  .z-menu-rozwin:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+  .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: none; }
+  .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
+  .z-menu section.duza h2 a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: 18px; opacity: .7; }
   /* jasny panel (przy jasnym pasku): tło strony, tekst w kolorze tekstu, linki przygaszone, sygnety i kreski w kolorze działu */
   .z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
   .z-menu-jasny h2 a { color: var(--ink); }
@@ -393,6 +408,9 @@
   .z-menu-jasny .z-menu-szukaj input::placeholder { color: var(--muted); }
   .z-menu-jasny .z-zamknij button { background: var(--surface); color: var(--ink); }
   .z-menu-jasny .z-zamknij button:hover { background: var(--line); }
+  .z-menu-jasny .z-menu-grupa h3 { color: var(--muted); }
+  .z-menu-jasny .z-menu-rozwin { color: var(--ink); }
+  .z-menu-jasny .z-menu-rozwin:hover { background: var(--surface); }
   /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
   .z-okl-marka { position: absolute; z-index: 5; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
   .z-okl-marka .z-okl-logo { height: 40px; }
@@ -467,7 +485,7 @@
   .z-strzalka svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob 2.6s ease-in-out infinite; }
   @keyframes z-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
   @media (prefers-reduced-motion: reduce) {
-    .z-menu, .z-menu.otwarte { transition: none; }
+    .z-menu, .z-menu.otwarte, .z-menu-rozwin svg { transition: none; }
     .z-strzalka svg { animation: none; }
     .z-barwa, .z-okl-liczby, .z-okl-liczby :is(a, b) { transition: none; }
     .z-okl-dz::before, .z-okl-dz .slot > span, .z-okl-nazwa span, .z-okl-nazwa span::before, .z-okl-nazwa span::after, .z-okl-szkic :is(.tusz path, .detale) { transition: none !important; }

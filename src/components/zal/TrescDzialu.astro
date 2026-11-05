@@ -12,7 +12,7 @@ import '../../styles/zal-dzialy.css';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz } from '../../lib/i18n';
 import { skrotNazwy } from '../../lib/patroni';
-import { rekrutacja, rokRekrutacji } from '../../lib/menu';
+import { rekrutacja, rokRekrutacji, jestUsos } from '../../lib/menu';
 import type { Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
@@ -34,8 +34,8 @@ const en = lang === 'en';
 const href = (a: string) => (isExternal(a) || a.startsWith('#') ? a : u(wJezyku(a, lang)));
 // pas z wierszami (wariant E) na działach z grupami z menu; Popularyzacja (grupy budowane w widoku) w dotychczasowym układzie
 const pas = dzial !== 'popularyzacja';
-// Studia: USOSweb pominięty w pasie, żeby wiersze były krótsze (do czasu usunięcia z nawigacja.json w CMS — RAPORT-ZLECENIE-11.md)
-const bezUsos = (l: LinkPod) => !(dzial === 'studia' && /(^|\.)usosweb\./i.test(l.adres.replace(/^https?:\/\//, '')));
+// Studia: USOSweb pominięty w pasie, żeby wiersze były krótsze (ten sam filtr w panelu hamburgera — PanelMenu.astro)
+const bezUsos = (l: LinkPod) => !(dzial === 'studia' && jestUsos(l.adres));
 const zGrupami = grupy.map((g) => (pas ? { ...g, linki: g.linki.filter(bezUsos) } : g)).filter((g) => g.linki.length > 0);
 const fakty = tekst?.fakty ?? [];
 const rek = dzial === 'studia' ? await rekrutacja(lang) : undefined;
@@ -51,7 +51,6 @@ const rokRek = rokRekrutacji();
             <h3>{wybierz(g, 'nazwa', lang)}</h3>
             <ul>
               {g.linki.map((l) => {
-                const zew = isExternal(l.adres);
                 const e = wybierz(l, 'etykieta', lang) as string;
                 const sk = skrotNazwy(e);
                 return (
@@ -78,7 +77,6 @@ const rokRek = rokRekrutacji();
           <h3>{wybierz(g, 'nazwa', lang)}</h3>
           <ul>
             {g.linki.map((l) => {
-              const zew = isExternal(l.adres);
               const e = wybierz(l, 'etykieta', lang) as string;
               const sk = skrotNazwy(e);
               return (

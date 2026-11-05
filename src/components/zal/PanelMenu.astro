@@ -4,12 +4,16 @@
 // przed każdym mała twarz patrona (sygnet 52×62, kreska w kolorze działu) — i na dole duże „Aktualności” i „Rekrutacja ↗”
 // (Rekrutacja nie dubluje się w liście Studiów). Kolor: granatowy; przy jasnym pasku jasny (klasa .z-menu-jasny,
 // ustawia src/scripts/zal/pasek.ts). Otwieranie i zamykanie: src/scripts/zal/menu.ts.
+// Zwijane działy (zlecenie 14, zalecenie 24; prototyp v90 „Zwijane działy”): pod nazwą działu grupy jak w menu działu
+// (nawigacja.json — mały nagłówek grupy, pod nim linki), przy nazwie przycisk ze strzałką; otwarty jeden dział naraz,
+// domyślnie wszystkie zwinięte. Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane).
+// USOSweb pominięty w Studiach (jak w pasie działu), SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
 import Szkic from './Szkic.astro';
 import Link from '../Link.astro';
-import { menuGlowne, rekrutacja } from '../../lib/menu';
+import { menuGlowne, rekrutacja, jestUsos } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
-import { PATRONI, DZIALY, pole } from '../../lib/patroni';
+import { PATRONI, DZIALY, pole, skrotNazwy } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
 interface Props { lang: Lang; id: string; jasny?: boolean; class?: string }
@@ -24,7 +28,9 @@ const dzialy = DZIALY.map((dz) => {
   return {
     dz, P,
     nazwa: (m && wybierz(m, 'etykieta', lang)) || pole(P, 'nazwa', lang),
-    linki: (m?.grupy ?? []).flatMap((g) => g.linki).filter((l) => l.adres !== rek.adres),
+    grupy: (m?.grupy ?? [])
+      .map((g) => ({ nazwa: wybierz(g, 'nazwa', lang) as string, linki: g.linki.filter((l) => l.adres !== rek.adres && !(dz === 'studia' && jestUsos(l.adres))) }))
+      .filter((g) => g.linki.length > 0),
   };
 });
 const akt = menu.find((p) => p.adres === '/aktualnosci');
@@ -39,8 +45,26 @@ const akt = menu.find((p) => p.adres === '/aktualnosci');
   {dzialy.map((d) => (
     <section data-dzial={d.dz}>
       <Szkic dzial={d.dz} rodzaj="sygnet" class="z-menu-sygnet" />
-      <h2><a href={href(d.P.adres)}>{d.nazwa}</a></h2>
-      <ul>{d.linki.map((l) => <li><Link href={href(l.adres)}>{wybierz(l, 'etykieta', lang)}</Link></li>)}</ul>
+      <h2>
+        <a href={href(d.P.adres)}>{d.nazwa}</a>
+        {d.grupy.length > 0 && (
+          <button type="button" class="z-menu-rozwin" aria-expanded="false" aria-controls={`${id}-${d.dz}`} aria-label={`${en ? 'Show pages' : 'Pokaż podstrony'}: ${d.nazwa}`} data-z-menu-rozwin>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+        )}
+      </h2>
+      <div class="z-menu-grupy" id={`${id}-${d.dz}`}>
+        {d.grupy.map((g) => (
+          <div class="z-menu-grupa">
+            <h3>{g.nazwa}</h3>
+            <ul>{g.linki.map((l) => {
+              const e = wybierz(l, 'etykieta', lang) as string;
+              const sk = skrotNazwy(e);
+              return <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}</Link></li>;
+            })}</ul>
+          </div>
+        ))}
+      </div>
     </section>
   ))}
   <section class="duza"><h2><a href={href('/aktualnosci')}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>

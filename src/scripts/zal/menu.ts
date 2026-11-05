@@ -14,10 +14,28 @@ function zamknij(zwrocFokus = true) {
   if (zwrocFokus) przycisk.focus({ preventScroll: true });
 }
 
+// Zwijane działy (zlecenie 14, zalecenie 24): bez JS grupy są widoczne; skrypt włącza zwijanie klasą .zwijane na panelu.
+// Przycisk przy nazwie działu rozwija jego grupy, otwarty jest jeden dział naraz; panel otwiera się ze zwiniętymi działami.
+const panele = [...document.querySelectorAll<HTMLElement>('[data-z-menu]')];
+panele.forEach((p) => p.classList.add('zwijane'));
+function ustawDzial(b: HTMLButtonElement, otw: boolean) {
+  b.setAttribute('aria-expanded', String(otw));
+  b.closest('section')?.classList.toggle('rozwiniety', otw);
+}
+const zwinWszystkie = (panel: Element) => panel.querySelectorAll<HTMLButtonElement>('[data-z-menu-rozwin]').forEach((b) => ustawDzial(b, false));
+panele.forEach((panel) => panel.addEventListener('click', (e) => {
+  const b = (e.target as Element).closest<HTMLButtonElement>('[data-z-menu-rozwin]');
+  if (!b) return;
+  const otw = b.getAttribute('aria-expanded') !== 'true';
+  zwinWszystkie(panel);
+  if (otw) ustawDzial(b, true);
+}));
+
 function otworz(przycisk: HTMLButtonElement) {
   const panel = document.getElementById(przycisk.getAttribute('aria-controls') || '');
   if (!panel) return;
   zamknij(false);
+  zwinWszystkie(panel);
   panel.classList.add('otwarte');
   przycisk.setAttribute('aria-expanded', 'true');
   otwarty = { panel, przycisk };
