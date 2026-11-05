@@ -14,7 +14,7 @@
   .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: 20px; }
 
   /* „Na tej stronie”: przyklejony, nie wychodzi poza kolumnę treści (sticky w komórce siatki); dłuższy niż okno — przewija się */
-  .z-spis { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow-y: auto; overscroll-behavior: contain;
+  .z-spis { position: sticky; top: calc(var(--gora) + 24px); align-self: start; max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; overscroll-behavior: contain;
     font-size: 14px; line-height: 1.35; }
   .z-spis-h { margin: 0 0 10px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
   .z-spis-przelacz { display: none !important; }

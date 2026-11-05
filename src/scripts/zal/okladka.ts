@@ -1,9 +1,10 @@
 // Okładka strony głównej na komputer (src/components/zal/Okladka.astro).
-// 1. Blok tytułu jako całość: logo, „Instytut” i „Matematyczny” zaczynają się od lewej, a ich prawe końce leżą na jednej
-//    prostej o nachyleniu s (px w prawo na px w dół). Dobieramy wysokość logo i stopień „Matematyczny” do „Instytut”.
-//    Ta prosta (plus odstęp) to granica ciemnego pola po skosie; za nią krótki gradient w zdjęcie (jak w prototypie).
-// 2. Hamburger: panel z prawej (Esc i klik obok zamykają, fokus wraca na przycisk).
-// 3. Strzałka „Szybki dostęp”: przewinięcie do drugiego ekranu (bez animacji przy prefers-reduced-motion).
+// 1. Blok tytułu jako całość: „Instytut” i „Matematyczny” zaczynają się od lewej, a ich prawe końce leżą na jednej
+//    prostej o nachyleniu s (px w prawo na px w dół). Dobieramy stopień „Matematyczny” do „Instytut” (logo UWr jest od
+//    zlecenia 11 w górnej linii okładki, nie w bloku tytułu). Ta prosta (plus odstęp) to granica ciemnego pola po skosie;
+//    za nią krótki gradient w zdjęcie (jak w prototypie).
+// 2. Strzałka „Szybki dostęp”: przewinięcie do drugiego ekranu (bez animacji przy prefers-reduced-motion).
+// Hamburger i panel menu: src/scripts/zal/menu.ts.
 const ok = document.querySelector<HTMLElement>('.z-okladka');
 const S = 0.32;
 
@@ -12,11 +13,9 @@ function uloz() {
   const tyt = ok.querySelector<HTMLElement>('.z-okl-tytul');
   const w1 = ok.querySelector<HTMLElement>('.w1');
   const w2 = ok.querySelector<HTMLElement>('.w2');
-  const logo = ok.querySelector<HTMLElement>('.z-okl-logo');
-  if (!tyt || !w1 || !w2 || !logo) return;
+  if (!tyt || !w1 || !w2) return;
   const H = ok.clientHeight, W = ok.clientWidth;
   tyt.style.removeProperty('--f2');
-  tyt.style.removeProperty('--logo-h');
   const f1 = parseFloat(getComputedStyle(w1).fontSize);
   const o = ok.getBoundingClientRect();
   const b = (el: HTMLElement) => { const r = el.getBoundingClientRect(); return { x2: r.right - o.left, yc: (r.top + r.bottom) / 2 - o.top }; };
@@ -25,12 +24,10 @@ function uloz() {
   // większe od pierwszego, a logo ogromne. Wtedy zostają stopnie z CSS, a skos liczymy od końca pierwszej linii.
   const wyrownaj = (w2.textContent ?? '').trim().length >= (w1.textContent ?? '').trim().length;
   for (let i = 0; wyrownaj && i < 4; i++) {
-    const L = b(logo), A = b(w1), M = b(w2);
+    const A = b(w1), M = b(w2);
     const f2 = parseFloat(getComputedStyle(w2).fontSize);
     const celM = A.x2 + S * (M.yc - A.yc);
     tyt.style.setProperty('--f2', Math.max(24, (f2 * (celM - lewa)) / (M.x2 - lewa)) + 'px');
-    const celL = A.x2 - S * (A.yc - L.yc);
-    tyt.style.setProperty('--logo-h', Math.max(34, (celL - lewa) / 3.125) + 'px');
   }
   // prosta przez końce „Instytut” i „Matematyczny”: x(y) = x0 + s·y
   const A = b(w1);
@@ -51,23 +48,6 @@ function uloz() {
 if (ok) {
   new ResizeObserver(() => uloz()).observe(ok);
   document.fonts?.ready.then(uloz);
-
-  const menu = ok.querySelector<HTMLElement>('#z-menu');
-  const burger = ok.querySelector<HTMLButtonElement>('#z-burger');
-  const zamknij = ok.querySelector<HTMLButtonElement>('#z-zamknij');
-  const ustaw = (otw: boolean) => {
-    if (!menu || !burger) return;
-    menu.classList.toggle('otwarte', otw);
-    burger.setAttribute('aria-expanded', String(otw));
-    (otw ? zamknij : burger)?.focus();
-  };
-  burger?.addEventListener('click', () => ustaw(true));
-  zamknij?.addEventListener('click', () => ustaw(false));
-  ok.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu?.classList.contains('otwarte')) ustaw(false); });
-  document.addEventListener('click', (e) => {
-    const cel = e.target as Element;
-    if (menu?.classList.contains('otwarte') && !cel.closest('#z-menu, #z-burger')) ustaw(false);
-  });
 
   const strzalka = ok.querySelector<HTMLAnchorElement>('.z-strzalka');
   strzalka?.addEventListener('click', (e) => {

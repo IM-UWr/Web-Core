@@ -1,0 +1,48 @@
+---
+// Panel menu z hamburgera (zlecenie 11, zalecenie 6; prototyp: .ok-menu): ten sam na okładce i przy pasku menu na każdej
+// stronie. Wysuwa się z prawej. Na górze pole „Szukaj na stronie” (formularz do /szukaj?q=…), cztery działy z podstronami —
+// przed każdym mała twarz patrona (sygnet 52×62, kreska w kolorze działu) — i na dole duże „Aktualności” i „Rekrutacja ↗”
+// (Rekrutacja nie dubluje się w liście Studiów). Kolor: granatowy; przy jasnym pasku jasny (klasa .z-menu-jasny,
+// ustawia src/scripts/zal/pasek.ts). Otwieranie i zamykanie: src/scripts/zal/menu.ts.
+import Szkic from './Szkic.astro';
+import { menuGlowne, rekrutacja } from '../../lib/menu';
+import { u, isExternal } from '../../lib/url';
+import { t, wJezyku, wybierz } from '../../lib/i18n';
+import { PATRONI, DZIALY, pole } from '../../lib/patroni';
+import type { Lang } from '../../lib/daty';
+
+interface Props { lang: Lang; id: string; jasny?: boolean; class?: string }
+const { lang, id, jasny = false, class: klasa } = Astro.props;
+const en = lang === 'en';
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const menu = await menuGlowne();
+const rek = await rekrutacja(lang);
+const dzialy = DZIALY.map((dz) => {
+  const P = PATRONI[dz];
+  const m = menu.find((p) => p.adres === P.adres);
+  return {
+    dz, P,
+    nazwa: (m && wybierz(m, 'etykieta', lang)) || pole(P, 'nazwa', lang),
+    linki: (m?.grupy ?? []).flatMap((g) => g.linki).filter((l) => l.adres !== rek.adres),
+  };
+});
+const akt = menu.find((p) => p.adres === '/aktualnosci');
+const zewn = en ? '(external website)' : '(strona zewnętrzna)';
+---
+<nav class:list={['z-menu', jasny && 'z-menu-jasny', klasa]} id={id} aria-label={en ? 'Main menu' : 'Menu główne'} data-z-menu>
+  <span class="z-zamknij"><button type="button" data-z-menu-zamknij aria-label={t(lang, 'zamknijMenu')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></span>
+  <form class="z-menu-szukaj" action={u(wJezyku('/szukaj', lang))} method="get" role="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+    <label class="sr-only" for={`${id}-q`}>{t(lang, 'szukaj')}</label>
+    <input id={`${id}-q`} type="search" name="q" placeholder={en ? 'Search the website' : 'Szukaj na stronie'} autocomplete="off" />
+  </form>
+  {dzialy.map((d) => (
+    <section data-dzial={d.dz}>
+      <Szkic dzial={d.dz} rodzaj="sygnet" class="z-menu-sygnet" />
+      <h2><a href={href(d.P.adres)}>{d.nazwa}</a></h2>
+      <ul>{d.linki.map((l) => <li><a href={href(l.adres)}>{wybierz(l, 'etykieta', lang)}{isExternal(l.adres) && <><span class="z-zew" aria-hidden="true"> ↗</span><span class="sr-only"> {zewn}</span></>}</a></li>)}</ul>
+    </section>
+  ))}
+  <section class="duza"><h2><a href={href('/aktualnosci')}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
+  <section class="duza"><h2><a href={href(rek.adres)}>{rek.etykieta}<span class="z-zew" aria-hidden="true"> ↗</span><span class="sr-only"> {zewn}</span></a></h2></section>
+</nav>

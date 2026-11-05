@@ -83,14 +83,13 @@
   .z-okl-foto { position: absolute; inset: 0 0 auto 0; width: 100%; height: 52%; object-fit: cover; object-position: 62% 50%; z-index: -2; }
   .z-okladka::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background: linear-gradient(180deg, rgb(9 16 34 / .1) 0, rgb(9 16 34 / .35) 26%, var(--granat) 50%, var(--granat) 100%); }
-  .z-skos, .z-narz, .z-menu { display: none !important; }
+  /* logo i wydział z górnej linii okładki są na telefonie w nagłówku (Naglowek.astro) */
+  .z-skos, .z-narz, .z-menu, .z-okl-marka { display: none !important; }
   .z-okl-tytul { position: relative; margin: 0 0 14px; }
   .z-okl-flaga { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-radius: 6px; background: rgb(9 16 34 / .6);
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 12.5px; font-weight: 600; color: #fff; text-decoration: none; }
   .z-okl-flaga::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--studia-j); }
-  .z-okl-uwr { display: block; width: fit-content; }
-  .z-okl-logo { display: block; height: 42px; aspect-ratio: 500 / 160; background: #fff; -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
-  .z-okl-tytul h1 { margin: 10px 0 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; color: #fff; }
+  .z-okl-tytul h1 { margin: 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; color: #fff; }
   .z-okl-tytul h1 > span { display: block; }
   .z-okl-tytul .w1 { font-size: 56px; }
   .z-okl-tytul .w2 { font-size: 34px; margin-top: .06em; }

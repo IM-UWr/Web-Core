@@ -139,7 +139,7 @@ const tytul = t(lang, 'aktualnosci');
 
   /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   @media (min-width: 761px) {
-    .ak-narz { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
+    .ak-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
       background: var(--bg); border-bottom: 2px solid var(--rule); }
     .ak-rodzaje button { font-size: 14px; padding: 7px 12px; }
     .ak-szukaj { flex: 1; min-width: 220px; font-size: 15px; padding: 8px 12px; }

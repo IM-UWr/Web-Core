@@ -35,7 +35,7 @@
   .z-gr .gr-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
 
   /* ---------- Plan zajęć: przyklejony pasek (semestr, wyszukiwarka, dni) i zajęcia w równych kolumnach ---------- */
-  .z-pl .pl-narz { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
+  .z-pl .pl-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
     background: var(--bg); border-bottom: 2px solid var(--rule); }
   /* bez JS: bez paska, wszystkie semestry jeden pod drugim; z JS widać tylko wybrany semestr */
   html:not(.js) .z-pl .pl-narz { display: none; }

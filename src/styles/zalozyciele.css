@@ -94,8 +94,19 @@
   .z-pasek { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: var(--gora); color: #fff;
     --marg: max(64px, calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); border-bottom: 1px solid rgb(255 255 255 / .14); }
   .z-pasek-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 100%; }
-  /* strona bez banera (np. pojedyncza aktualność): pasek na granacie, w zwykłym układzie */
-  body:not(:has(.z-nagl, .z-okladka)) .z-pasek { position: relative; background: var(--granat); }
+  /* strona bez banera (np. pojedyncza aktualność): pasek na granacie, w zwykłym układzie, przyklejony u góry */
+  body:not(:has(.z-nagl, .z-okladka)) .z-pasek { position: sticky; top: 0; background: var(--granat); }
+  /* przyklejony u góry (zlecenie 11, zalecenie 6): z JS stały nad banerem i treścią, kolor według tego, co pod nim
+     (src/scripts/zal/pasek.ts). Bez JS zostaje na banerze (position: absolute), bo nie miałby kiedy zmienić koloru. */
+  html.js body:has(.z-nagl) .z-pasek:not(.z-pasek-jasny) { position: fixed; }
+  html.js .z-pasek { transition: background-color .25s, color .25s, box-shadow .25s, border-color .25s; }
+  /* po przewinięciu nad banerem lub stopką: ciemne tło z mocnym rozmyciem, żeby tekst banera nie prześwitywał */
+  html.js .z-pasek.przewiniety:not(.jasny) { background: rgb(9 16 34 / .62); -webkit-backdrop-filter: blur(22px) saturate(1.3); backdrop-filter: blur(22px) saturate(1.3);
+    border-bottom-color: rgb(255 255 255 / .1); box-shadow: 0 8px 24px rgb(0 0 0 / .18); }
+  /* nad treścią: jasny — tło strony z lekką przezroczystością i rozmyciem, tekst i logo w kolorze tekstu, cienka linia u dołu */
+  html.js .z-pasek.jasny { background: color-mix(in srgb, var(--bg) 95%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    color: var(--ink); border-bottom-color: var(--line); box-shadow: 0 6px 18px rgb(13 24 48 / .06); }
+  @media (prefers-reduced-motion: reduce) { html.js .z-pasek { transition: none; } }
   .z-marka { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
   .z-logo { display: block; height: 40px; aspect-ratio: 500 / 160; background: #fff;
     -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
@@ -107,9 +118,21 @@
   .z-pasek nav a:hover, .z-pasek nav a[aria-current] { color: #fff; }
   .z-pasek nav a[aria-current] { font-weight: 700; }
   .z-pasek nav a[data-dzial]::after { content: ''; position: absolute; left: 11px; bottom: 3px; width: 18px; height: 2px; background: var(--d-j); }
-  .z-pasek nav a.z-rekr { margin-right: 10px; }
-  .z-pasek nav a.z-rekr::before { content: ''; position: absolute; left: -2px; top: 13px; bottom: 13px; width: 1px; background: rgb(255 255 255 / .25); }
   .z-pasek nav a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+  /* za cienką kreską: tryb ciemny, język i hamburger (Rekrutacja i Szukaj są w panelu hamburgera) */
+  .z-pasek-narz { position: relative; display: flex; align-items: center; margin-left: 12px; }
+  .z-pasek-narz::before { content: ''; position: absolute; left: -6px; top: 13px; bottom: 13px; width: 1px; background: rgb(255 255 255 / .25); }
+  .z-pasek-narz button { display: grid; place-items: center; width: 38px; height: 38px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none;
+    color: rgb(255 255 255 / .8); cursor: pointer; }
+  .z-pasek-narz button:hover { color: #fff; }
+  .z-pasek-narz button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .z-pasek-narz button[data-motyw] svg { width: 17px; height: 17px; }
+  .z-pasek-narz .z-burger svg { width: 21px; height: 21px; }
+  .z-pasek-narz :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 1px; border-radius: 4px; }
+  /* przycisk trybu: księżyc w jasnym, słońce w ciemnym (pasek i okładka) */
+  [data-motyw] .z-sl { display: none; }
+  :root[data-theme="dark"] [data-motyw] .z-ks { display: none; }
+  :root[data-theme="dark"] [data-motyw] .z-sl { display: block; }
   .z-jezyk { display: inline-flex !important; align-items: center; gap: 6px; }
   .z-flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-shadow: 0 0 0 1px rgb(0 0 0 / .12); }
 
@@ -249,32 +272,74 @@
   .z-narz :is(a, button):hover { background: rgb(9 16 34 / .7); }
   .z-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .z-narz svg:not(.z-flaga) { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
-  /* panel z hamburgera: z prawej, na granacie; kolory działów jako krótkie kreski */
-  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; width: min(460px, 40%); padding: 76px 36px 28px; overflow-y: auto;
-    background: rgb(9 16 34 / .96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
-    transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s linear .35s; }
-  .z-menu.otwarte { transform: none; visibility: visible; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s; }
+  /* panel z hamburgera (PanelMenu.astro; zlecenie 11, zalecenie 6): z prawej, na granacie (w ciemnym motywie --panel);
+     na okładce w obrębie okładki, przy pasku stały na całą wysokość okna; przy jasnym pasku jasny (.z-menu-jasny) */
+  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; width: min(460px, 40%); padding: 76px 36px 28px; overflow-y: auto; text-align: left;
+    background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
+    transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s linear .35s, background-color .25s, color .25s; }
+  .z-menu.otwarte { transform: none; visibility: visible; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s, background-color .25s, color .25s; }
+  .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: max(64px, calc((100vw - var(--kol)) / 2)); }
   .z-menu .z-zamknij { position: absolute; top: 18px; right: 32px; }
+  /* przy pasku krzyżyk w miejscu hamburgera */
+  .z-menu-pasek .z-zamknij { top: calc((var(--gora) - 40px) / 2); right: max(24px, calc(var(--marg) - 2px)); }
+  .z-menu .z-zamknij button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px;
+    color: #fff; background: rgb(255 255 255 / .08); cursor: pointer; }
+  .z-menu .z-zamknij button:hover { background: rgb(255 255 255 / .16); }
+  .z-menu .z-zamknij button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  .z-menu .z-zamknij svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .z-menu-szukaj { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 9px 12px; border: 1px solid rgb(255 255 255 / .3); color: rgb(255 255 255 / .75); }
+  .z-menu-szukaj svg { flex: none; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .z-menu-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-appearance: none; appearance: none;
+    font: inherit; font-size: 15px; color: #fff; outline: none; }
+  .z-menu-szukaj input::placeholder { color: rgb(255 255 255 / .6); opacity: 1; }
+  .z-menu-szukaj:focus-within { border-color: #fff; }
   .z-menu section { padding: 12px 0; border-bottom: 1px solid rgb(255 255 255 / .12); }
+  /* dział: mała twarz patrona (sygnet 52×62, kreska w kolorze działu) przed nazwą i listą */
+  .z-menu section[data-dzial] { display: grid; grid-template-columns: 52px minmax(0, 1fr); column-gap: 18px; align-items: start; }
+  .z-menu section[data-dzial] > :not(.z-menu-sygnet) { grid-column: 2; }
+  .z-menu .z-menu-sygnet { grid-row: 1 / span 2; display: block; width: 52px; height: 62px; margin-top: 2px; }
+  .z-menu .z-menu-sygnet path { fill: none; stroke: var(--d-j); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
   .z-menu h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.1; }
   .z-menu h2 a { color: #fff; text-decoration: none; }
   .z-menu h2 a::after { content: ''; display: block; width: 28px; height: 2px; margin-top: 6px; background: var(--d-j); }
   .z-menu ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 16px; font-size: 14.5px; }
   .z-menu ul a { display: inline-block; padding: 3px 0; color: var(--na-ciemnym-2); text-decoration: none; }
   .z-menu ul a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-  .z-menu section.duza h2 { margin: 0; }
+  /* Aktualności i Rekrutacja: duże, z większym oddechem, wyrównane do tekstu działów (za sygnetem) */
+  .z-menu section.duza { padding: 20px 0 20px 70px; }
+  .z-menu section[data-dzial] + section.duza { margin-top: 10px; }
+  .z-menu section.duza h2 { margin: 0; font-size: 28px; }
   .z-menu section.duza h2 a::after { content: none; }
   .z-menu section.duza h2 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
-  /* tytuł: logo, „Instytut” i „Matematyczny” z prawymi końcami na jednej skośnej */
-  .z-okl-tytul { position: absolute; left: 48px; top: clamp(64px, calc(var(--h) * .15), 170px); }
+  .z-menu section.duza .z-zew { font-family: var(--f-text); font-size: 18px; opacity: .7; }
+  /* jasny panel (przy jasnym pasku): tło strony, tekst w kolorze tekstu, linki przygaszone, sygnety i kreski w kolorze działu */
+  .z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
+  .z-menu-jasny h2 a { color: var(--ink); }
+  .z-menu-jasny h2 a::after { background: var(--d-a, var(--line)); }
+  .z-menu-jasny ul a { color: var(--muted); }
+  .z-menu-jasny ul a:hover { color: var(--ink); }
+  .z-menu-jasny section { border-bottom-color: var(--line); }
+  .z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }
+  .z-menu-jasny .z-menu-szukaj { border-color: var(--line); color: var(--muted); }
+  .z-menu-jasny .z-menu-szukaj:focus-within { border-color: var(--ink); }
+  .z-menu-jasny .z-menu-szukaj input { color: var(--ink); }
+  .z-menu-jasny .z-menu-szukaj input::placeholder { color: var(--muted); }
+  .z-menu-jasny .z-zamknij button { background: var(--surface); color: var(--ink); }
+  .z-menu-jasny .z-zamknij button:hover { background: var(--line); }
+  /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
+  .z-okl-marka { position: absolute; z-index: 5; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
+  .z-okl-marka .z-okl-logo { height: 40px; }
+  .z-okl-marka > span:last-child { padding-left: 14px; border-left: 1px solid rgb(255 255 255 / .35); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
+  .z-okl-marka:hover > span:last-child { color: #fff; }
+  .z-okl-marka:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+  /* tytuł: „Instytut” i „Matematyczny” z prawymi końcami na jednej skośnej; trochę niżej niż z logo (zalecenie 7) */
+  .z-okl-tytul { position: absolute; left: 48px; top: clamp(84px, calc(var(--h) * .2), 220px); }
   .z-okl-flaga { display: inline-flex; align-items: center; gap: 10px; margin-bottom: clamp(12px, calc(var(--h) * .024), 24px); padding: 6px 14px 6px 12px; border-radius: 6px;
     background: rgb(9 16 34 / .6); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 14px; font-weight: 600; color: #fff; text-decoration: none; }
   .z-okl-flaga::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--studia-j); }
-  .z-okl-uwr { display: block; width: fit-content; }
-  .z-okl-uwr:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
   .z-okl-logo { display: block; height: var(--logo-h, clamp(42px, calc(var(--h) * .074), 70px)); aspect-ratio: 500 / 160; background: #fff;
     -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
-  .z-okl-tytul h1 { margin: clamp(10px, calc(var(--h) * .02), 20px) 0 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; white-space: nowrap; color: #fff; }
+  .z-okl-tytul h1 { margin: 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; white-space: nowrap; color: #fff; }
   .z-okl-tytul h1 > span { display: block; width: fit-content; }
   .z-okl-tytul .w1 { font-size: var(--f1, clamp(56px, calc(var(--h) * .11), 116px)); }
   .z-okl-tytul .w2 { font-size: var(--f2, clamp(40px, calc(var(--h) * .074), 80px)); margin-top: .04em; }
@@ -316,14 +381,18 @@
   }
   /* strona główna: pasek menu na górze drugiego ekranu, zwykły (jasny) */
   .z-pasek.z-pasek-jasny { position: sticky; top: 0; color: var(--ink); background: var(--bg); border-bottom-color: var(--line); }
-  .z-pasek-jasny .z-logo { background: var(--uwr); }
-  .z-pasek-jasny .z-marka > span:last-child { border-left-color: var(--line); }
-  .z-pasek-jasny .z-marka small { color: var(--muted); }
-  .z-pasek-jasny nav a { color: var(--ink); }
-  .z-pasek-jasny nav a:hover, .z-pasek-jasny nav a[aria-current] { color: var(--ink); }
-  .z-pasek-jasny nav a[data-dzial]::after { background: var(--d-a); }
-  .z-pasek-jasny nav a.z-rekr::before { background: var(--line); }
-  .z-pasek-jasny nav a:focus-visible { outline-color: var(--ink); }
+  /* jasny pasek: na stronie głównej zawsze, na pozostałych nad treścią (.jasny); kreski działów w kolorze głębokim,
+     w ciemnym motywie w jasnym */
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-logo { background: var(--uwr); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka > span:last-child { border-left-color: var(--line); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka small { color: var(--muted); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a, :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button { color: color-mix(in srgb, var(--ink) 76%, transparent); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a:hover, :is(.z-pasek-jasny, .z-pasek.jasny) nav a[aria-current],
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button:hover { color: var(--ink); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a[data-dzial]::after { background: var(--d-g); }
+  :root[data-theme="dark"] :is(.z-pasek-jasny, .z-pasek.jasny) nav a[data-dzial]::after { background: var(--d-j); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz::before { background: var(--line); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a:focus-visible { outline-color: var(--ink); }
 
 
   /* ---------- podstrona działu: treść bez kafelków (układ ze spisem z prawej — zal-podstrona.css) ---------- */

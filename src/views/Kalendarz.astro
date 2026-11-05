@@ -123,7 +123,7 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
 
   /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   @media (min-width: 761px) {
-    .kal-narz { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
+    .kal-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
       background: var(--bg); border-bottom: 2px solid var(--rule); }
     .kal-narz button { font-size: 14px; padding: 7px 12px; }
     .kal-szukaj { flex: 1; min-width: 200px; font-size: 15px; padding: 8px 12px; }
