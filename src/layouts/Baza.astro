@@ -58,7 +58,9 @@ const { tytul, opis, obraz, opublikowany = true, pozaIndeksem = false, alternaty
 const wIndeksie = opublikowany && !pozaIndeksem;
 const sciezka = stripBase(Astro.url.pathname);
 const lang = jezykZeSciezki(sciezka);
-const pelnyTytul = stronaGlowna ? `${t(lang, 'instytut')} · ${t(lang, 'uwr')}` : `${tytul} · ${t(lang, 'instytut')} UWr`;
+// Po angielsku pełna nazwa bez skrótu UWr (decyzja D2, zlecenie 16).
+const nazwaStrony = lang === 'en' ? `${t(lang, 'instytut')}, ${t(lang, 'uwr')}` : `${t(lang, 'instytut')} UWr`;
+const pelnyTytul = stronaGlowna ? (lang === 'en' ? nazwaStrony : `${t(lang, 'instytut')} · ${t(lang, 'uwr')}`) : `${tytul} · ${nazwaStrony}`;
 const opisMeta = opis || (lang === 'en' ? ustawienia.wstep_en : ustawienia.wstep);
 const kanoniczny = absolute(sciezka, Astro.site);
 const inny = alternatywa === null ? null : alternatywa ?? drugiJezyk(sciezka);
@@ -95,7 +97,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
     <meta property="og:url" content={kanoniczny} />
     <meta property="og:image" content={ogObraz} />
     <meta property="og:locale" content={lang === 'en' ? 'en_GB' : 'pl_PL'} />
-    <meta property="og:site_name" content={`${t(lang, 'instytut')} UWr`} />
+    <meta property="og:site_name" content={nazwaStrony} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'aktualnosci')} — ${t(lang, 'instytut')}`} href={u(lang === 'en' ? '/en/rss.xml' : '/rss.xml')} />

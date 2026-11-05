@@ -15,7 +15,7 @@ const rok = new Date().getFullYear();
 ---
 <footer class="z-stopka">
   <div class="z-stopka-in">
-    <div><b>{t(lang, 'instytut')} UWr</b> · {k.adres} · <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a> · <a href={`mailto:${k.email}`}>{k.email}</a></div>
+    <div><b>{lang === 'en' ? `${t(lang, 'instytut')}, ${t(lang, 'uwr')}` : `${t(lang, 'instytut')} UWr`}</b> · {k.adres} · <a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a> · <a href={`mailto:${k.email}`}>{k.email}</a></div>
     <nav aria-label={lang === 'en' ? 'Legal' : 'Informacje prawne'}>
       <a href={u(wJezyku('/deklaracja-dostepnosci', lang))}>{t(lang, 'deklaracja')}</a>
       <a href={u(wJezyku('/polityka-prywatnosci', lang))}>{t(lang, 'prywatnosc')}</a>
