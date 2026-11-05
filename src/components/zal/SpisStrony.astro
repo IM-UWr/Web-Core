@@ -74,8 +74,8 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
       if (wybrana && !wybrana.li.hidden) biezaca = wybrana;
       pozycje.forEach((p) => (p === biezaca ? p.a.setAttribute('aria-current', 'location') : p.a.removeAttribute('aria-current')));
       if (biezaca && !telefon.matches) {
-        znacznik.style.top = `${biezaca.li.offsetTop}px`;
-        znacznik.style.height = `${biezaca.li.offsetHeight}px`;
+        // położenie i długość przez transform (zlecenie 13, punkt 8: przesuwanie bez przeliczania układu)
+        znacznik.style.transform = `translateY(${biezaca.li.offsetTop}px) scaleY(${biezaca.li.offsetHeight})`;
         znacznik.hidden = false;
       } else znacznik.hidden = true;
     };

@@ -31,9 +31,10 @@
   .z-spis-lista a:hover { color: var(--ink); }
   .z-spis-lista a[aria-current] { color: var(--ink); font-weight: 700; }
   .z-spis-lista a:focus-visible { outline: 2px solid var(--d-a); outline-offset: -2px; }
-  /* znacznik bieżącej sekcji: odcinek 3 px na linii, przesuwa się między pozycjami */
-  .z-spis-znacznik { position: absolute; left: 0; width: 3px; margin-left: -2px; background: var(--d-a); pointer-events: none;
-    transition: top .25s ease, height .25s ease; }
+  /* znacznik bieżącej sekcji: odcinek 3 px na linii, przesuwa się między pozycjami — pasek 1 px wysokości rozciągany
+     i przesuwany przez transform (translateY + scaleY z SpisStrony.astro; zlecenie 13, punkt 8 — bez przeliczania układu) */
+  .z-spis-znacznik { position: absolute; top: 0; left: 0; width: 3px; height: 1px; margin-left: -2px; background: var(--d-a); pointer-events: none;
+    transform-origin: 0 0; transition: transform .25s var(--rytm); }
   .z-spis-znacznik[hidden] { display: none; }
 
   /* dół podstrony („Następna strona w dziale”, „Zgłoś błąd”) wyrównany do kolumny treści */

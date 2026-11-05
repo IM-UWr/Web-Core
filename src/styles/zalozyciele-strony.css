@@ -26,14 +26,15 @@
   .z-skr-kd:not([data-zamiana=""]) .z-kd-kropka { width: auto; height: auto; padding: 0 6px; border-radius: 999px; font-size: 11px; font-weight: 800; color: #fff; }
   /* trzy kolumny: dwie krótkie po 3 pozycje (sloty 0 i 1), pod nimi Studia i Warto wiedzieć na 2/3, z prawej długa (slot 2) */
   .z-siatka { flex: 1 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; align-content: space-between; gap: 22px 36px; margin-top: 22px; }
-  .z-kolumna { position: relative; min-width: 0; background: var(--bg); }
-  /* kliknięta liczba na okładce (zlecenie 11, zalecenie 15): krótkie podświetlenie kolumny; przy ograniczonym ruchu — obrys */
-  .z-kolumna.z-podswietl { animation: z-podswietl 1.6s ease; }
-  @keyframes z-podswietl {
-    0%, 35% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--d-j, #c9d0de) 22%, transparent); background: color-mix(in srgb, var(--d-j, #c9d0de) 12%, var(--bg)); }
-    100% { box-shadow: 0 0 0 10px transparent; background: var(--bg); }
-  }
-  @media (prefers-reduced-motion: reduce) { .z-kolumna.z-podswietl { animation: none; outline: 2px solid var(--d-a); outline-offset: 8px; } }
+  .z-kolumna { position: relative; isolation: isolate; min-width: 0; background: var(--bg); }
+  /* kliknięta liczba na okładce (zlecenie 11, zalecenie 15): krótkie podświetlenie kolumny; przy ograniczonym ruchu — obrys.
+     Tło i obwódka w warstwie pod treścią kolumny, która gaśnie przez opacity (zlecenie 13, punkt 8; dawniej animacja
+     box-shadow i background całej kolumny) */
+  .z-kolumna::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+    background: color-mix(in srgb, var(--d-j, #c9d0de) 12%, var(--bg)); box-shadow: 0 0 0 10px color-mix(in srgb, var(--d-j, #c9d0de) 22%, transparent); }
+  .z-kolumna.z-podswietl::before { animation: z-podswietl 1.6s ease; }
+  @keyframes z-podswietl { 0%, 35% { opacity: 1; } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .z-kolumna.z-podswietl::before { animation: none; } .z-kolumna.z-podswietl { outline: 2px solid var(--d-a); outline-offset: 8px; } }
   .z-druga-obszar:focus { outline: none; }
   .z-kolumna[data-slot="0"] { grid-column: 1; grid-row: 1; }
   .z-kolumna[data-slot="1"] { grid-column: 2; grid-row: 1; }

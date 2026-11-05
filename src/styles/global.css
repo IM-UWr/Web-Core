@@ -8,6 +8,12 @@
    ========================================================================== */
 
 :root {
+  /* jeden rytm ruchu na całej stronie (zlecenie 13, punkt 9): krzywa i czasy przejść 0,15–0,35 s; dłuższe ruchy (szkic,
+     ciekawostka, barwienie okładki, przejazd) mają własne czasy z wcześniejszych zleceń, ale tę samą krzywą tam, gdzie to ruch */
+  --rytm: cubic-bezier(.22, .8, .2, 1);
+  --t-krotki: .15s;
+  --t-sredni: .25s;
+  --t-dlugi: .35s;
   --uwr: #05649c;
   /* paleta „zmierzch” (granat + bursztyn) */
   --bg: #ffffff;

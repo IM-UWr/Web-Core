@@ -38,9 +38,13 @@
   .z-dz-rzad a:hover { color: var(--d-a); }
   .z-dz-rzad a.zew::after { content: ' ↗'; font-family: var(--f-text); font-size: .8em; color: var(--muted); }
   .z-dz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display);
-    font-weight: 500; font-size: 22px; line-height: 1.2; white-space: nowrap; transition: filter .15s; }
+    font-weight: 500; font-size: 22px; line-height: 1.2; white-space: nowrap; position: relative; isolation: isolate; }
   .z-dz-rekr small { font-family: var(--f-text); font-size: 12.5px; font-weight: 700; opacity: .85; }
-  .z-dz-rekr:hover { filter: brightness(1.1); }
+  /* po najechaniu jaśniejsze tło: warstwa pod tekstem z rozjaśnionym kolorem, która wchodzi przez opacity (zlecenie 13, punkt 8;
+     dawniej przejście filter na całym przycisku) */
+  .z-dz-rekr::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--d-a); filter: brightness(1.1); opacity: 0;
+    transition: opacity var(--t-krotki) var(--rytm); pointer-events: none; }
+  .z-dz-rekr:hover::before { opacity: 1; }
   .z-dz-rekr:focus-visible { outline: 2px solid var(--d-a); outline-offset: 3px; }
   /* w ciemnym motywie kolor działu jest jasnym pastelem — napis granatowy (biały byłby nieczytelny) */
   :root[data-theme="dark"] .z-dz-rekr { color: var(--accent-ink); }

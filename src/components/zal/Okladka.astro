@@ -115,7 +115,7 @@ const rozmiarOkl = (p: number) =>
         <span class="z-okl-szkic"><Szkic dzial={d.dz} rodzaj="pelny" duch /></span>
         {/* telefon: zamiast pełnego szkicu uproszczony sygnet */}
         <Szkic dzial={d.dz} rodzaj="sygnet" class="z-okl-sygnet" />
-        <span class="z-okl-nazwa"><span>{d.nazwa}</span></span>
+        <span class="z-okl-nazwa"><span data-t={d.nazwa}>{d.nazwa}</span></span>
         <span class="slot">
           <span class="haslo-dz">{d.haslo}</span>
           <span class="patron"><b>{d.P.patron}</b>{d.P.lata}. {pole(d.P, 'fakt', lang)}</span>
