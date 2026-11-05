@@ -2819,14 +2819,14 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     e.preventDefault(); const n = IN_GRUPY[dzial].length, d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1;
     mzWybierz((+t.dataset.mz + d + n) % n);
   });
-  /* zasada z zalecenia 2 (zlecenie 11): liczby w jednym rzędzie, kończą się 40 px przed notką o patronie (na podstronie: przed opisem znaku);
+  /* zasada z zalecenia 2 (zlecenie 11): liczby w jednym rzędzie, kończą się 20 px przed notką o patronie (na podstronie: przed opisem znaku);
      nadmiarowe znikają w całości od końca, zawsze zostaje co najmniej jedna */
   function przytnijLiczby() {
     const sc = $('#scena'), k = sc.getBoundingClientRect().width / sc.offsetWidth || 1;
     document.querySelectorAll('#in-baner .in-liczby').forEach((rz) => {
       const box = rz.closest('.in-b4, .pd-b'); const gr = box && (box.querySelector('.in-patron') || box.querySelector('.znak-podpis')); if (!gr) return;
       let lim = gr.getBoundingClientRect().left; const bb = gr.querySelector('b'); if (bb) lim = Math.min(lim, bb.getBoundingClientRect().left);
-      lim -= 40 * k;
+      lim -= 20 * k; /* odstęp 20 px (5.11, 11:30: w Nauce 24 px wygląda dobrze) */
       const it = [...rz.children].filter((x) => x.tagName === 'DIV');
       it.forEach((x) => { x.hidden = false; x.removeAttribute('aria-hidden'); });
       for (let i = it.length - 1; i > 0; i--) { if (it[i].getBoundingClientRect().right > lim) { it[i].hidden = true; it[i].setAttribute('aria-hidden', 'true'); } else break; }
