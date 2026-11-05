@@ -47,6 +47,16 @@ Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`). Audyt: `dok/en/RAPORT-EN.
   czasopism i serii oraz nazwy przedmiotów cytowane w uwagach (np. „Miara i całka R”) — celowo.
 - `dok/en/TLUMACZENIA.md`: tabele do przejrzenia (patroni, napisy w kodzie, plan, publikacje).
 
+## Krok 3: tłumaczenia treści CMS jako łatki — w toku (5.11, ok. 02:35)
+- Łatki dla 17 repozytoriów w `dok/en/latki/` (po jednej na repozytorium; podstawa i zakres w `dok/en/TLUMACZENIA.md`,
+  sekcja 4). Wszystkie pozycje z sekcji C audytu: C1 obrony (`tresc_en`, 8 plików), C2 tematy prac (`opis_en`, 53),
+  C3 afiliacje prelegentów (`afiliacja_en`, 20 — także „IM UWr”, „UWr”, „MIM UW”, których audyt nie liczył), C4 sala
+  (`sala_en`), C5 streszczenia (`tresc_en`, 9 + jedno polskie streszczenie przetłumaczone w całości), C6 opisy grafik
+  testowych (`zdjecie_opis_en`, 4), C7 formularze (`formularz_en`, 6); martwy link w `wyklad-terencea-tao.md`
+  (→ `/nauka/konferencje#rok-2017`); nowe pola w `.pages.yml`.
+- Sprawdzone na lokalnych kopiach treści z nałożonymi łatkami: `git apply --check` dla każdej łatki, `sprawdz_tresci.py`
+  OK, `npm run build` OK; na stronach `/en` nie ma już linków do polskich stron (poza przełącznikiem języka).
+- W repozytoriach Web-* nic nie jest commitowane.
+
 ## Zostało
-- Krok 3: łatki z tłumaczeniami pól `_en` dla repozytoriów Web-* (`dok/en/latki/`), tabela w `dok/en/TLUMACZENIA.md`
-  (też „Do decyzji”), martwy link w `warto_wiedziec/wyklad-terencea-tao.md`, nowe pola w `.pages.yml`.
+- Krok 3: sekcja „Do decyzji” w `dok/en/TLUMACZENIA.md` (propozycje, bez wdrażania), końcowe sprawdzenie.

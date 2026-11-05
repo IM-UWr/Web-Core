@@ -1,0 +1,56 @@
+diff --git a/.pages.yml b/.pages.yml
+index ba2b07c..c261d0c 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -228,6 +228,9 @@ content:
+     - name: opis
+       label: Dopisek (np. rok, poziom)
+       type: string
++    - name: opis_en
++      label: 'EN: dopisek (puste = wersja angielska pokaże dopisek po polsku; temat zostaje w oryginale)'
++      type: string
+   - name: dokumenty
+     label: Dokumenty
+     type: object
+diff --git a/src/content/specjalnosci/matematyka-stosowana.md b/src/content/specjalnosci/matematyka-stosowana.md
+index ca640bd..7999111 100644
+--- a/src/content/specjalnosci/matematyka-stosowana.md
++++ b/src/content/specjalnosci/matematyka-stosowana.md
+@@ -309,26 +309,37 @@ kariera_en: |-
+ tematy_prac:
+ - tytul: Nielokalny model epidemii
+   opis: praca licencjacka; promotor prof. Grzegorz Karch; lista tematów prac dyplomowych IM (2024)
++  opis_en: "bachelor’s thesis; supervisor: Prof. Grzegorz Karch; Institute list of thesis topics (2024)"
+ - tytul: Model SEIR w modelowaniu COVID-19 w mieście Wuhan
+   opis: praca licencjacka; promotor prof. Grzegorz Karch; lista tematów prac dyplomowych IM (2024)
++  opis_en: "bachelor’s thesis; supervisor: Prof. Grzegorz Karch; Institute list of thesis topics (2024)"
+ - tytul: Model Mimury kolonii bakteryjnych
+   opis: praca licencjacka; promotor prof. Grzegorz Karch; lista tematów prac dyplomowych IM (2024)
++  opis_en: "bachelor’s thesis; supervisor: Prof. Grzegorz Karch; Institute list of thesis topics (2024)"
+ - tytul: Interaktywna platforma do matematycznego modelowania rozprzestrzeniania się chorób zakaźnych
+   opis: praca magisterska; promotor prof. Grzegorz Karch; lista tematów prac dyplomowych IM (2024)
++  opis_en: "master’s thesis; supervisor: Prof. Grzegorz Karch; Institute list of thesis topics (2024)"
+ - tytul: Lepkie równanie Burgersa na prostej
+   opis: praca magisterska; promotor prof. Grzegorz Karch; lista tematów prac dyplomowych IM (2024)
++  opis_en: "master’s thesis; supervisor: Prof. Grzegorz Karch; Institute list of thesis topics (2024)"
+ - tytul: Równania reakcji-dyfuzji, modelowanie reakcji chemicznych
+   opis: praca licencjacka; promotor prof. Piotr Biler; lista tematów prac dyplomowych IM (2024)
++  opis_en: "bachelor’s thesis; supervisor: Prof. Piotr Biler; Institute list of thesis topics (2024)"
+ - tytul: Nieliniowe poprawki do modelu Keller-Segela chemotaksji
+   opis: praca magisterska; promotor prof. Piotr Biler; lista tematów prac dyplomowych IM (2024)
++  opis_en: "master’s thesis; supervisor: Prof. Piotr Biler; Institute list of thesis topics (2024)"
+ - tytul: Tworzenie się wzorów w układach reakcji-dyfuzji
+   opis: praca magisterska; promotor dr Szymon Cygan; lista tematów prac dyplomowych IM (2024)
++  opis_en: "master’s thesis; supervisor: Dr Szymon Cygan; Institute list of thesis topics (2024)"
+ - tytul: Nielokalny model Kondo tworzenia się wzorów
+   opis: praca magisterska; promotor dr Szymon Cygan; lista tematów prac dyplomowych IM (2024)
++  opis_en: "master’s thesis; supervisor: Dr Szymon Cygan; Institute list of thesis topics (2024)"
+ - tytul: Strategie walki z epidemią
+   opis: praca licencjacka; promotor dr hab. Andrzej Raczyński; lista tematów prac dyplomowych IM (2024)
++  opis_en: "bachelor’s thesis; supervisor: Dr hab. Andrzej Raczyński; Institute list of thesis topics (2024)"
+ - tytul: Modele ciągłe vs. modele dyskretne w modelowaniu za pomocą równań różniczkowych
+   opis: praca magisterska; promotor dr hab. Andrzej Raczyński; lista tematów prac dyplomowych IM (2024)
++  opis_en: "master’s thesis; supervisor: Dr hab. Andrzej Raczyński; Institute list of thesis topics (2024)"
+ dokumenty:
+ - nazwa: Przewodnik po programie studiów I stopnia (od 2026/27)
+   nazwa_en: Guide to the first-cycle curriculum (from 2026/27)

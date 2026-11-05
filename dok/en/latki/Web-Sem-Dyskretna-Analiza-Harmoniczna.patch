@@ -1,0 +1,83 @@
+diff --git a/.pages.yml b/.pages.yml
+index 9dec127..dc21ca3 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -103,6 +103,9 @@ content:
+   - name: afiliacja
+     label: Afiliacja
+     type: string
++  - name: afiliacja_en
++    label: 'EN: afiliacja (puste = wersja angielska pokaże afiliację po polsku)'
++    type: string
+   - name: termin
+     label: Termin
+     type: date
+@@ -113,6 +116,9 @@ content:
+   - name: sala
+     label: Sala
+     type: string
++  - name: sala_en
++    label: 'EN: sala (opis miejsca po angielsku, gdy to nie numer sali; puste = wersja angielska pokaże salę po polsku)'
++    type: string
+   - name: pliki
+     label: Pliki (slajdy itp.)
+     type: object
+@@ -131,3 +137,6 @@ content:
+     type: code
+     options:
+       format: markdown
++  - name: tresc_en
++    label: 'EN: streszczenie (Markdown, wzory w $...$; puste = wersja angielska pokaże streszczenie z pola wyżej)'
++    type: text
+diff --git a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-11-bhattacharjee.md b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-11-bhattacharjee.md
+index c3e7bdd..320f6d9 100644
+--- a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-11-bhattacharjee.md
++++ b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-11-bhattacharjee.md
+@@ -2,6 +2,7 @@
+ tytul: "Crystallization and K-theoretical aspects of the quantum twistor bundle"
+ prelegent: "Suvrajit Bhattacharjee"
+ afiliacja: "Uniwersytet w Białymstoku"
++afiliacja_en: "University of Białystok"
+ termin: "2026-06-11T10:15"
+ sala: "604"
+ opublikowany: true
+diff --git a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md
+index 979a279..0de7ee7 100644
+--- a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md
++++ b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-06-18-chelstowski.md
+@@ -2,9 +2,11 @@
+ tytul: "Kwantowe grafy Knesera"
+ prelegent: "Igor Chełstowski"
+ afiliacja: "Uniwersytet Warszawski"
++afiliacja_en: "University of Warsaw"
+ termin: "2026-06-18T10:15"
+ sala: "604"
+ opublikowany: true
++tresc_en: "Quantum graphs are a noncommutative generalisation of ordinary, classical graphs in the spirit of the Gelfand–Naimark theorem. They have many interesting properties and applications in quantum information theory. In my talk I will present a method of constructing quantum graphs that can be regarded as noncommutative analogues of Kneser graphs — a family of graphs closely related to topological combinatorics and to the notion of fractional chromatic number. I will then discuss their properties, focusing in particular on their chromatic numbers."
+ ---
+ 
+ Grafy kwantowe są nieprzemiennym uogólnieniem zwykłych, klasycznych grafów w duchu twierdzenia Gelfanda-Naimarka. Mają one wiele interesujących właściwości i zastosowanie w kwantowej teorii informacji. W swoim referacie przedstawię metodę konstrukcji grafów kwantowych, które można uznać za nieprzemienne analogi grafów Knesera - rodziny grafów mocno związanych z kombinatoryką topologiczną i pojęciem ułamkowych liczb chromatycznych. Następnie omówię ich właściwości, skupiając się w szczególności na ich liczbach chromatycznych.
+diff --git a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-10-22-kogiso.md b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-10-22-kogiso.md
+index 3fe2146..d55e896 100644
+--- a/src/content/referaty/dyskretna-analiza-harmoniczna/2026-10-22-kogiso.md
++++ b/src/content/referaty/dyskretna-analiza-harmoniczna/2026-10-22-kogiso.md
+@@ -4,6 +4,7 @@ prelegent: "Takeyoshi Kogiso"
+ afiliacja: "Josai University"
+ termin: "2026-10-22T09:00"
+ sala: "D1.2, budynek C-16, Politechnika Wrocławska"
++sala_en: "room D1.2, Building C-16, Wrocław University of Science and Technology"
+ opublikowany: true
+ ---
+ 
+diff --git a/src/content/referaty/dyskretna-analiza-harmoniczna/test-2026-11-05-mister-test.md b/src/content/referaty/dyskretna-analiza-harmoniczna/test-2026-11-05-mister-test.md
+index b79f41f..b3edea9 100644
+--- a/src/content/referaty/dyskretna-analiza-harmoniczna/test-2026-11-05-mister-test.md
++++ b/src/content/referaty/dyskretna-analiza-harmoniczna/test-2026-11-05-mister-test.md
+@@ -2,6 +2,7 @@
+ tytul: "Testowe: Boolean cumulants and the Bercovici–Pata bijection for operator-valued distributions"
+ prelegent: "Mister Test"
+ afiliacja: "Uniwersytet Test"
++afiliacja_en: "Test University"
+ termin: "2026-11-05T10:15"
+ sala: "604"
+ opublikowany: true

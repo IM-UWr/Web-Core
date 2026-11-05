@@ -1,0 +1,44 @@
+diff --git a/.pages.yml b/.pages.yml
+index 43a0f02..1a7d76c 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -228,6 +228,9 @@ content:
+     - name: opis
+       label: Dopisek (np. rok, poziom)
+       type: string
++    - name: opis_en
++      label: 'EN: dopisek (puste = wersja angielska pokaże dopisek po polsku; temat zostaje w oryginale)'
++      type: string
+   - name: dokumenty
+     label: Dokumenty
+     type: object
+diff --git a/src/content/specjalnosci/analiza-danych.md b/src/content/specjalnosci/analiza-danych.md
+index 7b6e7ac..51940f7 100644
+--- a/src/content/specjalnosci/analiza-danych.md
++++ b/src/content/specjalnosci/analiza-danych.md
+@@ -259,18 +259,25 @@ kariera_en: |
+ tematy_prac:
+ - tytul: Zastosowanie operatora Steina do testowania zgodności z rozkładem Weibulla w obecności prawostronnego cenzurowania
+   opis: "Zuzanna Nogala, praca licencjacka (promotor: dr Grzegorz Wyłupek); nagroda w konkursie WMI na najlepszą pracę dyplomową, 2024"
++  opis_en: "Zuzanna Nogala, bachelor’s thesis (supervisor: Dr Grzegorz Wyłupek); prize in the Faculty competition for the best diploma thesis, 2024"
+ - tytul: Charakterystyka dominacji oraz krzywych Lorenza z zastosowaniem do testów ilorazu wiarogodności
+   opis: "Antoni Bieniasz, praca licencjacka (promotor: dr Grzegorz Wyłupek); wyróżnienie w konkursie WMI na najlepszą pracę dyplomową, 2024"
++  opis_en: "Antoni Bieniasz, bachelor’s thesis (supervisor: Dr Grzegorz Wyłupek); honourable mention in the Faculty competition for the best diploma thesis, 2024"
+ - tytul: Zastosowanie ukrytych modeli Markowa do klasyfikacji szeregów czasowych
+   opis: "Filip Gaj, praca licencjacka (promotor: dr hab. Paweł Lorek); finał konkursu WMI na najlepszą pracę dyplomową, 2024"
++  opis_en: "Filip Gaj, bachelor’s thesis (supervisor: Dr hab. Paweł Lorek); finalist in the Faculty competition for the best diploma thesis, 2024"
+ - tytul: Statystyczna analiza danych z użyciem pakietu nparLD
+   opis: "Magda Kozajda, praca licencjacka (promotor: dr Grzegorz Wyłupek); wyróżnienie w konkursie WMI na najlepszą pracę dyplomową, 2023"
++  opis_en: "Magda Kozajda, bachelor’s thesis (supervisor: Dr Grzegorz Wyłupek); honourable mention in the Faculty competition for the best diploma thesis, 2023"
+ - tytul: "Optymalny próg wykrycia w modelach typu: „igła w stogu siana”"
+   opis: "Kamil Zaborniak, praca licencjacka (promotor: dr Liudmyla Zaitseva); nagroda w konkursie WMI na najlepszą pracę dyplomową, 2023"
++  opis_en: "Kamil Zaborniak, bachelor’s thesis (supervisor: Dr Liudmyla Zaitseva); prize in the Faculty competition for the best diploma thesis, 2023"
+ - tytul: Analiza danych medycznych w oparciu o wielomianową regresję logistyczną
+   opis: "Maciej Kaczyński, praca licencjacka (promotor: dr Michał Kos); wyróżnienie w konkursie WMI na najlepszą pracę dyplomową, 2022"
++  opis_en: "Maciej Kaczyński, bachelor’s thesis (supervisor: Dr Michał Kos); honourable mention in the Faculty competition for the best diploma thesis, 2022"
+ - tytul: Predykcja liczby osób hospitalizowanych oraz w stanie ciężkim dla drugiej i trzeciej fali pandemii COVID-19
+   opis: "Patrycja Hęćka, praca magisterska (promotor: dr hab. Krzysztof Topolski); nagroda w konkursie WMI na najlepszą pracę dyplomową, 2022"
++  opis_en: "Patrycja Hęćka, master’s thesis (supervisor: Dr hab. Krzysztof Topolski); prize in the Faculty competition for the best diploma thesis, 2022"
+ dokumenty:
+ - nazwa: Przewodnik po programie studiów I stopnia (od 2026/27)
+   nazwa_en: Guide to the first-cycle programme (from 2026/27)

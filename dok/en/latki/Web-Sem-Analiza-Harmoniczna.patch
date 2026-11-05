@@ -1,0 +1,55 @@
+diff --git a/.pages.yml b/.pages.yml
+index b7b18c2..b0eaa93 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -103,6 +103,9 @@ content:
+   - name: afiliacja
+     label: Afiliacja
+     type: string
++  - name: afiliacja_en
++    label: 'EN: afiliacja (puste = wersja angielska pokaże afiliację po polsku)'
++    type: string
+   - name: termin
+     label: Termin
+     type: date
+@@ -113,6 +116,9 @@ content:
+   - name: sala
+     label: Sala
+     type: string
++  - name: sala_en
++    label: 'EN: sala (opis miejsca po angielsku, gdy to nie numer sali; puste = wersja angielska pokaże salę po polsku)'
++    type: string
+   - name: pliki
+     label: Pliki (slajdy itp.)
+     type: object
+@@ -131,3 +137,6 @@ content:
+     type: code
+     options:
+       format: markdown
++  - name: tresc_en
++    label: 'EN: streszczenie (Markdown, wzory w $...$; puste = wersja angielska pokaże streszczenie z pola wyżej)'
++    type: text
+diff --git a/src/content/referaty/analiza-harmoniczna/2026-06-03-lyzwa.md b/src/content/referaty/analiza-harmoniczna/2026-06-03-lyzwa.md
+index 8a16c2e..76b0d52 100644
+--- a/src/content/referaty/analiza-harmoniczna/2026-06-03-lyzwa.md
++++ b/src/content/referaty/analiza-harmoniczna/2026-06-03-lyzwa.md
+@@ -2,6 +2,7 @@
+ tytul: "Dimension dependence and dimension-free $\\ell^2$ estimates for variation seminorms of spherical means on the hypercube"
+ prelegent: "Rafał Łyżwa"
+ afiliacja: "UWr"
++afiliacja_en: "University of Wrocław"
+ termin: "2026-06-03T10:15"
+ sala: "601"
+ opublikowany: true
+diff --git a/src/content/referaty/analiza-harmoniczna/test-2026-11-04-mister-test.md b/src/content/referaty/analiza-harmoniczna/test-2026-11-04-mister-test.md
+index 5c28195..bb49231 100644
+--- a/src/content/referaty/analiza-harmoniczna/test-2026-11-04-mister-test.md
++++ b/src/content/referaty/analiza-harmoniczna/test-2026-11-04-mister-test.md
+@@ -2,6 +2,7 @@
+ tytul: "Testowe: Dimension-free estimates for Riesz transforms in the Laguerre setting"
+ prelegent: "Mister Test"
+ afiliacja: "Uniwersytet Test"
++afiliacja_en: "Test University"
+ termin: "2026-11-04T10:15"
+ sala: "601"
+ opublikowany: true

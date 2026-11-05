@@ -1,0 +1,179 @@
+diff --git a/.pages.yml b/.pages.yml
+index c996182..9c6b021 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -274,3 +274,6 @@ content:
+     type: rich-text
+     options:
+       format: markdown
++  - name: tresc_en
++    label: 'EN: treść (Markdown; puste = wersja angielska pokaże zaproszenie złożone z danych obrony)'
++    type: text
+diff --git a/src/content/aktualnosci/test-2026-10-27-dzien-otwarty-dla-kandydatow.md b/src/content/aktualnosci/test-2026-10-27-dzien-otwarty-dla-kandydatow.md
+index 7b0f884..5a0948e 100644
+--- a/src/content/aktualnosci/test-2026-10-27-dzien-otwarty-dla-kandydatow.md
++++ b/src/content/aktualnosci/test-2026-10-27-dzien-otwarty-dla-kandydatow.md
+@@ -7,6 +7,7 @@ dla:
+ zajawka: "Mini-wykłady, rozmowy ze studentami i kołami naukowymi oraz wszystko o rekrutacji na matematykę. Sobota, 28 listopada, 10:00–14:00."
+ zdjecie: "/pliki/aktualnosci/test-dzien-otwarty.jpg"
+ zdjecie_opis: "Mozaika Voronoi w kolorach strony Instytutu. Grafika testowa"
++zdjecie_opis_en: "A Voronoi mosaic in the Institute’s colours. Test image"
+ wydarzenie_poczatek: "2026-11-28T10:00"
+ wydarzenie_koniec: "2026-11-28T14:00"
+ wydarzenie_miejsce: "Instytut Matematyczny UWr, pl. Grunwaldzki 2"
+diff --git a/src/content/aktualnosci/test-2026-10-28-kolo-naukowe-gry-kombinatoryczne.md b/src/content/aktualnosci/test-2026-10-28-kolo-naukowe-gry-kombinatoryczne.md
+index a00d80b..464b5a8 100644
+--- a/src/content/aktualnosci/test-2026-10-28-kolo-naukowe-gry-kombinatoryczne.md
++++ b/src/content/aktualnosci/test-2026-10-28-kolo-naukowe-gry-kombinatoryczne.md
+@@ -7,6 +7,7 @@ dla:
+ zajawka: "Popularny referat o grach kombinatorycznych i twierdzeniu Sprague’a–Grundy’ego. Wstęp wolny, zapisy niepotrzebne."
+ zdjecie: "/pliki/aktualnosci/test-kolo-gry-kombinatoryczne.jpg"
+ zdjecie_opis: "Tabela dodawania w grze Nim (a XOR b); bursztynowe pola na przekątnej to pozycje przegrywające. Grafika testowa"
++zdjecie_opis_en: "Addition table of the game of Nim (a XOR b); the amber cells on the diagonal are losing positions. Test image"
+ wydarzenie_poczatek: "2026-11-02T18:15"
+ wydarzenie_koniec: "2026-11-02T19:45"
+ wydarzenie_miejsce: "sala 603, Instytut Matematyczny UWr"
+diff --git a/src/content/aktualnosci/test-2026-10-29-warsztaty-dla-licealistow-liczby-pierwsze.md b/src/content/aktualnosci/test-2026-10-29-warsztaty-dla-licealistow-liczby-pierwsze.md
+index 087366c..bb42bd7 100644
+--- a/src/content/aktualnosci/test-2026-10-29-warsztaty-dla-licealistow-liczby-pierwsze.md
++++ b/src/content/aktualnosci/test-2026-10-29-warsztaty-dla-licealistow-liczby-pierwsze.md
+@@ -7,6 +7,7 @@ dla:
+ zajawka: "Cztery godziny zajęć o liczbach pierwszych i kryptografii dla uczniów szkół średnich. Szkoły mogą zgłaszać grupy do 30 osób."
+ zdjecie: "/pliki/aktualnosci/test-warsztaty-liczby-pierwsze.jpg"
+ zdjecie_opis: "Spirala Ulama: liczby pierwsze jako jasne punkty, na bursztynowo — wartości wielomianu Eulera n² + n + 41. Grafika testowa"
++zdjecie_opis_en: "The Ulam spiral: primes as bright dots, with values of Euler’s polynomial n² + n + 41 in amber. Test image"
+ wydarzenie_poczatek: "2026-11-05T09:30"
+ wydarzenie_koniec: "2026-11-05T13:30"
+ wydarzenie_miejsce: "sala HS, Instytut Matematyczny UWr"
+diff --git a/src/content/aktualnosci/test-2026-10-30-wyklad-otwarty-macierze-losowe.md b/src/content/aktualnosci/test-2026-10-30-wyklad-otwarty-macierze-losowe.md
+index c4138cc..5cb00c5 100644
+--- a/src/content/aktualnosci/test-2026-10-30-wyklad-otwarty-macierze-losowe.md
++++ b/src/content/aktualnosci/test-2026-10-30-wyklad-otwarty-macierze-losowe.md
+@@ -9,6 +9,7 @@ dla:
+ zajawka: "Prof. Mister Test (Uniwersytet Test) o zaskakującym związku zer funkcji dzeta Riemanna z wartościami własnymi macierzy losowych."
+ zdjecie: "/pliki/aktualnosci/test-wyklad-macierze-losowe.jpg"
+ zdjecie_opis: "Kolorowanie dziedziny wielomianu charakterystycznego losowej macierzy unitarnej; białe punkty to wartości własne na okręgu jednostkowym. Grafika testowa"
++zdjecie_opis_en: "Domain colouring of the characteristic polynomial of a random unitary matrix; the white dots are eigenvalues on the unit circle. Test image"
+ wydarzenie_poczatek: "2026-11-12T13:15"
+ wydarzenie_koniec: "2026-11-12T14:45"
+ wydarzenie_miejsce: "sala WS, Instytut Matematyczny UWr"
+diff --git a/src/content/obrony/2026-06-18-maciej-korpalski.md b/src/content/obrony/2026-06-18-maciej-korpalski.md
+index 385633b..1e88279 100644
+--- a/src/content/obrony/2026-06-18-maciej-korpalski.md
++++ b/src/content/obrony/2026-06-18-maciej-korpalski.md
+@@ -16,6 +16,10 @@ recenzje:
+     plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_jkakol_korpalski.pdf"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Maciej Korpalski, MSc, entitled *On isomorphic and geometric properties of Banach spaces of continuous functions*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Macieja Korpalskiego pt. *On isomorphic and geometric properties of Banach spaces of continuous functions*.
+diff --git a/src/content/obrony/2026-06-19-aleksander-antasik.md b/src/content/obrony/2026-06-19-aleksander-antasik.md
+index 799ad5d..0312e05 100644
+--- a/src/content/obrony/2026-06-19-aleksander-antasik.md
++++ b/src/content/obrony/2026-06-19-aleksander-antasik.md
+@@ -16,6 +16,10 @@ recenzje:
+     plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_awreid_antasik.pdf"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Aleksander Antasik, MSc, entitled *Rational approximation of surface group representations*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Aleksandra Antasika pt. *Rational approximation of surface group representations*.
+diff --git a/src/content/obrony/2026-09-21-tomasz-zuchowski.md b/src/content/obrony/2026-09-21-tomasz-zuchowski.md
+index 9c05592..5d85c5b 100644
+--- a/src/content/obrony/2026-09-21-tomasz-zuchowski.md
++++ b/src/content/obrony/2026-09-21-tomasz-zuchowski.md
+@@ -16,6 +16,10 @@ recenzje:
+     plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_pzakrzewski_zuchowski.pdf"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Tomasz Żuchowski, MSc, entitled *On sequences of measures and ideals in Boolean algebras*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Tomasza Żuchowskiego pt. *On sequences of measures and ideals in Boolean algebras*.
+diff --git a/src/content/obrony/2026-10-20-maciej-tadej.md b/src/content/obrony/2026-10-20-maciej-tadej.md
+index 24e094d..ae1f68b 100644
+--- a/src/content/obrony/2026-10-20-maciej-tadej.md
++++ b/src/content/obrony/2026-10-20-maciej-tadej.md
+@@ -16,6 +16,10 @@ recenzje:
+     plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_spetrovskiy_tadej.pdf"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Maciej Tadej, MSc, entitled *Analysis and simulations of the non-linear models with non-local dispersal of species considered in finite, flat habitats*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Macieja Tadeja pt. *Analysis and simulations of the non-linear models with non-local dispersal of species considered in finite, flat habitats*.
+diff --git a/src/content/obrony/2026-10-27-malwina-mrowinska.md b/src/content/obrony/2026-10-27-malwina-mrowinska.md
+index 8c97bf1..868b01f 100644
+--- a/src/content/obrony/2026-10-27-malwina-mrowinska.md
++++ b/src/content/obrony/2026-10-27-malwina-mrowinska.md
+@@ -17,6 +17,10 @@ recenzje:
+     plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_izezula_mrowinska.pdf"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Malwina Mrowińska, MSc, entitled *Estimation of a block-structured covariance matrix*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr Malwiny Mrowińskiej pt. *Estimation of a block-structured covariance matrix*.
+diff --git a/src/content/obrony/test-2026-10-29-mister-test.md b/src/content/obrony/test-2026-10-29-mister-test.md
+index 3e9f562..06da0b8 100644
+--- a/src/content/obrony/test-2026-10-29-mister-test.md
++++ b/src/content/obrony/test-2026-10-29-mister-test.md
+@@ -17,6 +17,10 @@ recenzje:
+ data_ogloszenia: "2026-09-29"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Mister Test, MSc, entitled *Spectral gaps and cutoff for random walks on finite groups*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Spectral gaps and cutoff for random walks on finite groups*.
+diff --git a/src/content/obrony/test-2026-11-03-mister-test.md b/src/content/obrony/test-2026-11-03-mister-test.md
+index 32d037f..7990303 100644
+--- a/src/content/obrony/test-2026-11-03-mister-test.md
++++ b/src/content/obrony/test-2026-11-03-mister-test.md
+@@ -17,6 +17,10 @@ recenzje:
+ data_ogloszenia: "2026-10-02"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Mister Test, MSc, entitled *Regularity of free boundaries in the thin obstacle problem with variable coefficients*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Regularity of free boundaries in the thin obstacle problem with variable coefficients*.
+diff --git a/src/content/obrony/test-2026-11-27-mister-test.md b/src/content/obrony/test-2026-11-27-mister-test.md
+index e2f6aa0..2797e1f 100644
+--- a/src/content/obrony/test-2026-11-27-mister-test.md
++++ b/src/content/obrony/test-2026-11-27-mister-test.md
+@@ -17,6 +17,10 @@ recenzje:
+ data_ogloszenia: "2026-10-28"
+ w_aktualnosciach: true
+ opublikowany: true
++tresc_en: |-
++  You are cordially invited to the public defence of the doctoral dissertation of Mister Test, MSc, entitled *Topological dynamics of automorphism groups of countable homogeneous structures*.
++
++  The dissertation, abstracts and reviews are available below.
+ ---
+ 
+ Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Topological dynamics of automorphism groups of countable homogeneous structures*.

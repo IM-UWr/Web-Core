@@ -1,0 +1,67 @@
+diff --git a/.pages.yml b/.pages.yml
+index 866572e..24eab17 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -103,6 +103,9 @@ content:
+   - name: afiliacja
+     label: Afiliacja
+     type: string
++  - name: afiliacja_en
++    label: 'EN: afiliacja (puste = wersja angielska pokaże afiliację po polsku)'
++    type: string
+   - name: termin
+     label: Termin
+     type: date
+@@ -113,6 +116,9 @@ content:
+   - name: sala
+     label: Sala
+     type: string
++  - name: sala_en
++    label: 'EN: sala (opis miejsca po angielsku, gdy to nie numer sali; puste = wersja angielska pokaże salę po polsku)'
++    type: string
+   - name: pliki
+     label: Pliki (slajdy itp.)
+     type: object
+@@ -131,3 +137,6 @@ content:
+     type: code
+     options:
+       format: markdown
++  - name: tresc_en
++    label: 'EN: streszczenie (Markdown, wzory w $...$; puste = wersja angielska pokaże streszczenie z pola wyżej)'
++    type: text
+diff --git a/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md b/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md
+index 4737193..07405c2 100644
+--- a/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md
++++ b/src/content/referaty/rownania-rozniczkowe/2026-10-05-karch.md
+@@ -2,6 +2,7 @@
+ tytul: "Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji"
+ prelegent: "Grzegorz Karch"
+ afiliacja: "Uniwersytet Wrocławski"
++afiliacja_en: "University of Wrocław"
+ termin: "2026-10-05T15:15"
+ sala: "603"
+ opublikowany: true
+diff --git a/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md b/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md
+index bd8dd99..8f9f51e 100644
+--- a/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md
++++ b/src/content/referaty/rownania-rozniczkowe/2026-10-12-karch-2.md
+@@ -2,6 +2,7 @@
+ tytul: "Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji"
+ prelegent: "Grzegorz Karch"
+ afiliacja: "Uniwersytet Wrocławski"
++afiliacja_en: "University of Wrocław"
+ termin: "2026-10-12T15:15"
+ sala: "605"
+ opublikowany: true
+diff --git a/src/content/referaty/rownania-rozniczkowe/test-2026-11-02-mister-test.md b/src/content/referaty/rownania-rozniczkowe/test-2026-11-02-mister-test.md
+index 4a3f138..9e8902b 100644
+--- a/src/content/referaty/rownania-rozniczkowe/test-2026-11-02-mister-test.md
++++ b/src/content/referaty/rownania-rozniczkowe/test-2026-11-02-mister-test.md
+@@ -2,6 +2,7 @@
+ tytul: "Testowe: Finite-time blow-up versus global existence in a parabolic–elliptic Keller–Segel system with logistic damping"
+ prelegent: "Mister Test"
+ afiliacja: "Uniwersytet Test"
++afiliacja_en: "Test University"
+ termin: "2026-11-02T15:15"
+ sala: "605"
+ opublikowany: true

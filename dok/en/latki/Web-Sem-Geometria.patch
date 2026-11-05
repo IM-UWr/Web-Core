@@ -1,0 +1,31 @@
+diff --git a/.pages.yml b/.pages.yml
+index 55fa5a0..aec122d 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -103,6 +103,9 @@ content:
+   - name: afiliacja
+     label: Afiliacja
+     type: string
++  - name: afiliacja_en
++    label: 'EN: afiliacja (puste = wersja angielska pokaże afiliację po polsku)'
++    type: string
+   - name: termin
+     label: Termin
+     type: date
+@@ -113,6 +116,9 @@ content:
+   - name: sala
+     label: Sala
+     type: string
++  - name: sala_en
++    label: 'EN: sala (opis miejsca po angielsku, gdy to nie numer sali; puste = wersja angielska pokaże salę po polsku)'
++    type: string
+   - name: pliki
+     label: Pliki (slajdy itp.)
+     type: object
+@@ -131,3 +137,6 @@ content:
+     type: code
+     options:
+       format: markdown
++  - name: tresc_en
++    label: 'EN: streszczenie (Markdown, wzory w $...$; puste = wersja angielska pokaże streszczenie z pola wyżej)'
++    type: text

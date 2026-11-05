@@ -1,0 +1,59 @@
+diff --git a/.pages.yml b/.pages.yml
+index be986a2..d17d697 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -228,6 +228,9 @@ content:
+     - name: opis
+       label: Dopisek (np. rok, poziom)
+       type: string
++    - name: opis_en
++      label: 'EN: dopisek (puste = wersja angielska pokaże dopisek po polsku; temat zostaje w oryginale)'
++      type: string
+   - name: dokumenty
+     label: Dokumenty
+     type: object
+diff --git a/src/content/specjalnosci/matematyka-teoretyczna.md b/src/content/specjalnosci/matematyka-teoretyczna.md
+index 3b8879b..ae389d8 100644
+--- a/src/content/specjalnosci/matematyka-teoretyczna.md
++++ b/src/content/specjalnosci/matematyka-teoretyczna.md
+@@ -339,28 +339,40 @@ kariera_en: |
+ tematy_prac:
+ - tytul: Ważone L2-kohomologie dwuwymiarowych grup Coxetera
+   opis: praca magisterska; promotor Jan Dymara; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Jan Dymara; list of proposed topics, 2024"
+ - tytul: Przestrzenie Banacha typu Schreiera
+   opis: praca magisterska; promotor Piotr Borodulin-Nadzieja; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Piotr Borodulin-Nadzieja; list of proposed topics, 2024"
+ - tytul: Grupy autohomeomorfizmów przestrzeni metrycznych
+   opis: praca magisterska; promotor Piotr Borodulin-Nadzieja; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Piotr Borodulin-Nadzieja; list of proposed topics, 2024"
+ - tytul: Modelowe stowarzyszenia
+   opis: praca magisterska; promotor Piotr Kowalski; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Piotr Kowalski; list of proposed topics, 2024"
+ - tytul: Algebry Boole'a z miarą
+   opis: praca magisterska; promotor Grzegorz Plebanek; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Grzegorz Plebanek; list of proposed topics, 2024"
+ - tytul: Twierdzenie Carlesona o interpolacji
+   opis: praca magisterska; promotor Ryszard Szwarc; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Ryszard Szwarc; list of proposed topics, 2024"
+ - tytul: Grupy dyfeomorfizmów
+   opis: praca magisterska; promotor Michał Marcinkowski; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Michał Marcinkowski; list of proposed topics, 2024"
+ - tytul: Zjawisko koncentracji miary
+   opis: praca magisterska; promotor Błażej Wróbel; lista oferowanych tematów, 2024
++  opis_en: "master’s thesis; supervisor: Błażej Wróbel; list of proposed topics, 2024"
+ - tytul: Teoria Galois
+   opis: praca licencjacka; promotor Piotr Kowalski; lista oferowanych tematów, 2024
++  opis_en: "bachelor’s thesis; supervisor: Piotr Kowalski; list of proposed topics, 2024"
+ - tytul: Konsekwencje Hipotezy Continuum
+   opis: praca licencjacka; promotor Jan Kraszewski; lista oferowanych tematów, 2024
++  opis_en: "bachelor’s thesis; supervisor: Jan Kraszewski; list of proposed topics, 2024"
+ - tytul: Ciała cyklotomiczne
+   opis: praca licencjacka; promotor Tadeusz Pezda; lista oferowanych tematów, 2024
++  opis_en: "bachelor’s thesis; supervisor: Tadeusz Pezda; list of proposed topics, 2024"
+ - tytul: Twierdzenie Brunna-Minkowskiego
+   opis: praca licencjacka; promotor Błażej Wróbel; lista oferowanych tematów, 2024
++  opis_en: "bachelor’s thesis; supervisor: Błażej Wróbel; list of proposed topics, 2024"
+ dokumenty:
+ - nazwa: Specjalność matematyka teoretyczna — przedmioty podstawowe do wyboru (kategoria T)
+   nazwa_en: Theoretical mathematics — core elective courses (category T) (Polish)
