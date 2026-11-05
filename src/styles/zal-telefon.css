@@ -75,7 +75,9 @@
   [data-z-baner-dzialu].z-czeka .z-szkic .detale { opacity: 0; }
   [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
   [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  [data-z-baner-dzialu].z-rysuj .z-podpis.pisze mask path { animation: z-pisz-zast .45s linear 2.3s forwards; }
   @keyframes z-pisz { to { stroke-dashoffset: 0; } }
+  @keyframes z-pisz-zast { to { stroke-dashoffset: 0; } }
 
   /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
   .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h));

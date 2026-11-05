@@ -218,7 +218,10 @@
   [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
   /* podpis: obrys odsłaniany liniami prowadzącymi (maska); tempo ustawia src/scripts/zal/szkice.ts */
   [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  /* zastępczo, gdy moduł z tempem podpisu nie zdąży przed końcem szkicu (wolna sieć): podpis pisze się zaraz po szkicu */
+  [data-z-baner-dzialu].z-rysuj .z-podpis.pisze mask path { animation: z-pisz-zast .45s linear 2.3s forwards; }
   @keyframes z-pisz { to { stroke-dashoffset: 0; } }
+  @keyframes z-pisz-zast { to { stroke-dashoffset: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .z-szkic .tusz path, .z-szkic .detale { transition: none !important; }
     .z-podpis.pisze mask path { animation: none !important; }

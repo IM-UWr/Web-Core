@@ -84,12 +84,24 @@ const patronDzialu = lang === 'en' ? 'patron of the section' : 'patron działu';
 // matematyki” zostaje w <title> i na telefonie).
 const zMenu = rodzaj === 'dzial' && P ? (await menuGlowne()).find((m) => m.adres === P.adres) : undefined;
 const tytulBanera = rodzaj === 'dzial' && P ? ((zMenu && (wybierz(zMenu, 'etykieta', lang) as string)) || pole(P, 'nazwa', lang)) : tytul;
-// Stan szkicu ustawiany od razu, zanim strona się narysuje (opis w zalozyciele.css i src/scripts/zal/szkice.ts).
-const STAN = `(function(b){var s='z-gotowe',k='im-wizyta-dzialy',dz=b.getAttribute('data-z-baner-dzialu');try{` +
-  `if(!matchMedia('(prefers-reduced-motion: reduce)').matches){` +
-  `var z=JSON.parse(sessionStorage.getItem(k)||'[]');if(z.indexOf(dz)<0){z.push(dz);sessionStorage.setItem(k,JSON.stringify(z));` +
-  `if(JSON.parse(sessionStorage.getItem(k)||'[]').indexOf(dz)>=0)s='z-czeka';}}}catch(e){}` +
-  `b.classList.add(s);})(document.currentScript.parentElement);`;
+// Stan szkicu ustawiany od razu, zanim strona się narysuje (opis w zalozyciele.css i src/scripts/zal/szkice.ts), i start
+// rysowania stąd, bez czekania na moduł (zlecenie 13, punkt 2): .z-czeka przy pierwszym wejściu w dział w tej wizycie
+// (zapis w sessionStorage „im-wizyta-dzialy” potwierdzony odczytem), gdy szkic widać — dwie klatki i .z-rysuj, czas startu
+// w data-z-start, zdarzenie „z-rysuj” dla modułu (tempo podpisu). Ograniczony ruch, powrót albo brak zapisu: .z-gotowe.
+// Wczytywanie z wyprzedzeniem (prerender, punkt 4): w tle tylko odczyt (szkic czeka niewidoczny), zapis i rysowanie po
+// pokazaniu strony (prerenderingchange).
+const STAN = `(function(b){var k='im-wizyta-dzialy',dz=b.getAttribute('data-z-baner-dzialu'),sz=b.querySelector('.z-szkic');` +
+  `function nowy(zapis){try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return false;` +
+  `var z=JSON.parse(sessionStorage.getItem(k)||'[]');if(z.indexOf(dz)>=0)return false;if(!zapis)return true;` +
+  `z.push(dz);sessionStorage.setItem(k,JSON.stringify(z));return JSON.parse(sessionStorage.getItem(k)||'[]').indexOf(dz)>=0}catch(e){return false}}` +
+  `function rysuj(){function go(){requestAnimationFrame(function(){requestAnimationFrame(function(){` +
+  `b.classList.add('z-rysuj');b.classList.remove('z-czeka');b.setAttribute('data-z-start',performance.now());b.dispatchEvent(new Event('z-rysuj'))})})}` +
+  `if(!sz||!window.IntersectionObserver)return go();var io=new IntersectionObserver(function(w){` +
+  `for(var i=0;i<w.length;i++)if(w[i].isIntersecting){io.disconnect();return go()}});io.observe(sz)}` +
+  `function gotowe(){b.classList.remove('z-czeka');b.classList.add('z-gotowe')}` +
+  `if(document.prerendering&&nowy(false)){b.classList.add('z-czeka');` +
+  `document.addEventListener('prerenderingchange',function(){if(nowy(true))rysuj();else gotowe()},{once:true})}` +
+  `else if(!document.prerendering&&nowy(true)){b.classList.add('z-czeka');rysuj()}else gotowe()})(document.currentScript.parentElement);`;
 const salaNapis = lang === 'en' ? 'lecture room' : 'sala';
 // Losowanie ciekawostki (wzór: prototyp, ckUloz / ckStart): 1) przypięte na swoich stronach, 2) zestaw tej wizyty (ważne
 // pozycje zostają), 3) reszta stron dostaje ciekawostki w kolejności ważonej Math.random() ** (1 / waga), waga 3 dla
