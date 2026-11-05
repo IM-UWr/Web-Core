@@ -345,5 +345,8 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
 
   @media (min-width: 761px) {
     .kh-liczby { margin-top: 6px; max-width: none; }
+    /* fakty nie wchodzą pod opis znaku patrona: rząd kończy się 24 px przed lewą krawędzią opisu (zalozyciele.css:
+       .z-nagl-pod.z-liczbami .z-znak-opis — right: znak-p + 216 px, szerokość 210 px), dalsze fakty w następnym rzędzie */
+    :global(.z-nagl-pod:has(.z-znak-opis) .z-slot:has(> .kh-liczby)) { max-width: calc(100% - 450px + var(--marg) - var(--znak-p)); }
   }
 </style>

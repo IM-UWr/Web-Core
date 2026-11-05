@@ -133,7 +133,8 @@ panelu na każdej stronie (jak na głównej). **Jak cofnąć.** Usunąć klasę 
 ## 12.8. Liczby w banerze Kierunku
 **Pytanie.** Baner Kierunku miał na komputerze miejsce na liczby, ale żadnej nie pokazywał (dwie listy chowały się nawzajem).
 **Przyjęta odpowiedź.** Pokazuję fakty kierunku (np. „3 lata — studia I stopnia”, „A+ — kategoria naukowa”); na telefonie
-schowane jak dotąd. Przy czterech faktach rząd łamie się na komputerze — rozwiązuje to zalecenie 2 zlecenia 11.
+schowane jak dotąd. Rząd faktów kończy się przed opisem znaku patrona, dalsze fakty idą do drugiego rzędu (reguła
+w `Kierunek.astro`); jeden rząd z chowaniem nadmiarowych to zalecenie 2 zlecenia 11.
 **Jak cofnąć.** W `Kierunek.astro` usunąć listę `.kh-liczby` ze slotu `baner`.
 
 ## 12.9. Sygnety w menu telefonu a rozmiar stron

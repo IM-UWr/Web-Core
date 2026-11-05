@@ -285,7 +285,10 @@ Animacja szkiców patronów (`src/scripts/zal/szkice.ts`) działa dalej.
   (`raport-zrzuty/etap4-menu-telefonu-podstrona-przed-po-roznica.png`).
 - Kierunek (komputer): fakty w banerze są widoczne. W stanie po etapie 3 (i wcześniej na `wyglad/zalozyciele`) baner miał
   miejsce na liczby, ale dwie listy chowały się nawzajem i nie było żadnej (`etap4-kierunek-liczby-w-banerze-…png`).
-  Na telefonie fakty dalej schowane (cztery nie mieszczą się w trzech kolumnach).
+  Rząd faktów kończy się przed opisem znaku patrona i łamie się na drugi (pierwsza wersja wchodziła na opis przy 1366 px —
+  poprawione po teście nachodzenia na 48 banerach). Na telefonie fakty dalej schowane (cztery nie mieszczą się w trzech
+  kolumnach). Nachodzenie liczb na opis znaku przy wąskim oknie (≤ 1366 px) na Konferencjach, Publikacjach i Projektach
+  było już w stanie wyjściowym i zostaje (zalecenie 2 zlecenia 11).
 - Specjalność (telefon): etykiety specjalności w banerze widoczne także na telefonie (jedna wersja;
   `etap4-specjalnosc-telefon-etykiety-…png`).
 - Plan zajęć: panele semestrów mają `id` `zimowy` / `letni` — linki z treści (`/studia/plan-zajec#letni`) znów mają cel.
