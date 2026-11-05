@@ -393,7 +393,8 @@
   .z-menu-rozwin:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
   .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: none; }
   .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
-  .z-menu section.duza h2 a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: 18px; opacity: .7; }
+  /* „Rekrutacja ↗”: strzałka w linii — bez kreski działu z .z-menu h2 a::after (blok 28×2 px) */
+  .z-menu section.duza h2 a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: 18px; opacity: .7; display: inline; width: auto; height: auto; margin: 0; background: none; }
   /* jasny panel (przy jasnym pasku): tło strony, tekst w kolorze tekstu, linki przygaszone, sygnety i kreski w kolorze działu */
   .z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
   .z-menu-jasny h2 a { color: var(--ink); }
