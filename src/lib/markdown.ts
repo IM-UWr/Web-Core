@@ -3,6 +3,7 @@ import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeBase from '../plugins/rehype-base.mjs';
+import rehypeZewn from '../plugins/rehype-zewn.mjs';
 
 import type { Lang } from './daty';
 
@@ -21,7 +22,8 @@ export async function renderMarkdownZNaglowkami(src: string | undefined, lang: L
   if (!processor) {
     processor = await createMarkdownProcessor({
       remarkPlugins: [remarkMath],
-      rehypePlugins: [rehypeKatex, [rehypeBase, { base: import.meta.env.BASE_URL, lang }]],
+      // linki poza stronę: klasa zew (↗ z CSS) i ukryty dopisek „(inna strona)” / „(external site)” — zlecenie 14, zalecenie 23
+      rehypePlugins: [rehypeKatex, [rehypeBase, { base: import.meta.env.BASE_URL, lang }], [rehypeZewn, { site: import.meta.env.SITE, base: import.meta.env.BASE_URL, lang }]],
     } as any);
     procesory.set(lang, processor);
   }

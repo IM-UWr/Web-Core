@@ -4,6 +4,7 @@ import react from '@astrojs/react';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeBase from './src/plugins/rehype-base.mjs';
+import rehypeZewn from './src/plugins/rehype-zewn.mjs';
 
 // Adres strony. Na GitHub Pages (strona projektu) adres ma postać
 // https://<konto>.github.io/<repozytorium>/ — stąd BASE_PATH.
@@ -19,7 +20,7 @@ export default defineConfig({
   integrations: [react()],
   markdown: {
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex, [rehypeBase, { base }]],
+    rehypePlugins: [rehypeKatex, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
   },
   build: {
     format: 'directory',

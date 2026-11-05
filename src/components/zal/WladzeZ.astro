@@ -3,6 +3,7 @@
 // pod nim zastępcy połączeni cienkimi liniami; zdjęcia osób (dyrektor 120×150, zastępcy 96×120, władze Wydziału 76×95),
 // dalej Władze Wydziału w dwóch kolumnach, Sekretariat jako blok kontaktu (bez zdjęć), Kadencja, Rada Instytutu, Zobacz też.
 // Dane przygotowuje src/lib/widoki/wladze.ts (to samo co dla telefonu), tu tylko wyświetlanie.
+import Link from '../Link.astro';
 import '../../styles/zalozyciele-strony.css';
 import OsobaZ from './OsobaZ.astro';
 import { u, isExternal } from '../../lib/url';
@@ -44,7 +45,7 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
     <div class="z-dwie">
       {wydzial.osoby.map((o) => <OsobaZ o={o} lang={lang} zakres={false} />)}
     </div>
-    {wydzial.link && <p class="z-link-dalej"><a href={href(wydzial.link.adres)}>{wydzial.link.etykieta}{isExternal(wydzial.link.adres) && ' ↗'}</a></p>}
+    {wydzial.link && <p class="z-link-dalej"><Link href={href(wydzial.link.adres)}>{wydzial.link.etykieta}</Link></p>}
   </section>
 )}
 {sekretariat && (
@@ -77,6 +78,6 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
 {linki.length > 0 && (
   <section id="z-zobacz" aria-labelledby="z-zobacz-h">
     <h2 id="z-zobacz-h">{T('Zobacz też', 'See also')}</h2>
-    <ul class="z-zob">{linki.map((l) => <li><a href={href(l.adres)} class:list={[isExternal(l.adres) && 'zew']}>{l.etykieta}</a></li>)}</ul>
+    <ul class="z-zob">{linki.map((l) => <li><Link href={href(l.adres)}>{l.etykieta}</Link></li>)}</ul>
   </section>
 )}

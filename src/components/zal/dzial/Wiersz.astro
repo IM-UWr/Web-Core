@@ -2,6 +2,7 @@
 // Wiersz listy na stronie działu (komputer; TrescDzialu.astro): duży dzień Brygadą w kolorze działu, pod nim „mie rrrr”,
 // obok mała etykieta (rodzaj albo zakres dat · miejsce), tytuł i zajawka. Z adresem cały wiersz jest klikalny
 // (link w tytule; zewnętrzny z ↗). Używany w „Konferencjach” (Nauka) i „Aktualnościach dla studentów” (Studia).
+import Link from '../../Link.astro';
 import { u, isExternal } from '../../../lib/url';
 import { wJezyku } from '../../../lib/i18n';
 import { dayNum, monthShort, parse, type Lang } from '../../../lib/daty';
@@ -28,7 +29,7 @@ const href = adres ? (zew ? adres : u(wJezyku(adres, lang))) : undefined;
     )}
     <h3>
       {href ? (
-        <a href={href}>{tytul}{zew && <> <span class="z-dz-zew" aria-hidden="true">↗</span><span class="sr-only">{en ? '(external website)' : '(strona zewnętrzna)'}</span></>}</a>
+        <Link href={href}>{tytul}</Link>
       ) : tytul}
     </h3>
     {zajawka && <p>{zajawka}</p>}

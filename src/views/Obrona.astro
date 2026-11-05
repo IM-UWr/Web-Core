@@ -5,6 +5,7 @@
 // z parami Kiedy / Gdzie / Promotor (dl.para), po terminie — „Wydarzenie się odbyło”; zdjęcie, opis, dokumenty (ul.pliki),
 // ogłoszenie w BIP i data publikacji. Na /en treść z pola tresc_en albo zaproszenie po angielsku z danych obrony. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc).
 // Bez spisu „Na tej stronie” (mniej niż 2 sekcje z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -25,7 +26,7 @@ const { Content, htmlEn, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby 
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
   const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
-  return m ? m[1].toUpperCase() : isExternal(a) ? T('strona ↗', 'website ↗') : '';
+  return m ? m[1].toUpperCase() : isExternal(a) ? T('strona', 'website') : '';
 };
 ---
 <Podstrona lang={lang} tytul={d.kandydat} tytulKarty={tytul} opis={d.tytul_rozprawy} opublikowany={d.opublikowany} typ="article" uklad="zwarta portal-baner"
@@ -64,10 +65,10 @@ const typPliku = (a: string) => {
       {dokumenty.length > 0 && (
         <>
           <h2 id="h-dok">{t(lang, 'dokumenty')}</h2>
-          <ul class="pliki">{dokumenty.map((x) => <li><a href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{x.nazwa}</span><span class="typ">{typPliku(x.plik)}</span></a></li>)}</ul>
+          <ul class="pliki">{dokumenty.map((x) => <li><Link href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{x.nazwa}</span><span class="typ">{typPliku(x.plik)}</span></Link></li>)}</ul>
         </>
       )}
-      {d.bip && <p class="bip"><a href={d.bip}>{t(lang, 'bip')} <span aria-hidden="true">↗</span></a></p>}
+      {d.bip && <p class="bip"><Link href={d.bip}>{t(lang, 'bip')}</Link></p>}
       {d.data_ogloszenia && <p class="data">{t(lang, 'opublikowano')} {short(d.data_ogloszenia, lang)}</p>}
     </section>
   )}

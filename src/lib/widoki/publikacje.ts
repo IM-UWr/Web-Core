@@ -7,6 +7,7 @@ import glowny from '../../data/publikacje.json';
 import dzial from '../../data/dzialy/nauka.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
+import { isExternal } from '../url';
 
 export interface Praca { autorzy?: string; tytul?: string; zrodlo?: string; opis?: string; doi?: string; if?: string; uwagi?: string }
 export interface Grupa { naglowek?: string; naglowek_en?: string; rok_wydania?: number; prace: Praca[] }
@@ -107,8 +108,9 @@ function zWzorami(t: string): string {
     .join('');
 }
 const URL_RE = /https?:\/\/[A-Za-z0-9\-._~:/?#[\]@!$&'()*+,;=%]+/g;
-// Tekst wpisu jako HTML; z `linki` adresy http(s) stają się odnośnikami.
-export function tekstHtml(s: string | undefined, linki = false): string {
+// Tekst wpisu jako HTML; z `linki` adresy http(s) stają się odnośnikami — poza stronę z klasą zew i ukrytym dopiskiem
+// jak w Link.astro (zlecenie 14, zalecenie 23).
+export function tekstHtml(s: string | undefined, linki = false, lang: Lang = 'pl'): string {
   if (!s) return '';
   if (!linki) return zWzorami(s);
   let out = '';
@@ -119,7 +121,9 @@ export function tekstHtml(s: string | undefined, linki = false): string {
     // Adres przerwany nietypowym znakiem (błąd w źródle, np. „…/→ms/…”) zostaje zwykłym tekstem.
     const dalej = s.charAt(i + m[0].length);
     if (dalej && !/\s/.test(dalej)) continue;
-    out += zWzorami(s.slice(last, i)) + `<a href="${esc(url)}">${esc(url)}</a>`;
+    const zew = isExternal(url) ? ` class="zew"` : '';
+    const dopisek = zew ? `<span class="sr-only">${lang === 'en' ? ' (external site)' : ' (inna strona)'}</span>` : '';
+    out += zWzorami(s.slice(last, i)) + `<a${zew} href="${esc(url)}">${esc(url)}${dopisek}</a>`;
     last = i + url.length;
   }
   return out + zWzorami(s.slice(last));

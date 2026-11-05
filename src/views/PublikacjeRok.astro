@@ -7,6 +7,7 @@
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); własne style (na końcu pliku) dla listy
 // prac, przycisku PDF w banerze i nawigacji między latami. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Podstrona from '../components/zal/Podstrona.astro';
+import Link from '../components/Link.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import Ikona from '../components/Ikona.astro';
 import { u, isExternal } from '../lib/url';
@@ -48,11 +49,11 @@ const spis = zSpisem ? naglowki.map((n) => ({ id: n.slug, etykieta: n.text })) :
           <li>
             {p.autorzy && <span class="a" set:html={tekstHtml(p.autorzy)} />}
             {p.tytul && <span class="t" set:html={tekstHtml(p.tytul)} />}
-            {p.opis && <span class="o" set:html={tekstHtml(p.opis, true)} />}
+            {p.opis && <span class="o" set:html={tekstHtml(p.opis, true, lang)} />}
             {(p.zrodlo || p.doi || pokazIF(p)) && (
               <span class="z">
-                {p.zrodlo && <span set:html={tekstHtml(p.zrodlo, true)} />}
-                {p.doi && <> <a class="doi" href={doiUrl(p.doi)}>DOI: {p.doi}</a></>}
+                {p.zrodlo && <span set:html={tekstHtml(p.zrodlo, true, lang)} />}
+                {p.doi && <> <Link class="doi" href={doiUrl(p.doi)}>DOI: {p.doi}</Link></>}
                 {pokazIF(p) && <> <abbr class="if" title="Impact Factor">IF {p.if}</abbr></>}
               </span>
             )}

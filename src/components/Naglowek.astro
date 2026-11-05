@@ -1,6 +1,7 @@
 ---
 // Nagłówek na telefon (≤ 760 px; na komputerze schowany — tam jest pasek menu zal/PasekMenu.astro): logo, szukaj,
 // przełącznik trybu ciemnego i menu wysuwane z prawej (grupy z src/data/nawigacja.json, działy z sygnetem patrona).
+import Link from './Link.astro';
 import Ikona from './Ikona.astro';
 import Szkic from './zal/Szkic.astro';
 import Flaga from './zal/Flaga.astro';
@@ -79,17 +80,16 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
             <>
               <h3>{wybierz(g, 'nazwa', lang)}</h3>
               {g.linki.map((l) => (
-                <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
+                <Link href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
                   {wybierz(l, 'etykieta', lang)}
-                  {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-                </a>
+                </Link>
               ))}
             </>
           ))}
         </div>
       </div>
     ) : (
-      <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
+      <Link href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}{!isExternal(p.adres!) && <Ikona nazwa="strzalka" rozmiar={18} />}</Link>
     )
   )}
   {/* przełącznik języka z flagą języka docelowego (zlecenie 11, zalecenie 8) */}

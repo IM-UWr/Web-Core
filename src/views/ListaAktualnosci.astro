@@ -9,6 +9,7 @@
 // Planu zajęć); telefon (≤ 760 px) — rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
 // Bez JS: pasek schowany, widać całą listę.
 import Podstrona from '../components/zal/Podstrona.astro';
+import Link from '../components/Link.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { t, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
@@ -55,7 +56,7 @@ const tytul = t(lang, 'aktualnosci');
   <p class="ak-pusto" role="status" data-pusto hidden>{en ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
   <p class="ak-archiwum">
     {en ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
-    <a href={ustawienia.archiwum}>{en ? 'archive of the old website' : 'archiwum starej strony'}</a>.
+    <Link href={ustawienia.archiwum}>{en ? 'archive of the old website' : 'archiwum starej strony'}</Link>.
   </p>
 </Podstrona>
 

@@ -9,6 +9,7 @@
 //   pod nim miesiąc i rok, jak zal/dzial/Wiersz.astro);
 // - Zakłady Instytutu: lista linków do zakładów (ul.linki; bieżący wyróżniony) — nawigacja, poza indeksem wyszukiwarki.
 // Jedna wersja HTML: komputer — dwie kolumny list, tabela składu; telefon (≤ 760 px) — jedna kolumna, tabela w bloki.
+import Link from '../components/Link.astro';
 import { zTytulem } from '../lib/osoby';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -54,7 +55,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
     {(obszary.length > 0 || d.strona) && (
       <dl class="para zk-o">
         {obszary.length > 0 && <><dt>{T('Obszary badań', 'Research areas')}</dt><dd>{obszary.join(' · ')}</dd></>}
-        {d.strona && <><dt>{T('Strona zespołu', 'Group website')}</dt><dd><a href={d.strona}>{d.strona.replace(/^https?:\/\//, '').replace(/\/$/, '')}<span aria-hidden="true"> ↗</span></a></dd></>}
+        {d.strona && <><dt>{T('Strona zespołu', 'Group website')}</dt><dd><Link href={d.strona}>{d.strona.replace(/^https?:\/\//, '').replace(/\/$/, '')}</Link></dd></>}
       </dl>
     )}
   </section>
@@ -66,7 +67,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
         <div>
           <span class="etyk">{T('Kierownik', 'Head')}</span>
           <b>{kierownik?.data.strona
-            ? <a href={kierownik.data.strona}>{imie(kierownik)}<span aria-hidden="true"> ↗</span></a>
+            ? <Link href={kierownik.data.strona}>{imie(kierownik)}</Link>
             : kierownik ? imie(kierownik) : d.kierownik}</b>
           {(kierownik?.data.email || kierTel || kierownik?.data.pokoj) && (
             <dl class="para">
@@ -86,7 +87,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
           <tbody>
             {g.osoby.map((o) => (
               <tr>
-                <td>{o.data.strona ? <a href={o.data.strona}>{imie(o)}<span aria-hidden="true"> ↗</span></a> : imie(o)}</td>
+                <td>{o.data.strona ? <Link href={o.data.strona}>{imie(o)}</Link> : imie(o)}</td>
                 <td class="zk-mail">{o.data.email && <a href={`mailto:${o.data.email}`}>{o.data.email}</a>}</td>
                 <td class="zk-pok">{o.data.pokoj && <><span class="zk-lbl">{T('pok.', 'room')} </span>{o.data.pokoj}</>}</td>
               </tr>
@@ -169,7 +170,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
                   {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="zk-nadch">{T('nadchodząca', 'upcoming')}</span>}
                 </span>
                 {/* konferencje nie mają naszych podstron: link na stronę konferencji, bez strony — sam tytuł */}
-                <p class="t">{k.data.strona ? <a class="zew" href={k.data.strona}>{wybierz(k.data, 'tytul', lang)}</a> : wybierz(k.data, 'tytul', lang)}</p>
+                <p class="t">{k.data.strona ? <Link href={k.data.strona}>{wybierz(k.data, 'tytul', lang)}</Link> : wybierz(k.data, 'tytul', lang)}</p>
               </div>
             </li>
           );

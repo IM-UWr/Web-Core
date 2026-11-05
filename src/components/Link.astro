@@ -1,0 +1,18 @@
+---
+// Link z jedną zasadą dla linków poza stronę (zlecenie 14, zalecenie 23): gdy adres prowadzi do innej strony
+// (isExternal: inna domena niż `site` albo ścieżka spoza bazy), link dostaje klasę `zew` — strzałkę ↗ dopisuje CSS
+// (global.css, sklejoną twardą spacją z ostatnim słowem) — i ukryty dopisek dla czytników ekranu „(inna strona)” /
+// „(external site)”. Ta sama karta (bez target="_blank"). Linki wewnętrzne, mailto:, tel: i kotwice — zwykły <a>.
+// Treści z CMS (Markdown) dostają to samo z wtyczki src/plugins/rehype-zewn.mjs.
+// Użycie: <Link href={href(adres)} class="…">etykieta</Link>; język dopisku z adresu strony (albo lang).
+import { isExternal, stripBase } from '../lib/url';
+import { jezykZeSciezki } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+
+// href bywa pusty (np. wiersz wydarzenia bez adresu) — wtedy zwykły <a> bez href
+interface Props { href?: string; class?: string; lang?: Lang; [atrybut: string]: unknown }
+const { href, class: klasa, lang, ...reszta } = Astro.props;
+const zew = !!href && isExternal(href);
+const en = (lang ?? jezykZeSciezki(stripBase(Astro.url.pathname))) === 'en';
+---
+<a href={href} class:list={[klasa, zew && 'zew']} {...reszta}><slot />{zew && <span class="sr-only">{en ? ' (external site)' : ' (inna strona)'}</span>}</a>

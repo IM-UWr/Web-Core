@@ -62,6 +62,7 @@ export async function danePracownikow(lang: Lang) {
     pokoj: t(lang, 'pokoj'),
     strona: t(lang, 'strona'),
     link: 'WWW',
+    zewn: lang === 'en' ? ' (external site)' : ' (inna strona)',
     brak: lang === 'en' ? 'Nobody matches the search.' : 'Nikogo nie znaleziono.',
     zaklad: lang === 'en' ? 'Department' : 'Zakład',
     wszystkieZaklady: lang === 'en' ? 'All departments' : 'Wszystkie zakłady',

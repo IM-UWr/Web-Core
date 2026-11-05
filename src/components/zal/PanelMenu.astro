@@ -5,6 +5,7 @@
 // (Rekrutacja nie dubluje się w liście Studiów). Kolor: granatowy; przy jasnym pasku jasny (klasa .z-menu-jasny,
 // ustawia src/scripts/zal/pasek.ts). Otwieranie i zamykanie: src/scripts/zal/menu.ts.
 import Szkic from './Szkic.astro';
+import Link from '../Link.astro';
 import { menuGlowne, rekrutacja } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
@@ -27,7 +28,6 @@ const dzialy = DZIALY.map((dz) => {
   };
 });
 const akt = menu.find((p) => p.adres === '/aktualnosci');
-const zewn = en ? '(external website)' : '(strona zewnętrzna)';
 ---
 <nav class:list={['z-menu', jasny && 'z-menu-jasny', klasa]} id={id} aria-label={en ? 'Main menu' : 'Menu główne'} data-z-menu>
   <span class="z-zamknij"><button type="button" data-z-menu-zamknij aria-label={t(lang, 'zamknijMenu')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></span>
@@ -40,9 +40,9 @@ const zewn = en ? '(external website)' : '(strona zewnętrzna)';
     <section data-dzial={d.dz}>
       <Szkic dzial={d.dz} rodzaj="sygnet" class="z-menu-sygnet" />
       <h2><a href={href(d.P.adres)}>{d.nazwa}</a></h2>
-      <ul>{d.linki.map((l) => <li><a href={href(l.adres)}>{wybierz(l, 'etykieta', lang)}{isExternal(l.adres) && <><span class="z-zew" aria-hidden="true"> ↗</span><span class="sr-only"> {zewn}</span></>}</a></li>)}</ul>
+      <ul>{d.linki.map((l) => <li><Link href={href(l.adres)}>{wybierz(l, 'etykieta', lang)}</Link></li>)}</ul>
     </section>
   ))}
   <section class="duza"><h2><a href={href('/aktualnosci')}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
-  <section class="duza"><h2><a href={href(rek.adres)}>{rek.etykieta}<span class="z-zew" aria-hidden="true"> ↗</span><span class="sr-only"> {zewn}</span></a></h2></section>
+  <section class="duza"><h2><Link href={href(rek.adres)}>{rek.etykieta}</Link></h2></section>
 </nav>

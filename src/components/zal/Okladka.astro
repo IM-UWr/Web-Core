@@ -93,6 +93,8 @@ const rozmiarOkl = (p: number) =>
   <span class="z-barwa" aria-hidden="true"></span>
   <div class="z-skos" aria-hidden="true"></div>
   <a class="z-okl-marka" href={wmiAdres}>
+    {/* znak wydziału jak logo: bez widocznej ↗ (wyjątek z zalecenia 23), dopisek tylko dla czytników ekranu */}
+    {isExternal(wmiAdres) && <span class="sr-only">{lang === 'en' ? '(external site) ' : '(inna strona) '}</span>}
     <span class="z-okl-logo" role="img" aria-label={lang === 'en' ? 'University of Wrocław' : 'Uniwersytet Wrocławski'} style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
     <span>{wydz1}{wydz2 && <><br />{wydz2}</>}</span>
   </a>

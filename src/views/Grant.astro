@@ -6,6 +6,7 @@
 // (najwyżej 5, wiersze jak zakończone projekty w Projektach i grantach; link do wszystkich projektów zakładu).
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); bez spisu „Na tej stronie”
 // (jedna sekcja z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
@@ -56,7 +57,7 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
                 <>
                   {i > 0 && ', '}
                   {k.osoba?.data.strona
-                    ? <a href={k.osoba.data.strona}>{k.nazwa}<span aria-hidden="true">{' '}↗</span></a>
+                    ? <Link href={k.osoba.data.strona}>{k.nazwa}</Link>
                     : z ? <a href={adresZakladu(z)}>{k.nazwa}</a> : k.nazwa}
                 </>
               );
@@ -66,7 +67,7 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
       )}
       {d.wykonawcy && <><dt>{T('Wykonawcy', 'Team')}</dt><dd>{d.wykonawcy}</dd></>}
     </dl>
-    {d.strona && <p class="akcja glowny"><a href={d.strona}>{T('Strona projektu', 'Project website')} <span aria-hidden="true">↗</span></a></p>}
+    {d.strona && <p class="akcja glowny"><Link href={d.strona}>{T('Strona projektu', 'Project website')}</Link></p>}
     {maOpis && <div class="prose opis"><Content /></div>}
   </section>
 

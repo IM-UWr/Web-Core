@@ -14,6 +14,7 @@
 // (KoloryDniSemestr.astro) — wyróżniający blok strony, bez zaokrągleń. Baner bez zmian (hasło i trzy liczby semestru).
 // Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Podstrona from '../components/zal/Podstrona.astro';
+import Link from '../components/Link.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import Ikona from '../components/Ikona.astro';
 import PrzelacznikSemestrow from '../components/PrzelacznikSemestrow.astro';
@@ -156,7 +157,7 @@ const ps = (id: string) => (panele ? { 'data-ps-dla': id, 'data-ps-aktywny': id 
     <section id={ID.pobranie} aria-labelledby="kd-pobranie-h">
       <h2 id="kd-pobranie-h">{T('Do pobrania', 'Downloads')}</h2>
       <ul class="pliki">
-        {pdfy.map((s) => <li><a href={href(s.pdf!)}><Ikona nazwa="plik" rozmiar={18} /><span>{T('Kolory dni', 'Day colours')} — {nazwaSemestru(s, lang)}</span><span class="typ">PDF</span></a></li>)}
+        {pdfy.map((s) => <li><Link href={href(s.pdf!)}><Ikona nazwa="plik" rozmiar={18} /><span>{T('Kolory dni', 'Day colours')} — {nazwaSemestru(s, lang)}</span><span class="typ">PDF</span></Link></li>)}
       </ul>
     </section>
   )}

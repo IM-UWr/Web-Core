@@ -1,5 +1,6 @@
 ---
 // Osoba w schemacie Władz (komputer): zdjęcie, rola, imię i nazwisko (link do strony domowej), zakład, zakres, kontakt.
+import Link from '../Link.astro';
 import { u, isExternal } from '../../lib/url';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { rozmiarPola } from '../../lib/zdjecia';
@@ -19,12 +20,12 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
   {/* największe pole zdjęcia w schemacie Władz: 120 × 150 (dyrektor; zalozyciele-strony.css) */}
   {o.zdjecie && <ZdjecieZ class="fot" src={o.zdjecie} sizes={rozmiarPola([null, 120, 150])} />}
   {o.rola && <div class="rola">{o.rola}</div>}
-  <div class="imie">{o.strona ? <a href={o.strona}>{o.nazwa}</a> : o.nazwa}</div>
+  <div class="imie">{o.strona ? <Link href={o.strona}>{o.nazwa}</Link> : o.nazwa}</div>
   {o.zaklad && <div class="zakl"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></div>}
   {zakres && o.zakres && <p class="opis">{o.zakres}</p>}
   <div class="kont">
     {o.email && <a href={`mailto:${o.email}`} set:html={mail(o.email)} />}{o.pokoj && <>{o.email && ' · '}{pok(o.pokoj)}</>}
     {o.dyzur && <><br />{T('Dyżur:', 'Office hours:')} {o.dyzur}</>}
-    {o.strona && <> · <a href={o.strona}>{T('strona domowa', 'website')} ↗</a></>}
+    {o.strona && <> · <Link href={o.strona}>{T('strona domowa', 'website')}</Link></>}
   </div>
 </div>

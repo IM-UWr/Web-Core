@@ -1,6 +1,7 @@
 ---
 // Sekcja strony działu na komputerze (TrescDzialu.astro): kreska na całą szerokość, tytuł Brygadą 34 px, linki do pełnych
 // podstron po prawej („Wszystkie … →”, zewnętrzne z ↗), pod tytułem opcjonalny opis; treść w slocie. Style: zal-dzialy.css.
+import Link from '../../Link.astro';
 import { u, isExternal } from '../../../lib/url';
 import { wJezyku } from '../../../lib/i18n';
 import type { Lang } from '../../../lib/daty';
@@ -24,9 +25,7 @@ const en = lang === 'en';
         {linki.map((l) => {
           const zew = isExternal(l.adres);
           return (
-            <a href={zew ? l.adres : u(wJezyku(l.adres, lang))}>
-              {l.etykieta} <span aria-hidden="true">{zew ? '↗' : '→'}</span>{zew && <span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span>}
-            </a>
+            <Link href={zew ? l.adres : u(wJezyku(l.adres, lang))}>{l.etykieta}</Link>
           );
         })}
       </div>

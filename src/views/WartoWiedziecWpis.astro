@@ -5,6 +5,7 @@
 // zdjęcie z podpisem, treść z Markdown (podzielona na sekcje po nagłówkach ##, żeby działały kreski i spis „Na tej stronie”),
 // przycisk-link (pole „link”) i „Zobacz też” — pozostałe pozycje jako lista linków (WartoWiedziec.astro, uklad „linki”;
 // powtórzenie, poza indeksem wyszukiwarki). Jedna wersja HTML: komputer i telefon (≤ 760 px).
+import Link from '../components/Link.astro';
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
@@ -51,12 +52,12 @@ const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: z
     )}
     {tylkoPolski && <div class="uwaga"><p lang="en">{t('en', 'wersjaPolska')}</p></div>}
     {poczatek && <div class="ww-tresc" lang={jezykTresci} set:html={poczatek} />}
-    {przycisk && sekcje.length === 0 && <p class="akcja glowny"><a class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}<span aria-hidden="true">{przycisk.zew ? ' ↗' : ' →'}</span></a></p>}
+    {przycisk && sekcje.length === 0 && <p class="akcja glowny"><Link class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}{!przycisk.zew && <span aria-hidden="true"> →</span>}</Link></p>}
   </section>
   {sekcje.map((s, i) => (
     <section>
       <div class="ww-tresc" lang={jezykTresci} set:html={s.html} />
-      {przycisk && i === sekcje.length - 1 && <p class="akcja glowny"><a class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}<span aria-hidden="true">{przycisk.zew ? ' ↗' : ' →'}</span></a></p>}
+      {przycisk && i === sekcje.length - 1 && <p class="akcja glowny"><Link class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}{!przycisk.zew && <span aria-hidden="true"> →</span>}</Link></p>}
     </section>
   ))}
   <section id="zobacz-tez" aria-labelledby="zobacz-tez-h" data-pagefind-ignore>

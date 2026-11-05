@@ -7,6 +7,7 @@
 // z „W skrócie” (wartości Brygadą w kolorze działu, pierwszy akapit większy) i sekcje działu (slot; src/components/zal/dzial/).
 // Wstawiany na końcu <main> (za dotychczasową treścią, która na komputerze znika — src/styles/zal-dzialy.css).
 // Jedna wersja na każdą szerokość; telefon (≤ 760 px) — jedna kolumna (koniec zal-dzialy.css). Lista podstron poza indeksem wyszukiwarki.
+import Link from '../Link.astro';
 import '../../styles/zal-dzialy.css';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz } from '../../lib/i18n';
@@ -54,7 +55,7 @@ const rokRek = rokRekrutacji();
                 const e = wybierz(l, 'etykieta', lang) as string;
                 const sk = skrotNazwy(e);
                 return (
-                  <li><a class:list={[zew && 'zew']} href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}{zew && <span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span>}</a></li>
+                  <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}</Link></li>
                 );
               })}
             </ul>
@@ -62,10 +63,10 @@ const rokRek = rokRekrutacji();
         ))}
       </div>
       {rek && (
-        <a class="z-dz-rekr" href={rek.adres}>
+        <Link class="z-dz-rekr" href={rek.adres}>
           <small>{en ? 'For applicants' : 'Dla kandydatów'}</small>
-          <span>{rek.etykieta}{rokRek && ` ${rokRek}`} <span aria-hidden="true">↗</span><span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span></span>
-        </a>
+          <span class="z-dz-rekr-t">{rek.etykieta}{rokRek && ` ${rokRek}`}</span>
+        </Link>
       )}
     </nav>
   )}
@@ -82,10 +83,10 @@ const rokRek = rokRekrutacji();
               const sk = skrotNazwy(e);
               return (
                 <li>
-                  <a class:list={[zew && 'zew']} href={href(l.adres)} title={sk ? e : undefined}>
-                    <span>{sk ?? e}{zew && <span class="sr-only"> {en ? '(external website)' : '(strona zewnętrzna)'}</span>}</span>
+                  <Link href={href(l.adres)} title={sk ? e : undefined}>
+                    <span>{sk ?? e}</span>
                     {l.podpis && <small>{l.podpis}</small>}
-                  </a>
+                  </Link>
                 </li>
               );
             })}

@@ -32,7 +32,6 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
   text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); transition: color var(--t-krotki) var(--rytm); }
 .tresc a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
-.tresc p a.zew::after, .tresc li > a.zew::after { content: ' ↗'; font-size: .8em; }
 /* lista: krótka kreska 12×2 px w kolorze działu zamiast kropki */
 .tresc ul.kreski { list-style: none; margin: 0 0 16px; padding: 0; max-width: 42.7em; }
 .tresc ul.kreski li { position: relative; margin: 6px 0; padding-left: 24px; font-size: inherit; line-height: inherit; }
@@ -189,3 +188,8 @@ body .tresc .prose :is(img, code) { border-radius: 0; }
 .z-pole-wyboru select:focus { outline: none; }
 /* telefon: 16 px, żeby iOS nie powiększał strony przy wyborze */
 @media (max-width: 760px) { .z-pole-wyboru select { font-size: 16px; } }
+
+/* linki poza stronę (zlecenie 14, zalecenie 23): w tekście strzałka z global.css (:where(a.zew)::after); na liście plików
+   strzałka przy typie z prawej („strona ↗”), nie po całym wierszu */
+.tresc ul.pliki a.zew::after { content: none; }
+.tresc ul.pliki a.zew .typ::after { content: '\00a0↗'; }

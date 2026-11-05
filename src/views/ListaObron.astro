@@ -7,6 +7,7 @@
 // etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wierszy z datą.
 // Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Podstrona from '../components/zal/Podstrona.astro';
+import Link from '../components/Link.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
@@ -51,10 +52,10 @@ const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-d
           </li>
         ))}
       </ul>
-      {i === sekcje.length - 1 && <p class="archiwum">{t(lang, 'archiwumObron')} <a href={archiwum}>{t(lang, 'archiwum')}</a>.</p>}
+      {i === sekcje.length - 1 && <p class="archiwum">{t(lang, 'archiwumObron')} <Link href={archiwum}>{t(lang, 'archiwum')}</Link>.</p>}
     </section>
   ))}
-  {sekcje.length === 0 && <section><p class="archiwum">{t(lang, 'archiwumObron')} <a href={archiwum}>{t(lang, 'archiwum')}</a>.</p></section>}
+  {sekcje.length === 0 && <section><p class="archiwum">{t(lang, 'archiwumObron')} <Link href={archiwum}>{t(lang, 'archiwum')}</Link>.</p></section>}
 </Podstrona>
 
 <style>

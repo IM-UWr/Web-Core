@@ -8,6 +8,7 @@
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // lata jako podsekcje h3, etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wiersza z datą.
 // Jedna wersja HTML: komputer (≥ 761 px; minione w dwóch kolumnach) i telefon (≤ 760 px, jedna kolumna).
+import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import dzialNauka from '../data/dzialy/nauka.json';
@@ -26,7 +27,6 @@ const wstep = ((wybierz(dzialNauka as Record<string, any>, 'konferencje_tekst', 
   .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
 const etykieta = (k: Konferencja) => [range(k.data.poczatek, k.data.koniec, lang), miejsce(k.data.miejsce, lang)].filter(Boolean).join(' · ');
 const ileKonf = (n: number) => `${n} ${odmiana(n, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'], lang)}`;
-const zewn = T('(strona zewnętrzna)', '(external website)');
 const tytulNadch = T('Nadchodzące', 'Upcoming');
 // sekcje: nadchodzące i minione (lata jako podsekcje); wspólny wzór wiersza
 const sekcje = [
@@ -60,7 +60,7 @@ const spis = [
                   <p class="etyk">{etykieta(k)}{k.data.odwolana && <span class="odw">{odwolana}</span>}</p>
                   <h4>
                     {k.data.strona
-                      ? <a href={k.data.strona}>{tytul(k)}{'\u00a0'}<span class="zew" aria-hidden="true">↗</span><span class="sr-only">{zewn}</span></a>
+                      ? <Link href={k.data.strona}>{tytul(k)}</Link>
                       : tytul(k)}
                   </h4>
                 </div>

@@ -5,7 +5,7 @@
 // i opis referatu. Cały wiersz klikalny (link w tytule); konferencja bez strony — wiersz bez linku. Wiersze rozdzielone
 // cienką linią. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px, węższa kolumna daty).
 // data-ww i data-rodzaj — filtr i szukanie w Kalendarzu (szukanie w .ww-tresc, bez daty).
-import TytulZewn from './TytulZewn.astro';
+import Link from './Link.astro';
 import TytulReferatu from './TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE } from '../lib/i18n';
@@ -27,7 +27,7 @@ const etykieta = [RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce].filter(Boolean).j
     <div class="ww-rodz">{etykieta}</div>
     <H class="ww-t">
       {adres
-        ? <a href={adres}>{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : <TytulZewn tekst={w.tytul} zewn={zewn} rozmiar={13} />}</a>
+        ? <Link href={adres}>{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : w.tytul}</Link>
         : w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} /> : w.tytul}
     </H>
     {w.podtytul && <p lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</p>}

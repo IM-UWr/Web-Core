@@ -9,6 +9,7 @@
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2, czasopisma jako podsekcje h3
 // z parami dl.para, akapit .wst. Własne style (na końcu pliku): siatka lat z cienkimi liniami (bez kart).
 // Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import dzialNauka from '../data/dzialy/nauka.json';
@@ -98,7 +99,7 @@ const spis = [
                 {issn && <><dt>ISSN</dt><dd>{issn}</dd></>}
               </dl>
             )}
-            {c.adres && <p class="cz-link"><a href={href(c.adres)}>{T('Strona czasopisma', 'Journal website')} <span aria-hidden="true">↗</span></a></p>}
+            {c.adres && <p class="cz-link"><Link href={href(c.adres)}>{T('Strona czasopisma', 'Journal website')}</Link></p>}
           </div>
         );
       })}

@@ -8,6 +8,7 @@
 // Jedna wersja HTML: komputer — zajęcia w równych kolumnach; telefon (≤ 760 px) — przedmiot jako blok, zajęcia w dwóch
 // liniach, pasek w dwóch rzędach, spis kategorii zwijany nad planem (src/styles/zal-granty-plan.css, zal-podstrona.css).
 import Podstrona from '../components/zal/Podstrona.astro';
+import Link from '../components/Link.astro';
 import type { Lang } from '../lib/daty';
 import { danePlanuZajec } from '../lib/widoki/planZajec';
 import '../styles/zal-granty-plan.css';
@@ -85,7 +86,7 @@ const L = en
             <div class="pl-nagl" aria-hidden="true"><span>{T.kol.typ}</span><span>{T.kol.gr}</span><span>{T.kol.prow}</span><span>{T.kol.dzien}</span><span>{T.kol.godz}</span><span>{T.kol.sala}</span><span>{T.kol.uwagi}</span></div>
             {k.przedmioty.map((p) => (
               <div class="pl-p">
-                <h3><a href={p.usos}>{p.nazwaW}</a></h3>
+                <h3><Link href={p.usos}>{p.nazwaW}</Link></h3>
                 <div>
                   {p.zajecia.map((z) => (
                     <div class="pl-w" data-d={z.dzien ?? ''} data-t={doSzukania(p.nazwaW, p.nazwa, ...(z.prowadzacy || []), z.sala || '', salaW(z.sala) || '', tekstUwag(z.uwagi))}>
@@ -95,7 +96,7 @@ const L = en
                       <span class="dz">{z.dzien != null && <abbr title={T.dni[z.dzien]}>{DNI_KROTKO[z.dzien]}</abbr>}</span>
                       <span class="godz">{z.od && z.do ? `${z.od}–${z.do}` : ''}{z.czestotliwosc && T.czest[z.czestotliwosc] && <small>{T.czest[z.czestotliwosc]}</small>}</span>
                       <span class="sala">{z.sala && <>{salaW(z.sala) === z.sala && <span class="sr-only">{T.sala} </span>}{salaW(z.sala)}</>}</span>
-                      <span class="uw">{(z.uwagi || []).map((f) => (typeof f === 'string' ? f : <a href={f.a}>{f.t}</a>))}</span>
+                      <span class="uw">{(z.uwagi || []).map((f) => (typeof f === 'string' ? f : <Link href={f.a}>{f.t}</Link>))}</span>
                     </div>
                   ))}
                 </div>

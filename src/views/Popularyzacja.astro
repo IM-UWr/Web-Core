@@ -3,6 +3,7 @@
 // potem sekcje inicjatyw (dla uczniów, nauczycieli…); grupa bez inicjatyw jako „To be announced”.
 // Dane: src/data/popularyzacja.json (edycja w Pages CMS, repozytorium Web-Popularyzacja).
 // Jedna wersja HTML: komputer i telefon (≤ 760 px, jedna kolumna) — src/styles/zal-dzialy.css.
+import Link from '../components/Link.astro';
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import TrescDzialu from '../components/zal/TrescDzialu.astro';
@@ -50,7 +51,7 @@ const grupyPod = [
                       <li class:list={[adres && 'z-dz-klik']}>
                         <h3>
                           {adres ? (
-                            <a href={href(adres)}>{w(p, 'nazwa')}{zew && <> <span class="z-dz-zew" aria-hidden="true">↗</span><span class="sr-only">{T('(strona zewnętrzna)', '(external website)')}</span></>}</a>
+                            <Link href={href(adres)}>{w(p, 'nazwa')}</Link>
                           ) : w(p, 'nazwa')}
                         </h3>
                         {p.opis && <p>{w(p, 'opis')}</p>}

@@ -76,7 +76,7 @@
   .z-studia { grid-column: 1 / span 2; grid-row: 2; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 0 36px; padding: 10px 0 0; border-top: 2px solid var(--rule); }
   .z-studia .gdzie { display: block; font-size: 12px; font-weight: 700; color: var(--d-a); }
   .z-studia .h-link:hover { color: var(--d-a); }
-  .z-studia .zew-ikona { margin-left: 6px; font-family: var(--f-text); font-size: .7em; font-weight: 600; color: var(--d-a); vertical-align: .15em; }
+  .z-studia .h-link.zew::after { margin-left: 3px; font-family: var(--f-text); font-size: .7em; font-weight: 600; color: var(--d-a); vertical-align: .15em; }
   .z-studia p { margin: 6px 0 12px; color: var(--text); }
   .z-rekr-link { font-size: 14px; font-weight: 700; color: var(--ink) !important; text-decoration: underline !important; text-decoration-color: var(--line) !important; text-decoration-thickness: 2px !important; text-underline-offset: 4px; }
   .z-rekr-link:hover { text-decoration-color: var(--d-a) !important; }
@@ -202,3 +202,7 @@
 @media (hover: none) and (pointer: coarse) and (max-width: 760px) {
   html:has(.z-okladka) { scroll-padding-top: var(--hdr-h); }
 }
+
+/* kafelki drugiego ekranu z adresem poza stronę (zlecenie 14, zalecenie 23): strzałka przy tytule kafelka */
+:is(.z-skr > a, a.z-w, .z-kier > a, .z-warto .rzad > a).zew::after { content: none; }
+:is(.z-skr > a.zew > b, a.z-w.zew .t, .z-kier > a.zew > b, .z-warto .rzad > a.zew .t)::after { content: '\00a0↗'; font-size: .8em; }

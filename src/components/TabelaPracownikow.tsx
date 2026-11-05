@@ -10,6 +10,7 @@
 // administracja). Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
 // Komputer: wiersz w kolumnach z nagłówkiem nad listą (jak tabela wzorca treści); telefon (≤ 760 px): wiersz w jednej kolumnie.
 import { zTytulem } from '../lib/osoby';
+import { isExternal } from '../lib/url';
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export interface Osoba {
@@ -48,7 +49,7 @@ const forma = (n: number, f1: string, f2: string, f5: string) => {
   const j = n % 10, d = n % 100;
   return j >= 2 && j <= 4 && (d < 12 || d > 14) ? f2 : f5;
 };
-// Ikony jak w Ikona.astro („szukaj”, „dol”, „zewnetrzny”) — ozdobne
+// Ikony jak w Ikona.astro („szukaj”, „dol”) — ozdobne
 const ikona = (sciezki: ReactNode, rozmiar = 18) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" width={rozmiar} height={rozmiar}>
     {sciezki}
@@ -104,7 +105,9 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     return (
       <li key={o.id} className={o.strona ? 'zp-w zp-klik' : 'zp-w'}>
         <div className="zp-n">
-          {o.strona ? <a className="zp-imie" href={o.strona}>{nazwa}</a> : <span className="zp-imie">{nazwa}</span>}
+          {o.strona ? (isExternal(o.strona)
+            ? <a className="zp-imie zew" href={o.strona}>{nazwa}<span className="sr-only">{napisy.zewn}</span></a>
+            : <a className="zp-imie" href={o.strona}>{nazwa}</a>) : <span className="zp-imie">{nazwa}</span>}
           {(o.funkcja || linkZakladu) && (
             <small>
               {o.funkcja}
@@ -142,10 +145,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
         </div>
         <div className="zp-c zp-www" aria-hidden="true">
           {o.strona && (
-            <>
-              {napisy.link}
-              {ikona(<><path d="M14 4h6v6M20 4l-9 9" /><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></>, 12)}
-            </>
+            <span className={isExternal(o.strona) ? 'zp-www-l zew' : 'zp-www-l'}>{napisy.link}</span>
           )}
         </div>
       </li>

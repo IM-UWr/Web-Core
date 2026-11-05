@@ -6,6 +6,7 @@
 // uwagi w ramce uwagi, listy z kreskami, PDF jako pozycja listy plików; komórki kalendarza bez zaokrągleń.
 // panel = element przełącznika semestrów (PrzelacznikSemestrow.astro): id + data-ps-panel (+ data-ps-aktywny).
 import Ikona from '../components/Ikona.astro';
+import Link from '../components/Link.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { dayNum, longWithDay, range, type Lang } from '../lib/daty';
@@ -116,7 +117,7 @@ const zakres = (od: string, d: string) => range(od, d === od ? undefined : d, la
   )}
 
   {s.pdf && (
-    <ul class="pliki kd-pdf"><li><a href={href(s.pdf)}><Ikona nazwa="plik" rozmiar={18} /><span>{T('Kalendarz Instytutu w PDF', 'Institute calendar (PDF)')}</span><span class="typ">PDF</span></a></li></ul>
+    <ul class="pliki kd-pdf"><li><Link href={href(s.pdf)}><Ikona nazwa="plik" rozmiar={18} /><span>{T('Kalendarz Instytutu w PDF', 'Institute calendar (PDF)')}</span><span class="typ">PDF</span></Link></li></ul>
   )}
 </section>
 

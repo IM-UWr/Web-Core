@@ -10,6 +10,7 @@
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // etykieta .etyk, pliki ul.pliki. Własne style (na końcu pliku): wiersz referatu z datą, formularz zapisu, koordynatorzy
 // w banerze na telefonie. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
@@ -34,7 +35,7 @@ const tytulPow = T('Powiadomienia e-mail', 'Email notifications');
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
   const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
-  return m ? m[1].toUpperCase() : isExternal(a) ? T('strona ↗', 'website ↗') : '';
+  return m ? m[1].toUpperCase() : isExternal(a) ? T('strona', 'website') : '';
 };
 const spis = [
   { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
@@ -51,7 +52,7 @@ const spis = [
         {koordynatorzy.length > 0 && (
           <p class="sem-koord-osoby">
             <span class="sem-koord-l">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
-            <span class="sem-koord-n">{koordynatorzy.map((k, i) => <>{i > 0 && ', '}{k.strona ? <a href={k.strona}>{k.nazwa}</a> : k.nazwa}</>)}</span>
+            <span class="sem-koord-n">{koordynatorzy.map((k, i) => <>{i > 0 && ', '}{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</>)}</span>
           </p>
         )}
         {(d.kontakt || zakladySem.length > 0) && (
@@ -103,7 +104,7 @@ const spis = [
           <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
           {(en || r.body?.trim()) && <div class="prose streszcz">{en ? <Fragment set:html={en} /> : <C />}</div>}
           {r.data.pliki.length > 0 && (
-            <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></a></li>)}</ul>
+            <ul class="pliki">{r.data.pliki.map((p) => <li><Link href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></Link></li>)}</ul>
           )}
         </div>
       </article>
@@ -128,12 +129,12 @@ const spis = [
               </details>
             )}
             {r.data.pliki.length > 0 && (
-              <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></a></li>)}</ul>
+              <ul class="pliki">{r.data.pliki.map((p) => <li><Link href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></Link></li>)}</ul>
             )}
           </div>
         </article>
       ))}
-      {d.archiwum && <p class="archiwum"><a href={d.archiwum}>{t(lang, 'archiwumSem')} <span aria-hidden="true">↗</span></a></p>}
+      {d.archiwum && <p class="archiwum"><Link href={d.archiwum}>{t(lang, 'archiwumSem')}</Link></p>}
     </section>
   )}
 </Podstrona>

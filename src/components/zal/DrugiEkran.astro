@@ -9,6 +9,7 @@
 // - Studia: klikalne „Studiuj matematykę we Wrocławiu ↗” (strona rekrutacji), kierunki (SIAD jako skrót); Warto wiedzieć;
 // - pod spodem odchudzona stopka (StopkaZ w Baza.astro).
 // Telefon (≤ 760 px): kolumny jedna pod drugą, po 3 pozycje, „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
+import Link from '../Link.astro';
 import '../../styles/zalozyciele-strony.css';
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
@@ -140,14 +141,14 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
         <b data-kd-tytul>{k.tytul}</b><small><span class="z-kd-kropka" aria-hidden="true" data-kd-litera>{dzis.litera}</span><span data-kd-opis>{k.opis}</span></small>
       </a>
     ) : (
-      <a href={href(k.adres)}><b>{k.tytul}</b>{k.opis && <small>{k.opis}</small>}</a>
+      <Link href={href(k.adres)}><b>{k.tytul}</b>{k.opis && <small>{k.opis}</small>}</Link>
     ))}
   </nav>
   <div class="z-siatka" data-z-siatka>
     {SLOTY.map((key, slot) => {
       const k = KOL[key];
       const wiersze = k.pozycje.map((o) => (
-        <a class:list={['z-w', o.minelo && 'minelo']} href={o.adres ? href(o.adres) : undefined} data-dzial={o.dzial}>
+        <Link class:list={['z-w', o.minelo && 'minelo']} href={o.adres ? href(o.adres) : undefined} data-dzial={o.dzial}>
           <span class="kiedy"><b>{o.d}</b>{o.m}</span>
           <span class="tr">
             <span class="gdzie">{o.gdzie}{o.co && <i> · {o.co}</i>}</span>
@@ -156,7 +157,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           {'min' in k && (o.min
             ? <span class="min"><ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 72, 54])} /></span>
             : <span class="min zastepcza">{o.dzial && <Szkic dzial={o.dzial} rodzaj="sygnet" />}</span>)}
-        </a>
+        </Link>
       ));
       return (
         <section class="z-kolumna" data-key={key} data-slot={slot} aria-labelledby={`z-h-${key}`}>
@@ -174,20 +175,20 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
     <section class="z-studia" data-dzial="studia" aria-labelledby="z-h-studia">
       <div>
         <span class="gdzie">{T('Studia', 'Studies')}</span>
-        <h2 id="z-h-studia"><a class="h-link" href={st.rekrutacja}>{T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}<span class="zew-ikona" aria-hidden="true">↗</span></a></h2>
+        <h2 id="z-h-studia"><Link class="h-link" href={st.rekrutacja}>{T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}</Link></h2>
         <p>{wybierz(st, 'opis', lang)}</p>
-        <a class="z-rekr-link" href={st.rekrutacja}>{T('Rekrutacja na studia →', 'Admission →')}</a>
+        <Link class="z-rekr-link" href={st.rekrutacja}>{T('Rekrutacja na studia', 'Admission')}{!isExternal(st.rekrutacja) && <span aria-hidden="true"> →</span>}</Link>
       </div>
       <nav class="z-kier" aria-label={T('Kierunki', 'Programmes')}>
         {kierunki.map((k) => (
-          <a href={href(k.adres)}><small>{k.poziom}</small><b title={k.skrot ? k.pelna : undefined}>{k.skrot ?? k.nazwa}</b><span>{k.opis}</span></a>
+          <Link href={href(k.adres)}><small>{k.poziom}</small><b title={k.skrot ? k.pelna : undefined}>{k.skrot ?? k.nazwa}</b><span>{k.opis}</span></Link>
         ))}
       </nav>
     </section>
     {warto.length > 0 && (
       <section class="z-warto" data-dzial="instytut" aria-labelledby="z-h-warto">
         <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Did you know')}</h2><a href={href('/warto-wiedziec')}>{T('Wszystkie →', 'All →')}</a></div>
-        <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((w, i) => <a href={href(w.adres)} data-zawsze={w.zawsze ? '' : undefined} hidden={i >= WARTO_ILE}><span>{w.rok}</span><b class="t">{w.tytul}</b></a>)}</div>
+        <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((w, i) => <Link href={href(w.adres)} data-zawsze={w.zawsze ? '' : undefined} hidden={i >= WARTO_ILE}><span>{w.rok}</span><b class="t">{w.tytul}</b></Link>)}</div>
         <script is:inline set:html={LOSUJ} />
       </section>
     )}

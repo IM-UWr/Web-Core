@@ -377,7 +377,8 @@
   .z-menu section.duza h2 { margin: 0; font-size: 28px; }
   .z-menu section.duza h2 a::after { content: none; }
   .z-menu section.duza h2 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
-  .z-menu section.duza .z-zew { font-family: var(--f-text); font-size: 18px; opacity: .7; }
+  .z-menu ul a.zew::after { font-size: .85em; opacity: .7; }
+  .z-menu section.duza a.zew::after { font-family: var(--f-text); font-size: 18px; opacity: .7; }
   /* jasny panel (przy jasnym pasku): tło strony, tekst w kolorze tekstu, linki przygaszone, sygnety i kreski w kolorze działu */
   .z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
   .z-menu-jasny h2 a { color: var(--ink); }
