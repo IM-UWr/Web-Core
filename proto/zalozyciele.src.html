@@ -340,6 +340,28 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ok-menu section.duza h3 a::after { content: none; }
 .ok-menu section.duza h3 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
 @media (prefers-reduced-motion: reduce) { .ok-menu, .ok-menu.otwarte { transition: none; } }
+/* panel hamburgera z pełnymi listami (5.11, 12:00): te same grupy co w menu działu (IN_GRUPY), warianty nagłówków grup
+   (przełącznik „Hamburger”): bez nagłówków, małe szare, w kolorze działu, z lewej obok linków, zwijane działy */
+.ok-menu .mg + .mg { margin-top: 7px; }
+.ok-menu[data-nagl="bez"] .mg + .mg { margin-top: 9px; }
+.ok-menu .mg h4 { margin: 0; font-family: var(--f-text); font-size: 12px; font-weight: 600; line-height: 1.6; color: rgb(255 255 255 / .5); }
+.ok-menu[data-nagl="kolor"] .mg h4 { font-weight: 700; color: var(--d-j); }
+.ok-menu[data-nagl="obok"] .mg { display: grid; grid-template-columns: 92px minmax(0, 1fr); column-gap: 14px; align-items: baseline; }
+.ok-menu[data-nagl="obok"] .mg + .mg { margin-top: 3px; padding-top: 3px; border-top: 1px solid rgb(255 255 255 / .08); }
+.ok-menu[data-nagl="obok"] .mg h4 { line-height: 1.35; padding-top: 4px; }
+.ok-menu ul .zew { font-size: .85em; opacity: .7; }
+.ok-menu .mg-rozwin { display: inline-grid; place-items: center; width: 30px; height: 30px; margin-left: 6px; padding: 0; border: 0; border-radius: 3px; background: none; color: inherit; cursor: pointer; vertical-align: 2px; }
+.ok-menu .mg-rozwin svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.ok-menu .mg-rozwin[aria-expanded="true"] svg { transform: rotate(180deg); }
+.ok-menu .mg-rozwin:hover { background: rgb(255 255 255 / .1); }
+.ok-menu[data-nagl="zwijane"] h3 { display: flex; align-items: flex-start; justify-content: space-between; }
+.ok-menu[data-nagl="zwijane"] section[data-dzial]:not(.rozwiniety) .mg-grupy { display: none; }
+.ok-menu[data-nagl="zwijane"] section[data-dzial] .mg-grupy { padding-top: 4px; }
+@media (prefers-reduced-motion: reduce) { .ok-menu .mg-rozwin svg { transition: none; } }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .mg h4 { color: var(--m-muted); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu[data-nagl="kolor"] .mg h4 { color: var(--d-a); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu[data-nagl="obok"] .mg + .mg { border-top-color: var(--m-line); }
+:is(.ok-pasek.jasny, .in-strona:not(.pasek-na-banerze) .ok-pasek) .pasek-menu .mg-rozwin:hover { background: var(--m-surface); }
 .ok-tytul { position: absolute; left: 48px; top: clamp(84px, 20cqh, 220px); }
 /* logo UWr i wydział w górnej linii okładki (4.11, 23:16); w tytule zostaje sam „Instytut Matematyczny” */
 .ok-marka { position: absolute; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
@@ -1719,9 +1741,17 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" id="pr-5" data-v="5" aria-pressed="true">5</button>
       <button type="button" id="pr-20" data-v="20" aria-pressed="false">20 (próba)</button>
     </div></div>
+    <div class="grupa" id="wybor-panelu"><span>Hamburger</span><div class="seg" data-ustaw="panel">
+      <button type="button" data-v="skrot" aria-pressed="false">Skrót (dotąd)</button>
+      <button type="button" data-v="bez" aria-pressed="false">Bez nagłówków</button>
+      <button type="button" data-v="male" aria-pressed="true">Małe nagłówki</button>
+      <button type="button" data-v="kolor" aria-pressed="false">W kolorze działu</button>
+      <button type="button" data-v="obok" aria-pressed="false">Nagłówek z lewej</button>
+      <button type="button" data-v="zwijane" aria-pressed="false">Zwijane działy</button>
+    </div></div>
     <div class="grupa" id="wybor-wyr"><span>Pierwsza aktualność</span><div class="seg" data-ustaw="wyr">
-      <button type="button" id="wy-tak" data-v="tak" aria-pressed="true">Wyróżniona</button>
-      <button type="button" id="wy-nie" data-v="nie" aria-pressed="false">Zwykła</button>
+      <button type="button" id="wy-nie" data-v="nie" aria-pressed="true">Zwykła</button>
+      <button type="button" id="wy-tak" data-v="tak" aria-pressed="false">Wyróżniona (odłożona)</button>
     </div></div>
     <div class="grupa ustalone" id="wybor-prel"><span>Prelegent</span><div class="seg" data-ustaw="prel">
       <button type="button" id="pl-po" data-v="po" aria-pressed="true">Po tytule</button>
@@ -2214,7 +2244,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     ['studia', '1', 'paź · czw.', 'Studia', 'studenci', 'Witamy studentów pierwszego roku', '']];
   let liczbaSem = 5;
   /* wyróżniona aktualność (5.11, 11:51; pole „Wyróżnij do…” w CMS, wyroznij_do): pierwszy wpis AKT */
-  let wyrAkt = true;
+  let wyrAkt = false; /* 5.11, 12:00: „Wyróżnionego na razie nie będzie, mam wątpliwości co do wyróżniania” — przełącznik zostaje do porównań */
   const AKT_WYR = { fot: '{{MIN_MACIERZE_D}}', zaj: 'Gościnny wykład o zaskakującym związku zer funkcji dzeta Riemanna z wartościami własnymi macierzy losowych. Czwartek, 12 listopada, 13:15, sala WS.' };
   /* prelegent przy seminariach: kilka wariantów do porównania (przełącznik „Prelegent”) */
   let wariantPrel = 'po';
@@ -2979,6 +3009,32 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     m.innerHTML = $('#ok-menu').innerHTML.replace(' id="ok-zamknij"', '');
     h.appendChild(m); h.querySelector('.pasek-burger').setAttribute('aria-controls', m.id);
   });
+  /* panel z pełnymi listami (5.11, 12:00): grupy jak w menu działu (IN_GRUPY), linki poza stronę z ↗ (zalecenie 23) */
+  let panelNagl = 'male';
+  const PANEL_ZEW = new Set(['Biblioteka', 'Rada Dyscypliny Matematyka']);
+  const PANEL_SKROT = { instytut: ['Władze', 'Pracownicy', 'Struktura i zakłady', 'Kontakt', 'Infrastruktura', 'Biblioteka', 'Warto wiedzieć'], nauka: ['Seminaria', 'Konferencje', 'Obrony doktorskie', 'Projekty i granty', 'Publikacje', 'Sukcesy', 'Szkoła doktorska'], studia: ['Kierunki', 'Specjalności', 'Plan zajęć', 'Rok akademicki', 'Sprawy studenckie', 'MOST'], popularyzacja: ['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich'] };
+  const panelLink = (x) => { const n = x.split('|')[0].replace(/\s*↗$/, ''), zew = x.endsWith('↗') || PANEL_ZEW.has(n); return `<li><a href="#">${n}${zew ? '<span class="zew" aria-hidden="true">&nbsp;↗</span><span class="sr-only"> (inna strona)</span>' : ''}</a></li>`; };
+  function htmlPanelu(dz) {
+    const nazwa = D[dz].nazwa;
+    const glowa = `<span class="menu-sygnet" aria-hidden="true">${svgSygnet(dz)}</span><h3><a href="#">${nazwa}</a>${panelNagl === 'zwijane' ? `<button type="button" class="mg-rozwin" aria-expanded="false" aria-label="Pokaż podstrony: ${nazwa}"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>` : ''}</h3>`;
+    if (panelNagl === 'skrot') return `<section data-dzial="${dz}">${glowa}<ul>${PANEL_SKROT[dz].map((n) => `<li><a href="#">${n}</a></li>`).join('')}</ul></section>`;
+    const grupy = IN_GRUPY[dz].map(([g, l]) => `<div class="mg">${panelNagl === 'bez' ? '' : `<h4>${g}</h4>`}<ul>${l.map(panelLink).join('')}</ul></div>`).join('');
+    return `<section data-dzial="${dz}">${glowa}<div class="mg-grupy">${grupy}</div></section>`;
+  }
+  function rysujPanel() {
+    document.querySelectorAll('.ok-menu').forEach((m) => {
+      m.dataset.nagl = panelNagl;
+      m.querySelectorAll('section[data-dzial]').forEach((x) => x.remove());
+      m.querySelector('section.duza').insertAdjacentHTML('beforebegin', KOLEJ.map(htmlPanelu).join(''));
+    });
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.mg-rozwin'); if (!b) return;
+    const sec = b.closest('section'), m = b.closest('.ok-menu'), otw = !sec.classList.contains('rozwiniety');
+    m.querySelectorAll('section.rozwiniety').forEach((x) => { x.classList.remove('rozwiniety'); x.querySelector('.mg-rozwin').setAttribute('aria-expanded', 'false'); });
+    if (otw) { sec.classList.add('rozwiniety'); b.setAttribute('aria-expanded', 'true'); }
+  });
+  rysujPanel();
   const menuPasek = (h, otw) => {
     const m = h.querySelector('.pasek-menu'), b = h.querySelector('.pasek-burger');
     m.classList.toggle('otwarte', otw); b.setAttribute('aria-expanded', String(otw));
@@ -3383,6 +3439,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   function pokaz() {
     ['okladka', 'instytut', 'glowna', 'dzial', 'telefon', 'przyciski', 'ciekawostki', 'kolory', 'aktualnosci'].forEach((v) => { $('#v-' + v).hidden = v !== widok; });
     $('#wybor-wyr').hidden = widok !== 'okladka' && widok !== 'aktualnosci';
+    $('#wybor-panelu').hidden = widok !== 'okladka' && widok !== 'instytut';
     $('#wybor-inst').hidden = widok !== 'instytut';
     $('#wybor-wersja').hidden = widok !== 'instytut';
     $('#wybor-baner').hidden = widok !== 'instytut';
@@ -3413,7 +3470,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (widok === 'telefon') rysujTelefon();
     if (widok === 'kolory') { rysujKolory(); $('#podpowiedz').textContent = 'Wszystkie komplety obok siebie. „Użyj” włącza komplet w całym prototypie; potem obejrzyj okładkę i strony działów.'; }
     if (widok === 'ciekawostki') { rysujCiekawostki(); $('#podpowiedz').textContent = '„Losuj zestaw” pokazuje, co dostanie nowa wizyta. Kliknij wiersz albo kartę: ciekawostka pojawi się w nagłówku podstrony.'; }
-    if (widok === 'aktualnosci') { rysujAktualnosci(); $('#podpowiedz').textContent = 'Strona Aktualności: na górze wpis z polem „Wyróżnij do…” (znacznik „Ważne”, większe zdjęcie i tytuł). Przełącznik „Pierwsza aktualność” porównuje ze zwykłym wierszem.'; }
+    if (widok === 'aktualnosci') { rysujAktualnosci(); $('#podpowiedz').textContent = 'Strona Aktualności w stylu list z porządków. Wyróżniony wpis (znacznik „Ważne”, większe zdjęcie) odłożony 5.11, 12:00; można go jeszcze obejrzeć przełącznikiem „Pierwsza aktualność”.'; }
     if (widok === 'przyciski') { rysujPrzyciski(); $('#podpowiedz').textContent = 'Górny rząd: jak jest dziś. Dolny: po zmianie. Kliknij, żeby zobaczyć wybrany przycisk.'; }
     skaluj();
   }
@@ -3431,6 +3488,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'zakret') { zakret = v; ulozTytul(); }
     if (co === 'proba') { liczbaSem = Number(v); rysujKolumny(); }
     if (co === 'prel') { wariantPrel = v; rysujKolumny(); }
+    if (co === 'panel') { panelNagl = v; rysujPanel(); setTimeout(() => { if (widok === 'okladka') { if (!$('#ok-menu').classList.contains('otwarte')) $('#ok-burger').click(); } else { const pb = document.querySelector('#v-instytut .pasek-burger'); if (pb) pb.click(); } }, 0); }
     if (co === 'wyr') { wyrAkt = v === 'tak'; rysujKolumny(); if (widok === 'aktualnosci') { rysujAktualnosci(); skaluj(); } }
     if (co === 'bok') { bok = v; rysujInstytut(); skaluj(); }
     if (co === 'naglowek') { naglowek = v; rysujInstytut(); skaluj(); }
