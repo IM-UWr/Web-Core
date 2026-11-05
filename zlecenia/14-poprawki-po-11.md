@@ -9,7 +9,7 @@ Decyzje właściciela z 5.11 przed południem (godziny przy zaleceniach). Wzór 
 - Treści (nakładka: `src/data`, `src/content`, `public/pliki`) są poza gitem. Gdy zalecenie wymaga zmiany treści, **nie zmieniaj nakładki na stałe**: przygotuj łatkę dla repozytorium treści w `dok/latki/zlecenie-14/<Repozytorium>.patch` (jak `dok/en/latki/`) i opisz ją w raporcie. Do sprawdzenia lokalnie możesz zmienić plik nakładki, ale najpierw skopiuj oryginał do `.przekazanie\robocze\nakladka-przed-14\` (ta sama ścieżka), a po sprawdzeniu przywróć oryginał.
 - Po każdym zaleceniu: `npm run build`, zrzuty 1440 i 1920 px oraz telefon 390 px, jasny i ciemny motyw.
 
-**Zakres i kolejność:** 25 → 26 → 23 → 24 → 22 → 27. Zalecenie **21 CZEKA** (nie wykonywać).
+**Zakres i kolejność:** 25 → 26 → 23 → 24 → 22 → 27 → 28. Zalecenie **21 CZEKA** (nie wykonywać). *(Dopisek 5.11, 15:20: sesja zatrzymała się po zaleceniu 24 na limicie — dalej od 22.)*
 
 ## Zalecenia
 
@@ -88,6 +88,19 @@ Treść zalecenia dopisze właściciel. Nie wykonywać.
   4. **Jak zrobiona jest ta strona:** projekt i wykonanie Szymon Cygan; treści w Pages CMS, strona przebudowuje się sama kilka minut po zmianie; kod na GitHubie (https://github.com/IM-UWr/Web-Core); kroje Brygada 1918 i Manrope (SIL Open Font License), wzory KaTeX; zdanie o braku ciasteczek śledzących z linkiem do Polityki prywatności — sprawdź z polityką i obecną analityką, że to prawda.
   5. **Poprzednia strona:** link do archiwum (adres z `ustawienia.archiwum`, ten sam co na stronie 404). To jedyne miejsce poza stroną 404, bo ze stopki archiwum znika.
 - EN: cała strona po angielsku („About this site”), jak zasada z zalecenia 12.
+
+### 28. Powrót na stronę główną zeruje „pierwsze wejście” do działów (decyzja 5.11, 15:18)
+- Właściciel: „jak chodzę po stronie, to tylko raz, ale powrót na stronę główną, żeby znowu resetował i wejście do działu znowu robiło animację”.
+- **Dziś:** szkic patrona i podpis rysują się na banerze działu tylko przy pierwszym wejściu w wizycie. Pamięta to `sessionStorage` „im-wizyta-dzialy” (lista działów; `NaglowekZ.astro`, `src/scripts/zal/szkice.ts`).
+- **Nowe:** każde **pokazanie strony głównej** (PL `/` i EN `/en/`) czyści „im-wizyta-dzialy”, więc następne wejście do dowolnego działu znowu rysuje szkic i podpis. Bez zmian zostaje reszta:
+  - chodzenie po działach i podstronach bez strony głównej rysuje każdy dział raz, także „← Dział” z podstrony;
+  - ciekawostki losowane na wizytę („im-ciek-zestaw”, zalecenie 19) **się nie zmieniają**: zestaw zostaje do końca wizyty.
+- **Kiedy czyścić:**
+  - dopiero gdy strona główna jest naprawdę pokazana: nie w czasie `prerender` w tle (`document.prerendering` / `prerenderingchange`, jak w zleceniu 13). Inaczej samo najechanie na link „Strona główna” zerowałoby flagę;
+  - także przy powrocie przyciskiem „wstecz” z pamięci przeglądarki (zdarzenie `pageshow` z `persisted`).
+- **Przejście okładka → dział:** gdy baner czeka na rysowanie (`.z-czeka`), szkic nie „przelatuje” z okładki (`zal-przejscia.css`, `view-transition-name: none`). Po wejściu ze strony głównej rysuje się więc na banerze od początku. To zamierzone, sprawdź tylko, że nic nie miga.
+- **Ograniczony ruch** (`prefers-reduced-motion`) bez zmian: od razu gotowe.
+- **Sprawdzenie:** okładka → Nauka (rysuje) → podstrona → „← Nauka” (nie rysuje) → strona główna → Nauka (rysuje) → Studia (rysuje) → okładka „wstecz” → Studia (rysuje); prerender: najechanie na link strony głównej i powrót do działu bez kliknięcia nie zeruje.
 
 ## Na koniec
 `RAPORT-ZLECENIE-14.md`: co zrobione, czego nie i dlaczego, łatki treści (jeśli są), wyjątki z zalecenia 23, zrzuty przed/po, `astro check` bez nowych błędów.
