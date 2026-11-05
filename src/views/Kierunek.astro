@@ -19,6 +19,7 @@ import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneKierunku } from '../lib/widoki/kierunek';
+import { tytulyWJezyku } from '../lib/osoby';
 
 interface Props { kierunek: CollectionEntry<'kierunki'>; lang: Lang }
 const { kierunek, lang } = Astro.props;
@@ -268,7 +269,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
         {d.kontakt.map((k) => (
           <div>
             <span class="etyk">{w(k, 'rola')}</span>
-            <b>{k.osoba}</b>
+            <b>{tytulyWJezyku(k.osoba, lang)}</b>
             {(k.email || k.telefon || k.pokoj) && (
               <dl class="para">
                 {k.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${k.email}`}>{k.email}</a></dd></>}
