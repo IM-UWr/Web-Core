@@ -1,11 +1,13 @@
 // Drugi ekran strony głównej (src/components/zal/DrugiEkran.astro): trzy kolumny, z których jedna (slot 2) jest długa.
 // - Długa kolumna pokazuje tyle pozycji, ile się zmieści; pod nimi „i jeszcze N · Wszystkie … →” („N more · All … →”).
-// - „Zobacz więcej” zamienia klikniętą krótką kolumnę z długą: płynne przejście FLIP (0,52 s), kolejne pozycje rozwiniętej
-//   listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
+// - „Zobacz więcej” zamienia klikniętą krótką kolumnę z długą: płynne przejście FLIP (0,35 s — jeden rytm,
+//   zlecenie 13, punkt 9), kolejne pozycje rozwiniętej listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
 //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
 const siatka = document.querySelector<HTMLElement>('[data-z-siatka]');
 // Telefon (≤ 760 px): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
 const TELEFON = matchMedia('(max-width: 760px)');
+// jeden rytm ruchu (zlecenie 13, punkt 9; --rytm w global.css)
+const RYTM = 'cubic-bezier(.22, .8, .2, 1)';
 
 function dopasujDluga() {
   if (!siatka || !siatka.offsetHeight || TELEFON.matches) return;
@@ -49,15 +51,15 @@ function zamien(key: string) {
   for (const el of [kliknieta, dluga]) {
     const o = stare.get(el)!, n = el.getBoundingClientRect();
     const dx = o.left - n.left, dy = o.top - n.top;
-    if (bezRuchu) { el.animate([{ opacity: 0.55 }, { opacity: 1 }], { duration: 150, easing: 'ease-out' }); continue; }
+    if (bezRuchu) { el.animate([{ opacity: 0.55 }, { opacity: 1 }], { duration: 150, easing: RYTM }); continue; }
     if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
     if (el === kliknieta) el.style.zIndex = '2';
-    el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.22,.8,.2,1)' })
+    el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 350, easing: RYTM })
       .finished.then(() => { el.style.zIndex = ''; }).catch(() => {});
   }
   if (bezRuchu) return;
   Array.from(kliknieta.querySelectorAll<HTMLElement>('.z-w:not([hidden])')).slice(3).forEach((w, i) =>
-    w.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 380 + i * 45, easing: 'ease-out', fill: 'backwards' }));
+    w.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 250, delay: 250 + i * 35, easing: RYTM, fill: 'backwards' }));
 }
 
 if (siatka) {

@@ -253,6 +253,6 @@
   .js .hdr.hdr-glowna:not(.menu-otwarte) .brand-sub { color: rgb(255 255 255 / .82); }
   .js .hdr.hdr-glowna:not(.menu-otwarte) .brand-logo { background: #fff; }
   .js .hdr.hdr-glowna:not(.menu-otwarte) .icon-btn:not(.burger):hover { background: rgb(255 255 255 / .16); color: #fff; }
-  .hdr-glowna .brand-txt { transition: opacity .25s, transform .25s, visibility 0s; }
-  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 0; transform: translateY(4px); visibility: hidden; transition: opacity .25s, transform .25s, visibility 0s linear .25s; }
+  .hdr-glowna .brand-txt { transition: opacity var(--t-sredni) var(--rytm), transform var(--t-sredni) var(--rytm), visibility 0s; }
+  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 0; transform: translateY(4px); visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), transform var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
 }

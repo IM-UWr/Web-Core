@@ -106,7 +106,7 @@ picture.z-obraz { display: contents; }
 /* <source> bez pudełka — inaczej w siatce (np. wiersz z miniaturą) zajmowałby komórkę zamiast zdjęcia */
 picture.z-obraz > source { display: none; }
 html.js img.z-pelne:not(.z-wczytane) { opacity: 0; }
-img.z-pelne { transition: opacity .3s cubic-bezier(.22, .8, .2, 1); }
+img.z-pelne { transition: opacity var(--t-dlugi) var(--rytm); }
 @media (prefers-reduced-motion: reduce) { img.z-pelne { transition: none; } }
 a { color: var(--ink); }
 a:hover { color: var(--primary); }
@@ -138,11 +138,11 @@ h1, h2, h3, h4 { color: var(--ink); line-height: 1.2; letter-spacing: -0.01em; }
 /* Pływający nagłówek: zostaje u góry przy przewijaniu; kotwice i spis treści omijają jego wysokość. */
 html { scroll-padding-top: calc(var(--hdr-h) + 8px); }
 body > main { flex: 1 0 auto; }
-.hdr { position: sticky; top: 0; z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); transition: background-color .25s, border-color .25s, box-shadow .2s; }
+.hdr { position: sticky; top: 0; z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); transition: background-color var(--t-sredni) var(--rytm), border-color var(--t-sredni) var(--rytm), box-shadow var(--t-sredni) var(--rytm); }
 .hdr.przewiniety { box-shadow: 0 4px 18px rgb(0 0 0 / .08); }
 :root[data-theme='dark'] .hdr.przewiniety { box-shadow: 0 4px 18px rgb(0 0 0 / .45); }
 /* Strona główna: nagłówek na zdjęciu (przyciemnionym u góry), po przewinięciu kawałka — białe tło. Bez JS zwykły nagłówek. */
-.js .hdr-foto { margin-bottom: calc(-1 * var(--hdr-h)); transition: background-color .25s, border-color .25s, box-shadow .2s; }
+.js .hdr-foto { margin-bottom: calc(-1 * var(--hdr-h)); transition: background-color var(--t-sredni) var(--rytm), border-color var(--t-sredni) var(--rytm), box-shadow var(--t-sredni) var(--rytm); }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) { background: transparent; border-bottom-color: transparent; }
 .js .hdr.hdr-stopka:not(.menu-otwarte) { background: var(--footer-bg); border-bottom-color: transparent; box-shadow: none; }
 .js .hdr.hdr-stopka:not(.menu-otwarte) .burger { background: rgb(255 255 255 / .14); }
@@ -155,7 +155,7 @@ body > main { flex: 1 0 auto; }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .hdr-search, .js .hdr.hdr-stopka:not(.menu-otwarte) .hdr-search { background: rgb(0 0 0 / .62); color: rgb(255 255 255 / .9); }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .hdr-search input, .js .hdr.hdr-stopka:not(.menu-otwarte) .hdr-search input { color: #fff; }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .hdr-search input::placeholder, .js .hdr.hdr-stopka:not(.menu-otwarte) .hdr-search input::placeholder { color: rgb(255 255 255 / .8); }
-.hdr .brand-name, .hdr .brand-sub, .hdr .nav > a, .hdr .nav-pill, .hdr .icon-btn { transition: color .25s, background-color .25s; }
+.hdr .brand-name, .hdr .brand-sub, .hdr .nav > a, .hdr .nav-pill, .hdr .icon-btn { transition: color var(--t-sredni) var(--rytm), background-color var(--t-sredni) var(--rytm); }
 .hdr-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 70px; }
 /* nagłówek szerszy niż treść strony, żeby logotyp, nazwa i menu miały oddech */
 .hdr > .wrap.hdr-row { max-width: 1520px; }
@@ -165,8 +165,8 @@ body > main { flex: 1 0 auto; }
 .brand-uwr { display: flex; flex: none; }
 .brand-uwr, .brand-txt { text-decoration: none; }
 /* pełny logotyp UWr (orzeł + napis) jako maska w kolorze UWr; na zdjęciu i przy stopce — biały; na telefonie samo godło */
-.brand-logo { display: block; flex: none; height: 40px; aspect-ratio: 500 / 160; background: var(--uwr); -webkit-mask: var(--logo-pelne) left center / contain no-repeat; mask: var(--logo-pelne) left center / contain no-repeat; transition: background-color .25s; }
-.brand-uwr-logo + .brand-txt { padding-left: 12px; border-left: 1px solid var(--line); transition: border-color .25s; }
+.brand-logo { display: block; flex: none; height: 40px; aspect-ratio: 500 / 160; background: var(--uwr); -webkit-mask: var(--logo-pelne) left center / contain no-repeat; mask: var(--logo-pelne) left center / contain no-repeat; transition: background-color var(--t-sredni) var(--rytm); }
+.brand-uwr-logo + .brand-txt { padding-left: 12px; border-left: 1px solid var(--line); transition: border-color var(--t-sredni) var(--rytm); }
 @media (max-width: 640px) {
   .brand-logo { aspect-ratio: 1; -webkit-mask-image: var(--logo-godlo); mask-image: var(--logo-godlo); }
   .brand-uwr-logo + .brand-txt { padding-left: 0; border-left: 0; }
@@ -179,7 +179,7 @@ body > main { flex: 1 0 auto; }
 .brand-sub { font-size: 13px; font-weight: 500; color: var(--muted); }
 /* pozycja działu: napis = link do strony działu, strzałka = rozwinięcie; lista także po najechaniu myszką */
 .nav-item.open > .nav-pill { background: var(--surface); color: var(--ink); }
-.nav-item.open > .dropdown { visibility: visible; opacity: 1; pointer-events: auto; transition: opacity .12s, visibility 0s; }
+.nav-item.open > .dropdown { visibility: visible; opacity: 1; pointer-events: auto; transition: opacity var(--t-krotki) var(--rytm), visibility 0s; }
 .nav-item:not(.bez-hover):hover .nav-arrow .chev, .nav-item.open .nav-arrow .chev { transform: rotate(180deg); }
 .hdr-row { position: relative; }
 /* link zewnętrzny: zwykły tekst z ikonką za ostatnim słowem (flex odsuwał ikonkę do prawej krawędzi, gdy napis się zawijał) */
@@ -197,11 +197,11 @@ body > main { flex: 1 0 auto; }
 .mnav { position: fixed; top: var(--menu-top, var(--hdr-h)); right: 0; bottom: 0; z-index: 31; width: min(86vw, 420px);
   padding: 8px clamp(16px, 5vw, 24px) 24px; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); color: var(--ink);
   border-left: 1px solid var(--line); box-shadow: -14px 0 36px rgb(0 0 0 / .2);
-  transform: translateX(100%); visibility: hidden; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .3s; }
-.mnav.open { transform: none; visibility: visible; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+  transform: translateX(100%); visibility: hidden; transition: transform var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi); }
+.mnav.open { transform: none; visibility: visible; transition: transform var(--t-dlugi) var(--rytm), visibility 0s; }
 .mnav-tlo { position: fixed; inset: var(--menu-top, var(--hdr-h)) 0 0 0; z-index: 29; background: rgb(6 11 22 / .5);
-  opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s linear .3s; }
-.mnav-tlo.open { opacity: 1; visibility: visible; transition: opacity .3s, visibility 0s; }
+  opacity: 0; visibility: hidden; transition: opacity var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi); }
+.mnav-tlo.open { opacity: 1; visibility: visible; transition: opacity var(--t-dlugi) var(--rytm), visibility 0s; }
 html.menu-otwarte { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .mnav, .mnav.open, .mnav-tlo, .mnav-tlo.open { transition: none; } }
 .mnav .mitem, .mnav > a { border-bottom: 1px solid var(--line); }
@@ -214,7 +214,7 @@ html.menu-otwarte { overflow: hidden; }
 .mnav .mgroup { padding: 0 0 12px 12px; }
 .mnav .mgroup h3 { margin: 10px 0 2px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--menu-grupa); }
 .mnav .mgroup a { display: flex; align-items: center; gap: 6px; min-height: 40px; font-weight: 600; text-decoration: none; color: var(--ink); }
-.chev { transition: transform .15s; }
+.chev { transition: transform var(--t-krotki) var(--rytm); }
 details[open] > summary .chev { transform: rotate(180deg); }
 @media (max-width: 1180px) {
   .burger { display: inline-flex; }
@@ -524,7 +524,7 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 .callout .prose { color: var(--text); }
 /* Karta z podstroną: cała klikalna (link w tytule rozciągnięty na kartę), podświetlenie po najechaniu */
 .spec-link:hover .link-arrow svg { transform: translateX(3px); }
-.spec-link .link-arrow svg { transition: transform .15s; }
+.spec-link .link-arrow svg { transition: transform var(--t-krotki) var(--rytm); }
 @media (prefers-reduced-motion: reduce) { .spec-link .link-arrow svg { transition: none; transform: none !important; } }
 
 /* ---------- zapis na listę powiadomień (strona seminarium) ---------- */

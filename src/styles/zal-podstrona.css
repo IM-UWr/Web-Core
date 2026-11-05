@@ -27,7 +27,7 @@
   .z-spis-lista { position: relative; list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
   .z-spis-lista li { margin: 0; }
   .z-spis-lista li[hidden] { display: none; }
-  .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; transition: color .2s; }
+  .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
   .z-spis-lista a:hover { color: var(--ink); }
   .z-spis-lista a[aria-current] { color: var(--ink); font-weight: 700; }
   .z-spis-lista a:focus-visible { outline: 2px solid var(--d-a); outline-offset: -2px; }
@@ -56,7 +56,7 @@
   html:not(.js) .z-spis-przelacz { display: none; }
   .z-spis-przelacz { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; margin: 0; padding: 0;
     border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; }
-  .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform .2s; }
+  .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform var(--t-sredni) var(--rytm); }
   .z-spis-otwarty .z-spis-przelacz svg { transform: rotate(180deg); }
   .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
   .z-spis-lista { list-style: none; margin: 0 0 14px; padding: 0; border-left: 1px solid var(--line); }

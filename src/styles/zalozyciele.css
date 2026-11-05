@@ -246,7 +246,7 @@
   @media (prefers-reduced-motion: reduce) {
     .z-szkic .tusz path, .z-szkic .detale { transition: none !important; }
     .z-podpis.pisze mask path { animation: none !important; }
-    [data-z-baner-dzialu].z-gotowe .z-szkic-ramka, [data-z-baner-dzialu].z-gotowe .z-podpis-ramka { animation: z-rozjasnij .15s ease-out; }
+    [data-z-baner-dzialu].z-gotowe .z-szkic-ramka, [data-z-baner-dzialu].z-gotowe .z-podpis-ramka { animation: z-rozjasnij var(--t-krotki) var(--rytm); }
   }
   @keyframes z-rozjasnij { from { opacity: 0; } }
 
@@ -335,8 +335,8 @@
      na okładce w obrębie okładki, przy pasku stały na całą wysokość okna; przy jasnym pasku jasny (.z-menu-jasny) */
   .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; width: min(460px, 40%); padding: 76px 36px 28px; overflow-y: auto; text-align: left;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
-    transform: translateX(100%); visibility: hidden; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s linear .35s, background-color .25s, color .25s; }
-  .z-menu.otwarte { transform: none; visibility: visible; transition: transform .35s cubic-bezier(.2,.8,.2,1), visibility 0s, background-color .25s, color .25s; }
+    transform: translateX(100%); visibility: hidden; transition: transform var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi), background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
+  .z-menu.otwarte { transform: none; visibility: visible; transition: transform var(--t-dlugi) var(--rytm), visibility 0s, background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
   .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: max(64px, calc((100vw - var(--kol)) / 2)); }
   .z-menu .z-zamknij { position: absolute; top: 18px; right: 32px; }
   /* przy pasku krzyżyk w miejscu hamburgera */
@@ -408,7 +408,7 @@
   /* po najechaniu nazwa zostaje biała (globalne a:hover dawało granat na granacie) */
   .z-okl-dz:hover { color: #fff; }
   .z-okl-dz::before { content: ''; position: absolute; inset: 0; background: radial-gradient(52% 50% at 50% 34%, color-mix(in srgb, var(--d-g) 95%, transparent) 0, color-mix(in srgb, var(--d-g) 40%, transparent) 58%, transparent 100%);
-    opacity: 0; transition: opacity .6s; pointer-events: none; }
+    opacity: 0; transition: opacity .6s var(--rytm); pointer-events: none; }
   .z-okl-dz:hover::before, .z-okl-dz:focus-visible::before { opacity: 1; }
   .z-okl-dz > * { position: relative; }
   .z-okl-szkic { --sz: clamp(84px, calc(var(--h) * .18), 176px); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto clamp(4px, calc(var(--h) * .01), 10px); }
@@ -431,7 +431,7 @@
   .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::before { opacity: 1; }
   .z-okl-dz:focus-visible .z-okl-nazwa span { outline: 2px solid var(--d-j); outline-offset: 6px; }
   .z-okl-dz .slot { position: relative; display: block; height: 2.8em; margin-top: 6px; font-size: clamp(13.5px, calc(var(--h) * .021), 16px); line-height: 1.4; }
-  .z-okl-dz .slot > span { position: absolute; inset: 0; transition: opacity .4s, transform .4s; }
+  .z-okl-dz .slot > span { position: absolute; inset: 0; transition: opacity var(--t-dlugi) var(--rytm), transform var(--t-dlugi) var(--rytm); }
   .z-okl-dz .haslo-dz { color: var(--na-ciemnym-2); }
   .z-okl-dz .patron { opacity: 0; transform: translateY(4px); color: var(--na-ciemnym-2); }
   .z-okl-dz .patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; color: #fff; }
@@ -439,18 +439,18 @@
   .z-okl-dz:is(:hover, :focus-visible) .patron { opacity: 1; transform: none; }
   /* barwienie zdjęcia po najechaniu na dział (zlecenie 11, zalecenie 1; prototyp „Barwione”): warstwa nad zdjęciem, pod
      ciemnym polem; kolor --d-j z data-dzial warstwy (okladka.ts) */
-  .z-barwa { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: var(--d-j, transparent); mix-blend-mode: soft-light; opacity: 0; transition: opacity .6s; }
+  .z-barwa { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: var(--d-j, transparent); mix-blend-mode: soft-light; opacity: 0; transition: opacity .6s var(--rytm); }
   .z-okladka.zabarwione .z-barwa { opacity: .5; }
   /* liczby nad „Szybkim dostępem” (zlecenie 11, zalecenie 15; prototyp v75, wariant „przygaszone”): nie konkurują z działami */
   .z-okl-liczby { position: absolute; left: 50%; bottom: calc(clamp(10px, calc(var(--h) * .022), 24px) + 36px); transform: translateX(-50%); display: flex; align-items: baseline; white-space: nowrap; }
-  .z-okl-liczby a { position: relative; display: inline-flex; align-items: baseline; gap: 6px; padding: 3px 16px; font-size: 12.5px; color: rgb(255 255 255 / .5); text-decoration: none; transition: color .15s; }
+  .z-okl-liczby a { position: relative; display: inline-flex; align-items: baseline; gap: 6px; padding: 3px 16px; font-size: 12.5px; color: rgb(255 255 255 / .5); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
   .z-okl-liczby a + a::before { content: ''; position: absolute; left: 0; top: 7px; bottom: 5px; width: 1px; background: rgb(255 255 255 / .14); }
-  .z-okl-liczby b { font-family: var(--f-text); font-weight: 700; font-size: 14px; color: rgb(255 255 255 / .72); transition: color .15s; }
+  .z-okl-liczby b { font-family: var(--f-text); font-weight: 700; font-size: 14px; color: rgb(255 255 255 / .72); transition: color var(--t-krotki) var(--rytm); }
   .z-okl-liczby a:hover, .z-okl-liczby a:hover b { color: #fff; }
   .z-okl-liczby a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
   /* opis patrona środkowych działów (3 linie) sięga przy niższych oknach (np. 1366×768, 1280×720) do linii liczb —
      wtedy liczby na chwilę gasną; dział ma pierwszeństwo */
-  .z-okl-liczby { transition: opacity .25s; }
+  .z-okl-liczby { transition: opacity var(--t-sredni) var(--rytm); }
   .z-okladka:has(.z-okl-dz:is(:nth-child(2), :nth-child(3)):is(:hover, :focus-visible)) .z-okl-liczby { opacity: 0; }
   .z-strzalka { position: absolute; left: 50%; bottom: clamp(10px, calc(var(--h) * .022), 24px); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px;
     padding: 6px 12px; font-size: 14px; color: rgb(255 255 255 / .74); text-decoration: none; white-space: nowrap; }

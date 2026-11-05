@@ -34,7 +34,7 @@
   .z-dz-rzad + .z-dz-rzad { border-top: 1px solid color-mix(in srgb, var(--d-a) 20%, transparent); }
   .z-dz-rzad h3 { margin: 0; font-family: var(--f-text); font-size: 13.5px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
   .z-dz .z-dz-rzad ul { display: flex; flex-wrap: wrap; gap: 2px 24px; }
-  .z-dz-rzad a { font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink); white-space: nowrap; transition: color .15s; }
+  .z-dz-rzad a { font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink); white-space: nowrap; transition: color var(--t-krotki) var(--rytm); }
   .z-dz-rzad a:hover { color: var(--d-a); }
   .z-dz-rzad a.zew::after { content: ' ↗'; font-family: var(--f-text); font-size: .8em; color: var(--muted); }
   .z-dz-rekr { display: flex; flex-direction: column; gap: 2px; padding: 16px 22px; background: var(--d-a); color: #fff; font-family: var(--f-display);
@@ -84,7 +84,7 @@
   .z-dz-suk { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
   .z-dz-suk article { display: flex; flex-direction: column; }
   .z-dz-fot { display: grid; place-items: center; aspect-ratio: 3 / 2; overflow: hidden; background: var(--d-t); }
-  .z-dz-fot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+  .z-dz-fot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform var(--t-dlugi) var(--rytm); }
   .z-dz-suk article:hover .z-dz-fot img { transform: scale(1.03); }
   .z-dz-fot .z-sygnet { width: auto; height: 72%; }
   .z-dz-fot .z-sygnet path { fill: none; stroke: var(--d-a); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
