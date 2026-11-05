@@ -22,9 +22,16 @@
   .z-dz-rzad { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 8px 0; }
   .z-dz-rzad + .z-dz-rzad { border-top: 1px solid color-mix(in srgb, var(--d-a) 20%, transparent); }
   .z-dz-rzad h3 { margin: 0; font-family: var(--f-text); font-size: 13.5px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
-  .z-dz .z-dz-rzad ul { display: flex; flex-wrap: wrap; gap: 2px 24px; }
-  .z-dz-rzad a { font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink); white-space: nowrap; transition: color var(--t-krotki) var(--rytm); }
-  .z-dz-rzad a:hover { color: var(--d-a); }
+  .z-dz .z-dz-rzad ul { display: flex; flex-wrap: wrap; gap: 6px 24px; }
+  /* otoczka linku (zlecenie 17, punkt 3): większy obszar kliknięcia, ujemny margines zostawia napis w tym samym miejscu;
+     tło o ton mocniejsze od pasa, w ciemnym motywie ciemniejsze od pasa. Telefon ma te same otoczki (niżej tylko rozmiar pisma). */
+  .z-dz-rzad a { display: inline-block; margin: -4px -10px -5px; padding: 4px 10px 5px; border-radius: 5px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink); white-space: nowrap;
+    transition: color var(--t-krotki) var(--rytm), background-color var(--t-krotki) var(--rytm); }
+  .z-dz-rzad a:is(:hover, :active, :focus-visible) { color: var(--d-a); background-color: color-mix(in srgb, var(--d-a) 14%, var(--d-t)); }
+  :root[data-theme="dark"] .z-dz-rzad a:is(:hover, :active, :focus-visible) { background-color: color-mix(in oklab, var(--d-j) 5%, #18243b); }
+  .z-dz-rzad a:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  @media (prefers-reduced-motion: no-preference) { .z-dz-rzad a:active { transform: translateY(1px); } }
+  @media (prefers-reduced-motion: reduce) { .z-dz-rzad a { transition: none; } }
   /* podpis: domena partnera (Popularyzacja, zlecenie 15), przed strzałką */
   .z-dz-rzad a small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 500; color: var(--muted); }
   .z-dz-rzad a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: .8em; color: var(--muted); }
