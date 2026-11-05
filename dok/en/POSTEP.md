@@ -66,8 +66,9 @@ Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`). Audyt: `dok/en/RAPORT-EN.
   z zalecenia), nazwy przedmiotów z USOS w tekstach o studiach i w uwagach planu, nazwy własne (konkursy, szkoły,
   instytucje, adresy) oraz to, co czeka na decyzję (stopnie naukowe „prof. dr hab.”, „UWr” w nazwie strony, logo,
   tłumaczenia tytułów w nawiasach). Wpisy testowe („Testowe:”) zostają do usunięcia przez redakcję.
-- Wygląd bez zmian: polskie strony identyczne co do piksela (zrzuty komputera: 198/198 stron polskich i wspólnych),
-  na `/en` zmieniły się tylko teksty.
+- Wygląd bez zmian: zrzuty komputera po kroku 2 (1920/1536/1366 px, jasny i ciemny motyw) — wszystkie 192 zrzuty
+  32 stron polskich identyczne co do piksela z `wyglad/porzadki`; na 4 stronach `/en` z listy zmieniły się tylko teksty
+  (18 z 24 zrzutów; `/en/nauka/granty` bez zmian).
 - Sprawdzenie końcowe: `npm run build` OK, `astro check` — te same 3 błędy co na `wyglad/porzadki`, `sprawdz_tresci.py`
   OK (z nałożonymi łatkami).
 
