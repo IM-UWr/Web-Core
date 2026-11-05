@@ -415,9 +415,11 @@
 
   /* ---------- podstrona działu: treść bez kafelków (układ ze spisem z prawej — zal-podstrona.css) ---------- */
   .z-pd-tresc { min-width: 0; }
-  .z-pd-tresc > section { padding-bottom: 34px; margin-bottom: 30px; border-bottom: 1px solid var(--line); }
-  .z-pd-tresc > section:last-of-type { border-bottom: 0; }
-  .z-pd-tresc h2 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.6; color: var(--ink); }
+  /* sekcje i ich nagłówki według wzorca treści (zal-tresc.css) także na stronach z własnym blokiem (Władze, Projekty i granty —
+     zlecenie 11, zalecenie 14): kreska 1 px, 44 px nad nią i 40 px pod nią, nagłówek 32 px / 1,2, 16 px pod nim */
+  .z-pd-tresc > section { padding-bottom: 44px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
+  .z-pd-tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .z-pd-tresc h2 { margin: 0 0 16px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -.005em; color: var(--ink); }
   .z-pd-tresc .wst { margin: 0 0 26px; font-size: 17px; color: var(--text); }
   .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 72ch; }
   .z-pd-tresc a { color: var(--d-a); }

@@ -133,9 +133,6 @@
   .z-kont dd { margin: 0; font-size: 16px; color: var(--ink); }
   .z-sek-osoby .z-os { padding: 10px 0; border-top: 1px solid var(--line); }
   .z-sek-osoby .z-os .imie { font-size: 19px; }
-  .z-proza ul { padding-left: 20px; }
-  .z-proza li { margin: 3px 0; }
-  .z-proza li::marker { color: var(--d-a); }
   .z-zob { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 40px; }
   .z-zob li { break-inside: avoid; }
   .z-pd-tresc .z-zob a { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-size: 19px; color: var(--ink); text-decoration: none; }
@@ -172,12 +169,9 @@
 
   /* ---------- podstrona z nowym układem (Władze): bez bocznej nawigacji, schemat dyrekcji w dwóch kolumnach ---------- */
   .z-pd.z-wladze { padding: 18px 16px 24px; }
-  .z-pd.z-wladze .z-pd-tresc > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
-  .z-pd.z-wladze .z-pd-tresc > section:last-of-type { border-bottom: 0; }
-  .z-pd.z-wladze .z-pd-tresc h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
   .z-pd.z-wladze .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
-  .z-pd.z-wladze .z-pd-tresc :is(p, li) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
-  .z-pd.z-wladze .z-pd-tresc a { color: var(--d-a); }
+  .z-pd.z-wladze .z-pd-tresc :is(p, li):not(.tresc *) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-pd.z-wladze .z-pd-tresc a:not(.tresc *) { color: var(--d-a); }
   .z-pd.z-wladze .z-drzewo .z-dyr { width: 100%; margin-bottom: 30px; padding: 14px; }
   .z-pd.z-wladze .z-drzewo .z-dyr:has(.fot) { grid-template-columns: 84px minmax(0, 1fr); column-gap: 14px; width: 100%; }
   .z-pd.z-wladze .z-drzewo .z-dyr .fot { width: 84px; height: 105px; }

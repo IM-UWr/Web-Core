@@ -69,10 +69,10 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
   </section>
 )}
 {kadencjaHtml && (
-  <section id="z-kadencja" aria-labelledby="z-kadencja-h"><h2 id="z-kadencja-h">{T('Kadencja', 'Term of office')}</h2><div class="z-proza" set:html={kadencjaHtml} /></section>
+  <section id="z-kadencja" aria-labelledby="z-kadencja-h"><h2 id="z-kadencja-h">{T('Kadencja', 'Term of office')}</h2><div class="z-proza tresc"><div class="prose" set:html={kadencjaHtml} /></div></section>
 )}
 {radaHtml && (
-  <section id="z-rada" aria-labelledby="z-rada-h"><h2 id="z-rada-h">{radaTytul}</h2><div class="z-proza" set:html={radaHtml} /></section>
+  <section id="z-rada" aria-labelledby="z-rada-h"><h2 id="z-rada-h">{radaTytul}</h2><div class="z-proza tresc"><div class="prose" set:html={radaHtml} /></div></section>
 )}
 {linki.length > 0 && (
   <section id="z-zobacz" aria-labelledby="z-zobacz-h">

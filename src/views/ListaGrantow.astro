@@ -41,7 +41,7 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
   </Fragment>
-    {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+    {wstep.length > 0 && <section class="tresc">{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
 
     <section id="z-realizowane" aria-labelledby="z-h-realizowane">
       <h2 id="z-h-realizowane">{T('Realizowane', 'Ongoing')} ({realizowane.length})</h2>

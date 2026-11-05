@@ -64,9 +64,10 @@
   .z-spis-lista a:hover, .z-spis-lista a[aria-current] { color: var(--ink); }
   .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: calc(var(--hdr-h) + 16px); }
   /* treść bez kafelków (jak Władze z łatki telefonu): sekcje rozdzielone cienką linią, nagłówki Brygadą */
-  .z-pd-tresc > section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
-  .z-pd-tresc > section:last-of-type { border-bottom: 0; }
-  .z-pd-tresc h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  /* sekcje według wzorca treści na telefonie (zalecenie 14): 30 px nad kreską, 28 px pod nią, nagłówek 26 px, 12 px pod nim */
+  .z-pd-tresc > section { padding-bottom: 30px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .z-pd-tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .z-pd-tresc h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
   .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
   .z-pd-tresc :is(p, li) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
   .z-pd-tresc a { color: var(--d-a); }

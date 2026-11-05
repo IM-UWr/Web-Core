@@ -25,7 +25,9 @@
 .tresc p { margin: 0 0 14px; max-width: 70ch; font-size: inherit; line-height: inherit; color: inherit; }
 .tresc p.wst { color: var(--ink); }
 /* pierwszy akapit: odstęp i stopień jak reszta tekstu (bez .z-pd-tresc .wst z zalozyciele.css i zal-podstrona.css) */
-.z-pd-tresc.tresc .wst { margin: 0 0 14px; font-size: inherit; }
+:is(.z-pd-tresc.tresc, .z-pd-tresc .tresc) .wst { margin: 0 0 14px; font-size: inherit; }
+/* proza z CMS w sekcji strony z własnym blokiem (Władze: Kadencja, Rada): pierwszy akapit bez wyróżnienia — to nie początek strony */
+body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
   text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); transition: color .15s; }
 .tresc a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
