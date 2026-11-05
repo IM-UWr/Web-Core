@@ -727,6 +727,17 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .in-tba section { padding: 22px 0 26px; border-bottom: 1px solid var(--m-line); }
 .in-tba h4 { font-size: 28px; }
 .in-tba p { margin: 6px 0 0; font-size: 15.5px; color: var(--m-muted); font-style: italic; }
+/* propozycja tekstu Popularyzacji (5.11, ciekawostki/steinhaus/TEKST-POPULARYZACJA.md) */
+.in-tba.pop-nowy section { padding: 24px 0 28px; }
+.in-tba.pop-nowy p { margin: 10px 0 0; font-size: 16px; line-height: 1.62; font-style: normal; color: var(--m-text); }
+.in-tba.pop-nowy ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 16px; line-height: 1.55; color: var(--m-text); }
+.in-tba.pop-nowy li b { color: var(--m-ink); }
+.in-tba.pop-nowy p.pop-uz { margin-top: 14px; padding-left: 10px; border-left: 2px solid var(--d-a); font-size: 13.5px; line-height: 1.5; color: var(--m-muted); }
+.in-tba.pop-nowy p.pop-uz b { color: var(--d-a); font-weight: 700; }
+.pop-linki { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; font-size: 15px; font-weight: 600; }
+.pop-linki a { color: var(--d-a); text-decoration: none; }
+.pop-linki a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pop-linki a:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
 
 a.en { display: inline-flex !important; align-items: center; gap: 6px; }
 a.en .flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-shadow: 0 0 0 1px rgb(0 0 0 / .12); }
@@ -1537,6 +1548,10 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
       <button type="button" data-v="wiersz" aria-pressed="false">4. wiersz w pasie</button>
       <button type="button" data-v="baner" aria-pressed="false">przycisk w banerze</button>
       <button type="button" data-v="pas" aria-pressed="true">przycisk w pasie menu</button>
+    </div></div>
+    <div class="grupa" id="wybor-pop" hidden><span>Tekst Popularyzacji</span><div class="seg" data-ustaw="popTekst">
+      <button type="button" data-v="nowy" aria-pressed="true">nowy (propozycja)</button>
+      <button type="button" data-v="obecny" aria-pressed="false">obecny</button>
     </div></div>
     <div class="grupa" id="wybor-strony" hidden><span>Strona</span><div class="seg" data-ustaw="strona">
       <button type="button" id="s-dzial" data-v="dzial" aria-pressed="true">strona działu</button>
@@ -2485,6 +2500,20 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   const OBECNA = { instytut: '{{OBECNA_INSTYTUT}}', nauka: '{{OBECNA_NAUKA}}', studia: '{{OBECNA_STUDIA}}', popularyzacja: '{{OBECNA_POPULARYZACJA}}', wladze: '{{OBECNA_WLADZE}}', granty: '{{OBECNA_GRANTY}}', plan: '{{OBECNA_PLAN}}' };
   let baner = 'haslo';
   const dzien = (d, m) => `<div class="dz">${d}<small>${m}</small></div>`;
+  let popTekst = 'nowy';
+  const POP_LINKI = { fmw: ['Fundacja Matematyków Wrocławskich', 'https://fmw.math.uni.wroc.pl/'], portal: ['Wrocławski Portal Matematyczny', 'https://www.matematyka.wroc.pl/'], ptm: ['Wrocławski Oddział PTM', 'https://ptm.math.uni.wroc.pl/'] };
+  const POP_NOWY = {
+    haslo: 'Matematyka dla uczniów, nauczycieli i wszystkich',
+    liczby: [['od 1991', 'Wrocławskie Spotkania Matematyczne'], ['od 1989', 'Zimowe Szkoły Matematyki'], ['od 2004', 'seminarium I³ dla nauczycieli']],
+    wstep: 'Hugo Steinhaus, jeden z założycieli wrocławskiej matematyki, wydał w 1938 r. „Kalejdoskop matematyczny”: książkę z samych niemal obrazków, bez dowodów. Dziś matematycy z Instytutu, razem z Fundacją Matematyków Wrocławskich, Wydziałem Matematyki i Informatyki UWr i Wrocławskim Oddziałem PTM, prowadzą kółka i obozy dla uczniów, konkursy, wykłady popularnonaukowe oraz szkolenia dla nauczycieli. Terminy i zapisy są na stronach partnerów.',
+    skrot: [['Kółka i obozy', 'dla uczniów, z Fundacją'], ['Ligi zadaniowe', 'na Wrocławskim Portalu Matematycznym'], ['Pracownia Dydaktyki', 'kształcenie przyszłych nauczycieli']],
+    sekcje: [
+      { h: 'Dla uczniów', p: ['Zadanie ze „Stu zadań” Steinhausa (1958): postaw na odcinku punkty po kolei tak, żeby dwa pierwsze leżały w różnych połowach, trzy pierwsze w różnych trzecich częściach, i tak dalej. Siedemnaście się da, osiemnaście już nie.', 'Fundacja prowadzi Międzyszkolne Kółka Matematyczne, konkursy i obozy, a na Portalu są ligi zadaniowe, artykuły i zapowiedzi.'], uz: 'czy podać tu najbliższy termin zapisów na kółka.', l: ['fmw', 'portal'] },
+      { h: 'Dla nauczycieli', p: ['W Instytucie odbywa się seminarium I³ dla nauczycieli i studentów matematyki, prowadzone od semestru letniego 2003/2004. Na stronie Fundacji są też kursy, m.in. o specyficznych trudnościach w uczeniu się matematyki i o programowaniu w klasach 1–3; Fundacja współorganizuje również Szkołę Matematyki Poglądowej.', 'Przyszłych nauczycieli kształci w Instytucie Pracownia Dydaktyki i Popularyzacji Matematyki.'], uz: 'aktualny termin i sala seminarium I³. Strona Fundacji podaje wtorki 17:00–18:30 w sali 601, ale jej statystyka kończy się na roku 2018/19.', l: ['fmw'] },
+      { h: 'Dla wszystkich', p: ['W Instytucie od 1991 r. raz w miesiącu w roku szkolnym odbywają się popularnonaukowe Wrocławskie Spotkania Matematyczne. Wykłady prowadzą pracownicy i doktoranci Instytutu oraz goście z innych uczelni.', 'Wrocławski Portal Matematyczny publikuje artykuły i ciekawostki, a w dziale „Na czasie” podaje najbliższe terminy.'], uz: 'temat i data najbliższego spotkania, jeśli mają tu być.', l: ['portal', 'fmw'] },
+      { h: 'Organizatorzy', li: [['Fundacja Matematyków Wrocławskich', 'działa od 2007 r. Przyznaje stypendia, prowadzi kółka, organizuje konkursy i obozy, szkoli nauczycieli i wspiera wydawanie materiałów o matematyce.'], ['Wrocławski Portal Matematyczny', 'artykuły, zadania i zapowiedzi wydarzeń.'], ['Wrocławski Oddział PTM', 'prowadzi konkurs na prace studenckie, który w 1967 r. zainicjował Józef Łukaszewicz, uczeń Steinhausa.'], ['Pracownia Dydaktyki i Popularyzacji Matematyki', 'jednostka Instytutu zajmująca się dydaktyką, kształceniem przyszłych nauczycieli i popularyzacją matematyki wśród uczniów i nauczycieli.']], uz: 'osoba do kontaktu dla szkół, jeśli ma być podana.', l: ['fmw', 'portal', 'ptm'] }
+    ]
+  };
   function htmlReszta(dz) {
     if (dz === 'instytut') return htmlResztaInst();
     if (dz === 'nauka') return `<section class="in-sek"><div class="glowa"><h4>Realizowane projekty (5)</h4><div class="linki"><a href="#">Wszystkie projekty i granty →</a></div></div>
@@ -2506,6 +2535,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
         ['17', 'paź 2026', 'Ogłoszenie', 'Rusza tutornia', 'Od 19 października w sali 202 starsi studenci pomagają w problemach matematycznych — szczególnie osobom z pierwszego roku.'],
         ['16', 'paź 2026', 'Kariera', 'Praca dla korepetytora z matematyki', 'Firma JUBSOFT Piotr Zięba (marka Korepetycje Matematyki) zatrudni studentów matematyki na stanowisku korepetytora matematyki.']
       ].map(([d, m, r, t, z]) => `<div class="in-wiersz">${dzien(d, m)}<div><div class="rodz">${r}</div><h3>${t}</h3><p>${z}</p></div></div>`).join('')}</div></section>`;
+    if (popTekst === 'nowy') return `<section class="in-sek" style="border-top:0;padding-top:10px"><div class="in-tba pop-nowy">${POP_NOWY.sekcje.map((x) => `<section><h4>${x.h}</h4>${(x.p || []).map((t) => `<p>${t}</p>`).join('')}${x.li ? `<ul>${x.li.map(([b, t]) => `<li><b>${b}:</b> ${t}</li>`).join('')}</ul>` : ''}<p class="pop-uz"><b>Do uzupełnienia:</b> ${x.uz}</p><div class="pop-linki">${x.l.map((k) => `<a href="${POP_LINKI[k][1]}" target="_blank" rel="noopener">${POP_LINKI[k][0]} ↗</a>`).join('')}</div></section>`).join('')}</div></section>`;
     return `<section class="in-sek" style="border-top:0;padding-top:10px"><div class="in-tba">${['Dla uczniów', 'Dla nauczycieli', 'Dla wszystkich', 'Organizatorzy'].map((h) => `<section><h4>${h}</h4><p>To be announced</p></section>`).join('')}</div></section>`;
   }
   const SALE = { instytut: 'EM', nauka: 'WS', studia: 'B', popularyzacja: 'HS' }; // sale wykładowe nazwane od patronów; B = Knaster do sprawdzenia
@@ -2627,12 +2657,13 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
   function rysujInstytut() {
     const dz = dzial, f = IN_FOTO[dz], w = dz === 'instytut' ? wariantInst : '4';
     const d = dz === 'instytut' ? { ...D.instytut, tytul: 'O Instytucie', tekst: IN_INST.tekst, skrot: IN_INST.skrot }
-      : dz === 'popularyzacja' ? { ...D[dz], liczby: [], tekst: [], skrot: [] } : { ...D[dz], tekst: IN_DANE[dz].tekst, skrot: IN_DANE[dz].skrot };
+      : dz === 'popularyzacja' ? (popTekst === 'nowy' ? { ...D[dz], haslo: POP_NOWY.haslo, liczby: POP_NOWY.liczby, tekst: [POP_NOWY.wstep], skrot: POP_NOWY.skrot } : { ...D[dz], liczby: [], tekst: [], skrot: [] }) : { ...D[dz], tekst: IN_DANE[dz].tekst, skrot: IN_DANE[dz].skrot };
     const obecna = wersja === 'obecna', pod = (strona === 'pod' || (strona === 'wzor' && dz === 'studia')) && !!PODSTRONY[dz];
     const pierwsze = !pod && !obecna && w === '4' && pierwszeWejscie(dz);
     $('#wybor-strony').hidden = !PODSTRONY[dz];
     $('#wybor-menu').hidden = pod || dz === 'popularyzacja';
     $('#wybor-rekr').hidden = pod || dz !== 'studia';
+    $('#wybor-pop').hidden = dz !== 'popularyzacja';
     $('#wybor-nagl').hidden = !pod; $('#wybor-zdjec').hidden = !pod; $('#wybor-boku').hidden = !pod;
     $('#v-instytut').classList.toggle('n-jasny', pod && naglowek === 'jasny');
     $('#in-nowa').hidden = obecna; $('#in-obecna').hidden = !obecna;
@@ -3041,6 +3072,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     $('#wybor-strony').hidden = widok !== 'instytut';
     $('#wybor-menu').hidden = widok !== 'instytut';
     $('#wybor-rekr').hidden = widok !== 'instytut' || dzial !== 'studia';
+    $('#wybor-pop').hidden = widok !== 'instytut' || dzial !== 'popularyzacja';
     $('#wybor-anim').hidden = widok !== 'instytut';
     $('#wybor-losuj').hidden = widok !== 'instytut';
     if (widok === 'instytut') rysujInstytut();
@@ -3083,6 +3115,7 @@ span.pk-pole { min-width: 200px; justify-content: space-between; color: var(--m-
     if (co === 'zdjeciaWl') { zdjeciaWl = v === 'tak'; rysujInstytut(); skaluj(); }
     if (co === 'strona') { strona = v; if (v === 'wzor' && dzial !== 'studia') { document.querySelector('#d-studia').click(); } else { rysujInstytut(); skaluj(); } window.scrollTo(0, 0); }
     if (co === 'rekr') { rekrNaStudiach = v; rysujInstytut(); skaluj(); }
+    if (co === 'popTekst') { popTekst = v; rysujInstytut(); skaluj(); }
     if (co === 'menuDz') { menuDz = v; mzSekcja = 0; rysujInstytut(); skaluj(); }
     if (co === 'tlo') document.documentElement.dataset.tlo = v;
     if (co === 'ciemny') { if (v === 'obecny') delete document.documentElement.dataset.ciemny; else document.documentElement.dataset.ciemny = v; }
