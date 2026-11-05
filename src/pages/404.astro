@@ -15,9 +15,9 @@ import { t } from '../lib/i18n';
     <p style="font-size:18px;max-width:760px">{t('pl', 'nieZnalezionoOpis')}</p>
     <p lang="en" class="muted">{t('en', 'nieZnalezionoOpis')}</p>
     <div class="btn-row" style="margin-top:24px">
-      <a class="btn btn-primary" href={u('/')} data-en={u('/en/')}>{t('pl', 'powrot')} · <span lang="en">{t('en', 'powrot')}</span></a>
-      <a class="btn" href={u('/szukaj')} data-en={u('/en/szukaj')}>{t('pl', 'szukajNaStronie')} · <span lang="en">{t('en', 'szukajNaStronie')}</span></a>
-      <Link class="btn" href={ustawienia.archiwum}>{t('pl', 'archiwum')} · <span lang="en">{t('en', 'archiwum')}</span></Link>
+      <a class="btn btn-primary" href={u('/')} data-en={u('/en/')}><span>{t('pl', 'powrot')} · <span lang="en">{t('en', 'powrot')}</span></span></a>
+      <a class="btn" href={u('/szukaj')} data-en={u('/en/szukaj')}><span>{t('pl', 'szukajNaStronie')} · <span lang="en">{t('en', 'szukajNaStronie')}</span></span></a>
+      <Link class="btn" href={ustawienia.archiwum}><span>{t('pl', 'archiwum')} · <span lang="en">{t('en', 'archiwum')}</span></span></Link>
     </div>
   </div>
   <script is:inline>
