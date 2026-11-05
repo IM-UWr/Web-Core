@@ -3,7 +3,7 @@
 // Baner: imię i nazwisko, hasło, liczby (data, godzina, recenzje) i tytuł rozprawy (na każdej szerokości).
 // Treść: termin jednym wzorem daty (jak zal/dzial/Wiersz.astro: dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”)
 // z parami Kiedy / Gdzie / Promotor (dl.para), po terminie — „Wydarzenie się odbyło”; zdjęcie, opis, dokumenty (ul.pliki),
-// ogłoszenie w BIP i data publikacji. Na /en treść z pola tresc_en albo zaproszenie po angielsku z danych obrony. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc).
+// ogłoszenie w BIP i data publikacji. Tekst: na /en pole tresc_en, po polsku treść wpisu, a gdy puste, tekst z danych obrony dobierający czas. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc).
 // Bez spisu „Na tej stronie” (mniej niż 2 sekcje z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -23,7 +23,7 @@ const d = obrona.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 // tytuł karty (<title>): „Obrona doktoratu: …”; w banerze samo imię i nazwisko
-const { Content, htmlEn, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
+const { Content, html, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
   const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
@@ -57,8 +57,8 @@ const typPliku = (a: string) => {
         {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
       </figure>
     )}
-    {/* na /en: tresc_en albo zaproszenie po angielsku złożone z danych (src/lib/widoki/obrona.ts) */}
-    <div class="prose opis">{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
+    {/* tekst z danych albo tresc_en (src/lib/widoki/obrona.ts); inaczej treść wpisu */}
+    <div class="prose opis">{html ? <Fragment set:html={html} /> : <Content />}</div>
   </section>
 
   {(dokumenty.length > 0 || d.bip || d.data_ogloszenia) && (

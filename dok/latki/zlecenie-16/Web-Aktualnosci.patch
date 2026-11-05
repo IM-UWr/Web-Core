@@ -1,3 +1,16 @@
+diff --git a/.pages.yml b/.pages.yml
+index 9c6b021..6dceb36 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -270,7 +270,7 @@ content:
+       values: *id001
+     description: (lista z innego repozytorium — nowa pozycja wymaga dopisania w konfiguracji)
+   - name: body
+-    label: Dodatkowy opis (opcjonalnie)
++    label: 'Opis (opcjonalnie; puste = zaproszenie, a po terminie informacja o odbytej obronie, złożone z danych. Wpisany tekst nie zmieni się sam po terminie)'
+     type: rich-text
+     options:
+       format: markdown
 diff --git a/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md b/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md
 index c595d95..f63b1f7 100644
 --- a/src/content/aktualnosci/2015-01-01-blazej-wrobel-laureatem-nagrody-ptm.md
@@ -411,10 +424,10 @@ index 6c72b01..001aec6 100644
  
    Congratulations to the winners and their supervisors.
 diff --git a/src/content/obrony/2026-06-18-maciej-korpalski.md b/src/content/obrony/2026-06-18-maciej-korpalski.md
-index 1e88279..385633b 100644
+index 1e88279..972174a 100644
 --- a/src/content/obrony/2026-06-18-maciej-korpalski.md
 +++ b/src/content/obrony/2026-06-18-maciej-korpalski.md
-@@ -16,10 +16,6 @@ recenzje:
+@@ -16,12 +16,4 @@ recenzje:
      plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_jkakol_korpalski.pdf"
  w_aktualnosciach: true
  opublikowany: true
@@ -423,13 +436,15 @@ index 1e88279..385633b 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Macieja Korpalskiego pt. *On isomorphic and geometric properties of Banach spaces of continuous functions*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Macieja Korpalskiego pt. *On isomorphic and geometric properties of Banach spaces of continuous functions*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/2026-06-19-aleksander-antasik.md b/src/content/obrony/2026-06-19-aleksander-antasik.md
-index 0312e05..799ad5d 100644
+index 0312e05..cb8f688 100644
 --- a/src/content/obrony/2026-06-19-aleksander-antasik.md
 +++ b/src/content/obrony/2026-06-19-aleksander-antasik.md
-@@ -16,10 +16,6 @@ recenzje:
+@@ -16,12 +16,4 @@ recenzje:
      plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_awreid_antasik.pdf"
  w_aktualnosciach: true
  opublikowany: true
@@ -438,13 +453,15 @@ index 0312e05..799ad5d 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Aleksandra Antasika pt. *Rational approximation of surface group representations*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Aleksandra Antasika pt. *Rational approximation of surface group representations*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/2026-09-21-tomasz-zuchowski.md b/src/content/obrony/2026-09-21-tomasz-zuchowski.md
-index 5d85c5b..9c05592 100644
+index 5d85c5b..e7a875d 100644
 --- a/src/content/obrony/2026-09-21-tomasz-zuchowski.md
 +++ b/src/content/obrony/2026-09-21-tomasz-zuchowski.md
-@@ -16,10 +16,6 @@ recenzje:
+@@ -16,12 +16,4 @@ recenzje:
      plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_pzakrzewski_zuchowski.pdf"
  w_aktualnosciach: true
  opublikowany: true
@@ -453,13 +470,15 @@ index 5d85c5b..9c05592 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Tomasza Żuchowskiego pt. *On sequences of measures and ideals in Boolean algebras*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Tomasza Żuchowskiego pt. *On sequences of measures and ideals in Boolean algebras*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/2026-10-20-maciej-tadej.md b/src/content/obrony/2026-10-20-maciej-tadej.md
-index ae1f68b..24e094d 100644
+index ae1f68b..6ea689d 100644
 --- a/src/content/obrony/2026-10-20-maciej-tadej.md
 +++ b/src/content/obrony/2026-10-20-maciej-tadej.md
-@@ -16,10 +16,6 @@ recenzje:
+@@ -16,12 +16,4 @@ recenzje:
      plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_spetrovskiy_tadej.pdf"
  w_aktualnosciach: true
  opublikowany: true
@@ -468,13 +487,15 @@ index ae1f68b..24e094d 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Macieja Tadeja pt. *Analysis and simulations of the non-linear models with non-local dispersal of species considered in finite, flat habitats*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Macieja Tadeja pt. *Analysis and simulations of the non-linear models with non-local dispersal of species considered in finite, flat habitats*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/2026-10-27-malwina-mrowinska.md b/src/content/obrony/2026-10-27-malwina-mrowinska.md
-index 868b01f..8c97bf1 100644
+index 868b01f..829ebd5 100644
 --- a/src/content/obrony/2026-10-27-malwina-mrowinska.md
 +++ b/src/content/obrony/2026-10-27-malwina-mrowinska.md
-@@ -17,10 +17,6 @@ recenzje:
+@@ -17,12 +17,4 @@ recenzje:
      plik: "https://www.math.uni.wroc.pl/sites/default/files/recenzja_izezula_mrowinska.pdf"
  w_aktualnosciach: true
  opublikowany: true
@@ -483,13 +504,15 @@ index 868b01f..8c97bf1 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr Malwiny Mrowińskiej pt. *Estimation of a block-structured covariance matrix*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr Malwiny Mrowińskiej pt. *Estimation of a block-structured covariance matrix*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/test-2026-10-29-mister-test.md b/src/content/obrony/test-2026-10-29-mister-test.md
-index 06da0b8..3e9f562 100644
+index 06da0b8..76dcf3c 100644
 --- a/src/content/obrony/test-2026-10-29-mister-test.md
 +++ b/src/content/obrony/test-2026-10-29-mister-test.md
-@@ -17,10 +17,6 @@ recenzje:
+@@ -17,12 +17,4 @@ recenzje:
  data_ogloszenia: "2026-09-29"
  w_aktualnosciach: true
  opublikowany: true
@@ -498,13 +521,15 @@ index 06da0b8..3e9f562 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Spectral gaps and cutoff for random walks on finite groups*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Spectral gaps and cutoff for random walks on finite groups*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/test-2026-11-03-mister-test.md b/src/content/obrony/test-2026-11-03-mister-test.md
-index 7990303..32d037f 100644
+index 7990303..cb4276a 100644
 --- a/src/content/obrony/test-2026-11-03-mister-test.md
 +++ b/src/content/obrony/test-2026-11-03-mister-test.md
-@@ -17,10 +17,6 @@ recenzje:
+@@ -17,12 +17,4 @@ recenzje:
  data_ogloszenia: "2026-10-02"
  w_aktualnosciach: true
  opublikowany: true
@@ -513,13 +538,15 @@ index 7990303..32d037f 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Regularity of free boundaries in the thin obstacle problem with variable coefficients*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Regularity of free boundaries in the thin obstacle problem with variable coefficients*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.
 diff --git a/src/content/obrony/test-2026-11-27-mister-test.md b/src/content/obrony/test-2026-11-27-mister-test.md
-index 2797e1f..e2f6aa0 100644
+index 2797e1f..bc76f93 100644
 --- a/src/content/obrony/test-2026-11-27-mister-test.md
 +++ b/src/content/obrony/test-2026-11-27-mister-test.md
-@@ -17,10 +17,6 @@ recenzje:
+@@ -17,12 +17,4 @@ recenzje:
  data_ogloszenia: "2026-10-28"
  w_aktualnosciach: true
  opublikowany: true
@@ -528,5 +555,7 @@ index 2797e1f..e2f6aa0 100644
 -
 -  The dissertation, abstracts and reviews are available below.
  ---
- 
- Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Topological dynamics of automorphism groups of countable homogeneous structures*.
+-
+-Zapraszamy na publiczną obronę rozprawy doktorskiej mgr. Mister Test pt. *Topological dynamics of automorphism groups of countable homogeneous structures*.
+-
+-Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.

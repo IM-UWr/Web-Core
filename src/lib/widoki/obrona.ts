@@ -4,7 +4,7 @@ import dzial from '../../data/dzialy/nauka.json';
 import { t, wybierz } from '../i18n';
 import { renderMarkdown } from '../markdown';
 import { tytulyEn, tytulyWJezyku } from '../osoby';
-import { longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
+import { long, longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
 import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../tresci';
 
 export async function daneObrony(obrona: Obrona, lang: Lang) {
@@ -38,12 +38,14 @@ export async function daneObrony(obrona: Obrona, lang: Lang) {
     { n: d.recenzje.length, pl: ['recenzja', 'recenzje', 'recenzji'] as [string, string, string], en: ['review', 'reviews'] as [string, string] },
   ];
 
-  // Treść na /en: pole tresc_en, a bez niego zaproszenie po angielsku złożone z danych obrony (kandydat, tytuł rozprawy,
-  // termin, miejsce, promotorzy, dostępne dokumenty) — zamiast polskiego „Zapraszamy na publiczną obronę…” (zlecenie 11,
-  // zalecenie 12; dok/en/RAPORT-EN.md, K4). Po polsku zawsze treść wpisu (Markdown).
-  const htmlEn = lang === 'en' ? (d.tresc_en?.trim() ? await renderMarkdown(d.tresc_en, lang) : zaproszenieEn(obrona, przyszla)) : undefined;
+  // Treść: na /en pole tresc_en, po polsku treść wpisu (Markdown). Gdy puste, tekst złożony z danych obrony, który sam
+  // dobiera czas: przed terminem zaproszenie, po terminie informacja, że obrona się odbyła (zlecenie 11, zalecenie 12;
+  // dok/en/RAPORT-EN.md, K4; zlecenie 16, decyzja właściciela 5.11). undefined = treść wpisu (<Content />).
+  const html = lang === 'en'
+    ? d.tresc_en?.trim() ? await renderMarkdown(d.tresc_en, lang) : zaproszenieEn(obrona, przyszla)
+    : obrona.body?.trim() ? undefined : zaproszeniePl(obrona, przyszla);
 
-  return { Content, htmlEn, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby };
+  return { Content, html, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby };
 }
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -62,5 +64,27 @@ function zaproszenieEn(obrona: Obrona, przyszla: boolean): string {
   const dok = [d.rozprawa && 'dissertation', (d.streszczenie_pl || d.streszczenie_en) && (d.streszczenie_pl && d.streszczenie_en ? 'abstracts' : 'abstract'), d.recenzje.length && (d.recenzje.length > 1 ? 'reviews' : 'review')]
     .filter(Boolean) as string[];
   if (dok.length) akapity.push(`The ${lista(dok)} ${dok.length > 1 || /s$/.test(dok[0]) ? 'are' : 'is'} available below.`);
+  return akapity.map((a) => `<p>${a}</p>`).join('\n');
+}
+
+// „Zapraszamy na publiczną obronę rozprawy doktorskiej pt. <em>…</em>.” (po terminie: „Publiczna obrona rozprawy doktorskiej
+// pt. <em>…</em> odbyła się 18 czerwca 2026 r.”), „Rozprawa doktorska, streszczenia oraz recenzje są dostępne poniżej.”
+// Bez nazwiska w zdaniu, bo stoi w nagłówku tuż wyżej: odmiany nazwiska i „mgr” nie da się złożyć z danych. Termin i miejsce
+// są w parach Kiedy / Gdzie nad tekstem. Tytuł z lang="en", jak w banerze.
+function zaproszeniePl(obrona: Obrona, przyszla: boolean): string {
+  const d = obrona.data;
+  const praca = `rozprawy doktorskiej pt. <em lang="en">${esc(d.tytul_rozprawy)}</em>`;
+  const akapity = [przyszla ? `Zapraszamy na publiczną obronę ${praca}.` : `Publiczna obrona ${praca} odbyła się ${long(d.termin, 'pl', false)} r.`];
+  const dwaStreszczenia = d.streszczenie_pl && d.streszczenie_en;
+  const dok = [
+    d.rozprawa && ['rozprawa doktorska', 'jest dostępna'],
+    (d.streszczenie_pl || d.streszczenie_en) && (dwaStreszczenia ? ['streszczenia', 'są dostępne'] : ['streszczenie', 'jest dostępne']),
+    d.recenzje.length > 0 && (d.recenzje.length > 1 ? ['recenzje', 'są dostępne'] : ['recenzja', 'jest dostępna']),
+  ].filter(Boolean) as [string, string][];
+  if (dok.length) {
+    const nazwy = dok.map(([n]) => n);
+    const wyliczenie = nazwy.length > 1 ? `${nazwy.slice(0, -1).join(', ')} oraz ${nazwy[nazwy.length - 1]}` : nazwy[0];
+    akapity.push(`${wyliczenie[0].toUpperCase()}${wyliczenie.slice(1)} ${dok.length > 1 ? 'są dostępne' : dok[0][1]} poniżej.`);
+  }
   return akapity.map((a) => `<p>${a}</p>`).join('\n');
 }
