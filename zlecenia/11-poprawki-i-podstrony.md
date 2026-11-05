@@ -1,8 +1,29 @@
-# Zlecenie 11: poprawki po pracy nocnej (W PRZYGOTOWANIU, 4.11.2026)
+# Zlecenie 11: poprawki i podstrony (GOTOWE, 5.11.2026, 10:20)
 
-Stan: **szkic, uzupełniany w rozmowie.** Nie wykonywać, dopóki w nagłówku nie będzie „GOTOWE”.
-Podstawa: gałąź `wyglad/zalozyciele` (`d12c994`), raport `RAPORT-WYGLAD.md`, pytania `PYTANIA.md`, specyfikacja `dok/estetyka.md` na gałęzi `kopia/2026-11-01-estetyka-prototypy`.
-**Kolejność (4.11, 22:27):** najpierw zlecenie 12 (przebudowa i porządki, gałąź `wyglad/porzadki`). To zlecenie nakłada się potem na gałąź po porządkach, jeśli właściciel ją przyjmie, a jeśli nie, na `wyglad/zalozyciele`. Zalecenia opisują wygląd i zachowanie; nazwy plików są ze stanu `d12c994` i po porządkach mogą być inne.
+Stan: **GOTOWE do wykonania.** Właściciel 5.11, 10:15: porządki (zlecenie 12) przyjęte.
+Specyfikacja wyglądu: `dok/estetyka.md` i prototyp `proto/zalozyciele.src.html` na gałęzi `kopia/2026-11-01-estetyka-prototypy` (artefakt https://claude.ai/artifact/UuuZUa4ByC4AEYWEkrhibv). Raporty poprzednich prac: `RAPORT-WYGLAD.md`, `RAPORT-PORZADKI.md`, `PYTANIA.md` (sekcja „Zlecenie 12”), `dok/en/POSTEP.md`.
+
+**Baza: gałąź `wyglad/en` (`9223b2a`)** = porządki ze zlecenia 12 (`wyglad/porzadki`, `f315100`) + wersja angielska (zalecenie 12, wykonane osobno).
+
+**Gdzie i jak pracować**
+- W głównym folderze `C:\Users\Szymek\source\Web-Core`: `git fetch origin`, potem `git switch -c wyglad/zlecenie-11 origin/wyglad/en`.
+- Folder stoi dziś na `wyglad/zalozyciele`. Zmiany widoczne w `git status` to wyłącznie końce linii (sprawdzone 5.11 rano: `git diff --ignore-all-space --ignore-cr-at-eol` jest puste). Jeśli blokują przełączenie, sprawdź to samo i przywróć te pliki (`git restore .`). Nieśledzone `.claude/` i `package-lock.json` zostaw.
+- Treści (nakładka: `src/data`, `src/content`, `public/pliki`) zostają w folderze. **Nie uruchamiaj `skrypty/pobierz_tresci.py`.**
+- Commit po każdym zaleceniu. **Bez pushowania**, dopóki właściciel nie napisze „push”. Dziennik w `.przekazanie\dziennik.md` jak zwykle.
+- Folder `..\Web-Core-porzadki` (worktree do podglądu porządków) zostaw; usunie go właściciel.
+- Nazwy plików w zaleceniach są ze stanu `d12c994`; po porządkach część jest inna (np. `PasekMenu.astro`, `Naglowek.astro`, `zal/SpisStrony.astro`, `src/styles/zal-tresc.css`, `zal-podstrona.css`).
+
+**Zakres**
+- **Wykonać:** 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 16, 17, 19, 20.
+- **3** — wykonane w całości w zleceniu 12 (etap 2): tylko sprawdź.
+- **12** — wykonane na `wyglad/en` (`dok/en/POSTEP.md`): nic nie rób. Łatki treści i 20 spraw „do decyzji” czekają na właściciela.
+- **14** — wykonane w zleceniu 12 dla 16 stron etapu 3 i stron tekstowych (`RAPORT-PORZADKI.md`): sprawdź pozostałe strony (m.in. Władze, Plan zajęć, Projekty i granty, strony działów) i uzupełnij braki.
+- **4** — częściowo przy porządkach (np. paski w Aktualnościach, Kalendarzu, Planie, filtry Pracowników): przejdź listę miejsc z zalecenia i dokończ.
+- **18** — **CZEKA, nie wykonywać.**
+- Wpisy na listach i wyróżniona aktualność (zalecenia 21–22) dojdą osobną paczką po decyzji w prototypie.
+
+**Kolejność (propozycja):** 10 i 11 (paleta, ciemny motyw, lead) → 2 i 9 (banery, nagłówki podstron) → 5, 6, 7, 8, 13 (menu działu, pasek i hamburger, okładka, flaga, Rekrutacja) → 1, 15, 20 (okładka) → 4 i 14 (przyciski, wzorzec) → 16, 17 (plama, zdjęcie Studiów) → 19 (ciekawostki). Po każdym: `npm run build`, zrzuty 1440 i 1920 px oraz telefon, jasny i ciemny motyw.
+**Na koniec:** `RAPORT-ZLECENIE-11.md` (co zrobione, czego nie, pytania, zrzuty przed/po), `astro check` bez nowych błędów.
 
 ## Zalecenia
 
