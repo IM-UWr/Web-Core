@@ -13,12 +13,16 @@ export async function daneSeminarium(seminarium: Seminarium, lang: Lang) {
   const nazwa = (lang === 'en' && d.nazwa_en) || d.nazwa;
   const { Content } = await render(seminarium);
   // opis seminarium po angielsku (pole tresc_en); puste = wersja angielska pokazuje opis po polsku
-  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en, lang) : '';
   const wszystkie = (await referaty()).filter((r) => seminariumReferatu(r) === seminarium.id);
   // „Nadchodzące” = referaty z terminem w przyszłości — ta sama definicja co „zapowiedziane referaty” w banerach (liczbyTerminow.ts)
   const przyszle = (r: (typeof wszystkie)[number]) => wPrzyszlosci(r.data.termin);
-  const nadchodzace = await Promise.all(wszystkie.filter(przyszle).map(async (r) => ({ r, C: (await render(r)).Content })));
-  const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(async (r) => ({ r, C: (await render(r)).Content })));
+  // streszczenie: na /en pole tresc_en (en — HTML), a gdy puste — treść wpisu (C)
+  const zTresc = async (r: (typeof wszystkie)[number]) => ({
+    r, C: (await render(r)).Content, en: lang === 'en' && r.data.tresc_en?.trim() ? await renderMarkdown(r.data.tresc_en, lang) : '',
+  });
+  const nadchodzace = await Promise.all(wszystkie.filter(przyszle).map(zTresc));
+  const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(zTresc));
   // zakład(y), do których należy seminarium — link zamiast listy uczestników (skład jest na stronie zakładu)
   const zakladySem = (await zaklady()).filter((z) => d.zaklad.includes(z.id));
   // Koordynator(zy) = pole „prowadzący”: nazwisko z tytułem ze spisu pracowników, link do strony domowej, jeśli jest.

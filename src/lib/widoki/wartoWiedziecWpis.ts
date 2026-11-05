@@ -17,7 +17,7 @@ export async function daneWpisuWartoWiedziec(wpis: CollectionEntry<'warto_wiedzi
   const tytul = wybierz(d, 'tytul', lang);
   const zajawka = wybierz(d, 'zajawka', lang);
   const { Content } = await render(wpis);
-  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en, lang) : '';
   const tylkoPolski = lang === 'en' && !d.tresc_en;
   const dzial = DZIALY[d.dzial];
   // hasło na telefonie: „rok · dział” (EN: „2017 · Research”), bez roku — sam dział

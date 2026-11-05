@@ -2,8 +2,9 @@
 import { wybierzSemestr } from '../../components/wyborSemestru';
 import surowe from '../../data/plan/plan.json';
 import studia from '../../data/dzialy/studia.json';
-import { today, type Lang } from '../daty';
+import { today, short, type Lang } from '../daty';
 import { odmiana } from '../i18n';
+import { TYPY_EN, salaEn } from '../en/plan';
 
 const MIESIACE = [
   ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'],
@@ -31,8 +32,11 @@ export async function danePlanuZajec(lang: Lang) {
   const tekstStudiow = studia as { plan_haslo?: string; plan_haslo_en?: string };
   const haslo = (en ? tekstStudiow.plan_haslo_en : tekstStudiow.plan_haslo) || undefined;
 
-  const typPelny = (t: string) => dane.typy?.[t]?.[lang] || t;
-  const typKrotki = (t: string) => KROTKO[t]?.[en ? 1 : 0] ?? typPelny(t).toLowerCase();
+  // po angielsku nazwy typów z src/lib/en/plan.ts (zamiast kalk z USOS), potem z USOS
+  const typPelny = (t: string) => (en && TYPY_EN[t]?.pelna) || dane.typy?.[t]?.[lang] || t;
+  const typKrotki = (t: string) => (en && TYPY_EN[t]?.krotka) || KROTKO[t]?.[en ? 1 : 0] || typPelny(t).toLowerCase();
+  // sala z USOS; po angielsku „inna” → „other”, „zd” (zdalnie) → „online”
+  const salaW = (s?: string) => (s && en ? salaEn(s) : s);
   // jak w dawnym planie: przy wykładzie i konwersatorium bez numeru grupy
   const grupa = (z: Zajecie) => (z.typ === 'WYK' || z.typ === 'KONW' || z.grupa == null ? '' : String(z.grupa));
 
@@ -65,7 +69,7 @@ export async function danePlanuZajec(lang: Lang) {
       : krotko;
     const zakt = (s.zaktualizowano || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
     const aktualizacja = zakt
-      ? { pelna: `${+zakt[3]} ${MIESIACE[en ? 1 : 0][+zakt[2] - 1]} ${zakt[1]}, ${zakt[4]}:${zakt[5]}`, dzien: `${zakt[3]}.${zakt[2]}`, godzina: `${zakt[4]}:${zakt[5]}` }
+      ? { pelna: `${+zakt[3]} ${MIESIACE[en ? 1 : 0][+zakt[2] - 1]} ${zakt[1]}, ${zakt[4]}:${zakt[5]}`, dzien: short(`${zakt[1]}-${zakt[2]}-${zakt[3]}`, en ? 'en' : 'pl', false), godzina: `${zakt[4]}:${zakt[5]}` }
       : undefined;
     const liczbaPrzedmiotow = sekcje.reduce((a, k) => a + k.przedmioty.length, 0);
     return { s, kotwica, krotko, tytul, sekcje, spis, zimowy: m ? zimowy : undefined, przycisk, opis, aktualizacja, liczbaPrzedmiotow };
@@ -109,5 +113,5 @@ export async function danePlanuZajec(lang: Lang) {
     .filter((k) => semestry.some((x) => x.sekcje.some((s) => s.id === k.id)))
     .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl, krotka: KROTKIE[k.id]?.[en ? 1 : 0] }));
 
-  return { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
+  return { haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
 }

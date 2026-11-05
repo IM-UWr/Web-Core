@@ -15,7 +15,7 @@ import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz } from '../lib/i18n';
 import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
-import { sala, type Seminarium } from '../lib/tresci';
+import { sala, salaReferatu, type Seminarium } from '../lib/tresci';
 import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
 
 interface Props { lang: Lang }
@@ -79,7 +79,7 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
                 <h3><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></h3>
                 {r ? (
                   <p class="ref">
-                    {kiedyGdzie(r.data.termin, r.data.sala) && <span class="kiedy">{kiedyGdzie(r.data.termin, r.data.sala)}</span>}
+                    {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang)) && <span class="kiedy">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang))}</span>}
                     <TytulReferatu tekst={r.data.tytul} /> <span class="kto">({r.data.prelegent})</span>
                   </p>
                 ) : (

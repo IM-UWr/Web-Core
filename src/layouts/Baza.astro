@@ -97,7 +97,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
     <meta property="og:site_name" content={`${t(lang, 'instytut')} UWr`} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'aktualnosci')} — ${t(lang, 'instytut')}`} href={u('/rss.xml')} />
+    <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'aktualnosci')} — ${t(lang, 'instytut')}`} href={u(lang === 'en' ? '/en/rss.xml' : '/rss.xml')} />
     <meta name="theme-color" content="#1b2d52" />
     <script is:inline>
       (function () {

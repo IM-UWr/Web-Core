@@ -20,7 +20,7 @@ const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const adresZakladu = (id: string) => u(wJezyku(`/instytut/zaklady/${id}`, lang));
 
 const {
-  tytul, tytulDrugi, maOpis, Content, okres, trwa, rodzaj, finansowanie, haslo,
+  tytul, tytulDrugi, maOpis, Content, okres, trwa, rodzaj, finansowanie, program, haslo,
   osoby, kierownicy, zaklad, zakladOsoby, inne, opis,
 } = await daneGrantu(grant, lang);
 // wiersz innego projektu: tytuł i linia „rodzaj · kierownik · lata · numer” (puste pomijane)
@@ -34,14 +34,14 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
     {tytulDrugi && <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>}
     <div class="tags">
       <span class={`badge${d.rodzaj === 'ncn' ? ' badge-wydarzenie' : d.rodzaj === 'ue' ? ' badge-sukces' : ''}`}>{rodzaj}</span>
-      {d.program && <span class="badge">{d.program}</span>}
+      {program && <span class="badge">{program}</span>}
       {d.rok_do !== undefined && <span class={`badge gr-stan${trwa ? ' gr-trwa' : ''}`}>{trwa ? T('realizowany', 'ongoing') : T('zakończony', 'completed')}</span>}
     </div>
   </Fragment>
 
   <section aria-label={T('Informacje o projekcie', 'Project details')}>
     <dl class="para fakty">
-      <dt>{T('Finansowanie', 'Funding')}</dt><dd>{finansowanie}{d.program ? ` — ${d.program}` : ''}</dd>
+      <dt>{T('Finansowanie', 'Funding')}</dt><dd>{finansowanie}{program ? ` — ${program}` : ''}</dd>
       {d.kod && <><dt>{T('Numer', 'Number')}</dt><dd class="nr">{d.kod}</dd></>}
       {okres && <><dt>{T('Realizacja', 'Duration')}</dt><dd>{okres}</dd></>}
       {d.kwota && <><dt>{T('Kwota', 'Budget')}</dt><dd>{d.kwota}</dd></>}

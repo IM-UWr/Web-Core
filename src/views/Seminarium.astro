@@ -16,7 +16,7 @@ import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
-import { slugOf, sala, type Seminarium } from '../lib/tresci';
+import { slugOf, sala, salaReferatu, afiliacjaReferatu, type Seminarium } from '../lib/tresci';
 import { daneSeminarium } from '../lib/widoki/seminarium';
 
 interface Props { seminarium: Seminarium; lang: Lang }
@@ -71,14 +71,14 @@ const spis = [
   <section id="z-nadchodzace" aria-labelledby="h-nad">
     <h2 id="h-nad">{t(lang, 'nadchodzace')}</h2>
     {nadchodzace.length === 0 && <p class="pusto">{t(lang, 'brakNadchodzacych')}</p>}
-    {nadchodzace.map(({ r, C }) => (
+    {nadchodzace.map(({ r, C, en }) => (
       <article class="ref" id={slugOf(r.id)}>
         <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
         <div>
-          <p class="etyk">{kiedyGdzie(r.data.termin, r.data.sala, true)}</p>
+          <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), true)}</p>
           <h3><TytulReferatu tekst={r.data.tytul} /></h3>
-          <p class="kto">{r.data.prelegent}{r.data.afiliacja && <span> ({r.data.afiliacja})</span>}</p>
-          {r.body?.trim() && <div class="prose streszcz"><C /></div>}
+          <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
+          {(en || r.body?.trim()) && <div class="prose streszcz">{en ? <Fragment set:html={en} /> : <C />}</div>}
           {r.data.pliki.length > 0 && (
             <ul class="pliki">{r.data.pliki.map((p) => <li><a href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></a></li>)}</ul>
           )}
@@ -112,17 +112,17 @@ const spis = [
   {(minione.length > 0 || d.archiwum) && (
     <section id="z-minione" aria-labelledby="h-min">
       {minione.length > 0 && <h2 id="h-min">{t(lang, 'minione')}</h2>}
-      {minione.map(({ r, C }) => (
+      {minione.map(({ r, C, en }) => (
         <article class="ref maly" id={slugOf(r.id)}>
           <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
           <div>
-            {kiedyGdzie(r.data.termin, r.data.sala, false) && <p class="etyk">{kiedyGdzie(r.data.termin, r.data.sala, false)}</p>}
+            {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
             <h3><TytulReferatu tekst={r.data.tytul} /></h3>
-            <p class="kto">{r.data.prelegent}{r.data.afiliacja && <span> ({r.data.afiliacja})</span>}</p>
-            {r.body?.trim() && (
+            <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
+            {(en || r.body?.trim()) && (
               <details>
                 <summary>{t(lang, 'streszczenie')}</summary>
-                <div class="prose streszcz"><C /></div>
+                <div class="prose streszcz">{en ? <Fragment set:html={en} /> : <C />}</div>
               </details>
             )}
             {r.data.pliki.length > 0 && (

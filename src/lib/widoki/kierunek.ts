@@ -11,8 +11,8 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
   const w = (o: any, pole: string) => wybierz(o, pole, lang);
   const { Content } = await render(kierunek);
-  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
-  const md = (pl?: string, en?: string) => renderMarkdown((lang === 'en' && en) || pl || '');
+  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en, lang) : '';
+  const md = (pl?: string, en?: string) => renderMarkdown((lang === 'en' && en) || pl || '', lang);
   const kariera = await md(d.kariera, d.kariera_en);
   const praktyki = await md(d.praktyki, d.praktyki_en);
   const faq = await Promise.all(d.faq.map(async (f) => ({ q: w(f, 'pytanie'), a: await md(f.odpowiedz, f.odpowiedz_en) })));

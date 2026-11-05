@@ -1,7 +1,8 @@
 // Kierunek „Założyciele” (dok/estetyka.md): cztery działy, każdy z patronem z czwórki twórców wrocławskiej matematyki,
 // własnym kolorem z palety „Atramenty”, szkicem twarzy, sygnetem, podpisem i znakiem matematycznym.
 // Teksty o patronach są robocze (z prototypu „Założyciele”, wersja 33) — DO SPRAWDZENIA u historyka Instytutu,
-// zanim strona trafi do publikacji. Puste pole *_en = strona angielska pokazuje tekst polski.
+// zanim strona trafi do publikacji. Puste pole *_en = strona angielska pokazuje tekst polski. Notki i fakty po angielsku —
+// tłumaczenie z audytu wersji angielskiej (dok/en/RAPORT-EN.md, K1–K2; zlecenie 11, zalecenie 12), do sprawdzenia razem z polskimi.
 import szkice from '../assets/szkice/szkice.json';
 import type { Lang } from './daty';
 
@@ -33,8 +34,9 @@ export const PATRONI: Record<Dzial, Patron> = {
   instytut: {
     dzial: 'instytut', nazwa: 'Instytut', nazwa_en: 'Institute', adres: '/instytut',
     patron: 'Edward Marczewski', lata: '1907–1976', podpis: 'E. Marczewski', sala: 'EM',
-    notka: 'Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1957–1962. Zabiegał o budowę gmachu Instytutu.', notka_en: '',
-    fakt: 'Pierwszy dyrektor Instytutu.', fakt_en: '',
+    notka: 'Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1957–1962. Zabiegał o budowę gmachu Instytutu.',
+    notka_en: 'A co-founder of Wrocław mathematics and Rector of the University in 1957–1962. He campaigned for the construction of the Institute building.',
+    fakt: 'Pierwszy dyrektor Instytutu.', fakt_en: 'The Institute’s first director.',
     haslo: 'Wrocławska szkoła matematyczna', haslo_en: 'The Wrocław school of mathematics',
     znakNazwa: 'Twierdzenie Szpilrajna, 1930', znakNazwa_en: 'Szpilrajn’s theorem, 1930',
     znakFakt: 'Każdy porządek częściowy rozszerza się do liniowego. Szpilrajn to nazwisko, pod którym publikował Marczewski.',
@@ -44,8 +46,9 @@ export const PATRONI: Record<Dzial, Patron> = {
   nauka: {
     dzial: 'nauka', nazwa: 'Nauka', nazwa_en: 'Research', adres: '/nauka',
     patron: 'Władysław Ślebodziński', lata: '1884–1972', podpis: 'W. Ślebodziński', sala: 'WS',
-    notka: 'Geometra różniczkowy. W 1931 roku wprowadził pochodną Liego, dziś jedno z podstawowych narzędzi geometrii.', notka_en: '',
-    fakt: 'Wprowadził pochodną Liego.', fakt_en: '',
+    notka: 'Geometra różniczkowy. W 1931 roku wprowadził pochodną Liego, dziś jedno z podstawowych narzędzi geometrii.',
+    notka_en: 'A differential geometer. In 1931 he introduced the Lie derivative, now one of the basic tools of geometry.',
+    fakt: 'Wprowadził pochodną Liego.', fakt_en: 'Introduced the Lie derivative.',
     haslo: 'Poznaj nasze badania na A+', haslo_en: 'Explore our A+ research',
     znakNazwa: 'Pochodna Liego, 1931', znakNazwa_en: 'Lie derivative, 1931',
     znakFakt: 'Pole wektorów przenoszone wzdłuż przepływu innego pola.',
@@ -55,8 +58,9 @@ export const PATRONI: Record<Dzial, Patron> = {
   studia: {
     dzial: 'studia', nazwa: 'Studia', nazwa_en: 'Studies', adres: '/studia',
     patron: 'Bronisław Knaster', lata: '1893–1980', podpis: 'B. Knaster', sala: 'B',
-    notka: 'Topolog, autor twierdzenia Knastera–Tarskiego o punkcie stałym. Wychował pokolenia wrocławskich matematyków.', notka_en: '',
-    fakt: 'Topolog, oddany dydaktyce.', fakt_en: '',
+    notka: 'Topolog, autor twierdzenia Knastera–Tarskiego o punkcie stałym. Wychował pokolenia wrocławskich matematyków.',
+    notka_en: 'A topologist and co-author of the Knaster–Tarski fixed-point theorem. He trained generations of Wrocław mathematicians.',
+    fakt: 'Topolog, oddany dydaktyce.', fakt_en: 'A topologist devoted to teaching.',
     haslo: 'Studiuj matematykę we Wrocławiu', haslo_en: 'Study mathematics in Wrocław',
     znakNazwa: 'Kontinuum Knastera, 1922', znakNazwa_en: 'Knaster continuum, 1922',
     znakFakt: 'Nierozkładalne: nie jest sumą dwóch mniejszych kontinuów.',
@@ -66,8 +70,9 @@ export const PATRONI: Record<Dzial, Patron> = {
   popularyzacja: {
     dzial: 'popularyzacja', nazwa: 'Popularyzacja', nazwa_en: 'Outreach', adres: '/popularyzacja',
     patron: 'Hugo Steinhaus', lata: '1887–1972', podpis: 'H. Steinhaus', sala: 'HS',
-    notka: 'Współtwórca szkoły lwowskiej i wrocławskiej, mistrz matematycznego aforyzmu i popularyzacji.', notka_en: '',
-    fakt: '„Między duchem a materią pośredniczy matematyka”.', fakt_en: '',
+    notka: 'Współtwórca szkoły lwowskiej i wrocławskiej, mistrz matematycznego aforyzmu i popularyzacji.',
+    notka_en: 'A co-founder of the Lwów and Wrocław schools of mathematics, and a master of the mathematical aphorism and of popularisation.',
+    fakt: '„Między duchem a materią pośredniczy matematyka”.', fakt_en: '“Mathematics mediates between mind and matter.”',
     haslo: 'Matematyka dla uczniów i nauczycieli', haslo_en: 'Mathematics for students and teachers',
     znakNazwa: 'Kanapka z szynką, 1938', znakNazwa_en: 'Ham sandwich theorem, 1938',
     znakFakt: 'Jedna prosta przepoławia naraz obie figury.',

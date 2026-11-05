@@ -128,8 +128,13 @@ const referaty = defineCollection({
     tytul: z.string(),
     prelegent: z.string(),
     afiliacja: optStr,
+    // afiliacja, sala i streszczenie (Markdown) po angielsku — opcjonalne; puste = na /en wartość polska (sala: jak dotąd,
+    // „605” → „room 605”). Tytuł referatu zostaje w języku oryginału (zlecenie 11, zalecenie 12).
+    afiliacja_en: optStr,
     termin: date,
     sala: optStr,
+    sala_en: optStr,
+    tresc_en: optStr,
     pliki: plikList,
     opublikowany: published,
   }),
@@ -140,6 +145,8 @@ const obrony = defineCollection({
   schema: z.object({
     kandydat: z.string(),
     tytul_rozprawy: z.string(),
+    // treść po angielsku (Markdown, opcjonalnie); pusta = na /en zaproszenie składane z danych obrony (src/lib/widoki/obrona.ts)
+    tresc_en: optStr,
     // zdjęcie (opcjonalne) — na karcie na stronie głównej, na liście aktualności i na stronie obrony
     zdjecie: optStr,
     zdjecie_opis: optStr,
@@ -230,6 +237,8 @@ const kierunki = defineCollection({
       termin: optStr,
       termin_en: optStr,
       formularz: optStr,
+      // nazwa formularza po angielsku (opcjonalnie; np. „Formularz C1” → „Form C1”); puste = na /en nazwa polska
+      formularz_en: optStr,
       formularz_adres: optStr,
     })),
     programy: lista(z.object({
@@ -249,6 +258,8 @@ const kierunki = defineCollection({
       termin: optStr,
       termin_en: optStr,
       formularz: optStr,
+      // nazwa formularza po angielsku (opcjonalnie; np. „Formularz C1” → „Form C1”); puste = na /en nazwa polska
+      formularz_en: optStr,
       formularz_adres: optStr,
       // przypomnienie w „Najbliższych wydarzeniach” (strona główna, aktualności) przed terminem
       data: optDate,
@@ -310,7 +321,8 @@ const specjalnosci = defineCollection({
     umiejetnosci_en: strList,
     kariera: optStr,
     kariera_en: optStr,
-    tematy_prac: lista(z.object({ tytul: z.string(), opis: optStr })),
+    // tytuł pracy zostaje w języku oryginału (zlecenie 11, zalecenie 12); opis po angielsku opcjonalny (puste = na /en polski)
+    tematy_prac: lista(z.object({ tytul: z.string(), opis: optStr, opis_en: optStr })),
     dokumenty: lista(dokument),
     linki: lista(link),
     faq: lista(z.object({ pytanie: z.string(), pytanie_en: optStr, odpowiedz: z.string(), odpowiedz_en: optStr })),

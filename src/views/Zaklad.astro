@@ -16,7 +16,7 @@ import TytulReferatu from '../components/TytulReferatu.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import { range, long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
-import { slugOf, sala, miejsce, trwaLubBedzie, type Zaklad, type Pracownik } from '../lib/tresci';
+import { slugOf, sala, salaReferatu, miejsce, trwaLubBedzie, type Zaklad, type Pracownik } from '../lib/tresci';
 import { daneZakladu } from '../lib/widoki/zaklad';
 
 interface Props { zaklad: Zaklad; lang: Lang }
@@ -108,7 +108,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
             <li>
               <p class="t"><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{wybierz(s.data, 'nazwa', lang)}</a></p>
               {r ? (
-                <p><strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(r.data.sala, lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="zk-kto">({r.data.prelegent})</span></p>
+                <p><strong>{long(r.data.termin, lang)}{r.data.sala && `, ${sala(salaReferatu(r.data, lang), lang)}`}</strong> — <TytulReferatu tekst={r.data.tytul} /> <span class="zk-kto">({r.data.prelegent})</span></p>
               ) : (
                 <p class="zk-brak">{t(lang, 'brakNadchodzacych')}</p>
               )}

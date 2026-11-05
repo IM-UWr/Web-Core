@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import dzial from '../../data/dzialy/nauka.json';
 import { t, wybierz } from '../i18n';
+import { renderMarkdown } from '../markdown';
 import { longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
 import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../tresci';
 
@@ -36,5 +37,29 @@ export async function daneObrony(obrona: Obrona, lang: Lang) {
     { n: d.recenzje.length, pl: ['recenzja', 'recenzje', 'recenzji'] as [string, string, string], en: ['review', 'reviews'] as [string, string] },
   ];
 
-  return { Content, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby };
+  // Treść na /en: pole tresc_en, a bez niego zaproszenie po angielsku złożone z danych obrony (kandydat, tytuł rozprawy,
+  // termin, miejsce, promotorzy, dostępne dokumenty) — zamiast polskiego „Zapraszamy na publiczną obronę…” (zlecenie 11,
+  // zalecenie 12; dok/en/RAPORT-EN.md, K4). Po polsku zawsze treść wpisu (Markdown).
+  const htmlEn = lang === 'en' ? (d.tresc_en?.trim() ? await renderMarkdown(d.tresc_en, lang) : zaproszenieEn(obrona, przyszla)) : undefined;
+
+  return { Content, htmlEn, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby };
+}
+
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const lista = (x: string[]) => (x.length < 2 ? x.join('') : `${x.slice(0, -1).join(', ')} and ${x[x.length - 1]}`);
+
+// „You are cordially invited to the public defence of the doctoral dissertation of Malwina Mrowińska, entitled
+// <em>…</em>, on Tuesday, 27 October 2026, 13:15, in room WS, Mathematical Institute, University of Wrocław.” (po terminie:
+// „The public defence … took place on …”), „Supervisor: …”, „The dissertation, abstracts and reviews are available below.”
+function zaproszenieEn(obrona: Obrona, przyszla: boolean): string {
+  const d = obrona.data;
+  const kto = `the doctoral dissertation of ${esc(d.kandydat)}, entitled <em>${esc(d.tytul_rozprawy)}</em>`;
+  const gdzie = miejsce(d.miejsce, 'en');
+  const kiedy = `on ${esc(longWithDay(d.termin, 'en'))}${gdzie ? `, in ${esc(gdzie)}` : ''}`;
+  const akapity = [przyszla ? `You are cordially invited to the public defence of ${kto}, ${kiedy}.` : `The public defence of ${kto}, took place ${kiedy}.`];
+  if (d.promotorzy.length) akapity[0] += ` ${d.promotorzy.length > 1 ? 'Supervisors' : 'Supervisor'}: ${esc(d.promotorzy.join(', '))}.`;
+  const dok = [d.rozprawa && 'dissertation', (d.streszczenie_pl || d.streszczenie_en) && (d.streszczenie_pl && d.streszczenie_en ? 'abstracts' : 'abstract'), d.recenzje.length && (d.recenzje.length > 1 ? 'reviews' : 'review')]
+    .filter(Boolean) as string[];
+  if (dok.length) akapity.push(`The ${lista(dok)} ${dok.length > 1 || /s$/.test(dok[0]) ? 'are' : 'is'} available below.`);
+  return akapity.map((a) => `<p>${a}</p>`).join('\n');
 }

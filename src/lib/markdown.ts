@@ -4,21 +4,26 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeBase from '../plugins/rehype-base.mjs';
 
-let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | undefined;
+import type { Lang } from './daty';
+
+// osobny procesor dla stron /en: linki wewnętrzne w tekście dostają /en (src/plugins/rehype-base.mjs, opcja lang)
+const procesory = new Map<Lang, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
 
 export interface Naglowek { depth: number; slug: string; text: string }
 
-export async function renderMarkdown(src: string | undefined): Promise<string> {
-  return (await renderMarkdownZNaglowkami(src)).html;
+export async function renderMarkdown(src: string | undefined, lang: Lang = 'pl'): Promise<string> {
+  return (await renderMarkdownZNaglowkami(src, lang)).html;
 }
 
-export async function renderMarkdownZNaglowkami(src: string | undefined): Promise<{ html: string; naglowki: Naglowek[] }> {
+export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl'): Promise<{ html: string; naglowki: Naglowek[] }> {
   if (!src) return { html: '', naglowki: [] };
+  let processor = procesory.get(lang);
   if (!processor) {
     processor = await createMarkdownProcessor({
       remarkPlugins: [remarkMath],
-      rehypePlugins: [rehypeKatex, [rehypeBase, { base: import.meta.env.BASE_URL }]],
+      rehypePlugins: [rehypeKatex, [rehypeBase, { base: import.meta.env.BASE_URL, lang }]],
     } as any);
+    procesory.set(lang, processor);
   }
   const result = await processor.render(src);
   return { html: result.code, naglowki: ((result.metadata as any)?.headings ?? []) as Naglowek[] };

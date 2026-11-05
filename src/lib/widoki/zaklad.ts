@@ -17,7 +17,7 @@ export async function daneZakladu(zaklad: Zaklad, lang: Lang) {
   const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
   const obszary = lang === 'en' && d.obszary_en.length ? d.obszary_en : d.obszary;
   const { Content } = await render(zaklad);
-  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en, lang) : '';
 
   // Skład. Osoba ze stroną domową to jedno klikalne pole (klasy .os-link / .os-a w global.css).
   // Telefonów pracowników naukowych nie podajemy (pole „telefon” zakładu — tylko numer ogólny, jeśli jest).

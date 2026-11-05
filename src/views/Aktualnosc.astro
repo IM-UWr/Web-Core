@@ -38,7 +38,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
 <Podstrona lang={lang} tytul={tytul} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta"
   wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} klasa="tresc">
   <section class="akt-wpis">
-    <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}</p>
+    <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}</p>
     {zajawka && <p class="wst">{zajawka}</p>}
 
     {wydarzenie && (

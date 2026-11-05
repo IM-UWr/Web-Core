@@ -4,6 +4,14 @@ import { RODZAJE_GRANTOW } from '../i18n';
 import { today, type Lang } from '../daty';
 import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, type Grant } from '../tresci';
 
+// Pole „program” nie ma wersji angielskiej: po angielsku znane polskie nazwy tłumaczymy, resztę zostawiamy (nazwy konkursów,
+// np. OPUS, są takie same w obu językach). Używane w plakietce, karcie danych, haśle, opisie strony i na liście projektów.
+const PROGRAMY_EN: Record<string, string> = { 'grant promotorski': 'supervisor grant' };
+export const programGrantu = (program: string | undefined, lang: Lang): string => {
+  const p = program?.trim() ?? '';
+  return p && lang === 'en' ? PROGRAMY_EN[p.toLowerCase()] ?? p : p;
+};
+
 export async function daneGrantu(grant: Grant, lang: Lang) {
   const d = grant.data;
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
@@ -26,8 +34,7 @@ export async function daneGrantu(grant: Grant, lang: Lang) {
 
   // Hasło w banerze na telefonie — składane z pól projektu: źródło (krótko), program (jeśli jest) i lata realizacji,
   // np. „NCN · 2025–2028”, „NCN, grant promotorski · 2009–2011”. Program wielką literą (nazwa konkursu, np. OPUS) stoi
-  // zaraz po źródle („NCN OPUS”), małą — po przecinku. Pole „program” nie ma wersji angielskiej: po angielsku znane
-  // polskie nazwy tłumaczymy (PROGRAMY_EN), resztę zostawiamy (nazwy konkursów są takie same w obu językach).
+  // zaraz po źródle („NCN OPUS”), małą — po przecinku (program po angielsku: programGrantu wyżej).
   // Źródło krótko, żeby hasło mieściło się w jednej linijce przy 360 px (UE — jak plakietka: „UE i międzynarodowe”).
   const ZRODLO_HASLA: Record<string, [string, string]> = {
     ncn: ['NCN', 'NCN'],
@@ -35,8 +42,7 @@ export async function daneGrantu(grant: Grant, lang: Lang) {
     wewnetrzny: ['Środki wewnętrzne', 'Internal funding'],
     inny: ['Inne źródła', 'Other sources'],
   };
-  const PROGRAMY_EN: Record<string, string> = { 'grant promotorski': 'supervisor grant' };
-  const program = d.program?.trim() ? (lang === 'en' ? PROGRAMY_EN[d.program.trim().toLowerCase()] ?? d.program.trim() : d.program.trim()) : '';
+  const program = programGrantu(d.program, lang);
   const zrodloHasla = ZRODLO_HASLA[d.rodzaj] ? T(...ZRODLO_HASLA[d.rodzaj]) : rodzaj;
   const skad = program ? `${zrodloHasla}${/^\p{Lu}/u.test(program) ? ' ' : ', '}${program}` : zrodloHasla;
   const haslo = [skad, okres].filter(Boolean).join(' · ');
@@ -53,7 +59,7 @@ export async function daneGrantu(grant: Grant, lang: Lang) {
 
   // Inne projekty tego samego zakładu (najnowsze): pięć pod kartą, resztę pokazuje strona zakładu.
   const inne = zaklad ? (await granty()).filter((g) => g.id !== grant.id && zakladGrantu(g, osoby) === zaklad.id) : [];
-  const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${d.program ? ` (${d.program})` : ''}`, okres, kierownicy.length ? `${T('kierownik', 'PI')}: ${kierownicy.map((k) => k.nazwa).join(', ')}` : '']
+  const opis = [`${T('Projekt', 'Project')}: ${rodzaj}${program ? ` (${program})` : ''}`, okres, kierownicy.length ? `${T('kierownik', 'PI')}: ${kierownicy.map((k) => k.nazwa).join(', ')}` : '']
     .filter(Boolean)
     .join(', ');
 

@@ -10,7 +10,7 @@ export async function daneAktualnosciZamianyDni(data: string, lang: Lang) {
   const dzis = today();
   const a = aktualnoscZamiany(data, lang, dzis)!;
   const d = a.dzien;
-  const html = await renderMarkdown(a.tresc);
+  const html = await renderMarkdown(a.tresc, lang);
   const minela = dzis > a.data;
   const dla = ['studenci', 'pracownicy'];
   const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dni', 'day-swaps')}`;

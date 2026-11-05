@@ -10,6 +10,7 @@ import { wJezyku, wybierz, RODZAJE_GRANTOW } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { lataGrantu, slugOf, type Grant } from '../lib/tresci';
 import { daneListyGrantow, odm } from '../lib/widoki/listaGrantow';
+import { programGrantu } from '../lib/widoki/grant';
 import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
@@ -28,7 +29,7 @@ const kierownicyTekst = (g: Grant) => kier(g).map((x) => x.nazwa).join(', ');
 // części linii pod tytułem (puste pomijane); na końcu numer projektu cyframi tabelarycznymi (.nr), a bez numeru — program (jak w prototypie)
 const czesciKont = (g: Grant, ...czesci: string[]) => [
   ...czesci.filter(Boolean).map((t) => ({ t, nr: false })),
-  ...(g.data.kod ? [{ t: g.data.kod, nr: true }] : g.data.program ? [{ t: g.data.program, nr: false }] : []),
+  ...(g.data.kod ? [{ t: g.data.kod, nr: true }] : g.data.program ? [{ t: programGrantu(g.data.program, lang), nr: false }] : []),
 ];
 const dzisR = osRealizowanych && dzisNaOsi(osRealizowanych);
 const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);

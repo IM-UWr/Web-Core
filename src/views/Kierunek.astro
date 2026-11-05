@@ -130,10 +130,10 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
                 {(e.termin || (e.formularz && !e.formularz_adres)) && (
                   <dl class="para">
                     {e.termin && <><dt>{T('Termin', 'Deadline')}</dt><dd>{w(e, 'termin')}</dd></>}
-                    {e.formularz && !e.formularz_adres && <><dt>{T('Formularz', 'Form')}</dt><dd>{e.formularz}</dd></>}
+                    {e.formularz && !e.formularz_adres && <><dt>{T('Formularz', 'Form')}</dt><dd>{w(e, 'formularz')}</dd></>}
                   </dl>
                 )}
-                {e.formularz && e.formularz_adres && <p class="akcja"><a href={e.formularz_adres}>{e.formularz}{isExternal(e.formularz_adres) ? ' ↗' : ''}</a></p>}
+                {e.formularz && e.formularz_adres && <p class="akcja"><a href={e.formularz_adres}>{w(e, 'formularz')}{isExternal(e.formularz_adres) ? ' ↗' : ''}</a></p>}
               </li>
             ))}
           </ol>
@@ -177,7 +177,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
               <td>{w(x, 'co')}</td>
               <td>{w(x, 'kogo')}</td>
               <td>{w(x, 'termin')}</td>
-              {formularze && <td>{x.formularz && (x.formularz_adres ? <a href={x.formularz_adres}>{x.formularz}</a> : x.formularz)}</td>}
+              {formularze && <td>{x.formularz && (x.formularz_adres ? <a href={x.formularz_adres}>{w(x, 'formularz')}</a> : w(x, 'formularz'))}</td>}
             </tr>
           ))}
         </tbody>

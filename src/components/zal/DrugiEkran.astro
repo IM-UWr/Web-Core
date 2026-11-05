@@ -34,7 +34,7 @@ const MIES = { pl: ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz
 const DNI = { pl: ['niedz.', 'pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
 const data = (s: string) => { const p = parse(s); return { d: String(p.d), m: `${MIES[lang][p.m - 1]} · ${DNI[lang][weekday(s)]}` }; };
 const godzina = (s: string) => (s.includes('T') ? s.slice(11, 16).replace(/^0/, '') : '');
-const krotkaSala = (s?: string) => (s ? (/^[\w.\-]{1,6}$/.test(s) ? `${en ? 'r.' : 's.'} ${s}` : s) : '');
+const krotkaSala = (s?: string) => (s ? (/^[\w.\-]{1,6}$/.test(s) ? `${en ? 'room' : 's.'} ${s}` : s) : '');
 const dzialZ = (adres?: string): Dzial | undefined => (adres && !isExternal(adres) ? dzialZeSciezki(adres) : undefined);
 const NAZWY_DZ: Record<Dzial, [string, string]> = { instytut: ['Instytut', 'Institute'], nauka: ['Nauka', 'Research'], studia: ['Studia', 'Studies'], popularyzacja: ['Popularyzacja', 'Outreach'] };
 
@@ -50,7 +50,7 @@ const dniTel = Number((ustawienia as any).wydarzenia_dni_telefon ?? 30) || 30;
 const RODZ_WYD: Record<string, [string, string]> = { obrona: ['obrona doktorska', 'PhD defence'], konferencja: ['konferencja', 'conference'], termin: ['termin', 'deadline'] };
 const wpisy = new Map((await wszystkieAktualnosci()).map((a) => [`/aktualnosci/${slugOf(a.id)}`, a.data]));
 // „sala HS, Instytut Matematyczny UWr” → „s. HS” (jak w prototypie); inne miejsca bez zmian
-const krotkieMiejsce = (m?: string) => (m ?? '').replace(/,\s*(Instytut Matematyczny UWr|Mathematical Institute, University of Wrocław)$/, '').replace(/^(sala|room)\s+/, en ? 'r. ' : 's. ');
+const krotkieMiejsce = (m?: string) => (m ?? '').replace(/,\s*(Instytut Matematyczny UWr|Mathematical Institute, University of Wrocław)$/, '').replace(/^(sala|room)\s+/, en ? 'room ' : 's. ');
 const wydarzenia: Wiersz[] = (await wydarzeniaNaTelefon(10, lang, dniTel)).map((w) => {
   const wpis = w.href ? wpisy.get(w.href) : undefined;
   const dz: Dzial | undefined = w.rodzaj === 'obrona' || w.rodzaj === 'konferencja' ? 'nauka' : w.rodzaj === 'termin' ? 'studia' : wpis ? dzialWpisu(wpis) : dzialZ(w.href);
@@ -161,7 +161,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           <div class="z-h"><h2 id={`z-h-${key}`} tabindex="-1">{k.tytul}{'zakres' in k && <small>{k.zakres}</small>}</h2><a href={href(k.adres)}>{k.link}</a></div>
           <div class="lista"><div class="lista-in">
             <div class="pozycje">{wiersze}{k.pozycje.length === 0 && <p class="z-pusto">{k.pusto}</p>}</div>
-            <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze', 'and')}>{k.wsz}</a>
+            <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze {n}', '{n} more')}>{k.wsz}</a>
           </div></div>
           {k.pozycje.length > 3 && (
             <button type="button" class="z-wiecej" data-key={key}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'See more')} ({k.pozycje.length - 3})</span></button>

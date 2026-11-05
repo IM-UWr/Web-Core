@@ -84,8 +84,8 @@ export async function daneWladz(lang: Lang) {
   const sekJest = !!sek && !!(sek.email || sekTelefony.length || sekOsoby.length);
 
   // Teksty w Markdownie
-  const kadencjaHtml = await renderMarkdown(w(d, 'kadencja') || undefined);
-  const radaHtml = await renderMarkdown(w(d.rada, 'opis') || undefined);
+  const kadencjaHtml = await renderMarkdown(w(d, 'kadencja') || undefined, lang);
+  const radaHtml = await renderMarkdown(w(d.rada, 'opis') || undefined, lang);
   const linki = (d.linki ?? []).filter((l) => l && l.adres && l.etykieta);
 
   return {

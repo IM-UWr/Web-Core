@@ -15,7 +15,7 @@ import '../styles/zal-granty-plan.css';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { haslo, typPelny, typKrotki, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer } = await danePlanuZajec(lang);
+const { haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer } = await danePlanuZajec(lang);
 
 const T = en
   ? {
@@ -88,13 +88,13 @@ const L = en
                 <h3><a href={p.usos}>{p.nazwaW}</a></h3>
                 <div>
                   {p.zajecia.map((z) => (
-                    <div class="pl-w" data-d={z.dzien ?? ''} data-t={doSzukania(p.nazwaW, p.nazwa, ...(z.prowadzacy || []), z.sala || '', tekstUwag(z.uwagi))}>
+                    <div class="pl-w" data-d={z.dzien ?? ''} data-t={doSzukania(p.nazwaW, p.nazwa, ...(z.prowadzacy || []), z.sala || '', salaW(z.sala) || '', tekstUwag(z.uwagi))}>
                       <span class="typ"><abbr title={typPelny(z.typ)}>{typKrotki(z.typ)}</abbr></span>
                       <span class="gr">{grupa(z) && <><span class="sr-only">{T.gr} </span>{grupa(z)}</>}</span>
                       <span class="prow">{(z.prowadzacy || []).map((o, i) => <>{i > 0 && <br />}{o}</>)}</span>
                       <span class="dz">{z.dzien != null && <abbr title={T.dni[z.dzien]}>{DNI_KROTKO[z.dzien]}</abbr>}</span>
                       <span class="godz">{z.od && z.do ? `${z.od}–${z.do}` : ''}{z.czestotliwosc && T.czest[z.czestotliwosc] && <small>{T.czest[z.czestotliwosc]}</small>}</span>
-                      <span class="sala">{z.sala && <><span class="sr-only">{T.sala} </span>{z.sala}</>}</span>
+                      <span class="sala">{z.sala && <>{salaW(z.sala) === z.sala && <span class="sr-only">{T.sala} </span>}{salaW(z.sala)}</>}</span>
                       <span class="uw">{(z.uwagi || []).map((f) => (typeof f === 'string' ? f : <a href={f.a}>{f.t}</a>))}</span>
                     </div>
                   ))}

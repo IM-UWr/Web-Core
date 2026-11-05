@@ -15,7 +15,7 @@ export async function daneAktualnosci(wpis: Aktualnosc, lang: Lang) {
   const opisZdjecia = wybierz(d, 'zdjecie_opis', lang);
 
   const { Content } = await render(wpis);
-  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en) : '';
+  const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en, lang) : '';
   const tylkoPolski = lang === 'en' && !d.tresc_en;
 
   const wydarzenie: Wydarzenie | undefined = d.wydarzenie_poczatek

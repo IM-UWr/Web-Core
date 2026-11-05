@@ -141,6 +141,11 @@ export async function referaty(wszystkie = false): Promise<Referat[]> {
     .sort((a, b) => (a.data.termin < b.data.termin ? -1 : 1));
 }
 
+// Sala i afiliacja referatu w języku strony: pole *_en (opcjonalne), a gdy puste — polskie (sala przechodzi potem przez sala()).
+export const salaReferatu = (d: { sala?: string; sala_en?: string }, lang: Lang): string | undefined => (lang === 'en' && d.sala_en) || d.sala;
+export const afiliacjaReferatu = (d: { afiliacja?: string; afiliacja_en?: string }, lang: Lang): string | undefined =>
+  (lang === 'en' && d.afiliacja_en) || d.afiliacja;
+
 // "605" → "sala 605"; dłuższe opisy miejsca zostają bez zmian.
 export function sala(s: string | undefined, lang: Lang = 'pl'): string | undefined {
   if (!s) return undefined;
@@ -216,8 +221,8 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
     const semId = seminariumReferatu(r);
     if (!nazwy.has(semId)) continue;
     out.push({
-      rodzaj: 'referat', tytul: r.data.tytul, podtytul: `${r.data.prelegent}${r.data.afiliacja ? ` (${r.data.afiliacja})` : ''}`,
-      poczatek: r.data.termin, koniecIcs: koniecDomyslny(r.data.termin, 90), miejsce: sala(r.data.sala, lang),
+      rodzaj: 'referat', tytul: r.data.tytul, podtytul: `${r.data.prelegent}${afiliacjaReferatu(r.data, lang) ? ` (${afiliacjaReferatu(r.data, lang)})` : ''}`,
+      poczatek: r.data.termin, koniecIcs: koniecDomyslny(r.data.termin, 90), miejsce: sala(salaReferatu(r.data, lang), lang),
       href: `/seminaria/${semId}#${slugOf(r.id)}`, uid: `ref-${semId}-${slugOf(r.id)}`, opis: `${lang === 'en' ? 'Seminar' : 'Seminarium'}: ${nazwy.get(semId)}`,
     });
   }
@@ -287,7 +292,8 @@ export async function przypomnieniaTerminow(lang: Lang = 'pl'): Promise<Wydarzen
       if (d < dzis) return;
       const pl = lang !== 'en';
       const kogo = (pl ? t.kogo : t.kogo_en || t.kogo) || '';
-      const form = t.formularz ? `${pl ? 'formularz' : 'form'} ${t.formularz}` : '';
+      // po angielsku nazwa z pola formularz_en (np. „Form C1”), a bez niego „form <nazwa polska>”
+      const form = t.formularz ? (pl ? `formularz ${t.formularz}` : t.formularz_en || `form ${t.formularz}`) : '';
       out.push({
         rodzaj: 'termin', tytul: (pl ? t.co : t.co_en || t.co), podtytul: [kogo, form].filter(Boolean).join(' · ') || undefined,
         poczatek: d, href: `/studia/${k.id}#terminy`, uid: `termin-${k.id}-${i}-${d}`, widoczneOd: addDays(d, -t.dni_przed),
@@ -316,7 +322,7 @@ export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLisc
     .map((r) => {
       const semId = seminariumReferatu(r);
       return {
-        termin: r.data.termin, sala: r.data.sala, seminarium: nazwy.get(semId)!, seminariumId: semId, tytul: r.data.tytul,
+        termin: r.data.termin, sala: salaReferatu(r.data, lang), seminarium: nazwy.get(semId)!, seminariumId: semId, tytul: r.data.tytul,
         prelegent: r.data.prelegent, href: `/seminaria/${semId}#${slugOf(r.id)}`,
       };
     });

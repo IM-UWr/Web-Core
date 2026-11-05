@@ -167,7 +167,7 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
   {d.tematy_prac.length > 0 && (
     <section id="tematy" aria-labelledby="tematy-h">
       <h2 id="tematy-h">{H.tematy}</h2>
-      <ul class="kreski">{d.tematy_prac.map((x) => <li>{x.tytul}{x.opis && <span class="sp-opis"> — {x.opis}</span>}</li>)}</ul>
+      <ul class="kreski">{d.tematy_prac.map((x) => <li>{x.tytul}{x.opis && <span class="sp-opis"> — {wybierz(x, 'opis', lang)}</span>}</li>)}</ul>
     </section>
   )}
 

@@ -29,7 +29,7 @@ const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   <div class="z-pd">
     <div class="z-pd-tresc tresc">
       <section class="zd">
-        <p class="etyk zd-meta"><span>{RODZAJE.ogloszenie[lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od)}</time></span> · <span>{t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span></p>
+        <p class="etyk zd-meta"><span>{RODZAJE.ogloszenie[lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od, lang)}</time></span> · <span>{t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span></p>
 
         {minela && <div class="uwaga"><p>{T('Ta zamiana dni już się odbyła.', 'This day swap has already taken place.')}</p></div>}
 

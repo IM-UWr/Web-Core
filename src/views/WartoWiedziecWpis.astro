@@ -23,7 +23,7 @@ const { d, tytul, zajawka, htmlEn, tylkoPolski, dzial, haslo, zewnetrzny, etykie
 
 // Treść jako HTML (ten sam renderer co treść kolekcji: remark-math, rehype-katex, rehype-base — astro.config.mjs) i podział
 // na sekcje po <h2>: pierwsza część (przed pierwszym nagłówkiem) idzie do sekcji z zajawką i zdjęciem.
-const html = htmlEn || (await renderMarkdown(wpis.body ?? ''));
+const html = htmlEn || (await renderMarkdown(wpis.body ?? '', lang));
 const [poczatek, ...dalsze] = html.split(/(?=<h2[\s>])/);
 const sekcje = dalsze.map((h) => {
   const m = h.match(/^<h2[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/);
