@@ -47,7 +47,7 @@ Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`). Audyt: `dok/en/RAPORT-EN.
   czasopism i serii oraz nazwy przedmiotów cytowane w uwagach (np. „Miara i całka R”) — celowo.
 - `dok/en/TLUMACZENIA.md`: tabele do przejrzenia (patroni, napisy w kodzie, plan, publikacje).
 
-## Krok 3: tłumaczenia treści CMS jako łatki — w toku (5.11, ok. 02:35)
+## Krok 3: tłumaczenia treści CMS jako łatki — zrobione (5.11, ok. 02:45)
 - Łatki dla 17 repozytoriów w `dok/en/latki/` (po jednej na repozytorium; podstawa i zakres w `dok/en/TLUMACZENIA.md`,
   sekcja 4). Wszystkie pozycje z sekcji C audytu: C1 obrony (`tresc_en`, 8 plików), C2 tematy prac (`opis_en`, 53),
   C3 afiliacje prelegentów (`afiliacja_en`, 20 — także „IM UWr”, „UWr”, „MIM UW”, których audyt nie liczył), C4 sala
@@ -58,5 +58,18 @@ Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`). Audyt: `dok/en/RAPORT-EN.
   OK, `npm run build` OK; na stronach `/en` nie ma już linków do polskich stron (poza przełącznikiem języka).
 - W repozytoriach Web-* nic nie jest commitowane.
 
+- `dok/en/TLUMACZENIA.md`, sekcja 5 „Do decyzji”: 20 propozycji (16 z audytu i 4 z tej pracy: tematy prac, sala „zd”,
+  daty w polskim zapisie w tekstach EN, dopisek „(in Polish)” przy linkach w menu) — nie wdrożone, czekają na decyzję.
+
+## Stan końcowy
+- Na `/en` po polsku zostały: tytuły w oryginale (prac, rozpraw, referatów, skryptów, publikacji, czasopism; wyjątek
+  z zalecenia), nazwy przedmiotów z USOS w tekstach o studiach i w uwagach planu, nazwy własne (konkursy, szkoły,
+  instytucje, adresy) oraz to, co czeka na decyzję (stopnie naukowe „prof. dr hab.”, „UWr” w nazwie strony, logo,
+  tłumaczenia tytułów w nawiasach). Wpisy testowe („Testowe:”) zostają do usunięcia przez redakcję.
+- Wygląd bez zmian: polskie strony identyczne co do piksela (zrzuty komputera: 198/198 stron polskich i wspólnych),
+  na `/en` zmieniły się tylko teksty.
+- Sprawdzenie końcowe: `npm run build` OK, `astro check` — te same 3 błędy co na `wyglad/porzadki`, `sprawdz_tresci.py`
+  OK (z nałożonymi łatkami).
+
 ## Zostało
-- Krok 3: sekcja „Do decyzji” w `dok/en/TLUMACZENIA.md` (propozycje, bez wdrażania), końcowe sprawdzenie.
+- Decyzje właściciela (sekcja 5 w `TLUMACZENIA.md`) i nałożenie łatek w repozytoriach treści po akceptacji tłumaczeń.

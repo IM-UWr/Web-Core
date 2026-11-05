@@ -335,3 +335,30 @@ tekstach EN na stronie).
 | Web-Studia | `kierunki/matematyka.md` | `etapy[3].formularz_en` | Formularz C3 | Form C3 |
 | Web-Studia | `kierunki/matematyka.md` | `etapy[4].formularz_en` | Formularz E | Form E |
 | Web-Instytut | `warto_wiedziec/wyklad-terencea-tao.md` | `tresc_en` i treść PL | link `(/nauka/konferencje/2017-analysis-and-applications-in-honor-of-professor-elias-m-stein)` — martwy (konferencje nie mają podstron) | `(/nauka/konferencje#rok-2017)` — lista konferencji, rok 2017 (na `/en` link dostaje `/en` automatycznie) |
+
+## 5. Do decyzji (propozycje — nie wdrożone; sekcja „Do decyzji” audytu i sprawy z tej pracy)
+
+Każdą pozycję da się wdrożyć szybko po decyzji; miejsce w kodzie podane przy propozycji.
+
+| # | Sprawa | Propozycja | Gdzie |
+|---|---|---|---|
+| D1 | Stopnie i tytuły w polskiej formie na `/en` („prof. dr hab. X”, „dr hab. X, prof. UWr”, „mgr inż. X”) — pracownicy, zakłady, granty („PI: …”), obrony („Review: …”) | **A (zalecam):** zwyczaj brytyjski — „Prof. X” (prof. dr hab. i dr hab. …, prof. UWr), „Dr X” (dr, dr hab., dr inż.), „mgr”, „mgr inż.” — bez tytułu. **B:** forma polska wielką literą — „Prof. dr hab. X”, „Dr hab. X, Prof. UWr”. Teksty EN pisane w CMS już używają „Prof.”, „Dr hab.”, „Dr” | `zTytulem()` w `src/lib/osoby.ts` z parametrem `lang`; pola tekstowe z tytułem (`prowadzacy`, `recenzent`, `kierownik`, `wykonawcy`, `promotorzy`) — ta sama zamiana przy wyświetlaniu |
+| D2 | „UWr” w nazwie strony: „… · Mathematical Institute UWr” (`<title>`, `og:site_name`, stopka) | „Mathematical Institute, University of Wrocław” w `<title>` i `og:site_name`; w stopce to samo albo bez zmian (skrót znany) | `src/layouts/Baza.astro:61, 97`, `src/components/zal/StopkaZ.astro:17` |
+| D3 | Logo „Uniwersytet Wrocławski” na `/en` | angielska wersja logo UWr („University of Wrocław”) — potrzebny plik od UWr (nie ma go w repozytorium) | `src/components/zal/PasekMenu.astro`, `src/components/Naglowek.astro`, okładka |
+| D4 | Polskie tytuły prac, grantów i referatów cytowane w aktualnościach (ok. 90 tytułów na 46 stronach `/en/aktualnosci/*`) | zawsze tłumaczenie w nawiasie po tytule oryginalnym (jak już w części wpisów: „… (Dimension-free estimates for …)”); mogę przygotować łatkę `tresc_en` z tłumaczeniami | `tresc_en` wpisów w Web-Aktualnosci |
+| D5 | Oryginalny polski tytuł grantu pod angielskim (87 z 94 grantów) | etykieta „Original title:” przed tytułem polskim | `src/views/Grant.astro` (`p.lead` w banerze) |
+| D6 | Polskie nazwy przedmiotów i systemów w tekstach o studiach („Analiza matematyczna 1”, „Wstęp do matematyki”, „Grupy zajęciowe”, „Mój USOSweb”, „kolokwia”, „starosta”, „dziekanat”) | zostawić nazwy z USOS (student musi je znaleźć), przy pierwszym użyciu angielski odpowiednik w nawiasie | `tresc_en` stron w Web-Studia |
+| D7 | Tytuły skryptów po polsku z dopiskiem „(in Polish)” | zostawić | — |
+| D8 | Nazwy konkursów i programów („Krok w Przyszłość”, „Perspektywy”, „POWROTY”, „Iuvenes Wratislaviae”…) | tłumaczenie w nawiasie przy pierwszym użyciu; ujednolicić pisownię „Krok w Przyszłość” (dziś także „Krok w przyszłość”) | `tytul_en`, `zajawka_en`, `tresc_en` wpisów |
+| D9 | Polskie nazwy szkół, firm i instytucji w ogłoszeniach | zostawić (nazwy własne; obok jest angielski opis) | — |
+| D10 | Polskie tytuły referatów („Rozwiązania automorficzne (self-similar) równań konwekcji-dyfuzji”, „Kwantowe grafy Knesera”) | tytuł zostaje (cytat); dopisek „(talk in Polish)” — nowe pole `jezyk` referatu albo ręcznie w `tresc_en`. Streszczenie „Kwantowych grafów Knesera” jest już przetłumaczone w łatce | schemat `referaty`, `src/views/Seminarium.astro` |
+| D11 | Adresy i miejsca („pl. Grunwaldzki 2”, „Będlewo”, „Hejnice”, „Szklarska P.”) | adresy zostają; w konferencji `2020-model-theory-conference.md` poprawić skrót „Szklarska P.” na „Szklarska Poręba” — to pole polskie, nie `_en`, więc poza łatkami | `miejsce` konferencji w Web-Nauka |
+| D12 | „Juwenalia” z objaśnieniem | zostawić | — |
+| D13 | Przełącznik „Wersja polska” / „PL” na `/en` | zostawić (nazwa języka w tym języku) | — |
+| D14 | Fragmenty po polsku bez `lang="pl"` (wartości polskie pokazane, gdy `_en` jest puste) | oznaczać `lang="pl"`, gdy pokazujemy wartość polską w miejsce pustego `_en` — czytnik ekranu przeczyta je polskim głosem | `wybierz()` w `src/lib/i18n.ts` (zwracać też informację o języku), widoki |
+| D15 | Strona 404 dla gościa z `/en`: nagłówek i przyciski po polsku | nagłówek i przyciski w obu językach (strona 404 jest jedna) | `src/pages/404.astro` |
+| D16 | `/powiadomienia/` (link z angielskich e-maili) ma polskie menu i stopkę | wersja angielska `/en/powiadomienia/` albo dwujęzyczny szablon; link w e-mailach do wersji EN | `src/pages/powiadomienia.astro`, skrypty powiadomień |
+| D17 | Tematy prac na stronach specjalności — tytuły polskie (53) | zostawić w oryginale (jak tytuły prac); ewentualnie tłumaczenie w nawiasie | `tematy_prac[].tytul` |
+| D18 | Sala „zd” w planie z USOS — przyjąłem „zdalnie” → „online” | potwierdzić znaczenie skrótu | `src/lib/en/plan.ts` (`SALE_EN`) |
+| D19 | Daty w tekstach angielskich w polskim zapisie („Mon 8.02, 8:30–13:00”, „7.01–2.02”, „13.11 — University Day”) na `/en/studia/pierwszy-rok`, `/zajecia`, `/egzaminy-i-dyplom` | zapis angielski „Mon 8 Feb”, „7 Jan – 2 Feb”; zmiana w `tresc_en` tych stron (mogę przygotować łatkę) | `tresc_en` stron w Web-Studia |
+| D20 | Linki zewnętrzne do stron tylko po polsku w menu („Library”, „Mathematics Discipline Council”, „Admissions”) | dopisek „(in Polish)” jak przy „All Faculty authorities (in Polish) ↗” | `src/data/nawigacja.json` (Web-Ustawienia) |
