@@ -391,6 +391,16 @@ export async function aktualnosciNaGlowna(limit = 6, lang: Lang = 'pl'): Promise
   return [...pilne, ...wyroznione, ...reszta].slice(0, limit);
 }
 
+// Liczby na okładce strony głównej nad „Szybkim dostępem” (zlecenie 11, zalecenie 15), z tych samych danych co kolumny
+// drugiego ekranu: wydarzenia w najbliższych 7 dniach (dziś i 6 kolejnych, z przypomnieniami terminów), referaty
+// seminariów z kolumny „Seminaria” (ten sam tydzień) i aktualności z ostatnich 7 dni (bez wpisów, których wydarzenie
+// już się odbyło — jak w kolumnie). Liczone przy budowaniu strony, jak cały drugi ekran.
+export async function liczbyNaOkladke(lang: Lang = 'pl'): Promise<{ wyd: number; sem: number; akt: number }> {
+  const dzis = today(), odDnia = addDays(dzis, -6);
+  const [wyd, sem, akt] = await Promise.all([wydarzeniaNaTelefon(100, lang, 6), referatyWTygodniu(lang), aktualnosciNaGlowna(1000, lang)]);
+  return { wyd: wyd.length, sem: sem.length, akt: akt.filter((p) => p.data.slice(0, 10) >= odDnia && p.data.slice(0, 10) <= dzis).length };
+}
+
 // Żółty pasek w banerze: pierwszy wyróżniony wpis (bez wpisów, których wydarzenie już się odbyło).
 export async function wyroznionaAktualnosc(lang: Lang = 'pl'): Promise<PozycjaListy | undefined> {
   const lista = await listaAktualnosci(lang);

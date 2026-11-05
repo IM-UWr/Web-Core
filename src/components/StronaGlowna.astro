@@ -19,7 +19,10 @@ const wyrozniona = await wyroznionaAktualnosc(lang);
 ---
 <Baza tytul={t(lang, 'instytut')} stronaGlowna>
   <Okladka lang={lang} inny={drugiJezyk(sciezka)} wyrozniona={wyrozniona ? { tytul: wyrozniona.tytul, adres: wyrozniona.href } : undefined} />
-  <div id="szybki-dostep" class="z-druga-start"></div>
-  <PasekMenu lang={lang} sciezka={sciezka} inny={drugiJezyk(sciezka)} class="z-pasek-jasny" />
-  <DrugiEkran lang={lang} />
+  {/* drugi ekran razem z paskiem jako jeden obszar: drugie z dwóch położeń strony (okładka / Szybki dostęp od górnej
+      krawędzi — zlecenie 11, zalecenie 20; src/scripts/zal/przejazd.ts, na dotyku scroll-snap); niżej przewija się swobodnie */}
+  <div id="szybki-dostep" class="z-druga-obszar" tabindex="-1">
+    <PasekMenu lang={lang} sciezka={sciezka} inny={drugiJezyk(sciezka)} class="z-pasek-jasny" />
+    <DrugiEkran lang={lang} />
+  </div>
 </Baza>

@@ -3,7 +3,10 @@
 //    prostej o nachyleniu s (px w prawo na px w dół). Dobieramy stopień „Matematyczny” do „Instytut” (logo UWr jest od
 //    zlecenia 11 w górnej linii okładki, nie w bloku tytułu). Ta prosta (plus odstęp) to granica ciemnego pola po skosie;
 //    za nią krótki gradient w zdjęcie (jak w prototypie).
-// 2. Strzałka „Szybki dostęp”: przewinięcie do drugiego ekranu (bez animacji przy prefers-reduced-motion).
+// 2. Barwienie (zlecenie 11, zalecenie 1): po najechaniu kursorem albo fokusie na dział całe zdjęcie lekko barwi się na
+//    jasny kolor tego działu (warstwa .z-barwa, soft-light, 50%; przejście 0,6 s, bez przejścia przy ograniczonym ruchu).
+//    Kolor (--d-j) bierze warstwa z własnego data-dzial — reszta okładki zostaje w swoich kolorach. Telefon bez zmian.
+// Strzałka „Szybki dostęp”, liczby nad nią i przejazd okładka ↔ drugi ekran: src/scripts/zal/przejazd.ts.
 // Hamburger i panel menu: src/scripts/zal/menu.ts.
 const ok = document.querySelector<HTMLElement>('.z-okladka');
 const S = 0.32;
@@ -49,14 +52,14 @@ if (ok) {
   new ResizeObserver(() => uloz()).observe(ok);
   document.fonts?.ready.then(uloz);
 
-  const strzalka = ok.querySelector<HTMLAnchorElement>('.z-strzalka');
-  strzalka?.addEventListener('click', (e) => {
-    const cel = document.querySelector<HTMLElement>(strzalka.getAttribute('href') || '');
-    if (!cel) return;
-    e.preventDefault();
-    const ruch = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: cel.getBoundingClientRect().top + window.scrollY, behavior: ruch ? 'smooth' : 'auto' });
-    cel.setAttribute('tabindex', '-1');
-    cel.focus({ preventScroll: true });
+  const barwa = ok.querySelector<HTMLElement>('.z-barwa');
+  const telefon = matchMedia('(max-width: 760px)');
+  if (barwa) ok.querySelectorAll<HTMLElement>('.z-okl-dz').forEach((dz) => {
+    const wlacz = () => { if (telefon.matches) return; barwa.dataset.dzial = dz.dataset.dzial || ''; ok.classList.add('zabarwione'); };
+    const wylacz = () => ok.classList.remove('zabarwione');
+    dz.addEventListener('mouseenter', wlacz);
+    dz.addEventListener('mouseleave', wylacz);
+    dz.addEventListener('focus', wlacz);
+    dz.addEventListener('blur', wylacz);
   });
 }

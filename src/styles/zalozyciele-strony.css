@@ -27,6 +27,14 @@
   /* trzy kolumny: dwie krótkie po 3 pozycje (sloty 0 i 1), pod nimi Studia i Warto wiedzieć na 2/3, z prawej długa (slot 2) */
   .z-siatka { flex: 1 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; align-content: space-between; gap: 22px 36px; margin-top: 22px; }
   .z-kolumna { position: relative; min-width: 0; background: var(--bg); }
+  /* kliknięta liczba na okładce (zlecenie 11, zalecenie 15): krótkie podświetlenie kolumny; przy ograniczonym ruchu — obrys */
+  .z-kolumna.z-podswietl { animation: z-podswietl 1.6s ease; }
+  @keyframes z-podswietl {
+    0%, 35% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--d-j, #c9d0de) 22%, transparent); background: color-mix(in srgb, var(--d-j, #c9d0de) 12%, var(--bg)); }
+    100% { box-shadow: 0 0 0 10px transparent; background: var(--bg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .z-kolumna.z-podswietl { animation: none; outline: 2px solid var(--d-a); outline-offset: 8px; } }
+  .z-druga-obszar:focus { outline: none; }
   .z-kolumna[data-slot="0"] { grid-column: 1; grid-row: 1; }
   .z-kolumna[data-slot="1"] { grid-column: 2; grid-row: 1; }
   .z-kolumna[data-slot="2"] { grid-column: 3; grid-row: 1 / span 3; display: flex; flex-direction: column; }
@@ -184,4 +192,18 @@
   .z-pd.z-wladze .z-kont dl > div { grid-template-columns: 76px 1fr; }
   .z-pd.z-wladze .z-zob { columns: 1; }
   .z-pd.z-wladze .z-pd-tresc .z-zob a { font-size: 17px; }
+}
+
+/* Strona główna na dotyku (telefon, tablet): dwa położenia — okładka w całości albo Szybki dostęp od górnej krawędzi
+   (zlecenie 11, zalecenie 20). Obszar „Szybki dostęp + reszta strony” jest jednym polem przyciągania wyższym niż okno —
+   w nim przewija się swobodnie. Stopka (poza obszarem, w Baza.astro) ma własny punkt „do końca”, żeby dało się dojechać
+   na sam dół. Kółko i klawisze: src/scripts/zal/przejazd.ts. */
+@media (hover: none) and (pointer: coarse) {
+  html:has(.z-okladka) { scroll-snap-type: y mandatory; scroll-padding-top: 0; }
+  .z-okladka, .z-druga-obszar { scroll-snap-align: start; }
+  body:has(.z-okladka) .z-stopka { scroll-snap-align: end; }
+}
+/* telefon: pod przyklejonym nagłówkiem (Naglowek.astro) */
+@media (hover: none) and (pointer: coarse) and (max-width: 760px) {
+  html:has(.z-okladka) { scroll-padding-top: var(--hdr-h); }
 }

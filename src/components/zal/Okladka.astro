@@ -6,7 +6,9 @@
 // - blok tytułu z równymi końcami: „Instytut” i „Matematyczny”; prawe końce na jednej prostej o nachyleniu 0,32,
 //   która jest granicą ciemnego pola po skosie (układ liczy src/scripts/zal/okladka.ts; bez JS — zwykły gradient);
 // - zdjęcie gmachu przesunięte w prawo i w górę; rząd 4 działów nisko: szkic („duch” w spoczynku, po najechaniu kontur się
-//   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron); strzałka „Szybki dostęp” do drugiego ekranu.
+//   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron; całe zdjęcie lekko barwi się na jasny kolor
+//   działu — zalecenie 1); nad strzałką „Szybki dostęp” przygaszone liczby (wydarzenia, seminaria, nowe aktualności —
+//   zalecenie 15); okładka ↔ Szybki dostęp bez zatrzymywania w połowie (src/scripts/zal/przejazd.ts, zalecenie 20).
 // Telefon (≤ 760 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez skosu.
 import Szkic from './Szkic.astro';
 import Flaga from './Flaga.astro';
@@ -17,6 +19,7 @@ import dzNauka from '../../data/dzialy/nauka.json';
 import dzStudia from '../../data/dzialy/studia.json';
 import dzPopularyzacja from '../../data/popularyzacja.json';
 import { menuGlowne } from '../../lib/menu';
+import { liczbyNaOkladke } from '../../lib/tresci';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
@@ -46,9 +49,22 @@ const podzial = wydzial.search(/ (i|and) /);
 const [wydz1, wydz2] = podzial > 0 ? [wydzial.slice(0, podzial), wydzial.slice(podzial + 1)] : [wydzial, ''];
 const wmiAdres = 'https://wmi.uwr.edu.pl/';
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
+// liczby nad „Szybkim dostępem” (zalecenie 15): pozycja z zerem znika; odmiana jak w prototypie (1 / 2–4 / 5+, bez 12–14)
+const odm = (n: number, f: [string, string, string]) => (n === 1 ? f[0] : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? f[1] : f[2]);
+const ile = await liczbyNaOkladke(lang);
+const FORMY: Record<'wyd' | 'sem' | 'akt', { pl: [string, string, string]; en: [string, string] }> = {
+  wyd: { pl: ['wydarzenie', 'wydarzenia', 'wydarzeń'], en: ['event', 'events'] },
+  sem: { pl: ['seminarium', 'seminaria', 'seminariów'], en: ['seminar', 'seminars'] },
+  akt: { pl: ['nowa aktualność', 'nowe aktualności', 'nowych aktualności'], en: ['new post', 'new posts'] },
+};
+const liczby = (['wyd', 'sem', 'akt'] as const).filter((k) => ile[k] > 0).map((k) => ({
+  key: k, n: ile[k], tekst: lang === 'en' ? FORMY[k].en[ile[k] === 1 ? 0 : 1] : odm(ile[k], FORMY[k].pl),
+}));
 ---
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {baner.zdjecie && <img class="z-okl-foto" src={u(baner.zdjecie)} alt={wybierz(baner, 'opis', lang) || ''} decoding="async" fetchpriority="high" />}
+  {/* zalecenie 1: po najechaniu na dział zdjęcie lekko barwi się na jasny kolor działu (okladka.ts) */}
+  <span class="z-barwa" aria-hidden="true"></span>
   <div class="z-skos" aria-hidden="true"></div>
   <a class="z-okl-marka" href={wmiAdres}>
     <span class="z-okl-logo" role="img" aria-label={lang === 'en' ? 'University of Wrocław' : 'Uniwersytet Wrocławski'} style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
@@ -81,6 +97,12 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
       </a>
     ))}
   </div>
+  {/* zalecenie 15: liczby nad „Szybkim dostępem” (przygaszone); kliknięcie — przejazd na drugi ekran i podświetlenie kolumny */}
+  {liczby.length > 0 && (
+    <div class="z-okl-liczby" role="group" aria-label={lang === 'en' ? 'At a glance' : 'W skrócie'}>
+      {liczby.map((l) => <a href={`#z-h-${l.key}`} data-kol={l.key}><b>{l.n}</b> {l.tekst}</a>)}
+    </div>
+  )}
   <a class="z-strzalka" href={cel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>{lang === 'en' ? 'Quick access' : 'Szybki dostęp'}{licznik && ` · ${licznik}`}</a>
 </section>
-<script>import '../../scripts/zal/okladka'; import '../../scripts/zal/menu';</script>
+<script>import '../../scripts/zal/okladka'; import '../../scripts/zal/menu'; import '../../scripts/zal/przejazd';</script>
