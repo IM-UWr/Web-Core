@@ -7,7 +7,7 @@
 //   wchodzi (0,3 s, tylko z JS; bez JS — od razu pełne). Banery i okładka.
 // Plik spoza public/pliki albo zewnętrzny — zwykły <img> jak dotąd.
 import { Picture } from 'astro:assets';
-import { zdjecie, zastepczy as malutka } from '../lib/zdjecia';
+import { zestawZdjecia, zastepczy as malutka } from '../lib/zdjecia';
 import { u } from '../lib/url';
 
 interface Props {
@@ -28,26 +28,20 @@ interface Props {
   // jakość AVIF/WebP (1–100); domyślne 50 z sharp gubi drobne szczegóły (liście, światła na nocnym zdjęciu okładki) —
   // 60 daje obraz nieodróżnialny od JPG przy ok. 40% jego wagi (pomiar 5.11.2026: kampus-zmierzch 1280 px — 213 KB, JPG 2400 px — 561 KB)
   jakosc?: number;
+  // tylko okładka strony głównej (zlecenie 21, punkt 10): pokazanie po zdekodowaniu (decoding="sync") i bez płynnego wejścia, gdy plik przyszedł
+  // w pierwszych 400 ms. Przy wolniejszym wczytaniu rozmyta wersja i przejście zostają. Działa razem z zastepczy
+  szybkieWejscie?: boolean;
 }
-const { src, alt = '', sizes: rozmiar, szerokosci: szer, loading = 'lazy', fetchpriority, decoding = 'async', class: klasa, style, zastepczy = false, jakosc = 60 } = Astro.props;
-const meta = await zdjecie(src);
-const sizes = typeof rozmiar === 'function' ? rozmiar(meta ? meta.width / meta.height : 1.5) : rozmiar;
-const piks = /\d(vw|vh|svh|%|em|rem)/.test(sizes) ? [] : [...sizes.matchAll(/(\d+(?:\.\d+)?)px/g)].map((m) => +m[1]);
-const szerokosci = szer ?? (piks.length ? piks.flatMap((x) => [1, 2, 3].map((k) => Math.ceil(x * k))) : [400, 640, 960, 1280, 1600, 1920, 2560, 3200]);
-// szerokości rosnąco, bez prawie powtórzonych (różnica poniżej 10% — np. 240 i 243 z dwóch pól miniatury); sam plik na końcu
-// tylko wtedy, gdy któraś szerokość go przekracza (miniatura nie potrzebuje pełnego zdjęcia)
-const mniejsze = meta ? szerokosci.filter((w) => w < meta.width).sort((a, b) => a - b) : [];
-const widths = meta
-  ? [...mniejsze, ...(mniejsze.length < szerokosci.length || !mniejsze.length ? [meta.width] : [])]
-      .filter((w, i, t) => i === t.length - 1 || !t.slice(i + 1).some((v) => v <= w * 1.1))
-  : [];
+const { src, alt = '', sizes: rozmiar, szerokosci: szer, loading = 'lazy', fetchpriority, decoding = 'async', class: klasa, style, zastepczy = false, jakosc = 60, szybkieWejscie = false } = Astro.props;
+const { meta, sizes, widths } = await zestawZdjecia(src, rozmiar, szer);
 const maly = zastepczy && meta ? await malutka(src) : undefined;
+const poWczytaniu = `${szybkieWejscie ? "if (performance.now() < 400) this.style.transition = 'none';" : ''}this.classList.add('z-wczytane')`;
 ---
 {maly && <img class:list={['z-lqip', klasa]} src={maly} alt="" aria-hidden="true" style={style} decoding="sync" />}
 {meta ? (
-  <Picture src={meta} alt={alt} formats={['avif', 'webp']} widths={widths} sizes={sizes} quality={jakosc} loading={loading} decoding={decoding}
+  <Picture src={meta} alt={alt} formats={['avif', 'webp']} widths={widths} sizes={sizes} quality={jakosc} loading={loading} decoding={szybkieWejscie ? 'sync' : decoding}
     fetchpriority={fetchpriority} class:list={[klasa, maly && 'z-pelne']} style={style} pictureAttributes={{ class: 'z-obraz' }}
-    {...(maly ? { onload: "this.classList.add('z-wczytane')" } : {})} />
+    {...(maly ? { onload: poWczytaniu } : {})} />
 ) : (
   <img src={u(src)} alt={alt} loading={loading} decoding={decoding} fetchpriority={fetchpriority} class={klasa} style={style} />
 )}

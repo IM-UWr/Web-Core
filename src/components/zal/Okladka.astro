@@ -21,6 +21,7 @@ import dzStudia from '../../data/dzialy/studia.json';
 import dzPopularyzacja from '../../data/popularyzacja.json';
 import { menuGlowne } from '../../lib/menu';
 import { liczbyNaOkladke } from '../../lib/tresci';
+import { rozmiarOkl } from '../../lib/zdjecia';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
@@ -121,19 +122,13 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `if(r){var Sz=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',Sz+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*Sz/r)+'px');ok.classList.add('z-kadr')}` +
   `ok.classList.add('z-ulozona')}` +
   `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
-
-// szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6; zlecenie 18, punkt 13): na komputerze ok. 1,09 · (100vw − foto-x), czyli
-// nieco ponad szerokość okna, a przy niskim oknie 77% wysokości okładki (max(600px, 100svh)) razy proporcje zdjęcia (p); na telefonie
-// 62% wysokości okładki razy p (zal-telefon.css)
-const rozmiarOkl = (p: number) =>
-  `(min-width: 761px) max(103vw, ${Math.ceil(462 * p)}px, ${Math.ceil(77 * p)}vh), max(100vw, ${Math.ceil(62 * p)}vh)`;
 ---
 {/* dotyk: odświeżenie i powrót „wstecz” przy schowanej okładce; przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
     Telefon (do 760 px) bez kotwicy w adresie zawsze wraca na okładkę (zlecenie 21, punkt 9), więc tam okładka zostaje. */}
 <script is:inline>if(history.state&&history.state.zBezOkladki&&location.hash!=='#okladka'&&(location.hash||!matchMedia('(max-width: 760px)').matches)&&matchMedia('(hover: none) and (pointer: coarse)').matches)document.documentElement.classList.add('bez-okladki','bez-wejscia')</script>
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
-  {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy />}
+  {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy szybkieWejscie />}
   {/* zalecenie 1: po najechaniu na dział zdjęcie lekko barwi się na jasny kolor działu (okladka.ts) */}
   <span class="z-barwa" aria-hidden="true"></span>
   <div class="z-skos" aria-hidden="true"></div>

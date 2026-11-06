@@ -6,6 +6,9 @@ import Baza from '../layouts/Baza.astro';
 import Okladka from './zal/Okladka.astro';
 import PasekMenu from './zal/PasekMenu.astro';
 import DrugiEkran from './zal/DrugiEkran.astro';
+import ZdjeciePreload from './ZdjeciePreload.astro';
+import ustawienia from '../data/ustawienia.json';
+import { rozmiarOkl } from '../lib/zdjecia';
 import { stripBase } from '../lib/url';
 import { t, drugiJezyk } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -18,6 +21,7 @@ const sciezka = stripBase(Astro.url.pathname);
 const wyrozniona = await wyroznionaAktualnosc(lang);
 ---
 <Baza tytul={t(lang, 'instytut')} stronaGlowna>
+  <ZdjeciePreload slot="head" src={ustawienia.baner.zdjecie} sizes={rozmiarOkl} />
   <Okladka lang={lang} inny={drugiJezyk(sciezka)} wyrozniona={wyrozniona ? { tytul: wyrozniona.tytul, adres: wyrozniona.href } : undefined} />
   {/* drugi ekran razem z paskiem jako jeden obszar: drugie z dwóch położeń strony (okładka / Szybki dostęp od górnej
       krawędzi — zlecenie 11, zalecenie 20; src/scripts/zal/przejazd.ts, na dotyku scroll-snap); niżej przewija się swobodnie */}
