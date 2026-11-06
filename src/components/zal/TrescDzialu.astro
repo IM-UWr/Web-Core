@@ -75,7 +75,7 @@ const kolumny = (n: number) => (n <= 5 ? Math.max(n, 3) : n === 6 ? 3 : 4);
           <section class="z-dz-rzad" id={`z-dz-gr-${i}`}>
             <div class="z-dz-rzad-w">
               <h3>{wybierz(g, 'nazwa', lang)}</h3>
-              <ul style={`--m:${kolumny(g.linki.length)}`}>
+              <ul style={`--m:${kolumny(g.linki.length)};--m3:${Math.min(kolumny(g.linki.length), 3)}`}>
                 {g.linki.map((l) => {
                   const e = wybierz(l, 'etykieta', lang) as string;
                   const sk = skrotNazwy(e);
