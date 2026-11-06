@@ -181,6 +181,9 @@
   .z-nagl.z-nagl-pod.z-foto-nat .z-foto { left: auto; right: 0; width: 78%; }
   .z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { background: linear-gradient(to right, var(--g-pod) 0, color-mix(in srgb, var(--g-pod) 65%, transparent) 22%, color-mix(in srgb, var(--g-pod) 22%, transparent) 42%, color-mix(in srgb, var(--g-pod) 18%, transparent) 100%); }
   .z-nagl.z-nagl-pod.z-foto-nat :is(h1, .z-haslo, .z-sciezka a) { text-shadow: 0 1px 8px rgb(13 24 48 / .75); }
+  /* podstrony Studiów: zdjęcie przybliżone na tablice (zlecenie 18, punkt 17); baner działu Studia bez zmian. Także mała wersja zdjęcia */
+  .z-nagl.z-nagl-pod[data-dzial="studia"] .z-foto { container-type: inline-size; }
+  .z-nagl.z-nagl-pod[data-dzial="studia"] .z-foto .z-foto-obr img { position: absolute; inset: auto; left: -53.4cqw; top: min(0px, calc(50% - 29.7cqw)); width: 220cqw; max-width: none; height: 123.9cqw; object-fit: fill; }
   .z-nagl.z-nagl-pod .z-tyt { position: relative; z-index: 1; margin: 0; max-width: none; padding: 0; }
   .z-nagl.z-nagl-pod .z-tyt-g { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: end; max-width: none; }
   .z-nagl.z-nagl-pod:not(:has(.z-sygnet-nagl)) .z-tyt-g { display: block; }

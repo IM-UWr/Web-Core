@@ -73,7 +73,8 @@ const f = FOTO[fotoNat ? 'aktualnosci' : (dzial ?? 'granat')];
 const altFoto = f.alt ? f.alt[lang] : '';
 const styl = `object-position:${rodzaj === 'podstrona' && !fotoNat ? '50% 40%' : f.kadr}${f.filtr ? `;--filtr:${f.filtr}` : ''}`;
 // szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6) — jak w zalozyciele.css: baner działu od 36% szerokości, Studia
-// w szerokości --sz przypiętej do szkicu (zlecenie 11, zalecenie 17), podstrona Studiów 122% (same tablice), telefon — cały ekran.
+// w szerokości --sz przypiętej do szkicu (zlecenie 11, zalecenie 17), podstrona Studiów 122% (same tablice; na telefonie 220%, zlecenie 18,
+// punkt 17), telefon — cały ekran.
 // Zdjęcie wypełnia pole przez object-fit: cover, więc gdy pole jest wyższe niż zdjęcie w tej szerokości, potrzebna szerokość
 // to wysokość pola × proporcje zdjęcia (p): baner działu ma ok. 366 px wysokości na komputerze i do ok. 410 px na telefonie,
 // nagłówek podstrony na telefonie do ok. 300 px (pomiar 5.11.2026 w Edge, 390–1920 px)
@@ -84,7 +85,7 @@ const rozmiar = (p: number) => rodzaj === 'dzial'
     ? `${KOMPUTER} max(1454px, calc((max(64px, (100vw - 1240px) / 2) + 155px) / .4025)), max(100vw, ${px(410, p)})`
     : `${KOMPUTER} max(64vw, ${px(370, p)}), max(100vw, ${px(410, p)})`)
   : (fotoNat ? `${KOMPUTER} min(62vw, 1270px), max(78vw, ${px(300, p)})`
-    : dzial === 'studia' ? `${KOMPUTER} 122vw, max(100vw, ${px(300, p)})` : `max(100vw, ${px(300, p)})`);
+    : dzial === 'studia' ? `${KOMPUTER} 122vw, 220vw` : `max(100vw, ${px(300, p)})`);
 
 // Ciekawostka patrona (zalecenie 19): każda podstrona z menu działu dostaje inną ciekawostkę patrona, losowaną raz na wizytę
 // (sessionStorage „im-ciek-zestaw”: {dział: {strona: id}}) skryptem w linii za znakiem, zanim strona się narysuje; pula działu
