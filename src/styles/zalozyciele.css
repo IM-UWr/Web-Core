@@ -136,7 +136,7 @@
   html.js .z-pasek.przewiniety .z-pasek-tlo { opacity: 0; visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
   html.js .z-pasek:not(.z-pasek-jasny)::before, html.js .z-pasek:not(.z-pasek-jasny)::after { content: ''; position: absolute; inset: 0 0 -1px; z-index: -1;
     pointer-events: none; opacity: 0; visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
-  /* po przewinięciu nad banerem lub stopką: rozmycie z tym samym lekkim tłem co na górze, bez przyciemnienia (zlecenie 18, punkt 10).
+  /* po przewinięciu nad banerem: rozmycie z tym samym lekkim tłem co na górze, bez przyciemnienia (zlecenie 18, punkt 10).
      Krycie tylko tak duże, żeby tekst menu miał kontrast 4,5:1 z najjaśniejszym miejscem pod paskiem (pomiary w RAPORT-ZLECENIE-18.md):
      banery działów i ich podstron mają przy dolnej krawędzi jaśniejszy kolor, a zdjęcie Aktualności jasną podłogę */
   body:has(.z-nagl:not(.z-nagl-pod)) .z-pasek { --pasek-krycie: 45%; }
@@ -147,10 +147,12 @@
   /* nad treścią: jasny — tło strony z lekką przezroczystością i rozmyciem, tekst i logo w kolorze tekstu, cienka linia u dołu */
   html.js .z-pasek::after { background: color-mix(in srgb, var(--bg) 95%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--line); box-shadow: 0 6px 18px rgb(13 24 48 / .06); }
+  /* stopka w oknie: pasek w jej kolorze, bez rozmycia (src/scripts/zal/pasek.ts) */
+  html.js .z-pasek.przy-stopce::before { background: var(--granat); -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom-color: rgb(255 255 255 / .14); box-shadow: none; }
   html.js .z-pasek.przewiniety:not(.jasny)::before, html.js .z-pasek.jasny::after { opacity: 1; visibility: visible; transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
   html.js .z-pasek { transition: color var(--t-sredni) var(--rytm); }
   html.js .z-pasek.jasny { color: var(--ink); }
-  /* strona bez banera: na górze i nad stopką pasek na granacie (warstwa ciemna bez rozmycia), nad treścią jasny */
+  /* strona bez banera: na górze i przy stopce pasek na granacie (warstwa ciemna bez rozmycia), nad treścią jasny */
   html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek { background: none; }
   html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek::before { background: var(--granat); -webkit-backdrop-filter: none; backdrop-filter: none;
     border-bottom-color: rgb(255 255 255 / .14); box-shadow: none; }
