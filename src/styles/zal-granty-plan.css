@@ -11,8 +11,9 @@
   .z-gr, .z-pl, .z-gr h2, .z-pl h2 { line-height: 1.6; }
 
   /* ---------- Projekty i granty: paski czasu na wspólnej osi lat ---------- */
-  .z-gr .os-lat, .z-gr .gr-w { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: center; }
-  .z-gr .gr-w.maly, .z-gr .os-lat.maly { grid-template-columns: minmax(0, 1fr) 240px; }
+  /* pasek czasu: 380 px przy zwykłej kolumnie treści, węższy razem z nią, tytuł nie jest ściskany (zlecenie 25, punkt 2.8) */
+  .z-gr .os-lat, .z-gr .gr-w { display: grid; grid-template-columns: minmax(0, 1fr) clamp(160px, 41%, 380px); gap: 32px; align-items: center; }
+  .z-gr .gr-w.maly, .z-gr .os-lat.maly { grid-template-columns: minmax(0, 1fr) clamp(120px, 26%, 240px); }
   .z-gr .os-lat { margin: 6px 0 4px; }
   .z-gr .tor-os { position: relative; height: 18px; border-bottom: 1px solid var(--line); }
   .z-gr .tor-os b { position: absolute; bottom: 3px; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
