@@ -141,6 +141,8 @@
   .z-okl-dzialy { display: block; border-top: 1px solid rgb(255 255 255 / .14); }
   .z-okl-dz { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 0 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgb(255 255 255 / .12);
     color: #fff; text-decoration: none; }
+  /* po stuknięciu :hover zostaje na linku także po powrocie „wstecz”, a globalne a:hover dawało ciemną nazwę na zdjęciu; ciemnieje tylko pod palcem. :root przebija regułę ciemnego motywu */
+  :root .z-okl-dz:hover:not(:active) { color: #fff; }
   /* na telefonie zamiast pełnego szkicu uproszczony sygnet (dok/estetyka.md: małe rozmiary — sygnet) */
   .z-okl-szkic { display: none; }
   .z-okl-sygnet { display: block; grid-row: 1 / span 2; width: 40px; height: 48px; }
@@ -152,6 +154,7 @@
   .z-okl-dz:focus-visible { outline: 2px solid var(--d-j); outline-offset: 2px; }
   .z-strzalka { position: absolute; left: 50%; bottom: calc(14px + var(--z-nadmiar)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;
     color: rgb(255 255 255 / .78); text-decoration: none; white-space: nowrap; }
+  :root .z-strzalka:hover:not(:active) { color: rgb(255 255 255 / .78); } /* jak .z-okl-dz wyżej */
   .z-strzalka svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob-tel 2.6s ease-in-out infinite; }
   @keyframes z-bob-tel { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
   @media (prefers-reduced-motion: reduce) { .z-strzalka svg { animation: none; } }
