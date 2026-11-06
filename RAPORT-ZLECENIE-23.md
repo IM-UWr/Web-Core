@@ -1,6 +1,6 @@
 # Raport: zlecenie 23 — telefon w poziomie i okładka „na próg” (6.11.2026)
 
-Gałąź: `wyglad/zlecenie-16`, lokalnie, **bez pushowania**, także w repozytoriach treści. Zrobione wszystkie punkty GOTOWE: od 1 do 6. Zlecenie jest otwarte i rosło w trakcie pracy (doszły punkty 5 i 6, punkt 2 dostał status GOTOWE), więc na końcu pobrałem je jeszcze raz. Ostatnia wersja w źródle: `c9d3f0a2`, bez nowych punktów.
+Gałąź: `wyglad/zlecenie-16`. Zlecenie mówiło „bez pushowania”, więc wypchnąłem ją dopiero na słowo właściciela („Tak push”, 6.11). Repozytoriów treści to zlecenie nie zmieniało, a `main` nie jest ruszany. Zrobione wszystkie punkty GOTOWE: od 1 do 6. Zlecenie jest otwarte i rosło w trakcie pracy (doszły punkty 5 i 6, punkt 2 dostał status GOTOWE), więc na końcu pobrałem je jeszcze raz. Ostatnia wersja w źródle: `c9d3f0a2`, bez nowych punktów.
 
 | Punkt | Co | Commit |
 | --- | --- | --- |
