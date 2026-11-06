@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Szybka kontrola plików treści bez budowania strony: czy frontmatter to poprawny YAML
 i czy są wymagane pola. Użycie: python3 skrypty/sprawdz_tresci.py [plik lub katalog ...]"""
-import sys, os, re, glob, yaml
+import sys, os, re, glob, json, yaml
 
 WYMAGANE = {
     'aktualnosci': ['tytul', 'data'], 'strony': ['tytul'], 'seminaria': ['nazwa'], 'referaty': ['tytul', 'prelegent', 'termin'],
@@ -87,5 +87,21 @@ for a in sys.argv[1:] or ['src/content']:
     else:
         pliki.append(a)
 wszystkie = [b for p in pliki for b in sprawdz(p)]
-print('\n'.join(wszystkie) if wszystkie else f'OK — sprawdzono {len(pliki)} plików')
+
+# Ciekawostki patronów: nazwisko patrona w każdej karcie (src/data/ciekawostki/README.md). Tylko bez argumentów, czyli przy pełnej kontroli.
+# Zaimków nie sprawdzamy: w „kierował nim Marczewski” słowo „nim” to Instytut.
+PATRONI = {'instytut': 'Marczewsk', 'nauka': 'Ślebodzińsk', 'studia': 'Knaster', 'popularyzacja': 'Steinhaus'}
+kart = 0
+if not sys.argv[1:]:
+    for dzial, rdzen in PATRONI.items():
+        p = f'src/data/ciekawostki/{dzial}.json'
+        for k in json.load(open(p, encoding='utf-8')):
+            kart += 1
+            if rdzen not in f"{k.get('nazwa', '')} {k.get('zdanie', '')}":
+                wszystkie.append(f"{p}: {k.get('id')}: brak nazwiska patrona (PL)")
+            # puste zdanie_en: /en pokazuje tekst polski
+            if k.get('zdanie_en') and rdzen not in f"{k.get('nazwa_en', '')} {k['zdanie_en']}":
+                wszystkie.append(f"{p}: {k.get('id')}: brak nazwiska patrona (EN)")
+
+print('\n'.join(wszystkie) if wszystkie else f'OK — sprawdzono {len(pliki)} plików' + (f' i {kart} ciekawostek' if kart else ''))
 sys.exit(1 if wszystkie else 0)
