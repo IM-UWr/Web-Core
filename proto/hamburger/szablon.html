@@ -1,0 +1,228 @@
+<meta charset="utf-8">
+<title>Hamburger na komputerze</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Brygada+1918:wght@400..700&family=Manrope:wght@400..800&display=swap">
+<style>
+/* Układ: dwie ramki obok siebie z prawym fragmentem prawdziwego ekranu, w skali 1:1, jeśli się mieści. */
+:root {
+  --bg: #fcfaf6; --line: #e5e0d6; --ink: #131c31; --text: #2b3245; --muted: #5b6375; --on: #131c31; --on-ink: #fcfaf6;
+  --f-d: 'Brygada 1918', 'Iowan Old Style', Georgia, serif; --f-t: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0a1020; --line: #243049; --ink: #ecf0f7; --text: #d3d9e6; --muted: #98a3b8; --on: #ecf0f7; --on-ink: #0a1020; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #0a1020; --line: #243049; --ink: #ecf0f7; --text: #d3d9e6; --muted: #98a3b8; --on: #ecf0f7; --on-ink: #0a1020; color-scheme: dark; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--f-t); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.gora { padding-block: 22px 10px; }
+.gora h1 { margin: 0 0 4px; font: 500 32px/1.15 var(--f-d); color: var(--ink); text-wrap: balance; }
+.gora p { margin: 0; max-width: 88ch; }
+.narz { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.narz > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-block: 10px; }
+.grp { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { padding: 5px 10px; border: 0; background: none; font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--on); color: var(--on-ink); }
+#tresc { display: flex; flex-wrap: wrap; gap: 16px; padding-top: 18px; align-items: flex-start; }
+.kon { min-width: 0; }
+.kon h2 { margin: 0 0 6px; font: 500 21px/1.2 var(--f-d); color: var(--ink); }
+.kon h2 small { margin-left: 8px; font: 500 13px/1.3 var(--f-t); color: var(--muted); font-variant-numeric: tabular-nums; }
+.okno { position: relative; overflow: hidden; background: #fff; outline: 1px solid var(--line); }
+.okno iframe { position: absolute; top: 0; right: 0; display: block; border: 0; transform-origin: 100% 0; background: #fff; }
+.blad { padding: 18px; font-weight: 600; }
+</style>
+<div class="gora">
+  <h1>Hamburger na komputerze</h1>
+  <p>Prawdziwa strona i prawdziwy panel z kodu. Z lewej obecny panel, z prawej nowy. Kliknij strzałkę przy dziale, a rozwinie się w obu naraz. Ramka ma dokładnie wysokość ekranu wybranego monitora, więc widać, czy wszystko się mieści. Ramki są w skali 1:1, jeśli okno jest wystarczająco szerokie.</p>
+</div>
+<div class="narz">
+  <div>
+    <span class="grp">Monitor <span class="seg" id="s-mn" role="group" aria-label="Monitor"></span></span>
+    <span class="grp">Rozwinięty dział <span class="seg" id="s-dz" role="group" aria-label="Rozwinięty dział"></span></span>
+    <span class="grp">Panel <span class="seg" id="s-pa" role="group" aria-label="Kolor panelu"></span></span>
+    <span class="grp">Motyw <span class="seg" id="s-mo" role="group" aria-label="Motyw"></span></span>
+    <span class="grp">Widok <span class="seg" id="s-wi" role="group" aria-label="Widok"></span></span>
+  </div>
+</div>
+<main id="tresc"></main>
+
+<script type="text/plain" id="baza-css">
+html, body { overflow: hidden !important; }
+.z-menu { transition: none !important; }
+</script>
+<script type="text/plain" id="nowe-css">
+/* ---------- nazwy grup bez koloru działu (komputer i telefon) ---------- */
+.z-menu .z-menu-grupa h3 { color: rgb(255 255 255 / .58); }
+
+@media (min-width: 761px) {
+  .z-menu-jasny .z-menu-grupa h3 { color: var(--muted); }
+
+  /* ---------- wielkości rosną z wysokością okna: przy 640 px jak dotąd, pełne przy 800 px i wyżej ---------- */
+  .z-menu {
+    --mw: clamp(0px, calc(100vh - 640px), 160px);
+    --m-h2: calc(23px + var(--mw) / 23);    /* nazwa działu: 23 → 30 */
+    --m-l: calc(14.5px + var(--mw) / 53);   /* link: 14,5 → 17,5 */
+    --m-g: calc(12.5px + var(--mw) / 80);   /* nazwa grupy: 12,5 → 14,5 */
+    --m-s: calc(40px + var(--mw) / 11.5);   /* sygnet: 40 → 54 */
+    width: min(calc(640px + var(--mw) / 2), calc(100vw - 64px)); /* 640 → 720 */
+    display: flex; flex-direction: column;
+  }
+  .z-menu-szukaj { flex: none; margin-bottom: calc(8px + var(--mw) / 15); padding: calc(8px + var(--mw) / 53) 13px; }
+  .z-menu-szukaj input { font-size: calc(15px + var(--mw) / 106); }
+
+  /* ---------- rzędy dzielą między siebie całą wolną wysokość panelu; rozwinięcie działu samo ściska pozostałe ---------- */
+  .z-menu section { flex: 1 0 auto; max-height: calc(var(--m-s) * 1.2 + 90px); }
+  .z-menu section.rozwiniety { max-height: calc(var(--m-s) * 1.2 + 360px); }
+  .z-menu section[data-dzial] { grid-template-columns: var(--m-s) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: calc(14px + var(--mw) / 53); align-content: center; }
+  .z-menu section.duza { flex-grow: .72; max-height: calc(var(--m-h2) + 76px); display: flex; flex-direction: column; justify-content: center; padding-left: calc(var(--m-s) + 14px + var(--mw) / 53); }
+  .z-menu .z-menu-sygnet { grid-row: 1; width: var(--m-s); height: calc(var(--m-s) * 1.2); }
+  /* rozwinięty: sygnet nie rozpycha rzędu, grupy stoją tuż pod nazwą działu */
+  .z-menu section.rozwiniety .z-menu-sygnet { grid-row: 1 / span 2; margin-bottom: calc(var(--m-s) * -1.2); }
+  .z-menu h2 { font-size: var(--m-h2); }
+  .z-menu h2 a::after { width: calc(28px + var(--mw) / 32); margin-top: calc(4px + var(--mw) / 53); }
+  .z-menu section.duza h2 { font-size: calc(var(--m-h2) + 1px); }
+  .z-menu section.duza h2 a.zew::after { font-size: .72em; }
+  .z-menu-rozwin { width: calc(30px + var(--mw) / 30); height: calc(30px + var(--mw) / 30); }
+  .z-menu-rozwin svg { width: calc(18px + var(--mw) / 53); height: calc(18px + var(--mw) / 53); }
+
+  .z-menu .z-menu-grupa h3 { font-size: var(--m-g); }
+  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: calc(5px + var(--mw) / 21); }
+  .z-menu ul { font-size: var(--m-l); gap: 2px calc(16px + var(--mw) / 53); }
+
+  /* ---------- rozwijanie płynne: wysokość grup przechodzi przez 0fr → 1fr (grupy w dodatkowym div.z-menu-grupy-w) ---------- */
+  .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .32s var(--rytm), visibility 0s linear .32s; }
+  .z-menu.zwijane section[data-dzial].rozwiniety .z-menu-grupy { display: grid; grid-template-rows: 1fr; visibility: visible; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s; }
+  .z-menu-grupy-w { min-height: 0; overflow: hidden; }
+  .z-menu-grupy-w::before { content: ''; display: block; height: calc(4px + var(--mw) / 26); }
+}
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+  .z-menu.zwijane section[data-dzial] .z-menu-grupy { transition: none !important; }
+}
+</script>
+<script>
+const STRONA = /*STRONA*/null;
+const BAZA = document.getElementById('baza-css').textContent;
+const NOWE = document.getElementById('nowe-css').textContent;
+const SZER = [1366, 1536, 1920, 2560];
+const MON = [[1366, 768], [1536, 864], [1920, 1080], [2560, 1440]].map(([w, h]) => ({ id: String(w), w, h, v: h - 135 }));
+let moj = MON.find((m) => m.w === screen.width && m.h === screen.height);
+if (!moj && screen.width >= 1200 && screen.width <= 3840) {
+  moj = { id: 'moj', w: screen.width, h: screen.height, v: Math.max(500, screen.availHeight - 87) };
+  MON.push(moj); MON.sort((a, b) => a.w - b.w || a.h - b.h);
+}
+if (moj) moj.twoj = true;
+const DZ = [['instytut', 'Instytut'], ['nauka', 'Nauka'], ['studia', 'Studia'], ['popularyzacja', 'Popularyzacja'], ['', 'Żaden']];
+const st = { mon: moj ? moj.id : '1920', otw: 'studia', jasny: false, widok: 'obok' };
+let ramki = [];
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const motyw = () => document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const monitor = () => MON.find((m) => m.id === st.mon);
+const najblizsza = (w) => SZER.reduce((a, b) => (Math.abs(b - w) < Math.abs(a - w) ? b : a));
+const atr = (o) => Object.entries(o).map(([k, v]) => `${k}="${esc(v)}"`).join(' ');
+const wstawMaski = (t) => Object.entries(STRONA.INL).reduce((a, [n, d]) => a.split(n).join(d), t);
+const CSS = wstawMaski(STRONA.STY.join('\n'));
+const WARIANT = { teraz: 'Teraz', nowa: 'Nowy' };
+
+// Nowy panel ma grupy w dodatkowym elemencie, przez który płynnie zmienia się wysokość.
+const pamiec = {};
+function tresc(wariant, w) {
+  const k = wariant + w;
+  if (pamiec[k]) return pamiec[k];
+  let t = wstawMaski(STRONA.tresc[w]);
+  if (wariant === 'nowa') {
+    const d = new DOMParser().parseFromString(t, 'text/html');
+    d.querySelectorAll('.z-menu-grupy').forEach((g) => { const o = d.createElement('div'); o.className = 'z-menu-grupy-w'; while (g.firstChild) o.append(g.firstChild); g.append(o); });
+    t = d.body.innerHTML;
+  }
+  return (pamiec[k] = t);
+}
+function dokument(wariant, m) {
+  const css = BAZA + (wariant === 'nowa' ? NOWE : '');
+  return `<!doctype html><html ${atr({ ...STRONA.html, 'data-theme': motyw() })}><head><meta charset="utf-8"><base href="${esc(document.baseURI)}"><style>${CSS}</style><style>${css}</style></head><body ${atr(STRONA.body)}>${tresc(wariant, najblizsza(m.w))}</body></html>`;
+}
+function seg(id, opcje, klucz, biezacy) {
+  $(id).innerHTML = opcje.map(([v, n, tyt]) => `<button type="button" data-${klucz}="${esc(v)}" aria-pressed="${String(v) === String(biezacy)}"${tyt ? ` title="${esc(tyt)}"` : ''}>${esc(n)}</button>`).join('');
+}
+function rysujNarz() {
+  seg('#s-mn', MON.map((m) => [m.id, `${m.w}×${m.h}${m.twoj ? ' · Twój' : ''}`, `Widać około ${m.v} px wysokości`]), 'mn', st.mon);
+  seg('#s-dz', DZ, 'dz', st.otw);
+  seg('#s-pa', [['ciemny', 'Granatowy'], ['jasny', 'Jasny']], 'pa', st.jasny ? 'jasny' : 'ciemny');
+  seg('#s-mo', [['light', 'Jasny'], ['dark', 'Ciemny']], 'mo', motyw());
+  seg('#s-wi', [['obok', 'Obok siebie'], ['ekran', 'Cały ekran']], 'wi', st.widok);
+}
+function ustawPanel(r) {
+  const d = r.d; if (!d) return;
+  const p = d.querySelector('.z-menu.otwarte') || d.querySelector('.z-menu-pasek'); if (!p) return;
+  p.classList.add('otwarte', 'zwijane');
+  p.classList.toggle('z-menu-jasny', st.jasny);
+  p.querySelectorAll('section[data-dzial]').forEach((s) => {
+    const otw = s.dataset.dzial === st.otw;
+    s.classList.toggle('rozwiniety', otw);
+    s.querySelector('[data-z-menu-rozwin]')?.setAttribute('aria-expanded', String(otw));
+  });
+  p.scrollTop = 0;
+}
+function podlacz(r) {
+  let d;
+  try { d = r.f.contentDocument; } catch { d = null; }
+  if (!d || !d.body) { r.okno.innerHTML = '<div class="blad">Nie udało się otworzyć ramki ze stroną.</div>'; return; }
+  r.d = d;
+  ustawPanel(r);
+  d.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-z-menu-rozwin]');
+    if (b) {
+      const dz = b.closest('section').dataset.dzial;
+      st.otw = st.otw === dz ? '' : dz;
+      rysujNarz();
+      ramki.forEach(ustawPanel);
+    }
+    if (e.target.closest('a, button, form')) e.preventDefault();
+  }, true);
+  d.addEventListener('submit', (e) => e.preventDefault(), true);
+}
+function ustawRamke(r, ile) {
+  const m = monitor(), pole = $('#tresc').clientWidth, gap = 16;
+  const w = st.widok === 'obok' ? Math.min(m.w, 760) : m.w;
+  const k = Math.min(1, (pole - gap * (ile - 1)) / ile / w);
+  r.f.style.width = m.w + 'px';
+  r.f.style.height = m.v + 'px';
+  r.f.style.transform = k === 1 ? 'none' : `scale(${k})`;
+  r.okno.style.width = Math.floor(w * k) + 'px';
+  r.okno.style.height = Math.ceil(m.v * k) + 'px';
+  r.skala.textContent = `${m.w}×${m.v} px widoczne, skala ${Math.round(k * 100)}%`;
+}
+function rysuj() {
+  rysujNarz();
+  const m = monitor(), t = $('#tresc');
+  t.textContent = '';
+  const warianty = st.widok === 'obok' ? ['teraz', 'nowa'] : ['nowa'];
+  ramki = warianty.map((v) => {
+    const el = document.createElement('section');
+    el.className = 'kon';
+    el.innerHTML = `<h2>${WARIANT[v]}<small></small></h2><div class="okno"><iframe scrolling="no" title="${esc(WARIANT[v])}"></iframe></div>`;
+    t.append(el);
+    const r = { v, el, f: $('iframe', el), okno: $('.okno', el), skala: $('small', el), d: null };
+    r.f.addEventListener('load', () => podlacz(r));
+    r.f.srcdoc = dokument(v, m);
+    return r;
+  });
+  ramki.forEach((r) => ustawRamke(r, ramki.length));
+}
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  const mn = t.closest('[data-mn]'); if (mn) { st.mon = mn.dataset.mn; rysuj(); return; }
+  const dz = t.closest('[data-dz]'); if (dz) { st.otw = dz.dataset.dz; rysujNarz(); ramki.forEach(ustawPanel); return; }
+  const pa = t.closest('[data-pa]'); if (pa) { st.jasny = pa.dataset.pa === 'jasny'; rysujNarz(); ramki.forEach(ustawPanel); return; }
+  const wi = t.closest('[data-wi]'); if (wi) { st.widok = wi.dataset.wi; rysuj(); return; }
+  const mo = t.closest('[data-mo]'); if (mo) { document.documentElement.dataset.theme = mo.dataset.mo; rysujNarz(); ramki.forEach((r) => r.d && r.d.documentElement.setAttribute('data-theme', mo.dataset.mo)); }
+});
+new ResizeObserver(() => ramki.forEach((r) => ustawRamke(r, ramki.length))).observe($('#tresc'));
+rysuj();
+</script>
