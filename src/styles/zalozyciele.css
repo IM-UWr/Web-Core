@@ -467,16 +467,14 @@
   }
   /* strona główna: pasek menu na górze drugiego ekranu, zwykły (jasny) */
   .z-pasek.z-pasek-jasny { position: sticky; top: 0; color: var(--ink); background: var(--bg); border-bottom-color: var(--line); }
-  /* jasny pasek: na stronie głównej zawsze, na pozostałych nad treścią (.jasny); kreski działów w kolorze głębokim,
-     w ciemnym motywie w jasnym */
+  /* jasny pasek: na stronie głównej zawsze, na pozostałych nad treścią (.jasny); kreski działów jak na ciemnym pasku,
+     w jasnym kolorze działu (--d-j), bo głęboki (--d-g) wyglądał na czarny */
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-logo { background: var(--uwr); }
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka > span:last-child { border-left-color: var(--line); }
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka small, :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka:hover b { color: var(--muted); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a, :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button { color: color-mix(in srgb, var(--ink) 76%, transparent); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a:hover, :is(.z-pasek-jasny, .z-pasek.jasny) nav a[aria-current],
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button:hover { color: var(--ink); }
-  :is(.z-pasek-jasny, .z-pasek.jasny) nav a[data-dzial]::after { background: var(--d-g); }
-  :root[data-theme="dark"] :is(.z-pasek-jasny, .z-pasek.jasny) nav a[data-dzial]::after { background: var(--d-j); }
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz::before { background: var(--line); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a:focus-visible { outline-color: var(--ink); }
   /* węższe okna: pasek mieści się w oknie (burger uciekał poza ekran przy 761–971 px, główna przewijała się w poziomie),
