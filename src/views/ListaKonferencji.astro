@@ -99,7 +99,7 @@ const spis = [
   /* ---------- komputer (≥ 1024 px): minione w dwóch kolumnach ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
   @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-    .wiersze.dwie { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
+    .wiersze.dwie { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(300px, 45%), 1fr)); gap: 0 48px; }
     .wiersze.dwie .wiersz h4 { font-size: 19px; }
   }
 
