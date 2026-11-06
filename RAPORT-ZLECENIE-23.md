@@ -13,6 +13,8 @@ Gałąź: `wyglad/zlecenie-16`. Zlecenie mówiło „bez pushowania”, więc wy
 
 Punkty 3 i 4 zrobiłem przed punktem 2, bo punkt 2 nie był jeszcze GOTOWE, gdy do nich doszedłem.
 
+**Po wypchnięciu, na opublikowanym Web-Podglad (przebieg `42268895461`, zielony):** punkt 2: 174 z 174. Jasna linia: 0 z 21 ramek z ułamkową wysokością; 4 trafienia na 6 prób przez CDP to ten sam artefakt emulatora przy 801, 802, 805 i 806 px. Sygnet: 0 problemów. Telefon w poziomie, skrócona próba: 6 otwarć, oznaczone 2 to znane fałszywe alarmy (zdjęcie ucięte banerem, `.kier-podpis`). Obrót: 0 problemów. `main` repozytoriów treści bez zmian.
+
 **Kolejność zleceń.** Zlecenie mówi „dopiero po zakończeniu zleceń 21 i 22”, a zlecenie 22 nadal czeka na etapie 9 na zapisy właściciela w CMS. Zrobiłem 23 na wyraźne polecenie właściciela. Obie prace się nie krzyżują: zlecenie 23 nie zmienia pól CMS ani treści.
 
 ## Co sprawdza właściciel na telefonie
