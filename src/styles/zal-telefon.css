@@ -89,7 +89,12 @@
   /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
   .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h));
     padding: 0 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
-  .z-okl-foto { position: absolute; inset: 0 0 auto 0; width: 100%; height: 52%; object-fit: cover; object-position: 62% 50%; z-index: -2; }
+  /* środek ekranu na 38% szerokości zdjęcia, czyli na budynku Instytutu; pionowo liczy ULOZ w Okladka.astro (zlecenie 18, punkt 13) */
+  .z-okl-foto { position: absolute; top: var(--foto-top, -12%); left: 50%; right: auto; width: auto; max-width: none; height: 62%; object-fit: fill; transform: translateX(-38%); z-index: -2;
+    /* na niskich ekranach dół zdjęcia wypada powyżej końca gradientu z ::after: bez zaniku byłoby widać jego krawędź */
+    -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%); mask-image: linear-gradient(180deg, #000 78%, transparent 100%); }
+  /* telefon obrócony: okładka niska, zdjęcie o tej wysokości byłoby węższe od ekranu */
+  @media (orientation: landscape) { .z-okl-foto { left: 0; width: 100%; height: auto; transform: none; } }
   .z-okladka::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background: linear-gradient(180deg, rgb(9 16 34 / .1) 0, rgb(9 16 34 / .35) 26%, var(--granat) 50%, var(--granat) 100%); transform: translateY(-14px); }
   /* logo i wydział z górnej linii okładki są na telefonie w nagłówku (Naglowek.astro); panel menu: ten przy pasku drugiego ekranu */

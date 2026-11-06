@@ -361,8 +361,10 @@
 
   /* ---------- okładka strony głównej (pierwszy ekran; rozmiary od wysokości okna, jak w prototypie z cqh) ---------- */
   .z-okladka { --h: max(600px, 100svh); position: relative; height: var(--h); overflow: hidden; background: var(--granat); color: #fff; isolation: isolate; font-family: var(--f-text); }
-  .z-okl-foto { position: absolute; top: -13%; left: var(--foto-x, 24%); width: calc(100% - var(--foto-x, 24%)); height: 100%; object-fit: cover; object-position: 2% 50%; z-index: -3;
+  .z-okl-foto { position: absolute; top: -13%; left: var(--foto-x, 24%); width: calc(100% - var(--foto-x, 24%)); max-width: none; height: 100%; object-fit: cover; object-position: 2% 50%; z-index: -3;
     -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 140px); mask-image: linear-gradient(90deg, transparent 0, #000 140px); }
+  /* kadr z naturalnych proporcji zdjęcia, rozmiar i położenie liczy skrypt ULOZ w Okladka.astro (zlecenie 18, punkt 13); bez JS reguła wyżej */
+  .z-okladka.z-kadr .z-okl-foto { top: var(--foto-top); width: var(--foto-w); height: auto; object-fit: fill; }
   /* ciemne pole pod tytułem z krawędzią po skosie (kąt i położenie liczy okladka.ts; bez JS — gradient z lewej) */
   .z-skos { position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background: var(--skos, linear-gradient(90deg, rgb(9 16 34 / .97) 0, rgb(9 16 34 / .86) 30%, rgb(9 16 34 / 0) 55%)); }

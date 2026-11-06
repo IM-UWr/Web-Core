@@ -73,7 +73,12 @@ const ZERUJ = `(function(){function z(){try{sessionStorage.removeItem('im-wizyta
 // px w dół): stopień „Matematyczny” dobrany do „Instytut” (po angielsku drugie słowo krótsze — wtedy stopnie z CSS, a skos od
 // końca pierwszej linii). Prosta (plus odstęp) to granica ciemnego pola po skosie (--skos), za nią krótki gradient
 // w zdjęcie; zdjęcie zaczyna się tak, żeby jego lewa krawędź była schowana w pełnym ciemnym polu (--foto-x).
-const ULOZ = `(function(ok){var S=.32;function uloz(){if(!ok.offsetHeight||matchMedia('(max-width: 760px)').matches)return;` +
+// Kadr zdjęcia (zlecenie 18, punkt 13), ta sama kompozycja na każdym ekranie. Środek budynku Instytutu leży na 47% wysokości zdjęcia.
+// Komputer: szerokość tak, by przy prawej krawędzi ekranu wypadało 92% zdjęcia, ale zdjęcie sięga pełnego granatu u dołu (77% wysokości
+// okładki); środek budynku na 34,5% wysokości okładki, u góry bez pustego miejsca. Telefon: rozmiar i poziomo w CSS (zal-telefon.css), tu
+// tylko pionowo: środek budynku w połowie między paskiem a górą liter „Instytut”. Bez JS kadr z CSS.
+const ULOZ = `(function(ok){var S=.32,f=ok.querySelector('.z-okl-foto:not(.z-lqip)');function uloz(){if(!ok.offsetHeight)return;` +
+  `if(matchMedia('(max-width: 760px)').matches){var l=ok.querySelector('.w1');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,(l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
   `var tyt=ok.querySelector('.z-okl-tytul'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2');if(!tyt||!w1||!w2)return;` +
   `var H=ok.clientHeight,W=ok.clientWidth,i,A,M,f2;tyt.style.removeProperty('--f2');var f1=parseFloat(getComputedStyle(w1).fontSize),o=ok.getBoundingClientRect();` +
   `function b(el){var r=el.getBoundingClientRect();return{x2:r.right-o.left,yc:(r.top+r.bottom)/2-o.top}}` +
@@ -83,14 +88,16 @@ const ULOZ = `(function(ok){var S=.32;function uloz(){if(!ok.offsetHeight||match
   `kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],` +
   `g='rgb(9 16 34',k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
   `ok.style.setProperty('--skos','linear-gradient('+kat.toFixed(2)+'deg, '+g+' / .97) 0px, '+k.map(function(p){return g+' / '+p[1]+') '+(t1+p[0]*zanik).toFixed(1)+'px'}).join(', ')+')');` +
-  `ok.style.setProperty('--foto-x',Math.max(0,x0-150)+'px');ok.classList.add('z-ulozona')}` +
-  `uloz();if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
+  `var X=Math.max(0,x0-150),r=f&&(f.getAttribute('width')/f.getAttribute('height')||f.naturalWidth/f.naturalHeight);ok.style.setProperty('--foto-x',X+'px');` +
+  `if(r){var D=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',D+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*D/r)+'px');ok.classList.add('z-kadr')}` +
+  `ok.classList.add('z-ulozona')}` +
+  `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 
-// szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6): zdjęcie wypełnia okładkę przez object-fit: cover, a okładka jest
-// wyższa niż szeroka w proporcjach zdjęcia (p), więc liczy się wysokość — na komputerze max(600px, 100svh), na telefonie
-// zdjęcie zajmuje ok. 52% wysokości ekranu (zal-telefon.css)
+// szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6; zlecenie 18, punkt 13): na komputerze ok. 1,09 · (100vw − foto-x), czyli
+// nieco ponad szerokość okna, a przy niskim oknie 77% wysokości okładki (max(600px, 100svh)) razy proporcje zdjęcia (p); na telefonie
+// 62% wysokości okładki razy p (zal-telefon.css)
 const rozmiarOkl = (p: number) =>
-  `(min-width: 761px) max(85vw, ${Math.ceil(600 * p)}px, ${Math.ceil(100 * p)}vh), max(100vw, ${Math.ceil(52 * p)}vh)`;
+  `(min-width: 761px) max(103vw, ${Math.ceil(462 * p)}px, ${Math.ceil(77 * p)}vh), max(100vw, ${Math.ceil(62 * p)}vh)`;
 ---
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
