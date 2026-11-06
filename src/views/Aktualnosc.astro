@@ -177,8 +177,8 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
     .akt-karta { grid-template-columns: 240px minmax(0, 1fr); column-gap: 20px; align-items: start; margin: 4px 0 24px; }
     .akt-karta:has(.akt-fot) .akt-wyd { padding-top: 0; border-top: 0; }
     .akt-karta:not(:has(.akt-fot)), .akt-karta:not(:has(.akt-wyd)) { grid-template-columns: minmax(0, 1fr); }
-    .akt-karta:not(:has(.akt-wyd)) .akt-fot { display: grid; grid-template-columns: 240px minmax(0, 1fr); column-gap: 20px; align-items: start; }
-    .akt-karta:not(:has(.akt-wyd)) .akt-fot figcaption { margin-top: 0; }
+    /* samo zdjęcie, bez wydarzenia: karta tak szeroka jak zdjęcie z podpisem, bez pustego tła (zlecenie 25, punkt 2.13) */
+    .akt-karta:not(:has(.akt-wyd)) { width: fit-content; max-width: 360px; }
   }
 
   /* ---------- okno ≥ 1104 px: dwie kolumny. Rzędy: lewa kolumna idzie po kolei (auto), a ostatni rząd (1fr) bierze nadmiar wysokości,
