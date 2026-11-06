@@ -1,0 +1,27 @@
+ M src/components/Naglowek.astro
+ M src/components/zal/Okladka.astro
+ M src/components/zal/PanelMenu.astro
+ M src/components/zal/PasekMenu.astro
+ M src/layouts/Baza.astro
+ M src/lib/menu.ts
+ M src/scripts/zal/menu.ts
+ M src/scripts/zal/przejazd.ts
+ M src/styles/global.css
+ M src/styles/telefon.css
+ M src/styles/uklad-zwarta.css
+ M src/styles/zal-telefon.css
+ M src/styles/zalozyciele.css
+?? .claude/
+?? package-lock.json
+?? raport-zrzuty/z18-aktualnosci-baner-po-komputer-en.png
+?? raport-zrzuty/z18-aktualnosci-baner-po-komputer.png
+?? raport-zrzuty/z18-aktualnosci-baner-po-telefon-en.png
+?? raport-zrzuty/z18-aktualnosci-baner-po-telefon.png
+?? raport-zrzuty/z18-aktualnosci-baner-przed-komputer.png
+?? raport-zrzuty/z18-aktualnosci-baner-przed-telefon.png
+?? raport-zrzuty/z18-lista-1024.jpg
+?? raport-zrzuty/z18-lista-1536-ciemny.jpg
+?? raport-zrzuty/z18-lista-1536-jasny.jpg
+?? raport-zrzuty/z18-lista-800.jpg
+?? raport-zrzuty/z18-lista-filtr-1536.jpg
+?? src/styles/zal-menu.css
