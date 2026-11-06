@@ -4,6 +4,7 @@
 // (zgoda zapamiętana w tej przeglądarce pod tym samym kluczem „mapa-google” co mapa w dotychczasowym bloku).
 import Sekcja from './Sekcja.astro';
 import { t } from '../../../lib/i18n';
+import { mailHtml } from '../../../lib/limity.mjs';
 import type { Lang } from '../../../lib/daty';
 
 interface Props {
@@ -27,7 +28,7 @@ const linki = [
       <dl>
         {k.adres && <div><dt>{T('Adres', 'Address')}</dt><dd>{k.adres}</dd></div>}
         {k.telefon && <div><dt>{T('Telefon', 'Phone')}</dt><dd><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></dd></div>}
-        {k.email && <div><dt>E-mail</dt><dd><a href={`mailto:${k.email}`}>{k.email}</a></dd></div>}
+        {k.email && <div><dt>E-mail</dt><dd><a href={`mailto:${k.email}`} data-limit-linii="2" set:html={mailHtml(k.email)} /></dd></div>}
         {godziny && <div><dt>{T('Godziny', 'Hours')}</dt><dd>{godziny}</dd></div>}
       </dl>
     </div>

@@ -12,6 +12,7 @@
 import { zTytulem } from '../lib/osoby';
 import type { Lang } from '../lib/daty';
 import { isExternal } from '../lib/url';
+import { czesciMaila } from '../lib/limity.mjs';
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export interface Osoba {
@@ -108,8 +109,8 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy, lang 
       <li key={o.id} className={o.strona ? 'zp-w zp-klik' : 'zp-w'}>
         <div className="zp-n">
           {o.strona ? (isExternal(o.strona)
-            ? <a className="zp-imie zew" href={o.strona}>{nazwa}<span className="sr-only">{napisy.zewn}</span></a>
-            : <a className="zp-imie" href={o.strona}>{nazwa}</a>) : <span className="zp-imie">{nazwa}</span>}
+            ? <a className="zp-imie zew" data-limit-linii="2" href={o.strona}>{nazwa}<span className="sr-only">{napisy.zewn}</span></a>
+            : <a className="zp-imie" data-limit-linii="2" href={o.strona}>{nazwa}</a>) : <span className="zp-imie" data-limit-linii="2">{nazwa}</span>}
           {(o.funkcja || linkZakladu) && (
             <small>
               {o.funkcja}
@@ -123,7 +124,7 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy, lang 
           {o.email && (
             <>
               <span className="zp-lbl">{napisy.email}: </span>
-              <a href={`mailto:${o.email}`}>{o.email}</a>
+              <a href={`mailto:${o.email}`} data-limit-linii="2"><span className="mail-cz">{czesciMaila(o.email)[0]}</span><wbr /><span className="mail-cz">{czesciMaila(o.email)[1]}</span></a>
             </>
           )}
         </div>

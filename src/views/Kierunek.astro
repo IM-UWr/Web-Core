@@ -20,6 +20,7 @@ import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneKierunku } from '../lib/widoki/kierunek';
 import { tytulyWJezyku } from '../lib/osoby';
+import { limitKomorki, mailHtml } from '../lib/limity.mjs';
 
 interface Props { kierunek: CollectionEntry<'kierunki'>; lang: Lang }
 const { kierunek, lang } = Astro.props;
@@ -180,9 +181,9 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
         <tbody>
           {d.terminy.map((x) => (
             <tr>
-              <td>{w(x, 'co')}</td>
-              <td>{w(x, 'kogo')}</td>
-              <td>{w(x, 'termin')}</td>
+              <td data-limit-linii={limitKomorki(w(x, 'co'))}>{w(x, 'co')}</td>
+              <td data-limit-linii={limitKomorki(w(x, 'kogo'))}>{w(x, 'kogo')}</td>
+              <td data-limit-linii={limitKomorki(w(x, 'termin'))}>{w(x, 'termin')}</td>
               {formularze && <td>{x.formularz && (x.formularz_adres ? <Link href={x.formularz_adres}>{w(x, 'formularz')}</Link> : w(x, 'formularz'))}</td>}
             </tr>
           ))}
@@ -269,10 +270,10 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
         {d.kontakt.map((k) => (
           <div>
             <span class="etyk">{w(k, 'rola')}</span>
-            <b>{tytulyWJezyku(k.osoba, lang)}</b>
+            <b data-limit-linii="2">{tytulyWJezyku(k.osoba, lang)}</b>
             {(k.email || k.telefon || k.pokoj) && (
               <dl class="para">
-                {k.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${k.email}`}>{k.email}</a></dd></>}
+                {k.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${k.email}`} data-limit-linii="2" set:html={mailHtml(k.email)} /></dd></>}
                 {k.telefon && <><dt>{T('tel.', 'phone')}</dt><dd>{k.telefon}</dd></>}
                 {k.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{k.pokoj}</dd></>}
               </dl>

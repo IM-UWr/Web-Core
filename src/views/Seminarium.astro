@@ -19,6 +19,7 @@ import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n'
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
 import { slugOf, sala, salaReferatu, afiliacjaReferatu, type Seminarium } from '../lib/tresci';
 import { daneSeminarium } from '../lib/widoki/seminarium';
+import { mailHtml } from '../lib/limity.mjs';
 
 interface Props { seminarium: Seminarium; lang: Lang }
 const { seminarium, lang } = Astro.props;
@@ -76,13 +77,13 @@ const spis = [
           {koordynatorzy.length > 0 && (
             <div>
               <span class="etyk">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
-              {koordynatorzy.map((k) => <b>{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</b>)}
+              {koordynatorzy.map((k) => <b data-limit-linii="2">{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</b>)}
             </div>
           )}
           {d.kontakt && (
             <div>
               <span class="etyk">{T('Kontakt', 'Contact')}</span>
-              <a class="wart" href={`mailto:${d.kontakt}`}>{d.kontakt}</a>
+              <a class="wart" href={`mailto:${d.kontakt}`} data-limit-linii="2" set:html={mailHtml(d.kontakt)} />
             </div>
           )}
           {zakladySem.length > 0 && (

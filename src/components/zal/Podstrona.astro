@@ -2,10 +2,12 @@
 // Wspólny szablon podstrony (kierunek „Założyciele”; zlecenie 12, etap 2; zlecenie 11, zalecenie 3):
 // nagłówek (NaglowekStrony → zal/NaglowekZ), treść bez kafelków i pasów, spis „Na tej stronie” z prawej (zal/SpisStrony),
 // „Następna strona w dziale” i „Zgłoś błąd” (wstawia Baza.astro pod <main> na podstronach z menu działu).
-// Jedna wersja HTML: komputer — treść i kolumna spisu 236 px; telefon — jedna kolumna, spis zwijany nad treścią
+// Jedna wersja HTML: komputer — treść i kolumna spisu 236 px; telefon — jedna kolumna, bez spisu
 // (src/styles/zal-podstrona.css). Strona z mniej niż 2 sekcjami nie ma spisu, treść ma tę samą szerokość.
 // Slot „bok” (opcjonalny; zlecenie 11, zalecenie 4 — np. powiadomienia e-mail seminarium): blok w prawej kolumnie pod
 // spisem, oddzielony kreską, przyklejony razem ze spisem; na telefonie pod treścią.
+// Gdy brakuje miejsca (zlecenie 25, punkt 1): pomiar w linii na końcu .z-pd. Najpierw stan pełny, potem pole zwinięte nad treścią (data-pole="zwiniete"), na końcu
+// widok telefonu dla samej treści (data-tresc="telefon", reguły robi src/plugins/postcss-tresc-telefon.mjs). Pozycje z limitem linii mają data-limit-linii="N" (src/lib/limity.mjs).
 // Sloty: domyślny — treść; „baner” — to, co ma stać w nagłówku pod tytułem (liczby .pt-liczby, plakietki, linki).
 // Właściwości: jak Baza (tytul, opis, obraz, uklad…) i NaglowekStrony (lead, haslo, okruszki, wstecz) oraz
 // dzial (kolory działu treści), spis ({ id, etykieta, krotka? }), klasa i atrybuty elementu treści.
@@ -14,6 +16,7 @@ import NaglowekStrony from '../NaglowekStrony.astro';
 import SpisStrony from './SpisStrony.astro';
 import type { Lang } from '../../lib/daty';
 import type { Dzial } from '../../lib/patroni';
+import { MQ_TELEFON } from '../../lib/media';
 
 interface Props {
   lang: Lang;
@@ -45,6 +48,22 @@ interface Props {
 }
 const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, hasloBezLiczb, bezPodpisu, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
 const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lang, okruszki, wstecz };
+
+// Zasada treści (zlecenie 25, punkt 1). Pozycja jest zła, gdy ma więcej linii niż limit (różne górne krawędzie prostokątów tekstu, tolerancja pół wysokości linii, tekst tylko
+// dla czytnika pominięty) albo gdy słowo wystaje z kolumny. Chwile: przed pierwszym narysowaniem, po wczytaniu krojów, przy zmianie szerokości okna (od stanu pełnego, w rAF, bez mrugania).
+// Po filtrowaniu (zdarzenie z-spis) stan tylko schodzi niżej, żeby układ nie skakał przy wpisywaniu. Widok telefonu całej strony: atrybuty zdjęte, nic nie trzeba mierzyć.
+const ZASADA = `(function(pd){var tel=matchMedia('${MQ_TELEFON}'),tr=pd.querySelector('.z-pd-tresc'),pelna=pd.classList.contains('z-pd-pelna'),sz=innerWidth,cz;` +
+  `function zla(e){var k=e,kr,w,t,g=document.createRange(),rs=[],i,r,ile=0,d=-1e9;while(k.parentElement&&getComputedStyle(k).display==='inline')k=k.parentElement;kr=k.getBoundingClientRect();` +
+  `w=document.createTreeWalker(e,4);while(t=w.nextNode()){if(!t.nodeValue.trim()||t.parentElement.closest('.sr-only'))continue;g.selectNodeContents(t);rs.push.apply(rs,[].slice.call(g.getClientRects()))}` +
+  `rs=rs.filter(function(q){return q.width>2}).sort(function(a,b){return a.top-b.top});` +
+  `for(i=0;i<rs.length;i++){r=rs[i];if(r.right>kr.right+1||r.left<kr.left-1)return true;if(r.top-d>r.height/2){ile++;d=r.top}}` +
+  `return ile>+e.getAttribute('data-limit-linii')||k.scrollWidth>k.clientWidth+1}` +
+  `function zle(){if(tr.scrollWidth>tr.clientWidth+1)return true;var e=pd.querySelectorAll('[data-limit-linii]'),i;for(i=0;i<e.length;i++)if(zla(e[i]))return true;return false}` +
+  `function uloz(odNowa){var y=scrollY;if(tel.matches||odNowa){pd.removeAttribute('data-pole');pd.removeAttribute('data-tresc')}if(tel.matches)return;` +
+  `if(!pd.hasAttribute('data-tresc')&&zle()){if(!pelna&&!pd.hasAttribute('data-pole')){pd.setAttribute('data-pole','zwiniete');if(zle())pd.setAttribute('data-tresc','telefon')}else pd.setAttribute('data-tresc','telefon')}` +
+  `if(scrollY!==y)scrollTo({top:y,behavior:'instant'})}` +
+  `uloz(true);addEventListener('resize',function(){if(innerWidth===sz)return;sz=innerWidth;cancelAnimationFrame(cz);cz=requestAnimationFrame(function(){uloz(true)})});` +
+  `if(document.fonts)document.fonts.ready.then(function(){uloz(true)});document.addEventListener('z-spis',function(){uloz(false)})})(document.currentScript.parentElement);`;
 ---
 <Baza tytul={tytulKarty ?? tytul} opis={opis} obraz={obraz} opublikowany={opublikowany} alternatywa={alternatywa} typ={typ} uklad={uklad}>
   {Astro.slots.has('baner')
@@ -55,5 +74,6 @@ const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lan
       ? <div class="z-pd-prawa"><SpisStrony spis={spis} lang={lang} /><div class="z-pd-bok"><slot name="bok" /></div></div>
       : <SpisStrony spis={spis} lang={lang} />}
     <div class:list={['z-pd-tresc', klasa]} {...atrybuty}><slot /></div>
+    <script is:inline set:html={ZASADA} />
   </div>
 </Baza>

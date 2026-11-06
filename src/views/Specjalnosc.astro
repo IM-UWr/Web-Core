@@ -19,6 +19,7 @@ import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz, langTekstu } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneSpecjalnosci } from '../lib/widoki/specjalnosc';
+import { mailHtml } from '../lib/limity.mjs';
 
 interface Props { specjalnosc: CollectionEntry<'specjalnosci'>; lang: Lang }
 const { specjalnosc, lang } = Astro.props;
@@ -211,12 +212,12 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
         {opiekunowie.map((o) => (
           <div>
             {o.rola && <span class="etyk">{w(o, 'rola')}</span>}
-            <b>{o.osoba?.data.strona
+            <b data-limit-linii="2">{o.osoba?.data.strona
               ? <Link href={o.osoba.data.strona}>{zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang)}</Link>
               : o.osoba ? zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang) : o.imie_nazwisko}</b>
             {o.osoba && (o.osoba.data.email || o.osoba.data.pokoj || o.osoba.data.telefon) && (
               <dl class="para">
-                {o.osoba.data.email && <><dt>e-mail</dt><dd><a href={`mailto:${o.osoba.data.email}`}>{o.osoba.data.email}</a></dd></>}
+                {o.osoba.data.email && <><dt>e-mail</dt><dd><a href={`mailto:${o.osoba.data.email}`} data-limit-linii="2" set:html={mailHtml(o.osoba.data.email)} /></dd></>}
                 {o.osoba.data.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{o.osoba.data.pokoj}</dd></>}
                 {o.osoba.data.telefon && <><dt>{T('tel.', 'phone')}</dt><dd>{o.osoba.data.telefon}</dd></>}
               </dl>

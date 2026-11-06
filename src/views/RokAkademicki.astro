@@ -24,6 +24,7 @@ import { t, wJezyku } from '../lib/i18n';
 import { long, longWithDay, range, daysBetween, type Lang } from '../lib/daty';
 import { nazwaSemestru, nazwaDnia, dzienTygodnia, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
 import { daneRokuAkademickiego } from '../lib/widoki/rokAkademicki';
+import { limitKomorki } from '../lib/limity.mjs';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -101,7 +102,7 @@ const ps = (id: string) => (panele ? { 'data-ps-dla': id, 'data-ps-aktywny': id 
             <table class="tab kd-terminy">
               <tbody>
                 {x.terminy.map((w) => (
-                  <tr class:list={{ wazne: w.wazne }}><th scope="row">{w.etykieta}</th><td>{w.wartosc}</td></tr>
+                  <tr class:list={{ wazne: w.wazne }}><th scope="row" data-limit-linii={limitKomorki(w.etykieta)}>{w.etykieta}</th><td data-limit-linii={limitKomorki(w.wartosc)}>{w.wartosc}</td></tr>
                 ))}
               </tbody>
             </table>

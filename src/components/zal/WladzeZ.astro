@@ -8,6 +8,7 @@ import '../../styles/zalozyciele-strony.css';
 import OsobaZ from './OsobaZ.astro';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku } from '../../lib/i18n';
+import { mailHtml } from '../../lib/limity.mjs';
 import type { Lang } from '../../lib/daty';
 
 type Os = { rola: string; nazwa: string; inicjaly: string; email: string; pokoj: string; strona: string; zakres: string; dyzur: string; zdjecie: string; zaklad?: { nazwa: string; adres: string } };
@@ -23,8 +24,6 @@ interface Props {
 const { lang, wstep, dyrektor, zastepcy, wydzial, sekretariat, kadencjaHtml, radaHtml, radaTytul, linki } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
-const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const mail = (e: string) => esc(e).replace('@', '<wbr>@');
 const tel = (n: string) => { const c = n.replace(/[^\d+]/g, ''); return `tel:${c.startsWith('+') ? c : `+48${c}`}`; };
 const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
 ---
@@ -54,7 +53,7 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
     {sekretariat.opis && <p class="wst">{sekretariat.opis}</p>}
     <div class="z-kont">
       <dl>
-        {sekretariat.email && <div><dt>{T('E-mail', 'E-mail')}</dt><dd><a href={`mailto:${sekretariat.email}`} set:html={mail(sekretariat.email)} /></dd></div>}
+        {sekretariat.email && <div><dt>{T('E-mail', 'E-mail')}</dt><dd><a href={`mailto:${sekretariat.email}`} data-limit-linii="2" set:html={mailHtml(sekretariat.email)} /></dd></div>}
         {sekretariat.telefony.length > 0 && <div><dt>{T('Telefon', 'Phone')}</dt><dd>{sekretariat.telefony.map((n, i) => <>{i > 0 && ', '}<a href={tel(n)}>{n}</a></>)}</dd></div>}
         {(sekretariat.adres || sekretariat.pokoj) && <div><dt>{T('Adres', 'Address')}</dt><dd>{[sekretariat.adres, sekretariat.pokoj && pok(sekretariat.pokoj)].filter(Boolean).join(', ')}</dd></div>}
         {sekretariat.godziny && <div><dt>{T('Godziny', 'Hours')}</dt><dd>{sekretariat.godziny}</dd></div>}
@@ -62,7 +61,7 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
       {sekretariat.osoby.length > 0 && (
         <div class="z-sek-osoby">
           {sekretariat.osoby.map((o) => (
-            <div class="z-os"><div class="imie">{o.nazwa}</div><div class="kont">{o.email && <a href={`mailto:${o.email}`} set:html={mail(o.email)} />}{o.telefon && <> · <a href={tel(o.telefon)}>{o.telefon}</a></>}</div></div>
+            <div class="z-os"><div class="imie" data-limit-linii="2">{o.nazwa}</div><div class="kont">{o.email && <a href={`mailto:${o.email}`} data-limit-linii="2" set:html={mailHtml(o.email)} />}{o.telefon && <> · <a href={tel(o.telefon)}>{o.telefon}</a></>}</div></div>
           ))}
         </div>
       )}

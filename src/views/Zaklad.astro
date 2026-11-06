@@ -20,6 +20,7 @@ import { t, wJezyku, wybierz, RODZAJE_GRANTOW, langPola } from '../lib/i18n';
 import { range, long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { slugOf, sala, salaReferatu, miejsce, trwaLubBedzie, type Zaklad, type Pracownik } from '../lib/tresci';
 import { daneZakladu } from '../lib/widoki/zaklad';
+import { mailHtml } from '../lib/limity.mjs';
 
 interface Props { zaklad: Zaklad; lang: Lang }
 const { zaklad, lang } = Astro.props;
@@ -66,12 +67,12 @@ const kierTel = kierownik?.data.telefon || d.telefon;
       <div class="kontakty zk-kier">
         <div>
           <span class="etyk">{T('Kierownik', 'Head')}</span>
-          <b>{kierownik?.data.strona
+          <b data-limit-linii="2">{kierownik?.data.strona
             ? <Link href={kierownik.data.strona}>{imie(kierownik)}</Link>
             : kierownik ? imie(kierownik) : tytulyWJezyku(d.kierownik ?? '', lang)}</b>
           {(kierownik?.data.email || kierTel || kierownik?.data.pokoj) && (
             <dl class="para">
-              {kierownik?.data.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${kierownik.data.email}`}>{kierownik.data.email}</a></dd></>}
+              {kierownik?.data.email && <><dt>{T('e-mail', 'e-mail')}</dt><dd><a href={`mailto:${kierownik.data.email}`} data-limit-linii="2" set:html={mailHtml(kierownik.data.email)} /></dd></>}
               {kierTel && <><dt>{T('tel.', 'phone')}</dt><dd>{kierTel}</dd></>}
               {kierownik?.data.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{kierownik.data.pokoj}</dd></>}
             </dl>
@@ -87,8 +88,8 @@ const kierTel = kierownik?.data.telefon || d.telefon;
           <tbody>
             {g.osoby.map((o) => (
               <tr>
-                <td>{o.data.strona ? <Link href={o.data.strona}>{imie(o)}</Link> : imie(o)}</td>
-                <td class="zk-mail">{o.data.email && <a href={`mailto:${o.data.email}`}>{o.data.email}</a>}</td>
+                <td data-limit-linii="2">{o.data.strona ? <Link href={o.data.strona}>{imie(o)}</Link> : imie(o)}</td>
+                <td class="zk-mail">{o.data.email && <a href={`mailto:${o.data.email}`} data-limit-linii="2" set:html={mailHtml(o.data.email)} />}</td>
                 <td class="zk-pok">{o.data.pokoj && <><span class="zk-lbl">{T('pok.', 'room')} </span>{o.data.pokoj}</>}</td>
               </tr>
             ))}
@@ -240,10 +241,8 @@ const kierTel = kierownik?.data.telefon || d.telefon;
   .zk-o { margin-top: 18px; }
   /* kierownik: jeden blok kontaktu wzorca, szerszy niż kolumna 1/3 */
   :global(.tresc) .kontakty.zk-kier { grid-template-columns: minmax(0, 480px); margin: 0 0 6px; }
-  .zk-kier .para { overflow-wrap: anywhere; }
-  /* tabela składu: kolumna pokoju wąska (wzorzec daje ostatniej kolumnie 14em), e-mail łamany w dowolnym miejscu */
+  /* tabela składu: kolumna pokoju wąska (wzorzec daje ostatniej kolumnie 14em) */
   table.tab.zk-os td.zk-pok { min-width: 0; width: 5.5em; font-variant-numeric: tabular-nums; }
-  table.tab.zk-os td.zk-mail { overflow-wrap: anywhere; }
   table.tab.zk-os td a :global(span) { font-size: .8em; }
   .zk-lbl { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .zk-dalej { margin: 18px 0 0; font-size: 15px; color: var(--muted); }

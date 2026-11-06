@@ -17,6 +17,7 @@ import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { danePublikacji, odmiana } from '../lib/widoki/publikacje';
+import { mailHtml } from '../lib/limity.mjs';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -95,7 +96,7 @@ const spis = [
                 {wydawca && <><dt>{T('Wydawca', 'Publisher')}</dt><dd>{wydawca}</dd></>}
                 {wsparcie && <><dt>{T('Wsparcie', 'Sponsored by')}</dt><dd>{wsparcie}</dd></>}
                 {redakcja && <><dt>{T('Redakcja', 'Editorial office')}</dt><dd>{redakcja}</dd></>}
-                {c.kontakt && <><dt>{T('Kontakt', 'Contact')}</dt><dd><a href={`mailto:${c.kontakt}`}>{c.kontakt}</a></dd></>}
+                {c.kontakt && <><dt>{T('Kontakt', 'Contact')}</dt><dd><a href={`mailto:${c.kontakt}`} set:html={mailHtml(c.kontakt)} /></dd></>}
                 {issn && <><dt>ISSN</dt><dd>{issn}</dd></>}
               </dl>
             )}

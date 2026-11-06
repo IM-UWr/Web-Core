@@ -4,6 +4,8 @@
 // - komputer: kolumna z prawej (236 px), przyklejona; nad listą „Na tej stronie” w kolorze działu, lista z cienką linią
 //   po lewej, bieżąca sekcja pogrubiona, a na linii odcinek 3 px w kolorze działu, który przesuwa się między pozycjami;
 // - telefon (≤ 1023 px): bez spisu (zlecenie 18, punkt 18).
+// - gdy na podstronie brakuje miejsca (.z-pd[data-pole="zwiniete"], pomiar w zal/Podstrona.astro; zlecenie 25, punkt 1): pole zwinięte nad treścią, wygląd i działanie sprzed
+//   punktu 18: przycisk z nazwą, lista po rozwinięciu, kliknięcie w pozycję zwija. Bez JS lista otwarta.
 // Bieżąca sekcja: ostatnia, której początek minął ok. 30% wysokości okna (aria-current="location"). Kliknięcie — płynne
 // przewinięcie (20 px zapasu; przy „ogranicz ruch” od razu). Zwykłe linki #kotwica, więc działają też bez JS.
 // Sekcje schowane (filtr planu, inny semestr) znikają ze spisu; widok może poprosić o odświeżenie zdarzeniem `z-spis`.
@@ -18,6 +20,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
 {spis.length >= 2 && (
   <nav class="z-spis" aria-labelledby="z-spis-h" data-pagefind-ignore data-z-spis>
     <p class="z-spis-h" id="z-spis-h">{tytul}</p>
+    <button type="button" class="z-spis-przelacz" aria-expanded="false" aria-controls="z-spis-lista">{tytul}<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <ul class="z-spis-lista" id="z-spis-lista">
       {spis.map((s) => <li><a href={`#${s.id}`} title={s.krotka && s.krotka !== s.etykieta ? s.etykieta : undefined}>{s.krotka ?? s.etykieta}</a></li>)}
       <li class="z-spis-znacznik" aria-hidden="true"></li>
@@ -40,6 +43,14 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
       try { return document.getElementById(decodeURIComponent(a.hash.slice(1))); } catch { return null; }
     };
     const widoczny = (el: HTMLElement | null): el is HTMLElement => !!el && el.getClientRects().length > 0;
+
+    // stan zwinięty nad treścią: przycisk rozwija listę, wybór pozycji ją zwija
+    const przelacz = spis.querySelector<HTMLButtonElement>('.z-spis-przelacz');
+    const ustawOtwarty = (otwarty: boolean) => {
+      przelacz?.setAttribute('aria-expanded', String(otwarty));
+      spis.classList.toggle('z-spis-otwarty', otwarty);
+    };
+    przelacz?.addEventListener('click', () => ustawOtwarty(!spis.classList.contains('z-spis-otwarty')));
 
     let ramka = 0;
     const zaplanuj = () => { cancelAnimationFrame(ramka); ramka = requestAnimationFrame(odswiez); };
@@ -72,6 +83,7 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
 
     // kliknięcie: płynne przewinięcie do sekcji (20 px zapasu), przy „ogranicz ruch” od razu
     pozycje.forEach(({ a }) => a.addEventListener('click', (e) => {
+      ustawOtwarty(false);
       const el = cel(a);
       if (!el) return;
       e.preventDefault();

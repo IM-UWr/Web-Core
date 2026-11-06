@@ -4,7 +4,7 @@
    Komputer (≥ 1024 px): treść i kolumna spisu 236 px z prawej, odstęp 56 px; spis przyklejony, wariant „kreska”.
    Strona bez spisu (mniej niż 2 sekcje) ma tę samą szerokość treści, a miejsce po prawej puste.
    Wyjątek: .z-pd-pelna (lista Aktualności, wpis z kartą boczną), treść na całą szerokość ramy, a prawą kolumnę układa sam widok.
-   Telefon (≤ 1023 px): jedna kolumna, spis zwijany nad treścią.
+   Telefon (≤ 1023 px): jedna kolumna, bez spisu.
    ========================================================================== */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
@@ -40,6 +40,24 @@
     transform-origin: 0 0; transition: transform .25s var(--rytm); }
   .z-spis-znacznik[hidden] { display: none; }
 
+  /* Pole zwinięte nad treścią, gdy na tej podstronie brakuje miejsca (zlecenie 25, punkt 1; pomiar w zal/Podstrona.astro). Prawa kolumna ustępuje treści. */
+  .z-spis-przelacz { display: none; }
+  .z-pd[data-pole="zwiniete"] { display: block; }
+  .z-pd[data-pole="zwiniete"]:has(> .z-pd-prawa) { display: flex; flex-direction: column; }
+  .z-pd[data-pole="zwiniete"] > .z-pd-prawa { display: contents; }
+  .z-pd[data-pole="zwiniete"] .z-pd-bok { order: 1; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .z-pd[data-pole="zwiniete"] .z-spis { position: static; max-height: none; overflow: visible; margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
+  .z-pd[data-pole="zwiniete"] .z-spis-h { display: none; }
+  .z-pd[data-pole="zwiniete"] .z-spis-przelacz { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; margin: 0; padding: 0; border: 0; border-radius: 0;
+    background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; }
+  .z-pd[data-pole="zwiniete"] .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform var(--t-krotki) var(--rytm); }
+  .z-pd[data-pole="zwiniete"] .z-spis-otwarty .z-spis-przelacz svg { transform: rotate(180deg); }
+  .z-pd[data-pole="zwiniete"] .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .z-pd[data-pole="zwiniete"] .z-spis-lista { margin: 0 0 14px; overflow-y: visible; }
+  .z-pd[data-pole="zwiniete"] .z-spis:not(.z-spis-otwarty) .z-spis-lista { display: none; }
+  .z-pd[data-pole="zwiniete"] .z-spis-znacznik { display: none; }
+  body:has(.z-pd[data-pole="zwiniete"]) .z-nast { margin-right: var(--marg); }
+
   /* dół podstrony („Następna strona w dziale”, „Zgłoś błąd”) wyrównany do kolumny treści */
   body:has(.z-pd) .z-nast { margin-top: 0; margin-left: var(--marg); margin-right: calc(var(--marg) + 292px); }
 }
@@ -71,6 +89,20 @@
   .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
   .z-nast-meta a { color: var(--d-a); }
 }
+/* Bez JavaScriptu nie ma pomiaru (zlecenie 25, punkt 1): na podstronach z pozycjami z limitem pole zwinięte poniżej 1300 px, lista otwarta nad treścią; widok telefonu treści się nie włącza. */
+@media (min-width: 1024px) and (max-width: 1299px) {
+  html:not(.js) .z-pd:not(.z-pd-pelna):has([data-limit-linii]) { display: block; }
+  html:not(.js) .z-pd:has([data-limit-linii]) > .z-pd-prawa { display: contents; }
+  html:not(.js) .z-pd:has([data-limit-linii]) .z-spis { position: static; max-height: none; overflow: visible; margin: 0 0 18px; padding-bottom: 6px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  html:not(.js) .z-pd:has([data-limit-linii]) .z-spis-h { margin-top: 12px; }
+  html:not(.js) body:has(.z-pd [data-limit-linii]) .z-nast { margin-right: var(--marg); }
+}
+
+/* Widok telefonu dla samej treści (zlecenie 25, punkt 1): reguły telefonu i wyłączenie reguł komputera robi przy budowaniu src/plugins/postcss-tresc-telefon.mjs. Tu tylko to, czego reguły
+   telefonu nie mają: kolumna tekstu jak w widoku telefonu 753–1023 px, wysokość przyklejonego paska komputera, dół strony w tej samej kolumnie. Poza @media: atrybut stawia tylko pomiar na komputerze. */
+.z-pd[data-tresc="telefon"] { --hdr-h: var(--gora); padding-inline: max(16px, calc((100% - 720px) / 2)); }
+body:has(.z-pd[data-tresc="telefon"]) .z-nast { margin-inline: max(16px, calc((100% - 720px) / 2)); }
+
 @media (prefers-reduced-motion: reduce) {
   .z-spis-lista a, .z-spis-znacznik { transition: none; }
 }

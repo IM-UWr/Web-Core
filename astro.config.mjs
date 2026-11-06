@@ -6,7 +6,9 @@ import rehypeKatex from 'rehype-katex';
 import rehypeBase from './src/plugins/rehype-base.mjs';
 import rehypeZewn from './src/plugins/rehype-zewn.mjs';
 import rehypeBloki from './src/plugins/rehype-bloki.mjs';
+import rehypeLimity from './src/plugins/rehype-limity.mjs';
 import panelWariantow from './src/plugins/panel-wariantow.mjs';
+import trescTelefon from './src/plugins/postcss-tresc-telefon.mjs';
 
 // Adres strony. Na GitHub Pages (strona projektu) adres ma postać
 // https://<konto>.github.io/<repozytorium>/ — stąd BASE_PATH.
@@ -25,9 +27,12 @@ export default defineConfig({
   integrations: [react(), ...(PANEL_WARIANTOW ? [panelWariantow()] : [])],
   markdown: {
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex, rehypeBloki, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
+    rehypePlugins: [rehypeKatex, rehypeBloki, rehypeLimity, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
   },
   build: {
     format: 'directory',
+  },
+  vite: {
+    css: { postcss: { plugins: [trescTelefon()] } },
   },
 });
