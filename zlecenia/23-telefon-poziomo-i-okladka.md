@@ -90,3 +90,32 @@ Wpisz to w istniejące reguły (`zal-telefon.css`: 30–37, 145, 190), nie jako 
 - Przejścia między stronami (pasek stoi) bez mignięcia granatem; wejście na adres z kotwicą (`#…`) kończy z nagłówkiem sekcji pod paskiem jak dziś.
 - Strony bez banera i strona główna: piksel w piksel bez zmian; komputer bez zmian.
 - Zrzuty: `raport-zrzuty/z23-pasek-*`.
+
+## 4. Telefon, strona główna: pasek na okładce na tle zdjęcia, nie granatowy — GOTOWE (decyzja 6.11, 16:52)
+Właściciel: „Na stronie głównej w mobilce navbar powinien mieć tło zdjęcia, ewentualnie rozmazane, ale nie niebieski pasek jak teraz.”
+
+**Przyczyna ta sama co w punkcie 3:** okładka zaczyna się pod paskiem, więc pasek na górze dostaje pełny granat (`zal-telefon.css:30–33`).
+
+**Zmiana** (telefon, strona główna, tylko gdy pod paskiem jest okładka): okładka zaczyna się pod paskiem (pełna wysokość okna), a pasek jest półprzezroczysty z rozmyciem i prześwituje przez niego zdjęcie. Budynek zostaje tam, gdzie dziś: skrypt `ULOZ` w `Okladka.astro` (gałąź telefonu, linia 94) liczy środek budynku w połowie między **dolną krawędzią paska** a górą liter „Instytut”, a nie od górnej krawędzi okładki. Sprawdzone w emulacji wstrzykniętym CSS i skryptem:
+```css
+@media (max-width: 760px) {   /* po punkcie 1: nowa definicja „telefonu” */
+  .z-okladka { margin-top: calc(-1 * var(--hdr-h)); padding-top: var(--hdr-h); min-height: 100svh; min-height: 100dvh; }
+  body:has(.z-okladka) .hdr:not(.jasny):not(.menu-otwarte) { background: color-mix(in srgb, var(--granat) 30%, transparent) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.1) !important; backdrop-filter: blur(14px) saturate(1.1) !important; border-bottom-color: rgb(255 255 255 / .12) !important; }
+}
+```
+```js
+// ULOZ, telefon: h = wysokość paska .hdr (offsetHeight)
+--foto-top = Math.min(0, (h + l.top - ok.top + .14 * fontSize(l)) / 2 - .47 * f.offsetHeight)
+```
+- Wpisz w istniejące reguły (`zal-telefon.css:107` okładka, `30–37` pasek), popraw komentarze. Usuń martwe reguły starego nagłówka strony głównej w `src/styles/telefon.css:240–248` (`.hdr-glowna`), jeśli nic ich już nie używa.
+- Okładka nadal kończy się dokładnie na dolnej krawędzi okna, więc Szybki dostęp zaczyna się tam, gdzie dziś. Gdy Szybki dostęp jest pod paskiem, pasek jasny jak dziś. Otwarte menu: pasek jak dziś.
+- Z punktem 2 (okładka „na próg”): pasek prześwituje także podczas ciągnięcia okładki.
+
+**Wzór:** `23-zalaczniki/23-pasek-na-okladce.png` (390 px; jasny motyw: dziś | po, ciemny motyw: dziś | po).
+
+**Odbiór**
+- Telefon 390×844, 412×915, 360×740, PL i EN, jasny i ciemny motyw: górna krawędź okładki = 0, pasek półprzezroczysty z rozmyciem, środek budynku na tej samej wysokości ekranu co dziś (±2 px), Szybki dostęp zaczyna się na dolnej krawędzi okna jak dziś.
+- Kontrast nazwy Wydziału i ikon w pasku na zdjęciu co najmniej 4,5:1 (zmierz na najjaśniejszym miejscu zdjęcia pod paskiem; jeśli mniej, podnieś krycie granatu, nie zmieniaj rozmycia).
+- Po przejściu na Szybki dostęp pasek jasny, przy stopce jak dziś; komputer i tablet bez zmian.
+- Zrzuty: `raport-zrzuty/z23-okladka-pasek-*`.
