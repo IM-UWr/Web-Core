@@ -41,7 +41,7 @@
     try { sessionStorage.setItem('pr-prog', String(i)); } catch (e) {}
     powiedz('Próg: ' + progi[i][1] + ' wysokości ekranu');
   });
-  setTimeout(function () { if (!html.classList.contains('bez-okladki')) powiedz(matchMedia('(hover: none) and (pointer: coarse)').matches ? 'Pociągnij okładkę w górę, aby przejść do Szybkiego dostępu' : 'Przewiń kółkiem w dół, aby przejść do Szybkiego dostępu'); }, 900);
+  setTimeout(function () { if (!html.classList.contains('bez-okladki')) powiedz(matchMedia('(hover: none) and (pointer: coarse)').matches ? 'Pociągnij okładkę w górę, aby przejść do Szybkiego dostępu' : 'Kliknij „Szybki dostęp” na dole okładki — kółko na okładce nic nie robi'); }, 900);
   // linki: makieta podstrony zamiast przejścia (strona główna obsługuje swoje linki wcześniej i je zatrzymuje)
   var strona = document.getElementById('pr-strona');
   window.addEventListener('click', function (e) {
