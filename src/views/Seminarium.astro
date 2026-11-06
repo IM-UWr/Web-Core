@@ -175,6 +175,11 @@ const spis = [
   .prose + .sem-dane { margin-top: 18px; }
   .sem-dane b { margin: 2px 0 0; font-size: 19px; }
   .sem-dane .wart { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.45; overflow-wrap: anywhere; }
+  /* wąskie okno obok spisu (kolumna treści poniżej 560 px, jak siatka boksów): w trzech kolumnach nazwiska wychodzą poza kolumnę */
+  @media (min-width: 761px) and (max-width: 979px) {
+    .sem-dane { grid-template-columns: minmax(0, 1fr); }
+    .sem-dane > div + div { margin-top: 20px; }
+  }
   .ref { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
   .ref .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
   .ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }

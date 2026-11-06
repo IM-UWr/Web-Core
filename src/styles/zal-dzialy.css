@@ -25,7 +25,7 @@
   .z-dz .z-dz-rzad ul { display: flex; flex-wrap: wrap; gap: 6px 24px; }
   /* otoczka linku (zlecenie 17, punkt 3): większy obszar kliknięcia, ujemny margines zostawia napis w tym samym miejscu;
      tło o ton mocniejsze od pasa, w ciemnym motywie ciemniejsze od pasa. Telefon ma te same otoczki (niżej tylko rozmiar pisma). */
-  .z-dz-rzad a { display: inline-block; margin: -4px -10px -5px; padding: 4px 10px 5px; border-radius: 5px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink); white-space: nowrap;
+  .z-dz-rzad a { display: inline-block; margin: -4px -10px -5px; padding: 4px 10px 5px; border-radius: 5px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.35; color: var(--ink);
     transition: color var(--t-krotki) var(--rytm), background-color var(--t-krotki) var(--rytm); }
   .z-dz-rzad a:is(:hover, :active, :focus-visible) { color: var(--d-a); background-color: color-mix(in srgb, var(--d-a) 14%, var(--d-t)); }
   :root[data-theme="dark"] .z-dz-rzad a:is(:hover, :active, :focus-visible) { background-color: color-mix(in oklab, var(--d-j) 5%, #18243b); }
@@ -149,7 +149,7 @@
   .z-dz .z-dz-rzad { display: block; padding: 9px 0; }
   .z-dz .z-dz-rzad h3 { margin-bottom: 2px; font-size: 13px; }
   .z-dz .z-dz-rzad ul { gap: 2px 18px; }
-  .z-dz .z-dz-rzad a { font-size: 19px; white-space: normal; } /* długie nazwy nie mieszczą się w jednej linii */
+  .z-dz .z-dz-rzad a { font-size: 19px; }
   .z-dz .z-dz-rekr { display: inline-flex; margin-top: 10px; padding: 12px 18px; font-size: 20px; }
   .z-dz .z-dz-pas + .z-dz-tresc { padding-top: 22px; }
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
