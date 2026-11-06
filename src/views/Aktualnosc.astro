@@ -3,12 +3,18 @@
 // (zal/Podstrona.astro; zlecenie 12, etap 3). Strona poza działami: granatowy nagłówek podstrony z tytułem wpisu
 // i „← Wszystkie aktualności” (dotąd pasek z linkiem powrotu bez banera), bez spisu „Na tej stronie”.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): pierwsza sekcja to wpis — etykieta
-// „Rodzaj · Opublikowano … · dla: …”, zajawka jako pierwszy akapit (p.wst), blok wydarzenia (data jak na stronach działów,
-// pary „Kiedy / Gdzie”, stan: trwa / odbyło się) między cienkimi liniami, zdjęcie z podpisem, tekst (.prose), pełny album
-// (przycisk-link); dalej sekcje „Galeria” (Galeria.tsx — podgląd na pełnym ekranie), „Załączniki” (ul.pliki) i „Najbliższe
-// wydarzenia” (WierszWydarzenia.astro; tylko gdy są blisko), kreski między sekcjami; na końcu „Nowszy / Starszy wpis”.
+// „Rodzaj · Opublikowano … · dla: …”, zajawka jako pierwszy akapit (p.wst), karta ze zdjęciem i blokiem wydarzenia (data jak
+// na stronach działów, pary „Kiedy / Gdzie”, stan: trwa / odbyło się), tekst (.prose), pełny album (przycisk-link); dalej sekcje
+// „Galeria” (Galeria.tsx — podgląd na pełnym ekranie), „Załączniki” (ul.pliki) i „Najbliższe wydarzenia” (WierszWydarzenia.astro;
+// tylko gdy są blisko), kreski między sekcjami; na końcu „Nowszy / Starszy wpis”.
 // Bez przycisku „Udostępnij” (decyzja 30.10.2026: nigdzie na stronie).
-// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px, jedna kolumna; „Nowszy / Starszy wpis” jeden pod drugim).
+// Karta (zlecenie 18, punkt 4; podgląd: wariant B „karta boczna”). Jedna wersja HTML:
+// - okno ≥ 1104 px: dwie kolumny, treść i przyklejona karta 360 px; sekcja wpisu ma display: contents, żeby karta mogła iść
+//   przez całą wysokość lewej kolumny, także obok Galerii i Załączników;
+// - okno 761–1103 px (lewa kolumna miałaby mniej niż 560 px): karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej;
+// - telefon (≤ 760 px): karta ma display: contents, czyli jedna kolumna: blok wydarzenia między liniami, pod nim zdjęcie;
+//   „Nowszy / Starszy wpis” jeden pod drugim.
+// Wpis bez zdjęcia: karta z samym blokiem wydarzenia. Bez zdjęcia i bez wydarzenia: bez karty, prawa kolumna pusta.
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
@@ -20,6 +26,7 @@ import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, langPola } from '../lib/i18n';
 import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, type Lang } from '../lib/daty';
 import { slugOf, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
+import { zdjecie } from '../lib/zdjecia';
 
 interface Props {
   wpis: Aktualnosc;
@@ -35,14 +42,18 @@ const { tytul, zajawka, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, m
 const href = (a: string) => (isExternal(a) ? a : u(a));
 // typ pliku z prawej w liście plików (wzorzec: „PDF”, „strona ↗”)
 const typPliku = (a: string) => (isExternal(a) && !/\.[a-z0-9]{2,5}$/i.test(a.split(/[?#]/)[0]) ? (en ? 'website' : 'strona') : (a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i)?.[1] ?? '').toUpperCase());
+// karta: zdjęcie nie większe niż plik (małe zdjęcia, np. 400 px, były rozciągane)
+const zKarta = !!d.zdjecie || !!wydarzenie;
+const szerPliku = (await zdjecie(d.zdjecie))?.width;
 const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}` : '';
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta"
-  wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} klasa="tresc">
+  wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} klasa={zKarta ? 'tresc akt-z-karta' : 'tresc'} klasaRamy={zKarta ? 'z-pd-pelna' : undefined}>
   <section class="akt-wpis">
     <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}</p>
     {zajawka && <p class="wst" lang={langPola(d, 'zajawka', lang)}>{zajawka}</p>}
 
+    {zKarta && <div class="akt-karta">
     {wydarzenie && (
       <div class="akt-wyd" role="group" aria-label={en ? 'Event details' : 'Szczegóły wydarzenia'}>
         <span class:list={['akt-wyd-data', { minione: minelo }]} aria-hidden="true">{dayNum(wydarzenie.poczatek)}<small>{monthShort(wydarzenie.poczatek, lang)} {parse(wydarzenie.poczatek).y}</small></span>
@@ -58,10 +69,11 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
 
     {d.zdjecie && (
       <figure class="akt-fot">
-        <ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes="(min-width: 860px) 800px, calc(100vw - 32px)" loading="eager" />
+        <ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes="(min-width: 1104px) 328px, (min-width: 761px) 240px, calc(100vw - 32px)" loading="eager" style={szerPliku ? `--szer-pliku: ${szerPliku}px` : undefined} />
         {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
       </figure>
     )}
+    </div>}
 
     {tylkoPolski && <p class="akt-uwaga" lang="en">{t('en', 'wersjaPolska')}</p>}
     <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
@@ -135,6 +147,44 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   .akt-fot :global(img) { display: block; width: 100%; height: auto; }
   .akt-fot figcaption { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   .akt-uwaga { font-style: italic; color: var(--muted); }
+
+  /* telefon: karta nie ma własnego pudełka, blok wydarzenia i zdjęcie stoją w toku tekstu */
+  .akt-karta { display: contents; }
+
+  /* ---------- karta: komputer (≥ 761 px), zdjęcie nad blokiem wydarzenia ---------- */
+  @media (min-width: 761px) {
+    .akt-karta { display: grid; gap: 14px; padding: 16px 16px 18px; border-radius: 5px; background: var(--surface); }
+    .akt-karta .akt-fot { order: -1; max-width: none; margin: 0; }
+    .akt-karta .akt-fot :global(img) { max-width: min(100%, var(--szer-pliku, 100%)); border-radius: 3px; }
+    .akt-karta .akt-wyd { grid-template-columns: 56px minmax(0, 1fr); gap: 4px 14px; max-width: none; margin: 0; padding: 0; border: 0; }
+    .akt-karta:has(.akt-fot) .akt-wyd { padding-top: 12px; border-top: 1px solid var(--line); }
+    .akt-karta .akt-wyd-data { grid-row: 1 / span 2; font-size: 30px; }
+    .akt-karta .akt-wyd-data small { white-space: nowrap; }
+    .akt-karta .akt-wyd dl { grid-template-columns: minmax(0, 1fr); gap: 0; font-size: 15px; }
+    .akt-karta .akt-wyd dd + dt { margin-top: 6px; }
+    .akt-karta .akt-wyd .akt-stan { grid-column: 2; }
+  }
+
+  /* ---------- okno 761–1103 px: karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej ---------- */
+  @media (min-width: 761px) and (max-width: 1103.98px) {
+    .akt-karta { grid-template-columns: 240px minmax(0, 1fr); column-gap: 20px; align-items: start; margin: 4px 0 24px; }
+    .akt-karta:has(.akt-fot) .akt-wyd { padding-top: 0; border-top: 0; }
+    .akt-karta:not(:has(.akt-fot)), .akt-karta:not(:has(.akt-wyd)) { grid-template-columns: minmax(0, 1fr); }
+    .akt-karta:not(:has(.akt-wyd)) .akt-fot { display: grid; grid-template-columns: 240px minmax(0, 1fr); column-gap: 20px; align-items: start; }
+    .akt-karta:not(:has(.akt-wyd)) .akt-fot figcaption { margin-top: 0; }
+  }
+
+  /* ---------- okno ≥ 1104 px: dwie kolumny. Rzędy: lewa kolumna idzie po kolei (auto), a ostatni rząd (1fr) bierze nadmiar wysokości,
+     gdy karta jest wyższa od tekstu; bez niego nadmiar rozkładałby się na odstępy między akapitami ---------- */
+  @media (min-width: 1104px) {
+    :global(.z-pd-tresc.akt-z-karta) { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: repeat(12, auto) 1fr; column-gap: 56px; }
+    :global(.z-pd-tresc.akt-z-karta > *), .akt-wpis > * { grid-column: 1; min-width: 0; }
+    .akt-wpis { display: contents; }
+    .akt-wpis > .akt-karta { grid-column: 2; grid-row: 1 / -1; align-self: start; position: sticky; top: calc(var(--gora) + 16px);
+      max-height: calc(100vh - var(--gora) - 32px); overflow-y: auto; overscroll-behavior: contain; }
+    /* odstęp i kreska po sekcji wpisu (zal-tresc.css: .tresc > section) na jej ostatnim elemencie, bo sama sekcja nie ma pudełka */
+    .akt-wpis:not(:last-of-type) > :last-child { padding-bottom: 44px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
+  }
   .akt-galeria :global(.gallery button) { border-radius: 0; }
 
   /* „Nowszy / Starszy wpis”: jak „Następna strona w dziale” — gruba kreska nad, tytuły Brygadą */
