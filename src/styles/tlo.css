@@ -143,7 +143,8 @@ body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-c
 .ph-granat.ph-z-foto { --ph-linie: rgb(232 239 248 / .22); }
 
 /* --- telefon i wąskie okna: motyw mniejszy, w prawym górnym rogu, za tytułem; zdjęcie pasem nad tytułem --- */
-@media (max-width: 760px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .ph .wrap { min-height: 0; padding-top: 22px; padding-bottom: 26px; }
   .js .hdr-foto ~ main > .ph:first-child > .wrap { min-height: 0; padding-top: calc(22px + var(--hdr-h)); }
   .js .hdr-foto ~ main > .ph:first-child .ph-m { top: var(--hdr-h); }
@@ -192,6 +193,6 @@ body[data-sekcje='karty'] .studia { border-top: 0; }
 body[data-sekcje='karty'] .prose h2 { position: relative; margin-top: 1.9em; padding-bottom: 12px; border-bottom: 2px solid var(--line); }
 body[data-sekcje='karty'] .prose h2::after { content: ''; position: absolute; left: 0; bottom: -2px; width: 64px; height: 2px; background: var(--accent); }
 body[data-sekcje='karty'] .prose > h2:first-child { margin-top: 0; }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   body[data-sekcje='karty'] .section > .wrap { margin-inline: 8px; }
 }

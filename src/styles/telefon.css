@@ -1,7 +1,7 @@
 /* ==========================================================================
    Telefon (≤ 760 px): wygląd wariantu „Portal”
    Na komputerze i tablecie (≥ 761 px) strona wygląda dokładnie tak jak bez tego pliku — każda reguła poniżej
-   (poza .tylko-telefon) siedzi w @media (max-width: 760px).
+   (poza .tylko-telefon) siedzi w @media telefonu.
    Wartości są przeniesione z wariantu „Portal” (gałąź wariant-portal: global.css i tlo.css; tam obowiązują
    na każdej szerokości). Plik ładuje się po global.css i tlo.css, więc reguły z węższych progów tamtych plików
    (720, 560 px), które nadpisywały te same właściwości, są tu powtórzone niżej — inaczej przegrałyby kolejnością.
@@ -15,7 +15,8 @@
    Gdy telefonowy układ wymaga innych znaczników (inna kolejność lub liczba pozycji), strona ma oba bloki:
    .tylko-komputer (dotychczasowy) i .tylko-telefon (portalowy, z data-pagefind-ignore, bez powtórzonych id). */
 
-@media (max-width: 760px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   /* ---------- podstawy ---------- */
   :root { --section: clamp(22px, 2.8vw, 34px); --hdr-h: 61px; }
   body { font-size: 16px; line-height: 1.55; }
@@ -146,7 +147,7 @@
    var(--znacznik, var(--primary)) — bez tokenu jak dotąd); tu tylko wartości tokenów i reguły etykiet B1.
    Rozszerzenie na komputer: definicje tokenów przenieść do global.css (:root i :root[data-theme='dark']),
    a reguły etykiet B1 — wyjąć z @media. */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   /* A1. Znacznik: kafelek daty (.datebox, .pt-dbox), etykieta „Wydarzenie”, aktywny filtr (.chip[aria-pressed]),
      przycisk menu (.burger). Jasny motyw: ten sam granat co --primary (nic się nie zmienia). Ciemny motyw: stalowy
      granat zamiast bursztynu, miesiąc na kafelku bursztynowy; tekstowe akcenty (.pt-k, .pt-all, .link-arrow, .event .k,
@@ -187,7 +188,7 @@
 }
 
 /* ---------- Wiersz filtrów list (decyzja 31.10.2026; Aktualności i Kalendarz — FiltrISzukaj.astro) ---------- */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   /* Z lewej lista rozwijana rodzajów
      (ok. 42% szerokości; szersza, gdy najdłuższa nazwa się nie mieści — np. „Announcements” po angielsku albo „Wydarzenia”
      przy 360 px), z prawej pole szukania z krótką podpowiedzią; obie 44 px wysokości, zaokrąglone jak pole szukania.
@@ -217,7 +218,7 @@
    p > .25 / p > .8 klasy .hero-dalej-ukryty i .hdr-zwiniety. Bez JS: zwykły blok 100svh pod zwykłym nagłówkiem.
    Kolejność warstw w banerze: zdjęcie (.hero-fig, z −1) z przyciemnieniem u góry (::before) i ciemnieniem przy zwijaniu
    (::after), nad nim tekst z otoczką (.hero-txt::before), mały napis w pasie, przycisk i podpis zdjęcia. Komputer bez zmian. */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   :root { --pas: calc(var(--hdr-h) + 36px); }
   /* kotwice i fokus nie chowają się pod pasem */
   :root.js:has(.hero-b2) { scroll-padding-top: calc(var(--pas) + 8px); }

@@ -124,7 +124,8 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
   .wszystkie { margin: 16px 0 0; font-weight: 600; }
 
   /* ---------- telefon (≤ 760 px) ---------- */
-  @media (max-width: 760px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .tags { margin-top: 12px; }
     .inne .t { font-size: 17px; }
   }

@@ -75,7 +75,7 @@
    i przycisk menu biorą kolor z tokenu --znacznik (--znacznik-ink — tekst na nim), tekstowe akcenty w ciemnym motywie
    (.link-arrow, .pt-k, .pt-all…) — z --znacznik-tekst, miesiąc na kafelku daty — z --znacznik-miesiac; etykiety
    w wierszach list (.news-meta .badge) — z tokenów --et-*. Reguły niżej mają zapas: var(--znacznik, var(--primary)) itd.,
-   więc bez tokenów wszystko wygląda jak dotąd. Tokeny są zdefiniowane w telefon.css (@media (max-width: 760px), blok
+   więc bez tokenów wszystko wygląda jak dotąd. Tokeny są zdefiniowane w telefon.css (@media telefonu, blok
    „Znaczniki i etykiety”) — żeby objąć komputer, wystarczy przenieść tamte definicje tutaj (i reguły etykiet B1). */
 
 /* ---------- podstawy ---------- */
@@ -287,7 +287,8 @@ details[open] > summary .chev { transform: rotate(180deg); }
 :root[data-theme='dark'] .sem-row .sem { color: var(--znacznik-tekst, var(--accent)); }
 .sem-row .talk b { font-size: 15px; color: var(--ink); }
 .sem-row .talk span { font-size: 14px; color: var(--muted); }
-@media (max-width: 760px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .sem-row .sem, .sem-row .talk { grid-column: 1 / -1; }
 }
 
@@ -301,7 +302,7 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .ftr-main .n { font-size: 20px; font-weight: 800; }
 .ftr-main .a { font-size: 15px; line-height: 1.6; color: var(--footer-muted); }
 /* Komputer (≥ 761 px): stopka w wersji „zwartej” — mniejsze odstępy, ta sama treść. Telefon: telefon.css (Portal). */
-@media (min-width: 761px) {
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   .ftr-main .n { font-size: 18px; }
   .ftr-main .a { line-height: 1.5; }
 }
@@ -350,7 +351,7 @@ details[open] > summary .chev { transform: rotate(180deg); }
    (miesiące: .lista-miesiac niżej).
    Kontener .karty-lista (kolumna z odstępem 10 px — karty się nie stykają; schowane pozycje nie zostawiają przerwy),
    pozycje .row-item jako karty: tło strony, cienka ramka, zaokrąglenie jak .spec. Telefon (≤ 760 px) bez zmian. */
-@media (min-width: 761px) {
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   /* miesiąc listy (.lista-miesiac z nagłówkiem h2.month) jako sekcja z kreską i bursztynowym początkiem — te same wartości
      co .zsec przy oprawie „linia” w wyglądzie „Zwarta” (tlo.css + uklad-zwarta.css) */
   .lista-miesiac > .month { margin: 0 0 12px; font-size: clamp(21px, 2.2vw, 24px); font-weight: 800; letter-spacing: -0.02em; text-transform: none; color: var(--ink); }
@@ -393,7 +394,7 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .staff td.n small { display: block; font-weight: 500; color: var(--muted); }
 .staff a { color: var(--ink); }
 .staff .count { margin: 12px 0 0; font-size: 14px; color: var(--muted); }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .staff thead { display: none; }
   .staff, .staff tbody, .staff tr, .staff td { display: block; width: 100%; }
   .staff tr { padding: 14px 0; border-bottom: 1px solid var(--line); }
@@ -416,10 +417,10 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 
 /* ---------- dodatki do nagłówka ---------- */
 /* duże ekrany: luźniej (po regułach podstawowych, żeby je nadpisać) */
-@media (min-width: 1400px) {
+@media (min-width: 1400px) and (min-height: 501px), (min-width: 1400px) and (pointer: fine) {
   .hdr-row { gap: 20px; }
 }
-@media (min-width: 1600px) {
+@media (min-width: 1600px) and (min-height: 501px), (min-width: 1600px) and (pointer: fine) {
   .hdr-row { gap: 24px; }
   .brand-name { font-size: 18px; }
 }
@@ -430,7 +431,7 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 [hidden] { display: none !important; }
 .article-head .lead { margin: 0; font-size: 19px; color: var(--muted); max-width: 760px; }
 .status { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--tint); color: var(--tint-ink); font-size: 14px; font-weight: 700; }
-@media (max-width: 760px) { .staff td:empty { display: none; } }
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) { .staff td:empty { display: none; } }
 /* ramka w prawym pasku, która „płynie” przy przewijaniu (np. Najbliższe wydarzenia przy aktualnościach) */
 .prose h2, .prose h3 { scroll-margin-top: 16px; }
 
@@ -509,7 +510,7 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
 .staff-row .n small { display: block; font-size: 14px; font-weight: 500; color: var(--muted); }
 .staff-row .n small a { color: inherit; }
 .staff-row .www { display: flex; align-items: center; gap: 4px; align-self: start; font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--muted); }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .staff-row .c:empty { display: none; }
   .staff-row .n { margin-bottom: 2px; }
 }
@@ -528,6 +529,6 @@ article.talk { padding: 18px 0; border-top: 1px solid var(--line); scroll-margin
    Większość kart (.tile, .stat, .side-box, .event-box, .why, .person, .dz-card, .cz …) jest biała dzięki tłu strony
    (tlo.css, „Kafelki wypełnione kolorem --surface”). Tu karty, których tamta reguła nie obejmuje: kierunki (.prog)
    i konferencje na liście (.event-szare); karty z własnym szarym tłem w stylach widoków (.gr-karta, .cz, .dz-card,
-   konferencje na „Nauce”) — tam, w @media (min-width: 761px).
+   konferencje na „Nauce”) — tam, w @media komputera.
    Szare zostają: podświetlenia po najechaniu, menu, wyszukiwarka, nagłówki tabel, weekendy w kalendarzu, liczniki,
    notki i nieaktywne specjalności (.spec-off). Telefon (≤ 760 px) bez zmian — wygląd „Portal”. */

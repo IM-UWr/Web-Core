@@ -3,7 +3,7 @@
    pod banerem pas z kafelkami grup jak w menu (zlecenie 20, punkt 2; bez JS wiersze grup), tekst działu z „W skrócie” i sekcje działu.
    Komponenty: src/components/zal/TrescDzialu.astro i src/components/zal/dzial/*. Wartości przeniesione z prototypu
    (proto/zalozyciele.src.html: .in-pod, .in-tresc, .in-sek, .in-suk, .in-kont, .in-mapa, .in-kart, .in-wiersz, .in-tba).
-   Telefon (≤ 760 px) bez zmian: blok ma klasę .tylko-komputer, a wszystkie reguły siedzą w @media (min-width: 761px).
+   Telefon (≤ 760 px) bez zmian: blok ma klasę .tylko-komputer, a wszystkie reguły siedzą w @media komputera.
    ========================================================================== */
 /* reguły na każdej szerokości; telefon (≤ 760 px) nadpisuje src/styles/zal-telefon.css */
 @media all {
@@ -149,7 +149,8 @@
 }
 
 /* ---------- komputer z JS: pas z kafelkami i pole ze stronami (zlecenie 20, punkt 2) ---------- */
-@media (min-width: 761px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   html.js .z-dz .z-dz-pas { display: block; padding: 0; background: none; }
   html.js .z-dz .z-dz-pas > .z-dz-rekr { display: none; }
 
@@ -205,7 +206,7 @@
 }
 
 /* ---------- telefon (≤ 760 px): strona działu w jednej kolumnie ---------- */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   /* ---------- treść strony działu ---------- */
   .z-dz { --marg: 16px; font-size: 15.5px; }
   /* pas podstron: nazwa grupy nad linkami, linki zawijane; przycisk rekrutacji pod wierszami */

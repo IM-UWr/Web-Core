@@ -273,7 +273,8 @@ const kierTel = kierownik?.data.telefon || d.telefon;
   .zk-nav a[aria-current] { color: var(--d-a); }
   .zk-nav a[aria-current]::after { content: '•'; color: var(--d-a); }
 
-  @media (max-width: 760px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .zk-foto { margin-bottom: 14px; }
     .zk-sem { grid-template-columns: minmax(0, 1fr); gap: 0; }
     .zk-daty li { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }

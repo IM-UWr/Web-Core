@@ -13,7 +13,7 @@ import { u } from '../lib/url';
 interface Props {
   src: string;
   alt?: string;
-  // szerokość wyświetlania (atrybut sizes), np. '(min-width: 761px) 64vw, 100vw'; albo funkcja proporcji zdjęcia
+  // szerokość wyświetlania (atrybut sizes), np. '(min-width: 1180px) 64vw, 100vw' (telefon: sizesTelefon z lib/media.ts); albo funkcja proporcji zdjęcia
   // (szerokość / wysokość) — dla zdjęć kadrowanych przez object-fit: cover, gdzie potrzebna szerokość zależy od wysokości pola
   sizes: string | ((proporcje: number) => string);
   // szerokości w srcset (px); większe od pliku są pomijane (zamiast nich sam plik). Domyślnie: przy sizes tylko w px

@@ -16,7 +16,9 @@
 //   dokładnie na tej krawędzi, a na krawędzi Szybkiego dostępu okładka dokładnie na niej się kończy.
 // Panel hamburgera ma kolor nagłówka. Panel strony głównej ma klasę .z-menu-jasny na stałe: na telefonie przełącza ją skrypt,
 // a na komputerze panel zostaje jasny, także po obróceniu telefonu lub zmianie szerokości okna.
-const TELEFON = matchMedia('(max-width: 760px)');
+import { MQ_TELEFON } from '../../lib/media';
+
+const TELEFON = matchMedia(MQ_TELEFON);
 const baner = document.querySelector<HTMLElement>('.z-nagl');
 const stopka = document.querySelector<HTMLElement>('.z-stopka');
 const pasek = document.querySelector<HTMLElement>('[data-z-pasek]:not(.z-pasek-jasny)');

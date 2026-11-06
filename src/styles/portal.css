@@ -46,7 +46,8 @@
    LiczbyBanera.astro); na pozostałych podstronach lista ma .tylko-komputer.
    Etykiety łamią się równo (text-wrap: balance — np. „ogłoszenia / z 30 dni”), najwyżej w dwóch linijkach; jednoliterowe
    wyrazy z twardą spacją (bezSierotek w i18n.ts; decyzja 31.10.2026). */
-@media (max-width: 760px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .pt-liczby { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0 12px; max-width: none;
     margin-top: 2px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
   .pt-liczby li { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; font-size: 12.5px; line-height: 1.25; text-wrap: balance; }

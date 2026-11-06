@@ -9,14 +9,15 @@
    global.css, tlo.css i stylów widoków są takie same jak w wariancie. Reguły treści działają tylko w <main>.
    Nie są przeniesione reguły elementów wspólnych całej strony — zostają jak na main: nagłówek u góry (.hdr-row, .brand-*,
    menu .nav / .dropdown, .icon-btn, .hdr-search, --hdr-h), przyciski (.btn, .btn-small) i stopka.
-   Odstępy własne widoków (np. strona działu) są w stylach widoku, też w @media (min-width: 761px).
-   Telefon (≤ 760 px): wszystko poniżej siedzi w @media (min-width: 761px), więc telefon wygląda jak bez tego pliku.
+   Odstępy własne widoków (np. strona działu) są w stylach widoku, też w @media komputera.
+   Telefon (≤ 760 px): wszystko poniżej siedzi w @media komputera, więc telefon wygląda jak bez tego pliku.
    PO PORZĄDKACH (zlecenie 12, 5.11.2026): zostały tylko reguły, które nadal trafiają w elementy na stronach z
    data-uklad (podstawowy stopień i interlinia treści, zaokrąglenia, .prose). Przełącznik zostaje, bo usunięcie zmieniłoby
    piksele 105 stron — opis w RAPORT-PORZADKI.md (etap 4).
    ========================================================================== */
 
-@media (min-width: 761px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   /* ---------- podstawy ----------
      --tresc-gora / --tresc-dol — odstęp treści podstrony od nagłówka i od stopki (.layout poniżej, widoki stron);
      zaokrąglenia, --section (pasy strony głównej) i czcionka podstawowa — tylko w treści (bez banera, nagłówka i stopki). */

@@ -14,6 +14,7 @@ import { wJezyku, bezSierotek } from '../lib/i18n';
 import { long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { slugOf } from '../lib/tresci';
 import { daneDzialuInstytut } from '../lib/widoki/dzialInstytut';
+import { sizesTelefon } from '../lib/media';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -24,7 +25,7 @@ const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukce
 // wypełnia pole wysokością, więc potrzebna szerokość rośnie o p / 1,5 (zlecenie 13, punkt 6). Na telefonie miniatura 54 × 54 px
 // jak w wierszu Aktualności: szerokość 54 px razy proporcje (zlecenie 21, punkt 4). Małe szerokości w srcset są dla telefonu,
 // szereg od 400 px taki sam jak dotąd, więc komputer pobiera te same pliki.
-const kartaSukcesu = (p: number) => `(max-width: 760px) ${Math.ceil(54 * Math.max(1, p))}px, ${Math.ceil(390 * Math.max(1, p / 1.5))}px`;
+const kartaSukcesu = (p: number) => `${sizesTelefon(`${Math.ceil(54 * Math.max(1, p))}px`)}, ${Math.ceil(390 * Math.max(1, p / 1.5))}px`;
 const SZEROKOSCI_SUKCESU = [54, 72, 81, 108, 120, 144, 162, 216, 240, 360, 400, 640, 960, 1280, 1600, 1920, 2560, 3200];
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">

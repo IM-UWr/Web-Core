@@ -92,7 +92,8 @@ const typPliku = (a: string) => {
   .rozprawa { font-weight: 600; color: #fff; }
 
   /* ---------- telefon (≤ 760 px) ---------- */
-  @media (max-width: 760px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .termin { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; }
     .termin .dz { font-size: 28px; }
     .termin .dz small { font-size: 12.5px; white-space: nowrap; }

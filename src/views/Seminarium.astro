@@ -176,7 +176,8 @@ const spis = [
   .sem-dane b { margin: 2px 0 0; font-size: 19px; }
   .sem-dane .wart { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.45; overflow-wrap: anywhere; }
   /* wąskie okno obok spisu (kolumna treści poniżej 560 px, jak siatka boksów): w trzech kolumnach nazwiska wychodzą poza kolumnę */
-  @media (min-width: 761px) and (max-width: 979px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 761px) and (min-height: 501px) and (max-width: 979px), (min-width: 761px) and (pointer: fine) and (max-width: 979px) {
     .sem-dane { grid-template-columns: minmax(0, 1fr); }
     .sem-dane > div + div { margin-top: 20px; }
   }
@@ -227,7 +228,7 @@ const spis = [
   @media (prefers-reduced-motion: reduce) { .pw-wiersz button { transition: none; } }
 
   /* ---------- telefon (≤ 760 px) ---------- */
-  @media (max-width: 760px) {
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .ref { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .ref .dz { font-size: 28px; }
     .ref .dz small { font-size: 12.5px; white-space: nowrap; }

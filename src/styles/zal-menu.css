@@ -67,7 +67,8 @@
 .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
 
 /* ---------- komputer ---------- */
-@media (min-width: 761px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 20px 28px 14px;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
   /* --marg z górną granicą: krzyżyk stoi w miejscu hamburgera do okna 1920 px; szerzej zostałby poza panelem, a pole szukania bez miejsca */
@@ -86,7 +87,7 @@
   .z-menu .z-zamknij svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
 }
 
-@media (min-width: 761px) {
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   /* wielkości rosną z wysokością okna: przy 640 px jak dotąd, pełne przy 800 px i wyżej */
   .z-menu {
     --mw: clamp(0px, calc(100vh - 640px), 160px);
@@ -133,14 +134,14 @@
 }
 
 /* okna do 800 px wysokości: ciaśniejsze rzędy, bo w wąskim panelu rozwinięte Studia mają więcej rzędów linków niż wyższe okna */
-@media (min-width: 761px) and (max-height: 800px) {
+@media (min-width: 761px) and (min-height: 501px) and (max-height: 800px), (min-width: 761px) and (pointer: fine) and (max-height: 800px) {
   .z-menu { padding-bottom: 10px; }
   .z-menu section { padding-block: 6px; }
   .z-menu section.duza { padding-block: 8px; }
 }
 
 /* ---------- telefon: wysuwa się pod nagłówkiem (--menu-top: dół nagłówka, ustawiany skryptem przy otwarciu) ---------- */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .z-menu { position: fixed; top: var(--menu-top, var(--hdr-h)); right: 0; bottom: 0; z-index: 31; width: min(86vw, 420px); padding: 14px clamp(16px, 5vw, 24px) 24px;
     background: var(--granat); border-left: 1px solid rgb(255 255 255 / .12); box-shadow: -14px 0 36px rgb(0 0 0 / .2); }
   .z-menu .z-zamknij { display: none; }
@@ -187,7 +188,7 @@
 .z-menu-jasny .z-menu-rozwin { color: var(--ink); }
 .z-menu-jasny .z-menu-rozwin:hover { background: var(--surface); }
 /* telefon: tło pełne, bo przy 97% prześwituje tekst strony */
-@media (max-width: 760px) { .z-menu.z-menu-jasny { background: var(--bg); } }
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) { .z-menu.z-menu-jasny { background: var(--bg); } }
 
 /* na końcu: wygrywa kolejnością z regułą przyciemnienia w bloku telefonu */
 @media (prefers-reduced-motion: reduce) {

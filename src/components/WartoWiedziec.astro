@@ -67,7 +67,7 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
           {k.zajawka && <p class="x">{k.zajawka}</p>}
           {k.etykieta && <p class:list={['ww-dalej', k.zewnetrzny && 'zew']} aria-hidden="true">{k.etykieta}</p>}
         </div>
-        {k.obraz && <span class="ww-min"><ZdjecieZ src={k.obraz} sizes={rozmiarPola(['(max-width: 760px)', 72, 54], [null, 120, 90])} /></span>}
+        {k.obraz && <span class="ww-min"><ZdjecieZ src={k.obraz} sizes={rozmiarPola(['telefon', 72, 54], [null, 120, 90])} /></span>}
       </li>
     ))}
   </ul>
@@ -90,7 +90,8 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
   .ww-dalej.zew::after { content: '\00a0↗'; }
   .ww-min { display: block; width: 120px; height: 90px; overflow: hidden; background: var(--surface); }
   .ww-min :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
-  @media (max-width: 760px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .ww-bez { font-size: 19px; }
     .ww-w { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .ww-w.ww-z-min { grid-template-columns: 54px minmax(0, 1fr) 72px; }

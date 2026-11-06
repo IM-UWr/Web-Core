@@ -67,7 +67,8 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
   .z-prac .zp-wybor select:focus { outline: none; }
   .z-prac .zp-ile { max-width: none; margin: 0; color: var(--muted); }
 
-  @media (min-width: 761px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
     .z-prac .zp-narz { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; }
     .z-prac .zp-szukaj { flex: 1 1 240px; }
     .z-prac .zp-szukaj input { font-size: 15px; line-height: 1.6; }
@@ -83,7 +84,7 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
     .z-prac .zp-n small { margin-top: 1px; font-size: 13.5px; line-height: 1.45; }
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     /* pasek: pole szukania w pierwszym rzędzie, zakład w drugim (bez wyboru grupy — zalecenie 4 zlecenia 11) */
     .z-prac .zp-narz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .z-prac .zp-szukaj { grid-column: 1 / -1; min-height: 44px; }

@@ -84,7 +84,8 @@ const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   .zd-dzien .zd-kolor { margin-top: 4px; font-size: 15.5px; line-height: 1.55; }
   .zd .akcja { margin-top: 18px; }
 
-  @media (max-width: 760px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .zd-dzien { align-items: flex-start; gap: 14px; }
     .zd-skrot { width: 54px; height: 54px; font-size: 18px; }
     .zd-dzien .zd-plan { font-size: 22px; }

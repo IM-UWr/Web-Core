@@ -71,6 +71,7 @@ const tytul = t(lang, 'aktualnosci');
 </Podstrona>
 
 <script>
+  import { sizesTelefon } from '../lib/media';
   const lista = document.querySelector('[data-lista]');
   const pozycje = Array.from(document.querySelectorAll<HTMLElement>('[data-lista] [data-wa]'));
   const grupy = Array.from(document.querySelectorAll<HTMLElement>('[data-grupa]'));
@@ -86,8 +87,8 @@ const tytul = t(lang, 'aktualnosci');
   // tekst do szukania: raz, przed pierwszym dopiskiem „… czytaj dalej”, żeby dopisek nie pasował do szukanego słowa
   const tekstWpisu = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
   // rozmiar zdjęcia przy przełożeniu powiększenia na inny wpis (te same pola co w WierszAktualnosci.astro)
-  const ROZMIAR_DUZY = '(max-width: 760px) 81px, 200px';
-  const ROZMIAR_MALY = '(max-width: 760px) 81px, 72px';
+  const ROZMIAR_DUZY = `${sizesTelefon('81px')}, 200px`;
+  const ROZMIAR_MALY = `${sizesTelefon('81px')}, 72px`;
   function powieksz(w: HTMLElement, tak: boolean) {
     w.classList.toggle('wyr', tak);
     w.querySelectorAll<HTMLImageElement | HTMLSourceElement>('source, img').forEach((e) => { e.sizes = tak ? ROZMIAR_DUZY : ROZMIAR_MALY; });
@@ -202,7 +203,8 @@ const tytul = t(lang, 'aktualnosci');
   @media (max-width: 979.98px) { .ak-pokaz { display: none; } }
 
   /* ---------- komputer (≥ 761 px): lista w dwóch kolumnach, gdy ma co najmniej 760 px ---------- */
-  @media (min-width: 761px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
     .ak-rodzaj-lista { display: none; }
     .ak-lista { container-type: inline-size; min-width: 0; }
     @container (min-width: 760px) {
@@ -212,7 +214,7 @@ const tytul = t(lang, 'aktualnosci');
   }
 
   /* ---------- okno 761–979 px: filtry jako pasek nad listą (przyciski rodzajów i pole szukania), nieprzyklejony ---------- */
-  @media (min-width: 761px) and (max-width: 979.98px) {
+  @media (min-width: 761px) and (min-height: 501px) and (max-width: 979.98px), (min-width: 761px) and (pointer: fine) and (max-width: 979.98px) {
     .ak-narz { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 0 0 12px; border-bottom: 2px solid var(--rule); }
     .ak-rodzaje button { font-size: 14px; padding: 7px 12px; }
     .ak-rodzaje button + button { border-left: 1px solid var(--line-ui); }
@@ -221,7 +223,7 @@ const tytul = t(lang, 'aktualnosci');
   }
 
   /* ---------- okno ≥ 980 px: filtry w prawej kolumnie, układ jak spis „Na tej stronie” (zal-podstrona.css) ---------- */
-  @media (min-width: 980px) {
+  @media (min-width: 980px) and (min-height: 501px), (min-width: 980px) and (pointer: fine) {
     .ak-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px; }
     .ak-lista { grid-column: 1; grid-row: 1; }
     .ak-panel { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: calc(var(--gora) + 16px);
@@ -241,7 +243,7 @@ const tytul = t(lang, 'aktualnosci');
   }
 
   /* ---------- telefon (≤ 760 px): rodzaje w dwóch rzędach, pole szukania pod nimi ---------- */
-  @media (max-width: 760px) {
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .ak-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     /* rodzaje jako lista wyboru (zlecenie 11, zalecenie 4: na telefonie lista zamiast paska, w stylu pola) */
     .ak-rodzaje { display: none; }

@@ -40,7 +40,7 @@ Animacja szkiców patronów (`src/scripts/zal/szkice.ts`) to osobna rzecz i dzia
    motywu wczyta się dopiero na stronie, która go potrzebuje).
 4. **Style** — `import '../scripts/baner/baner.css';` (w komponencie banera). Kolor rysunku: `--ph-rysunek` (składowe RGB),
    linie i akcent statycznego rysunku: `--ph-linie`, `--ph-akcent` na `.ph`.
-5. **Szerokość** — silnik działa tylko przy `(max-width: 760px)` (stała `TELEFON` w `silnik.ts`); na komputerze trzeba ją
+5. **Szerokość** — silnik działa tylko w widoku telefonu (`MQ_TELEFON` z `src/lib/media.ts`, stała `TELEFON` w `silnik.ts`); na komputerze trzeba ją
    zmienić i sprawdzić pole rysunku względem nowego nagłówka (znak patrona i opis po prawej).
 
 Wzór: `src/components/NaglowekStrony.astro` w stanie z `d12c994` (`git show d12c994:src/components/NaglowekStrony.astro`).

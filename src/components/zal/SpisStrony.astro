@@ -26,11 +26,13 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
 )}
 
 <script>
+  import { MQ_TELEFON } from '../../lib/media';
+
   const spis = document.querySelector<HTMLElement>('[data-z-spis]');
   const lista = spis?.querySelector<HTMLElement>('.z-spis-lista');
   const znacznik = spis?.querySelector<HTMLElement>('.z-spis-znacznik');
   if (spis && lista && znacznik) {
-    const telefon = matchMedia('(max-width: 760px)');
+    const telefon = matchMedia(MQ_TELEFON);
     const bezRuchu = matchMedia('(prefers-reduced-motion: reduce)');
 
     const pozycje = Array.from(lista.querySelectorAll<HTMLAnchorElement>('li > a')).map((a) => ({ a, li: a.parentElement as HTMLElement }));

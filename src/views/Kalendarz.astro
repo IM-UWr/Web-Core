@@ -134,7 +134,8 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
   .kal-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
 
   /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
-  @media (min-width: 761px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
     .kal-rodzaj-lista { display: none; }
     .kal-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
       background: var(--bg); border-bottom: 2px solid var(--rule); }
@@ -143,7 +144,7 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
   }
 
   /* ---------- telefon (≤ 760 px): widok, rodzaje po trzy w rzędzie i pole szukania jedno pod drugim ---------- */
-  @media (max-width: 760px) {
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     .kal-narz button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
     .kal-widok, .kal-rodzaje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }

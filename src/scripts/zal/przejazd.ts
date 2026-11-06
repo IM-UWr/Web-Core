@@ -1,3 +1,5 @@
+import { MQ_TELEFON } from '../../lib/media';
+
 // Strona główna: okładka ↔ Szybki dostęp bez zatrzymywania w połowie (zlecenie 11, zalecenie 20).
 // Dwa położenia: okładka w całości (0) albo Szybki dostęp od swojej górnej krawędzi (Y1 = początek #szybki-dostep,
 // na telefonie pod przyklejonym nagłówkiem). Niżej (Szybki dostęp, Studia, Warto wiedzieć, stopka) — swobodnie.
@@ -256,7 +258,7 @@ if (okladka && obszar) {
 
   // ---------- telefon: powrót zawsze na okładkę (zlecenie 21, punkt 9) ----------
   // Wyjątek: adres z kotwicą. Przywracanie położenia zapisuje się przy wpisie historii, więc przełączamy je także przy zmianie kotwicy.
-  const TELEFON = matchMedia('(max-width: 760px)');
+  const TELEFON = matchMedia(MQ_TELEFON);
   const kotwica = () => !!location.hash && location.hash !== '#okladka';
   const przywracanie = () => { history.scrollRestoration = TELEFON.matches && !kotwica() ? 'manual' : 'auto'; };
   let dotknieta = false; // palec w trakcie wczytywania: pierwsze pageshow nie zabiera strony spod palca

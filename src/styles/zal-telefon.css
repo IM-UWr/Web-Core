@@ -7,7 +7,8 @@
    ========================================================================== */
 .z-okl-sygnet { display: none; }
 
-@media (max-width: 760px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
 
   /* ---------- kolory i kroje (jak na komputerze) ---------- */
   :root {

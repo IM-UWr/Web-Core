@@ -4,6 +4,7 @@
 // public/pliki albo zewnętrzne — bez zmian (zwykły <img>).
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { WARUNEK_NISKI_DOTYK, sizesTelefon } from './media';
 
 // leniwe wczytanie: metadane (wymiary, format) tylko tych plików, które strona naprawdę pokazuje
 const PLIKI = import.meta.glob<{ default: ImageMetadata }>('/public/pliki/**/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}');
@@ -23,7 +24,7 @@ export async function zdjecie(adres?: string | null): Promise<ImageMetadata | un
 export async function zestawZdjecia(adres: string, rozmiar: string | ((proporcje: number) => string), szer?: number[]) {
   const meta = await zdjecie(adres);
   const sizes = typeof rozmiar === 'function' ? rozmiar(meta ? meta.width / meta.height : 1.5) : rozmiar;
-  const piks = /\d(vw|vh|svh|%|em|rem)/.test(sizes) ? [] : [...sizes.matchAll(/(\d+(?:\.\d+)?)px/g)].map((m) => +m[1]);
+  const piks = /\d(vw|vh|svh|%|em|rem)/.test(sizes) ? [] : [...sizes.replaceAll(WARUNEK_NISKI_DOTYK, '').matchAll(/(\d+(?:\.\d+)?)px/g)].map((m) => +m[1]);
   const szerokosci = szer ?? (piks.length ? piks.flatMap((x) => [1, 2, 3].map((k) => Math.ceil(x * k))) : [400, 640, 960, 1280, 1600, 1920, 2560, 3200]);
   // szerokości rosnąco, bez prawie powtórzonych (różnica poniżej 10% — np. 240 i 243 z dwóch pól miniatury); sam plik na końcu
   // tylko wtedy, gdy któraś szerokość go przekracza (miniatura nie potrzebuje pełnego zdjęcia)
@@ -39,7 +40,7 @@ export async function zestawZdjecia(adres: string, rozmiar: string | ((proporcje
 // czyli nieco ponad szerokość okna, a przy niskim oknie 77% wysokości okładki (max(600px, 100svh)) razy proporcje zdjęcia (p); na telefonie
 // 62% wysokości okładki razy p (zal-telefon.css)
 export const rozmiarOkl = (p: number) =>
-  `(min-width: 761px) max(103vw, ${Math.ceil(462 * p)}px, ${Math.ceil(77 * p)}vh), max(100vw, ${Math.ceil(62 * p)}vh)`;
+  `${sizesTelefon(`max(100vw, ${Math.ceil(62 * p)}vh)`)}, max(103vw, ${Math.ceil(462 * p)}px, ${Math.ceil(77 * p)}vh)`;
 
 const zastepcze = new Map<string, Promise<string | undefined>>();
 /** Malutka rozmyta wersja zdjęcia jako data: URI (WebP, 32 px szerokości, ok. 0,5–1 KB) — pod pełnym zdjęciem, zanim się
@@ -66,5 +67,5 @@ export function zastepczy(adres?: string | null): Promise<string | undefined> {
 /** Atrybut sizes dla zdjęcia kadrowanego przez object-fit: cover w polu o stałym rozmiarze (miniatury): pola
  *  [warunek, szerokość, wysokość] w px, ostatnie bez warunku. Potrzebna szerokość to max(szerokość pola, wysokość pola ×
  *  proporcje zdjęcia) — wąskie pole z szerokim zdjęciem wymaga szerszego pliku. Do ZdjecieZ jako sizes (funkcja proporcji). */
-export const rozmiarPola = (...pola: [string | null, number, number][]) => (p: number) =>
-  pola.map(([w, s, h]) => `${w ? w + ' ' : ''}${Math.ceil(Math.max(s, h * p))}px`).join(', ');
+export const rozmiarPola = (...pola: ['telefon' | null, number, number][]) => (p: number) =>
+  pola.map(([w, s, h]) => { const szer = `${Math.ceil(Math.max(s, h * p))}px`; return w ? sizesTelefon(szer) : szer; }).join(', ');

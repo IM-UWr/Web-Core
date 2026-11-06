@@ -2,9 +2,10 @@
    Kierunek „Założyciele” — podstrony „Projekty i granty” (ListaGrantow.astro, blok .z-gr) i „Plan zajęć” (PlanZajec.astro,
    blok .z-pl) na komputerze (≥ 761 px). Wzorzec: prototyp proto/zalozyciele.src.html (trescGranty, trescPlan, filtrujPlan),
    specyfikacja: dok/estetyka.md „Podstrony działów”. Wspólny szablon podstrony (.z-pd, spis, .z-pd-tresc, .z-nast) — zal-podstrona.css i zalozyciele.css.
-   Komputer: @media (min-width: 761px); telefon (≤ 760 px): bloki na końcu pliku.
+   Komputer: @media komputera; telefon (≤ 760 px): bloki na końcu pliku.
    ========================================================================== */
-@media (min-width: 761px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   :is(.z-gr, .z-pl) [hidden] { display: none !important; }
   /* interlinia jak w prototypie (treść podstrony 16 px / 1.6, nagłówki sekcji bez własnej interlinii) */
   .z-gr, .z-pl, .z-gr h2, .z-pl h2 { line-height: 1.6; }
@@ -78,7 +79,7 @@
    Przedmiot jako blok (nazwa Brygadą), pod nią zajęcia w dwóch liniach: „wyk. · gr. 1 · pon. · 10:15–12:00 · HS”
    i prowadzący z uwagami. Przyklejony pasek pod nagłówkiem: semestr i wyszukiwarka w jednym rzędzie, dni w drugim.
    Spis kategorii zwijany nad planem (zal/SpisStrony.astro, zal-podstrona.css). */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   :is(.z-gr, .z-pl) [hidden] { display: none !important; }
   .z-gr, .z-pl { line-height: 1.6; }
 
@@ -130,7 +131,7 @@
 /* ---------- telefon (≤ 760 px): Projekty i granty ----------
    Wiersz projektu w jednej kolumnie: rodzaj i lata, tytuł, kierownik · zakład · numer, pod spodem pasek czasu na całą
    szerokość; oś lat nad listą (te same marginesy co paski, żeby skrajne lata się mieściły). */
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   /* sekcje, nagłówki i wstęp według wzorca treści na telefonie (zalecenie 14; wstęp to blok .tresc — 16 px / 1,65) */
   .z-gr > section { padding-bottom: 30px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
   .z-gr > section:last-of-type { padding-bottom: 0; border-bottom: 0; margin-bottom: 0; }
@@ -158,6 +159,6 @@
 }
 
 /* spis „Na tej stronie” (komputer): nagłówek kategorii planu nie chowa się pod przyklejonym paskiem narzędzi */
-@media (min-width: 761px) {
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   .z-pd-tresc.z-pl .pl-kat[id] { scroll-margin-top: 76px; }
 }

@@ -20,9 +20,10 @@
 //   o 12 px przez 0,5 s — mierzymy dopiero po końcu tej animacji), po zmianie motywu jasny/ciemny (kolor z tokenu).
 import type { Linia, Modul, Motyw, Pole, Pudlo, Ustawienia } from './typy';
 import { S, ogr } from './wspolne';
+import { MQ_TELEFON } from '../../lib/media';
 
 const MODULY = import.meta.glob<Modul>('./motywy/*.ts');
-const TELEFON = matchMedia('(max-width: 760px)');
+const TELEFON = matchMedia(MQ_TELEFON);
 const RUCH = matchMedia('(prefers-reduced-motion: reduce)');
 const DPR_MAX = 1.5;
 const PUSTO = 16 - 90; // „brak tekstu w tym wierszu”: granica tak daleko w lewo, że od brzegu treści rysunek widać w pełni

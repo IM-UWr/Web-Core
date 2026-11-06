@@ -6,7 +6,8 @@
    Wyjątek: .z-pd-pelna (lista Aktualności, wpis z kartą boczną), treść na całą szerokość ramy, a prawą kolumnę układa sam widok.
    Telefon (≤ 760 px): jedna kolumna, spis zwijany nad treścią.
    ========================================================================== */
-@media (min-width: 761px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   .z-pd { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px;
     padding: 40px var(--marg) 30px; }
   .z-pd.z-pd-pelna { grid-template-columns: minmax(0, 1fr); gap: 0; }
@@ -43,7 +44,7 @@
   body:has(.z-pd) .z-nast { margin-top: 0; margin-left: var(--marg); margin-right: calc(var(--marg) + 292px); }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   /* rama podstrony: jedna kolumna */
   .z-pd { display: block; padding: 18px 16px 24px; }
   /* blok z prawej kolumny (slot „bok”) na telefonie pod treścią */

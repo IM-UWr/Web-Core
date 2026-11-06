@@ -27,6 +27,7 @@ import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, type Lan
 import { slugOf, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
 import { zdjecie } from '../lib/zdjecia';
+import { sizesTelefon } from '../lib/media';
 import { dzialWpisu } from '../lib/patroni';
 
 interface Props {
@@ -73,7 +74,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
 
     {d.zdjecie && (
       <figure class="akt-fot">
-        <ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes="(min-width: 1104px) 328px, (min-width: 761px) 240px, calc(100vw - 32px)" loading="eager" style={szerPliku ? `--szer-pliku: ${szerPliku}px` : undefined} />
+        <ZdjecieZ src={d.zdjecie} alt={opisZdjecia} sizes={`${sizesTelefon('calc(100vw - 32px)')}, (min-width: 1104px) 328px, 240px`} loading="eager" style={szerPliku ? `--szer-pliku: ${szerPliku}px` : undefined} />
         {opisZdjecia && <figcaption>{opisZdjecia}</figcaption>}
       </figure>
     )}
@@ -157,7 +158,8 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   .akt-karta { display: contents; }
 
   /* ---------- karta: komputer (≥ 761 px), zdjęcie nad blokiem wydarzenia ---------- */
-  @media (min-width: 761px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
     .akt-karta { display: grid; gap: 14px; padding: 16px 16px 18px; border-radius: 5px; background: var(--surface); }
     .akt-karta .akt-fot { order: -1; max-width: none; margin: 0; }
     .akt-karta .akt-fot :global(img) { max-width: min(100%, var(--szer-pliku, 100%)); border-radius: 3px; }
@@ -171,7 +173,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   }
 
   /* ---------- okno 761–1103 px: karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej ---------- */
-  @media (min-width: 761px) and (max-width: 1103.98px) {
+  @media (min-width: 761px) and (min-height: 501px) and (max-width: 1103.98px), (min-width: 761px) and (pointer: fine) and (max-width: 1103.98px) {
     .akt-karta { grid-template-columns: 240px minmax(0, 1fr); column-gap: 20px; align-items: start; margin: 4px 0 24px; }
     .akt-karta:has(.akt-fot) .akt-wyd { padding-top: 0; border-top: 0; }
     .akt-karta:not(:has(.akt-fot)), .akt-karta:not(:has(.akt-wyd)) { grid-template-columns: minmax(0, 1fr); }
@@ -181,7 +183,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
 
   /* ---------- okno ≥ 1104 px: dwie kolumny. Rzędy: lewa kolumna idzie po kolei (auto), a ostatni rząd (1fr) bierze nadmiar wysokości,
      gdy karta jest wyższa od tekstu; bez niego nadmiar rozkładałby się na odstępy między akapitami ---------- */
-  @media (min-width: 1104px) {
+  @media (min-width: 1104px) and (min-height: 501px), (min-width: 1104px) and (pointer: fine) {
     :global(.z-pd-tresc.akt-z-karta) { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-rows: repeat(12, auto) 1fr; column-gap: 56px; }
     :global(.z-pd-tresc.akt-z-karta > *), .akt-wpis > * { grid-column: 1; min-width: 0; }
     .akt-wpis { display: contents; }
@@ -200,7 +202,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   .akt-pn small { display: block; margin-bottom: 2px; font-family: var(--f-text); font-size: 13px; font-weight: 700; color: var(--d-a); }
   .akt-pn .akt-starszy { text-align: right; }
 
-  @media (max-width: 760px) {
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     .akt-wyd { grid-template-columns: 54px minmax(0, 1fr); gap: 6px 12px; }
     .akt-wyd-data { font-size: 28px; }
     .akt-wyd-data small { font-size: 12px; }

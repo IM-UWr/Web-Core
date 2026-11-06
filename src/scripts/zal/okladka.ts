@@ -6,10 +6,12 @@
 //    Kolor (--d-j) bierze warstwa z własnego data-dzial — reszta okładki zostaje w swoich kolorach. Telefon bez zmian.
 // Strzałka „Szybki dostęp”, liczby nad nią i przejazd okładka ↔ drugi ekran: src/scripts/zal/przejazd.ts.
 // Hamburger i panel menu: src/scripts/zal/menu.ts.
+import { MQ_TELEFON } from '../../lib/media';
+
 const ok = document.querySelector<HTMLElement>('.z-okladka');
 if (ok) {
   const barwa = ok.querySelector<HTMLElement>('.z-barwa');
-  const telefon = matchMedia('(max-width: 760px)');
+  const telefon = matchMedia(MQ_TELEFON);
   if (barwa) ok.querySelectorAll<HTMLElement>('.z-okl-dz').forEach((dz) => {
     const wlacz = () => { if (telefon.matches) return; barwa.dataset.dzial = dz.dataset.dzial || ''; ok.classList.add('zabarwione'); };
     const wylacz = () => ok.classList.remove('zabarwione');

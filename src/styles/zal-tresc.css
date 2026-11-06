@@ -134,7 +134,8 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 }
 
 /* ---------- telefon (≤ 760 px) ---------- */
-@media (max-width: 760px) {
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   .tresc { font-size: 16px; line-height: 1.65; }
   .z-pd-tresc.tresc > section { padding-bottom: 30px; margin-bottom: 28px; }
   .tresc h2 { font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
@@ -209,7 +210,7 @@ body .tresc .prose .kontakty { margin: 0 0 16px; }
 body .tresc .prose .kontakty p { margin: 0 0 8px; font-size: 15px; line-height: 1.55; }
 body .tresc .prose :is(.kontakty, ul.dwa) .akcja a { color: var(--d-a); font-weight: 600; font-size: 14.5px; }
 body .tresc .prose blockquote .etyk { margin-bottom: 4px; }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
   body .tresc .prose h2 { margin-top: 30px; padding-top: 28px; font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
   body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; }
   body .tresc .prose h3 { font-size: 20px; margin-top: 24px; }
@@ -235,7 +236,7 @@ body .tresc .prose blockquote .etyk { margin-bottom: 4px; }
 .z-pole-wyboru:focus-within { outline: 2px solid var(--d-a); outline-offset: -1px; }
 .z-pole-wyboru select:focus { outline: none; }
 /* telefon: 16 px, żeby iOS nie powiększał strony przy wyborze */
-@media (max-width: 760px) { .z-pole-wyboru select { font-size: 16px; } }
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) { .z-pole-wyboru select { font-size: 16px; } }
 
 /* linki poza stronę (zlecenie 14, zalecenie 23): w tekście strzałka z global.css (:where(a.zew)::after); na liście plików
    strzałka przy typie z prawej („strona ↗”), nie po całym wierszu */

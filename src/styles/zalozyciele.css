@@ -1,7 +1,7 @@
 /* ==========================================================================
    Kierunek „Założyciele” — wygląd na komputer (≥ 761 px). Specyfikacja: dok/estetyka.md (gałąź kopia/2026-11-01-estetyka-prototypy),
    wzorzec: prototyp proto/zalozyciele.src.html (ustawienia domyślne).
-   Telefon (≤ 760 px) bez zmian: tu poza @media (min-width: 761px) są wyłącznie nowe zmienne (nieużywane na telefonie).
+   Telefon (≤ 760 px) bez zmian: tu poza @media komputera są wyłącznie nowe zmienne (nieużywane na telefonie).
    ========================================================================== */
 
 /* ---------- zmienne: paleta »Lazur i malina« (jasny / głęboki / atrament / tło), granat, kroje, kolumna ----------
@@ -86,13 +86,14 @@
 :root[data-theme="dark"] .z-dz-skrot dl > div:last-child { border-bottom: 0; }
 
 /* Jeden tekst naraz, także dla czytników ekranu (zlecenie 18, punkt 14) */
-@media (min-width: 761px) { .tylko-telefon { display: none !important; } }
-@media (max-width: 760px) { .tylko-komputer { display: none !important; } }
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) { .tylko-telefon { display: none !important; } }
+@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) { .tylko-komputer { display: none !important; } }
 
 /* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); nie zmniejszać na żadnej szerokości */
 .z-okl-marka > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
 
-@media (min-width: 761px) {
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
   :root {
     --bg: #fcfaf6; --surface: #f4f1ea; --line: #e5e0d6;

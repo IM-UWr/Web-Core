@@ -16,6 +16,7 @@ import '../../styles/zalozyciele-strony.css';
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { rozmiarPola } from '../../lib/zdjecia';
+import { MQ_KOMPUTER, sizesTelefon } from '../../lib/media';
 import ustawienia from '../../data/ustawienia.json';
 import skroty from '../../data/skroty.json';
 import plan from '../../data/plan/plan.json';
@@ -124,7 +125,7 @@ const warto = (await getCollection('warto_wiedziec'))
   .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze))
   .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: w.body?.trim() ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
 // (tylko na komputerze — na telefonie ten blok jest schowany i losuje własna lista w StronaGlowna.astro)
-const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-width: 761px)').matches)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
+const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOMPUTER}').matches)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
   `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
   `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
   `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
@@ -155,8 +156,8 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           </span>
           {'min' in k && (o.min
             ? <span class="min">{o.wyr
-                ? <ZdjecieZ src={o.min} sizes={(p) => `(max-width: 760px) ${Math.ceil(Math.max(64, 48 * p))}px, (max-width: 1179px) 280px, ${Math.ceil(Math.max(78, 59 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
-                : <ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 56, 42])} />}</span>
+                ? <ZdjecieZ src={o.min} sizes={(p) => `${sizesTelefon(`${Math.ceil(Math.max(64, 48 * p))}px`)}, (max-width: 1179px) 280px, ${Math.ceil(Math.max(78, 59 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
+                : <ZdjecieZ src={o.min} sizes={rozmiarPola(['telefon', 64, 48], [null, 56, 42])} />}</span>
             : <span class="min zastepcza">{o.dzial && <Szkic dzial={o.dzial} rodzaj="sygnet" />}</span>)}
         </Link>
       ));

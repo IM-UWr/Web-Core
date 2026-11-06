@@ -22,6 +22,7 @@ import dzPopularyzacja from '../../data/popularyzacja.json';
 import { menuGlowne } from '../../lib/menu';
 import { liczbyNaOkladke } from '../../lib/tresci';
 import { rozmiarOkl } from '../../lib/zdjecia';
+import { MQ_TELEFON } from '../../lib/media';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
@@ -91,7 +92,7 @@ const UKLAD = {
 // tylko pionowo: środek budynku w połowie między paskiem a górą liter „Instytut”. Bez JS kadr z CSS.
 const OSTRZEZ = import.meta.env.DEV ? `console.warn('Okładka: łuk poza zakresem, zostaje skos',cx,cy,R);` : '';
 const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)');function uloz(){if(!ok.offsetHeight)return;` +
-  `if(matchMedia('(max-width: 760px)').matches){var l=ok.querySelector('.w1');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,(l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
+  `if(matchMedia('${MQ_TELEFON}').matches){var l=ok.querySelector('.w1');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,(l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
   `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
   `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
   // szerokość słowa przy 100 px, ukryta miarka w stylu h1
@@ -124,9 +125,9 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 ---
 {/* dotyk: odświeżenie i powrót „wstecz” przy schowanej okładce; przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
-    Telefon (do 760 px) bez kotwicy w adresie zawsze wraca na okładkę (zlecenie 21, punkt 9), więc tam okładka zostaje.
+    Widok telefonu bez kotwicy w adresie zawsze wraca na okładkę (zlecenie 21, punkt 9), więc tam okładka zostaje.
     Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px razem ze scroll-snap kończy się czasem na okładce albo 11 px za krawędzią. */}
-<script is:inline>if(location.hash!=='#okladka'&&matchMedia('(hover: none) and (pointer: coarse)').matches){var zk=document.documentElement.classList;if(location.hash)zk.add('bez-wejscia');if(history.state&&history.state.zBezOkladki&&(location.hash||!matchMedia('(max-width: 760px)').matches))zk.add('bez-okladki','bez-wejscia')}</script>
+<script is:inline set:html={`if(location.hash!=='#okladka'&&matchMedia('(hover: none) and (pointer: coarse)').matches){var zk=document.documentElement.classList;if(location.hash)zk.add('bez-wejscia');if(history.state&&history.state.zBezOkladki&&(location.hash||!matchMedia('${MQ_TELEFON}').matches))zk.add('bez-okladki','bez-wejscia')}`} />
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
   {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy szybkieWejscie />}

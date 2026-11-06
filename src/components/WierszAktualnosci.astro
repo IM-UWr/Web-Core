@@ -13,6 +13,7 @@
 import { u, isExternal } from '../lib/url';
 import ZdjecieZ from './ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
+import { sizesTelefon } from '../lib/media';
 import { wJezyku, RODZAJE, odbiorcyMalymi } from '../lib/i18n';
 import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
 import { dzialWpisu } from '../lib/patroni';
@@ -33,8 +34,8 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
     {p.zajawka && <p class="wa-zaj" lang={p.zajawkaLang}>{p.zajawka}</p>}
   </div>
   {p.zdjecie && <span class="wa-fot" aria-hidden="true">{wyr
-    ? <ZdjecieZ src={p.zdjecie} loading="eager" sizes={(pr) => `(max-width: 760px) ${Math.ceil(Math.max(54, 54 * pr))}px, ${Math.ceil(Math.max(200, 134 * pr))}px`} szerokosci={SZEROKOSCI} />
-    : <ZdjecieZ src={p.zdjecie} sizes={rozmiarPola(['(max-width: 760px)', 54, 54], [null, 72, 48])} szerokosci={SZEROKOSCI} />}</span>}
+    ? <ZdjecieZ src={p.zdjecie} loading="eager" sizes={(pr) => `${sizesTelefon(`${Math.ceil(Math.max(54, 54 * pr))}px`)}, ${Math.ceil(Math.max(200, 134 * pr))}px`} szerokosci={SZEROKOSCI} />
+    : <ZdjecieZ src={p.zdjecie} sizes={rozmiarPola(['telefon', 54, 54], [null, 72, 48])} szerokosci={SZEROKOSCI} />}</span>}
 </article>
 
 <style>
@@ -57,7 +58,8 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
   .wa-fot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
 
   /* komputer (zlecenie 18, punkt 3): tytuł zawsze w całości, zajawka najwyżej w 2 liniach */
-  @media (min-width: 761px) {
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
     .wa { --tlo-wa: var(--bg); grid-template-columns: 58px minmax(0, 1fr) auto; gap: 12px; padding: 14px 0; }
     .wa-data { font-size: 26px; }
     .wa-data small { font-size: 12px; white-space: nowrap; }
@@ -81,7 +83,7 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
     .wa:hover :global(.wa-dalej) { text-decoration: underline; text-underline-offset: 3px; }
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
     /* miniatura pod datą (kolumna daty), żeby tekst miał całą szerokość */
     .wa { grid-template-columns: 54px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 0 12px; padding: 13px 0; }
     .wa-data { grid-column: 1; grid-row: 1; font-size: 28px; }

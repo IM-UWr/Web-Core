@@ -2,6 +2,8 @@
 // Przycisk [data-z-menu-otworz] z aria-controls otwiera swój panel; krzyżyk, Esc i klik obok zamykają, fokus wraca na przycisk.
 // Fokus przenosimy z preventScroll: zwykłe focus() na wysuwającym się panelu przesuwało całą okładkę w bok (prototyp).
 // Skrypt wczytywany z okładki, paska i nagłówka telefonu: moduł wykonuje się raz, więc obsługa podpina się tylko raz.
+import { MQ_KOMPUTER } from '../../lib/media';
+
 const przyciski = [...document.querySelectorAll<HTMLButtonElement>('[data-z-menu-otworz]')];
 const tlo = document.querySelector<HTMLElement>('[data-z-menu-tlo]');
 const hdr = document.querySelector<HTMLElement>('.hdr');
@@ -86,4 +88,4 @@ document.addEventListener('click', (e) => {
 // więc panel, z którego kliknięto link, byłby wciąż otwarty — zamykamy go
 window.addEventListener('pageshow', (e) => { if (e.persisted) zamknij(false); });
 // przejście między komputerem a telefonem (obrót, zmiana okna): panel się zamyka, żeby strona znów się przewijała, a przycisk był widoczny
-window.matchMedia('(min-width: 761px)').addEventListener('change', () => zamknij(false));
+window.matchMedia(MQ_KOMPUTER).addEventListener('change', () => zamknij(false));

@@ -6,10 +6,11 @@
 //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
 // - Wydarzenia, które już się skończyły, znikają od razu w przeglądarce (zlecenie 06, punkt 4).
 import { hasTime, now, today } from '../../lib/daty';
+import { MQ_TELEFON } from '../../lib/media';
 
 const siatka = document.querySelector<HTMLElement>('[data-z-siatka]');
 // Telefon (≤ 760 px): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
-const TELEFON = matchMedia('(max-width: 760px)');
+const TELEFON = matchMedia(MQ_TELEFON);
 // jeden rytm ruchu (zlecenie 13, punkt 9; --rytm w global.css)
 const RYTM = 'cubic-bezier(.22, .8, .2, 1)';
 
