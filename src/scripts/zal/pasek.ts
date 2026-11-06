@@ -109,3 +109,4 @@ if (hdr) {
   poStopce.push(ustaw);
   ustaw();
 }
+export {}; // moduł, nie skrypt globalny: nazwa hdr jest też w menu.ts (astro check)
