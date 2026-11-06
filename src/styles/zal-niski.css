@@ -28,9 +28,8 @@
   main .z-nagl.z-baner-dzialu .z-slot .pt-liczby { margin-top: 8px; }
 
   /* ---------- nagłówek podstrony: ciaśniej; rysunek w wysokości banera ---------- */
-  main .z-nagl.z-nagl-pod { padding: calc(8px + var(--hdr-h)) 16px 12px; }
-  main .z-nagl.z-nagl-pod h1 { font-size: 26px; }
-  main .z-nagl.z-nagl-pod .z-sygnet-nagl { width: 34px; height: 41px; }
+  main .z-nagl.z-nagl-pod { --tyt-st: 26px; --syg-wys: 41px; padding: calc(8px + var(--hdr-h)) 16px 12px; }
+  main .z-nagl.z-nagl-pod .z-sygnet-nagl { width: 34px; }
 
   /* wspólne: liczby zawsze w trzech kolumnach, podpisy się zawijają */
   main .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .pt-liczby { padding-top: 6px; }

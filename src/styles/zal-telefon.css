@@ -220,10 +220,14 @@
   .z-nagl.z-nagl-pod .z-tyt { position: relative; z-index: 1; margin: 0; max-width: none; padding: 0; }
   .z-nagl.z-nagl-pod .z-tyt-g { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: end; max-width: none; }
   .z-nagl.z-nagl-pod:not(:has(.z-sygnet-nagl)) .z-tyt-g { display: block; }
-  .z-nagl.z-nagl-pod .z-sygnet-nagl { grid-row: 1 / span 2; width: 40px; height: 48px; padding-right: 10px; border-right: 1px solid rgb(255 255 255 / .28); box-sizing: content-box; }
+  /* Sygnet stoi w wierszu tytułu i sięga w górę, ku linkowi: jego dół to zawsze dół pierwszej linii tytułu, ile by tych linii nie było (zlecenie 23, punkt 6).
+     Wysokość linku się tu nie liczy, a wymiary są w zmiennych, więc inny rozmiar tytułu lub sygnetu (zal-niski.css) niczego nie rozjedzie.
+     Ujemny dolny margines: wysokość wiersza wyznacza sam tytuł, bez zaokrągleń od sygnetu. */
+  .z-nagl.z-nagl-pod { --tyt-st: 30px; --tyt-lh: 1.08; --tyt-odst: 4px; --syg-wys: 48px; }
+  .z-nagl.z-nagl-pod .z-sygnet-nagl { grid-row: 2; grid-column: 1; align-self: start; width: 40px; height: var(--syg-wys); margin-top: calc(var(--tyt-odst) + var(--tyt-lh) * var(--tyt-st) - var(--syg-wys)); margin-bottom: -1px; padding-right: 10px; border-right: 1px solid rgb(255 255 255 / .28); box-sizing: content-box; }
   .z-nagl.z-nagl-pod .z-sygnet-nagl path { fill: none; stroke: color-mix(in srgb, var(--d-j) 75%, #fff); stroke-width: 1.4px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
-  .z-nagl.z-nagl-pod .z-sciezka { margin: 0; }
-  .z-nagl.z-nagl-pod h1 { margin: 4px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.08; letter-spacing: -.005em; color: #fff; text-wrap: balance; }
+  .z-nagl.z-nagl-pod .z-sciezka { grid-row: 1; grid-column: 2; margin: 0; }
+  .z-nagl.z-nagl-pod h1 { grid-row: 2; grid-column: 2; margin: var(--tyt-odst) 0 0; font-family: var(--f-display); font-weight: 500; font-size: var(--tyt-st); line-height: var(--tyt-lh); letter-spacing: -.005em; color: #fff; text-wrap: balance; }
   .z-nagl.z-nagl-pod .z-podpis-maly, .z-nagl.z-nagl-pod .z-znak-opis { display: none; }
   /* cały rysunek w banerze i na ekranie, także w niskim banerze (zlecenie 18, punkt 15), więc liczony od dolnej krawędzi paska */
   .z-nagl.z-nagl-pod .z-znak { position: absolute; right: 6px; top: calc(6px + var(--hdr-h)); width: 104px; height: min(130px, calc(100% - 12px - var(--hdr-h))); z-index: 0; opacity: .7; pointer-events: none; }
