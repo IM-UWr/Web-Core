@@ -10,7 +10,7 @@
 //   18 px, zajawka w jednej linii z „… czytaj dalej”, gdy się nie mieści, zdjęcie albo sygnet 78×59; bez znacznika i bez pola w CMS;
 // - Studia: klikalne „Studiuj matematykę we Wrocławiu ↗” (strona rekrutacji), kierunki (SIAD jako skrót); Warto wiedzieć;
 // - pod spodem odchudzona stopka (StopkaZ w Baza.astro).
-// Telefon (≤ 760 px): kolumny jedna pod drugą, po 3 pozycje, „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
+// Telefon (≤ 760 px): kolumny jedna pod drugą, po 3 pozycje, pierwsza aktualność bez wyróżnienia (zlecenie 18, punkt 11), „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
 import Link from '../Link.astro';
 import '../../styles/zalozyciele-strony.css';
 import Szkic from './Szkic.astro';
@@ -144,7 +144,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
   <div class="z-siatka" data-z-siatka data-dalej={T('… czytaj dalej', '… read more')}>
     {SLOTY.map((key, slot) => {
       const k = KOL[key];
-      // wyróżniony wpis liczy się za dwa: w krótkiej kolumnie obok niego jeszcze jeden zwykły wiersz
+      // na komputerze wyróżniony wpis liczy się za dwa: w krótkiej kolumnie obok niego jeszcze jeden zwykły wiersz; na telefonie zawsze trzy wiersze
       const ileWidac = (k.pozycje[0] as Wiersz | undefined)?.wyr ? 2 : 3;
       const wiersze = k.pozycje.map((o) => (
         <Link class:list={['z-w', o.minelo && 'minelo', o.wyr && 'wyr']} href={o.adres ? href(o.adres) : undefined} data-dzial={o.dzial}>
@@ -156,7 +156,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           </span>
           {'min' in k && (o.min
             ? <span class="min">{o.wyr
-                ? <ZdjecieZ src={o.min} sizes={(p) => `(max-width: 760px) calc(100vw - 86px), (max-width: 1179px) 280px, ${Math.ceil(Math.max(78, 59 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
+                ? <ZdjecieZ src={o.min} sizes={(p) => `(max-width: 760px) ${Math.ceil(Math.max(64, 48 * p))}px, (max-width: 1179px) 280px, ${Math.ceil(Math.max(78, 59 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
                 : <ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 56, 42])} />}</span>
             : <span class="min zastepcza">{o.dzial && <Szkic dzial={o.dzial} rodzaj="sygnet" />}</span>)}
         </Link>
@@ -169,7 +169,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
             <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze {n}', '{n} more')}>{k.wsz}</a>
           </div></div>
           {k.pozycje.length > ileWidac && (
-            <button type="button" class="z-wiecej" data-key={key}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'See more')} ({k.pozycje.length - ileWidac})</span></button>
+            <button type="button" class="z-wiecej" data-key={key}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'See more')} ({ileWidac === 3 ? k.pozycje.length - 3 : <><span class="z-ile-k">{k.pozycje.length - ileWidac}</span><span class="z-ile-t">{k.pozycje.length - 3}</span></>})</span></button>
           )}
         </section>
       );

@@ -67,14 +67,6 @@
   .z-w .min.zastepcza { display: grid; place-items: center; background: var(--d-t); }
   .z-w .min.zastepcza svg { width: 40px; height: 48px; }
   .z-w .min.zastepcza path { fill: none; stroke: var(--d-a); stroke-width: 1.6px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
-  /* Powiększona pierwsza aktualność (zlecenie 14, zalecenie 22; wzór: prototyp v92, .ok-w.wyr): wartości z prototypu (50 | tekst | 168×126,
-     tytuł 21 px) przy kolumnie 584 px, czyli 1920 px strony. Węższe kolumny: zdjęcie proporcjonalnie, tytuł od 18 px, żeby tekst nie zszedł
-     do wąskiego słupka; poniżej 1180 px zdjęcie nad tekstem, jak na telefonie (reguły niżej). */
-  .z-w.wyr { grid-template-columns: 50px minmax(0, 1fr) clamp(112px, 28.8%, 168px); padding: 9px 0 10px; }
-  .z-w.wyr .min { width: 100%; height: auto; aspect-ratio: 4 / 3; }
-  .z-w.wyr .min.zastepcza svg { width: 56%; height: 80%; }
-  .z-w.wyr .t { margin-top: 3px; font-family: var(--f-display); font-weight: 500; font-size: clamp(18px, 1.094vw, 21px); line-height: 1.25; }
-  .z-w.wyr .zaj { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--text); }
   .z-pusto { margin: 10px 0; color: var(--muted); font-style: italic; }
   .z-wiecej { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; text-align: left; }
   .z-wiecej:hover { color: var(--ink); }
@@ -152,8 +144,8 @@
 }
 
 /* ---------- telefon (≤ 760 px): drugi ekran strony głównej i Władze ---------- */
-/* Powiększona aktualność na węższych ekranach: zdjęcie 3:2 na całą szerokość kolumny tekstu, nad etykietą */
-@media (max-width: 1179px) {
+/* Powiększona aktualność na węższym oknie komputera: zdjęcie 3:2 na całą szerokość kolumny tekstu, nad etykietą */
+@media (min-width: 761px) and (max-width: 1179px) {
   .z-druga .z-w.wyr { grid-template-columns: 50px minmax(0, 1fr); }
   .z-druga .z-w.wyr .kiedy { grid-column: 1; grid-row: 1 / span 2; }
   .z-druga .z-w.wyr .min { grid-column: 2; grid-row: 1; width: 100%; height: auto; aspect-ratio: 3 / 2; margin-bottom: 8px; }
@@ -172,7 +164,16 @@
 /* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
 @media (min-width: 761px) {
   .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
+  .z-wiecej .z-ile-t { display: none; }
 
+  /* Powiększona pierwsza aktualność (zlecenie 14, zalecenie 22; wzór: prototyp v92, .ok-w.wyr): wartości z prototypu (50 | tekst | 168×126,
+     tytuł 21 px) przy kolumnie 584 px, czyli 1920 px strony. Węższe kolumny: zdjęcie proporcjonalnie, tytuł od 18 px, żeby tekst nie zszedł
+     do wąskiego słupka; poniżej 1180 px zdjęcie nad tekstem. Na telefonie wyróżnienia nie ma (zlecenie 18, punkt 11). */
+  .z-w.wyr { grid-template-columns: 50px minmax(0, 1fr) clamp(112px, 28.8%, 168px); padding: 9px 0 10px; }
+  .z-w.wyr .min { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+  .z-w.wyr .min.zastepcza svg { width: 56%; height: 80%; }
+  .z-w.wyr .t { margin-top: 3px; font-family: var(--f-display); font-weight: 500; font-size: clamp(18px, 1.094vw, 21px); line-height: 1.25; }
+  .z-w.wyr .zaj { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--text); }
   /* Kolumna Aktualności, zwarta (zlecenie 18, punkt 8, wariant A): więcej wpisów na ekranie. Wydarzenia i Seminaria bez zmian. Pierwszy wpis
      wyróżniają tytuł Brygadą, zajawka w jednej linii i miniatura o 40% większa od zwykłych (obok tekstu od 1180 px, węziej nad tekstem) */
   .z-kolumna[data-key="akt"] .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; padding: 6px 0; }
@@ -204,16 +205,17 @@
   .z-druga .z-kolumna { display: block !important; margin-bottom: 24px; }
   .z-druga .z-kolumna :is(.lista, .lista-in, .pozycje) { position: static; display: block; min-height: 0; overflow: visible; }
   .z-druga .z-kolumna .z-w:nth-child(n+4) { display: none; }
-  .z-druga .z-kolumna:not(.z-rozwin) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
   .z-druga .z-kolumna.z-rozwin .z-w { display: grid; }
   .z-druga .z-kolumna .z-w[hidden] { display: none !important; }
   .z-druga .z-kolumna .reszta { display: none; }
   .z-druga .z-kolumna .z-wiecej { display: flex; }
+  .z-wiecej .z-ile-k { display: none; }
   .z-druga .z-kolumna.z-rozwin .z-wiecej { display: none; }
   .z-druga .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 0 10px; }
   .z-druga .z-w .min { width: 64px; height: 48px; }
-  .z-druga .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr); }
-  .z-druga .z-w.wyr .t { font-size: 19px; }
+  /* pierwsza aktualność jak każdy inny wiersz (zlecenie 18, punkt 11) */
+  .z-druga .z-w .zaj { display: none; }
+  .z-druga .z-w.wyr .kiedy b { color: var(--muted); }
   .z-druga .z-studia { display: block; padding-top: 10px; margin-bottom: 24px; }
   .z-druga .z-kier { grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 12px; }
   .z-druga .z-warto .rzad { grid-template-columns: 1fr; }

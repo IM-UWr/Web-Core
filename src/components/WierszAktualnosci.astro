@@ -6,7 +6,7 @@
 // Jedna wersja HTML: komputer (≥ 761 px; zlecenie 18, punkt 3: zwarty wiersz, zajawka najwyżej w 2 liniach, układ listy
 // w dwóch kolumnach w ListaAktualnosci.astro) i telefon (≤ 760 px, węższa kolumna daty i mniejsza miniatura).
 // data-wa, data-rodzaj, data-dla — filtr i szukanie listy (skrypt w ListaAktualnosci.astro).
-// wyr — pierwszy widoczny wpis listy wyróżniony (zlecenie 14, zalecenie 22; wariant B „na papierze”, zlecenie 18, punkt 3).
+// wyr — pierwszy widoczny wpis listy wyróżniony, tylko na komputerze; na telefonie wiersz jak każdy inny (zlecenie 14, zalecenie 22; wariant B „na papierze”, zlecenie 18, punkty 3 i 11).
 // Skrypt listy przestawia klasę po filtrze albo szukaniu i zmienia wtedy `sizes` zdjęcia, dlatego każde zdjęcie ma w srcset
 // także większą szerokość. Dopisek „… czytaj dalej” (.wa-dalej) wstawia ten sam skrypt, gdy zajawka się nie mieści.
 import { u, isExternal } from '../lib/url';
@@ -31,7 +31,7 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
     {p.zajawka && <p class="wa-zaj" lang={p.zajawkaLang}>{p.zajawka}</p>}
   </div>
   {p.zdjecie && <span class="wa-fot" aria-hidden="true">{wyr
-    ? <ZdjecieZ src={p.zdjecie} loading="eager" sizes={(pr) => `(max-width: 760px) calc(100vw - 98px), ${Math.ceil(Math.max(200, 134 * pr))}px`} szerokosci={SZEROKOSCI} />
+    ? <ZdjecieZ src={p.zdjecie} loading="eager" sizes={(pr) => `(max-width: 760px) ${Math.ceil(Math.max(54, 54 * pr))}px, ${Math.ceil(Math.max(200, 134 * pr))}px`} szerokosci={SZEROKOSCI} />
     : <ZdjecieZ src={p.zdjecie} sizes={rozmiarPola(['(max-width: 760px)', 54, 54], [null, 72, 48])} szerokosci={SZEROKOSCI} />}</span>}
 </article>
 
@@ -90,10 +90,5 @@ const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, 
     .wa p { font-size: 15px; }
     .wa .wa-kiedy { font-size: 13.5px; }
     .wa-fot { width: 54px; aspect-ratio: 1; }
-    /* powiększony wpis: zdjęcie 3:2 na całą szerokość kolumny tekstu, nad etykietą; tytuł o krok większy */
-    .wa.wyr .wa-data { grid-row: 1 / span 2; }
-    .wa.wyr .wa-fot { grid-column: 2; grid-row: 1; width: 100%; aspect-ratio: 3 / 2; margin: 0 0 10px; }
-    .wa.wyr .wa-tresc { grid-row: 2; }
-    .wa.wyr h3 { font-size: 22px; line-height: 1.25; }
   }
 </style>

@@ -86,7 +86,7 @@ const tytul = t(lang, 'aktualnosci');
   // tekst do szukania: raz, przed pierwszym dopiskiem „… czytaj dalej”, żeby dopisek nie pasował do szukanego słowa
   const tekstWpisu = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
   // rozmiar zdjęcia przy przełożeniu powiększenia na inny wpis (te same pola co w WierszAktualnosci.astro)
-  const ROZMIAR_DUZY = '(max-width: 760px) calc(100vw - 98px), 200px';
+  const ROZMIAR_DUZY = '(max-width: 760px) 81px, 200px';
   const ROZMIAR_MALY = '(max-width: 760px) 81px, 72px';
   function powieksz(w: HTMLElement, tak: boolean) {
     w.classList.toggle('wyr', tak);
