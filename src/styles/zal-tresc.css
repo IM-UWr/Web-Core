@@ -125,8 +125,8 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc .boks dl.para { margin-top: auto; padding-top: 6px; font-size: 14px; }
 @media (prefers-reduced-motion: no-preference) { .tresc ul.boksy > .boks:active { transform: translateY(1px); } }
 @media (prefers-reduced-motion: reduce) { .tresc ul.boksy > .boks, .tresc .boks h3 a { transition: none; } }
-/* kontakt: kolumny po 3, kreska 2 px nad każdą, etykieta roli, nazwisko Brygadą, pary e-mail / tel. / pokój */
-.tresc .kontakty { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; }
+/* kontakt: kolumny co najmniej 250 px (przy zwykłej kolumnie treści 3), kreska 2 px nad każdą, etykieta roli, nazwisko Brygadą, pary e-mail / tel. / pokój */
+.tresc .kontakty { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0 32px; }
 .tresc .kontakty > div { padding-top: 12px; border-top: 2px solid var(--rule); }
 .tresc .kontakty b { display: block; margin: 2px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
