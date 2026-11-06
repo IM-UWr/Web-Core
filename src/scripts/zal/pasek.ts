@@ -59,12 +59,16 @@ const hdr = document.querySelector<HTMLElement>('.hdr');
 
 if (hdr) {
   const okladka = document.querySelector<HTMLElement>('.z-okladka');
+  const szybkiDostep = document.getElementById('szybki-dostep');
   const panel = document.getElementById(hdr.querySelector('[data-z-menu-otworz]')?.getAttribute('aria-controls') || '');
   const pod = (el: Element | null, h: number) => {
     if (!el) return false;
     const r = el.getBoundingClientRect();
     return Math.round(r.top) <= h && Math.round(r.bottom) > h;
   };
+  // Okładka pod paskiem, liczona od Szybkiego dostępu: sama okładka bywa bez pudełka (schowana na dotyku, src/scripts/zal/przejazd.ts),
+  // a przy wejściu strony jest przesunięta o 12 px w dół (przejscia.css), więc jej góra byłaby wtedy poniżej paska.
+  const nadOkladka = (h: number) => !document.documentElement.classList.contains('bez-okladki') && !!szybkiDostep && Math.round(szybkiDostep.getBoundingClientRect().top) > h;
 
   const ustaw = () => {
     if (!TELEFON.matches) {
@@ -75,7 +79,7 @@ if (hdr) {
     const y = window.scrollY;
     let przewiniety = false;
     let ciemny: boolean;
-    if (okladka) ciemny = pod(okladka, h);
+    if (okladka) ciemny = nadOkladka(h);
     else if (baner) { przewiniety = y > h; ciemny = pod(baner, h) || pod(stopka, h); }
     else { przewiniety = y > 2; ciemny = !przewiniety || pod(stopka, h); }
     hdr.classList.toggle('przewiniety', przewiniety);
@@ -87,6 +91,7 @@ if (hdr) {
   window.addEventListener('scroll', () => { cancelAnimationFrame(rama); rama = requestAnimationFrame(ustaw); }, { passive: true });
   window.addEventListener('resize', ustaw);
   window.addEventListener('pageshow', ustaw);
+  document.addEventListener('animationend', (e) => { if (e.animationName === 'wejscie') ustaw(); }); // koniec przesunięcia przy wejściu strony
   TELEFON.addEventListener('change', ustaw);
   ustaw();
 }

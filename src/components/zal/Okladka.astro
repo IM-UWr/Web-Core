@@ -128,6 +128,8 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
 const rozmiarOkl = (p: number) =>
   `(min-width: 761px) max(103vw, ${Math.ceil(462 * p)}px, ${Math.ceil(77 * p)}vh), max(100vw, ${Math.ceil(62 * p)}vh)`;
 ---
+{/* dotyk: odświeżenie i powrót „wstecz” przy schowanej okładce; przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts) */}
+<script is:inline>if(history.state&&history.state.zBezOkladki&&location.hash!=='#okladka'&&matchMedia('(hover: none) and (pointer: coarse)').matches)document.documentElement.classList.add('bez-okladki','bez-wejscia')</script>
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
   {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy />}

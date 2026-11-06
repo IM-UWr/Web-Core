@@ -11,8 +11,10 @@
 // - Wszystko inne (pasek przewijania, kotwice #…, Ctrl+F, zaznaczanie tekstu, „wstecz”, Tab): przeglądarka przewija
 //   sama, a gdy skończy w połowie — dociągamy do bliższego z dwóch położeń (przy fokusie z klawiatury — tam, gdzie
 //   jest fokus). Przy wciśniętym przycisku myszy (zaznaczanie) czekamy do puszczenia.
-// - Dotyk (telefon, tablet): CSS scroll-snap (zalozyciele-strony.css) — przeglądarka sama dociąga; skrypt tylko
-//   obsługuje kliknięcia strzałki i liczb.
+// - Dotyk (telefon, tablet): CSS scroll-snap (zalozyciele-strony.css) — przeglądarka sama dociąga; skrypt obsługuje kliknięcia
+//   strzałki i liczb oraz zatrzymanie rozpędu na krawędzi (zlecenie 21, punkt 3): rozpędu palca nie da się przerwać ze skryptu, więc gdy
+//   Szybki dostęp stoi w spoczynku na krawędzi lub niżej, okładki nie ma w układzie strony (html.bez-okladki) i rozpęd kończy się na
+//   prawdziwej górze dokumentu. Wraca dopiero przy nowym dotknięciu na samej górze po CISZA ms spokoju; scroll-snap ją wtedy dociąga.
 // - prefers-reduced-motion: przejście natychmiastowe.
 // Zalecenie 15: kliknięcie liczby nad strzałką — przejazd na Szybki dostęp i krótkie (1,6 s) podświetlenie kolumny.
 const okladka = document.querySelector<HTMLElement>('.z-okladka');
@@ -209,4 +211,62 @@ if (okladka && obszar) {
     if (nowy !== poprzedniY1 && Math.abs(window.scrollY - poprzedniY1) <= 1 && !jedzie) window.scrollTo({ top: nowy, behavior: 'instant' });
     poprzedniY1 = nowy;
   }).observe(okladka);
+
+  // ---------- dotyk: okładka poza układem, gdy Szybki dostęp stoi na krawędzi lub niżej (zlecenie 21, punkt 3) ----------
+  // Chowanie i przywracanie to w tej samej chwili przewinięcie o wysokość okładki, więc nic na ekranie się nie rusza. Spokój: USPOKOJENIE ms
+  // bez zdarzeń scroll i bez palca na ekranie, nigdy w trakcie rozpędu. Odświeżenie i powrót „wstecz”: przeglądarka odtwarza położenie liczone
+  // bez okładki, więc znacznik w history.state chowa ją jeszcze przed pierwszym układem strony (skrypt w linii w Okladka.astro).
+  const USPOKOJENIE = 150; // ms
+  const html = document.documentElement;
+  let schowana = html.classList.contains('bez-okladki'), palec = false, ostatniScroll = -Infinity, czasSpokoju = 0;
+
+  const znacznik = (ustaw: boolean) => {
+    const { zBezOkladki: _, ...stan } = history.state ?? {};
+    history.replaceState(ustaw ? { ...stan, zBezOkladki: true } : stan, '');
+  };
+  function schowaj() {
+    const d = y1();
+    if (d <= 0) return;
+    const y = window.scrollY;
+    html.classList.add('bez-okladki', 'bez-wejscia'); // bez-wejscia: po przywróceniu z display: none powtórzyłoby się wejście strony (przejscia.css)
+    window.scrollTo({ top: Math.max(0, y - d), behavior: 'instant' });
+    schowana = true;
+    poprzedniY1 = y1(); // bez tego ResizeObserver wyżej wziąłby schowanie za zmianę wysokości okna
+    znacznik(true);
+  }
+  function pokaz() {
+    const y = window.scrollY;
+    html.classList.remove('bez-okladki');
+    poprzedniY1 = y1();
+    window.scrollTo({ top: y + poprzedniY1, behavior: 'instant' });
+    schowana = false;
+    znacznik(false);
+  }
+  const spokoj = () => {
+    if (!DOTYK.matches || palec || schowana) return;
+    if (html.classList.contains('menu-otwarte')) { pozniej(); return; } // strona stoi pod panelem: czekamy na jego zamknięcie
+    if (window.scrollY >= y1() - 1) schowaj();
+  };
+  function pozniej() {
+    clearTimeout(czasSpokoju);
+    czasSpokoju = window.setTimeout(spokoj, USPOKOJENIE);
+  }
+
+  window.addEventListener('touchstart', (e) => {
+    palec = e.touches.length > 0;
+    clearTimeout(czasSpokoju);
+    if (schowana && DOTYK.matches && window.scrollY <= 1 && performance.now() - ostatniScroll >= CISZA && !html.classList.contains('menu-otwarte')) pokaz();
+  }, { passive: true });
+  const puszczony = (e: TouchEvent) => { palec = e.touches.length > 0; pozniej(); };
+  window.addEventListener('touchend', puszczony, { passive: true });
+  window.addEventListener('touchcancel', puszczony, { passive: true });
+  window.addEventListener('scroll', () => { ostatniScroll = performance.now(); pozniej(); }, { passive: true });
+  window.addEventListener('pageshow', pozniej);
+  window.addEventListener('hashchange', () => {
+    if (!schowana) return;
+    if (location.hash === '#okladka') { pokaz(); window.scrollTo({ top: 0, behavior: 'instant' }); }
+    else znacznik(true); // nowy wpis w historii nie ma znacznika
+  });
+  DOTYK.addEventListener('change', () => { if (schowana && !DOTYK.matches) pokaz(); });
+  pozniej();
 }

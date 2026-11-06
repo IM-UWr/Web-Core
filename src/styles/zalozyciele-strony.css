@@ -249,6 +249,11 @@
   html:has(.z-okladka) { scroll-snap-type: y mandatory; scroll-padding-top: 0; }
   .z-okladka, .z-druga-obszar { scroll-snap-align: start; }
   body:has(.z-okladka) .z-stopka { scroll-snap-align: end; }
+  /* Szybki dostęp stoi na krawędzi lub niżej: okładki nie ma w układzie, więc rozpęd palca kończy się na krawędzi (src/scripts/zal/przejazd.ts;
+     zlecenie 21, punkt 3). !important: zal-telefon.css daje okładce display: flex !important */
+  html.bez-okladki .z-okladka { display: none !important; }
+  /* wejście strony (przejscia.css) tylko raz: przesunięcie o 12 px psuje też odtworzenie położenia po powrocie „wstecz” */
+  html.bez-wejscia #tresc > * { animation: none !important; }
 }
 /* telefon: pod przyklejonym nagłówkiem (Naglowek.astro) */
 @media (hover: none) and (pointer: coarse) and (max-width: 760px) {
