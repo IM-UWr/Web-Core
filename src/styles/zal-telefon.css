@@ -150,7 +150,9 @@
   .z-okl-dz:focus-visible { outline: 2px solid var(--d-j); outline-offset: 2px; }
   .z-strzalka { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;
     color: rgb(255 255 255 / .78); text-decoration: none; white-space: nowrap; }
-  .z-strzalka svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .z-strzalka svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob-tel 2.6s ease-in-out infinite; }
+  @keyframes z-bob-tel { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+  @media (prefers-reduced-motion: reduce) { .z-strzalka svg { animation: none; } }
 
   /* ---------- baner strony działu ---------- */
   /* kolejność: link wstecz, tytuł, hasło, patron, liczby, bez drugiej wersji HTML (zlecenie 18, punkt 14). Baner sięga pod pasek, treść zostaje na swoim miejscu (zlecenie 23, punkt 3) */

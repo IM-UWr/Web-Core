@@ -242,20 +242,25 @@
   .z-pd.z-wladze .z-pd-tresc .z-zob a { font-size: 17px; }
 }
 
-/* Strona główna na dotyku (telefon, tablet): dwa położenia — okładka w całości albo Szybki dostęp od górnej krawędzi
-   (zlecenie 11, zalecenie 20). Obszar „Szybki dostęp + reszta strony” jest jednym polem przyciągania wyższym niż okno —
-   w nim przewija się swobodnie. Stopka (poza obszarem, w Baza.astro) ma własny punkt „do końca”, żeby dało się dojechać
-   na sam dół. Kółko i klawisze: src/scripts/zal/przejazd.ts. */
-@media (hover: none) and (pointer: coarse) {
-  html:has(.z-okladka) { scroll-snap-type: y mandatory; scroll-padding-top: 0; }
-  .z-okladka, .z-druga-obszar { scroll-snap-align: start; }
-  body:has(.z-okladka) .z-stopka { scroll-snap-align: end; }
-  /* Szybki dostęp stoi na krawędzi lub niżej: okładki nie ma w układzie, więc rozpęd palca kończy się na krawędzi (src/scripts/zal/przejazd.ts;
-     zlecenie 21, punkt 3). !important: zal-telefon.css daje okładce display: flex !important */
-  html.bez-okladki .z-okladka { display: none !important; }
-  /* wejście strony (przejscia.css) tylko raz: przesunięcie o 12 px psuje też odtworzenie położenia po powrocie „wstecz” */
-  html.bez-wejscia #tresc > * { animation: none !important; }
-}
+/* Strona główna: okładka i Szybki dostęp (zlecenie 23, punkt 2; src/scripts/zal/przejazd.ts). Na Szybkim dostępie okładki nie ma
+   w układzie (html.bez-okladki), więc przewijanie jest zwykłe i kończy się na górze Szybkiego dostępu. Z okładki: na dotyku „na próg”
+   (palec przesuwa okładkę i treść Szybkiego dostępu, --z-ciag; strzałka reaguje, --z-postep), na komputerze tylko kliknięciem. */
+:root { --z-prog: .333; --z-opor: .55; }
+/* !important: zal-telefon.css daje okładce display: flex !important */
+html.bez-okladki .z-okladka { display: none !important; }
+/* wejście strony (przejscia.css) tylko raz: przesunięcie o 12 px psuje też odtworzenie położenia po powrocie „wstecz” */
+html.bez-wejscia #tresc > * { animation: none !important; }
+/* przesuwane: okładka oraz pasek i treść Szybkiego dostępu, nie sam obszar — w nim stoi panel menu (position: fixed), który pod
+   przesuniętym rodzicem wychodziłby w bok poza stronę, a telefon oddalałby wtedy widok */
+html.z-ciagnie :is(.z-okladka, .z-druga-obszar > :is(.z-pasek, .z-druga)) { transform: translateY(calc(var(--z-ciag, 0px) * -1)); will-change: transform; }
+html.z-jedzie :is(.z-okladka, .z-druga-obszar > :is(.z-pasek, .z-druga)) { transition: transform var(--z-czas, .4s) cubic-bezier(.22, .8, .2, 1); }
+/* strzałka reaguje na ciągnięcie: jaśnieje, podjeżdża do 10 px, za progiem grot w górę */
+html.z-ciagnie .z-strzalka { color: rgb(255 255 255 / calc(.76 + var(--z-postep, 0) * .24)); transform: translateX(-50%) translateY(calc(var(--z-postep, 0) * -10px)); }
+html.z-ciagnie .z-strzalka svg { animation: none; }
+.z-strzalka svg { transition: rotate .2s cubic-bezier(.22, .8, .2, 1); }
+.z-strzalka.z-za-progiem svg { rotate: 180deg; }
+/* okładka nie przewija się palcem (klasa z-prog ze skryptu — bez JS zwykłe przewijanie; także ekran dotykowy laptopa); szczypanie zostaje */
+html.z-prog:not(.bez-okladki) :is(.z-okladka, .hdr) { touch-action: pinch-zoom; }
 /* telefon: pod przyklejonym nagłówkiem (Naglowek.astro) */
 @media (hover: none) and (pointer: coarse) and (max-width: 760px), (hover: none) and (pointer: coarse) and (max-height: 500px) {
   html:has(.z-okladka) { scroll-padding-top: var(--hdr-h); }

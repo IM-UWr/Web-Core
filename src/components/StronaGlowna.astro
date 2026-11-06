@@ -23,8 +23,8 @@ const wyrozniona = await wyroznionaAktualnosc(lang);
 <Baza tytul={t(lang, 'instytut')} stronaGlowna>
   <ZdjeciePreload slot="head" src={ustawienia.baner.zdjecie} sizes={rozmiarOkl} />
   <Okladka lang={lang} inny={drugiJezyk(sciezka)} wyrozniona={wyrozniona ? { tytul: wyrozniona.tytul, adres: wyrozniona.href } : undefined} />
-  {/* drugi ekran razem z paskiem jako jeden obszar: drugie z dwóch położeń strony (okładka / Szybki dostęp od górnej
-      krawędzi — zlecenie 11, zalecenie 20; src/scripts/zal/przejazd.ts, na dotyku scroll-snap); niżej przewija się swobodnie */}
+  {/* drugi ekran razem z paskiem jako jeden obszar: drugi z dwóch stanów strony (okładka albo Szybki dostęp, zlecenie 23, punkt 2;
+      src/scripts/zal/przejazd.ts); w tym obszarze przewija się zwyczajnie */}
   <div id="szybki-dostep" class="z-druga-obszar" tabindex="-1">
     <PasekMenu lang={lang} sciezka={sciezka} inny={drugiJezyk(sciezka)} class="z-pasek-jasny" />
     <DrugiEkran lang={lang} />

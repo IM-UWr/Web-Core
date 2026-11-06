@@ -1,228 +1,58 @@
-import { MQ_TELEFON } from '../../lib/media';
-
-// Strona główna: okładka ↔ Szybki dostęp bez zatrzymywania w połowie (zlecenie 11, zalecenie 20).
-// Dwa położenia: okładka w całości (0) albo Szybki dostęp od swojej górnej krawędzi (Y1 = początek #szybki-dostep,
-// na telefonie pod przyklejonym nagłówkiem). Niżej (Szybki dostęp, Studia, Warto wiedzieć, stopka) — swobodnie.
-// - Kółko / gładzik: deltaY sumowane w oknie OKNO ms; po przekroczeniu PROG px — przejazd w całości (CZAS ms, krzywa
-//   z zlecenia 13: cubic-bezier(.22, .8, .2, 1)); poniżej progu nic się nie dzieje (preventDefault — bez „podskoku”).
-//   Na czas przejazdu i wygasania rozpędu (aż do CISZA ms bez zdarzeń) kolejne zdarzenia są pomijane.
-// - Z dołu w górę: strona przewija się zwykle, ale zatrzymuje na górnej krawędzi Szybkiego dostępu; na okładkę prowadzi
-//   dopiero nowy zdecydowany ruch po CISZA ms spokoju (histereza), nie ten sam rozpęd.
-// - Klawisze: PgDn / spacja / ↓ / End na okładce → Szybki dostęp; PgUp / Shift+spacja / ↑ / Home u krawędzi → okładka
-//   (przytrzymany klawisz nie przenosi dalej niż do krawędzi). Pola formularzy i przyciski (spacja) — bez zmian.
-// - Wszystko inne (pasek przewijania, kotwice #…, Ctrl+F, zaznaczanie tekstu, „wstecz”, Tab): przeglądarka przewija
-//   sama, a gdy skończy w połowie — dociągamy do bliższego z dwóch położeń (przy fokusie z klawiatury — tam, gdzie
-//   jest fokus). Przy wciśniętym przycisku myszy (zaznaczanie) czekamy do puszczenia.
-// - Dotyk (telefon, tablet): CSS scroll-snap (zalozyciele-strony.css) — przeglądarka sama dociąga; skrypt obsługuje kliknięcia
-//   strzałki i liczb oraz zatrzymanie rozpędu na krawędzi (zlecenie 21, punkt 3): rozpędu palca nie da się przerwać ze skryptu, więc gdy
-//   Szybki dostęp stoi w spoczynku na krawędzi lub niżej, okładki nie ma w układzie strony (html.bez-okladki) i rozpęd kończy się na
-//   prawdziwej górze dokumentu. Wraca dopiero przy nowym dotknięciu na samej górze po CISZA ms spokoju; scroll-snap ją wtedy dociąga.
-// - Telefon (≤ 760 px): powrót na stronę główną zawsze na okładkę, także „wstecz” i z pamięci przeglądarki; adres z kotwicą działa jak dotąd (zlecenie 21, punkt 9).
-// - prefers-reduced-motion: przejście natychmiastowe.
-// Zalecenie 15: kliknięcie liczby nad strzałką — przejazd na Szybki dostęp i krótkie (1,6 s) podświetlenie kolumny.
+// Strona główna: okładka i Szybki dostęp (zlecenie 23, punkt 2 — telefon, tablet i komputer; zastępuje zlecenie 11, zalecenie 20
+// oraz zlecenie 21, punkty 3 i 9).
+// Dwa stany: okładka (strona się nie przewija) albo Szybki dostęp (okładki nie ma w układzie — html.bez-okladki — zwykłe przewijanie).
+// - Dotyk (telefon, tablet): z okładki na Szybki dostęp „na próg” — palec przesuwa okładkę i treść Szybkiego dostępu z oporem
+//   (--z-opor; za progiem połowa oporu), strzałka jaśnieje i podjeżdża (--z-postep), za progiem obraca grot w górę. Próg:
+//   --z-prog × wysokość okna drogi palca; prędkość się nie liczy. Puszczenie za progiem — odjazd do końca, przed progiem — powrót.
+// - Komputer (decyzja 6.11, 17:14): na okładce kółko, gładzik i klawisze przewijania nie robią nic — przejście tylko kliknięciem.
+// - Wszędzie od razu: strzałka i liczby nad nią (klik / stuknięcie / Enter), fokus z klawiatury lub czytnika w Szybkim dostępie.
+// - Z Szybkiego dostępu na okładkę: tylko link do strony głównej w pasku (telefon: nazwa Instytutu, komputer: znak z nazwą) — strona
+//   na górę, okładka zjeżdża. Przewijanie w górę kończy się na górze Szybkiego dostępu; klawisze w górę też nie wracają.
+// - Historia: znacznik zBezOkladki w history.state; „wstecz” i odświeżenie wracają tam, skąd się wyszło (skrypt w linii w Okladka.astro
+//   chowa okładkę przed pierwszym układem), położenie odtwarza przeglądarka. Nowe wejście — okładka.
+// - Przewinięcie „z zewnątrz” na okładce: pasek przewijania myszą — z powrotem na okładkę; szukanie, czytnik ekranu, kotwica —
+//   w spoczynku od połowy drogi Szybki dostęp, wcześniej z powrotem na okładkę.
+// - Okładka nie mieści się w oknie (bardzo niskie okno, telefon w poziomie): bez progu, zwykłe przewijanie; okładka chowa się dopiero
+//   na krawędzi Szybkiego dostępu, w spoczynku.
+// - Na okładce touch-action: pinch-zoom (klasa html.z-prog, zalozyciele-strony.css), więc bez JS przewija się zwyczajnie.
+//   Nasłuchy dotyku pasywne. Kółko: nasłuch niepasywny tylko na tej stronie (zatrzymuje przewijanie okładki).
+// - prefers-reduced-motion: przesunięcie za palcem zostaje, przejścia natychmiastowe.
+// Liczby nad strzałką (zalecenie 15): odjazd i krótkie (1,6 s) podświetlenie kolumny.
 const okladka = document.querySelector<HTMLElement>('.z-okladka');
 const obszar = document.getElementById('szybki-dostep');
 
 if (okladka && obszar) {
+  const html = document.documentElement;
   const BEZ_RUCHU = matchMedia('(prefers-reduced-motion: reduce)');
   const DOTYK = matchMedia('(hover: none) and (pointer: coarse)');
-  const PROG = 60; // px
-  const OKNO = 200; // ms
-  const CISZA = 400; // ms
-  const CZAS = 700; // ms — przejazd między położeniami
-  const CZAS_KROTKI = 300; // ms — dociągnięcie z bliska
+  const ODJAZD = 400; // ms
+  const POWROT = 300; // ms
+  const naglowek = document.querySelector<HTMLElement>('.hdr'); // telefon: przyklejony nagłówek; komputer: brak (offsetHeight 0)
+  const strzalka = okladka.querySelector<HTMLElement>('.z-strzalka');
+  const dzialy = okladka.querySelector<HTMLElement>('.z-okl-dzialy');
 
-  // cubic-bezier(.22, .8, .2, 1)
-  const krzywa = (() => {
-    const [x1, y1, x2, y2] = [0.22, 0.8, 0.2, 1];
-    const f = (t: number, a: number, b: number) => ((1 - 3 * b + 3 * a) * t * t * t) + ((3 * b - 6 * a) * t * t) + (3 * a * t);
-    const df = (t: number, a: number, b: number) => (3 * (1 - 3 * b + 3 * a) * t * t) + (2 * (3 * b - 6 * a) * t) + (3 * a);
-    return (x: number) => {
-      if (x <= 0 || x >= 1) return Math.min(1, Math.max(0, x));
-      let t = x;
-      for (let i = 0; i < 8; i++) {
-        const e = f(t, x1, x2) - x, d = df(t, x1, x2);
-        if (Math.abs(e) < 1e-5 || Math.abs(d) < 1e-6) break;
-        t = Math.min(1, Math.max(0, t - e / d));
-      }
-      return f(t, y1, y2);
-    };
-  })();
-
-  // na telefonie pierwszy ekran zaczyna się pod przyklejonym nagłówkiem (Naglowek.astro); na komputerze nagłówka nie ma
-  const naglowek = document.querySelector<HTMLElement>('.hdr');
-  const y1 = () => Math.max(0, Math.round(obszar.getBoundingClientRect().top + window.scrollY - (naglowek?.offsetHeight || 0)));
-
-  let ramka = 0;
-  let jedzie = false;
-  let blokada = false; // po przejeździe / dojeździe do krawędzi: czekamy na CISZA ms spokoju
-  let ostatnie = 0; // czas ostatniego zdarzenia kółka lub powtórzenia klawisza
+  let schowana = html.classList.contains('bez-okladki');
+  let animacja = false;
+  let ciagPx = 0; // bieżące przesunięcie okładki i treści Szybkiego dostępu (transform, nie przewinięcie)
+  let ciag: { y0: number; d: number } | null = null; // palec
   let wcisniety = false;
-  const ruchy: [number, number][] = []; // [czas, deltaY] z ostatnich OKNO ms
-  let cel = 0, celCzas = 0; // przewidywane położenie przy zwykłym przewijaniu kółkiem (rozpęd przeglądarki wyprzedza scrollY)
+  let zMyszy = false; // przewinięcie paskiem przewijania (przycisk myszy wciśnięty)
 
-  const stop = () => { if (ramka) cancelAnimationFrame(ramka); ramka = 0; jedzie = false; };
-
-  function jedz(doY: number, czas = CZAS) {
-    stop();
-    blokada = true;
-    ostatnie = performance.now();
-    ruchy.length = 0;
-    const od = window.scrollY;
-    if (Math.abs(doY - od) < 1) return;
-    if (BEZ_RUCHU.matches) { window.scrollTo({ top: doY, behavior: 'instant' }); return; }
-    // na dotyku przyciąga CSS (scroll-snap) — przewijanie po klatce byłoby tam co chwilę dociągane; płynnie robi to przeglądarka
-    if (DOTYK.matches) { window.scrollTo({ top: doY, behavior: 'smooth' }); return; }
-    const t0 = performance.now();
-    jedzie = true;
-    const krok = (t: number) => {
-      const p = Math.min(1, (t - t0) / czas);
-      window.scrollTo({ top: od + (doY - od) * krzywa(p), behavior: 'instant' });
-      if (p < 1) ramka = requestAnimationFrame(krok);
-      else { ramka = 0; jedzie = false; }
-    };
-    ramka = requestAnimationFrame(krok);
-  }
-
-  // czy zdarzenie przewinie najpierw coś wewnątrz (np. długi panel menu)
-  function przewijaWewnatrz(el: EventTarget | null, dy: number): boolean {
-    for (let n = el instanceof Element ? el : null; n && n !== document.body && n !== document.documentElement; n = n.parentElement) {
-      if (n.scrollHeight <= n.clientHeight + 1) continue;
-      const o = getComputedStyle(n).overflowY;
-      if (o !== 'auto' && o !== 'scroll') continue;
-      if (dy > 0 ? n.scrollTop + n.clientHeight < n.scrollHeight - 1 : n.scrollTop > 0) return true;
-    }
-    return false;
-  }
-
-  // po przewinięciu „z zewnątrz” (pasek przewijania, kotwica, Ctrl+F, Tab…): w połowie → do bliższego położenia
-  function dociagnij() {
-    if (jedzie || wcisniety || DOTYK.matches) return;
-    const Y1 = y1(), y = window.scrollY;
-    if (y <= 1 || y >= Y1 - 1) return;
-    let doY = y < Y1 / 2 ? 0 : Y1;
-    const a = document.activeElement;
-    if (a instanceof HTMLElement && a !== document.body && a.matches(':focus-visible')) {
-      doY = a.getBoundingClientRect().top + y >= Y1 + (naglowek?.offsetHeight || 0) ? Y1 : 0;
-    }
-    jedz(doY, CZAS_KROTKI);
-  }
-
-  window.addEventListener('wheel', (e) => {
-    if (e.ctrlKey || e.defaultPrevented || DOTYK.matches) return; // Ctrl + kółko / szczypanie = powiększanie
-    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // ruch w bok
-    const dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? window.innerHeight : 1);
-    if (przewijaWewnatrz(e.target, dy) || (e.target instanceof Element && e.target.closest('.z-menu.otwarte'))) return; // kółko nad panelem menu nie rusza strony
-    const teraz = performance.now();
-    if (blokada) {
-      if (jedzie || teraz - ostatnie < CISZA) { ostatnie = teraz; e.preventDefault(); return; }
-      blokada = false;
-    }
-    ostatnie = teraz;
-    const Y1 = y1(), y = window.scrollY;
-
-    // niżej niż krawędź Szybkiego dostępu (choćby o piksel): swobodnie, ale w górę najwyżej do krawędzi — ruch w górę,
-    // który zaczął się poniżej, kończy się na krawędzi (histereza), nawet gdy pod nią jest tylko kawałek strony
-    if (y > Y1 + 0.9) {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      cel = Math.min(max, Math.max(0, (teraz - celCzas < 250 ? cel : y) + dy));
-      celCzas = teraz;
-      if (dy < 0 && cel < Y1) { e.preventDefault(); jedz(Y1, CZAS_KROTKI); }
-      return;
-    }
-    // u krawędzi w dół: swobodnie
-    if (y >= Y1 - 1 && dy > 0) { cel = y + dy; celCzas = teraz; return; }
-
-    // okładka (albo krawędź i ruch w górę): sumujemy ruch z ostatnich OKNO ms
-    e.preventDefault();
-    while (ruchy.length && (teraz - ruchy[0][0] > OKNO || Math.sign(ruchy[0][1]) !== Math.sign(dy))) ruchy.shift();
-    ruchy.push([teraz, dy]);
-    const suma = ruchy.reduce((s, [, d]) => s + d, 0);
-    if (Math.abs(suma) < PROG) return;
-    if (dy > 0) jedz(Y1);
-    else if (y > 1) jedz(0);
-  }, { passive: false });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || DOTYK.matches) return;
-    const k = e.key;
-    const dol = k === 'PageDown' || k === 'ArrowDown' || k === 'End' || (k === ' ' && !e.shiftKey);
-    const gora = k === 'PageUp' || k === 'ArrowUp' || k === 'Home' || (k === ' ' && e.shiftKey);
-    if (!dol && !gora) return;
-    if (document.querySelector('.z-menu.otwarte')) return; // otwarty panel menu: klawisze należą do niego
-    const t = e.target instanceof Element ? e.target : null;
-    if (t?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="slider"], [role="listbox"], [role="menu"], [role="tablist"]')) return;
-    if (k === ' ' && t?.closest('button, summary, [role="button"]')) return; // spacja naciska przycisk
-    const Y1 = y1(), y = window.scrollY;
-    const teraz = performance.now();
-
-    if (y > Y1 + 0.9) {
-      if (!gora) return;
-      if (jedzie) { e.preventDefault(); return; }
-      // przewidywany skok klawisza: strzałka ok. 40 px, strona — prawie całe okno, Home — na samą górę
-      const skok = k === 'ArrowUp' ? 40 : k === 'Home' ? Infinity : window.innerHeight * 0.875;
-      if (y - skok >= Y1) return;
-      e.preventDefault();
-      jedz(Y1, CZAS_KROTKI);
-      return;
-    }
-    if (y >= Y1 - 1 && dol && !(e.repeat && blokada)) return; // u krawędzi w dół: swobodnie
-
-    e.preventDefault();
-    if (jedzie) return;
-    // przytrzymany klawisz (powtórzenia) nie przenosi dalej niż do krawędzi — dopiero nowe naciśnięcie
-    if (e.repeat && blokada && teraz - ostatnie < CISZA) { ostatnie = teraz; return; }
-    if (dol) jedz(Y1);
-    else if (y > 1) jedz(0);
-  });
-
-  // kliknięcia: strzałka „Szybki dostęp” i liczby nad nią (zalecenie 15)
-  okladka.addEventListener('click', (e) => {
-    const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>('.z-strzalka, .z-okl-liczby a') : null;
-    if (!a) return;
-    e.preventDefault();
-    jedz(y1());
-    const key = a.dataset.kol;
-    const kol = key ? document.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`) : null;
-    // fokus tam, dokąd prowadzi link: nagłówek kolumny albo początek drugiego ekranu
-    (kol?.querySelector<HTMLElement>('.z-h h2') ?? obszar).focus({ preventScroll: true });
-    if (!kol) return;
-    window.setTimeout(() => {
-      kol.classList.remove('z-podswietl');
-      void kol.offsetWidth; // od nowa, gdy kliknięto drugi raz
-      kol.classList.add('z-podswietl');
-      window.setTimeout(() => kol.classList.remove('z-podswietl'), 1600);
-    }, BEZ_RUCHU.matches ? 0 : 450);
-  });
-
-  window.addEventListener('pointerdown', (e) => { wcisniety = true; if (jedzie && e.pointerType !== 'touch') stop(); }, { passive: true });
-  window.addEventListener('pointerup', () => { wcisniety = false; dociagnij(); }, { passive: true });
-  window.addEventListener('pointercancel', () => { wcisniety = false; }, { passive: true });
-  // test na document (ten sam GlobalEventHandlers): przy teście na window TypeScript zawęża window w else do never
-  if ('onscrollend' in document) window.addEventListener('scrollend', dociagnij);
-  else {
-    let czas = 0;
-    window.addEventListener('scroll', () => { clearTimeout(czas); czas = window.setTimeout(dociagnij, 150); }, { passive: true });
-  }
-  document.addEventListener('focusin', () => requestAnimationFrame(dociagnij));
-  window.addEventListener('pageshow', () => requestAnimationFrame(dociagnij));
-
-  // zmiana wysokości okna: kto stał na krawędzi Szybkiego dostępu, zostaje na niej
-  let poprzedniY1 = y1();
-  new ResizeObserver(() => {
-    const nowy = y1();
-    if (nowy !== poprzedniY1 && Math.abs(window.scrollY - poprzedniY1) <= 1 && !jedzie) window.scrollTo({ top: nowy, behavior: 'instant' });
-    poprzedniY1 = nowy;
-  }).observe(okladka);
-
-  // ---------- dotyk: okładka poza układem, gdy Szybki dostęp stoi na krawędzi lub niżej (zlecenie 21, punkt 3) ----------
-  // Chowanie i przywracanie to w tej samej chwili przewinięcie o wysokość okładki, więc nic na ekranie się nie rusza. Spokój: USPOKOJENIE ms
-  // bez zdarzeń scroll i bez palca na ekranie, nigdy w trakcie rozpędu. Odświeżenie i powrót „wstecz”: przeglądarka odtwarza położenie liczone
-  // bez okładki, więc znacznik w history.state chowa ją jeszcze przed pierwszym układem strony (skrypt w linii w Okladka.astro). Telefon bez kotwicy
-  // w adresie położenia nie odtwarza (punkt 9, niżej); znacznik zostaje dla kotwic i dla obróconego telefonu szerszego niż 760 px.
-  const USPOKOJENIE = 150; // ms
-  const html = document.documentElement;
-  let schowana = html.classList.contains('bez-okladki'), palec = false, ostatniScroll = -Infinity, czasSpokoju = 0;
+  const zmienna = (nazwa: string, domyslna: number) => {
+    const v = parseFloat(getComputedStyle(html).getPropertyValue(nazwa));
+    return Number.isFinite(v) && v > 0 ? v : domyslna;
+  };
+  const prog = () => zmienna('--z-prog', 1 / 3) * window.innerHeight;
+  // odległość od okładki do Szybkiego dostępu (obszar sam się nie przesuwa, przesuwa się jego treść)
+  const y1 = () => Math.max(0, Math.round(obszar.getBoundingClientRect().top + window.scrollY - (naglowek?.offsetHeight || 0)));
+  // okładka jest z założenia dłuższa niż okno (punkt 5) — liczy się dół bloku działów na górze strony
+  const miesci = () => !dzialy || dzialy.getBoundingClientRect().bottom + ciagPx + window.scrollY <= window.innerHeight + 1;
+  const naOkladce = () => !schowana && miesci();
+  const ustawProg = () => { html.classList.toggle('z-prog', naOkladce()); }; // touch-action działa tylko na dotyk
+  // pasek (pasek.ts) przelicza kolor przy przewinięciu; schowanie okładki na górze strony nie przewija, więc dajemy znać osobnym zdarzeniem
+  const powiadomPasek = () => window.dispatchEvent(new Event('z-okladka'));
+  // otwarty panel menu; klasa html.menu-otwarte jest tylko na telefonie (menu.ts)
+  const menuOtwarte = () => !!document.querySelector('.z-menu.otwarte');
 
   const znacznik = (ustaw: boolean) => {
     const { zBezOkladki: _, ...stan } = history.state ?? {};
@@ -235,62 +65,196 @@ if (okladka && obszar) {
     html.classList.add('bez-okladki', 'bez-wejscia'); // bez-wejscia: po przywróceniu z display: none powtórzyłoby się wejście strony (przejscia.css)
     window.scrollTo({ top: Math.max(0, y - d), behavior: 'instant' });
     schowana = true;
-    poprzedniY1 = y1(); // bez tego ResizeObserver wyżej wziąłby schowanie za zmianę wysokości okna
     znacznik(true);
+    ustawProg();
+    powiadomPasek();
   }
   function pokaz() {
     const y = window.scrollY;
     html.classList.remove('bez-okladki');
-    poprzedniY1 = y1();
-    window.scrollTo({ top: y + poprzedniY1, behavior: 'instant' });
+    window.scrollTo({ top: y + y1(), behavior: 'instant' });
     schowana = false;
     znacznik(false);
-  }
-  const spokoj = () => {
-    if (!DOTYK.matches || palec || schowana) return;
-    if (html.classList.contains('menu-otwarte')) { pozniej(); return; } // strona stoi pod panelem: czekamy na jego zamknięcie
-    if (window.scrollY >= y1() - 1) schowaj();
-  };
-  function pozniej() {
-    clearTimeout(czasSpokoju);
-    czasSpokoju = window.setTimeout(spokoj, USPOKOJENIE);
+    ustawProg();
+    powiadomPasek();
   }
 
-  // ---------- telefon: powrót zawsze na okładkę (zlecenie 21, punkt 9) ----------
-  // Wyjątek: adres z kotwicą. Przywracanie położenia zapisuje się przy wpisie historii, więc przełączamy je także przy zmianie kotwicy.
-  const TELEFON = matchMedia(MQ_TELEFON);
-  const kotwica = () => !!location.hash && location.hash !== '#okladka';
-  const przywracanie = () => { history.scrollRestoration = TELEFON.matches && !kotwica() ? 'manual' : 'auto'; };
-  let dotknieta = false; // palec w trakcie wczytywania: pierwsze pageshow nie zabiera strony spod palca
-  function naOkladke() {
-    if (schowana) pokaz();
-    else if (history.state?.zBezOkladki) znacznik(false);
-    window.scrollTo({ top: 0, behavior: 'instant' });
+  // ---------- przesunięcie okładki (palec, kółko, odjazd, powrót) ----------
+  const przesun = (px: number, postep: number) => {
+    ciagPx = px;
+    html.style.setProperty('--z-ciag', `${px.toFixed(1)}px`);
+    html.style.setProperty('--z-postep', Math.min(1, Math.max(0, postep)).toFixed(3));
+    strzalka?.classList.toggle('z-za-progiem', postep >= 1);
+  };
+  const zOporem = (d: number) => {
+    const p = prog(), opor = zmienna('--z-opor', 0.55);
+    return Math.min(d <= p ? d * opor : p * opor + (d - p) * opor * 0.55, y1());
+  };
+  const koniecCiagu = () => {
+    ciagPx = 0;
+    html.classList.remove('z-ciagnie', 'z-jedzie');
+    html.style.removeProperty('--z-ciag');
+    html.style.removeProperty('--z-postep');
+    html.style.removeProperty('--z-czas');
+    strzalka?.classList.remove('z-za-progiem');
+  };
+  // płynne dojście do położenia: przejście CSS na transform (klasa z-jedzie), zapasowo zegar
+  const dojedz = (doPx: number, postep: number, czas: number, potem: () => void) => {
+    html.classList.add('z-ciagnie');
+    if (BEZ_RUCHU.matches || czas <= 0) { przesun(doPx, postep); potem(); return; }
+    animacja = true;
+    html.style.setProperty('--z-czas', `${czas}ms`);
+    void okladka.offsetWidth; // styl bieżącego położenia, zanim zmieni się wartość — przejście rusza stąd
+    html.classList.add('z-jedzie');
+    przesun(doPx, postep);
+    let zrobione = false;
+    const koniec = (e: TransitionEvent) => { if (e.target === okladka && e.propertyName === 'transform') skoncz(); };
+    const skoncz = () => { if (zrobione) return; zrobione = true; animacja = false; okladka.removeEventListener('transitionend', koniec); potem(); };
+    okladka.addEventListener('transitionend', koniec);
+    window.setTimeout(skoncz, czas + 120);
+  };
+  function przejdz(natychmiast = false) {
+    if (schowana || animacja) return;
+    ciag = null;
+    if (window.scrollY > 1) window.scrollTo({ top: 0, behavior: 'instant' });
+    // najpierw bez przesunięcia, potem schowanie — w tej samej klatce, więc nic nie skacze
+    dojedz(y1(), 1, natychmiast ? 0 : ODJAZD, () => { koniecCiagu(); schowaj(); });
   }
-  przywracanie();
-  TELEFON.addEventListener('change', przywracanie);
-  window.addEventListener('pageshow', (e) => {
-    if (TELEFON.matches && !kotwica() && (e.persisted || !dotknieta)) naOkladke();
+  function wroc() { dojedz(0, 0, POWROT, koniecCiagu); }
+  // link do strony głównej w pasku: strona na górę, okładka zjeżdża z góry
+  function naOkladke() {
+    const plynnie = BEZ_RUCHU.matches ? 'instant' : 'smooth';
+    if (!schowana) { window.scrollTo({ top: 0, behavior: plynnie }); return; }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    pokaz(); // okładka nad Szybkim dostępem, widok bez zmian
+    window.scrollTo({ top: 0, behavior: plynnie });
+  }
+
+  // ---------- palec ----------
+  window.addEventListener('touchstart', (e) => {
+    if (ciag && e.touches.length > 1) { ciag = null; wroc(); return; } // drugi palec: szczypanie
+    if (!DOTYK.matches || !html.classList.contains('z-prog') || animacja || menuOtwarte() || e.touches.length !== 1) return;
+    const t = e.target instanceof Element ? e.target : null;
+    if (!t?.closest('.z-okladka, .hdr') || t.closest('.z-menu')) return;
+    ciag = { y0: e.touches[0].clientY, d: 0 };
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (!ciag) return;
+    if (e.touches.length !== 1) { ciag = null; wroc(); return; }
+    const d = Math.max(0, ciag.y0 - e.touches[0].clientY);
+    ciag.d = d;
+    if (d > 2) html.classList.add('z-ciagnie');
+    przesun(zOporem(d), d / prog());
+  }, { passive: true });
+  window.addEventListener('touchend', () => {
+    if (!ciag) return;
+    const { d } = ciag;
+    ciag = null;
+    if (d >= prog()) przejdz();
+    else if (d > 2) wroc();
+    else koniecCiagu();
+  }, { passive: true });
+  window.addEventListener('touchcancel', () => { if (ciag) { ciag = null; wroc(); } }, { passive: true });
+
+  // ---------- kółko i gładzik ----------
+  // czy zdarzenie przewinie najpierw coś wewnątrz (np. długi panel menu)
+  function przewijaWewnatrz(el: EventTarget | null, dy: number): boolean {
+    for (let n = el instanceof Element ? el : null; n && n !== document.body && n !== html; n = n.parentElement) {
+      if (n.scrollHeight <= n.clientHeight + 1) continue;
+      const o = getComputedStyle(n).overflowY;
+      if (o !== 'auto' && o !== 'scroll') continue;
+      if (dy > 0 ? n.scrollTop + n.clientHeight < n.scrollHeight - 1 : n.scrollTop > 0) return true;
+    }
+    return false;
+  }
+  // na okładce kółko i gładzik nie przewijają (komputer: przejście tylko kliknięciem); panel menu przewija się sam, a na jego końcu ruch nie przechodzi na stronę
+  window.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.defaultPrevented || !naOkladce()) return; // Ctrl + kółko / szczypanie = powiększanie
+    const dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? window.innerHeight : 1);
+    if (przewijaWewnatrz(e.target, dy)) return;
+    e.preventDefault();
+  }, { passive: false });
+
+  // ---------- klawisze na okładce ----------
+  window.addEventListener('keydown', (e) => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !naOkladce()) return;
+    const k = e.key;
+    const dol = k === 'PageDown' || k === 'ArrowDown' || k === 'End' || (k === ' ' && !e.shiftKey);
+    const gora = k === 'PageUp' || k === 'ArrowUp' || k === 'Home' || (k === ' ' && e.shiftKey);
+    if (!dol && !gora) return;
+    const t = e.target instanceof Element ? e.target : null;
+    if (t?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="slider"], [role="listbox"], [role="menu"], [role="tablist"]')) return;
+    if (k === ' ' && t?.closest('button, summary, [role="button"]')) return; // spacja naciska przycisk
+    if (menuOtwarte() && przewijaWewnatrz(t, dol ? 1 : -1)) return; // otwarty panel menu przewija się sam
+    e.preventDefault(); // klawisze przewijania na okładce nic nie robią; do Szybkiego dostępu — Tab do strzałki i Enter
   });
 
-  window.addEventListener('touchstart', (e) => {
-    dotknieta = true;
-    palec = e.touches.length > 0;
-    clearTimeout(czasSpokoju);
-    if (schowana && DOTYK.matches && window.scrollY <= 1 && performance.now() - ostatniScroll >= CISZA && !html.classList.contains('menu-otwarte')) pokaz();
-  }, { passive: true });
-  const puszczony = (e: TouchEvent) => { palec = e.touches.length > 0; pozniej(); };
-  window.addEventListener('touchend', puszczony, { passive: true });
-  window.addEventListener('touchcancel', puszczony, { passive: true });
-  window.addEventListener('scroll', () => { ostatniScroll = performance.now(); pozniej(); }, { passive: true });
-  window.addEventListener('pageshow', pozniej);
+  // ---------- kliknięcia ----------
+  // strzałka „Szybki dostęp” i liczby nad nią (zalecenie 15)
+  okladka.addEventListener('click', (e) => {
+    const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>('.z-strzalka, .z-okl-liczby a') : null;
+    if (!a) return;
+    e.preventDefault();
+    if (miesci()) przejdz();
+    else window.scrollTo({ top: y1(), behavior: BEZ_RUCHU.matches ? 'instant' : 'smooth' });
+    const key = a.dataset.kol;
+    const kol = key ? document.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`) : null;
+    // fokus tam, dokąd prowadzi link: nagłówek kolumny albo początek drugiego ekranu
+    (kol?.querySelector<HTMLElement>('.z-h h2') ?? obszar).focus({ preventScroll: true });
+    if (!kol) return;
+    window.setTimeout(() => {
+      kol.classList.remove('z-podswietl');
+      void kol.offsetWidth; // od nowa, gdy kliknięto drugi raz
+      kol.classList.add('z-podswietl');
+      window.setTimeout(() => kol.classList.remove('z-podswietl'), 1600);
+    }, BEZ_RUCHU.matches ? 0 : 450);
+  });
+  // link do tej samej strony (bez kotwicy) w pasku — przed innymi nasłuchami kliknięć. Strona się nie przeładowuje, więc otwarty panel menu zamykamy sami
+  const bezUkosnika = (s: string) => s.replace(/\/+$/, '');
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>('a[href]') : null;
+    if (!a || (a.target && a.target !== '_self') || a.closest('.z-okladka')) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || bezUkosnika(url.pathname) !== bezUkosnika(location.pathname) || url.search !== location.search || url.hash) return;
+    e.preventDefault();
+    document.querySelector<HTMLElement>('.z-menu.otwarte [data-z-menu-zamknij]')?.click();
+    naOkladke();
+  }, true);
+
+  // ---------- dostępność i przewijanie „z zewnątrz” ----------
+  // fokus z klawiatury albo czytnika w Szybkim dostępie przy widocznej okładce (fokus z kliknięcia strzałki — już po przejściu)
+  // panel menu telefonu stoi w tym obszarze, a otwarty dostaje fokus: to nie jest przejście do Szybkiego dostępu
+  obszar.addEventListener('focusin', (e) => {
+    if (e.target instanceof Element && e.target.closest('.z-menu')) return;
+    if (naOkladce() && !ciag && !animacja) przejdz(true);
+  });
+  let czasSpokoju = 0;
+  const wSpoczynku = () => {
+    if (schowana || ciag || animacja || wcisniety || menuOtwarte()) return;
+    const y = window.scrollY, Y1 = y1(), mysz = zMyszy;
+    zMyszy = false;
+    if (y <= 1) return;
+    if (!miesci()) { if (y >= Y1 - 1) schowaj(); return; }
+    // głębiej niż krawędź (szukanie w stronie, kotwica w Szybkim dostępie) położenie zostaje
+    if (!mysz && y >= Y1 / 2) { if (y < Y1) window.scrollTo({ top: Y1, behavior: 'instant' }); schowaj(); }
+    else window.scrollTo({ top: 0, behavior: BEZ_RUCHU.matches ? 'instant' : 'smooth' });
+  };
+  window.addEventListener('scroll', () => { clearTimeout(czasSpokoju); czasSpokoju = window.setTimeout(wSpoczynku, 150); }, { passive: true });
+  window.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') wcisniety = true; }, { passive: true });
+  window.addEventListener('pointerup', () => { if (wcisniety) { wcisniety = false; zMyszy = naOkladce() && window.scrollY > 1; wSpoczynku(); } }, { passive: true });
+  window.addEventListener('pointercancel', () => { wcisniety = false; }, { passive: true });
+
   window.addEventListener('hashchange', () => {
-    przywracanie();
-    if (TELEFON.matches && !location.hash) { naOkladke(); return; } // „wstecz” z adresu z kotwicą na ten sam dokument, bez pageshow
     if (!schowana) return;
-    if (location.hash === '#okladka') { pokaz(); window.scrollTo({ top: 0, behavior: 'instant' }); }
+    if (location.hash === '#okladka') naOkladke();
     else znacznik(true); // nowy wpis w historii nie ma znacznika
   });
-  DOTYK.addEventListener('change', () => { if (schowana && !DOTYK.matches) pokaz(); });
-  pozniej();
+  window.addEventListener('pageshow', () => { schowana = html.classList.contains('bez-okladki'); ustawProg(); });
+  window.addEventListener('resize', ustawProg);
+  new ResizeObserver(ustawProg).observe(okladka);
+  document.fonts?.ready.then(ustawProg);
+  document.addEventListener('animationend', (e) => { if (e.animationName === 'wejscie') ustawProg(); }); // przy wejściu strony działy są przesunięte o 12 px (przejscia.css)
+  DOTYK.addEventListener('change', ustawProg);
+  ustawProg();
 }

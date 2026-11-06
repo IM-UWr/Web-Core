@@ -8,7 +8,7 @@
 // - zdjęcie gmachu przesunięte w prawo i w górę; rząd 4 działów nisko: szkic („duch” w spoczynku, po najechaniu kontur się
 //   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron; całe zdjęcie lekko barwi się na jasny kolor
 //   działu — zalecenie 1); nad strzałką „Szybki dostęp” przygaszone liczby (wydarzenia, seminaria, nowe aktualności —
-//   zalecenie 15); okładka ↔ Szybki dostęp bez zatrzymywania w połowie (src/scripts/zal/przejazd.ts, zalecenie 20).
+//   zalecenie 15); okładka albo Szybki dostęp, nigdy nic pomiędzy (src/scripts/zal/przejazd.ts, zlecenie 23, punkt 2).
 // Telefon (≤ 760 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez łuku.
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
@@ -124,10 +124,9 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `ok.classList.add('z-ulozona')}` +
   `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 ---
-{/* dotyk: odświeżenie i powrót „wstecz” przy schowanej okładce; przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
-    Widok telefonu bez kotwicy w adresie zawsze wraca na okładkę (zlecenie 21, punkt 9), więc tam okładka zostaje.
-    Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px razem ze scroll-snap kończy się czasem na okładce albo 11 px za krawędzią. */}
-<script is:inline set:html={`if(location.hash!=='#okladka'&&matchMedia('(hover: none) and (pointer: coarse)').matches){var zk=document.documentElement.classList;if(location.hash)zk.add('bez-wejscia');if(history.state&&history.state.zBezOkladki&&(location.hash||!matchMedia('${MQ_TELEFON}').matches))zk.add('bez-okladki','bez-wejscia')}`} />
+{/* Odświeżenie i powrót „wstecz” z Szybkiego dostępu, a także adres #szybki-dostep: okładkę chowamy przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
+    Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px zmyliłoby przewinięcie do kotwicy. */}
+<script is:inline set:html={`if(location.hash!=='#okladka'){var zk=document.documentElement.classList;if(location.hash)zk.add('bez-wejscia');if(location.hash==='#szybki-dostep'||(history.state&&history.state.zBezOkladki))zk.add('bez-okladki','bez-wejscia')}`} />
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
   {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy szybkieWejscie />}

@@ -80,7 +80,7 @@ if (hdr) {
     const r = el.getBoundingClientRect();
     return Math.round(r.top) <= h && Math.round(r.bottom) > h;
   };
-  // Okładka pod paskiem, liczona od Szybkiego dostępu: sama okładka bywa bez pudełka (schowana na dotyku, src/scripts/zal/przejazd.ts),
+  // Okładka pod paskiem, liczona od Szybkiego dostępu: sama okładka bywa bez pudełka (schowana, src/scripts/zal/przejazd.ts),
   // a przy wejściu strony jest przesunięta o 12 px w dół (przejscia.css), więc jej góra byłaby wtedy poniżej paska.
   const nadOkladka = (h: number) => !document.documentElement.classList.contains('bez-okladki') && !!szybkiDostep && Math.round(szybkiDostep.getBoundingClientRect().top) > h;
 
@@ -106,6 +106,7 @@ if (hdr) {
   window.addEventListener('scroll', () => { cancelAnimationFrame(rama); rama = requestAnimationFrame(ustaw); }, { passive: true });
   window.addEventListener('resize', ustaw);
   window.addEventListener('pageshow', ustaw);
+  window.addEventListener('z-okladka', ustaw); // okładka schowana lub pokazana na górze strony, bez zdarzenia scroll (przejazd.ts)
   document.addEventListener('animationend', (e) => { if (e.animationName === 'wejscie') ustaw(); }); // koniec przesunięcia przy wejściu strony
   TELEFON.addEventListener('change', ustaw);
   poStopce.push(ustaw);
