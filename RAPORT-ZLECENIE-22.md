@@ -1,8 +1,8 @@
 # Raport: zlecenie 22 — wszystkie pola w CMS i praca edytorów na gałęzi (6.11.2026)
 
-**Etapy 0–8 są zrobione i wypchnięte, etap 11 (`dok/start-strony.md`) napisany. Etap 9: gałęzie `test-cms` czekają, właściciel odłożył zapisy w CMS na później.** Etap 10 czeka na słowo „przełącz”, a jego warunkiem w zleceniu jest udany etap 9. Numer 22 był wolny. Zlecenie 22 ma osobne commity, zlecenia 21 w nich nie ma.
+**Etapy 0–8 są zrobione i wypchnięte, etap 11 (`dok/start-strony.md`) napisany. Etap 9 ma wynik: 8 z 9 zapisów dobrych, jeden psuje listę numerowaną na „Dla uczniów”.** Decyzja o poprawce należy do właściciela, gałęzie `test-cms` zostają do tej decyzji. Etap 10 czeka na słowo „przełącz”, a jego warunkiem w zleceniu jest udany etap 9. Numer 22 był wolny. Zlecenie 22 ma osobne commity, zlecenia 21 w nich nie ma.
 
-Skrypt kontrolny daje **0 problemów przy 575 plikach**: 567 po etapach 0–7 i 8 wpisów testowych, o które właściciel poprosił później. Żadnego formularza nie sprawdzono jeszcze w prawdziwym Pages CMS: to etap 9.
+Skrypt kontrolny daje **0 problemów przy 575 plikach**: 567 po etapach 0–7 i 8 wpisów testowych, o które właściciel poprosił później. Formularze sprawdzono w prawdziwym Pages CMS na 9 wpisach w 6 repozytoriach (etap 9).
 
 ## Decyzje właściciela
 
@@ -130,9 +130,31 @@ Pola `*_haslo` nazywają w etykiecie stronę, np. „Hasło na banerze: Projekty
 
 **Harmonogram Web-Podglad nie działa co godzinę.** Zlecenie zakłada przebieg co godzinę, o :23, a `podglad.yml` ma taki cron, ale GitHub uruchamiał go nieregularnie: ostatnio o 08:04, 00:27, 18:52, 11:15, 02:37, 21:59 UTC. Workflow zostawiłem bez zmian. Ręcznie uruchomiłem dwa przebiegi: do sprawdzenia etapu 8 i po wpisach testowych. Zmiana treści może więc na podglądzie pojawić się dopiero po wielu godzinach, chyba że ktoś uruchomi przebieg ręcznie.
 
-## Etap 9: próba w CMS (odłożona)
+## Etap 9: próba w CMS
 
-Właściciel odłożył ją 6.11: „testy edycji zrobimy później”. Gałęzie `test-cms` zostają do tego czasu.
+**Wynik (6.11): 8 z 9 zapisów dobrych, jeden psuje listę numerowaną.** Właściciel zapisał 9 wpisów w 6 repozytoriach. Wszystkie commity doszły na `test-cms` (autor „Symon Cygan”, „Update … (via Pages CMS)”), a `main` i gałąź robocza pozostały bez zmian.
+
+| Sprawdzenie | Wynik |
+| --- | --- |
+| Pola ukryte (`naglowki_podstron`, `zrodla`, `pochodzenie`, `etykieta_krotka`, `liczby`, `pinezka`, `rola_en` i inne) | wszystkie przetrwały, bez różnicy wartości |
+| Budowa strony z 9 zapisami | przechodzi, 747 stron, schemat przyjmuje pliki |
+| Tekst i struktura `<main>` 8 stron bez zapisanej listy, PL i EN, po usunięciu słowa „test” | 0 różnic: strona główna, Matematyka, Szkoła doktorska, Skrypty, specjalność, seminarium Topologia, publikacje 2025, angielska wersja „Dla uczniów” |
+| `opublikowany` | zniknęło, dopuszczone przez zlecenie |
+| Formatowanie plików, kolejność kluczy | zmienione, dopuszczone przez zlecenie |
+| Puste wartości (`baner.podpis_telefon`, `logo`, `partnerzy: []`, `powiadomienia: {adres: ''}`) | znikają, bez skutku: kod przyjmuje ich brak |
+| Wartości domyślne dopisane przez CMS (`w_menu`, `na_stronie_glownej`, `na_stronie_kierunku`, `bez_podstrony`, `kierunki`, `terminy[].przypomnienie`, `dni_przed`, `co_roku`) | to samo znaczenie co brak pola |
+
+**Defekt: „Dla uczniów”, lista „Jak zacząć”.** Pole treści to edytor rich-text, który przy zapisie przepisuje cały Markdown. W liście numerowanej daje dalsze akapity wcięte o 2 spacje zamiast 3, a przy znaczniku `1. ` to już nie jest ten sam punkt. Na zbudowanej stronie znikają etykiety „Krok 1–3”: z 3 punktów zostaje 1 i goły tekst „2. Zapisz się”, „3. Przyjdź do Instytutu”. Skala: wśród 378 plików z polem rich-text taką listę ma tylko ten jeden plik. Każdy zapis tego wpisu w CMS zepsuje ją od nowa, także gdy edytor zmieni jedno słowo gdzie indziej. Listy punktowane i bloki z kilkoma akapitami przetrwały, bo dla `- ` 2 spacje wystarczają.
+
+**Propozycja, decyzja właściciela.** Mała wtyczka Markdown w kodzie strony, która rozpoznaje wcięty akapit między punktami listy numerowanej i dołącza go z powrotem do punktu. Edytorzy zostają przy rich-text i naprawia to też wszystkie przyszłe zapisy; nie zmienia plików ani formularzy. Alternatywy są gorsze: zamiana pola na edytor Markdown w „Stronach Popularyzacji” pogarsza pracę edytorów, a przepisanie tej jednej listy bez dalszych akapitów traci wygląd bloków „Krok N”.
+
+**Drobiazg do odnotowania, bez skutku dziś.** W `terminy[]` bez daty CMS wpisuje dzisiejszą datę (`data: 2026-11-06`). Strona jej nie używa, dopóki `przypomnienie` jest wyłączone. Gdyby edytor włączył przypomnienie, data będzie już wypełniona dniem zapisu, więc trzeba ją wtedy poprawić.
+
+**`test-cms`** zostaje do decyzji o liście. Po niej usuwam gałęzie w sześciu repozytoriach. Instalacja Pages CMS w IM-UWr to 179410413, na wszystkich repozytoriach, a nie na wybranych 21: działa, ale aplikacja ma też zapis w Web-Core, Web-Podglad i `.github`, więc warto ją zawęzić (robi to właściciel).
+
+### Przebieg
+
+Właściciel najpierw odłożył próbę: „testy edycji zrobimy później”. Po instalacji aplikacji wykonał ją jeszcze tego samego dnia.
 
 **Pierwsza próba zapisu (6.11): odrzucona.** CMS pokazał „Resource not accessible by integration” przy zapisie pliku. Przyczyna: aplikacja Pages CMS nie jest zainstalowana w organizacji IM-UWr (są tylko `claude` i `im-uwr-strona-powiadomienia`). Repozytoria są publiczne, więc formularze się otwierają, ale zapis wymaga instalacji. Bez niej nie zapisze też żaden edytor, także po etapie 10. Instalację robi właściciel. Żaden zapis nie doszedł: wszystkie 6 gałęzi `test-cms` bez zmian.
 

@@ -13,7 +13,7 @@ KLONY=../tresci
 
 ## Zanim zaczniesz
 
-**1. Próba zapisu w CMS (zlecenie 22, etap 9) ma wynik pozytywny.** Właściciel odłożył ją 6.11. Dopóki jej nie ma, formularzy nie sprawdzono w prawdziwym Pages CMS. Wymaga aplikacji Pages CMS zainstalowanej w organizacji IM-UWr na 21 repozytoriach treści: bez niej każdy zapis, także edytorów, kończy się błędem „Resource not accessible by integration” (tak było 6.11).
+**1. Lista na „Dla uczniów” po zapisie w CMS jest rozstrzygnięta.** Próba w CMS (zlecenie 22, etap 9) wykonana 6.11: 8 z 9 zapisów dobrych, a każdy zapis tej strony psuje jej listę numerowaną (szczegóły w `RAPORT-ZLECENIE-22.md`). Do tego aplikacja Pages CMS musi być zainstalowana w organizacji IM-UWr, bo bez niej każdy zapis kończy się błędem „Resource not accessible by integration”. Od 6.11 jest zainstalowana (179410413), na wszystkich repozytoriach; wystarczy 21 repozytoriów treści.
 
 **2. Wpisy testowe są usunięte.** To 8 wpisów i 4 zdjęcia dodane na prośbę właściciela, wyłącznie na gałęzi `wyglad/zlecenie-16`. Usunąć je w klonach, na tej gałęzi, i wypchnąć tylko tę gałąź.
 
