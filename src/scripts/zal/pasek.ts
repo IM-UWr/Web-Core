@@ -8,12 +8,12 @@
 // przy pasku dostaje ten sam kolor (.z-menu-jasny). Strona główna ma własny, zawsze jasny pasek — tu pomijany.
 // Stopka w oknie (na komputerze i telefonie, uwaga właściciela z 6.11, zmienia „nad stopką” z punktu 2): pasek w kolorze stopki, pełny granat
 // (.przy-stopce). Liczy się samo pojawienie się stopki na dole okna, bo jest niska i pod pasek zwykle nie dochodzi. Strona główna bez tego.
-// Telefon (≤ 760 px): nagłówek .hdr (src/components/Naglowek.astro), style w src/styles/zal-telefon.css. Stoi w układzie strony, więc:
-// - strona z banerem: na górze pełny granat (pod paskiem nie ma jeszcze banera, prześwit dałby szarość), dalej jak na komputerze;
+// Telefon (widok telefonu, src/lib/media.ts): nagłówek .hdr (src/components/Naglowek.astro), style w src/styles/zal-telefon.css. Stoi w układzie strony, więc:
+// - strona z banerem: baner zaczyna się pod paskiem już na górze (zlecenie 23, punkt 3), więc pasek prześwituje od początku, cień po przewinięciu, dalej jak na komputerze;
 // - strona bez banera: na górze pełny granat, po przewinięciu jasny;
 // - strona główna: nad okładką pełny granat, od krawędzi Szybkiego dostępu zawsze jasny, także przy stopce;
-// - co jest pod paskiem, sprawdza linia 1 px tuż pod jego dolną krawędzią (na komputerze tuż nad nią): przy scrollY 0 baner zaczyna się
-//   dokładnie na tej krawędzi, a na krawędzi Szybkiego dostępu okładka dokładnie na niej się kończy.
+// - co jest pod paskiem, sprawdza linia 1 px tuż pod jego dolną krawędzią (na komputerze tuż nad nią): na krawędzi Szybkiego dostępu
+//   okładka dokładnie na niej się kończy.
 // Panel hamburgera ma kolor nagłówka. Panel strony głównej ma klasę .z-menu-jasny na stałe: na telefonie przełącza ją skrypt,
 // a na komputerze panel zostaje jasny, także po obróceniu telefonu lub zmianie szerokości okna.
 import { MQ_TELEFON } from '../../lib/media';

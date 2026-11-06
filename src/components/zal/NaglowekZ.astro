@@ -77,15 +77,15 @@ const styl = `object-position:${rodzaj === 'podstrona' && !fotoNat ? '50% 40%' :
 // w szerokości --sz przypiętej do szkicu (zlecenie 11, zalecenie 17), podstrona Studiów 122% (same tablice; na telefonie 220%, zlecenie 18,
 // punkt 17), telefon — cały ekran.
 // Zdjęcie wypełnia pole przez object-fit: cover, więc gdy pole jest wyższe niż zdjęcie w tej szerokości, potrzebna szerokość
-// to wysokość pola × proporcje zdjęcia (p): baner działu ma ok. 366 px wysokości na komputerze i do ok. 410 px na telefonie,
-// nagłówek podstrony na telefonie do ok. 300 px (pomiar 5.11.2026 w Edge, 390–1920 px)
+// to wysokość pola × proporcje zdjęcia (p): baner działu ma ok. 366 px wysokości na komputerze i do ok. 475 px na telefonie,
+// nagłówek podstrony na telefonie do ok. 365 px (pomiar 5.11.2026 w Edge, 390–1920 px, plus 61 px paska, pod który baner sięga od zlecenia 23, punkt 3)
 const px = (wys: number, p: number) => `${Math.ceil(wys * p)}px`;
 const rozmiar = (p: number) => rodzaj === 'dzial'
   ? (dzial === 'studia'
-    ? `${sizesTelefon(`max(100vw, ${px(410, p)})`)}, max(1454px, calc((max(64px, (100vw - 1240px) / 2) + 155px) / .4025))`
-    : `${sizesTelefon(`max(100vw, ${px(410, p)})`)}, max(64vw, ${px(370, p)})`)
-  : (fotoNat ? `${sizesTelefon(`max(78vw, ${px(300, p)})`)}, min(62vw, 1270px)`
-    : dzial === 'studia' ? `${sizesTelefon('220vw')}, 122vw` : `max(100vw, ${px(300, p)})`);
+    ? `${sizesTelefon(`max(100vw, ${px(475, p)})`)}, max(1454px, calc((max(64px, (100vw - 1240px) / 2) + 155px) / .4025))`
+    : `${sizesTelefon(`max(100vw, ${px(475, p)})`)}, max(64vw, ${px(370, p)})`)
+  : (fotoNat ? `${sizesTelefon(`max(78vw, ${px(365, p)})`)}, min(62vw, 1270px)`
+    : dzial === 'studia' ? `${sizesTelefon('220vw')}, 122vw` : `${sizesTelefon(`max(100vw, ${px(365, p)})`)}, max(100vw, ${px(300, p)})`);
 
 // Ciekawostka patrona (zalecenie 19): każda podstrona z menu działu dostaje inną ciekawostkę patrona, losowaną raz na wizytę
 // (sessionStorage „im-ciek-zestaw”: {dział: {strona: id}}) skryptem w linii za znakiem, zanim strona się narysuje; pula działu

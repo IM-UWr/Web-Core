@@ -16,7 +16,7 @@
   main .z-nast { margin-inline: max(16px, calc((100% - var(--kol-niski)) / 2)); }
 
   /* ---------- baner działu: wysokość z treści, ciaśniej, szkic mniejszy i nie zachodzi na tekst ---------- */
-  main .z-nagl.z-baner-dzialu { padding: 10px 16px 12px; }
+  main .z-nagl.z-baner-dzialu { padding: calc(10px + var(--hdr-h)) 16px 12px; }
   main .z-nagl.z-baner-dzialu h1 { max-width: none; margin-top: 8px; font-size: 36px; }
   main .z-nagl.z-baner-dzialu[data-dzial="popularyzacja"] h1 { font-size: 34px; padding-right: 0; }
   main .z-nagl.z-baner-dzialu .z-haslo { max-width: 62%; margin-top: 4px; font-size: 14px; }
@@ -28,7 +28,7 @@
   main .z-nagl.z-baner-dzialu .z-slot .pt-liczby { margin-top: 8px; }
 
   /* ---------- nagłówek podstrony: ciaśniej; rysunek w wysokości banera ---------- */
-  main .z-nagl.z-nagl-pod { padding: 8px 16px 12px; }
+  main .z-nagl.z-nagl-pod { padding: calc(8px + var(--hdr-h)) 16px 12px; }
   main .z-nagl.z-nagl-pod h1 { font-size: 26px; }
   main .z-nagl.z-nagl-pod .z-sygnet-nagl { width: 34px; height: 41px; }
 
