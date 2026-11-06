@@ -163,9 +163,9 @@
   .z-dz-karta[aria-expanded="true"] .z-dz-szew { transform: rotate(180deg); }
   .z-dz-karta em { display: block; grid-area: op; font-style: normal; font-size: 13.5px; line-height: 1.35; color: var(--muted); }
   .z-dz-karta small { grid-area: ile; margin-top: 5px; font-size: 12.5px; font-weight: 600; color: var(--d-a); }
-  /* po najechaniu i po rozwinięciu ten sam kolor; strzałka też */
+  /* po najechaniu i po rozwinięciu ten sam kolor; strzałka też. Opis i liczba stron w kolorze tekstu: --muted i --d-a na --ton schodzą poniżej 4,5:1 */
   .z-dz-karta:hover, .z-dz-karta[aria-expanded="true"] { background-color: var(--ton); }
-  .z-dz-karta[aria-expanded="true"] em { color: var(--text); }
+  .z-dz-karta:is(:hover, [aria-expanded="true"]) :is(em, small) { color: var(--text); }
   .z-dz-karta[aria-expanded="true"]::after { content: ''; position: absolute; left: 24px; bottom: -7px; width: 14px; height: 14px; background: var(--ton); transform: rotate(45deg); }
   .z-dz-karta:focus-visible { outline: 2px solid var(--d-a); outline-offset: -3px; }
 
