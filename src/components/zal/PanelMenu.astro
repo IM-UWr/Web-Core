@@ -6,7 +6,8 @@
 // ustawia src/scripts/zal/pasek.ts). Style: src/styles/zal-menu.css. Otwieranie i zamykanie: src/scripts/zal/menu.ts.
 // Zwijane działy (zlecenie 14, zalecenie 24; prototyp v90 „Zwijane działy”): pod nazwą działu grupy jak w menu działu
 // (nawigacja.json — mały nagłówek grupy, pod nim linki), przy nazwie przycisk ze strzałką; otwarty jeden dział naraz.
-// Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane).
+// Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane). Przez .z-menu-grupy-w płynnie zmienia się
+// wysokość grup na komputerze (zlecenie 20, punkt 1).
 // Bieżąca strona (zlecenie 18, punkt 6): aria-current="page" na najdłuższym pasującym adresie, także dla podstron głębszych niż
 // pozycja menu; panel otwiera się z rozwiniętym działem tej strony (section[data-biezacy]), poza działami wszystkie zwinięte.
 // SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
@@ -63,16 +64,18 @@ const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres
         )}
       </h2>
       <div class="z-menu-grupy" id={`${id}-${d.dz}`}>
-        {d.grupy.map((g) => (
-          <div class="z-menu-grupa">
-            <h3>{g.nazwa}</h3>
-            <ul>{g.linki.map((l) => {
-              const e = wybierz(l, 'etykieta', lang) as string;
-              const sk = skrotNazwy(e);
-              return <li><Link href={href(l.adres)} title={sk ? e : undefined} aria-current={d.dz === dzialBiezacy && l.adres === biezacy?.adres ? 'page' : undefined}>{sk ?? e}</Link></li>;
-            })}</ul>
-          </div>
-        ))}
+        <div class="z-menu-grupy-w">
+          {d.grupy.map((g) => (
+            <div class="z-menu-grupa">
+              <h3>{g.nazwa}</h3>
+              <ul>{g.linki.map((l) => {
+                const e = wybierz(l, 'etykieta', lang) as string;
+                const sk = skrotNazwy(e);
+                return <li><Link href={href(l.adres)} title={sk ? e : undefined} aria-current={d.dz === dzialBiezacy && l.adres === biezacy?.adres ? 'page' : undefined}>{sk ?? e}</Link></li>;
+              })}</ul>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   ))}

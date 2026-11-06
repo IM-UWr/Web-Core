@@ -46,7 +46,10 @@ panele.forEach((panel) => panel.addEventListener('click', (e) => {
 
 // Przy każdym otwarciu panel wraca do tego samego stanu: rozwinięty dział, w którym jesteś (poza działami wszystkie zwinięte;
 // section[data-biezacy] wyznacza PanelMenu.astro), panel od góry, a bieżący link w widocznej części. Przewija się sam panel, bez animacji.
+// Ten stan ustawia się bez animacji wysokości (.bez-animacji, zlecenie 20, punkt 1): pomiar bieżącego linku trafiłby w grupy jeszcze zwinięte.
 function stanPoczatkowy(panel: HTMLElement) {
+  panel.classList.add('bez-animacji');
+  requestAnimationFrame(() => panel.classList.remove('bez-animacji'));
   zwinWszystkie(panel);
   const b = panel.querySelector<HTMLButtonElement>('section[data-biezacy] [data-z-menu-rozwin]');
   if (b) ustawDzial(b, true);
