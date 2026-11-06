@@ -124,8 +124,9 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 ---
 {/* dotyk: odświeżenie i powrót „wstecz” przy schowanej okładce; przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
-    Telefon (do 760 px) bez kotwicy w adresie zawsze wraca na okładkę (zlecenie 21, punkt 9), więc tam okładka zostaje. */}
-<script is:inline>if(history.state&&history.state.zBezOkladki&&location.hash!=='#okladka'&&(location.hash||!matchMedia('(max-width: 760px)').matches)&&matchMedia('(hover: none) and (pointer: coarse)').matches)document.documentElement.classList.add('bez-okladki','bez-wejscia')</script>
+    Telefon (do 760 px) bez kotwicy w adresie zawsze wraca na okładkę (zlecenie 21, punkt 9), więc tam okładka zostaje.
+    Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px razem ze scroll-snap kończy się czasem na okładce albo 11 px za krawędzią. */}
+<script is:inline>if(location.hash!=='#okladka'&&matchMedia('(hover: none) and (pointer: coarse)').matches){var zk=document.documentElement.classList;if(location.hash)zk.add('bez-wejscia');if(history.state&&history.state.zBezOkladki&&(location.hash||!matchMedia('(max-width: 760px)').matches))zk.add('bez-okladki','bez-wejscia')}</script>
 <section class="z-okladka" id="okladka" data-pagefind-ignore>
   {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
   {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy szybkieWejscie />}
