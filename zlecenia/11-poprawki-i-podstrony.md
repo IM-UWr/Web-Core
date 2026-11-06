@@ -316,9 +316,9 @@ Specyfikacja wyglądu: `dok/estetyka.md` i prototyp `proto/zalozyciele.src.html`
   `cqw` liczy się względem kontenera strony (`.in-strona`, `container-type: inline-size`).
 - **Telefon:** bez przypinania, zwykłe `object-fit: cover`. Kadr pokazać właścicielowi na zrzucie.
 - **Odbiór:** zrzuty banera i podstrony przy 1366, 1536, 1920, 2560 i 3440 px. Środek szkicu ma wypadać w 44,25% szerokości zdjęcia przy każdej szerokości okna (sprawdzić pomiarem). Baner z portretem ani ściana z napisem nie mogą wejść w kadr; na stronie działu przy bardzo szerokich oknach dopuszczalny jest skrawek jasnej ściany przy prawym brzegu, jeśli nie widać napisu.
-- **Przed publikacją właściciel porównuje wzory na tablicach z oryginałem**, bo zdjęcie przeszło przez ChatGPT. Autor zdjęcia do uzupełnienia.
+- Wzory na tablicach sprawdzone przez właściciela, autor zdjęcia jest z Instytutu (6.11, 09:24).
 
-### 18. Okładka: to samo zdjęcie, nowe ułożenie (decyzja 5.11, 01:05–01:08) — **CZEKA, nie wykonywać przed potwierdzeniem właściciela**
+### 18. Okładka: to samo zdjęcie, nowe ułożenie (decyzja 5.11, 01:05–01:08) — **NIEAKTUALNE, nie wykonywać: zastępuje je zlecenie 18, punkt 13 (6.11)**
 - **Decyzja:** zdjęcie główne zostaje (nocne ujęcie budynku z lotu ptaka), ale do dopracowania jest jego ułożenie. Kadr ma trzymać budynek i pokazywać też fragment mostu. **Powiększenie zależy od proporcji okna: płasko większy zoom, kwadratowo dalszy kadr.**
 - **Stan dziś:** `object-position: 2% 50%` przykleja kadr do lewej strony pliku, więc mostu nie widać.
 - **Źródło:** `kampus-2000.jpg` (2000×880) to wycięty i wyostrzony w ChatGPT fragment zdjęcia https://fotopolska.eu/1158570 (plik https://fotopolska.eu/foto/1158/1158570.jpg, 3500×2623). Wycinek leży w oryginale ok. x 1504–3495, y 891–1766. Oryginał ma zapas w górę, w dół i w lewo, ale nie w prawo, bo tam się kończy, razem z mostem.
