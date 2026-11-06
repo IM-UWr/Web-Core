@@ -360,6 +360,8 @@ export interface PozycjaListy {
   pilne?: boolean;
   // koniec wydarzenia (wpis z polem „Wydarzenie: początek” albo obrona) — po nim wpis znika z Aktualności na stronie głównej
   koniec?: string;
+  // zakład z CMS — do reguły działu wpisu (dzialWpisu w src/lib/patroni.ts)
+  zaklad?: string;
 }
 
 // Czy wydarzenie z wpisu już się odbyło (wpis bez wydarzenia — nigdy).
@@ -372,7 +374,7 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
     zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zajawkaLang: langPola(a.data, 'zajawka', lang), zdjecie: a.data.zdjecie,
     zdjecie_opis: (lang === 'en' && a.data.zdjecie_opis_en) || a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
     koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
-    wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`,
+    wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`, zaklad: a.data.zaklad,
   }));
   for (const o of obr) {
     if (o.data.w_aktualnosciach === false) continue;

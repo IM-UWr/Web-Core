@@ -2,7 +2,8 @@
 // Wiersz listy aktualności (ListaAktualnosci.astro) w języku podstron „Założycieli”: data jak na stronach działów
 // (zal/dzial/Wiersz.astro — dzień dużą Brygadą, pod nim „mie rrrr”), obok mała etykieta „Rodzaj · odbiorcy”, tytuł Brygadą,
 // „Kiedy:” przy wydarzeniach i zajawka; miniatura zdjęcia wpisu z prawej. Cały wiersz klikalny (link w tytule), wiersze
-// rozdzielone cienką linią. Kolor daty i etykiety — kolor działu treści (poza działami granat, w ciemnym motywie jasny).
+// rozdzielone cienką linią. Dział wiersza z dzialWpisu (src/lib/patroni.ts; ta sama reguła co na Szybkim dostępie, zlecenie 19, punkt 1):
+// jego kolor mają data, etykieta, tytuł po najechaniu, „… czytaj dalej” i obrys fokusu; w ciemnym motywie reguła [data-dzial] z zalozyciele.css.
 // Jedna wersja HTML: komputer (≥ 761 px; zlecenie 18, punkt 3: zwarty wiersz, zajawka najwyżej w 2 liniach, układ listy
 // w dwóch kolumnach w ListaAktualnosci.astro) i telefon (≤ 760 px, węższa kolumna daty i mniejsza miniatura).
 // data-wa, data-rodzaj, data-dla — filtr i szukanie listy (skrypt w ListaAktualnosci.astro).
@@ -14,6 +15,7 @@ import ZdjecieZ from './ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
 import { wJezyku, RODZAJE, odbiorcyMalymi } from '../lib/i18n';
 import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
+import { dzialWpisu } from '../lib/patroni';
 import type { PozycjaListy } from '../lib/tresci';
 
 interface Props { p: PozycjaListy; lang: Lang; wyr?: boolean }
@@ -22,7 +24,7 @@ const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
 const SZEROKOSCI = [54, 72, 81, 120, 144, 160, 216, 240, 360, 400, 540, 720];
 const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, lang)).join(', ')].filter(Boolean).join(' · ');
 ---
-<article class:list={['wa', wyr && 'wyr']} data-wa data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
+<article class:list={['wa', wyr && 'wyr']} data-wa data-dzial={dzialWpisu(p)} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
   <time class="wa-data" datetime={p.data.slice(0, 10)}>{dayNum(p.data)}<small>{monthShort(p.data, lang)} {parse(p.data).y}</small></time>
   <div class="wa-tresc">
     <div class="wa-rodz">{etykieta}</div>
