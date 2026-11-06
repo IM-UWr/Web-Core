@@ -30,8 +30,8 @@ interface Props {
   lang: Lang;
   // HTML przekazany do banera przez widok (liczby .pt-liczby, plakietki, linki) — pokazywany pod tytułem
   slot?: string;
-  // link „← …” (podstrona: dział albo poziom wyżej)
-  wstecz: { etykieta: string; adres: string };
+  // link „← …” (podstrona: dział albo poziom wyżej); telefon: krótsza etykieta na ≤ 760 px (zlecenie 01, punkt 7)
+  wstecz: { etykieta: string; telefon?: string; adres: string };
   // ciekawostka patrona: znak z opisem, losowana na wizytę (podstrony z menu działu; zlecenie 11, zalecenie 19)
   znak?: boolean;
   // podstrona bez małego podpisu patrona (strona seminarium); sygnet wtedy na środku bloku z linkiem i tytułem
@@ -209,7 +209,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
     <div class="z-tyt">
       <div class="z-tyt-g">
         {P && <Szkic dzial={P.dzial} rodzaj="sygnet" class="z-sygnet-nagl" />}
-        <p class="z-sciezka"><a href={u(wJezyku(wstecz.adres, lang))}>← {wstecz.etykieta}</a></p>
+        <p class="z-sciezka"><a href={u(wJezyku(wstecz.adres, lang))}>← {wstecz.telefon ? <><span class="tylko-komputer">{wstecz.etykieta}</span><span class="tylko-telefon">{wstecz.telefon}</span></> : wstecz.etykieta}</a></p>
         <h1 data-pagefind-meta="title" lang={tytulLang}>{tytul}</h1>
         {P && !bezPodpisu && <span class="z-podpis-maly"><Szkic dzial={P.dzial} rodzaj="podpis" /></span>}
       </div>
