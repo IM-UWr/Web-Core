@@ -104,7 +104,7 @@
   .z-os .zakl a { color: inherit; text-decoration: none; }
   .z-os .zakl a:hover { color: var(--d-a); text-decoration: underline; }
   .z-pd-tresc .z-os .opis { margin: 6px 0 0; font-size: 14px; line-height: 1.5; }
-  .z-os .kont { margin-top: 8px; font-size: 13.5px; line-height: 1.55; color: var(--text); overflow-wrap: anywhere; }
+  .z-os .kont { margin-top: 8px; font-size: 13.5px; line-height: 1.55; color: var(--text); }
   .z-os .kont a { text-decoration: none; }
   .z-os .kont a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .z-os .fot { display: block; object-fit: cover; background: var(--surface); }
@@ -115,7 +115,7 @@
   .z-drzewo .z-dyr .fot { grid-row: 1 / span 6; width: 120px; height: 150px; }
   .z-drzewo .z-dyr:has(.fot) > :not(.fot) { grid-column: 2; }
   .z-drzewo .z-dyr:has(+ .z-zast)::after { content: ''; position: absolute; left: 50%; bottom: -44px; height: 44px; border-left: 1px solid var(--muted); }
-  .z-zast { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding-top: 22px; }
+  .z-zast { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; padding-top: 22px; }
   .z-zast::before { content: ''; position: absolute; top: 0; left: calc((100% - 72px) / 8); right: calc((100% - 72px) / 8); border-top: 1px solid var(--muted); }
   .z-zast .z-os { position: relative; text-align: center; padding-top: 12px; }
   .z-zast .z-os::before { content: ''; position: absolute; left: 50%; top: -22px; height: 22px; border-left: 1px solid var(--muted); }
@@ -127,9 +127,9 @@
   .z-dwie .z-os .fot { grid-row: 1 / span 6; width: 76px; height: 95px; }
   .z-dwie .z-os:has(.fot) > :not(.fot) { grid-column: 2; }
   .z-link-dalej { margin: 14px 0 0; }
-  .z-kont { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+  .z-kont { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px; }
   .z-kont dl { margin: 0; }
-  .z-kont dl div { display: grid; grid-template-columns: 90px 1fr; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .z-kont dl div { display: grid; grid-template-columns: 90px minmax(0, 1fr); padding: 10px 0; border-bottom: 1px solid var(--line); }
   .z-kont dt { font-size: 13px; font-weight: 700; color: var(--muted); }
   .z-kont dd { margin: 0; font-size: 16px; color: var(--ink); }
   .z-sek-osoby .z-os { padding: 10px 0; border-top: 1px solid var(--line); }
@@ -190,6 +190,16 @@
   .z-kolumna[data-key="akt"] .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr) 78px; }
   .z-kolumna[data-key="akt"] .z-w.wyr .min { width: 78px; height: 59px; }
 }
+/* Władze na komputerze: gdy zastępcy nie mieszczą się w 4 kolumnach, kreski schematu nie mają czego łączyć (zlecenie 25, punkt 2.7) */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-drzewo { container-type: inline-size; }
+  @container (max-width: 871.98px) {
+    .z-zast { padding-top: 0; }
+    .z-zast::before, .z-zast .z-os::before, .z-zast .z-os::after { display: none; }
+    .z-zast .z-os { padding-top: 0; }
+  }
+}
+
 @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
   /* ---------- drugi ekran: kolumny jedna pod drugą, po 3 pozycje i „Zobacz więcej” ---------- */
   .z-druga { display: block !important; min-height: 0; padding: 18px 16px 26px !important; font-size: 14.5px; line-height: 1.4; }
