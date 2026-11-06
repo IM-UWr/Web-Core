@@ -5,8 +5,9 @@
 // także bez polskich znaków) i filtr dni. Semestr wg daty albo adresu #zimowy / #letni; bez JS pasek schowany, oba semestry
 // jeden pod drugim. Dane: src/data/plan/plan.json — pobierane automatycznie z USOS (skrypty/plan/pobierz_plan.py,
 // workflow .github/workflows/plan-zajec.yml). Danych nie edytuje się ręcznie.
-// Jedna wersja HTML: komputer — zajęcia w równych kolumnach; telefon (≤ 760 px) — przedmiot jako blok, zajęcia w dwóch
-// liniach, pasek w dwóch rzędach, spis kategorii zwijany nad planem (src/styles/zal-granty-plan.css, zal-podstrona.css).
+// Jedna wersja HTML: komputer — zajęcia w równych kolumnach; telefon (≤ 760 px) — przedmiot jako blok, zajęcia w jednej linii
+// (typ · grupa · prowadzący · dzień, godziny · sala), prowadzący skrótem, pasek bez wyszukiwarki w dwóch rzędach, bez spisu
+// (zlecenie 18, punkty 18 i 19; src/styles/zal-granty-plan.css).
 import Podstrona from '../components/zal/Podstrona.astro';
 import Link from '../components/Link.astro';
 import type { Lang } from '../lib/daty';
@@ -48,6 +49,13 @@ const T = en
 
 // Skróty dni w kolumnie „dzień” i w filtrze dni (pon.–pt.), tekst do wyszukiwania.
 const DNI_KROTKO = en ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.'];
+// Prowadzący na telefonie: inicjał imienia i nazwisko; gdy ten sam skrót wypadłby dwóm osobom, pełne imię (zlecenie 18, punkt 19).
+const skrotOsoby = (o: string) => { const [imie, ...nazwisko] = o.split(' '); return nazwisko.length ? `${[...imie][0]}. ${nazwisko.join(' ')}` : o; };
+const ileSkrotow = new Map<string, number>();
+new Set(semestry.flatMap((x) => x.sekcje.flatMap((k) => k.przedmioty.flatMap((p) => p.zajecia.flatMap((z) => z.prowadzacy || []))))).forEach((o) => {
+  ileSkrotow.set(skrotOsoby(o), (ileSkrotow.get(skrotOsoby(o)) ?? 0) + 1);
+});
+const krotkoOsoba = (o: string) => ((ileSkrotow.get(skrotOsoby(o)) ?? 0) > 1 ? o : skrotOsoby(o));
 const tekstUwag = (u?: (string | { t: string })[]) => (u || []).map((f) => (typeof f === 'string' ? f : f.t)).join('');
 const doSzukania = (...cz: string[]) => cz.join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
 // sekcja kategorii z kotwicą bez semestru (#z-pl-o): w semestrze wybranym podczas budowania; gdy go nie ma — w pierwszym, który ją ma
@@ -92,7 +100,7 @@ const L = en
                     <div class="pl-w" data-d={z.dzien ?? ''} data-t={doSzukania(p.nazwaW, p.nazwa, ...(z.prowadzacy || []), z.sala || '', salaW(z.sala) || '', tekstUwag(z.uwagi))}>
                       <span class="typ"><abbr title={typPelny(z.typ)}>{typKrotki(z.typ)}</abbr></span>
                       <span class="gr">{grupa(z) && <><span class="sr-only">{T.gr} </span>{grupa(z)}</>}</span>
-                      <span class="prow">{(z.prowadzacy || []).map((o, i) => <>{i > 0 && <br />}{o}</>)}</span>
+                      <span class="prow">{(z.prowadzacy || []).map((o, i) => <>{i > 0 && <><span class="tylko-telefon" aria-hidden="true">, </span><br /></>}<span class="tylko-telefon" aria-hidden="true">{krotkoOsoba(o)}</span><span class="pl-pelne">{o}</span></>)}</span>
                       <span class="dz">{z.dzien != null && <abbr title={T.dni[z.dzien]}>{DNI_KROTKO[z.dzien]}</abbr>}</span>
                       <span class="godz">{z.od && z.do ? `${z.od}–${z.do}` : ''}{z.czestotliwosc && T.czest[z.czestotliwosc] && <small>{T.czest[z.czestotliwosc]}</small>}</span>
                       <span class="sala">{z.sala && <>{salaW(z.sala) === z.sala && <span class="sr-only">{T.sala} </span>}{salaW(z.sala)}</>}</span>

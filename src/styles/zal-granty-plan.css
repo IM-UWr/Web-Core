@@ -86,7 +86,6 @@
     margin: 0 -16px; padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--rule); }
   html:not(.js) .z-pl .pl-narz { display: none; }
   html.js .z-pl [data-z-panel]:not([data-z-aktywny]) { display: none; }
-  .z-pl .pl-narz:not(:has(.pl-sem)) .pl-szukaj { grid-column: 1 / -1; }
   .z-pl .pl-sem, .z-pl .pl-dni { display: flex; border: 1px solid var(--line-ui); }
   .z-pl .pl-dni { grid-column: 1 / -1; }
   .z-pl .pl-sem button, .z-pl .pl-dni button { flex: 1 1 auto; margin: 0; min-height: 40px; padding: 6px 10px; border: 0; border-radius: 0; background: transparent;
@@ -94,10 +93,9 @@
   .z-pl .pl-sem button + button, .z-pl .pl-dni button + button { border-left: 1px solid var(--line-ui); }
   .z-pl .pl-sem button[aria-pressed="true"], .z-pl .pl-dni button[aria-pressed="true"] { background: var(--d-a); color: var(--bg); }
   .z-pl .pl-sem button:focus-visible, .z-pl .pl-dni button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
-  .z-pl .pl-szukaj { width: 100%; min-width: 0; margin: 0; padding: 8px 10px; border: 1px solid var(--line-ui); border-radius: 0; background: var(--bg);
-    font: inherit; font-size: 16px; color: var(--ink); }
-  .z-pl .pl-szukaj::placeholder { color: var(--muted); opacity: 1; }
-  .z-pl .pl-szukaj:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+  /* pasek w dwóch rzędach: semestry po równo, pod nimi dni; wyszukiwarka tylko na komputerze (zlecenie 18, punkt 19) */
+  .z-pl .pl-szukaj { display: none; }
+  .z-pl .pl-sem { grid-column: 1 / -1; }
   .z-pl .pl-info { margin: 12px 0 6px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
 
   .z-pl .pl-kat { margin: 22px 0 0; scroll-margin-top: calc(var(--hdr-h) + 120px); }
@@ -106,15 +104,14 @@
   .z-pl .pl-p { padding: 10px 0 8px; border-top: 1px solid var(--line); }
   .z-pl .pl-p h3 { margin: 0 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.3; }
   .z-pl .pl-p h3 a { color: var(--ink); text-decoration: none; }
-  /* wiersz zajęć: pierwsza linia (typ, grupa, dzień, godziny, sala), druga (prowadzący, uwagi) */
+  /* wiersz zajęć w jednej linii: typ · grupa · prowadzący · dzień, godziny · sala, na końcu uwagi; dłuższy łamie się zwyczajnie (zlecenie 18, punkt 19) */
   .z-pl .pl-w { display: flex; flex-wrap: wrap; align-items: baseline; padding: 5px 0; font-size: 14.5px; line-height: 1.45; color: var(--text); }
-  .z-pl .pl-w::before { content: ''; order: 2; flex-basis: 100%; }
   .z-pl .pl-w > * { order: 1; min-width: 0; overflow-wrap: anywhere; }
-  .z-pl .pl-w > :is(.prow, .uw) { order: 3; }
-  .z-pl .pl-w > :is(.gr, .dz, .sala):not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
+  .z-pl .pl-w > .uw { order: 3; }
+  .z-pl .pl-w > :is(.gr, .prow, .dz, .sala):not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
   .z-pl .pl-w > .godz:not(:empty)::before { content: ''; margin-left: 6px; }
-  .z-pl .pl-w > .typ + .gr:empty + .dz:empty + .godz:not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
-  .z-pl .pl-sem button { flex: none; padding: 6px 8px; font-size: 12.5px; }
+  .z-pl .pl-w > .dz:empty + .godz:not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
+  .z-pl .pl-sem button { flex: 1 1 0; padding: 6px 8px; }
   .z-pl .pl-w abbr { text-decoration: none; }
   .z-pl .pl-w .typ { font-weight: 700; color: var(--ink); }
   .z-pl .pl-w .gr .sr-only { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; clip-path: none; white-space: normal; }
@@ -122,8 +119,10 @@
   .z-pl .pl-w .godz { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
   .z-pl .pl-w .godz small { margin-left: 5px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
   .z-pl .pl-w .prow { color: var(--text); }
+  /* prowadzący: na ekranie skrót, kilku po przecinku; pełne nazwisko tylko dla czytnika ekranu (skrót ma aria-hidden) */
+  .z-pl .pl-w .prow br { display: none; }
+  .z-pl .pl-w .pl-pelne { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .z-pl .pl-w .uw:not(:empty) { margin-left: 8px; font-size: 13px; color: var(--muted); }
-  .z-pl .pl-w .prow:empty + .uw { margin-left: 0; }
   .z-pl .pl-w .uw a { color: inherit; text-underline-offset: 2px; }
   .z-pl .pl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
 }
