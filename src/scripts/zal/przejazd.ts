@@ -15,6 +15,7 @@
 //   strzałki i liczb oraz zatrzymanie rozpędu na krawędzi (zlecenie 21, punkt 3): rozpędu palca nie da się przerwać ze skryptu, więc gdy
 //   Szybki dostęp stoi w spoczynku na krawędzi lub niżej, okładki nie ma w układzie strony (html.bez-okladki) i rozpęd kończy się na
 //   prawdziwej górze dokumentu. Wraca dopiero przy nowym dotknięciu na samej górze po CISZA ms spokoju; scroll-snap ją wtedy dociąga.
+// - Telefon (≤ 760 px): powrót na stronę główną zawsze na okładkę, także „wstecz” i z pamięci przeglądarki; adres z kotwicą działa jak dotąd (zlecenie 21, punkt 9).
 // - prefers-reduced-motion: przejście natychmiastowe.
 // Zalecenie 15: kliknięcie liczby nad strzałką — przejazd na Szybki dostęp i krótkie (1,6 s) podświetlenie kolumny.
 const okladka = document.querySelector<HTMLElement>('.z-okladka');
@@ -215,7 +216,8 @@ if (okladka && obszar) {
   // ---------- dotyk: okładka poza układem, gdy Szybki dostęp stoi na krawędzi lub niżej (zlecenie 21, punkt 3) ----------
   // Chowanie i przywracanie to w tej samej chwili przewinięcie o wysokość okładki, więc nic na ekranie się nie rusza. Spokój: USPOKOJENIE ms
   // bez zdarzeń scroll i bez palca na ekranie, nigdy w trakcie rozpędu. Odświeżenie i powrót „wstecz”: przeglądarka odtwarza położenie liczone
-  // bez okładki, więc znacznik w history.state chowa ją jeszcze przed pierwszym układem strony (skrypt w linii w Okladka.astro).
+  // bez okładki, więc znacznik w history.state chowa ją jeszcze przed pierwszym układem strony (skrypt w linii w Okladka.astro). Telefon bez kotwicy
+  // w adresie położenia nie odtwarza (punkt 9, niżej); znacznik zostaje dla kotwic i dla obróconego telefonu szerszego niż 760 px.
   const USPOKOJENIE = 150; // ms
   const html = document.documentElement;
   let schowana = html.classList.contains('bez-okladki'), palec = false, ostatniScroll = -Infinity, czasSpokoju = 0;
@@ -252,7 +254,25 @@ if (okladka && obszar) {
     czasSpokoju = window.setTimeout(spokoj, USPOKOJENIE);
   }
 
+  // ---------- telefon: powrót zawsze na okładkę (zlecenie 21, punkt 9) ----------
+  // Wyjątek: adres z kotwicą. Przywracanie położenia zapisuje się przy wpisie historii, więc przełączamy je także przy zmianie kotwicy.
+  const TELEFON = matchMedia('(max-width: 760px)');
+  const kotwica = () => !!location.hash && location.hash !== '#okladka';
+  const przywracanie = () => { history.scrollRestoration = TELEFON.matches && !kotwica() ? 'manual' : 'auto'; };
+  let dotknieta = false; // palec w trakcie wczytywania: pierwsze pageshow nie zabiera strony spod palca
+  function naOkladke() {
+    if (schowana) pokaz();
+    else if (history.state?.zBezOkladki) znacznik(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  przywracanie();
+  TELEFON.addEventListener('change', przywracanie);
+  window.addEventListener('pageshow', (e) => {
+    if (TELEFON.matches && !kotwica() && (e.persisted || !dotknieta)) naOkladke();
+  });
+
   window.addEventListener('touchstart', (e) => {
+    dotknieta = true;
     palec = e.touches.length > 0;
     clearTimeout(czasSpokoju);
     if (schowana && DOTYK.matches && window.scrollY <= 1 && performance.now() - ostatniScroll >= CISZA && !html.classList.contains('menu-otwarte')) pokaz();
@@ -263,6 +283,8 @@ if (okladka && obszar) {
   window.addEventListener('scroll', () => { ostatniScroll = performance.now(); pozniej(); }, { passive: true });
   window.addEventListener('pageshow', pozniej);
   window.addEventListener('hashchange', () => {
+    przywracanie();
+    if (TELEFON.matches && !location.hash) { naOkladke(); return; } // „wstecz” z adresu z kotwicą na ten sam dokument, bez pageshow
     if (!schowana) return;
     if (location.hash === '#okladka') { pokaz(); window.scrollTo({ top: 0, behavior: 'instant' }); }
     else znacznik(true); // nowy wpis w historii nie ma znacznika

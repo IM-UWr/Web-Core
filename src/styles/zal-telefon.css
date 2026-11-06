@@ -103,7 +103,8 @@
   @keyframes z-pisz-zast { to { stroke-dashoffset: 0; } }
 
   /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
-  .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h));
+  /* dvh: przy schowanym pasku adresu okno jest wyższe niż 100svh i pod okładką widać byłoby początek Szybkiego dostępu (zlecenie 21, punkt 9); svh dla starszych przeglądarek */
+  .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h)); min-height: calc(100dvh - var(--hdr-h));
     padding: 0 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
   /* środek ekranu na 38% szerokości zdjęcia, czyli na budynku Instytutu; pionowo liczy ULOZ w Okladka.astro (zlecenie 18, punkt 13) */
   .z-okl-foto { position: absolute; top: var(--foto-top, -12%); left: 50%; right: auto; width: auto; max-width: none; height: 62%; object-fit: fill; transform: translateX(-38%); z-index: -2;
