@@ -170,7 +170,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
             <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze {n}', '{n} more')}>{k.wsz}</a>
           </div></div>
           {k.pozycje.length > ileWidac && (
-            <button type="button" class="z-wiecej" data-key={key}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'See more')} ({ileWidac === 3 ? <span class="z-ile">{k.pozycje.length - 3}</span> : <><span class="z-ile-k">{k.pozycje.length - ileWidac}</span><span class="z-ile-t">{k.pozycje.length - 3}</span></>})</span></button>
+            <button type="button" class="z-wiecej" data-key={key}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'Show more')} ({ileWidac === 3 ? <span class="z-ile">{k.pozycje.length - 3}</span> : <><span class="z-ile-k">{k.pozycje.length - ileWidac}</span><span class="z-ile-t">{k.pozycje.length - 3}</span></>})</span></button>
           )}
         </section>
       );
