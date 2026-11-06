@@ -1,7 +1,7 @@
 ---
 // Lista aktualności (/aktualnosci, EN /en/aktualnosci) na wspólnym szablonie podstrony (zal/Podstrona.astro; zlecenie 12,
-// etap 3). Strona poza działami: granatowy nagłówek z hasłem i trzema liczbami (nowe ogłoszenia, nadchodzące wydarzenia,
-// zapowiedziane referaty — LiczbyBanera; zlecenie 01), bez spisu „Na tej stronie” (miesiące to grupy listy, nie sekcje strony).
+// etap 3). Strona poza działami: granatowy nagłówek z hasłem, bez liczb (zlecenie 18, punkt 2: zwykła wysokość nagłówka podstrony),
+// bez spisu „Na tej stronie” (miesiące to grupy listy, nie sekcje strony).
 // Filtr rodzaju i szukanie (filtrowanie w przeglądarce, także bez polskich znaków); ?dla=studenci itp. z linków zawęża listę
 // (z przyciskiem „Pokaż wszystkie”), ?rodzaj=… wybiera rodzaj. Wpisy po miesiącach: nagłówek miesiąca Brygadą, wiersze
 // z cienkimi liniami i datą jak na stronach działów (WierszAktualnosci.astro, wzór: zal/dzial/Wiersz.astro). Pierwszy widoczny wpis
@@ -12,7 +12,6 @@
 import Podstrona from '../components/zal/Podstrona.astro';
 import Link from '../components/Link.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
-import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { t, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneListyAktualnosci } from '../lib/widoki/listaAktualnosci';
@@ -20,12 +19,11 @@ import { daneListyAktualnosci } from '../lib/widoki/listaAktualnosci';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { ustawienia, grupy, rodzaje, lead, haslo, liczby, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
+const { ustawienia, grupy, rodzaje, lead, haslo, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
 const tytul = t(lang, 'aktualnosci');
 ---
-<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
   okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-bez-boku" atrybuty={{ 'data-lista': '' }}>
-  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
   <div class="ak-narz" data-pagefind-ignore>
     <div class="ak-rodzaje" role="group" aria-label={filtrEtykieta}>

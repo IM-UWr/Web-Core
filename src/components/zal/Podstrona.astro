@@ -30,6 +30,8 @@ interface Props {
   uklad?: string;
   lead?: string;
   haslo?: string;
+  // hasło także bez liczb w banerze (lista Aktualności; zlecenie 18, punkt 2)
+  hasloBezLiczb?: boolean;
   // nagłówek bez małego podpisu patrona pod sygnetem (strona seminarium)
   bezPodpisu?: boolean;
   okruszki?: { etykieta: string; adres?: string }[];
@@ -41,8 +43,8 @@ interface Props {
   klasaRamy?: string;
   atrybuty?: Record<string, string>;
 }
-const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, bezPodpisu, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
-const naglowek = { tytul, tytulLang, lead, haslo, bezPodpisu, lang, okruszki, wstecz };
+const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, hasloBezLiczb, bezPodpisu, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
+const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lang, okruszki, wstecz };
 ---
 <Baza tytul={tytulKarty ?? tytul} opis={opis} obraz={obraz} opublikowany={opublikowany} alternatywa={alternatywa} typ={typ} uklad={uklad}>
   {Astro.slots.has('baner')

@@ -24,6 +24,8 @@ interface Props {
   tytul: string;
   tytulLang?: string;
   haslo?: string;
+  // hasło także bez liczb (lista Aktualności; zlecenie 18, punkt 2)
+  hasloBezLiczb?: boolean;
   lang: Lang;
   // HTML przekazany do banera przez widok (liczby .pt-liczby, plakietki, linki) — pokazywany pod tytułem
   slot?: string;
@@ -34,17 +36,17 @@ interface Props {
   // podstrona bez małego podpisu patrona (strona seminarium); sygnet wtedy na środku bloku z linkiem i tytułem
   bezPodpisu?: boolean;
 }
-const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false, bezPodpisu = false } = Astro.props;
+const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false, bezPodpisu = false, hasloBezLiczb = false } = Astro.props;
 const P = dzial ? PATRONI[dzial] : undefined;
 // Trzy style banerów (zlecenie 11, zalecenie 2): baner działu; podstrona z liczbami (tytuł, hasło, kreska, liczby);
 // podstrona bez liczb (sam tytuł). Hasło i liczby razem albo wcale: liczby bez hasła w danych nie pokazują się
-// (styl 3), hasło bez liczb też nie. Baner działu: gdy w CMS hasło działu puste — hasło z prototypu (decyzja 2.11).
+// (styl 3), hasło bez liczb też nie, chyba że widok o nie prosi (hasloBezLiczb, styl 3 z hasłem). Baner działu: gdy w CMS hasło działu puste — hasło z prototypu (decyzja 2.11).
 // liczby w banerze: lista .pt-liczby przekazana przez widok (LiczbyBanera.astro albo własna lista widoku)
 const LISTA_LICZB = /<ul class="pt-liczby[^"]*"[^>]*>[\s\S]*?<\/ul>/g;
 const maLiczby = /<ul class="pt-liczby/.test(slotWidoku);
 const hasloDanych = Astro.props.haslo?.trim() || (rodzaj === 'dzial' && P ? pole(P, 'haslo', lang) : undefined);
 const zLiczbami = maLiczby && !!hasloDanych;
-const haslo = zLiczbami ? hasloDanych : undefined;
+const haslo = zLiczbami || hasloBezLiczb ? hasloDanych : undefined;
 const slot = zLiczbami ? slotWidoku : slotWidoku.replace(LISTA_LICZB, '').trim();
 // do uzupełnienia w CMS: ostrzeżenie przy budowaniu (lista stron w RAPORT-ZLECENIE-11.md)
 if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola hasła w CMS): ${Astro.url.pathname}`);
