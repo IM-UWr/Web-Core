@@ -112,7 +112,7 @@ const spis = [
 <style>
   /* Lata: siatka z cienkimi liniami (kreska nad każdym rokiem), rok Brygadą — odnośnik do wykazu, pod nim liczba pozycji
      i PDF. Reszta — wzorzec treści .tresc (src/styles/zal-tresc.css). */
-  .lata { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 32px; margin: 18px 0 0; padding: 0; list-style: none; }
+  .lata { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(150px, 21%), 1fr)); gap: 0 32px; margin: 18px 0 0; padding: 0; list-style: none; }
   .lata li { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; max-width: none; margin: 0; padding: 10px 0 12px;
     border-top: 1px solid var(--line); font-size: inherit; }
   .lata p { margin: 0; max-width: none; }
