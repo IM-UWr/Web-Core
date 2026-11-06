@@ -106,3 +106,159 @@ Bieżąca strona zostaje bez zmian (`--d-j` na granacie, `--d-a` w jasnym panelu
 - Kontrast nazw grup co najmniej 4,5:1 na granacie i w jasnym panelu, w obu motywach.
 - Telefon 390×780: układ jak dotąd, nazwy grup bez koloru.
 - Zrzuty: rozwinięte Studia i zwinięte działy przy 1366×640, 1536×730 i 1920×950, granatowy i jasny panel; telefon 390 px; po jednym w ciemnym motywie → `raport-zrzuty/z20-menu-*`.
+
+## 2. Strona działu na komputerze: pas z kafelkami i pole ze stronami — GOTOWE (decyzja 6.11, 10:58)
+Właściciel wybrał to na podglądzie: „Tak, zajebiste!”. Decyzje z tej rozmowy: pas pod banerem, na całą szerokość, działy rozdzielone cienką kreską, kafelek z krótkim opisem i liczbą stron, domyślnie wszystko zwinięte. Po naciśnięciu strzałka, lekki odstęp i pole **na szerokość tekstu, nie strony**, wyższe, pod każdą stroną krótki opis. Kolor rozwiniętego działu ten sam co po najechaniu, bez pełnego koloru. Rekrutacja lekko wyróżniona, pusta. Pas nie trzyma się paska menu przy przewijaniu.
+
+Ten punkt **zmienia zapis „Komputer bez zmian” z punktu 16 zlecenia 18**. Telefon zostaje bez zmian.
+
+**Wzór:** artefakt https://claude.ai/artifact/KN1U3BrE7qxMACVCXCkm7n (5. wersja; przełączniki działu, monitora i motywu). Źródło: `.przekazanie\prototypy\20-pas-dzialu-podglad.html`, blok `kaf-css`. Klasy w podglądzie są inne niż niżej, ale wartości te same. Pliki: `src/components/zal/TrescDzialu.astro`, `src/styles/zal-dzialy.css`, `src/lib/menu.ts`, `src/content.config.ts`, nakładka `src/data/nawigacja.json` i `src/content/kierunki/*.md`.
+
+**Bez JS** na komputerze wszystko jak dziś: wiersze grup i przycisk Rekrutacja. Nowy układ tylko pod `html.js` i od 761 px.
+
+### Dane: opisy grup i stron
+- Treści to łatki, jak w zleceniu 15: oryginał pliku nakładki kopiuj do `.przekazanie\robocze\nakladka-przed-20\`, zmieniaj nakładkę lokalnie, a różnice zapisz w `dok/latki/zlecenie-20/<Repozytorium>.patch`, razem ze zmianami formularza CMS.
+- `nawigacja.json`: nowe pola `opis` i `opis_en` przy grupach i linkach. Typy `Grupa` i `Link` w `menu.ts`.
+- Kierunki z kolekcji: nowe pola `menu_opis`, `menu_opis_en`. Kierunek ze skrótem w menu i bez `menu_opis` (SIAD, ISIM) dostaje jako opis pełną nazwę (`nazwa`, `nazwa_en`), bez kopiowania tekstu. Wypełnij `menu_opis` przy Matematyce i Szkole doktorskiej.
+- Teksty angielskie to propozycje. Oznacz je w raporcie jako do przejrzenia przez właściciela. Pole puste: bez opisu, układ się nie psuje.
+
+| Grupa | `opis` | `opis_en` |
+|---|---|---|
+| Ludzie | władze i pracownicy | management and staff |
+| Organizacja | zakłady i kontakt | departments and contact |
+| Więcej | informatyka i biblioteka | IT and library |
+| Wydarzenia naukowe | seminaria, konferencje, obrony | seminars, conferences, defences |
+| Badania | projekty, publikacje, sukcesy | grants, publications, achievements |
+| Stopnie naukowe | doktorat i habilitacja | PhD and habilitation |
+| Kierunki | matematyka, SIAD, ISIM, doktorat | mathematics, SIAD, ISIM, PhD |
+| Na co dzień | plan, kalendarz, zajęcia, pierwszy rok | timetable, calendar, classes, first year |
+| Dyplom i sprawy | egzaminy, dyplom, wnioski, wyjazdy | exams, diploma, requests, exchanges |
+| Dla kogo | uczniowie, nauczyciele, wszyscy | pupils, teachers, everyone |
+| Partnerzy | fundacja, portal, PTM | foundation, portal, PTM |
+
+| Strona | `opis` | `opis_en` |
+|---|---|---|
+| Władze | dyrekcja i Rada Instytutu | directors and Institute Council |
+| Pracownicy | spis osób, pokoje, kontakt | people, rooms, contact |
+| Struktura i zakłady | osiem zakładów i pracownia | eight departments and a unit |
+| Kontakt | adres, sekretariat, dojazd | address, office, directions |
+| Infrastruktura informatyczna | konta, sieć, drukarki | accounts, network, printers |
+| Biblioteka | Biblioteka Matematyczna | Mathematics Library |
+| Seminaria | cotygodniowe seminaria zakładów | weekly department seminars |
+| Konferencje | organizowane przez Instytut | organised by the Institute |
+| Obrony doktorskie | rozprawy i terminy obron | theses and defence dates |
+| Projekty i granty | realizowane i zakończone | ongoing and completed |
+| Publikacje | wykazy roczne | annual lists |
+| Sukcesy | nagrody i wyróżnienia | awards and distinctions |
+| Szkoła doktorska (obie pozycje) | Kolegium Doktorskie Matematyki | Doctoral College of Mathematics |
+| Rada Dyscypliny Matematyka | doktoraty i habilitacje | PhDs and habilitations |
+| Matematyka | I i II stopień, pięć specjalności | BSc and MSc, five specialisations |
+| Studia podyplomowe | kwalifikacje do nauczania | teaching qualifications |
+| Plan zajęć | przedmioty, terminy, sale | courses, times, rooms |
+| Rok akademicki | semestry, sesje, przerwy | semesters, exam sessions, breaks |
+| Zajęcia i konsultacje | zapisy i dyżury | enrolment and office hours |
+| Pierwszy rok | pierwsze kroki na studiach | first steps at university |
+| Egzaminy i dyplom | sesja i egzamin dyplomowy | exam session and final exam |
+| Procedura dyplomowania | praca, recenzje, obrona | thesis, reviews, defence |
+| Sprawy studenckie | wnioski, stypendia, dziekanat | requests, scholarships, dean’s office |
+| Program MOST | semestr na innej polskiej uczelni | a semester at another Polish university |
+| Skrypty i materiały | materiały do przedmiotów | course materials |
+| Dla uczniów | kółka, obozy i konkursy | clubs, camps and competitions |
+| Dla nauczycieli | szkolenia | training |
+| Dla wszystkich | wykłady popularnonaukowe | popular science lectures |
+| Fundacja Matematyków Wrocławskich | fmw.math.uni.wroc.pl | fmw.math.uni.wroc.pl |
+| Wrocławski Portal Matematyczny | matematyka.wroc.pl | matematyka.wroc.pl |
+| Wrocławski Oddział PTM | ptm.math.uni.wroc.pl | ptm.math.uni.wroc.pl |
+
+### HTML (`TrescDzialu.astro`)
+- `.z-dz-karty`: `style` z `--n` (liczba grup, dla telefonu) i `--nk` (grupy plus 1, gdy jest Rekrutacja).
+- Karta:
+  ```astro
+  <button type="button" class="z-dz-karta" aria-expanded="false" aria-controls={`z-dz-gr-${i}`}>
+    <b>{nazwa}</b>
+    <svg class="z-dz-szew" viewBox="0 0 12 7" aria-hidden="true"><path d="M1 1l5 5 5-5" /></svg>
+    {opis && <em>{opis}</em>}
+    <small>{ileStron(g.linki.length)}</small>
+  </button>
+  ```
+- Po kartach drugi egzemplarz Rekrutacji, w `.z-dz-karty`: `<Link class="z-dz-kart-rekr" href={rek.adres}><b>{etykietaRek} {rokRek}</b><span>{en ? 'for applicants' (z „· in Polish” jak dziś) : 'dla kandydatów'}</span></Link>`. Egzemplarz `.z-dz-rekr` zostaje dla wersji bez JS.
+- Grupa: `<section class="z-dz-rzad" id=…><div class="z-dz-rzad-w"><h3>…</h3><ul style={`--m:${kolumny}`}>…</ul></div></section>`; `kolumny`: do 5 linków `max(n, 3)`, przy 6 linkach 3, powyżej 4.
+- Link: `<Link …><b>{sk ?? e}</b>{opis && <span class="z-dz-l-opis">{opis}</span>}</Link>`.
+- Skrypt: bez zmian w działaniu (otwarta jedna grupa, ponowne naciśnięcie zamyka). Popraw komentarz, bo działa też na komputerze, i dodaj Esc: zamyka otwartą grupę, gdy fokus jest w pasie, i oddaje fokus karcie.
+
+### CSS (`zal-dzialy.css`)
+Na każdej szerokości, przed blokiem telefonu, także bez JS:
+```css
+.z-dz-szew, .z-dz-karta em, .z-dz-l-opis, .z-dz-kart-rekr { display: none; }
+.z-dz-rzad a b { font-weight: inherit; }
+```
+Komputer z JS:
+```css
+@media (min-width: 761px) {
+  html.js .z-dz .z-dz-pas { display: block; padding: 0; background: none; }
+  html.js .z-dz .z-dz-pas > .z-dz-rekr { display: none; }
+
+  /* pas na całą szerokość, tekst równo z kolumną; komórka wystaje z kolumny o 20 px w lewo */
+  html.js .z-dz-karty { --ton: color-mix(in srgb, var(--d-a) 15%, var(--d-t)); --kreska: color-mix(in srgb, var(--d-a) 34%, transparent);
+    position: relative; z-index: 1; display: grid; grid-template-columns: repeat(var(--nk), minmax(0, 1fr)); min-height: 98px; padding-inline: calc(var(--marg) - 20px);
+    background: var(--d-t); box-shadow: 0 1px 0 var(--kreska); }
+  .z-dz-karta { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nz sz" "op op" "ile ile"; grid-template-rows: auto 1fr auto; gap: 3px 10px;
+    min-width: 0; margin: 0; padding: 13px 20px 12px; border: 0; background: none; color: var(--ink); font-family: var(--f-text); line-height: 1.3; text-align: left; cursor: pointer;
+    transition: background-color .3s var(--rytm); }
+  .z-dz-karta + .z-dz-karta { box-shadow: inset 1px 0 0 var(--kreska); }
+  .z-dz-karta b { grid-area: nz; justify-self: start; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.15; }
+  .z-dz-szew { display: block; grid-area: sz; margin-top: 8px; width: 12px; height: 7px; fill: none; stroke: currentColor; stroke-width: 1.6; opacity: .65; transition: transform .3s var(--rytm); }
+  .z-dz-karta[aria-expanded="true"] .z-dz-szew { transform: rotate(180deg); }
+  .z-dz-karta em { display: block; grid-area: op; font-style: normal; font-size: 13.5px; line-height: 1.35; color: var(--muted); }
+  .z-dz-karta small { grid-area: ile; margin-top: 5px; font-size: 12.5px; font-weight: 600; color: var(--d-a); }
+  /* po najechaniu i po rozwinięciu ten sam kolor; strzałka też */
+  .z-dz-karta:hover, .z-dz-karta[aria-expanded="true"] { background-color: var(--ton); }
+  .z-dz-karta[aria-expanded="true"] em { color: var(--text); }
+  .z-dz-karta[aria-expanded="true"]::after { content: ''; position: absolute; left: 24px; bottom: -7px; width: 14px; height: 14px; background: var(--ton); transform: rotate(45deg); }
+  .z-dz-karta:focus-visible { outline: 2px solid var(--d-a); outline-offset: -3px; }
+
+  /* Rekrutacja: pusta, sam obrys; prawa krawędź równo z kolumną */
+  html.js .z-dz-kart-rekr { display: grid; align-content: center; gap: 3px; margin: 8px 20px 8px 12px; padding: 13px 8px 12px 14px; background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--d-a); color: var(--d-a); line-height: 1.3; text-decoration: none; transition: background-color .3s var(--rytm); }
+  .z-dz-kart-rekr:hover { background-color: color-mix(in srgb, var(--d-a) 7%, var(--bg)); }
+  .z-dz-kart-rekr:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .z-dz-kart-rekr b { font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.15; white-space: nowrap; }
+  .z-dz-kart-rekr span { font-family: var(--f-text); font-size: 13.5px; line-height: 1.35; color: var(--muted); }
+  .z-dz-kart-rekr.zew::after { content: none; }
+  .z-dz-kart-rekr.zew b::after { content: '\00a0↗'; font-family: var(--f-text); font-size: .72em; }
+
+  /* pole ze stronami: 12 px pod pasem, od lewej krawędzi pierwszej komórki do końca kolumny tekstu, bez podziałów */
+  html.js .z-dz .z-dz-rzad { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 0fr; gap: 0; padding: 0; border: 0; transition: grid-template-rows .3s var(--rytm); }
+  html.js .z-dz .z-dz-rzad.z-otwarta { grid-template-rows: 1fr; }
+  html.js .z-dz .z-dz-rzad h3 { display: none; }
+  html.js .z-dz .z-dz-rzad-w { min-height: 0; overflow: hidden; }
+  html.js .z-dz .z-dz-rzad ul { display: grid; grid-template-columns: repeat(var(--m), minmax(0, 1fr)); gap: 10px 22px; margin: 12px var(--marg) 0 calc(var(--marg) - 20px); padding: 16px 20px 18px; background: var(--d-t);
+    opacity: 0; transform: translateY(-8px); visibility: hidden; transition: opacity .3s linear, transform .3s var(--rytm), visibility 0s linear .3s; }
+  html.js .z-dz .z-dz-rzad.z-otwarta ul { opacity: 1; transform: none; visibility: visible; transition: opacity .3s linear, transform .3s var(--rytm), visibility 0s; }
+  html.js .z-dz .z-dz-rzad a { display: block; margin: -5px -10px; padding: 5px 10px 6px; font-family: var(--f-text); font-size: 13.5px; line-height: 1.3; }
+  html.js .z-dz .z-dz-rzad a b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.2; white-space: nowrap; color: var(--ink); transition: color var(--t-krotki) var(--rytm); }
+  html.js .z-dz .z-dz-l-opis { display: block; margin-top: 2px; font-weight: 400; line-height: 1.35; color: var(--muted); }
+  html.js .z-dz .z-dz-rzad a:is(:hover, :focus-visible) { background-color: color-mix(in srgb, var(--d-a) 10%, var(--d-t)); }
+  html.js .z-dz .z-dz-rzad a:is(:hover, :focus-visible) b { color: var(--d-a); }
+  html.js .z-dz .z-dz-rzad a.zew::after { content: none; }
+  html.js .z-dz .z-dz-rzad a.zew b::after { content: '\00a0↗'; font-family: var(--f-text); font-size: .72em; color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .z-dz-karta, .z-dz-szew, .z-dz-kart-rekr, html.js .z-dz .z-dz-rzad, html.js .z-dz .z-dz-rzad ul { transition: none; }
+  }
+}
+```
+- Reguły ciemnego motywu (`--d-a`, `--d-t`, `--text`, `--muted`) działają bez osobnych wartości. Istniejąca reguła najechania linku w ciemnym motywie zostaje.
+- Popraw komentarze na górze pliku i w `TrescDzialu.astro` („nic się nie rozwija”, „tylko telefon z JS”), opis w `dok/estetyka.md`, jeśli plik jest.
+
+### Odbiór
+- `astro check` bez nowych błędów, `npm run build` przechodzi.
+- Komputer, cztery działy, PL i EN, przy 1366, 1536, 1920 i 2560 px, jasny i ciemny motyw: na starcie wszystko zwinięte; kliknięcie otwiera grupę, drugie zamyka, otwarta jedna naraz, Esc zamyka.
+- PL: pas ma 98 px w każdym dziale, a opis grupy jedną linię (także Kierunki). EN: podaj wysokości; dłuższe nazwy mogą się złamać, ale nic nie może być ucięte ani wystawać poza komórkę.
+- Pole: lewa krawędź równo z lewą krawędzią pierwszej komórki, prawa z końcem kolumny tekstu i prawą krawędzią Rekrutacji; tekst pierwszej komórki i pierwszego linku w jednej pionowej linii. Nazwa strony w jednej linii, także „Procedura dyplomowania” przy 1366 px, bez nachodzenia na następną kolumnę; opis może mieć dwie linie.
+- Kolor po najechaniu i rozwiniętej karty równe (porównaj `getComputedStyle`).
+- Tab nie wchodzi w linki zamkniętej grupy. `aria-expanded` poprawne. Fokus widoczny na karcie, Rekrutacji i linku.
+- Przewijanie: pas odjeżdża razem ze stroną, pasek menu działa jak dotąd.
+- Bez JS: wiersze i przycisk Rekrutacja jak dziś, bez kart, opisów i strzałek.
+- Telefon 390 px: bez żadnej zmiany względem stanu sprzed punktu (karty, kolor `--d-a`, dwie kolumny linków, bez opisów, bez drugiej Rekrutacji). Porównaj zrzutami przed i po.
+- Kontrast co najmniej 4,5:1: opis i liczba stron na `--d-t` i `--ton`, opis strony na `--d-t`, Rekrutacja na `--bg`, w obu motywach. Jeśli któryś nie spełnia, podaj wartość i proponowaną poprawkę, a nie zmieniaj koloru sam.
+- Zrzuty: zwinięte i każda grupa rozwinięta na Studiach przy 1536 i 1920 px, po jednym rozwiniętym w pozostałych działach, EN Studia, ciemny motyw, bez JS, telefon → `raport-zrzuty/z20-pas-*`.
