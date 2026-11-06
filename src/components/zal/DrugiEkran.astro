@@ -26,7 +26,7 @@ import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { listaKierunkow } from '../../lib/menu';
 import { tekstDnia } from '../../lib/kolory-dni';
 import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU } from '../../lib/tresci';
-import { dzialZeSciezki, skrotNazwy, type Dzial } from '../../lib/patroni';
+import { dzialWpisu, dzialZeSciezki, skrotNazwy, type Dzial } from '../../lib/patroni';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -44,11 +44,6 @@ const dzialZ = (adres?: string): Dzial | undefined => (adres && !isExternal(adre
 const NAZWY_DZ: Record<Dzial, [string, string]> = { instytut: ['Instytut', 'Institute'], nauka: ['Nauka', 'Research'], studia: ['Studia', 'Studies'], popularyzacja: ['Popularyzacja', 'Outreach'] };
 
 type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; tytulLang?: string; polski?: boolean; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean; wyr?: boolean; zaj?: string; zajLang?: string };
-
-// Dział wpisu (aktualności nie mają jeszcze pola „Dział” — reguła z dok/estetyka.md, „CMS: dział przy aktualnościach”):
-// „dla” studenci lub kandydaci → Studia; sukces, obrona albo wpisany zakład → Nauka; pozostałe → Instytut.
-const dzialWpisu = (p: { rodzaj: string; dla: string[]; zaklad?: string }): Dzial =>
-  p.dla.some((x) => x === 'studenci' || x === 'kandydaci') ? 'studia' : p.rodzaj === 'obrona' || p.rodzaj === 'sukces' || p.zaklad ? 'nauka' : 'instytut';
 
 // Nadchodzące wydarzenia (jak na telefonie: 30 dni i przypomnienia terminów)
 const dniTel = Number((ustawienia as any).wydarzenia_dni_telefon ?? 30) || 30;

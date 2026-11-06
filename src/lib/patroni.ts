@@ -99,6 +99,18 @@ const CZLONY: Record<string, Dzial> = {
   nauka: 'nauka', seminaria: 'nauka', 'obrony-doktorskie': 'nauka',
   studia: 'studia', popularyzacja: 'popularyzacja',
 };
+// Dział wpisu aktualności (pola „Dział” w CMS jeszcze nie ma; zlecenie 18, punkt 9): kolor, etykieta i zastępczy sygnet na drugim ekranie
+// strony głównej. Najpierw rodzaj wpisu, dopiero potem odbiorcy, bo prawie każdy wpis jest „dla studentów”:
+// 1. sukces, obrona → Nauka; 2. kariera → Studia; 3. wydarzenie: pierwszym odbiorcą kandydaci → Popularyzacja, inaczej Nauka;
+// 4. pozostałe: studenci lub kandydaci → Studia; wpisany zakład → Nauka; reszta → Instytut.
+export function dzialWpisu(p: { rodzaj: string; dla: string[]; zaklad?: string }): Dzial {
+  if (p.rodzaj === 'sukces' || p.rodzaj === 'obrona') return 'nauka';
+  if (p.rodzaj === 'kariera') return 'studia';
+  if (p.rodzaj === 'wydarzenie') return p.dla[0] === 'kandydaci' ? 'popularyzacja' : 'nauka';
+  if (p.dla.some((x) => x === 'studenci' || x === 'kandydaci')) return 'studia';
+  return p.zaklad ? 'nauka' : 'instytut';
+}
+
 export function dzialZeSciezki(sciezka: string): Dzial | undefined {
   const czlon = sciezka.replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';
   return CZLONY[czlon];
