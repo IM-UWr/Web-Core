@@ -3,7 +3,7 @@
 // stronach działów (zal/dzial/Wiersz.astro — dzień dużą Brygadą, pod nim „mie rrrr”; minione — szarym), obok mała etykieta
 // „Rodzaj · dzień i godzina · miejsce”, tytuł Brygadą (referat — wzory przez KaTeX, strona zewnętrzna — z ikoną), podtytuł
 // i opis referatu. Cały wiersz klikalny (link w tytule); konferencja bez strony — wiersz bez linku. Wiersze rozdzielone
-// cienką linią. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px, węższa kolumna daty).
+// cienką linią. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px, węższa kolumna daty).
 // data-ww i data-rodzaj — filtr i szukanie w Kalendarzu (szukanie w .ww-tresc, bez daty).
 import Link from './Link.astro';
 import TytulReferatu from './TytulReferatu.astro';
@@ -55,7 +55,7 @@ const etykieta = [RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce].filter(Boolean).j
   .ww .ww-opis { margin-top: 2px; font-size: 14px; color: var(--muted); }
 
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .ww { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .ww-data { font-size: 28px; }
     .ww-data small { font-size: 12px; }

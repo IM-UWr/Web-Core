@@ -1,6 +1,6 @@
 ---
 // Lista seminariów (/seminaria), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro (spis „Na tej stronie” z prawej,
-// na telefonie zwijany nad treścią). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px) — style na końcu pliku.
+// na telefonie zwijany nad treścią). Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px) — style na końcu pliku.
 // Sekcje: najbliższe referaty (tydzień albo przyszły tydzień), tekst wprowadzający z CMS (src/data/dzialy/nauka.json,
 // pola seminaria_tekst / _en; akapity oddzielone pustą linią, puste pole = bez tekstu), seminaria zakładów i niezależne
 // z najbliższym referatem (siatka boksów ul.boksy, zlecenie 17, punkt 6), pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
@@ -141,9 +141,9 @@ const osoby = (l: string[]) => l.length <= 2
   .b-ref .kto { color: var(--muted); }
   .b-brak { margin-top: 6px !important; }
 
-  /* ---------- telefon (≤ 760 px): jedna kolumna, mniejszy dzień ---------- */
+  /* ---------- telefon (≤ 1023 px): jedna kolumna, mniejszy dzień ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .wiersz .dz { font-size: 28px; }
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }

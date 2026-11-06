@@ -9,7 +9,7 @@ import { hasTime, now, today } from '../../lib/daty';
 import { MQ_TELEFON } from '../../lib/media';
 
 const siatka = document.querySelector<HTMLElement>('[data-z-siatka]');
-// Telefon (≤ 760 px): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
+// Telefon (≤ 1023 px): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
 const TELEFON = matchMedia(MQ_TELEFON);
 // jeden rytm ruchu (zlecenie 13, punkt 9; --rytm w global.css)
 const RYTM = 'cubic-bezier(.22, .8, .2, 1)';

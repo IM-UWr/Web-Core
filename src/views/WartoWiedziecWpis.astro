@@ -4,7 +4,7 @@
 // W nagłówku tytuł i „← Warto wiedzieć”. Treść: etykieta „rok · dział” (link do działu), zajawka jako pierwszy akapit (.wst),
 // zdjęcie z podpisem, treść z Markdown (podzielona na sekcje po nagłówkach ##, żeby działały kreski i spis „Na tej stronie”),
 // przycisk-link (pole „link”) i „Zobacz też” — pozostałe pozycje jako lista linków (WartoWiedziec.astro, uklad „linki”;
-// powtórzenie, poza indeksem wyszukiwarki). Jedna wersja HTML: komputer i telefon (≤ 760 px).
+// powtórzenie, poza indeksem wyszukiwarki). Jedna wersja HTML: komputer i telefon (≤ 1023 px).
 import Link from '../components/Link.astro';
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -71,7 +71,7 @@ const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: z
   .ww-meta a:hover { text-decoration: underline; text-underline-offset: 3px; }
   /* zdjęcie pozycji: bez zaokrągleń i cieni, podpis przygaszony */
   .ww-foto { margin: 6px 0 22px; }
-  .ww-foto :global(img) { display: block; width: 100%; max-width: 760px; height: auto; }
+  .ww-foto :global(img) { display: block; width: 100%; max-width: var(--szer-akapitu); height: auto; }
   .ww-foto figcaption { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   /* treść z Markdown: listy jak lista z kreskami wzorca (ul.kreski), tabele jak tabela wzorca */
   .ww-tresc :global(ul) { list-style: none; max-width: 42.7em; margin: 0 0 16px; padding: 0; }

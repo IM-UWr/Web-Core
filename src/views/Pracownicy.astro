@@ -7,7 +7,7 @@
 // W nagłówku hasło (pole pracownicy_haslo / pracownicy_haslo_en w src/data/dzialy/instytut.json) i liczby (osoby · zakłady ·
 // doktoranci). Treść: pasek filtrów (szukaj, grupa, zakład) i grupy osób jako sekcje — spis „Na tej stronie” prowadzi do
 // grup (TabelaPracownikow.tsx, wyspa React). Jedna wersja HTML: komputer — wiersz osoby w kolumnach (imię i nazwisko,
-// e-mail, telefon, pokój, strona); telefon (≤ 760 px) — wiersz w jednej kolumnie, pasek filtrów w dwóch rzędach.
+// e-mail, telefon, pokój, strona); telefon (≤ 1023 px) — wiersz w jednej kolumnie, pasek filtrów w dwóch rzędach.
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TabelaPracownikow from '../components/TabelaPracownikow.tsx';
@@ -32,7 +32,7 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
   /* Pracownicy (blok .z-prac w .z-pd-tresc.tresc; elementy wyspy TabelaPracownikow.tsx). Nagłówki h2/h3, linki i kolory —
      wzorzec treści (zal-tresc.css); sekcje grup nie są dziećmi .z-pd-tresc (siedzą w wyspie), więc kreski między nimi
      ustawione tu tymi samymi wartościami. Wiersze osób jak tabela wzorca: nagłówek kolumn 13 px przygaszony z kreską
-     2 px, wiersze oddzielone 1 px. Komputer ≥ 761 px, telefon ≤ 760 px. */
+     2 px, wiersze oddzielone 1 px. Komputer ≥ 1024 px, telefon ≤ 1023 px. */
   .z-prac [hidden] { display: none !important; }
   /* bez JS filtry nie działają — pasek schowany, lista pełna */
   html:not(.js) .z-prac .zp-narz { display: none; }
@@ -68,7 +68,7 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
   .z-prac .zp-ile { max-width: none; margin: 0; color: var(--muted); }
 
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .z-prac .zp-narz { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; }
     .z-prac .zp-szukaj { flex: 1 1 240px; }
     .z-prac .zp-szukaj input { font-size: 15px; line-height: 1.6; }
@@ -84,7 +84,7 @@ const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.
     .z-prac .zp-n small { margin-top: 1px; font-size: 13.5px; line-height: 1.45; }
   }
 
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     /* pasek: pole szukania w pierwszym rzędzie, zakład w drugim (bez wyboru grupy — zalecenie 4 zlecenia 11) */
     .z-prac .zp-narz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .z-prac .zp-szukaj { grid-column: 1 / -1; min-height: 44px; }

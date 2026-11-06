@@ -1,7 +1,7 @@
 # Silnik animacji banerów — nieużywany od 4–5.11.2026
 
 ## Do czego służył
-Animacje w tle banerów podstron **na telefonie** (≤ 760 px) w dotychczasowym wyglądzie (zlecenia 02–05, 31.10–1.11.2026):
+Animacje w tle banerów podstron **na telefonie** (≤ 1023 px) w dotychczasowym wyglądzie (zlecenia 02–05, 31.10–1.11.2026):
 każda podstrona miała „swój” rysunek matematyczny, który powoli się rysował za tytułem (atraktor Lorenza w Nauce,
 dendryt w Instytucie, sumy Riemanna w Studiach, fala Fouriera w Aktualnościach, histogram na seminarium ze statystyki,
 genealogia przy obronach itd.). Na komputerze silnik nic nie robił — zostawał statyczny rysunek działu `.ph-m`.

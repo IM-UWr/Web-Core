@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Kierunek „Założyciele” — wygląd na telefon (≤ 760 px). Podstawa: próbna wersja z Web-Podglad (testy/telefon-TEST.patch),
+   Kierunek „Założyciele” — wygląd na telefon (≤ 1023 px). Podstawa: próbna wersja z Web-Podglad (testy/telefon-TEST.patch),
    przyjęta jako docelowa 4.11.2026 (zlecenie 12).
    Tu: kolory i kroje jak na komputerze (paleta „Lazur i malina”, Brygada 1918 + Manrope, ciepłe tło), nagłówek i menu,
    stopka, okładka, banery działów i nagłówki podstron. Układ bloków treści na wąski ekran jest na końcu plików tych bloków
@@ -8,7 +8,7 @@
 .z-okl-sygnet { display: none; }
 
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
 
   /* ---------- kolory i kroje (jak na komputerze) ---------- */
   :root {

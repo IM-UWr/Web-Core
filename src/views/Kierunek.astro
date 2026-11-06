@@ -9,8 +9,8 @@
 //   roczników .tresc-taby i wybór roku rozpoczęcia, pliki ul.pliki) → Praktyki → Po studiach → Pytania (.faq) → Kontakt
 //   (.kontakty) → Akty prawne (ul.pliki).
 // Nagłówki sekcji szkoły doktorskiej jak we wzorze („O Kolegium Doktorskim”, „Od rekrutacji do obrony” …).
-// Liczby w banerze: fakty kierunku w jednym wierszu (na telefonie schowane). Jedna wersja HTML: komputer (≥ 761 px)
-// i telefon (≤ 760 px, jedna kolumna, tabela w bloki — zal-tresc.css).
+// Liczby w banerze: fakty kierunku w jednym wierszu (na telefonie schowane). Jedna wersja HTML: komputer (≥ 1024 px)
+// i telefon (≤ 1023 px, jedna kolumna, tabela w bloki — zal-tresc.css).
 import Link from '../components/Link.astro';
 import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -329,7 +329,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
   /* baner na telefonie: trzy pierwsze fakty w trzech kolumnach (zal-telefon.css), wartości mniejsze, bo bywają słowami („6 semestrów”);
      bez liczb nie byłoby też hasła (zlecenie 11, zalecenie 2: hasło i liczby razem albo wcale) */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) { :global(.z-nagl .z-slot .pt-liczby.kh-liczby .n) { font-size: 21px; } }
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { :global(.z-nagl .z-slot .pt-liczby.kh-liczby .n) { font-size: 21px; } }
   [hidden] { display: none !important; }
   /* bez JS: bez przełącznika i wyboru roku, wszystkie programy z podpisami; z JS podpis tylko dla czytników ekranu */
   :global(html:not(.js)) :is(.tresc-taby, .kier-rok) { display: none; }
@@ -351,7 +351,7 @@ const jednaSciezka = sciezki.length === 1 && doktorat;
   /* pytania: stary styl .faq z global.css (pogrubienie, wysokość 52 px) nie przecieka do wzorca */
   .faq summary { min-height: 0; align-items: flex-start; font-weight: 400; }
 
-  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     /* szerokość rzędu faktów (do ciekawostki z prawej, bez drugiego rzędu) ustawia skrypt w NaglowekZ.astro */
     .kh-liczby { margin-top: 6px; }
   }

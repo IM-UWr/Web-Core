@@ -8,7 +8,7 @@
 // pokazywała się już ta sama lista (zal-telefon.css), więc dawnej listy telefonu (LiczbyBanera, liczbyTelefon) nie ma.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2, czasopisma jako podsekcje h3
 // z parami dl.para, akapit .wst. Własne style (na końcu pliku): siatka lat z cienkimi liniami (bez kart).
-// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
@@ -134,9 +134,9 @@ const spis = [
   .cz-link { margin: 10px 0 0; font-weight: 600; }
   .arch { margin: 30px 0 0; font-size: 15.5px; color: var(--muted); }
 
-  /* ---------- telefon (≤ 760 px): trzy kolumny lat ---------- */
+  /* ---------- telefon (≤ 1023 px): trzy kolumny lat ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .lata { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 14px; }
     .rok { font-size: 23px; }
     .ile { font-size: 13px; }

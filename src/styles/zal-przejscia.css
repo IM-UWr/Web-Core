@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Kierunek „Założyciele” — przejścia między stronami na komputerze (≥ 761 px; dok/estetyka.md „Przejścia między stronami”).
+   Kierunek „Założyciele” — przejścia między stronami na komputerze (≥ 1024 px; dok/estetyka.md „Przejścia między stronami”).
    Korzysta z przejść między dokumentami (View Transitions API, @view-transition w przejscia.css; Chrome/Edge 126+,
    Safari 18.2+; Firefox przechodzi zwyczajnie). Tu tylko nazwy wspólnych elementów i czasy:
    - okładka → strona działu: narysowany szkic przelatuje na miejsce w banerze i rośnie, nazwa działu przesuwa się
@@ -13,7 +13,7 @@
    Telefon bez zmian (nazwy tylko w @media komputera).
    ========================================================================== */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-@media (min-width: 761px) and (min-height: 501px) and (prefers-reduced-motion: no-preference), (min-width: 761px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 1024px) and (min-height: 501px) and (prefers-reduced-motion: no-preference), (min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   /* pasek na górze strony stoi; na stronie głównej (pod okładką) nie ma nazwy, więc na stronie działu się pojawia.
      Nazwa na treści paska, nie na całym pasku: warstwy z backdrop-filter w elemencie z nazwą nie widzą nic pod nim, więc rozmycie
      nie działało (zlecenie 18, punkt 10). Tło paska przenika razem ze stroną. */

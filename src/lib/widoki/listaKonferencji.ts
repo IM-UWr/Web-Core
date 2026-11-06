@@ -19,7 +19,7 @@ export async function daneListyKonferencji(lang: Lang) {
   const lead = lang === 'en'
     ? 'Conferences and workshops organised or co-organised by members of the Mathematical Institute.'
     : 'Konferencje i warsztaty organizowane lub współorganizowane przez pracowników Instytutu Matematycznego.';
-  // Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json,
+  // Telefon (≤ 1023 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json,
   // konferencje_haslo / _en) i trzy liczby pod kreską — konferencje bez odwołanych: w bieżącym roku (dzień budowania) ·
   // wszystkie od pierwszego roku w danych · we Wrocławiu (miejsce zawiera „Wrocław”). Etykieta bez rzeczownika
   // („w 2026 roku”), więc ta sama dla każdej liczby.

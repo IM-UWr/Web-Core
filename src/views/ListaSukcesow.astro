@@ -8,7 +8,7 @@
 // Baner (bez zmian): hasło (nauka.json: sukcesy_haslo / _en) i liczby w jednej liście .pt-liczby — na telefonie
 // pokazywała się już ta sama lista (zal-telefon.css), więc dawnej listy telefonu (LiczbyBanera, liczbyTelefon) nie ma.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); własne style (na końcu pliku)
-// tylko dla wierszy z datą. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// tylko dla wierszy z datą. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Podstrona from '../components/zal/Podstrona.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
@@ -94,9 +94,9 @@ const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
   /* rok (podsekcja): liczba wpisów małym krojem tekstu */
   h3 small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
 
-  /* ---------- telefon (≤ 760 px): mniejszy dzień, bez miniatur (jak dotąd na telefonie; obok dnia za mało miejsca) ---------- */
+  /* ---------- telefon (≤ 1023 px): mniejszy dzień, bez miniatur (jak dotąd na telefonie; obok dnia za mało miejsca) ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .wiersz.z-min { grid-template-columns: 54px minmax(0, 1fr); }
     .wiersz .dz { font-size: 28px; }

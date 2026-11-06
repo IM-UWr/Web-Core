@@ -4,7 +4,7 @@
 // Treść: termin jednym wzorem daty (jak zal/dzial/Wiersz.astro: dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”)
 // z parami Kiedy / Gdzie / Promotor (dl.para), po terminie — „Wydarzenie się odbyło”; zdjęcie, opis, dokumenty (ul.pliki),
 // ogłoszenie w BIP i data publikacji. Tekst: na /en pole tresc_en, po polsku treść wpisu, a gdy puste, tekst z danych obrony dobierający czas. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc).
-// Bez spisu „Na tej stronie” (mniej niż 2 sekcje z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// Bez spisu „Na tej stronie” (mniej niż 2 sekcje z nagłówkiem). Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
@@ -91,9 +91,9 @@ const typPliku = (a: string) => {
   /* tytuł rozprawy w banerze (jak dotąd: półgruby, biały) */
   .rozprawa { font-weight: 600; color: #fff; }
 
-  /* ---------- telefon (≤ 760 px) ---------- */
+  /* ---------- telefon (≤ 1023 px) ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .termin { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; }
     .termin .dz { font-size: 28px; }
     .termin .dz small { font-size: 12.5px; white-space: nowrap; }

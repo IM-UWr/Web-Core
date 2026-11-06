@@ -8,9 +8,8 @@
 // wyróżniony (zlecenie 14, zalecenie 22; zlecenie 18, punkt 3): w HTML najnowszy, po filtrze albo szukaniu skrypt przestawia klasę.
 // Jedna wersja HTML (zlecenie 18, punkt 3; podgląd: wariant B „na papierze”):
 // - okno ≥ 980 px: lista w kolumnie treści (948 px), filtry w prawej kolumnie (236 px), przyklejone jak spis „Na tej stronie”;
-// - okno 761–979 px: prawa kolumna zabrałaby liście za dużo, więc filtry jako nieprzyklejony pasek nad listą;
 // - kolumna listy ≥ 760 px (okno ≥ 1180 px, przy pasku ≥ 888 px): wpisy w dwóch kolumnach, węższa: w jednej;
-// - telefon (≤ 760 px): rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
+// - telefon (≤ 1023 px): rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
 // „… czytaj dalej” dopisuje skrypt, tylko gdy zajawka się nie mieści (wygląd w WierszAktualnosci.astro).
 // Bez JS: filtry schowane, widać całą listę.
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -200,11 +199,11 @@ const tytul = t(lang, 'aktualnosci');
   .ak-archiwum a { color: var(--d-a); }
 
   /* „Pokaż” tylko w panelu z prawej */
-  @media (max-width: 979.98px) { .ak-pokaz { display: none; } }
-
-  /* ---------- komputer (≥ 761 px): lista w dwóch kolumnach, gdy ma co najmniej 760 px ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .ak-pokaz { display: none; } }
+
+  /* ---------- komputer (≥ 1024 px): lista w dwóch kolumnach, gdy ma co najmniej 760 px ---------- */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .ak-rodzaj-lista { display: none; }
     .ak-lista { container-type: inline-size; min-width: 0; }
     @container (min-width: 760px) {
@@ -213,17 +212,8 @@ const tytul = t(lang, 'aktualnosci');
     }
   }
 
-  /* ---------- okno 761–979 px: filtry jako pasek nad listą (przyciski rodzajów i pole szukania), nieprzyklejony ---------- */
-  @media (min-width: 761px) and (min-height: 501px) and (max-width: 979.98px), (min-width: 761px) and (pointer: fine) and (max-width: 979.98px) {
-    .ak-narz { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 0 0 12px; border-bottom: 2px solid var(--rule); }
-    .ak-rodzaje button { font-size: 14px; padding: 7px 12px; }
-    .ak-rodzaje button + button { border-left: 1px solid var(--line-ui); }
-    .ak-szukaj { flex: 1; min-width: 220px; font-size: 15px; padding: 8px 12px; }
-    .ak-dla { font-size: 15px; }
-  }
-
-  /* ---------- okno ≥ 980 px: filtry w prawej kolumnie, układ jak spis „Na tej stronie” (zal-podstrona.css) ---------- */
-  @media (min-width: 980px) and (min-height: 501px), (min-width: 980px) and (pointer: fine) {
+  /* ---------- filtry w prawej kolumnie, układ jak spis „Na tej stronie” (zal-podstrona.css) ---------- */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .ak-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px; }
     .ak-lista { grid-column: 1; grid-row: 1; }
     .ak-panel { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: calc(var(--gora) + 16px);
@@ -242,8 +232,8 @@ const tytul = t(lang, 'aktualnosci');
     .ak-dla button:focus-visible { outline-offset: -2px; }
   }
 
-  /* ---------- telefon (≤ 760 px): rodzaje w dwóch rzędach, pole szukania pod nimi ---------- */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  /* ---------- telefon (≤ 1023 px): rodzaje w dwóch rzędach, pole szukania pod nimi ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .ak-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     /* rodzaje jako lista wyboru (zlecenie 11, zalecenie 4: na telefonie lista zamiast paska, w stylu pola) */
     .ak-rodzaje { display: none; }

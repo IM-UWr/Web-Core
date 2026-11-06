@@ -1,6 +1,6 @@
 ---
 // Nagłówki stron (kierunek „Założyciele”, dok/estetyka.md), wstawiane przez NaglowekStrony.astro. Jedna wersja HTML:
-// komputer (≥ 761 px) — src/styles/zalozyciele.css, telefon (≤ 760 px) — src/styles/zal-telefon.css.
+// komputer (≥ 1024 px) — src/styles/zalozyciele.css, telefon (≤ 1023 px) — src/styles/zal-telefon.css.
 //
 // rodzaj „dzial” — baner strony działu („opcja 4”): granat przechodzi w zdjęcie działu w dwóch kolorach (cienie granatowe,
 //   światła w jasnym kolorze działu), szkic patrona jasną kreską z poświatą, notka o patronie i podpis. Szkic i podpis rysują
@@ -31,7 +31,7 @@ interface Props {
   lang: Lang;
   // HTML przekazany do banera przez widok (liczby .pt-liczby, plakietki, linki) — pokazywany pod tytułem
   slot?: string;
-  // link „← …” (podstrona: dział albo poziom wyżej); telefon: krótsza etykieta na ≤ 760 px (zlecenie 01, punkt 7)
+  // link „← …” (podstrona: dział albo poziom wyżej); telefon: krótsza etykieta na ≤ 1023 px (zlecenie 01, punkt 7)
   wstecz: { etykieta: string; telefon?: string; adres: string };
   // ciekawostka patrona: znak z opisem, losowana na wizytę (podstrony z menu działu; zlecenie 11, zalecenie 19)
   znak?: boolean;

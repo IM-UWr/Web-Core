@@ -28,7 +28,7 @@ export async function daneListySeminariow(lang: Lang) {
   const lead = lang === 'en'
     ? 'Research seminars of the Mathematical Institute. Everyone is welcome.'
     : 'Seminaria naukowe Instytutu Matematycznego. Zapraszamy wszystkich zainteresowanych.';
-  // Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json, seminaria_haslo / _en)
+  // Telefon (≤ 1023 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json, seminaria_haslo / _en)
   // i trzy liczby pod kreską: seminaria (aktywne, jak karty niżej) · zapowiedziane referaty (wszystkich seminariów, definicja
   // wspólna z Kalendarzem — src/lib/liczbyTerminow.ts) · referaty w archiwum (minione referaty opublikowanych seminariów).
   const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'seminaria_haslo_en' : 'seminaria_haslo'] as string | undefined) || undefined;

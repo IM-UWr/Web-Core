@@ -25,7 +25,7 @@ export async function daneObrony(obrona: Obrona, lang: Lang) {
     d.streszczenie_en && { nazwa: t(lang, 'streszczenieEn'), plik: d.streszczenie_en },
     ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${tytulyWJezyku(r.recenzent, lang)}`, plik: r.plik })),
   ].filter(Boolean) as { nazwa: string; plik: string }[];
-  // Telefon (≤ 760 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Obrony doktorskie”, imię i nazwisko,
+  // Telefon (≤ 1023 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Obrony doktorskie”, imię i nazwisko,
   // hasło (src/data/dzialy/nauka.json, obrona_haslo / _en), kreska i trzy pozycje: data („20 paź”, pod nią dzień tygodnia
   // i rok) · godzina (pod nią sala — pierwszy człon miejsca, gdy to sala; inaczej „godzina”) · liczba recenzji.
   // Tytuł rozprawy na telefonie pod banerem (.ob-rozprawa), w banerze tylko na komputerze.

@@ -8,7 +8,7 @@
 // Każda osoba to wiersz listy: gdy ma stronę domową, link na imieniu i nazwisku obejmuje cały wiersz (e-mail i zakład
 // to osobne linki nad nim). Kolumna „Telefon” pojawia się tylko w sekcjach, w których ktoś ma numer (w praktyce:
 // administracja). Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
-// Komputer: wiersz w kolumnach z nagłówkiem nad listą (jak tabela wzorca treści); telefon (≤ 760 px): wiersz w jednej kolumnie.
+// Komputer: wiersz w kolumnach z nagłówkiem nad listą (jak tabela wzorca treści); telefon (≤ 1023 px): wiersz w jednej kolumnie.
 import { zTytulem } from '../lib/osoby';
 import type { Lang } from '../lib/daty';
 import { isExternal } from '../lib/url';

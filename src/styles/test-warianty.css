@@ -5,10 +5,10 @@
    w px, współczynnik (--t-n, --t-o, --t-b) to długość: 1px = 100%. Dzięki temu „płynne” może zależeć od vw (dzielenie długości
    przez długość nie działa w każdej przeglądarce). Właściwe wdrożenie wybranego wariantu będzie osobnym zleceniem.
    Tekst, Nagłówki, Odstępy: bez Szybkiego dostępu i Planu zajęć ([data-z-plan], .z-pl). Drugi ekran głównej (.z-druga): tylko Aktualności.
-   Telefon (≤ 760 px): bez zmian, przycisk ukryty.
+   Telefon (≤ 1023 px): bez zmian, przycisk ukryty.
    ========================================================================== */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   /* „płynne”: 0,8 przy oknie do 1366 px, 1 od 2400 px, liniowo pomiędzy. Zwykły tekst nigdy nie jest płynny (Ctrl + go powiększa). */
   html { --t-plynny: clamp(.8px, calc(.8px + (100vw - 1366px) * .2 / 1034), 1px); }
 
@@ -137,7 +137,7 @@
   .t-przywroc { margin: 3px 0 0; padding: 5px 10px; border: 1px solid var(--line-ui); border-radius: 7px; background: transparent; color: var(--ink); font: 600 12.5px/1.35 var(--f-text); cursor: pointer; }
   .t-przywroc:hover { background: var(--surface); }
 }
-@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
   .t-zakladka, .t-panel { display: none !important; }
 }
 @media print {

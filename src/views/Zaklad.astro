@@ -8,7 +8,7 @@
 // - Konferencje, Obrony doktorskie, Aktualności: wiersze z datą (jeden wzór daty — duży dzień Brygadą w kolorze działu,
 //   pod nim miesiąc i rok, jak zal/dzial/Wiersz.astro);
 // - Zakłady Instytutu: lista linków do zakładów (ul.linki; bieżący wyróżniony) — nawigacja, poza indeksem wyszukiwarki.
-// Jedna wersja HTML: komputer — dwie kolumny list, tabela składu; telefon (≤ 760 px) — jedna kolumna, tabela w bloki.
+// Jedna wersja HTML: komputer — dwie kolumny list, tabela składu; telefon (≤ 1023 px) — jedna kolumna, tabela w bloki.
 import Link from '../components/Link.astro';
 import { zTytulem, tytulyWJezyku } from '../lib/osoby';
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -232,7 +232,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
   .zk-ile { font-family: var(--f-text); font-size: 15px; font-weight: 600; color: var(--muted); }
   /* zdjęcie zakładu: bez zaokrągleń i cieni, podpis przygaszony */
   .zk-foto { margin: 0 0 18px; }
-  .zk-foto :global(img) { display: block; width: 100%; max-width: 760px; height: auto; }
+  .zk-foto :global(img) { display: block; width: 100%; max-width: var(--szer-akapitu); height: auto; }
   .zk-foto figcaption { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   /* opis z Markdown: akapity wzorca, pierwszy w kolorze nagłówków (jak p.wst) */
   .zk-opis > :global(p:first-child) { color: var(--ink); }
@@ -274,7 +274,7 @@ const kierTel = kierownik?.data.telefon || d.telefon;
   .zk-nav a[aria-current]::after { content: '•'; color: var(--d-a); }
 
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .zk-foto { margin-bottom: 14px; }
     .zk-sem { grid-template-columns: minmax(0, 1fr); gap: 0; }
     .zk-daty li { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }

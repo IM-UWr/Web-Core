@@ -1,4 +1,4 @@
-// Silnik animacji w tle banerów podstron — tylko telefon (≤ 760 px; zlecenie 02, decyzje 31.10.2026).
+// Silnik animacji w tle banerów podstron — tylko telefon (≤ 1023 px; zlecenie 02, decyzje 31.10.2026).
 // Baner deklaruje motyw atrybutem data-animacja na .ph (NaglowekStrony.astro, mapa strona → motyw w src/lib/motywyBanerow.ts);
 // silnik ładuje tylko kod tego motywu (osobny plik w motywy/, dynamiczny import), mierzy baner, nakłada maskę
 // „obrys linii” i prowadzi pętlę. Na komputerze nic nie robi — zostaje statyczny rysunek .ph-m. Bez JS, przy błędzie

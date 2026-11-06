@@ -40,7 +40,7 @@
 
 /* ---------- telefon: pole rysunku i animacja (tlo.css, telefon.css) ---------- */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
   .js .hdr-foto ~ main > .ph:first-child .ph-m { top: var(--hdr-h); }
   .ph-m, .ph-zdjecie.ph-z-foto .ph-m, .ph-granat.ph-z-foto .ph-m { top: 0; bottom: auto; height: 150px; right: 0; width: 78%; opacity: .8; }
   .ph-m, .ph-zdjecie.ph-z-foto .ph-m, .ph-granat.ph-z-foto .ph-m { height: 120px; width: 70%; opacity: .7; }

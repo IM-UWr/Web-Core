@@ -8,11 +8,11 @@ import type { Lang } from '../daty';
 
 type Link = { etykieta: string; etykieta_en?: string; adres: string };
 
-// Wygląd na komputerze (≥ 761 px): strony działów „Instytut” i „Studia” (adres /instytut/… lub /studia/…; `adres` to id pliku,
+// Wygląd na komputerze (≥ 1024 px): strony działów „Instytut” i „Studia” (adres /instytut/… lub /studia/…; `adres` to id pliku,
 // więc obejmuje też wersje angielskie /en/instytut/…, /en/studia/…) — np. kontakt, infrastruktura informatyczna z podstronami,
 // pierwszy rok, egzaminy i dyplom, sprawy studenckie, podstrony szkoły doktorskiej — mają baner jak w wariancie „Portal”
 // i treść jak w wariancie „Zwarta”, tak jak strony tych działów i ich pozostałe podstrony. Strony innych działów z tego
-// widoku — bez zmian (bez propu `uklad`). Telefon (≤ 760 px) bez zmian na wszystkich stronach. Popularyzacja: zlecenie 15.
+// widoku — bez zmian (bez propu `uklad`). Telefon (≤ 1023 px) bez zmian na wszystkich stronach. Popularyzacja: zlecenie 15.
 const DZIALY_PORTAL_ZWARTA = ['/instytut/', '/studia/', '/popularyzacja/'];
 
 export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) {

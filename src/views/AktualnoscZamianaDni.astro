@@ -8,7 +8,7 @@
 // etykieta wpisu, ramka uwagi po zamianie, dzień zamiany (kółko w kolorze dnia ze skrótem planu, data, plan, kolor dnia
 // i semestr) między cienkimi liniami, tekst, przycisk-link do kalendarza, sekcja „Zobacz też” (ul.linki).
 // Szablon Podstrona.astro nie przekazuje do Baza.astro `szukaj` ani slotu „head” (noindex poza oknem), dlatego rama jest
-// tu złożona z tych samych elementów ręcznie. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// tu złożona z tych samych elementów ręcznie. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import { u } from '../lib/url';
@@ -85,7 +85,7 @@ const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   .zd .akcja { margin-top: 18px; }
 
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .zd-dzien { align-items: flex-start; gap: 14px; }
     .zd-skrot { width: 54px; height: 54px; font-size: 18px; }
     .zd-dzien .zd-plan { font-size: 22px; }

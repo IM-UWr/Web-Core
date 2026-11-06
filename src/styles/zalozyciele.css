@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Kierunek „Założyciele” — wygląd na komputer (≥ 761 px). Specyfikacja: dok/estetyka.md (gałąź kopia/2026-11-01-estetyka-prototypy),
+   Kierunek „Założyciele” — wygląd na komputer (≥ 1024 px). Specyfikacja: dok/estetyka.md (gałąź kopia/2026-11-01-estetyka-prototypy),
    wzorzec: prototyp proto/zalozyciele.src.html (ustawienia domyślne).
-   Telefon (≤ 760 px) bez zmian: tu poza @media komputera są wyłącznie nowe zmienne (nieużywane na telefonie).
+   Telefon (≤ 1023 px) bez zmian: tu poza @media komputera są wyłącznie nowe zmienne (nieużywane na telefonie).
    ========================================================================== */
 
 /* ---------- zmienne: paleta »Lazur i malina« (jasny / głęboki / atrament / tło), granat, kroje, kolumna ----------
@@ -87,13 +87,13 @@
 
 /* Jeden tekst naraz, także dla czytników ekranu (zlecenie 18, punkt 14) */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) { .tylko-telefon { display: none !important; } }
-@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) { .tylko-komputer { display: none !important; } }
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) { .tylko-telefon { display: none !important; } }
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .tylko-komputer { display: none !important; } }
 
 /* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); nie zmniejszać na żadnej szerokości */
 .z-okl-marka > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
 
-@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
   :root {
     --bg: #fcfaf6; --surface: #f4f1ea; --line: #e5e0d6;
@@ -486,21 +486,11 @@
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button:hover { color: var(--ink); }
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz::before { background: var(--line); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a:focus-visible { outline-color: var(--ink); }
-  /* węższe okna: pasek mieści się w oknie (burger uciekał poza ekran przy 761–971 px, główna przewijała się w poziomie),
-     a nazwa Instytutu nie wystaje z paska. Najpierw znika podpis Wydziału, potem linki: wszystkie są w panelu hamburgera. */
-  @media (min-width: 1024px) and (max-width: 1119px) {
+  /* najwęższe okno komputera: nazwa Instytutu nie wystaje z paska. Poniżej 1024 px jest już widok telefonu (zlecenie 24, punkt 1). */
+  @media (max-width: 1119px) {
     .z-marka small { display: none; }
     .z-pasek nav > a { padding-inline: 9px; }
     .z-pasek nav > a[data-dzial]::after { left: 9px; }
-  }
-  @media (max-width: 1023px) {
-    .z-pasek nav > a { display: none; }
-    .z-pasek-narz { margin-left: 0; }
-    .z-pasek-narz::before { display: none; }
-    /* okładka: działy ciaśniej, lewa krawędź nazw zostaje na 48 px; w wąskich kolumnach hasło ma do trzech wierszy */
-    .z-okl-dzialy { left: 36px; right: 36px; }
-    .z-okl-dz { padding-inline: 12px; }
-    .z-okl-dz .slot { height: 4.2em; }
   }
 
 

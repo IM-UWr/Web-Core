@@ -8,7 +8,7 @@
 //        'linki' = lista linków do stron powiązanych (ul.linki wzorca: dwie kolumny, Brygada, → albo ↗).
 // pomin: identyfikator pozycji do pominięcia (bieżąca podstrona). Kolejność: pole „kolejność”, potem rok (od najnowszego)
 // i tytuł. Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
-// Jedna wersja HTML: komputer i telefon (≤ 760 px — węższa kolumna roku i mniejsza miniatura).
+// Jedna wersja HTML: komputer i telefon (≤ 1023 px — węższa kolumna roku i mniejsza miniatura).
 import Link from './Link.astro';
 import { getCollection } from 'astro:content';
 import { u, isExternal } from '../lib/url';
@@ -91,7 +91,7 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
   .ww-min { display: block; width: 120px; height: 90px; overflow: hidden; background: var(--surface); }
   .ww-min :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .ww-bez { font-size: 19px; }
     .ww-w { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .ww-w.ww-z-min { grid-template-columns: 54px minmax(0, 1fr) 72px; }

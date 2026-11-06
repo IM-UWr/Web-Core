@@ -7,7 +7,7 @@ import 'katex/dist/katex.min.css';
 // do reguł trafiających w elementy stron — zlecenie 12, etap 4; opis w nagłówkach plików).
 import '../styles/global.css';
 import '../styles/tlo.css';
-// Komputer (≥ 761 px): przełącznik prop `uklad` → <body data-uklad> (interlinia nagłówka i treści na części podstron).
+// Komputer (≥ 1024 px): przełącznik prop `uklad` → <body data-uklad> (interlinia nagłówka i treści na części podstron).
 import '../styles/uklad-zwarta.css';
 import '../styles/uklad-portal.css';
 import '../styles/portal.css';
@@ -16,7 +16,7 @@ import '../styles/telefon.css';
 import '../styles/przejscia.css';
 // Kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource; Fonty.astro), paleta „Lazur i malina”,
 // pasek menu, nagłówki, stopka (src/styles/zalozyciele.css, src/components/zal/), szablon podstrony i spis (zal-podstrona.css),
-// wzorzec treści (zal-tresc.css; zlecenie 11, zalecenie 14), telefon ≤ 760 px (zal-telefon.css i końce plików bloków).
+// wzorzec treści (zal-tresc.css; zlecenie 11, zalecenie 14), telefon ≤ 1023 px (zal-telefon.css i końce plików bloków).
 import '../styles/zalozyciele.css';
 import '../styles/zal-przejscia.css';
 import '../styles/zal-podstrona.css';
@@ -49,7 +49,7 @@ interface Props {
   stronaGlowna?: boolean;
   // czy indeksować treść w wyszukiwarce (Pagefind)
   szukaj?: boolean;
-  // Wygląd tej podstrony na komputerze (≥ 761 px), słowa oddzielone spacją → <body data-uklad="…">; telefon bez zmian.
+  // Wygląd tej podstrony na komputerze (≥ 1024 px), słowa oddzielone spacją → <body data-uklad="…">; telefon bez zmian.
   // zwarta — treść pod banerem jak w wariancie Zwarta (src/styles/uklad-zwarta.css); zwarta-baner — baner jak w Zwarta;
   // portal-baner — baner jak w Portal (src/styles/uklad-portal.css). Np. uklad="zwarta portal-baner". Bez propu — jak dotąd.
   uklad?: string;

@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Kierunek „Założyciele” — strony z prototypu na komputer (≥ 761 px): drugi ekran strony głównej, strony działów,
+   Kierunek „Założyciele” — strony z prototypu na komputer (≥ 1024 px): drugi ekran strony głównej, strony działów,
    Władze, Projekty i granty, Plan zajęć. Zmienne i elementy wspólne: zalozyciele.css. Telefon bez zmian.
    ========================================================================== */
-/* reguły na każdej szerokości; telefon (≤ 760 px) nadpisuje src/styles/zal-telefon.css */
+/* reguły na każdej szerokości; telefon (≤ 1023 px) nadpisuje src/styles/zal-telefon.css */
 @media all {
   /* ---------- drugi ekran strony głównej ---------- */
   .z-druga { --marg: 48px; display: flex; flex-direction: column; min-height: calc(100svh - var(--gora) - 47px); padding: 22px var(--marg); font-size: 14.5px; line-height: 1.4; color: var(--text); }
@@ -143,27 +143,24 @@
 
 }
 
-/* ---------- telefon (≤ 760 px): drugi ekran strony głównej i Władze ---------- */
+/* ---------- telefon (≤ 1023 px): drugi ekran strony głównej i Władze ---------- */
 /* Powiększona aktualność na węższym oknie komputera: zdjęcie 3:2 na całą szerokość kolumny tekstu, nad etykietą */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-@media (min-width: 761px) and (min-height: 501px) and (max-width: 1179px), (min-width: 761px) and (pointer: fine) and (max-width: 1179px) {
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1179px), (min-width: 1024px) and (pointer: fine) and (max-width: 1179px) {
   .z-druga .z-w.wyr { grid-template-columns: 50px minmax(0, 1fr); }
   .z-druga .z-w.wyr .kiedy { grid-column: 1; grid-row: 1 / span 2; }
   .z-druga .z-w.wyr .min { grid-column: 2; grid-row: 1; width: 100%; height: auto; aspect-ratio: 3 / 2; margin-bottom: 8px; }
   .z-druga .z-w.wyr .tr { grid-column: 2; grid-row: 2; }
 }
 /* Studia: poniżej 1366 px pięć kierunków nie mieści się obok opisu (karta potrzebuje ok. 96 px, przy 1024 px miała 53 px i teksty
-   nachodziły na siebie): opis nad kierunkami, a przy wąskim pasku trzy kolumny. Warto wiedzieć: długie słowa nie mieściły się
+   nachodziły na siebie): opis nad kierunkami. Warto wiedzieć: długie słowa nie mieściły się
    w czterech kolumnach, więc dwie. Telefon ma własny układ (niżej). */
-@media (min-width: 761px) and (min-height: 501px) and (max-width: 1365px), (min-width: 761px) and (pointer: fine) and (max-width: 1365px) {
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1365px), (min-width: 1024px) and (pointer: fine) and (max-width: 1365px) {
   .z-studia { grid-template-columns: minmax(0, 1fr); gap: 12px 0; }
   .z-warto .rzad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (min-width: 761px) and (min-height: 501px) and (max-width: 959px), (min-width: 761px) and (pointer: fine) and (max-width: 959px) {
-  .z-kier { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 14px; }
-}
 /* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
-@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
   .z-wiecej .z-ile-t { display: none; }
 
@@ -193,7 +190,7 @@
   .z-kolumna[data-key="akt"] .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr) 78px; }
   .z-kolumna[data-key="akt"] .z-w.wyr .min { width: 78px; height: 59px; }
 }
-@media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
   /* ---------- drugi ekran: kolumny jedna pod drugą, po 3 pozycje i „Zobacz więcej” ---------- */
   .z-druga { display: block !important; min-height: 0; padding: 18px 16px 26px !important; font-size: 14.5px; line-height: 1.4; }
   body:has(.z-druga) .z-stopka { padding-inline: 16px !important; }
@@ -262,7 +259,7 @@ html.z-ciagnie .z-strzalka svg { animation: none; }
 /* okładka nie przewija się palcem (klasa z-prog ze skryptu — bez JS zwykłe przewijanie; także ekran dotykowy laptopa); szczypanie zostaje */
 html.z-prog:not(.bez-okladki) :is(.z-okladka, .hdr) { touch-action: pinch-zoom; }
 /* telefon: pod przyklejonym nagłówkiem (Naglowek.astro) */
-@media (hover: none) and (pointer: coarse) and (max-width: 760px), (hover: none) and (pointer: coarse) and (max-height: 500px) {
+@media (hover: none) and (pointer: coarse) and (max-width: 1023px), (hover: none) and (pointer: coarse) and (max-height: 500px) {
   html:has(.z-okladka) { scroll-padding-top: var(--hdr-h); }
 }
 

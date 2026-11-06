@@ -11,8 +11,8 @@
 // Karta (zlecenie 18, punkt 4; podgląd: wariant B „karta boczna”). Jedna wersja HTML:
 // - okno ≥ 1104 px: dwie kolumny, treść i przyklejona karta 360 px; sekcja wpisu ma display: contents, żeby karta mogła iść
 //   przez całą wysokość lewej kolumny, także obok Galerii i Załączników;
-// - okno 761–1103 px (lewa kolumna miałaby mniej niż 560 px): karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej;
-// - telefon (≤ 760 px): karta ma display: contents, czyli jedna kolumna: blok wydarzenia między liniami, pod nim zdjęcie;
+// - okno 1024–1103 px (lewa kolumna miałaby mniej niż 560 px): karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej;
+// - telefon (≤ 1023 px): karta ma display: contents, czyli jedna kolumna: blok wydarzenia między liniami, pod nim zdjęcie;
 //   „Nowszy / Starszy wpis” jeden pod drugim.
 // Wpis bez zdjęcia: karta z samym blokiem wydarzenia. Bez zdjęcia i bez wydarzenia: bez karty, prawa kolumna pusta.
 import Link from '../components/Link.astro';
@@ -157,9 +157,9 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   /* telefon: karta nie ma własnego pudełka, blok wydarzenia i zdjęcie stoją w toku tekstu */
   .akt-karta { display: contents; }
 
-  /* ---------- karta: komputer (≥ 761 px), zdjęcie nad blokiem wydarzenia ---------- */
+  /* ---------- karta: komputer (≥ 1024 px), zdjęcie nad blokiem wydarzenia ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .akt-karta { display: grid; gap: 14px; padding: 16px 16px 18px; border-radius: 5px; background: var(--surface); }
     .akt-karta .akt-fot { order: -1; max-width: none; margin: 0; }
     .akt-karta .akt-fot :global(img) { max-width: min(100%, var(--szer-pliku, 100%)); border-radius: 3px; }
@@ -172,8 +172,8 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
     .akt-karta .akt-wyd .akt-stan { grid-column: 2; }
   }
 
-  /* ---------- okno 761–1103 px: karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej ---------- */
-  @media (min-width: 761px) and (min-height: 501px) and (max-width: 1103.98px), (min-width: 761px) and (pointer: fine) and (max-width: 1103.98px) {
+  /* ---------- okno 1024–1103 px: karta nad tekstem na całą szerokość, zdjęcie z lewej, szczegóły z prawej ---------- */
+  @media (min-width: 1024px) and (min-height: 501px) and (max-width: 1103.98px), (min-width: 1024px) and (pointer: fine) and (max-width: 1103.98px) {
     .akt-karta { grid-template-columns: 240px minmax(0, 1fr); column-gap: 20px; align-items: start; margin: 4px 0 24px; }
     .akt-karta:has(.akt-fot) .akt-wyd { padding-top: 0; border-top: 0; }
     .akt-karta:not(:has(.akt-fot)), .akt-karta:not(:has(.akt-wyd)) { grid-template-columns: minmax(0, 1fr); }
@@ -202,7 +202,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
   .akt-pn small { display: block; margin-bottom: 2px; font-family: var(--f-text); font-size: 13px; font-weight: 700; color: var(--d-a); }
   .akt-pn .akt-starszy { text-align: right; }
 
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .akt-wyd { grid-template-columns: 54px minmax(0, 1fr); gap: 6px 12px; }
     .akt-wyd-data { font-size: 28px; }
     .akt-wyd-data small { font-size: 12px; }

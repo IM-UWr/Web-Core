@@ -1,6 +1,6 @@
 /* ==========================================================================
    Przejścia między stronami i łagodne wejście treści (bez JavaScriptu).
-   Na całej stronie (telefon i komputer) — na próbę od 31.10.2026 (od 30.10.2026 było tylko na telefonie, ≤ 760 px).
+   Na całej stronie (telefon i komputer) — na próbę od 31.10.2026 (od 30.10.2026 było tylko na telefonie, ≤ 1023 px).
    1) Przejście między dokumentami (View Transitions API, Chrome/Edge 126+, Safari 18.2+):
       stara strona gaśnie, nowa się pojawia, nagłówek stoi w miejscu (osobna nazwa).
       Przeglądarki bez obsługi (Firefox) przechodzą zwyczajnie.

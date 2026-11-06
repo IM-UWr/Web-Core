@@ -5,8 +5,8 @@
 // referaty, wydarzenia — LiczbyBanera; zlecenie 01), bez spisu „Na tej stronie” (miesiące to grupy listy).
 // Widok „Nadchodzące” / „Archiwum” (w adresie #archiwum), filtr rodzaju (w adresie także ?rodzaj=…) i szukanie po tekście
 // pozycji działają razem. Pozycje po miesiącach: nagłówek miesiąca Brygadą, wiersze z cienkimi liniami i datą jak na
-// stronach działów (WierszWydarzenia.astro). Jedna wersja HTML: komputer (≥ 761 px) — przyklejony pasek: widok, rodzaje
-// i pole szukania w jednym wierszu (jak w Planie zajęć); telefon (≤ 760 px) — widok, rodzaje (lista wyboru) i pole
+// stronach działów (WierszWydarzenia.astro). Jedna wersja HTML: komputer (≥ 1024 px) — przyklejony pasek: widok, rodzaje
+// i pole szukania w jednym wierszu (jak w Planie zajęć); telefon (≤ 1023 px) — widok, rodzaje (lista wyboru) i pole
 // szukania jedno pod drugim, pasek nieprzyklejony. Bez JS: pasek schowany, widać oba widoki jeden pod drugim (z podpisami).
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -133,9 +133,9 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
     font-size: 23px; line-height: 1.4; color: var(--d-a); }
   .kal-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
 
-  /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
+  /* ---------- komputer (≥ 1024 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .kal-rodzaj-lista { display: none; }
     .kal-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
       background: var(--bg); border-bottom: 2px solid var(--rule); }
@@ -143,8 +143,8 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
     .kal-szukaj { flex: 1; min-width: 200px; font-size: 15px; padding: 8px 12px; }
   }
 
-  /* ---------- telefon (≤ 760 px): widok, rodzaje po trzy w rzędzie i pole szukania jedno pod drugim ---------- */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  /* ---------- telefon (≤ 1023 px): widok, rodzaje po trzy w rzędzie i pole szukania jedno pod drugim ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     .kal-narz button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
     .kal-widok, .kal-rodzaje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }

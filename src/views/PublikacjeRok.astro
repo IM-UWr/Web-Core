@@ -5,7 +5,7 @@
 // Praca: autorzy, tytuł Brygadą, opis, źródło z DOI i IF, uwagi; wiersze oddzielone cienką linią, numer przygaszony z lewej.
 // Baner: hasło (nauka.json: rocznik_haslo / _en), „Wykaz w PDF” i liczby (LiczbyBanera) — na każdej szerokości.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); własne style (na końcu pliku) dla listy
-// prac, przycisku PDF w banerze i nawigacji między latami. Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// prac, przycisku PDF w banerze i nawigacji między latami. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Podstrona from '../components/zal/Podstrona.astro';
 import Link from '../components/Link.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -110,9 +110,9 @@ const spis = zSpisem ? naglowki.map((n) => ({ id: n.slug, etykieta: n.text })) :
   .lata a.nowszy { text-align: right; }
   .lata small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
 
-  /* ---------- telefon (≤ 760 px) ---------- */
+  /* ---------- telefon (≤ 1023 px) ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .prace { padding-left: 2.6em; }
     .prace li { padding-left: 2px; font-size: 15px; }
     .prace .t { font-size: 17px; }

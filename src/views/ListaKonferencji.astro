@@ -7,7 +7,7 @@
 // początku dużą Brygadą w kolorze działu, pod nim „mie rrrr”, nad tytułem daty i miejsce.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // lata jako podsekcje h3, etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wiersza z datą.
-// Jedna wersja HTML: komputer (≥ 761 px; minione w dwóch kolumnach) i telefon (≤ 760 px, jedna kolumna).
+// Jedna wersja HTML: komputer (≥ 1024 px; minione w dwóch kolumnach) i telefon (≤ 1023 px, jedna kolumna).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -96,15 +96,15 @@ const spis = [
   /* rok (podsekcja): liczba konferencji małym krojem tekstu */
   h3 small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
 
-  /* ---------- komputer (≥ 761 px): minione w dwóch kolumnach ---------- */
+  /* ---------- komputer (≥ 1024 px): minione w dwóch kolumnach ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .wiersze.dwie { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
     .wiersze.dwie .wiersz h4 { font-size: 19px; }
   }
 
-  /* ---------- telefon (≤ 760 px): jedna kolumna, mniejszy dzień ---------- */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  /* ---------- telefon (≤ 1023 px): jedna kolumna, mniejszy dzień ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .wiersz .dz { font-size: 28px; }
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }

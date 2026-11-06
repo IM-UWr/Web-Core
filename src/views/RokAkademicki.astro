@@ -12,7 +12,7 @@
 // zwijany nad treścią), „Dziś” bez karty — kółko w kolorze dnia między cienkimi liniami, tabela terminów (table.tab),
 // listy z kreskami, pliki (ul.pliki), zakończone semestry jako pytanie rozwijane (.faq). Kalendarz miesięcy
 // (KoloryDniSemestr.astro) — wyróżniający blok strony, bez zaokrągleń. Baner bez zmian (hasło i trzy liczby semestru).
-// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Podstrona from '../components/zal/Podstrona.astro';
 import Link from '../components/Link.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -252,7 +252,7 @@ const ps = (id: string) => (panele ? { 'data-ps-dla': id, 'data-ps-aktywny': id 
   .kd-archiwum summary { min-height: 0; align-items: flex-start; font-weight: 400; }
 
   /* --- Rok w skrócie: terminy semestru jako tabela wzorca (etykieta w wierszu zamiast nagłówka kolumny) --- */
-  .kd-terminy { max-width: 760px; margin: 0 0 6px; }
+  .kd-terminy { max-width: var(--szer-akapitu); margin: 0 0 6px; }
   .kd-terminy th { width: 46%; padding: 11px 18px 11px 0; border-bottom: 1px solid var(--line); font-size: inherit; font-weight: 400; color: var(--ink); vertical-align: top; }
   .kd-terminy tr:first-child :is(th, td) { border-top: 1px solid var(--line); }
   .kd-terminy tr.wazne :is(th, td) { font-weight: 700; color: var(--ink); }
@@ -265,7 +265,7 @@ const ps = (id: string) => (panele ? { 'data-ps-dla': id, 'data-ps-aktywny': id 
   .kd-uwaga { font-style: italic; color: var(--muted); }
 
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .kd-dzis { align-items: flex-start; gap: 14px; margin-bottom: 28px; }
     .kd-kolko { width: 56px; height: 56px; font-size: 26px; }
     .kd-dzis:not([data-zamiana='']) > .kd-kolko { font-size: 19px; }

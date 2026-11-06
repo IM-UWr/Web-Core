@@ -5,7 +5,7 @@
 // kierownik, wykonawcy), „Strona projektu ↗” (główny przycisk-link), opis (jeśli jest) i inne projekty tego samego zakładu
 // (najwyżej 5, wiersze jak zakończone projekty w Projektach i grantach; link do wszystkich projektów zakładu).
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); bez spisu „Na tej stronie”
-// (jedna sekcja z nagłówkiem). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// (jedna sekcja z nagłówkiem). Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
@@ -123,9 +123,9 @@ const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kiero
   .klik:has(.t:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
   .wszystkie { margin: 16px 0 0; font-weight: 600; }
 
-  /* ---------- telefon (≤ 760 px) ---------- */
+  /* ---------- telefon (≤ 1023 px) ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .tags { margin-top: 12px; }
     .inne .t { font-size: 17px; }
   }

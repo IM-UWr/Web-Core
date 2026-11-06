@@ -5,7 +5,7 @@
 // obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wierszy z datą.
-// Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px).
+// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Podstrona from '../components/zal/Podstrona.astro';
 import Link from '../components/Link.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
@@ -78,9 +78,9 @@ const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-d
   .klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
   .archiwum { margin: 22px 0 0; font-size: 15.5px; color: var(--muted); }
 
-  /* ---------- telefon (≤ 760 px): mniejszy dzień ---------- */
+  /* ---------- telefon (≤ 1023 px): mniejszy dzień ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (max-width: 760px), (max-height: 500px) and (pointer: coarse) {
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .wiersz .dz { font-size: 28px; }
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
