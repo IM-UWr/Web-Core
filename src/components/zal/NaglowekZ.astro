@@ -152,31 +152,29 @@ const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.l
   `if(document.prerendering)document.addEventListener('prerenderingchange',function(){var z2=czytaj(),u2;if(!z2)return;u2=uloz(z2[dz]||u);` +
   `if(zapisz(z2,u2)&&u2[st]!==u[st]){pokaz(u2[st]);dispatchEvent(new Event('resize'))}},{once:true});` +
   `if(document.prerendering||zapisz(z,u))pokaz(u[st])}}catch(e){}finally{n.classList.remove('z-ck-losuje')}})`;
-// Dopasowanie nagłówka (zlecenie 11, zalecenia 2 i 9), w linii na końcu nagłówka — zanim strona się narysuje, potem przy
+// Dopasowanie nagłówka (zlecenie 11, zalecenia 2 i 9; zlecenie 24, punkt 3), w linii na końcu nagłówka — zanim strona się narysuje, potem przy
 // zmianie rozmiaru okna i po wczytaniu krojów:
-// - granica z prawej: lewa krawędź ciekawostki (znak z opisem) albo notki o patronie; odstęp tytułu 40 px (zalecenie 9),
-//   rzędu liczb 20 px (zalecenie 2, zmiana 5.11, 11:30 z 40 px);
-// - tytuł podstrony najwyżej w dwóch liniach: jeśli zająłby więcej, stopień maleje co 4 px, najwyżej do 44 px; szerokość
-//   do granicy; przy dwóch liniach sygnet (z podpisem) podnosi się o pół linii — środek blisko środka dwóch linii tytułu;
-// - liczby zawsze w jednym rzędzie (CSS: zawijanie i wysokość jednego rzędu): szerokość rzędu do granicy, liczby
-//   z drugiego rzędu są niewidoczne w całości i dostają aria-hidden; pierwsza zostaje zawsze. Telefon: najwyżej trzy.
+// - granica z prawej: lewa krawędź ciekawostki (znak z opisem) albo notki o patronie, liczona z prostokątów linii tekstu (tekst jest wyrównany
+//   do prawej); odstęp tytułu i hasła 40 px (zalecenie 9), rzędu liczb 20 px (zalecenie 2, zmiana 5.11, 11:30 z 40 px);
+// - tytuł (podstrona i baner działu): szerokość do granicy, najwyżej dwie linie i bez wystawania jednego długiego słowa: stopień maleje
+//   co 4 px, najwyżej do 44 px; przy dwóch liniach na podstronie sygnet (z podpisem) podnosi się o pół linii — środek blisko środka dwóch linii tytułu;
+// - hasło: szerokość do granicy, zawija się;
+// - liczby zawsze w jednym rzędzie (CSS: zawijanie i wysokość jednego rzędu): szerokość rzędu do granicy, ale tylko tych prostokątów, które
+//   nachodzą na rząd w pionie; liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy.
 const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
-  `function dopasuj(){var tel=matchMedia('${MQ_TELEFON}').matches,h1=n.querySelector('h1'),ul=n.querySelector('.z-slot .pt-liczby'),g=n.querySelector('.z-tyt-g'),` +
-  `ty=n.querySelector('.z-tyt,.z-tytul'),nr=n.getBoundingClientRect(),gr=Infinity;` +
-  // granica z prawej: lewy brzeg tekstu ciekawostki (nie jej pudełka — tekst jest wyrównany do prawej) i znaku; w opisie
-  // znaku tylko linie tekstu (tytuł ciekawostki ma pudełko wysunięte o 160 px w lewo, zalecenie 19)
-  `n.querySelectorAll('.z-ciek,.z-ciek-opis,.z-znak,.z-znak-opis,.z-patron').forEach(function(e){var rs,g,w,t;` +
-  `if(e instanceof SVGElement||!e.textContent.trim())rs=[e.getBoundingClientRect()];` +
-  `else if(e.classList.contains('z-znak-opis')){rs=[];w=document.createTreeWalker(e,4);while(t=w.nextNode()){g=document.createRange();g.selectNodeContents(t);rs.push.apply(rs,[].slice.call(g.getClientRects()))}}` +
-  `else{g=document.createRange();g.selectNodeContents(e);rs=g.getClientRects()}` +
-  `for(var i=0;i<rs.length;i++)if(rs[i].width&&rs[i].height)gr=Math.min(gr,rs[i].left)});` +
-  `var gl=gr===Infinity?nr.right-(ty?ty.getBoundingClientRect().left-nr.left:64):gr-20;gr=gr===Infinity?gl:gr-40;` +
-  `if(h1&&n.classList.contains('z-nagl-pod')){h1.style.fontSize='';h1.style.maxWidth='';var lin=1;` +
-  `if(!tel){h1.style.maxWidth=Math.max(240,gr-h1.getBoundingClientRect().left)+'px';var fs=px(getComputedStyle(h1).fontSize),lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh);` +
-  `while(lin>2&&fs>44){fs=Math.max(44,fs-4);h1.style.fontSize=fs+'px';lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh)}` +
+  // prostokąty linii tekstu elementu (nie jego pudełka; tytuł ciekawostki ma pudełko wysunięte o 160 px w lewo, zalecenie 19)
+  `function linie(e){var w=document.createTreeWalker(e,4),t,g,rs=[];while(t=w.nextNode())if(t.nodeValue.trim()){g=document.createRange();g.selectNodeContents(t);rs.push.apply(rs,[].slice.call(g.getClientRects()))}return rs.filter(function(r){return r.width&&r.height})}` +
+  `function dopasuj(){var tel=matchMedia('${MQ_TELEFON}').matches,h1=n.querySelector('h1'),ul=n.querySelector('.z-slot .pt-liczby'),g=n.querySelector('.z-tyt-g'),hs=n.querySelector('.z-haslo'),` +
+  `ty=n.querySelector('.z-tyt,.z-tytul'),nr=n.getBoundingClientRect(),pola=[],gk=nr.right-(ty?ty.getBoundingClientRect().left-nr.left:64),gr=Infinity;` +
+  `n.querySelectorAll('.z-znak,.z-znak-opis,.z-patron').forEach(function(e){if(e instanceof SVGElement){var r=e.getBoundingClientRect();if(r.width&&r.height)pola.push(r)}else pola.push.apply(pola,linie(e))});` +
+  `pola.forEach(function(r){gr=Math.min(gr,r.left)});var gt=gr===Infinity?gk:gr-40;` +
+  `if(h1){h1.style.fontSize='';h1.style.maxWidth='';var lin=1;` +
+  `if(!tel){h1.style.maxWidth=Math.max(0,gt-h1.getBoundingClientRect().left)+'px';var fs=px(getComputedStyle(h1).fontSize),lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh);` +
+  `while((lin>2||h1.scrollWidth>h1.clientWidth)&&fs>44){fs=Math.max(44,fs-4);h1.style.fontSize=fs+'px';lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh)}` +
   `if(g)g.style.setProperty('--syg-podnies',Math.max(0,lin-1)*lh/2+'px')}else if(g)g.style.removeProperty('--syg-podnies');` +
   `n.classList.toggle('z-tyt-dlugi',lin>1)}` +
-  `if(ul){ul.style.maxWidth='';if(!tel)ul.style.maxWidth=Math.max(0,gl-ul.getBoundingClientRect().left)+'px';var li=ul.children,t0=li.length?li[0].offsetTop:0;` +
+  `if(hs){hs.style.maxWidth='';if(!tel)hs.style.maxWidth=Math.max(0,gt-hs.getBoundingClientRect().left)+'px'}` +
+  `if(ul){ul.style.maxWidth='';if(!tel){var ur=ul.getBoundingClientRect(),gl=gk;pola.forEach(function(r){if(r.top<ur.bottom&&ur.top<r.bottom)gl=Math.min(gl,r.left-20)});ul.style.maxWidth=Math.max(0,gl-ur.left)+'px'}var li=ul.children,t0=li.length?li[0].offsetTop:0;` +
   `for(var i=0;i<li.length;i++){if(tel?i>2:li[i].offsetTop>t0+4)li[i].setAttribute('aria-hidden','true');else li[i].removeAttribute('aria-hidden')}}}` +
   `dopasuj();var cz;addEventListener('resize',function(){cancelAnimationFrame(cz);cz=requestAnimationFrame(dopasuj)});` +
   `if(document.fonts)document.fonts.ready.then(dopasuj)})(document.currentScript.parentElement);`;
@@ -200,7 +198,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
       <p class="tylko-telefon">{pole(P, 'fakt', lang)}</p>
     </div>
     <script is:inline set:html={STAN} />
-    {zLiczbami && <script is:inline set:html={DOPASUJ} />}
+    <script is:inline set:html={DOPASUJ} />
   </div>
 )}
 {rodzaj === 'podstrona' && (
