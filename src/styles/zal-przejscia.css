@@ -13,8 +13,10 @@
    Telefon bez zmian (nazwy tylko w @media (min-width: 761px)).
    ========================================================================== */
 @media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
-  /* pasek na górze strony stoi; na stronie głównej (pod okładką) nie ma nazwy, więc na stronie działu się pojawia */
-  .z-pasek:not(.z-pasek-jasny) { view-transition-name: z-pasek; }
+  /* pasek na górze strony stoi; na stronie głównej (pod okładką) nie ma nazwy, więc na stronie działu się pojawia.
+     Nazwa na treści paska, nie na całym pasku: warstwy z backdrop-filter w elemencie z nazwą nie widzą nic pod nim, więc rozmycie
+     nie działało (zlecenie 18, punkt 10). Tło paska przenika razem ze stroną. */
+  .z-pasek:not(.z-pasek-jasny) .z-pasek-in { view-transition-name: z-pasek; }
   /* zdjęcie banera NIE ma własnej nazwy: element z nazwą jest na czas przejścia wynoszony ponad całą stronę (bez gradientu,
      tekstu i mieszania kolorów), a potem gradient i notka wskakiwały skokiem. Zdjęcie przenika razem ze stroną. */
   /* twarz patrona: szkic na okładce, szkic w banerze działu, sygnet na podstronie — ta sama nazwa w obrębie działu */

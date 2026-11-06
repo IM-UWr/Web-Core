@@ -108,21 +108,34 @@
 
   /* ---------- pasek menu na banerze ---------- */
   .z-pasek { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: var(--gora); color: #fff;
-    --marg: max(64px, calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); border-bottom: 1px solid rgb(255 255 255 / .14); }
+    --marg: max(64px, calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); border-bottom: 1px solid rgb(255 255 255 / .14);
+    --pasek-krycie: 30%; }
   .z-pasek-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 100%; }
   /* strona bez banera (np. pojedyncza aktualność): pasek na granacie, w zwykłym układzie, przyklejony u góry */
   body:not(:has(.z-nagl, .z-okladka)) .z-pasek { position: sticky; top: 0; background: var(--granat); }
   /* przyklejony u góry (zlecenie 11, zalecenie 6): z JS stały nad banerem i treścią, kolor według tego, co pod nim
      (src/scripts/zal/pasek.ts). Bez JS zostaje na banerze (position: absolute), bo nie miałby kiedy zmienić koloru. */
   html.js body:has(.z-nagl) .z-pasek:not(.z-pasek-jasny) { position: fixed; }
-  /* Tło stanów to dwie warstwy pod treścią paska (::before ciemna, ::after jasna — każda z tłem, rozmyciem, cieniem i dolną
-     linią), które wchodzą i gasną przez opacity (zlecenie 13, punkt 8: dawniej przejście background-color i box-shadow
-     samego paska z backdrop-filter, czyli odmalowywanie rozmycia w każdej klatce). Ukryta warstwa ma visibility: hidden,
-     więc jej rozmycie nie jest liczone. */
+  /* Tło stanów to trzy warstwy pod treścią paska (.z-pasek-tlo na górze nad banerem, ::before po przewinięciu, ::after jasna;
+     każda z tłem, rozmyciem i dolną linią), które wchodzą i gasną przez opacity (zlecenie 13, punkt 8: dawniej przejście
+     background-color i box-shadow samego paska z backdrop-filter, czyli odmalowywanie rozmycia w każdej klatce). Ukryta warstwa ma
+     visibility: hidden, więc jej rozmycie nie jest liczone. */
+  /* na samej górze nad banerem (także bez JS; zlecenie 18, punkt 10): lekkie rozmycie, żeby napisy ze zdjęcia nie mieszały się z menu */
+  body:has(.z-nagl) .z-pasek:not(.z-pasek-jasny):not(.przewiniety) { border-bottom-color: transparent; }
+  .z-pasek-tlo { display: none; }
+  body:has(.z-nagl) .z-pasek-tlo { display: block; position: absolute; inset: 0 0 -1px; z-index: -1; pointer-events: none;
+    background: color-mix(in srgb, var(--granat) 30%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid rgb(255 255 255 / .16);
+    transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
+  html.js .z-pasek.przewiniety .z-pasek-tlo { opacity: 0; visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
   html.js .z-pasek:not(.z-pasek-jasny)::before, html.js .z-pasek:not(.z-pasek-jasny)::after { content: ''; position: absolute; inset: 0 0 -1px; z-index: -1;
     pointer-events: none; opacity: 0; visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
-  /* po przewinięciu nad banerem lub stopką: ciemne tło z mocnym rozmyciem, żeby tekst banera nie prześwitywał */
-  html.js .z-pasek::before { background: rgb(9 16 34 / .62); -webkit-backdrop-filter: blur(22px) saturate(1.3); backdrop-filter: blur(22px) saturate(1.3);
+  /* po przewinięciu nad banerem lub stopką: rozmycie z tym samym lekkim tłem co na górze, bez przyciemnienia (zlecenie 18, punkt 10).
+     Krycie tylko tak duże, żeby tekst menu miał kontrast 4,5:1 z najjaśniejszym miejscem pod paskiem (pomiary w RAPORT-ZLECENIE-18.md):
+     banery działów i ich podstron mają przy dolnej krawędzi jaśniejszy kolor, a zdjęcie Aktualności jasną podłogę */
+  body:has(.z-nagl:not(.z-nagl-pod)) .z-pasek { --pasek-krycie: 45%; }
+  body:has(.z-nagl-pod[data-dzial]) .z-pasek { --pasek-krycie: 40%; }
+  body:has(.z-foto-nat) .z-pasek { --pasek-krycie: 60%; }
+  html.js .z-pasek::before { background: color-mix(in srgb, var(--granat) var(--pasek-krycie), transparent); -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1);
     border-bottom: 1px solid rgb(255 255 255 / .1); box-shadow: 0 8px 24px rgb(0 0 0 / .18); }
   /* nad treścią: jasny — tło strony z lekką przezroczystością i rozmyciem, tekst i logo w kolorze tekstu, cienka linia u dołu */
   html.js .z-pasek::after { background: color-mix(in srgb, var(--bg) 95%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -135,7 +148,7 @@
   html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek::before { background: var(--granat); -webkit-backdrop-filter: none; backdrop-filter: none;
     border-bottom-color: rgb(255 255 255 / .14); box-shadow: none; }
   html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek:not(.jasny)::before { opacity: 1; visibility: visible; transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
-  @media (prefers-reduced-motion: reduce) { html.js .z-pasek, html.js .z-pasek::before, html.js .z-pasek::after { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { html.js .z-pasek, html.js .z-pasek::before, html.js .z-pasek::after, .z-pasek-tlo { transition: none !important; } }
   .z-marka { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
   /* najechanie: nazwa przygasa do koloru podpisu, bez podkreślenia (zlecenie 18, punkt 1); kolor na jasnym pasku niżej.
      color: inherit na linku, bo globalne a:hover dawało granat na granacie */

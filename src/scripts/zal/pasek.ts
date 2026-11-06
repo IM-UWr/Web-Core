@@ -1,8 +1,9 @@
 // Kolor przyklejonego paska menu (src/components/zal/PasekMenu.astro; zlecenie 11, zalecenie 6):
-// - na samej górze, nad banerem — przezroczysty (jak dotąd);
-// - po przewinięciu, dopóki pod paskiem jest baner — ciemny z mocnym rozmyciem (.przewiniety);
-// - nad treścią — jasny (.jasny); nad stopką — znowu ciemny.
-// Co jest pod paskiem, mówi IntersectionObserver: obszar obserwacji to pas okna o wysokości paska. Panel hamburgera
+// - na samej górze, nad banerem — lekkie rozmycie i lekkie tło granatu (bez klasy; także bez JS; zlecenie 18, punkt 10);
+// - po przewinięciu, dopóki pod paskiem jest baner — mocniejsze rozmycie z tym samym tłem, cień (.przewiniety);
+// - nad treścią — jasny (.jasny); nad stopką — znowu jak nad banerem. Strona bez banera: pełny granat zamiast rozmycia.
+// Co jest pod paskiem, mówi IntersectionObserver: obszar obserwacji to linia okna na dolnej krawędzi paska, bo prześwitujący pasek
+// może stać tylko nad samym banerem: gdy pod pasek wchodzi jasna treść, jest już jasny (zlecenie 18, punkt 10). Panel hamburgera
 // przy pasku dostaje ten sam kolor (.z-menu-jasny). Strona główna ma własny, zawsze jasny pasek — tu pomijany.
 const pasek = document.querySelector<HTMLElement>('[data-z-pasek]:not(.z-pasek-jasny)');
 
@@ -27,11 +28,11 @@ if (pasek) {
     pod.clear();
     const h = pasek.offsetHeight || 66;
     // stan od razu, z położenia (pierwsza odpowiedź obserwatora przychodzi dopiero po klatce — bez mignięcia jasnym)
-    [baner, stopka].forEach((el) => { if (!el) return; const r = el.getBoundingClientRect(); if (r.top < h && r.bottom > 0) pod.add(el); });
+    [baner, stopka].forEach((el) => { if (!el) return; const r = el.getBoundingClientRect(); if (r.top < h && r.bottom >= h) pod.add(el); });
     obs = new IntersectionObserver((wpisy) => {
       wpisy.forEach((w) => (w.isIntersecting ? pod.add(w.target) : pod.delete(w.target)));
       ustaw();
-    }, { rootMargin: `0px 0px ${-(Math.max(1, window.innerHeight - h))}px 0px`, threshold: 0 });
+    }, { rootMargin: `${-(h - 1)}px 0px ${-(Math.max(1, window.innerHeight - h))}px 0px`, threshold: 0 });
     [baner, stopka].forEach((el) => el && obs!.observe(el));
   };
 

@@ -35,6 +35,7 @@ const naAktualnosciach = bezJezyka === '/aktualnosci' || bezJezyka.startsWith('/
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
 <header class:list={['z-pasek', klasa]} data-z-pasek>
+  {!jasny && <span class="z-pasek-tlo" aria-hidden="true"></span>}
   <div class="z-pasek-in">
     <a class="z-marka" href={u(wJezyku('/', lang))}>
       <span class="z-logo" aria-hidden="true" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
