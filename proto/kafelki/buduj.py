@@ -15,6 +15,17 @@ for _, lista in D['G']['popularyzacja']:
 opisy.update({'Dla uczniów': 'kółka, obozy i konkursy', 'Dla nauczycieli': 'szkolenia', 'Dla wszystkich': 'wykłady popularnonaukowe'})
 grupy = dict(D['S'])
 grupy.update({'Dla kogo': 'uczniowie, nauczyciele, wszyscy', 'Partnerzy': 'fundacja, portal, PTM'})
+# decyzja 6.11, 10:51: Kierunki w jednej linii, bez studiów podyplomowych; krótkie opisy stron
+grupy['Kierunki'] = 'matematyka, SIAD, ISIM, doktorat'
+opisy.update({
+    'Matematyka': 'I i II stopień, pięć specjalności',
+    'SIAD': 'Sztuczna inteligencja w analizie danych',
+    'Studia podyplomowe': 'kwalifikacje do nauczania',
+    'Plan zajęć': 'przedmioty, terminy, sale',
+    'Rok akademicki': 'semestry, sesje, przerwy',
+    'Zajęcia i konsultacje': 'zapisy i dyżury',
+    'Procedura dyplomowania': 'praca, recenzje, obrona',
+})
 
 
 def js(o):
