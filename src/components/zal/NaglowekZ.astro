@@ -163,7 +163,7 @@ const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.l
 //   które nachodzą na rząd w pionie, od 1368 px wszystkie, razem z pudełkami akapitów notki, jak przed zleceniem 24 (nagłówek tam bez zmian, punkt 2); liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy. Pierwsza liczba
 //   nigdy ucięta: gdy nie mieści się w całości, znika cały rząd razem z kreską (zlecenie 24, punkt 4);
 // - bezpiecznik (zlecenie 24, punkt 4): gdy mimo tego tekst nagłówka dotyka opisu ciekawostki albo akapitu notki o patronie, hasło ma ponad dwie linie
-//   albo tytuł przy 44 px dalej się nie mieści, dodatek się chowa (symbol, imię i linia z latami zostają) i układ liczy się od nowa, już bez niego;
+//   albo tytuł przy 44 px dalej się nie mieści, albo sam dodatek schodzi poniżej nagłówka, dodatek się chowa (symbol, imię i linia z latami zostają) i układ liczy się od nowa, już bez niego;
 // - ciekawostka w widoku telefonu (zlecenie 24, punkt 5; CSS w zal-telefon.css, od 560 px): opis z lewej od symbolu zostaje tylko wtedy, gdy ma 16 px
 //   odstępu od tytułu, ścieżki, hasła i liczb i nie schodzi poniżej dolnego paddingu nagłówka. Bez JS schowany.
 const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
@@ -186,7 +186,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   `for(var i=0;i<li.length;i++){if(tel?i>2:li[i].offsetTop>t0+4)li[i].setAttribute('aria-hidden','true');else li[i].removeAttribute('aria-hidden')}}return zaDlugi}` +
   `if(dod)dod.classList.remove('z-brak-miejsca');var zaDlugi=uklad();` +
   `if(dod&&getComputedStyle(dod).display!=='none'){var rd=linie(dod),m=tel?16:0;` +
-  `if(zaDlugi||(tel&&dod.getBoundingClientRect().bottom>nr.bottom-px(getComputedStyle(n).paddingBottom))||teksty().some(function(t){return rd.some(function(r){return t.left<r.right+m&&r.left<t.right+m&&t.top<r.bottom&&r.top<t.bottom})})){dod.classList.add('z-brak-miejsca');uklad()}}}` +
+  `if(zaDlugi||(tel&&dod.getBoundingClientRect().bottom>nr.bottom-px(getComputedStyle(n).paddingBottom))||rd.some(function(r){return r.bottom>nr.bottom})||teksty().some(function(t){return rd.some(function(r){return t.left<r.right+m&&r.left<t.right+m&&t.top<r.bottom&&r.top<t.bottom})})){dod.classList.add('z-brak-miejsca');uklad()}}}` +
   `dopasuj();var cz;addEventListener('resize',function(){cancelAnimationFrame(cz);cz=requestAnimationFrame(dopasuj)});` +
   `if(document.fonts)document.fonts.ready.then(dopasuj)})(document.currentScript.parentElement);`;
 ---
