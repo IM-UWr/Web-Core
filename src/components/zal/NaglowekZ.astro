@@ -163,7 +163,9 @@ const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.l
 //   nachodzą na rząd w pionie; liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy. Pierwsza liczba
 //   nigdy ucięta: gdy nie mieści się w całości, znika cały rząd razem z kreską (zlecenie 24, punkt 4);
 // - bezpiecznik (zlecenie 24, punkt 4): gdy mimo tego tekst nagłówka dotyka opisu ciekawostki albo akapitu notki o patronie, hasło ma ponad dwie linie
-//   albo tytuł przy 44 px dalej się nie mieści, dodatek się chowa (symbol, imię i linia z latami zostają) i układ liczy się od nowa, już bez niego.
+//   albo tytuł przy 44 px dalej się nie mieści, dodatek się chowa (symbol, imię i linia z latami zostają) i układ liczy się od nowa, już bez niego;
+// - ciekawostka w widoku telefonu (zlecenie 24, punkt 5; CSS w zal-telefon.css, od 560 px): opis z lewej od symbolu zostaje tylko wtedy, gdy ma 16 px
+//   odstępu od tytułu, ścieżki, hasła i liczb i nie schodzi poniżej dolnego paddingu nagłówka. Bez JS schowany.
 const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   // prostokąty linii tekstu elementu (nie jego pudełka; tytuł ciekawostki ma pudełko wysunięte o 160 px w lewo, zalecenie 19)
   `function linie(e){var w=document.createTreeWalker(e,4),t,g,rs=[];while(t=w.nextNode())if(t.nodeValue.trim()){g=document.createRange();g.selectNodeContents(t);rs.push.apply(rs,[].slice.call(g.getClientRects()))}return rs.filter(function(r){return r.width&&r.height})}` +
@@ -183,8 +185,8 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   `if(ul.children.length&&ul.children[0].getBoundingClientRect().right>ul.getBoundingClientRect().right+.5)ul.classList.add('z-bez-liczb')}var li=ul.children,t0=li.length?li[0].offsetTop:0;` +
   `for(var i=0;i<li.length;i++){if(tel?i>2:li[i].offsetTop>t0+4)li[i].setAttribute('aria-hidden','true');else li[i].removeAttribute('aria-hidden')}}return zaDlugi}` +
   `if(dod)dod.classList.remove('z-brak-miejsca');var zaDlugi=uklad();` +
-  `if(dod&&!tel&&getComputedStyle(dod).display!=='none'){var rd=linie(dod);` +
-  `if(zaDlugi||teksty().some(function(t){return rd.some(function(r){return t.left<r.right&&r.left<t.right&&t.top<r.bottom&&r.top<t.bottom})})){dod.classList.add('z-brak-miejsca');uklad()}}}` +
+  `if(dod&&getComputedStyle(dod).display!=='none'){var rd=linie(dod),m=tel?16:0;` +
+  `if(zaDlugi||(tel&&dod.getBoundingClientRect().bottom>nr.bottom-px(getComputedStyle(n).paddingBottom))||teksty().some(function(t){return rd.some(function(r){return t.left<r.right+m&&r.left<t.right+m&&t.top<r.bottom&&r.top<t.bottom})})){dod.classList.add('z-brak-miejsca');uklad()}}}` +
   `dopasuj();var cz;addEventListener('resize',function(){cancelAnimationFrame(cz);cz=requestAnimationFrame(dopasuj)});` +
   `if(document.fonts)document.fonts.ready.then(dopasuj)})(document.currentScript.parentElement);`;
 ---

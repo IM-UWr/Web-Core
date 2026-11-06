@@ -235,8 +235,15 @@
   /* cały rysunek w banerze i na ekranie, także w niskim banerze (zlecenie 18, punkt 15), więc liczony od dolnej krawędzi paska */
   .z-nagl.z-nagl-pod .z-znak { position: absolute; right: 6px; top: calc(6px + var(--hdr-h)); width: 104px; height: min(130px, calc(100% - 12px - var(--hdr-h))); z-index: 0; opacity: .7; pointer-events: none; }
   .z-nagl.z-nagl-pod .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.3; stroke-linecap: round; }
-  /* ciekawostka (zalecenie 19): na telefonie sam rysunek, do końca losowania niewidoczny */
-  html.js .z-nagl.z-nagl-pod.z-ck-losuje .z-znak { visibility: hidden; }
+  /* ciekawostka (zalecenie 19): na wąskim telefonie sam rysunek, do końca losowania niewidoczny */
+  html.js .z-nagl.z-nagl-pod.z-ck-losuje :is(.z-znak, .z-znak-opis) { visibility: hidden; }
+  /* szersze okno widoku telefonu (zlecenie 24, punkt 5): opis z lewej od symbolu (104 + 6 px, 14 px odstępu), gdy jest miejsce; sprawdza to skrypt dopasowania w NaglowekZ.astro. Bez JS schowany */
+  @media (min-width: 560px) {
+    html.js .z-nagl.z-nagl-pod .z-znak-opis { display: block; position: absolute; z-index: 1; right: 124px; top: calc(var(--hdr-h) + 16px); width: min(290px, 40%); margin: 0; text-align: right;
+      font-size: 12.5px; line-height: 1.45; color: rgb(255 255 255 / .85); text-shadow: 0 1px 8px rgb(13 24 48 / .9); }
+    html.js .z-nagl.z-nagl-pod .z-znak-opis b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 14px; color: #fff; }
+    html.js .z-nagl.z-nagl-pod .z-znak-opis.z-brak-miejsca { display: none; }
+  }
   .z-nagl.z-nagl-pod .z-haslo { max-width: none; }
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .lead { margin: 8px 0 0; font-size: 14px; color: var(--na-ciemnym-2); }
   .z-nagl:is(.z-nagl-pod, .z-baner-dzialu) .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }
