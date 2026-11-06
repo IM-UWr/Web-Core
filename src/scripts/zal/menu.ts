@@ -2,7 +2,7 @@
 // Przycisk [data-z-menu-otworz] z aria-controls otwiera swój panel; krzyżyk, Esc i klik obok zamykają, fokus wraca na przycisk.
 // Fokus przenosimy z preventScroll: zwykłe focus() na wysuwającym się panelu przesuwało całą okładkę w bok (prototyp).
 // Skrypt wczytywany z okładki, paska i nagłówka telefonu: moduł wykonuje się raz, więc obsługa podpina się tylko raz.
-import { MQ_KOMPUTER } from '../../lib/media';
+import { MQ_KOMPUTER, MQ_TELEFON } from '../../lib/media';
 
 const przyciski = [...document.querySelectorAll<HTMLButtonElement>('[data-z-menu-otworz]')];
 const tlo = document.querySelector<HTMLElement>('[data-z-menu-tlo]');
@@ -46,16 +46,18 @@ panele.forEach((panel) => panel.addEventListener('click', (e) => {
   if (otw) ustawDzial(b, true);
 }));
 
-// Przy każdym otwarciu panel wraca do tego samego stanu: rozwinięty dział, w którym jesteś (poza działami wszystkie zwinięte;
-// section[data-biezacy] wyznacza PanelMenu.astro), panel od góry, a bieżący link w widocznej części. Przewija się sam panel, bez animacji.
+// Przy każdym otwarciu panel wraca do tego samego stanu, od góry. Telefon: wszystkie działy zwinięte, menu nie wskazuje, gdzie jesteś
+// (prośba właściciela, 6.11). Komputer: rozwinięty dział, w którym jesteś (poza działami wszystkie zwinięte; section[data-biezacy]
+// wyznacza PanelMenu.astro), a bieżący link w widocznej części. Przewija się sam panel, bez animacji.
 // Ten stan ustawia się bez animacji wysokości (.bez-animacji, zlecenie 20, punkt 1): pomiar bieżącego linku trafiłby w grupy jeszcze zwinięte.
 function stanPoczatkowy(panel: HTMLElement) {
   panel.classList.add('bez-animacji');
   requestAnimationFrame(() => panel.classList.remove('bez-animacji'));
   zwinWszystkie(panel);
+  panel.scrollTop = 0;
+  if (window.matchMedia(MQ_TELEFON).matches) return;
   const b = panel.querySelector<HTMLButtonElement>('section[data-biezacy] [data-z-menu-rozwin]');
   if (b) ustawDzial(b, true);
-  panel.scrollTop = 0;
   const link = panel.querySelector('[aria-current="page"]')?.getBoundingClientRect();
   const dol = panel.getBoundingClientRect().bottom;
   if (link && link.bottom > dol) panel.scrollTop = Math.ceil(link.bottom - dol + 24);

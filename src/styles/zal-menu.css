@@ -40,9 +40,13 @@
 .z-menu ul a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .z-menu ul a.zew::after { font-size: .85em; opacity: .7; }
 
-/* ---------- bieżąca strona: ta sama grubość co reszta, oznacza ją kolor działu; Aktualności bez koloru działu mają krótką kreskę (zlecenie 21, punkt 5) ---------- */
-.z-menu ul a[aria-current='page'], .z-menu section[data-dzial] h2 a[aria-current='page'] { color: var(--d-j); }
-.z-menu section.duza h2 a[aria-current='page']::after { content: ''; background: currentColor; }
+/* ---------- bieżąca strona: ta sama grubość co reszta, oznacza ją kolor działu; Aktualności bez koloru działu mają krótką kreskę (zlecenie 21, punkt 5).
+   Tylko komputer: na telefonie menu nie wskazuje, gdzie jesteś (prośba właściciela, 6.11). ---------- */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  .z-menu ul a[aria-current='page'], .z-menu section[data-dzial] h2 a[aria-current='page'] { color: var(--d-j); }
+  .z-menu section.duza h2 a[aria-current='page']::after { content: ''; background: currentColor; }
+}
 
 /* ---------- Aktualności i Rekrutacja: duże, z większym oddechem, wyrównane do tekstu działów (za sygnetem) ---------- */
 .z-menu section.duza { padding: 10px 0 10px 54px; }
@@ -54,7 +58,7 @@
 .z-menu section.duza h2 a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: 18px; opacity: .7; display: inline; width: auto; height: auto; margin: 0; background: none; }
 
 /* ---------- zwijane działy (zlecenie 14, zalecenie 24): przycisk ze strzałką z prawej przy nazwie działu (obraca się o 180°).
-   Bez JS grupy widoczne, przycisk schowany; zwijanie włącza skrypt (.zwijane). Panel otwiera się z rozwiniętym bieżącym działem. ---------- */
+   Bez JS grupy widoczne, przycisk schowany; zwijanie włącza skrypt (.zwijane). Na komputerze panel otwiera się z rozwiniętym bieżącym działem, na telefonie złożony. ---------- */
 .z-menu section[data-dzial] h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .z-menu-rozwin { display: none; flex: none; place-items: center; width: 30px; height: 30px; margin-top: -1px; padding: 0; border: 0; border-radius: 3px; background: none; color: #fff; cursor: pointer;
   transition: background-color var(--t-krotki) var(--rytm); }
@@ -67,7 +71,6 @@
 .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
 
 /* ---------- komputer ---------- */
-/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
 @media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
   .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 20px 28px 14px;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
@@ -175,7 +178,9 @@
 .z-menu-jasny h2 a::after { background: var(--d-a, var(--line)); }
 .z-menu-jasny ul a { color: var(--text); }
 .z-menu-jasny ul a:hover { color: var(--ink); }
-.z-menu-jasny ul a[aria-current='page'], .z-menu-jasny section[data-dzial] h2 a[aria-current='page'] { color: var(--d-a); }
+@media (min-width: 761px) and (min-height: 501px), (min-width: 761px) and (pointer: fine) {
+  .z-menu-jasny ul a[aria-current='page'], .z-menu-jasny section[data-dzial] h2 a[aria-current='page'] { color: var(--d-a); }
+}
 .z-menu-jasny section { border-bottom-color: var(--line); }
 .z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }
 .z-menu-jasny .z-menu-szukaj { border-color: var(--line); color: var(--muted); }

@@ -9,7 +9,8 @@
 // Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane). Przez .z-menu-grupy-w płynnie zmienia się
 // wysokość grup na komputerze (zlecenie 20, punkt 1).
 // Bieżąca strona (zlecenie 18, punkt 6): aria-current="page" na najdłuższym pasującym adresie, także dla podstron głębszych niż
-// pozycja menu; panel otwiera się z rozwiniętym działem tej strony (section[data-biezacy]), poza działami wszystkie zwinięte.
+// pozycja menu; na komputerze panel otwiera się z rozwiniętym działem tej strony (section[data-biezacy]), poza działami wszystkie zwinięte.
+// Na telefonie zawsze złożony i bez koloru bieżącej strony (prośba właściciela, 6.11); aria-current zostaje dla czytników ekranu.
 // SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
 import Szkic from './Szkic.astro';
 import Link from '../Link.astro';
