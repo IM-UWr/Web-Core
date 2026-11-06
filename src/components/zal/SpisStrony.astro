@@ -61,8 +61,13 @@ const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
     const zwolnij = () => { if (wybrana) { wybrana = undefined; zaplanuj(); } };
     ['wheel', 'touchstart', 'keydown'].forEach((t) => window.addEventListener(t, zwolnij, { passive: true }));
 
+    // spis dłuższy niż okno: zanikanie przy dolnej krawędzi pokazuje, że jest więcej (zlecenie 25, punkt 2.15)
+    const wiecej = () => spis.classList.toggle('z-spis-wiecej', spis.scrollHeight - spis.clientHeight - spis.scrollTop > 1);
+    spis.addEventListener('scroll', wiecej, { passive: true });
+
     const odswiez = () => {
       if (telefon.matches) return; // na telefonie spis jest schowany
+      wiecej();
       // pozycje, których sekcja jest schowana (filtr, inny semestr), znikają ze spisu
       pozycje.forEach((p) => { p.li.hidden = !widoczny(cel(p.a)); });
       const widoczne = pozycje.filter((p) => !p.li.hidden);
