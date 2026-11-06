@@ -172,6 +172,24 @@
 /* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
 @media (min-width: 761px) {
   .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
+
+  /* Kolumna Aktualności, zwarta (zlecenie 18, punkt 8, wariant A): więcej wpisów na ekranie. Wydarzenia i Seminaria bez zmian. Pierwszy wpis
+     wyróżniają tytuł Brygadą, zajawka w jednej linii i miniatura o 40% większa od zwykłych (obok tekstu od 1180 px, węziej nad tekstem) */
+  .z-kolumna[data-key="akt"] .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; padding: 6px 0; }
+  .z-kolumna[data-key="akt"] .z-w .kiedy b { font-size: 22px; }
+  .z-kolumna[data-key="akt"] .z-w .t { font-size: 14px; }
+  .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min { width: 56px; height: 42px; }
+  .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min.zastepcza svg { width: 31px; height: 37px; }
+  .z-kolumna[data-key="akt"] .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr); padding: 8px 0; }
+  .z-kolumna[data-key="akt"] .z-w.wyr .t { font-size: 18px; }
+  .z-kolumna[data-key="akt"] .z-w.wyr .zaj { position: relative; -webkit-line-clamp: 1; }
+  /* „… czytaj dalej” (wstawia src/scripts/zal/drugi-ekran.ts, gdy zajawka się nie mieści), na tle strony */
+  .z-w .dalej { position: absolute; right: 0; bottom: 0; padding-left: 26px; background: linear-gradient(to right, transparent, var(--bg) 22px); font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .z-druga a:hover .dalej { text-decoration: underline; text-underline-offset: 3px; }
+}
+@media (min-width: 1180px) {
+  .z-kolumna[data-key="akt"] .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr) 78px; }
+  .z-kolumna[data-key="akt"] .z-w.wyr .min { width: 78px; height: 59px; }
 }
 @media (max-width: 760px) {
   /* ---------- drugi ekran: kolumny jedna pod drugą, po 3 pozycje i „Zobacz więcej” ---------- */

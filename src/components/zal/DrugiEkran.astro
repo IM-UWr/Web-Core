@@ -5,9 +5,9 @@
 //   wysokość (tyle pozycji, ile się zmieści). „Zobacz więcej” płynnie zamienia klikniętą kolumnę z długą (FLIP 0,52 s,
 //   bez ruchu przy prefers-reduced-motion; fokus na nagłówek rozwiniętej kolumny) — src/scripts/zal/drugi-ekran.ts;
 // - jeden wzór daty we wszystkich kolumnach (dzień dużą Brygadą, pod nim „lis · pon.”); prelegent po tytule seminarium
-//   (półpauza, nazwisko kursywą Brygady, bez łamania, bez afiliacji); miniatury aktualności 72×54 (bez zdjęcia — sygnet działu);
-// - pierwszy wpis kolumny „Aktualności” zawsze powiększony (zlecenie 14, zalecenie 22; wzór: prototyp v92, .ok-w.wyr): zajmuje miejsce
-//   dwóch wierszy, tytuł Brygadą, zajawka, większe zdjęcie albo sygnet; bez znacznika i bez pola w CMS;
+//   (półpauza, nazwisko kursywą Brygady, bez łamania, bez afiliacji); miniatury aktualności 56×42 (bez zdjęcia — sygnet działu);
+// - pierwszy wpis kolumny „Aktualności” zawsze wyróżniony (zlecenie 14, zalecenie 22; kolumna zwarta: zlecenie 18, punkt 8): tytuł Brygadą
+//   18 px, zajawka w jednej linii z „… czytaj dalej”, gdy się nie mieści, zdjęcie albo sygnet 78×59; bez znacznika i bez pola w CMS;
 // - Studia: klikalne „Studiuj matematykę we Wrocławiu ↗” (strona rekrutacji), kierunki (SIAD jako skrót); Warto wiedzieć;
 // - pod spodem odchudzona stopka (StopkaZ w Baza.astro).
 // Telefon (≤ 760 px): kolumny jedna pod drugą, po 3 pozycje, „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
@@ -78,7 +78,7 @@ const seminaria: Wiersz[] = (await referatyWTygodniu(lang)).map((r) => ({
   tytul: r.tytul, polski: poPolskuNaEn(r.jezyk, lang), kto: r.prelegent, adres: r.href,
 }));
 
-// Aktualności: miniatura 72×54, bez zdjęcia — sygnet działu wpisu. Pierwszy wpis powiększony (data nieprzygaszona, zajawka)
+// Aktualności: miniatura 56×42, bez zdjęcia — sygnet działu wpisu. Pierwszy wpis wyróżniony (data nieprzygaszona, zajawka)
 const akt = await aktualnosciNaGlowna(12, lang);
 const aktualnosci: Wiersz[] = akt.map((p, i) => {
   const dz = dzialWpisu(p);
@@ -146,10 +146,10 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
       <Link href={href(k.adres)}><b>{k.tytul}</b>{k.opis && <small>{k.opis}</small>}</Link>
     ))}
   </nav>
-  <div class="z-siatka" data-z-siatka>
+  <div class="z-siatka" data-z-siatka data-dalej={T('… czytaj dalej', '… read more')}>
     {SLOTY.map((key, slot) => {
       const k = KOL[key];
-      // powiększony wpis liczy się za dwa: w krótkiej kolumnie obok niego jeszcze jeden zwykły wiersz
+      // wyróżniony wpis liczy się za dwa: w krótkiej kolumnie obok niego jeszcze jeden zwykły wiersz
       const ileWidac = (k.pozycje[0] as Wiersz | undefined)?.wyr ? 2 : 3;
       const wiersze = k.pozycje.map((o) => (
         <Link class:list={['z-w', o.minelo && 'minelo', o.wyr && 'wyr']} href={o.adres ? href(o.adres) : undefined} data-dzial={o.dzial}>
@@ -161,8 +161,8 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('(min-wid
           </span>
           {'min' in k && (o.min
             ? <span class="min">{o.wyr
-                ? <ZdjecieZ src={o.min} sizes={(p) => `(max-width: 760px) calc(100vw - 86px), (max-width: 1179px) 280px, ${Math.ceil(Math.max(168, 126 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
-                : <ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 72, 54])} />}</span>
+                ? <ZdjecieZ src={o.min} sizes={(p) => `(max-width: 760px) calc(100vw - 86px), (max-width: 1179px) 280px, ${Math.ceil(Math.max(78, 59 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
+                : <ZdjecieZ src={o.min} sizes={rozmiarPola(['(max-width: 760px)', 64, 48], [null, 56, 42])} />}</span>
             : <span class="min zastepcza">{o.dzial && <Szkic dzial={o.dzial} rodzaj="sygnet" />}</span>)}
         </Link>
       ));

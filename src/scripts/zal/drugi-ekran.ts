@@ -1,5 +1,6 @@
 // Drugi ekran strony głównej (src/components/zal/DrugiEkran.astro): trzy kolumny, z których jedna (slot 2) jest długa.
 // - Długa kolumna pokazuje tyle pozycji, ile się zmieści; pod nimi „i jeszcze N · Wszystkie … →” („N more · All … →”).
+// - Zajawka wyróżnionej aktualności: jedna linia, a gdy się nie mieści, „… czytaj dalej” (komputer; zlecenie 18, punkt 8).
 // - „Zobacz więcej” zamienia klikniętą krótką kolumnę z długą: płynne przejście FLIP (0,35 s — jeden rytm,
 //   zlecenie 13, punkt 9), kolejne pozycje rozwiniętej listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
 //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
@@ -25,6 +26,22 @@ function dopasujDluga() {
   });
   // data-wiecej: wzór z {n} („i jeszcze {n}”, po angielsku „{n} more” — liczba przed słowem)
   link.textContent = ukryte ? `${(link.dataset.wiecej || '{n}').replace('{n}', String(ukryte))} · ${link.dataset.wsz}` : link.dataset.wsz || '';
+}
+
+// dopisek bez znaczenia dla czytnika ekranu, bo klikalny jest cały wiersz; tolerancja 1 px na zaokrąglenie wysokości linii
+function dalej() {
+  if (!siatka) return;
+  siatka.querySelectorAll<HTMLElement>('.z-w.wyr .zaj').forEach((z) => {
+    const d = z.querySelector('.dalej');
+    const ucieta = !TELEFON.matches && z.scrollHeight > z.clientHeight + 1;
+    if (ucieta && !d) {
+      const s = document.createElement('span');
+      s.className = 'dalej';
+      s.setAttribute('aria-hidden', 'true');
+      s.textContent = siatka.dataset.dalej ?? '';
+      z.append(s);
+    } else if (!ucieta && d) d.remove();
+  });
 }
 
 function zamien(key: string) {
@@ -64,6 +81,7 @@ function zamien(key: string) {
 
 if (siatka) {
   siatka.querySelectorAll<HTMLButtonElement>('.z-wiecej').forEach((b) => b.addEventListener('click', () => zamien(b.dataset.key || '')));
-  new ResizeObserver(() => dopasujDluga()).observe(siatka);
-  document.fonts?.ready.then(dopasujDluga);
+  const dopasuj = () => { dopasujDluga(); dalej(); };
+  new ResizeObserver(dopasuj).observe(siatka);
+  document.fonts?.ready.then(dopasuj);
 }
