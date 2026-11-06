@@ -174,8 +174,11 @@ const spis = [
   .opis .prose > :global(:last-child) { margin-bottom: 0; }
   /* koordynatorzy, kontakt i zakład pod opisem: wzorzec .kontakty (src/styles/zal-tresc.css; na telefonie sam daje jedną kolumnę) */
   .prose + .sem-dane { margin-top: 18px; }
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    :global(.tresc) .kontakty.sem-dane { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  }
   .sem-dane b { margin: 2px 0 0; font-size: 19px; }
-  .sem-dane .wart { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.45; overflow-wrap: anywhere; }
+  .sem-dane .wart { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.45; }
   .ref { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
   .ref .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
   .ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
