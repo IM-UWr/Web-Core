@@ -79,6 +79,10 @@
 :root[data-theme="dark"] .z-dz-skrot { padding: 10px 20px 6px; background: var(--surface); }
 :root[data-theme="dark"] .z-dz-skrot dl > div:last-child { border-bottom: 0; }
 
+/* Jeden tekst naraz, także dla czytników ekranu (zlecenie 18, punkt 14) */
+@media (min-width: 761px) { .tylko-telefon { display: none !important; } }
+@media (max-width: 760px) { .tylko-komputer { display: none !important; } }
+
 /* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); nie zmniejszać na żadnej szerokości */
 .z-okl-marka > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
 

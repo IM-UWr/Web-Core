@@ -194,7 +194,9 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
     <div class="z-patron">
       <b>{P.patron}</b>
       <span>{`${P.lata} · ${patronDzialu} · ${salaNapis} ${P.sala}`}</span>
-      <p>{pole(P, 'notka', lang)}</p>
+      {/* telefon: krótki fakt w jednej linii zamiast notki (zlecenie 18, punkt 14) */}
+      <p class="tylko-komputer">{pole(P, 'notka', lang)}</p>
+      <p class="tylko-telefon">{pole(P, 'fakt', lang)}</p>
     </div>
     <script is:inline set:html={STAN} />
     {zLiczbami && <script is:inline set:html={DOPASUJ} />}
