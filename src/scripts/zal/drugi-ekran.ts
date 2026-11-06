@@ -4,11 +4,31 @@
 // - „Zobacz więcej” zamienia klikniętą krótką kolumnę z długą: płynne przejście FLIP (0,35 s — jeden rytm,
 //   zlecenie 13, punkt 9), kolejne pozycje rozwiniętej listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
 //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
+// - Wydarzenia, które już się skończyły, znikają od razu w przeglądarce (zlecenie 06, punkt 4).
+import { hasTime, now, today } from '../../lib/daty';
+
 const siatka = document.querySelector<HTMLElement>('[data-z-siatka]');
 // Telefon (≤ 760 px): na wąskim ekranie kolumny stoją jedna pod drugą, „Zobacz więcej” rozwija listę w miejscu
 const TELEFON = matchMedia('(max-width: 760px)');
 // jeden rytm ruchu (zlecenie 13, punkt 9; --rytm w global.css)
 const RYTM = 'cubic-bezier(.22, .8, .2, 1)';
+
+// Strona przebudowuje się 2× dziennie, więc po usunięciu zakończonych liczymy widok od nowa: CSS pokazuje pierwsze trzy
+// pozostałe, N w „Zobacz więcej (N)” jest aktualne, przy ≤ 3 nie ma przycisku, przy 0 pokazuje się komunikat.
+function schowajZakonczone() {
+  const kol = siatka?.querySelector<HTMLElement>('.z-kolumna[data-key="wyd"]');
+  if (!kol) return;
+  const n = now(), d = today();
+  kol.querySelectorAll<HTMLElement>('[data-koniec]').forEach((w) => {
+    const koniec = w.dataset.koniec || '';
+    if (koniec && (hasTime(koniec) ? koniec < n : koniec < d)) w.remove();
+  });
+  const zostalo = kol.querySelectorAll('.z-w').length;
+  const przycisk = kol.querySelector('.z-wiecej');
+  if (zostalo <= 3) przycisk?.remove();
+  else { const ile = przycisk?.querySelector('.z-ile'); if (ile) ile.textContent = String(zostalo - 3); }
+  if (!zostalo) kol.querySelector('.z-pusto')?.removeAttribute('hidden');
+}
 
 function dopasujDluga() {
   if (!siatka || !siatka.offsetHeight || TELEFON.matches) return;
@@ -80,6 +100,7 @@ function zamien(key: string) {
 }
 
 if (siatka) {
+  schowajZakonczone();
   siatka.querySelectorAll<HTMLButtonElement>('.z-wiecej').forEach((b) => b.addEventListener('click', () => zamien(b.dataset.key || '')));
   const dopasuj = () => { dopasujDluga(); dalej(); };
   new ResizeObserver(dopasuj).observe(siatka);
