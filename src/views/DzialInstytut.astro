@@ -11,7 +11,7 @@ import Szkic from '../components/zal/Szkic.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, bezSierotek } from '../lib/i18n';
-import { long, type Lang } from '../lib/daty';
+import { long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { slugOf } from '../lib/tresci';
 import { daneDzialuInstytut } from '../lib/widoki/dzialInstytut';
 
@@ -20,12 +20,12 @@ const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed } = await daneDzialuInstytut(lang);
-// zdjęcie karty sukcesu (pole 3 : 2, object-fit: cover): na komputerze trzy kolumny po ok. 390 px, na telefonie jedna kolumna;
-// zdjęcie szersze niż 3 : 2 wypełnia pole wysokością, więc potrzebna szerokość rośnie o p / 1,5 (zlecenie 13, punkt 6)
-const kartaSukcesu = (p: number) => {
-  const k = Math.max(1, p / 1.5);
-  return `(max-width: 760px) calc((100vw - 32px) * ${k.toFixed(3)}), ${Math.ceil(390 * k)}px`;
-};
+// zdjęcie sukcesu (object-fit: cover): na komputerze karta 3 : 2 w jednej z trzech kolumn po ok. 390 px; zdjęcie szersze niż 3 : 2
+// wypełnia pole wysokością, więc potrzebna szerokość rośnie o p / 1,5 (zlecenie 13, punkt 6). Na telefonie miniatura 54 × 54 px
+// jak w wierszu Aktualności: szerokość 54 px razy proporcje (zlecenie 21, punkt 4). Małe szerokości w srcset są dla telefonu,
+// szereg od 400 px taki sam jak dotąd, więc komputer pobiera te same pliki.
+const kartaSukcesu = (p: number) => `(max-width: 760px) ${Math.ceil(54 * Math.max(1, p))}px, ${Math.ceil(390 * Math.max(1, p / 1.5))}px`;
+const SZEROKOSCI_SUKCESU = [54, 72, 81, 108, 120, 144, 162, 216, 240, 360, 400, 640, 960, 1280, 1600, 1920, 2560, 3200];
 ---
 <Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
@@ -45,11 +45,16 @@ const kartaSukcesu = (p: number) => {
             return (
               <article class="z-dz-klik">
                 <div class="z-dz-fot">
-                  {a.data.zdjecie ? <ZdjecieZ src={a.data.zdjecie} sizes={kartaSukcesu} /> : <Szkic dzial="instytut" rodzaj="sygnet" />}
+                  {a.data.zdjecie ? <ZdjecieZ src={a.data.zdjecie} sizes={kartaSukcesu} szerokosci={SZEROKOSCI_SUKCESU} /> : <Szkic dzial="instytut" rodzaj="sygnet" />}
                 </div>
-                <time datetime={a.data.data.slice(0, 10)}>{long(a.data.data, lang, false)}</time>
-                <h3><a href={href(`/aktualnosci/${slugOf(a.id)}`)}>{(lang === 'en' && a.data.tytul_en) || a.data.tytul}</a></h3>
-                {zajawka && <p>{zajawka}</p>}
+                <time datetime={a.data.data.slice(0, 10)}>
+                  <span class="z-dz-suk-dl">{long(a.data.data, lang, false)}</span>
+                  <span class="z-dz-suk-kr">{dayNum(a.data.data)}<small>{monthShort(a.data.data, lang)} {parse(a.data.data).y}</small></span>
+                </time>
+                <div class="z-dz-suk-tr">
+                  <h3><a href={href(`/aktualnosci/${slugOf(a.id)}`)}>{(lang === 'en' && a.data.tytul_en) || a.data.tytul}</a></h3>
+                  {zajawka && <p>{zajawka}</p>}
+                </div>
               </article>
             );
           })}
