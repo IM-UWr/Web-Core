@@ -18,6 +18,7 @@
      Linki się nie łamią w środku — za długi wiersz zawija się pod sobą. Na Studiach z prawej przycisk rekrutacji (zalecenie 13):
      stoi obok wszystkich wierszy, pionowo na środku; najdłuższy wiersz może się wtedy złamać na dwie linie (zamierzone). */
   .z-dz-pas { padding: 12px var(--marg); background: var(--d-t); }
+  .z-dz-karty { display: none; } /* tylko telefon z JS (koniec pliku) */
   .z-dz-pas:has(.z-dz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 36px; }
   .z-dz-rzad { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 8px 0; }
   .z-dz-rzad + .z-dz-rzad { border-top: 1px solid color-mix(in srgb, var(--d-a) 20%, transparent); }
@@ -150,7 +151,30 @@
   .z-dz .z-dz-rzad h3 { margin-bottom: 2px; font-size: 13px; }
   .z-dz .z-dz-rzad ul { gap: 2px 18px; }
   .z-dz .z-dz-rzad a { font-size: 19px; }
-  .z-dz .z-dz-rekr { display: inline-flex; margin-top: 10px; padding: 12px 18px; font-size: 20px; }
+  .z-dz .z-dz-rekr { display: none; }
+  /* pas działu z JS: karty grup, niżej strony wybranej grupy (zlecenie 18, punkt 16, wariant I) */
+  html.js .z-dz .z-dz-pas { padding: 16px 16px 0; background: none; }
+  html.js .z-dz-karty { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; }
+  .z-dz-karta { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; min-height: 76px; padding: 10px 10px 9px;
+    border: 0; border-radius: 5px; background: var(--d-t); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+  /* krój bez zmian; przy trzech kartach na wąskim ekranie „Organizacja” i „Programmes” nie mieszczą się w linii: przenosimy, nigdy poza kartę */
+  .z-dz-karta b { font-family: var(--f-display); font-weight: 500; font-size: 16px; line-height: 1.15; -webkit-hyphens: auto; hyphens: auto; overflow-wrap: anywhere; }
+  .z-dz-karta small { font-size: 12px; font-weight: 600; color: var(--d-a); }
+  .z-dz-karta[aria-expanded="true"] { background: var(--d-a); color: var(--bg); }
+  .z-dz-karta[aria-expanded="true"] small { color: inherit; opacity: .85; }
+  .z-dz-karta[aria-expanded="true"]::after { content: ''; position: absolute; left: 18px; bottom: -7px; width: 14px; height: 14px; background: var(--d-a); transform: rotate(45deg); }
+  .z-dz-karta:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  @media (prefers-reduced-motion: no-preference) { .z-dz-karta:active { transform: translateY(1px); } }
+  html.js .z-dz .z-dz-rzad { display: none; margin-top: 12px; padding: 6px 12px; border: 0; border-radius: 5px; background: var(--d-t); }
+  html.js .z-dz .z-dz-rzad.z-otwarta { display: block; }
+  html.js .z-dz .z-dz-rzad h3 { display: none; }
+  html.js .z-dz .z-dz-rzad ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+  /* podświetlenie po dotknięciu na ::before: wysunięte o połowę odstępu między kolumnami, nie nachodzi na sąsiada, a tekst bez ujemnych marginesów */
+  html.js .z-dz .z-dz-rzad a { position: relative; z-index: 0; display: flex; align-items: center; min-height: 44px; margin: 0; padding: 4px 0; font-size: 16px; line-height: 1.2; }
+  html.js .z-dz .z-dz-rzad a:is(:hover, :active, :focus-visible) { background: none; }
+  html.js .z-dz .z-dz-rzad a::before { content: ''; position: absolute; inset: 2px -6px; z-index: -1; border-radius: 5px; transition: background-color var(--t-krotki) var(--rytm); }
+  html.js .z-dz .z-dz-rzad a:is(:hover, :active, :focus-visible)::before { background-color: color-mix(in srgb, var(--d-a) 14%, var(--d-t)); }
+  :root[data-theme="dark"] .z-dz .z-dz-rzad a:is(:hover, :active, :focus-visible)::before { background-color: color-mix(in oklab, var(--d-j) 5%, #18243b); }
   .z-dz .z-dz-pas + .z-dz-tresc { padding-top: 22px; }
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
   .z-dz .z-dz-tresc h2 { font-size: 28px; }

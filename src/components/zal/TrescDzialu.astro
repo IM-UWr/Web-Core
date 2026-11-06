@@ -7,6 +7,8 @@
 // z „W skrócie” (wartości Brygadą w kolorze działu, pierwszy akapit większy) i sekcje działu (slot; src/components/zal/dzial/).
 // Wstawiany na końcu <main> (za dotychczasową treścią, która na komputerze znika — src/styles/zal-dzialy.css).
 // Jedna wersja na każdą szerokość; telefon (≤ 760 px) — jedna kolumna (koniec zal-dzialy.css). Lista podstron poza indeksem wyszukiwarki.
+// Telefon (zlecenie 18, punkt 16, wariant I): w pasie po jednej karcie na grupę, naciśnięcie pokazuje niżej strony tej grupy, bez przycisku
+// Rekrutacji (jest w menu). Bez JS karty schowane i wszystkie grupy z nagłówkami widoczne, jak na komputerze jedna pod drugą.
 import Link from '../Link.astro';
 import '../../styles/zal-dzialy.css';
 import { u, isExternal } from '../../lib/url';
@@ -38,14 +40,25 @@ const rokRek = rokRekrutacji();
 const DOPISEK_RE = /\s*\(in Polish\)\s*$/;
 const rekPoPolsku = !!rek && DOPISEK_RE.test(rek.etykieta);
 const etykietaRek = rek?.etykieta.replace(DOPISEK_RE, '');
+const ileStron = (n: number) => en
+  ? `${n} ${n === 1 ? 'page' : 'pages'}`
+  : `${n} ${n === 1 ? 'strona' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'strony' : 'stron'}`;
 ---
 <div class="z-dz" data-dzial={dzial}>
   {zGrupami.length > 0 && (
     <nav class="z-dz-pas" aria-labelledby="z-dz-pod-h" data-pagefind-ignore>
       <h2 class="sr-only" id="z-dz-pod-h">{en ? 'In this section' : 'W tym dziale'}</h2>
+      <div class="z-dz-karty" style={`--n:${zGrupami.length}`} data-z-dz-karty>
+        {zGrupami.map((g, i) => (
+          <button type="button" class="z-dz-karta" aria-expanded="false" aria-controls={`z-dz-gr-${i}`}>
+            <b>{wybierz(g, 'nazwa', lang)}</b>
+            <small>{ileStron(g.linki.length)}</small>
+          </button>
+        ))}
+      </div>
       <div class="z-dz-rzedy">
-        {zGrupami.map((g) => (
-          <section class="z-dz-rzad">
+        {zGrupami.map((g, i) => (
+          <section class="z-dz-rzad" id={`z-dz-gr-${i}`}>
             <h3>{wybierz(g, 'nazwa', lang)}</h3>
             <ul>
               {g.linki.map((l) => {
@@ -86,3 +99,18 @@ const etykietaRek = rek?.etykieta.replace(DOPISEK_RE, '');
 
   <slot />
 </div>
+
+<script>
+  // Telefon: karty grup w pasie działu. Otwarta jedna grupa naraz, ponowne naciśnięcie zamyka.
+  document.querySelectorAll('[data-z-dz-karty]').forEach((pas) => {
+    const karty = [...pas.querySelectorAll('button')];
+    karty.forEach((b) => b.addEventListener('click', () => {
+      const otworz = b.getAttribute('aria-expanded') !== 'true';
+      karty.forEach((k) => {
+        const ta = k === b && otworz;
+        k.setAttribute('aria-expanded', String(ta));
+        document.getElementById(k.getAttribute('aria-controls') ?? '')?.classList.toggle('z-otwarta', ta);
+      });
+    }));
+  });
+</script>
