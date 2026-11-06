@@ -134,7 +134,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
     <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
     {/* komputer: pasek menu na banerze (strona główna ma go pod okładką); telefon: nagłówek (Naglowek.astro). Panel menu jest jeden, przy pasku (PanelMenu.astro) */}
     {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} />}
-    <Naglowek lang={lang} sciezka={sciezka} inny={inny} idPanelu={stronaGlowna ? 'z-menu-druga' : 'z-menu-pasek'} />
+    <Naglowek lang={lang} sciezka={sciezka} inny={inny} idPanelu={stronaGlowna ? 'z-menu-druga' : 'z-menu-pasek'} naOkladce={stronaGlowna} />
     {!opublikowany && (
       <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>
     )}

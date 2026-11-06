@@ -34,6 +34,19 @@
   .hdr .brand-logo { background: #fff !important; }
   .hdr .icon-btn { color: #fff !important; background: transparent; }
   .hdr .icon-btn.burger { background: rgb(255 255 255 / .14) !important; color: #fff !important; }
+  /* strona główna: Wydział albo Instytut w tym samym miejscu, widoczny jeden; ukryty bez fokusu i poza czytnikami (zlecenie 18, punkt 12) */
+  .brand-okladka { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+  .hdr-row:has(.brand-okladka) { gap: 6px; }
+  /* najwyżej trzy linie, krój bez zmian: „Faculty of Mathematics” mieści się w linii dopiero przy 390 px (przy 360–380 dzięki mniejszym przyciskom),
+     więc angielska nazwa łamie się tu sama; przy 320 px „Computer Science” wymaga jeszcze węższych marginesów paska */
+  @media (max-width: 389px) { .z-wydzial-nazwa:lang(en) br { display: none; } }
+  @media (max-width: 330px) { .hdr-row:has(.brand-okladka) { padding-inline: 12px; } .brand-okladka { gap: 8px; } }
+  /* po zjechaniu: pełna nazwa wydziału po angielsku nie mieści się obok przycisków */
+  @media (max-width: 500px) { .brand-okladka .brand-sub:lang(en) { display: none; } }
+  .brand-okladka > .brand-txt { grid-area: 1 / 2; transition: opacity var(--t-krotki) var(--rytm), visibility var(--t-krotki); }
+  .brand-okladka > .brand-txt:not(.z-wydzial), .hdr.po-okladce .z-wydzial { opacity: 0; visibility: hidden; }
+  .hdr.po-okladce .brand-okladka > .brand-txt:not(.z-wydzial) { opacity: 1; visibility: visible; }
+  @media (prefers-reduced-motion: reduce) { .brand-okladka > .brand-txt { transition: none; } }
   /* przełącznik języka: flaga języka docelowego i skrót, w miejscu dawnej lupy (zlecenie 18, punkt 6) */
   .hdr .icon-btn.z-jezyk { width: auto; min-width: 44px; padding: 0 4px; gap: 5px; border-radius: 6px; font-size: 13.5px; font-weight: 600; }
   .hdr .z-flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-shadow: 0 0 0 1px rgb(0 0 0 / .12); }
@@ -78,10 +91,10 @@
     padding: 0 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
   .z-okl-foto { position: absolute; inset: 0 0 auto 0; width: 100%; height: 52%; object-fit: cover; object-position: 62% 50%; z-index: -2; }
   .z-okladka::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: linear-gradient(180deg, rgb(9 16 34 / .1) 0, rgb(9 16 34 / .35) 26%, var(--granat) 50%, var(--granat) 100%); }
+    background: linear-gradient(180deg, rgb(9 16 34 / .1) 0, rgb(9 16 34 / .35) 26%, var(--granat) 50%, var(--granat) 100%); transform: translateY(-14px); }
   /* logo i wydział z górnej linii okładki są na telefonie w nagłówku (Naglowek.astro); panel menu: ten przy pasku drugiego ekranu */
   .z-skos, .z-narz, .z-okladka .z-menu, .z-okl-marka, .z-barwa, .z-okl-liczby { display: none !important; }
-  .z-okl-tytul { position: relative; margin: 0 0 14px; }
+  .z-okl-tytul { position: relative; margin: 0 0 28px; }
   .z-okl-flaga { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 5px 10px; border-radius: 6px; background: rgb(9 16 34 / .6);
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 12.5px; font-weight: 600; color: #fff; text-decoration: none; }
   .z-okl-flaga::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--studia-j); }

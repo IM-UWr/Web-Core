@@ -22,7 +22,7 @@ import dzPopularyzacja from '../../data/popularyzacja.json';
 import { menuGlowne } from '../../lib/menu';
 import { liczbyNaOkladke } from '../../lib/tresci';
 import { u, isExternal } from '../../lib/url';
-import { t, wJezyku, wybierz } from '../../lib/i18n';
+import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
@@ -45,10 +45,8 @@ const dzialy = DZIALY.map((dz) => {
 const baner = ustawienia.baner;
 const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');
 // górna linia: logo UWr i nazwa wydziału w dwóch liniach („Wydział Matematyki / i Informatyki”), link do strony wydziału
-const wydzial = t(lang, 'wydzial');
-const podzial = wydzial.search(/ (i|and) /);
-const [wydz1, wydz2] = podzial > 0 ? [wydzial.slice(0, podzial), wydzial.slice(podzial + 1)] : [wydzial, ''];
-const wmiAdres = 'https://wmi.uwr.edu.pl/';
+const [wydz1, wydz2] = wydzialLinie(lang);
+const wmiAdres = WMI_ADRES;
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
 // liczby nad „Szybkim dostępem” (zalecenie 15): pozycja z zerem znika; odmiana jak w prototypie (1 / 2–4 / 5+, bez 12–14)
 const odm = (n: number, f: [string, string, string]) => (n === 1 ? f[0] : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? f[1] : f[2]);

@@ -2,15 +2,18 @@
 // Nagłówek na telefon (≤ 760 px; na komputerze schowany — tam jest pasek menu zal/PasekMenu.astro): logo, nazwa, przełącznik
 // języka z flagą języka docelowego, tryb ciemny i hamburger. Menu to ten sam panel co na komputerze (zal/PanelMenu.astro,
 // zlecenie 18, punkt 6); renderuje go PasekMenu, id przychodzi z Baza.astro, otwiera src/scripts/zal/menu.ts.
+// Strona główna: na okładce zamiast nazwy Instytutu nazwa Wydziału (link na jego stronę), krojem z okładki komputera; po zjechaniu
+// z okładki znów Instytut (zlecenie 18, punkt 12). Dwa linki w jednym miejscu, widoczny jeden (zal-telefon.css); bez JS zostaje Wydział.
 import Ikona from './Ikona.astro';
 import Flaga from './zal/Flaga.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
+import { t, wJezyku, wydzialLinie, WMI_ADRES } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
-interface Props { lang: Lang; sciezka: string; inny: string | null; idPanelu: string }
-const { lang, inny, idPanelu } = Astro.props;
+interface Props { lang: Lang; sciezka: string; inny: string | null; idPanelu: string; naOkladce?: boolean }
+const { lang, inny, idPanelu, naOkladce = false } = Astro.props;
+const [wydz1, wydz2] = wydzialLinie(lang);
 const logo = (ustawienia as any).logo as string | undefined;
 // logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
 const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
@@ -18,12 +21,19 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
 <header class="hdr">
   <div class="wrap hdr-row">
-    <div class="brand">
+    <div class:list={['brand', { 'brand-okladka': naOkladce }]}>
       <a class:list={['brand-uwr', { 'brand-uwr-logo': !logo }]} href={uwrAdres} aria-label={t(lang, 'uwrStronaGlowna')}>
         {logo
           ? <img src={u(logo)} alt="" width="44" height="44" />
           : <span class="brand-logo" aria-hidden="true" style={`--logo-pelne:url(${u('/pliki/uwr-logo.png')});--logo-godlo:url(${u('/pliki/uwr-godlo.png')})`}></span>}
       </a>
+      {naOkladce && (
+        <a class="brand-txt z-wydzial" href={WMI_ADRES}>
+          {/* jak znak wydziału na okładce komputera: bez widocznej ↗ (wyjątek z zalecenia 23), dopisek tylko dla czytników ekranu */}
+          <span class="sr-only">{lang === 'en' ? '(external site) ' : '(inna strona) '}</span>
+          <span class="z-wydzial-nazwa">{wydz1}{wydz2 && <>{' '}<br />{wydz2}</>}</span>
+        </a>
+      )}
       <a class="brand-txt" href={u(wJezyku('/', lang))}>
         <span class="brand-name">{t(lang, 'instytut')}</span>
         <span class="brand-sub">{t(lang, 'wydzial')}</span>
@@ -59,4 +69,16 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
       try { localStorage.setItem('motyw', nowy); } catch (e) {}
     })
   );
+
+  // Strona główna: Wydział w pasku, dopóki tytuł okładki nie schowa się pod paskiem (61 px, --hdr-h w telefon.css). Obserwator liczy
+  // stan od razu, więc także przy wejściu w środku strony; po powrocie z pamięci przeglądarki liczy go od nowa.
+  const hdr = document.querySelector('.hdr');
+  const tytul = document.querySelector('.z-okl-tytul');
+  if (hdr?.querySelector('.brand-okladka') && tytul) {
+    const obs = new IntersectionObserver(([w]) => {
+      hdr.classList.toggle('po-okladce', !w.isIntersecting && w.boundingClientRect.bottom <= 61);
+    }, { rootMargin: '-61px 0px 0px 0px' });
+    obs.observe(tytul);
+    addEventListener('pageshow', (e) => { if (e.persisted) { obs.unobserve(tytul); obs.observe(tytul); } });
+  }
 </script>

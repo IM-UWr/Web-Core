@@ -79,6 +79,9 @@
 :root[data-theme="dark"] .z-dz-skrot { padding: 10px 20px 6px; background: var(--surface); }
 :root[data-theme="dark"] .z-dz-skrot dl > div:last-child { border-bottom: 0; }
 
+/* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); nie zmniejszać na żadnej szerokości */
+.z-okl-marka > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
+
 @media (min-width: 761px) {
   /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
   :root {
@@ -376,7 +379,7 @@
   /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
   .z-okl-marka { position: absolute; z-index: 5; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
   .z-okl-marka .z-okl-logo { height: 40px; }
-  .z-okl-marka > span:last-child { padding-left: 14px; border-left: 1px solid rgb(255 255 255 / .35); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
+  .z-okl-marka > span:last-child { padding-left: 14px; border-left: 1px solid rgb(255 255 255 / .35); }
   .z-okl-marka:hover > span:last-child { color: #fff; }
   .z-okl-marka:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
   /* tytuł: „Instytut” i „Matematyczny” z prawymi końcami na jednej skośnej; trochę niżej niż z logo (zalecenie 7) */
