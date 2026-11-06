@@ -10,10 +10,6 @@ export type Link = { etykieta: string; etykieta_en?: string; adres: string };
 export type Grupa = { nazwa: string; nazwa_en?: string; kierunki?: boolean; linki: Link[] };
 export type Pozycja = { etykieta: string; etykieta_en?: string; adres?: string; grupy?: Grupa[] };
 
-/** USOSweb — w Studiach pomijany w pasie działu i w panelu hamburgera, żeby listy były krótsze (zlecenie 13; zlecenie 14,
- *  zalecenie 24), do czasu usunięcia z nawigacja.json w CMS (RAPORT-ZLECENIE-11.md). */
-export const jestUsos = (adres: string): boolean => /(^|\.)usosweb\./i.test(adres.replace(/^https?:\/\//, ''));
-
 /** Kierunki w kolejności (pole „kolejność”), tylko opublikowane. */
 export async function listaKierunkow() {
   return (await getCollection('kierunki'))

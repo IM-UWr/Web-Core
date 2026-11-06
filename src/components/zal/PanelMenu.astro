@@ -7,10 +7,10 @@
 // Zwijane działy (zlecenie 14, zalecenie 24; prototyp v90 „Zwijane działy”): pod nazwą działu grupy jak w menu działu
 // (nawigacja.json — mały nagłówek grupy, pod nim linki), przy nazwie przycisk ze strzałką; otwarty jeden dział naraz,
 // domyślnie wszystkie zwinięte. Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane).
-// USOSweb pominięty w Studiach (jak w pasie działu), SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
+// SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
 import Szkic from './Szkic.astro';
 import Link from '../Link.astro';
-import { menuGlowne, rekrutacja, jestUsos } from '../../lib/menu';
+import { menuGlowne, rekrutacja } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, skrotNazwy } from '../../lib/patroni';
@@ -29,7 +29,7 @@ const dzialy = DZIALY.map((dz) => {
     dz, P,
     nazwa: (m && wybierz(m, 'etykieta', lang)) || pole(P, 'nazwa', lang),
     grupy: (m?.grupy ?? [])
-      .map((g) => ({ nazwa: wybierz(g, 'nazwa', lang) as string, linki: g.linki.filter((l) => l.adres !== rek.adres && !(dz === 'studia' && jestUsos(l.adres))) }))
+      .map((g) => ({ nazwa: wybierz(g, 'nazwa', lang) as string, linki: g.linki.filter((l) => l.adres !== rek.adres) }))
       .filter((g) => g.linki.length > 0),
   };
 });
