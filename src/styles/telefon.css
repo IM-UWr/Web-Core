@@ -19,7 +19,7 @@
   /* ---------- podstawy ---------- */
   :root { --section: clamp(22px, 2.8vw, 34px); --hdr-h: 61px; }
   body { font-size: 16px; line-height: 1.55; }
-  .btn { min-height: 44px; padding: 0 18px; }
+  .btn { min-height: 44px; padding: 0 14px; }
 
   /* ---------- nagłówek ---------- */
   .hdr-row { min-height: 60px; }

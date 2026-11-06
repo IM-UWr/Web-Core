@@ -125,10 +125,12 @@ h1, h2, h3, h4 { color: var(--ink); line-height: 1.2; letter-spacing: -0.01em; }
 .muted { color: var(--muted); }
 
 /* ---------- przyciski i etykiety ---------- */
-.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-weight: 700; font-size: 15px; text-decoration: none; cursor: pointer; }
-.btn:hover { border-color: var(--ink); color: var(--ink); }
-.btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
-.btn-primary:hover { color: var(--primary-ink); filter: brightness(1.12); }
+/* przycisk-link jak .tresc a.przycisk (zlecenie 11, zalecenie 4): bez zaokrągleń, główny wypełniony kolorem działu */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 0; border: 1px solid var(--line-ui); background: transparent; color: var(--ink); font: inherit; font-weight: 600; font-size: 14px; line-height: 1.6; text-decoration: none; cursor: pointer; transition: border-color var(--t-krotki) var(--rytm), color var(--t-krotki) var(--rytm); }
+.btn:hover { border-color: var(--d-a); color: var(--d-a); }
+.btn:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+.btn-primary { background: var(--d-a); border-color: var(--d-a); color: var(--bg); }
+.btn-primary:hover { border-color: color-mix(in srgb, var(--d-a) 85%, #000); background: color-mix(in srgb, var(--d-a) 85%, #000); color: var(--bg); }
 .link-arrow { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 700; font-size: 15px; text-decoration: none; color: var(--primary); }
 :root[data-theme='dark'] .link-arrow { color: var(--znacznik-tekst, var(--accent)); }
 .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; line-height: 1.4; background: var(--tint); color: var(--tint-ink); }
