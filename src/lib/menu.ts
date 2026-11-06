@@ -3,12 +3,22 @@
 import { getCollection } from 'astro:content';
 import nawigacja from '../data/nawigacja.json';
 import { wybierz } from './i18n';
+import { isExternal } from './url';
 import { semestry } from './kolory-dni';
 import type { Lang } from './daty';
 
 export type Link = { etykieta: string; etykieta_en?: string; adres: string };
 export type Grupa = { nazwa: string; nazwa_en?: string; kierunki?: boolean; linki: Link[] };
 export type Pozycja = { etykieta: string; etykieta_en?: string; adres?: string; grupy?: Grupa[] };
+
+/** Ścieżka strony bez przedrostka języka i końcowego ukośnika (strona główna: „/”). */
+export const sciezkaBezJezyka = (sciezka: string): string => sciezka.replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
+
+/** Czy pozycja menu prowadzi na tę stronę albo jest jej stroną nadrzędną (ścieżka z sciezkaBezJezyka; adres bez kotwicy). */
+export const pasujeDoSciezki = (sciezka: string, adres: string): boolean => {
+  const a = adres.replace(/#.*$/, '').replace(/\/$/, '');
+  return !isExternal(adres) && !!a && (sciezka === a || sciezka.startsWith(`${a}/`));
+};
 
 /** Kierunki w kolejności (pole „kolejność”), tylko opublikowane. */
 export async function listaKierunkow() {

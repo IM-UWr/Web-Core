@@ -90,8 +90,8 @@
   /* ozdobne tło obecnej strony (Ustawienia → „Tło strony”) — w nowym wyglądzie gładkie ciepłe tło */
   body[data-tlo] { background: var(--bg); }
   body[data-tlo]::before, body[data-tlo]::after { content: none !important; }
-  /* stary nagłówek, menu na telefon i stara stopka — tylko na telefonie */
-  .hdr, .mnav, .mnav-tlo { display: none !important; }
+  /* stary nagłówek i przyciemnienie pod panelem menu — tylko na telefonie */
+  .hdr, .z-menu-tlo { display: none !important; }
 
   /* dotychczasowy baner: na komputerze zostaje tylko nowy nagłówek wstawiony na jego końcu (NaglowekZ.astro) */
   .ph.ph-z, .page-head.ph-z { display: contents; }
@@ -342,80 +342,6 @@
   .z-narz :is(a, button):hover { background: rgb(9 16 34 / .7); }
   .z-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .z-narz svg:not(.z-flaga) { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
-  /* panel z hamburgera (PanelMenu.astro; zlecenie 11, zalecenie 6): z prawej, na granacie (w ciemnym motywie --panel);
-     na okładce w obrębie okładki, przy pasku stały na całą wysokość okna; przy jasnym pasku jasny (.z-menu-jasny) */
-  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; width: min(460px, max(40%, 360px)); padding: 76px 36px 28px; overflow-y: auto; text-align: left;
-    background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; box-shadow: -18px 0 40px rgb(0 0 0 / .3);
-    transform: translateX(100%); visibility: hidden; transition: transform var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi), background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
-  .z-menu.otwarte { transform: none; visibility: visible; transition: transform var(--t-dlugi) var(--rytm), visibility 0s, background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
-  .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: max(64px, calc((100vw - var(--kol)) / 2)); }
-  .z-menu .z-zamknij { position: absolute; top: 18px; right: 32px; }
-  /* przy pasku krzyżyk w miejscu hamburgera */
-  .z-menu-pasek .z-zamknij { top: calc((var(--gora) - 40px) / 2); right: max(24px, calc(var(--marg) - 2px)); }
-  .z-menu .z-zamknij button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px;
-    color: #fff; background: rgb(255 255 255 / .08); cursor: pointer; }
-  .z-menu .z-zamknij button:hover { background: rgb(255 255 255 / .16); }
-  .z-menu .z-zamknij button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-  .z-menu .z-zamknij svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
-  .z-menu-szukaj { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 9px 12px; border: 1px solid rgb(255 255 255 / .3); color: rgb(255 255 255 / .75); }
-  .z-menu-szukaj svg { flex: none; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
-  .z-menu-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-appearance: none; appearance: none;
-    font: inherit; font-size: 15px; color: #fff; outline: none; }
-  .z-menu-szukaj input::placeholder { color: rgb(255 255 255 / .6); opacity: 1; }
-  .z-menu-szukaj:focus-within { border-color: #fff; }
-  .z-menu section { padding: 12px 0; border-bottom: 1px solid rgb(255 255 255 / .12); }
-  /* dział: mała twarz patrona (sygnet 52×62, kreska w kolorze działu) przed nazwą i listą */
-  .z-menu section[data-dzial] { display: grid; grid-template-columns: 52px minmax(0, 1fr); column-gap: 18px; align-items: start; }
-  .z-menu section[data-dzial] > :not(.z-menu-sygnet) { grid-column: 2; }
-  .z-menu .z-menu-sygnet { grid-row: 1 / span 2; display: block; width: 52px; height: 62px; margin-top: 2px; }
-  .z-menu .z-menu-sygnet path { fill: none; stroke: var(--d-j); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-  .z-menu h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.1; }
-  .z-menu h2 a { color: #fff; text-decoration: none; }
-  .z-menu h2 a::after { content: ''; display: block; width: 28px; height: 2px; margin-top: 6px; background: var(--d-j); }
-  .z-menu ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 16px; font-size: 14.5px; }
-  .z-menu ul a { display: inline-block; padding: 3px 0; color: var(--na-ciemnym-2); text-decoration: none; }
-  .z-menu ul a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-  /* Aktualności i Rekrutacja: duże, z większym oddechem, wyrównane do tekstu działów (za sygnetem) */
-  .z-menu section.duza { padding: 20px 0 20px 70px; }
-  .z-menu section[data-dzial] + section.duza { margin-top: 10px; }
-  .z-menu section.duza h2 { margin: 0; font-size: 28px; }
-  .z-menu section.duza h2 a::after { content: none; }
-  .z-menu section.duza h2 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
-  .z-menu ul a.zew::after { font-size: .85em; opacity: .7; }
-  /* zwijane działy (zlecenie 14, zalecenie 24; prototyp v90): grupy jak w menu działu — mały nagłówek, pod nim linki;
-     przycisk ze strzałką z prawej przy nazwie działu (30×30, strzałka obraca się o 180°). Bez JS grupy widoczne,
-     przycisk schowany; zwijanie włącza skrypt (.zwijane, src/scripts/zal/menu.ts). */
-  .z-menu section[data-dzial] h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: 7px; }
-  .z-menu .z-menu-grupa h3 { margin: 0; font-family: var(--f-text); font-size: 12px; font-weight: 600; line-height: 1.6; color: rgb(255 255 255 / .5); }
-  .z-menu-rozwin { display: none; flex: none; place-items: center; width: 30px; height: 30px; margin-top: -1px; padding: 0; border: 0; border-radius: 3px; background: none; color: #fff; cursor: pointer;
-    transition: background-color var(--t-krotki) var(--rytm); }
-  .z-menu.zwijane .z-menu-rozwin { display: inline-grid; }
-  .z-menu-rozwin svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s var(--rytm); }
-  .z-menu-rozwin[aria-expanded='true'] svg { transform: rotate(180deg); }
-  .z-menu-rozwin:hover { background: rgb(255 255 255 / .1); }
-  .z-menu-rozwin:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
-  .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: none; }
-  .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
-  /* „Rekrutacja ↗”: strzałka w linii — bez kreski działu z .z-menu h2 a::after (blok 28×2 px) */
-  .z-menu section.duza h2 a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: 18px; opacity: .7; display: inline; width: auto; height: auto; margin: 0; background: none; }
-  /* jasny panel (przy jasnym pasku): tło strony, tekst w kolorze tekstu, linki przygaszone, sygnety i kreski w kolorze działu */
-  .z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
-  .z-menu-jasny h2 a { color: var(--ink); }
-  .z-menu-jasny h2 a::after { background: var(--d-a, var(--line)); }
-  .z-menu-jasny ul a { color: var(--muted); }
-  .z-menu-jasny ul a:hover { color: var(--ink); }
-  .z-menu-jasny section { border-bottom-color: var(--line); }
-  .z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }
-  .z-menu-jasny .z-menu-szukaj { border-color: var(--line); color: var(--muted); }
-  .z-menu-jasny .z-menu-szukaj:focus-within { border-color: var(--ink); }
-  .z-menu-jasny .z-menu-szukaj input { color: var(--ink); }
-  .z-menu-jasny .z-menu-szukaj input::placeholder { color: var(--muted); }
-  .z-menu-jasny .z-zamknij button { background: var(--surface); color: var(--ink); }
-  .z-menu-jasny .z-zamknij button:hover { background: var(--line); }
-  .z-menu-jasny .z-menu-grupa h3 { color: var(--muted); }
-  .z-menu-jasny .z-menu-rozwin { color: var(--ink); }
-  .z-menu-jasny .z-menu-rozwin:hover { background: var(--surface); }
   /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
   .z-okl-marka { position: absolute; z-index: 5; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
   .z-okl-marka .z-okl-logo { height: 40px; }
@@ -491,7 +417,6 @@
   .z-strzalka svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob 2.6s ease-in-out infinite; }
   @keyframes z-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
   @media (prefers-reduced-motion: reduce) {
-    .z-menu, .z-menu.otwarte, .z-menu-rozwin svg { transition: none; }
     .z-strzalka svg { animation: none; }
     .z-barwa, .z-okl-liczby, .z-okl-liczby :is(a, b) { transition: none; }
     .z-okl-dz::before, .z-okl-dz .slot > span, .z-okl-nazwa span, .z-okl-nazwa span::before, .z-okl-nazwa span::after, .z-okl-szkic :is(.tusz path, .detale) { transition: none !important; }

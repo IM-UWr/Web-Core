@@ -1,29 +1,20 @@
 ---
-// Nagłówek na telefon (≤ 760 px; na komputerze schowany — tam jest pasek menu zal/PasekMenu.astro): logo, szukaj,
-// przełącznik trybu ciemnego i menu wysuwane z prawej (grupy z src/data/nawigacja.json, działy z sygnetem patrona).
-import Link from './Link.astro';
+// Nagłówek na telefon (≤ 760 px; na komputerze schowany — tam jest pasek menu zal/PasekMenu.astro): logo, nazwa, przełącznik
+// języka z flagą języka docelowego, tryb ciemny i hamburger. Menu to ten sam panel co na komputerze (zal/PanelMenu.astro,
+// zlecenie 18, punkt 6); renderuje go PasekMenu, id przychodzi z Baza.astro, otwiera src/scripts/zal/menu.ts.
 import Ikona from './Ikona.astro';
-import Szkic from './zal/Szkic.astro';
 import Flaga from './zal/Flaga.astro';
-import { dzialZeSciezki, PATRONI } from '../lib/patroni';
-import { menuGlowne, type Pozycja } from '../lib/menu';
 import ustawienia from '../data/ustawienia.json';
-import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz } from '../lib/i18n';
+import { u } from '../lib/url';
+import { t, wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
-interface Props { lang: Lang; sciezka: string; inny: string | null }
-const { lang, sciezka, inny } = Astro.props;
-
-const menu: Pozycja[] = await menuGlowne();
-
-const bezJezyka = sciezka.replace(/^\/en(?=\/|$)/, '') || '/';
-const pasuje = (adres: string) => !isExternal(adres) && adres !== '/' && (bezJezyka === adres || bezJezyka.startsWith(adres.replace(/#.*$/, '') + '/'));
-const tuJestem = (adres?: string) => !!adres && !isExternal(adres) && bezJezyka.replace(/\/$/, '') === adres.replace(/\/$/, '');
-const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
+interface Props { lang: Lang; sciezka: string; inny: string | null; idPanelu: string }
+const { lang, inny, idPanelu } = Astro.props;
 const logo = (ustawienia as any).logo as string | undefined;
 // logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
 const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
+const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
 <header class="hdr">
   <div class="wrap hdr-row">
@@ -40,12 +31,12 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
     </div>
 
     <div class="hdr-tools">
-      <a class="icon-btn search-narrow" href={u(wJezyku('/szukaj', lang))} aria-label={t(lang, 'szukaj')}><Ikona nazwa="szukaj" /></a>
+      {inny && <a class="icon-btn z-jezyk" href={u(inny)} hreflang={doJezyka} lang={doJezyka} aria-label={t(lang, 'innyJezyk')}><Flaga jezyk={doJezyka} />{t(lang, 'innyJezykKrotko')}</a>}
       <button type="button" class="icon-btn" data-motyw aria-label={t(lang, 'motyw')}>
         <Ikona nazwa="ksiezyc" class="when-light" />
         <Ikona nazwa="slonce" class="when-dark" />
       </button>
-      <button type="button" class="icon-btn burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls="menu-telefon" data-burger data-otworz={t(lang, 'otworzMenu')} data-zamknij={t(lang, 'zamknijMenu')}>
+      <button type="button" class="icon-btn burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls={idPanelu} data-burger data-z-menu-otworz data-otworz={t(lang, 'otworzMenu')} data-zamknij={t(lang, 'zamknijMenu')}>
         <Ikona nazwa="menu" class="when-closed" />
         <Ikona nazwa="zamknij" class="when-open" />
       </button>
@@ -53,50 +44,12 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   </div>
 </header>
 
-{/* Menu na telefon: panel wysuwany z prawej pod nagłówkiem, nad treścią strony (strona się nie przesuwa).
-     Po lewej zostaje przyciemniony pasek strony (.mnav-tlo) — klik w niego zamyka menu. Poza <header>, żeby
-     panel zawsze liczył położenie od okna (nagłówek na zdjęciu ma chwilami backdrop-filter). */}
-<div class="mnav-tlo menu-ciemne" data-mnav-tlo aria-hidden="true"></div>
-<nav class="mnav menu-ciemne" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
-  {/* Dział z listą: napis prowadzi na stronę działu (jak na komputerze), strzałka za kreską rozwija listę.
-       Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę.
-       Na pierwszej pozycji „Strona główna” — na wszystkich stronach poza samą stroną główną. */}
-  {bezJezyka !== '/' && <a href={u(wJezyku('/', lang))}>{t(lang, 'stronaGlowna')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
-  {menu.map((p, i) =>
-    p.grupy ? (
-      <div class="mitem" data-dzial={p.adres && dzialZeSciezki(p.adres) && PATRONI[dzialZeSciezki(p.adres)!].adres === p.adres ? dzialZeSciezki(p.adres) : undefined}>
-        <div class="mrow">
-          {/* sygnet patrona przy dziale (telefon) */}
-          {p.adres && dzialZeSciezki(p.adres) && PATRONI[dzialZeSciezki(p.adres)!].adres === p.adres && <Szkic dzial={dzialZeSciezki(p.adres)!} rodzaj="sygnet" class="z-mnav-sygnet" />}
-          {p.adres ? (
-            <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
-          ) : (
-            <button type="button" class="mrow-link" data-mrozwin aria-expanded="false" aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
-          )}
-          <button type="button" class="mrow-btn" data-mrozwin aria-expanded="false" aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
-        </div>
-        <div class="mgroup" id={`mgroup-${i}`} hidden>
-          {p.grupy.map((g) => (
-            <>
-              <h3>{wybierz(g, 'nazwa', lang)}</h3>
-              {g.linki.map((l) => (
-                <Link href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
-                  {wybierz(l, 'etykieta', lang)}
-                </Link>
-              ))}
-            </>
-          ))}
-        </div>
-      </div>
-    ) : (
-      <Link href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}{!isExternal(p.adres!) && <Ikona nazwa="strzalka" rozmiar={18} />}</Link>
-    )
-  )}
-  {/* przełącznik języka z flagą języka docelowego (zlecenie 11, zalecenie 8) */}
-  {inny && <a class="mnav-jezyk" href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}><span><Flaga jezyk={lang === 'pl' ? 'en' : 'pl'} />{t(lang, 'innyJezyk')}</span><Ikona nazwa="strzalka" rozmiar={18} /></a>}
-</nav>
+{/* przyciemnienie strony pod panelem menu: panel to zal/PanelMenu.astro, przy pasku menu (src/styles/zal-menu.css) */}
+<div class="z-menu-tlo" data-z-menu-tlo aria-hidden="true"></div>
 
 <script>
+  import '../scripts/zal/menu';
+
   // Tryb ciemny
   document.querySelectorAll<HTMLButtonElement>('[data-motyw]').forEach((b) =>
     b.addEventListener('click', () => {
@@ -105,53 +58,5 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
       d.setAttribute('data-theme', nowy);
       try { localStorage.setItem('motyw', nowy); } catch (e) {}
     })
-  );
-
-  const hdr = document.querySelector<HTMLElement>('.hdr');
-
-  // Menu na telefon
-  // Panel wysuwa się z prawej nad stroną; strona pod spodem się nie przewija. Otwiera się ze zwiniętymi listami.
-  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
-  const mnav = document.getElementById('menu-telefon');
-  const mtlo = document.querySelector<HTMLElement>('[data-mnav-tlo]');
-  const ustawMenu = (otwarte: boolean) => {
-    if (!mnav || !burger || !hdr) return;
-    if (otwarte) {
-      mpozycje.forEach((x) => ustawM(x, false));
-      document.documentElement.style.setProperty('--menu-top', `${Math.max(0, Math.round(hdr.getBoundingClientRect().bottom))}px`);
-    }
-    mnav.classList.toggle('open', otwarte);
-    mtlo?.classList.toggle('open', otwarte);
-    hdr.classList.toggle('menu-otwarte', otwarte);
-    document.documentElement.classList.toggle('menu-otwarte', otwarte);
-    burger.setAttribute('aria-expanded', String(otwarte));
-    burger.setAttribute('aria-label', (otwarte ? burger.dataset.zamknij : burger.dataset.otworz) || '');
-  };
-  const menuOtwarte = () => !!mnav?.classList.contains('open');
-  burger?.addEventListener('click', () => ustawMenu(!menuOtwarte()));
-  mtlo?.addEventListener('click', () => ustawMenu(false));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && menuOtwarte()) { ustawMenu(false); burger?.focus(); }
-  });
-  // powrót przyciskiem „wstecz” na stronę zapamiętaną z otwartym menu (bfcache): menu zamknięte, strona się przewija
-  window.addEventListener('pageshow', (e) => { if (e.persisted && menuOtwarte()) ustawMenu(false); });
-  // po przejściu do szerokiego ekranu (menu komputerowe) panel się zamyka, żeby strona znów się przewijała
-  window.matchMedia('(min-width: 761px)').addEventListener('change', (m) => { if (m.matches && menuOtwarte()) ustawMenu(false); });
-
-  // Menu na telefonie: strzałka rozwija listę działu, otwarcie jednej zamyka poprzednią
-  const mpozycje = Array.from(document.querySelectorAll<HTMLElement>('.mnav .mitem'));
-  const ustawM = (m: HTMLElement, otwarta: boolean) => {
-    m.classList.toggle('open', otwarta);
-    m.querySelector('.mgroup')?.toggleAttribute('hidden', !otwarta);
-    m.querySelectorAll('[data-mrozwin]').forEach((b) => b.setAttribute('aria-expanded', String(otwarta)));
-  };
-  mpozycje.forEach((m) =>
-    m.querySelectorAll<HTMLButtonElement>('[data-mrozwin]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const otworz = !m.classList.contains('open');
-        mpozycje.forEach((x) => x !== m && ustawM(x, false));
-        ustawM(m, otworz);
-      })
-    )
   );
 </script>

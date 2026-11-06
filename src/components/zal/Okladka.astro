@@ -114,7 +114,7 @@ const rozmiarOkl = (p: number) =>
     {inny && <a class="z-jezyk" href={u(inny)} hreflang={doJezyka} lang={doJezyka} aria-label={t(lang, 'innyJezyk')}><Flaga jezyk={doJezyka} />{t(lang, 'innyJezykKrotko')}</a>}
     <button type="button" class="z-burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls="z-menu" data-z-menu-otworz><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
   </nav>
-  <PanelMenu lang={lang} id="z-menu" />
+  <PanelMenu lang={lang} id="z-menu" sciezka="/" />
   <div class="z-okl-tytul">
     {wyrozniona && <a class="z-okl-flaga" href={href(wyrozniona.adres)}>{wyrozniona.tytul}</a>}
     <h1><span class="w1">{slowo1}</span> <span class="w2">{reszta.join(' ')}</span></h1>

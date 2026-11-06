@@ -7,7 +7,7 @@
    (720, 560 px), które nadpisywały te same właściwości, są tu powtórzone niżej — inaczej przegrałyby kolejnością.
    Klocki wariantu (.pt-box, .pt-list, …) są w portal.css; na tej gałęzi używają ich tylko bloki .tylko-telefon.
    PO PORZĄDKACH (zlecenie 12, 5.11.2026): telefon ma nowy wygląd (src/styles/zal-telefon.css i końce plików bloków).
-   Tu zostały tylko reguły dawnego telefonu, które nadal trafiają w elementy (nagłówek .hdr i menu .mnav z Naglowek.astro,
+   Tu zostały tylko reguły dawnego telefonu, które nadal trafiają w elementy (nagłówek .hdr z Naglowek.astro,
    tokeny kolorów, odstępy treści); bloki .tylko-telefon / .tylko-komputer i ich przełączanie usunięte.
    ========================================================================== */
 
@@ -144,18 +144,17 @@
 /* ---------- Znaczniki i etykiety (decyzja 31.10.2026: ciemny motyw A1 „stalowy granat”, etykiety B1) ----------
    Na razie tylko telefon. Reguły, które używają tokenów --znacznik*, są w global.css i portal.css (z zapasem
    var(--znacznik, var(--primary)) — bez tokenu jak dotąd); tu tylko wartości tokenów i reguły etykiet B1.
-   Rozszerzenie na komputer: definicje tokenów przenieść do global.css (:root i :root[data-theme='dark'], .menu-ciemne),
+   Rozszerzenie na komputer: definicje tokenów przenieść do global.css (:root i :root[data-theme='dark']),
    a reguły etykiet B1 — wyjąć z @media. */
 @media (max-width: 760px) {
   /* A1. Znacznik: kafelek daty (.datebox, .pt-dbox), etykieta „Wydarzenie”, aktywny filtr (.chip[aria-pressed]),
      przycisk menu (.burger). Jasny motyw: ten sam granat co --primary (nic się nie zmienia). Ciemny motyw: stalowy
      granat zamiast bursztynu, miesiąc na kafelku bursztynowy; tekstowe akcenty (.pt-k, .pt-all, .link-arrow, .event .k,
      .sem-row .sem, .talk summary, .more summary) jasnoniebieskie; tekst na jasnym tle --tint jasnoszary zamiast bursztynu.
-     .menu-ciemne (nagłówek i menu na ciemnym pasie w jasnym motywie) — jak ciemny motyw (global.css robi tak samo).
      Granatowy baner (.ph-granat, oba motywy): aktywny filtr biały z granatowym tekstem.
      Bursztyn zostaje: hasło, rysunek w banerze, miesiąc na kafelku, kreski sekcji, linki w treści, przyciski .btn-primary. */
   :root { --znacznik: #1b2d52; --znacznik-ink: #ffffff; }
-  :root[data-theme='dark'], .menu-ciemne { --znacznik: #2b4170; --znacznik-ink: #f1f4fa; --znacznik-tekst: #a9c0e8; --znacznik-miesiac: #f2a33a; }
+  :root[data-theme='dark'] { --znacznik: #2b4170; --znacznik-ink: #f1f4fa; --znacznik-tekst: #a9c0e8; --znacznik-miesiac: #f2a33a; }
   :root[data-theme='dark'] { --tint-ink: #d3dcea; }
   .ph-granat { --znacznik: #ffffff; --znacznik-ink: #1b2d52; }
 
@@ -242,7 +241,7 @@
   /* Nagłówek strony głównej (.hdr-glowna) — przez cały czas ciemny, półprzezroczysty i rozmyty (na zdjęciu i nad pasem);
      dzisiejsze bielenie po przewinięciu (.przewiniety) i animacja hero-hdr wyłączone. Na zdjęciu bez dolnej linii
      i bez nazwy Instytutu; po zwinięciu banera (.hdr-zwiniety, p > .8) — cienka linia i nazwa jak na podstronach. Logo,
-     lupa, motyw i menu białe. Przy stopce (.hdr-stopka) i z otwartym menu (.menu-otwarte, kolory .menu-ciemne) — jak dotąd. */
+     lupa, motyw i menu białe. Przy stopce (.hdr-stopka) i z otwartym menu (.menu-otwarte) — jak dotąd. */
   .js .hdr.hdr-glowna.hdr-foto { animation: none; }
   .js .hdr.hdr-glowna:not(.hdr-stopka):not(.menu-otwarte) { background: rgb(10 18 38 / .58); -webkit-backdrop-filter: blur(10px) saturate(1.15); backdrop-filter: blur(10px) saturate(1.15);
     border-bottom-color: transparent; box-shadow: none; }

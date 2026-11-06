@@ -1,23 +1,25 @@
 ---
 // Panel menu z hamburgera (zlecenie 11, zalecenie 6; prototyp: .ok-menu): ten sam na okładce i przy pasku menu na każdej
-// stronie. Wysuwa się z prawej. Na górze pole „Szukaj na stronie” (formularz do /szukaj?q=…), cztery działy z podstronami —
+// stronie, także na telefonie (zlecenie 18, punkt 6: otwiera go hamburger z Naglowek.astro). Wysuwa się z prawej. Na górze pole „Szukaj na stronie” (formularz do /szukaj?q=…), cztery działy z podstronami —
 // przed każdym mała twarz patrona (sygnet 52×62, kreska w kolorze działu) — i na dole duże „Aktualności” i „Rekrutacja ↗”
-// (Rekrutacja nie dubluje się w liście Studiów). Kolor: granatowy; przy jasnym pasku jasny (klasa .z-menu-jasny,
-// ustawia src/scripts/zal/pasek.ts). Otwieranie i zamykanie: src/scripts/zal/menu.ts.
+// (Rekrutacja nie dubluje się w liście Studiów). Kolor: granatowy; na komputerze przy jasnym pasku jasny (klasa .z-menu-jasny,
+// ustawia src/scripts/zal/pasek.ts). Style: src/styles/zal-menu.css. Otwieranie i zamykanie: src/scripts/zal/menu.ts.
 // Zwijane działy (zlecenie 14, zalecenie 24; prototyp v90 „Zwijane działy”): pod nazwą działu grupy jak w menu działu
-// (nawigacja.json — mały nagłówek grupy, pod nim linki), przy nazwie przycisk ze strzałką; otwarty jeden dział naraz,
-// domyślnie wszystkie zwinięte. Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane).
+// (nawigacja.json — mały nagłówek grupy, pod nim linki), przy nazwie przycisk ze strzałką; otwarty jeden dział naraz.
+// Bez JS grupy są widoczne, a przycisk schowany (zwijanie włącza skrypt klasą .zwijane).
+// Bieżąca strona (zlecenie 18, punkt 6): aria-current="page" na najdłuższym pasującym adresie, także dla podstron głębszych niż
+// pozycja menu; panel otwiera się z rozwiniętym działem tej strony (section[data-biezacy]), poza działami wszystkie zwinięte.
 // SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
 import Szkic from './Szkic.astro';
 import Link from '../Link.astro';
-import { menuGlowne, rekrutacja } from '../../lib/menu';
+import { menuGlowne, rekrutacja, sciezkaBezJezyka, pasujeDoSciezki } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
-import { PATRONI, DZIALY, pole, skrotNazwy } from '../../lib/patroni';
+import { PATRONI, DZIALY, dzialZeSciezki, pole, skrotNazwy } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-interface Props { lang: Lang; id: string; jasny?: boolean; class?: string }
-const { lang, id, jasny = false, class: klasa } = Astro.props;
+interface Props { lang: Lang; id: string; sciezka: string; jasny?: boolean; class?: string }
+const { lang, id, sciezka, jasny = false, class: klasa } = Astro.props;
 const en = lang === 'en';
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
@@ -34,8 +36,15 @@ const dzialy = DZIALY.map((dz) => {
   };
 });
 const akt = menu.find((p) => p.adres === '/aktualnosci');
+const tu = sciezkaBezJezyka(sciezka);
+const linki = dzialy.flatMap((d) => d.grupy.flatMap((g) => g.linki.map((l) => ({ dz: d.dz, adres: l.adres }))));
+const biezacy = linki.filter((l) => pasujeDoSciezki(tu, l.adres)).sort((a, b) => b.adres.length - a.adres.length)[0];
+// dział ze ścieżki (strona działu nie ma swojego linku w grupach), chyba że link tej strony stoi tylko w innym dziale: wtedy dział
+// z linkiem, żeby bieżąca strona była widoczna. Ten sam adres w dwóch działach (Szkoła doktorska: Nauka i Studia): oznaczony w tym ze ścieżki.
+const zeSciezki = dzialZeSciezki(sciezka);
+const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres === biezacy.adres) ? zeSciezki : biezacy.dz;
 ---
-<nav class:list={['z-menu', jasny && 'z-menu-jasny', klasa]} id={id} aria-label={en ? 'Main menu' : 'Menu główne'} data-z-menu>
+<nav class:list={['z-menu', jasny && 'z-menu-jasny', klasa]} id={id} aria-label={en ? 'Main menu' : 'Menu główne'} tabindex="-1" data-z-menu>
   <span class="z-zamknij"><button type="button" data-z-menu-zamknij aria-label={t(lang, 'zamknijMenu')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></span>
   <form class="z-menu-szukaj" action={u(wJezyku('/szukaj', lang))} method="get" role="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
@@ -43,10 +52,10 @@ const akt = menu.find((p) => p.adres === '/aktualnosci');
     <input id={`${id}-q`} type="search" name="q" placeholder={en ? 'Search the website' : 'Szukaj na stronie'} autocomplete="off" />
   </form>
   {dzialy.map((d) => (
-    <section data-dzial={d.dz}>
+    <section data-dzial={d.dz} data-biezacy={d.dz === dzialBiezacy ? '' : undefined}>
       <Szkic dzial={d.dz} rodzaj="sygnet" class="z-menu-sygnet" />
       <h2>
-        <a href={href(d.P.adres)}>{d.nazwa}</a>
+        <a href={href(d.P.adres)} aria-current={tu === d.P.adres ? 'page' : undefined}>{d.nazwa}</a>
         {d.grupy.length > 0 && (
           <button type="button" class="z-menu-rozwin" aria-expanded="false" aria-controls={`${id}-${d.dz}`} aria-label={`${en ? 'Show pages' : 'Pokaż podstrony'}: ${d.nazwa}`} data-z-menu-rozwin>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
@@ -60,13 +69,13 @@ const akt = menu.find((p) => p.adres === '/aktualnosci');
             <ul>{g.linki.map((l) => {
               const e = wybierz(l, 'etykieta', lang) as string;
               const sk = skrotNazwy(e);
-              return <li><Link href={href(l.adres)} title={sk ? e : undefined}>{sk ?? e}</Link></li>;
+              return <li><Link href={href(l.adres)} title={sk ? e : undefined} aria-current={d.dz === dzialBiezacy && l.adres === biezacy?.adres ? 'page' : undefined}>{sk ?? e}</Link></li>;
             })}</ul>
           </div>
         ))}
       </div>
     </section>
   ))}
-  <section class="duza"><h2><a href={href('/aktualnosci')}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
+  <section class="duza"><h2><a href={href('/aktualnosci')} aria-current={pasujeDoSciezki(tu, '/aktualnosci') ? 'page' : undefined}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
   <section class="duza"><h2><Link href={href(rek.adres)}>{rek.etykieta}</Link></h2></section>
 </nav>

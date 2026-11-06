@@ -5,7 +5,8 @@
 // Przyklejony u góry (poza stroną główną): przezroczysty na samej górze nad banerem, po przewinięciu nad banerem ciemny
 // z rozmyciem, nad treścią jasny, nad stopką znowu ciemny — kolor wybiera src/scripts/zal/pasek.ts (style: zalozyciele.css).
 // Strona główna: zwykły jasny pasek na górze drugiego ekranu (klasa z-pasek-jasny).
-// Na telefonie (≤ 760 px) schowany (zal-telefon.css) — tam jest nagłówek z menu (Naglowek.astro).
+// Na telefonie (≤ 760 px) sam pasek jest schowany (zal-telefon.css), tam jest nagłówek Naglowek.astro; panel zostaje i otwiera go
+// hamburger z nagłówka (id panelu: Baza.astro).
 import PanelMenu from './PanelMenu.astro';
 import Flaga from './Flaga.astro';
 import { menuGlowne } from '../../lib/menu';
@@ -61,5 +62,5 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
     </nav>
   </div>
 </header>
-<PanelMenu lang={lang} id={idPanelu} jasny={jasny} class="z-menu-pasek" />
+<PanelMenu lang={lang} id={idPanelu} sciezka={sciezka} jasny={jasny} class="z-menu-pasek" />
 <script>import '../../scripts/zal/menu'; import '../../scripts/zal/pasek';</script>

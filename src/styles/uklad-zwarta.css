@@ -8,7 +8,7 @@
    selektor co tam, poprzedzony warunkiem w :where(…) — :where nie dodaje wagi, więc kolejność i siła reguł względem
    global.css, tlo.css i stylów widoków są takie same jak w wariancie. Reguły treści działają tylko w <main>.
    Nie są przeniesione reguły elementów wspólnych całej strony — zostają jak na main: nagłówek u góry (.hdr-row, .brand-*,
-   menu .nav / .dropdown / .mnav, .icon-btn, .hdr-search, --hdr-h), przyciski (.btn, .btn-small) i stopka.
+   menu .nav / .dropdown, .icon-btn, .hdr-search, --hdr-h), przyciski (.btn, .btn-small) i stopka.
    Odstępy własne widoków (np. strona działu) są w stylach widoku, też w @media (min-width: 761px).
    Telefon (≤ 760 px): wszystko poniżej siedzi w @media (min-width: 761px), więc telefon wygląda jak bez tego pliku.
    PO PORZĄDKACH (zlecenie 12, 5.11.2026): zostały tylko reguły, które nadal trafiają w elementy na stronach z

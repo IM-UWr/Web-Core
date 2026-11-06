@@ -107,7 +107,7 @@ if (okladka && obszar) {
     if (e.ctrlKey || e.defaultPrevented || DOTYK.matches) return; // Ctrl + kółko / szczypanie = powiększanie
     if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // ruch w bok
     const dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? window.innerHeight : 1);
-    if (przewijaWewnatrz(e.target, dy)) return;
+    if (przewijaWewnatrz(e.target, dy) || (e.target instanceof Element && e.target.closest('.z-menu.otwarte'))) return; // kółko nad panelem menu nie rusza strony
     const teraz = performance.now();
     if (blokada) {
       if (jedzie || teraz - ostatnie < CISZA) { ostatnie = teraz; e.preventDefault(); return; }
