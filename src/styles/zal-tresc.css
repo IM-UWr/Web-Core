@@ -121,7 +121,7 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc .boks:hover h3 a { color: var(--d-a); }
 .tresc .boks h3 a:focus-visible { outline: none; }
 .tresc .boks h3 a:focus-visible::after { outline: 2px solid var(--d-a); outline-offset: 2px; }
-.tresc .boks .haslo { font-size: 14px; font-weight: 600; color: var(--d-a); }
+.tresc .boks .haslo { font-family: var(--f-display); font-style: italic; font-size: 16px; font-weight: 400; line-height: 1.3; color: var(--muted); }
 .tresc .boks dl.para { margin-top: auto; padding-top: 6px; font-size: 14px; }
 @media (prefers-reduced-motion: no-preference) { .tresc ul.boksy > .boks:active { transform: translateY(1px); } }
 @media (prefers-reduced-motion: reduce) { .tresc ul.boksy > .boks, .tresc .boks h3 a { transition: none; } }
