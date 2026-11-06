@@ -37,34 +37,39 @@ Właściciel: „Ta strona wygląda do bani na widoku poziomym telefonu, możemy
 - `astro check` bez nowych błędów, `npm run build` przechodzi.
 - Zrzuty przed i po: `raport-zrzuty/z23-poziomo-*` (Pixel 7 i iPhone 13 w poziomie, główna, Nauka, Matematyka).
 
-## 2. Telefon, strona główna: z okładki na Szybki dostęp „na próg” — CZEKA (właściciel najpierw próbuje prototypu na telefonie)
-Właściciel (6.11, 16:20): „na głównym ekranie trzeba przeciągnąć scrolla mocno, może jakaś dyskretne animowanie strzałki do Szybkiego dostępu, żeby przejść na Szybki dostęp, nie leciutki scroll od razu przerzuca. A jak już jesteśmy na Szybkim dostępie, to tam normalne zasady scrolla, żadnych specjalnych, powrót na stronę główną tylko naciśnięciem przycisku na navbarze.” Decyzje 16:34: „Wszystko zgoda” (próg 1/3 ekranu, „wstecz” wraca do Szybkiego dostępu, tablet jak telefon).
+## 2. Strona główna (telefon, tablet i komputer): z okładki na Szybki dostęp „na próg”, powrót tylko z paska — GOTOWE (decyzje 6.11, 16:34 i 17:03)
+Właściciel (16:20, telefon): „na głównym ekranie trzeba przeciągnąć scrolla mocno, może jakieś dyskretne animowanie strzałki do Szybkiego dostępu, żeby przejść na Szybki dostęp, nie leciutki scroll od razu przerzuca. A jak już jesteśmy na Szybkim dostępie, to tam normalne zasady scrolla, żadnych specjalnych, powrót na stronę główną tylko naciśnięciem przycisku na navbarze.” 16:34: „Wszystko zgoda” (próg 1/3 ekranu, „wstecz” wraca do Szybkiego dostępu, tablet jak telefon). 17:03 (komputer): „podobna zasada, scroll na głównej nie działa, tylko Szybki dostęp. Podobnie jak na telefonie można animować. Do powrotu scroll też nie działa, tylko guzik na navbarze.”
 
-**Przyczyna dzisiejszego „koślawego” przewijania** (dotyk, `(hover: none) and (pointer: coarse)`):
-- `scroll-snap-type: y mandatory` z trzema punktami: okładka, początek Szybkiego dostępu i koniec stopki (`src/styles/zalozyciele-strony.css:249–251`, `scroll-padding-top` w 260). Przeglądarka dociąga do najbliższego punktu, więc lekkie machnięcie przerzuca na Szybki dostęp, a przy dole strony ściąga ją do końca stopki.
-- Chowanie okładki po 150 ms spokoju na krawędzi i jej przywracanie przy nowym dotknięciu na górze (`src/scripts/zal/przejazd.ts:216–255` i 272–293, zlecenie 21, punkt 3).
+**Wzór: prototyp** https://claude.ai/artifact/FupESJkYq78jUCRkhjHfcq — prawdziwa strona główna z `e6b6cb2` zbudowana z tymi zmianami (plus punkty 4 i 5). Przełącznik „Prototyp · próg” w rogu i makieta podstrony po stuknięciu linku są tylko w prototypie — **nie wdrażać** (`23-zalaczniki/23-prototyp-dodatki-NIE-WDRAZAC.html`).
+**Kod prototypu:** `23-zalaczniki/23-prototyp-okladki.patch` (na `e6b6cb2`, `git apply --check` przechodzi; pliki: `src/scripts/zal/przejazd.ts` przepisany w całości — też osobno `23-przejazd.ts` — `zalozyciele-strony.css`, `zal-telefon.css`, `Okladka.astro`). Łatka zawiera też punkty 4 i 5 (w `zal-telefon.css` dopisane na końcu bloku telefonu — przy wdrożeniu wpisz je w istniejące reguły). Weź łatkę jako punkt wyjścia, przenieś porządnie na stan po zleceniach 21 i 22 i po punkcie 1 (nowa definicja „telefonu”).
+
+**Przyczyna dzisiejszego „koślawego” przewijania** (dotyk):
+- `scroll-snap-type: y mandatory` z trzema punktami: okładka, początek Szybkiego dostępu i koniec stopki (`src/styles/zalozyciele-strony.css:249–251`, `scroll-padding-top` w 260). Lekkie machnięcie przerzuca na Szybki dostęp, przy dole strony przeglądarka ściąga ją do końca stopki.
+- Chowanie okładki po 150 ms spokoju na krawędzi i przywracanie przy nowym dotknięciu na górze (`przejazd.ts:216–255` i 272–293, zlecenie 21, punkt 3).
 - Telefon zawsze wraca na okładkę (`przejazd.ts:257–271`, zlecenie 21, punkt 9).
+- Komputer: kółko na okładce przenosi po 60 px sumy w 200 ms, a ruch w górę z krawędzi Szybkiego dostępu wraca na okładkę (`przejazd.ts:106–171`).
 
-**Co się zmienia** (tylko dotyk; kółko, klawisze i kliknięcia na komputerze w `przejazd.ts` bez zmian)
-1. **Usunąć** wszystkie trzy mechanizmy wyżej. Zostaje `html.bez-okladki .z-okladka { display: none !important }` i `bez-wejscia`, poprawka `dvh` z punktu 9 zlecenia 21 też zostaje.
-2. **Okładka nie przewija się palcem**, gdy mieści się na ekranie: `touch-action: pinch-zoom` na okładce i pasku `.hdr`, włączane klasą ze skryptu (bez JS zwykłe przewijanie). Bez nasłuchów `touchmove` z `passive: false`.
-3. **Ciągnięcie w górę** (palec od dotknięcia): okładka i Szybki dostęp jadą za palcem z oporem. Do progu przesuwają się o 0,55 drogi palca, za progiem o 0,3. Spod okładki wyłania się początek Szybkiego dostępu. Strzałka „Szybki dostęp” jaśnieje i podjeżdża do 10 px, a za progiem obraca się grotem w górę.
-   - **Próg:** 1/3 wysokości okna drogi palca. Prędkość się nie liczy: samo szybkie machnięcie nie przenosi.
-   - **Puszczenie za progiem:** okładka odjeżdża do końca (0,4 s, krzywa `cubic-bezier(.22, .8, .2, 1)`), Szybki dostęp staje pod paskiem, potem okładka znika z układu (`html.bez-okladki`) bez żadnego skoku na ekranie.
-   - **Puszczenie przed progiem:** wszystko wraca (0,3 s).
-   - Drugi palec (szczypanie) przerywa ciągnięcie i wraca. Ruch palca w dół na okładce nic nie robi.
-   - Próg i opór jako zmienne CSS (`--z-prog: .333`, `--z-opor: .55`), jedno miejsce do zmiany.
-4. **Strzałka:** na telefonie podskakuje co 2,6 s jak na komputerze (`z-bob`; dziś na telefonie stoi). Bez podskoku przy „ogranicz ruch” i w trakcie ciągnięcia. Stuknięcie strzałki i liczb: ten sam odjazd co za progiem.
-5. **Szybki dostęp:** zwykłe przewijanie, okładki nie ma w układzie, ruch w górę kończy się na górze strony. Żadnych własnych reguł.
-6. **Powrót na okładkę:** stuknięcie nazwy Instytutu w pasku na stronie głównej, bez przeładowania: strona od razu na górę, okładka zjeżdża z góry (0,4 s). Na innych stronach ten link działa jak dziś.
-7. **Historia:** „wstecz” i odświeżenie wracają tam, skąd się wyszło. Z Szybkiego dostępu na to samo miejsce: znacznik `zBezOkladki` w `history.state`, położenie odtwarza przeglądarka (`history.scrollRestoration = 'auto'`), a skrypt w linii w `Okladka.astro` (linia 129) chowa okładkę przed pierwszym układem także na telefonie. Nowe wejście (link, wpisany adres, „← Strona główna”, nazwa w pasku z innej strony) zawsze na okładkę.
-8. **Tablet:** to samo co telefon.
-9. **Okładka nie mieści się w oknie** (np. bardzo niski ekran): bez progu i bez `touch-action`, zwykłe przewijanie, okładka zostaje w układzie.
-10. **Dostępność:** fokus z klawiatury lub czytnika ekranu w Szybkim dostępie przy widocznej okładce → przejście bez animacji. Przewinięcie przez czytnik ekranu albo szukanie na stronie do krawędzi lub niżej (w spoczynku, nie w trakcie ciągnięcia) → okładka się chowa. Przy „ogranicz ruch” palec dalej przesuwa okładkę, ale przejścia są natychmiastowe.
+**Jak ma działać** (wszystkie urządzenia; tak działa prototyp)
+1. **Dwa stany.** Okładka: strona się nie przewija. Szybki dostęp: okładki nie ma w układzie (`html.bez-okladki` — teraz także na komputerze), zwykłe przewijanie bez żadnych reguł, ruch w górę kończy się na górze Szybkiego dostępu. Usunąć: `scroll-snap`, chowanie po spokoju, „zawsze na okładkę” na telefonie, dwa położenia z dociąganiem na komputerze (`jedz`, `dociagnij`, `ResizeObserver` krawędzi).
+2. **„Na próg” palcem (dotyk):** okładka i treść Szybkiego dostępu jadą za palcem z oporem (do progu 0,55 drogi palca, za progiem 0,3). Spod okładki wyłania się Szybki dostęp. Strzałka „Szybki dostęp” jaśnieje i podjeżdża do 10 px, a za progiem obraca grot w górę. Próg: `--z-prog` (1/3) × wysokość okna drogi palca; prędkość się nie liczy. Puszczenie za progiem — odjazd do końca (0,4 s, `cubic-bezier(.22, .8, .2, 1)`), przed progiem — powrót (0,3 s). Drugi palec przerywa i wraca. Na okładce `touch-action: pinch-zoom` (klasa `html.z-prog` ze skryptu; bez JS zwykłe przewijanie), nasłuchy dotyku pasywne.
+3. **„Na próg” kółkiem i gładzikiem (komputer):** ten sam ruch i ta sama strzałka. Suma ruchu kółka w dół na okładce zamiast drogi palca (ruch w górę ją zmniejsza), przesunięcie wygładzone (0,14 s). Przekroczenie progu — od razu odjazd; 260 ms bez ruchu przed progiem — powrót. Po odjeździe rozpęd gładzika wygasa (350 ms, przedłużane przez kolejne zdarzenia), zanim Szybki dostęp zacznie się przewijać. Przy oknie 950 px próg to ok. 3–4 ząbki kółka. Ctrl + kółko (powiększanie) i przewijanie wewnątrz otwartego panelu menu bez zmian.
+4. **Od razu, bez progu:** stuknięcie/kliknięcie strzałki i liczb nad nią (zalecenie 15, z podświetleniem kolumny), klawisze w dół na okładce (PgDn, spacja, ↓, End; nie przy powtórzeniu), fokus z klawiatury lub czytnika w Szybkim dostępie. Klawisze w górę na okładce nic nie robią; na Szybkim dostępie działają zwyczajnie i nie wracają na okładkę.
+5. **Powrót na okładkę tylko z paska:** link do strony głównej w pasku (telefon: nazwa Instytutu w `.hdr`; komputer: znak z nazwą `.z-marka` w pasku Szybkiego dostępu) na stronie głównej — bez przeładowania: strona od razu na górę, okładka nad Szybkim dostępem i płynne przewinięcie na nią. Na innych stronach te linki działają jak dziś. Także `#okladka` w adresie.
+6. **Historia:** „wstecz” i odświeżenie wracają tam, skąd się wyszło: znacznik `zBezOkladki` w `history.state`, położenie odtwarza przeglądarka (`scrollRestoration` domyślne). Skrypt w linii w `Okladka.astro` (linia 129) chowa okładkę przed pierwszym układem przy znaczniku albo przy `#szybki-dostep` — na każdym urządzeniu. Nowe wejście (link, wpisany adres, „← Strona główna”, link z innej strony) zawsze na okładkę.
+7. **Przewinięcie „z zewnątrz” na okładce** (pasek przewijania myszą, szukanie na stronie, czytnik ekranu, kotwica): w spoczynku (150 ms; przy wciśniętym przycisku myszy — po puszczeniu) od połowy drogi — Szybki dostęp, wcześniej — płynnie z powrotem na okładkę.
+8. **Okładka nie mieści się w oknie** (dół bloku działów `.z-okl-dzialy` poniżej okna, np. bardzo niskie okno, telefon w poziomie po punkcie 1): bez progu i bez `touch-action`, zwykłe przewijanie; okładka chowa się na krawędzi Szybkiego dostępu, w spoczynku.
+9. **Strzałka podskakuje** co 2,6 s także na telefonie (`z-bob`; dziś na telefonie stoi), bez podskoku przy „ogranicz ruch” i w trakcie ciągnięcia.
+10. **Przesuwane elementy:** `.z-okladka` oraz `.z-druga-obszar > .z-pasek` i `.z-druga-obszar > .z-druga`, a **nie** sam `.z-druga-obszar`: stoi w nim panel menu (`position: fixed`), który pod przesuniętym rodzicem wychodzi w bok poza stronę, a telefon oddala wtedy widok (w prototypie `innerHeight` skakał z 839 na 1560 — znalezione i poprawione).
+11. **Pasek telefonu** po schowaniu okładki na górze strony nie dostaje zdarzenia `scroll` — skrypt musi sam poprosić `pasek.ts` o przeliczenie koloru (w prototypie sztuczne zdarzenie `scroll`; w kodzie lepiej własne zdarzenie, np. `z-okladka`).
+12. **„Ogranicz ruch”:** przesunięcie za palcem i kółkiem zostaje, przejścia natychmiastowe.
+13. Próg i opór jako zmienne CSS (`--z-prog: .333`, `--z-opor: .55`) — jedno miejsce do zmiany po próbach właściciela.
 
-**Wzór:** prototyp do wypróbowania na telefonie (link dopisze rozmowa w claude.ai).
-
-**Odbiór** (uzupełni się po prototypie): emulacja Pixel 7 i iPhone 13, prawdziwe zdarzenia dotyku przez CDP (`Input.dispatchTouchEvent`). Ciągnięcia 100, 200, 260, 300, 400 px wolno (okno 839, próg ok. 280): przejście tylko od progu. Machnięcie 150 px w 80 ms: bez przejścia. Na Szybkim dostępie machnięcie w górę z +600 px kończy się na górze, okładki nie widać. Nazwa w pasku: okładka. „Wstecz” z podstrony otwartej z +800 px: +800, okładka schowana. Nowe wejście: okładka. Bez JS: zwykłe przewijanie. Brak nasłuchów dotyku z `passive: false` (CDP `DOMDebugger.getEventListeners`). Komputer: kółko i klawisze jak dziś.
+**Odbiór** (w prototypie zmierzone w emulacji; powtórz na kodzie, także EN)
+- Telefon (Pixel 7, 412×839, prawdziwe zdarzenia dotyku przez CDP `Input.dispatchTouchEvent`): 150 i 260 px wolno — powrót; machnięcie 200 px w 60 ms — powrót; 300 px wolno — Szybki dostęp pod paskiem (61 px), okładka schowana, pasek jasny; nazwa w pasku — okładka; strzałka — Szybki dostęp; odświeżenie z Szybkiego dostępu — Szybki dostęp; brak przewijania w poziomie i stały `innerHeight` w trakcie ciągnięcia.
+- Komputer 1920×950 i 1366×640: 1 ząbek — okładka podjeżdża ok. 55 px i wraca; 4 ząbki — Szybki dostęp; dalej kółkiem — zwykłe przewijanie; mocno w górę — zatrzymuje się na górze Szybkiego dostępu; znak w pasku — okładka; PageDown — Szybki dostęp; PageUp — bez powrotu.
+- Nasłuchy na `window` (CDP `DOMDebugger.getEventListeners`): dotyk pasywny; `wheel` niepasywny tylko na stronie głównej.
+- Bez JS: zwykłe przewijanie od okładki w dół. Bez błędów w konsoli.
+- **Czego emulacja nie sprawdzi** (właściciel na telefonie): czucie progu i oporu, Safari na iPhonie, gładzik na Macu (rozpęd), czytniki ekranu.
 
 ## 3. Telefon: pasek u samej góry podstrony w kolorze banera — GOTOWE (decyzja 6.11, 16:45)
 Właściciel (zrzut `/obrony-doktorskie/` przy 400 px): „Navbar na podstronach dalej ma swój własny kolor, a nie motyw banera. Przy zjechaniu kawałek jest ok, ale na samej górze też powinno być z motywem banera.”
@@ -140,3 +145,21 @@ Właściciel (zrzut z telefonu, Brave na Androidzie, Web-Podglad): „Na mobilce
 - Emulacja z ułamkową skalą i wysokością (CDP `Emulation.setDeviceMetricsOverride`: skala 2,75, wysokości 801–806 px co 0,25 przez `screenHeight`/`height` i paski przeglądarki): na górze strony głównej ostatni rząd pikseli okna ma kolor okładki, nigdy jasny. Pomiar: zrzut i kolor dolnych 3 pikseli ekranu.
 - Strzałka „Szybki dostęp” i ostatni dział stoją tam, gdzie dziś (±1 px) przy 390×844, 412×915, 360×740.
 - Właściciel sprawdza na swoim telefonie (Brave, Chrome): brak jasnej linii na dole okładki, także po wysunięciu i schowaniu paska adresu.
+
+## 6. Telefon: sygnet przy długich tytułach na wysokości linku i pierwszej linii — GOTOWE (decyzja 6.11, 17:00)
+Właściciel (zrzuty „Teoria modeli” i „Analiza harmoniczna i rozwinięcia ortogonalne”): „Przy długich nazwach seminariów głowa powinna być jak przy krótkich: szary napis + pierwsza linia.”
+
+**Przyczyna:** w `.z-tyt-g` jest `align-items: end`, a sygnet zajmuje oba wiersze (`zal-telefon.css:205–207`), więc przy tytule w kilku liniach zjeżdża na dół, do ostatnich linii. Pomiar przy 412 px (od góry bloku): krótki tytuł — sygnet 13–61 px, czyli od linku „← Seminaria” do dołu pierwszej linii tytułu (61 px); 3 linie — 78–126 px; 4 linie — 110–158 px.
+
+**Zmiana:** sygnet zawsze tam, gdzie przy tytule w jednej linii: dół sygnetu na dole pierwszej linii tytułu, niezależnie od liczby linii; kreska obok bez zmian (48 px). Sprawdzone w emulacji wstrzykniętym CSS — wynik 13–61 px przy 1, 3 i 4 liniach:
+```css
+.z-nagl.z-nagl-pod .z-sygnet-nagl { align-self: start; margin-top: 13px; }
+```
+Lepiej liczyć to z wymiarów (wysokość linku + 4 px odstępu + jedna linia tytułu `1.08 × 30 px` − 48 px), żeby zmiana kroju albo rozmiaru linku nie rozjechała sygnetu. Dotyczy wszystkich podstron z sygnetem na telefonie (seminaria, ISIM, granty i inne długie tytuły), nie tylko seminariów. Komputer bez zmian (ma własną zasadę z zalecenia 9 zlecenia 11) — chyba że właściciel zdecyduje inaczej.
+
+**Wzór:** `23-zalaczniki/23-sygnet-dlugie-tytuly.png` (góra: dziś; dół: po; Teoria modeli, Analiza harmoniczna…, Dyskretna analiza harmoniczna…).
+
+**Odbiór**
+- 360, 390 i 412 px, PL i EN: na seminariach Teoria modeli (1 linia), Analiza harmoniczna i rozwinięcia ortogonalne (3), Dyskretna analiza harmoniczna… i Prawdopodobieństwo (4) oraz ISIM: górna i dolna krawędź sygnetu w tym samym miejscu względem linku (±1 px), dół sygnetu = dół pierwszej linii tytułu (±1 px).
+- Tytuły w jednej linii piksel w piksel bez zmian.
+- Zrzuty: `raport-zrzuty/z23-sygnet-*`.
