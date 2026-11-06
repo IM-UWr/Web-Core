@@ -119,3 +119,24 @@ Właściciel: „Na stronie głównej w mobilce navbar powinien mieć tło zdję
 - Kontrast nazwy Wydziału i ikon w pasku na zdjęciu co najmniej 4,5:1 (zmierz na najjaśniejszym miejscu zdjęcia pod paskiem; jeśli mniej, podnieś krycie granatu, nie zmieniaj rozmycia).
 - Po przejściu na Szybki dostęp pasek jasny, przy stopce jak dziś; komputer i tablet bez zmian.
 - Zrzuty: `raport-zrzuty/z23-okladka-pasek-*`.
+
+## 5. Telefon, strona główna: jasna linia pod okładką — GOTOWE (decyzja 6.11, 16:58)
+Właściciel (zrzut z telefonu, Brave na Androidzie, Web-Podglad): „Na mobilce pod sam koniec głównej zostaje cieniutki jasny pasek z Szybkiego dostępu. Z czego to wynika? Jak naprawić?”
+
+**Przyczyna (z pomiaru zrzutu, 1178×2576):** na dolnej krawędzi okładki, tuż nad dolnym paskiem przeglądarki, jest linia grubości 2 pikseli ekranu w kolorze (112, 116, 127), czyli granat zmieszany mniej więcej pół na pół z jasnym tłem Szybkiego dostępu (`23-zalaczniki/23-szczelina-pod-okladka.png`, powiększenie 12×). Telefon ma skalę ok. 2,75, więc wysokość okna w pikselach CSS jest ułamkowa, a okładka (`min-height: calc(100dvh - var(--hdr-h))`, `zal-telefon.css:107`) kończy się ok. 0,4 px nad dołem ekranu. W tę szczelinę wchodzi początek Szybkiego dostępu. W emulacji (okrągłe wymiary) tego nie widać. To samo stanie się przy każdej chwilowej różnicy między oknem a `dvh` (wysuwanie paska adresu).
+
+**Zmiana** (telefon; zapis po punkcie 4, gdy okładka zaczyna się pod paskiem): okładka zawsze trochę wychodzi poza dół widocznego okna: wysokość największego okna (`lvh`, jak przy schowanych paskach przeglądarki) plus 1 px. Tytuł, działy i strzałka zostają w widocznej części (`dvh`), a nadmiar pod nimi to sam granat:
+```css
+.z-okladka { --z-nadmiar: calc(100lvh - 100dvh + 1px);
+  min-height: calc(100vh + 1px); min-height: calc(100lvh + 1px);   /* zamiast 100svh / 100dvh z punktu 4 */
+  padding-bottom: calc(52px + var(--z-nadmiar)); }
+.z-okladka .z-strzalka { bottom: calc(14px + var(--z-nadmiar)); }
+```
+- Z punktem 2 strona na okładce się nie przewija, więc granatowego nadmiaru nie widać. Tam, gdzie próg nie działa (bez JS, okładka nie mieści się w oknie), nadmiar to kawałek granatu przed Szybkim dostępem — dopuszczalne.
+- Punkt 2: warunek „okładka mieści się w oknie” liczyć z dolnej krawędzi bloku działów (`.z-okl-dzialy`), a nie z wysokości całej okładki (ta jest teraz z założenia wyższa niż okno). Odjazd po progu przesuwa o pełną wysokość okładki do Szybkiego dostępu, jak dotąd (`y1()`).
+- Komputer, tablet (widok komputera) i telefon w poziomie po punkcie 1 (okładka w dwóch kolumnach): sprawdź, że nadmiar nie psuje układu; w poziomie, gdy okładka ma wysokość z treści, nadmiar może zostać.
+
+**Odbiór**
+- Emulacja z ułamkową skalą i wysokością (CDP `Emulation.setDeviceMetricsOverride`: skala 2,75, wysokości 801–806 px co 0,25 przez `screenHeight`/`height` i paski przeglądarki): na górze strony głównej ostatni rząd pikseli okna ma kolor okładki, nigdy jasny. Pomiar: zrzut i kolor dolnych 3 pikseli ekranu.
+- Strzałka „Szybki dostęp” i ostatni dział stoją tam, gdzie dziś (±1 px) przy 390×844, 412×915, 360×740.
+- Właściciel sprawdza na swoim telefonie (Brave, Chrome): brak jasnej linii na dole okładki, także po wysunięciu i schowaniu paska adresu.
