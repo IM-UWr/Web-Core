@@ -8,7 +8,7 @@
    ========================================================================== */
 /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-  .z-pd { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px;
+  .z-pd { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px;
     padding: 40px var(--marg) 30px; }
   .z-pd.z-pd-pelna { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .z-pd > .z-pd-tresc { grid-column: 1; grid-row: 1; min-width: 0; }

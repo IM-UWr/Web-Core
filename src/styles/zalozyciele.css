@@ -95,6 +95,9 @@
 
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
+  /* Nagłówki poniżej 1368 px (zlecenie 24, punkt 2): każdy rozmiar to wartość przy 1368 px × szerokość / 1368, z dolnym progiem:
+     clamp(próg, calc(wartość * var(--jn)), wartość). Od 1368 px clamp daje samą wartość, więc nic się tam nie zmienia. --marg-min: margines maleje z 64 do 24 px. */
+  :root { --jn: calc(100vw / 1368); --marg-min: clamp(24px, calc(64 * var(--jn)), 64px); }
   :root {
     --bg: #fcfaf6; --surface: #f4f1ea; --line: #e5e0d6;
     --ink: #131c31; --text: #2b3245; --muted: #5b6375;
@@ -122,7 +125,7 @@
 
   /* ---------- pasek menu na banerze ---------- */
   .z-pasek { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: var(--gora); color: #fff;
-    --marg: max(64px, calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); border-bottom: 1px solid rgb(255 255 255 / .14);
+    --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); border-bottom: 1px solid rgb(255 255 255 / .14);
     --pasek-krycie: 30%; }
   .z-pasek-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 100%; }
   /* strona bez banera (np. pojedyncza aktualność): pasek na granacie, w zwykłym układzie, przyklejony u góry */
@@ -202,7 +205,7 @@
 
   /* ---------- wspólne: zdjęcie w dwóch kolorach (cienie granatowe, światła w jasnym kolorze działu) ---------- */
   .z-nagl { position: relative; overflow: hidden; color: #fff; isolation: isolate; background: var(--granat);
-    --marg: max(64px, calc((100% - var(--kol)) / 2)); box-shadow: 0 1px 0 var(--line); }
+    --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); box-shadow: 0 1px 0 var(--line); }
   .z-foto { position: absolute; top: 0; bottom: 0; left: 36%; right: 0; z-index: -2; background: var(--d-j); }
   /* zdjęcie (i jego malutka wersja, zlecenie 13) w opakowaniu .z-foto-obr, które mnoży się z kolorem działu (mix-blend-mode);
      filtr z --filtr (np. Nauka) albo domyślny */
@@ -212,28 +215,29 @@
   .z-foto img.z-pelne { position: relative; }
   .z-foto::after { content: ''; position: absolute; inset: 0; background: var(--granat); mix-blend-mode: lighten; }
   /* Studia (zlecenie 11, zalecenie 17; prototyp v79): zdjęcie z sali HS przypięte do szkicu patrona, nie do szerokości okna — twarz
-     Knastera wypada między głowami w ławkach na każdym ekranie. Środek szkicu: --marg + 155 px od prawej (40 px + połowa z 230 px);
-     .4425 (= 1 − .5575) — miejsce zdjęcia pod środkiem szkicu od lewej; .4025 pilnuje, żeby z prawej nie wszedł baner z portretem;
+     Knastera wypada między głowami w ławkach na każdym ekranie. Środek szkicu: --m + odstęp + połowa szkicu od prawej (--c, przy 1368 px i wyżej 40 + 115 = 155 px);
+     zdjęcie maleje poniżej 1368 px razem ze szkicem (zlecenie 24, punkt 2), więc twarz stoi na tym samym tle; .4425 (= 1 − .5575) — miejsce zdjęcia pod środkiem szkicu od lewej; .4025 pilnuje, żeby z prawej nie wszedł baner z portretem;
      .2951 — wysokość kadru; .5631 — proporcje pliku (3200×1802). Margines liczony w cqw kontenera zdjęcia (szerokość banera), bo
      „100%” z --marg w `top` liczyłoby się względem wysokości. */
   .z-baner-dzialu[data-dzial="studia"] .z-foto { left: 0; container-type: inline-size; }
-  .z-baner-dzialu[data-dzial="studia"] .z-foto img { --m: max(64px, calc((100cqw - var(--kol)) / 2)); --sz: max(1454px, calc((var(--m) + 155px) / .4025));
-    position: absolute; top: calc(50% - .2951 * var(--sz)); right: calc(var(--m) + 155px - .5575 * var(--sz)); left: auto; bottom: auto;
+  .z-baner-dzialu[data-dzial="studia"] .z-foto img { --m: max(var(--marg-min), calc((100cqw - var(--kol)) / 2)); --c: calc(var(--m) + var(--odst) + var(--szk) / 2);
+    --sz: max(min(1454px, calc(1454 * var(--jn))), calc(var(--c) / .4025));
+    position: absolute; top: calc(50% - .2951 * var(--sz)); right: calc(var(--c) - .5575 * var(--sz)); left: auto; bottom: auto;
     width: var(--sz); max-width: none; height: calc(.5631 * var(--sz)); object-fit: fill; }
   .z-nagl h1 { margin: 0; color: #fff; font-family: var(--f-display); font-weight: 500; letter-spacing: -0.012em; }
   .z-nagl a { color: inherit; }
   .z-wstecz, .z-sciezka a { font-size: 14px; font-weight: 600; color: var(--na-ciemnym-2) !important; text-decoration: none; }
   .z-wstecz:hover, .z-sciezka a:hover { color: #fff !important; }
   .z-sciezka { margin: 0; }
-  .z-haslo { margin: 10px 0 0; font-size: 19px; font-weight: 500; color: var(--d-j); }
+  .z-haslo { margin: 10px 0 0; font-size: clamp(15px, calc(19 * var(--jn)), 19px); font-weight: 500; color: var(--d-j); }
   /* liczby pod hasłem: lista przekazana przez widok (.pt-liczby) */
   /* liczby zawsze w jednym rzędzie (zlecenie 11, zalecenie 2): rząd zawija się, ale ma wysokość jednego rzędu — liczby, które
      przeszłyby do drugiego, znikają w całości (kolejność z danych: pierwsze najważniejsze). Szerokość rzędu do ciekawostki
      lub notki o patronie (minus 20 px) i aria-hidden ukrytych ustawia skrypt w nagłówku (NaglowekZ.astro). */
   .z-slot .pt-liczby { display: flex !important; flex-wrap: wrap; gap: 60px 34px; width: fit-content; max-width: 100%; max-height: 52px; overflow: hidden; margin: 20px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid rgb(255 255 255 / .2); }
-  .z-baner-dzialu .z-slot .pt-liczby { max-width: calc(100vw - 2 * var(--marg) - 560px); } /* bez JS: notka 540 px + 20 px odstępu */
-  .z-slot .pt-liczby li { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: 14px; font-weight: 500; white-space: nowrap; color: var(--na-ciemnym-2); }
-  .z-slot .pt-liczby .n { font-family: var(--f-display); font-size: 30px; font-weight: 500; line-height: 1.1; color: #fff; }
+  .z-baner-dzialu .z-slot .pt-liczby { max-width: calc(100vw - 2 * var(--marg) - var(--szk) - var(--odst) - var(--patron-w) - 20px); } /* bez JS: notka ze szkicem + 20 px odstępu */
+  .z-slot .pt-liczby li { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: clamp(13px, calc(14 * var(--jn)), 14px); font-weight: 500; white-space: nowrap; color: var(--na-ciemnym-2); }
+  .z-slot .pt-liczby .n { font-family: var(--f-display); font-size: clamp(22px, calc(30 * var(--jn)), 30px); font-weight: 500; line-height: 1.1; color: #fff; }
   .z-slot .lead { margin: 10px 0 0; max-width: 640px; font-size: 15.5px; color: var(--na-ciemnym-2); }
   .z-slot .tags, .z-slot .ww-meta, .z-slot .pr-akcje { margin: 14px 0 0; }
   .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }
@@ -241,20 +245,21 @@
   .z-slot .pt-liczby + .pt-liczby { display: none !important; }
 
   /* ---------- baner strony działu („opcja 4”) ---------- */
-  .z-baner-dzialu { height: calc(300px + var(--gora)); }
+  .z-baner-dzialu { --szk: clamp(140px, calc(230 * var(--jn)), 230px); --odst: clamp(14px, calc(40 * var(--jn)), 40px); --patron-w: clamp(200px, calc(270 * var(--jn)), 270px);
+    height: calc(clamp(230px, calc(300 * var(--jn)), 300px) + var(--gora)); }
   .z-baner-dzialu::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
     linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
     radial-gradient(300px 230px at 76% 52%, rgb(13 24 48 / .62), rgb(13 24 48 / 0) 100%),
     radial-gradient(330px 210px at 62% 40%, rgb(13 24 48 / .6), rgb(13 24 48 / 0) 100%),
     linear-gradient(100deg, var(--granat) 0, var(--granat) 41%, rgb(13 24 48 / .86) 47%, rgb(13 24 48 / .4) 58%, rgb(13 24 48 / 0) 70%); }
-  .z-baner-dzialu .z-tytul { position: absolute; z-index: 3; left: var(--marg); top: calc(50px + var(--gora)); }
-  .z-baner-dzialu h1 { margin-top: 6px; font-size: 76px; line-height: 1; }
+  .z-baner-dzialu .z-tytul { position: absolute; z-index: 3; left: var(--marg); top: calc(clamp(34px, calc(50 * var(--jn)), 50px) + var(--gora)); }
+  .z-baner-dzialu h1 { margin-top: 6px; font-size: clamp(44px, calc(76 * var(--jn)), 76px); line-height: 1; }
   /* długi tytuł z danych (np. „Popularyzacja matematyki”) nie wchodzi pod notkę o patronie: łamie się i jest mniejszy */
-  .z-baner-dzialu h1 { max-width: min(660px, calc(100vw - 128px - 600px)); text-wrap: balance; }
-  .z-baner-dzialu:not(:has(.z-slot)) h1 { font-size: clamp(56px, 4vw, 76px); }
-  .z-szkic-ramka { position: absolute; z-index: 1; right: calc(var(--marg) + 40px); top: calc(50% - 138px + var(--gora) / 2); width: 230px; height: 276px;
+  .z-baner-dzialu h1 { max-width: min(660px, calc(100vw - 2 * var(--marg-min) - var(--szk) - var(--odst) - var(--patron-w) - 60px)); text-wrap: balance; }
+  .z-baner-dzialu:not(:has(.z-slot)) h1 { font-size: clamp(44px, max(min(calc(56 * var(--jn)), 56px), 4vw), 76px); }
+  .z-szkic-ramka { position: absolute; z-index: 1; right: calc(var(--marg) + var(--odst)); top: calc(50% - var(--szk) * .6 + var(--gora) / 2); width: var(--szk); height: calc(var(--szk) * 1.2);
     filter: drop-shadow(0 0 7px color-mix(in srgb, var(--d-j) 55%, transparent)); }
-  .z-podpis-ramka { position: absolute; z-index: 3; right: calc(var(--marg) + 60px); bottom: 20px; height: 46px; line-height: 0;
+  .z-podpis-ramka { position: absolute; z-index: 3; right: calc(var(--marg) + clamp(22px, calc(60 * var(--jn)), 60px)); bottom: 20px; height: clamp(30px, calc(46 * var(--jn)), 46px); line-height: 0;
     color: color-mix(in srgb, var(--d-j) 72%, #fff); transform: rotate(-4deg); filter: drop-shadow(0 1px 6px rgb(13 24 48 / .8)); }
   .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
   /* szkic patrona na banerze działu bez plamy (zlecenie 11, zalecenie 16; prototyp „mocniejszy + cień kreski”): kreski i podpis
@@ -264,12 +269,12 @@
   .z-baner-dzialu .z-szkic-ramka { filter: drop-shadow(0 0 1.5px rgb(9 16 34 / .95)) drop-shadow(0 0 4px rgb(9 16 34 / .7))
     drop-shadow(0 0 10px color-mix(in srgb, var(--d-jm) 40%, transparent)); }
   .z-baner-dzialu .z-podpis-ramka { color: var(--d-jm); }
-  .z-patron { position: absolute; z-index: 2; top: calc(58px + var(--gora)); right: calc(var(--marg) + 270px); width: 270px; text-align: right; text-shadow: 0 1px 10px rgb(13 24 48 / .9); }
-  .z-patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 23px; color: #fff; }
+  .z-patron { position: absolute; z-index: 2; top: calc(clamp(40px, calc(58 * var(--jn)), 58px) + var(--gora)); right: calc(var(--marg) + var(--szk) + var(--odst)); width: var(--patron-w); text-align: right; text-shadow: 0 1px 10px rgb(13 24 48 / .9); }
+  .z-patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(18px, calc(23 * var(--jn)), 23px); color: #fff; }
   /* lata · patron działu · sala — zawsze w jednej linii (zlecenie 14, zalecenie 26); dłuższa wychodzi w lewo poza blok 270 px,
      nie w prawo (flex-end). Pudełko zostaje szerokości bloku: skrypt dopasowania liczb (NaglowekZ.astro) liczy granicę z pudełek. */
   .z-patron span { display: flex; justify-content: flex-end; margin-top: 2px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
-  .z-patron p { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 45%, transparent); font-size: 14px; line-height: 1.5; color: rgb(255 255 255 / .86); }
+  .z-patron p { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 45%, transparent); font-size: clamp(13px, calc(14 * var(--jn)), 14px); line-height: 1.5; color: rgb(255 255 255 / .86); }
 
   /* szkic: kontur rysuje się (pathLength=1, dasharray/dashoffset), detale pojawiają się; po narysowaniu jednolity */
   .z-szkic { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -323,39 +328,45 @@
   .z-tyt { position: relative; z-index: 1; margin-left: var(--marg); max-width: calc(100% - 2 * var(--marg)); }
   /* tytuł nie wchodzi pod opis znaku; liczby pod nim mogą iść dalej w prawo (jak w prototypie) */
   /* bez JS; z JS szerokość tytułu do ciekawostki (minus 40 px) liczy skrypt w nagłówku */
-  html:not(.js) .z-nagl-pod:has(.z-znak) .z-tyt-g { max-width: calc(100% - max(570px, 676px - var(--marg))); }
+  html:not(.js) .z-nagl-pod:has(.z-znak) .z-tyt-g { max-width: calc(100% - max(clamp(400px, calc(570 * var(--jn)), 570px), clamp(470px, calc(676 * var(--jn)), 676px) - var(--marg))); }
   /* w wąskim oknie (mały margines) rząd liczb łamie się przed znakiem, zamiast na niego wchodzić */
-  html:not(.js) .z-nagl-pod:has(.z-znak) .z-slot { max-width: calc(100% - max(0px, 200px - var(--marg) + var(--znak-p))); }
+  html:not(.js) .z-nagl-pod:has(.z-znak) .z-slot { max-width: calc(100% - max(0px, var(--zn) - var(--marg) + var(--znak-p))); }
   .z-tyt-g { position: relative; }
-  .z-nagl-pod h1 { margin-top: 6px; font-size: 58px; line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+  .z-nagl-pod h1 { margin-top: 6px; font-size: clamp(40px, calc(58 * var(--jn)), 58px); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
   /* sygnet w lewym marginesie przed tytułem, oddzielony pionową kreską; pod nim mały podpis (ok. 56 px) */
-  .z-sygnet-nagl { position: absolute; right: calc(100% + 22px); bottom: -14px; width: 74px; height: 89px; padding-right: 18px; box-sizing: content-box;
+  .z-sygnet-nagl { position: absolute; right: calc(100% + clamp(14px, calc(22 * var(--jn)), 22px)); bottom: -14px; width: clamp(52px, calc(74 * var(--jn)), 74px); height: clamp(62px, calc(89 * var(--jn)), 89px); padding-right: clamp(12px, calc(18 * var(--jn)), 18px); box-sizing: content-box;
     border-right: 1px solid rgb(255 255 255 / .28); }
   .z-nagl-pod:not(.z-liczbami) .z-sygnet-nagl { bottom: 26px; }
   .z-nagl-pod.z-bez-podpisu .z-sygnet-nagl { bottom: -5px; } /* bez podpisu: na środku bloku z linkiem i tytułem (seminarium) */
   .z-sygnet-nagl path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
-  .z-podpis-maly { position: absolute; right: calc(100% + 47px); top: calc(100% + 20px); line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
+  .z-podpis-maly { position: absolute; right: calc(100% + clamp(30px, calc(47 * var(--jn)), 47px)); top: calc(100% + 20px); line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
     filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
   .z-nagl-pod:not(.z-liczbami) .z-podpis-maly { top: calc(100% - 21px); }
   /* tytuł w dwóch liniach: sygnet z podpisem podniesiony o pół linii (skrypt ustawia --syg-podnies), środek blisko środka
      dwóch linii tytułu; kreska obok sygnetu dłuższa w górę o tyle samo (zlecenie 11, zalecenie 9, doprecyzowanie 5.11) */
   .z-sygnet-nagl, .z-podpis-maly { translate: 0 calc(-1 * var(--syg-podnies, 0px)); }
   .z-nagl-pod.z-tyt-dlugi .z-sygnet-nagl { padding-block: calc(var(--syg-podnies, 0px) / 2); translate: 0 calc(-.5 * var(--syg-podnies, 0px)); }
-  .z-podpis-maly svg { display: block; width: 56px; height: auto; }
+  .z-podpis-maly svg { display: block; width: clamp(40px, calc(56 * var(--jn)), 56px); height: auto; }
   /* znak patrona z opisem: grafika na zewnątrz (wysunięta ok. 90 px w prawy margines), tekst do środka */
-  .z-nagl-pod { --znak-p: max(16px, calc(var(--marg) - 90px)); }
+  .z-nagl-pod { --znak-p: max(16px, calc(var(--marg) - 90px)); --zn: clamp(120px, calc(200 * var(--jn)), 200px); }
   /* nad blokiem tytułu (.z-tyt, z-index 1, pełna szerokość kolumny), żeby kursor trafiał w znak (rysowanie po najechaniu) */
-  .z-znak { position: absolute; z-index: 2; right: var(--znak-p); top: calc(var(--gora) + 10px); width: 145px; height: 170px; }
+  .z-znak { position: absolute; z-index: 2; right: var(--znak-p); top: calc(var(--gora) + 10px); width: calc(var(--zn) * .725); height: calc(var(--zn) * .85); }
   .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 60%, #fff); stroke-opacity: .7; stroke-width: 1.3px; vector-effect: non-scaling-stroke;
     stroke-linecap: round; stroke-linejoin: round; }
   .z-znak path.gruba { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-opacity: 1; stroke-width: 2px; filter: drop-shadow(0 0 4px rgb(13 24 48 / .8)); }
   /* ciekawostka (zalecenie 19): zdanie w kolumnie 300 px, tytuł (nazwa, rok) zawsze w jednej linii — wychodzi w lewo poza
      kolumnę, jak .pd-b .znak-podpis b w prototypie; granicę tytułu strony i liczb liczy skrypt w nagłówku */
-  .z-znak-opis { position: absolute; z-index: 1; right: calc(var(--znak-p) + 160px); top: calc(var(--gora) + 62px); width: 300px; margin: 0; text-align: right;
+  .z-znak-opis { position: absolute; z-index: 1; right: calc(var(--znak-p) + var(--zn) * .8); top: calc(var(--gora) + 62px); width: clamp(210px, calc(300 * var(--jn)), 300px); margin: 0; text-align: right;
     font-size: 12.5px; line-height: 1.45; color: rgb(255 255 255 / .85); text-shadow: 0 1px 8px rgb(13 24 48 / .9); }
   .z-znak-opis b { display: block; margin-left: -160px; white-space: nowrap; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 15px; color: #fff; }
-  .z-liczby-pod, .z-nagl-pod.z-liczbami .z-znak { width: 200px; height: 200px; top: calc(var(--gora) + 34px); }
-  .z-nagl-pod.z-liczbami .z-znak-opis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + 216px); }
+  .z-liczby-pod, .z-nagl-pod.z-liczbami .z-znak { width: var(--zn); height: var(--zn); top: calc(var(--gora) + 34px); }
+  .z-nagl-pod.z-liczbami .z-znak-opis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + var(--zn) + 16px); }
+  /* poniżej 1368 px kursywny tytuł ciekawostki łamie się w swojej kolumnie, a drobny tekst ma co najmniej 13 px (zlecenie 24, punkt 2) */
+  @media (max-width: 1367px) {
+    .z-znak-opis { font-size: 13px; }
+    .z-znak-opis b { margin-left: 0; white-space: normal; font-size: clamp(13.5px, calc(15 * var(--jn)), 15px); }
+    .z-patron span { font-size: 13px; }
+  }
   /* ciekawostka losowana na wizytę: do końca skryptu za znakiem niewidoczna (bez mignięcia stałej z budowania) */
   html.js .z-nagl-pod.z-ck-losuje :is(.z-znak, .z-znak-opis) { visibility: hidden; }
   /* po najechaniu znak rysuje się od nowa (~1 s): cienkie linie, na końcu gruba; sam CSS (pathLength="1"); bez animacji przy
@@ -368,7 +379,7 @@
 
   /* wąskie okno (np. laptop 1366 px): margines za mały na sygnet — sygnet z podpisem wchodzi do kolumny, tytuł przesuwa się w prawo */
   @media (max-width: 1499px) {
-    .z-nagl-pod .z-tyt:has(.z-sygnet-nagl) { padding-left: 122px; }
+    .z-nagl-pod .z-tyt:has(.z-sygnet-nagl) { padding-left: clamp(84px, calc(122 * var(--jn)), 122px); }
   }
 
 
@@ -504,7 +515,7 @@
   .z-pd-tresc .wst { margin: 0 0 26px; font-size: 17px; color: var(--text); }
   .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 43.92em; }
   .z-pd-tresc a { color: var(--d-a); }
-  .z-nast { --marg: max(64px, calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  .z-nast { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
     margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--rule); }
   .z-nast-link { font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
   .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
@@ -512,7 +523,7 @@
   .z-nast-meta a { color: var(--d-a); }
 
   /* ---------- odchudzona stopka w jednej linii ---------- */
-  .z-stopka { --marg: max(64px, calc((100% - var(--kol)) / 2)); padding: 13px var(--marg); background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.4; }
+  .z-stopka { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); padding: 13px var(--marg); background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.4; }
   .z-stopka-in { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 24px; }
   .z-stopka b { color: #fff; font-family: var(--f-display); font-weight: 500; font-size: 15.5px; }
   .z-stopka a { color: inherit; text-decoration: none; }

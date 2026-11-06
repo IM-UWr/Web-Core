@@ -75,7 +75,7 @@
   .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 20px 28px 14px;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
   /* --marg z górną granicą: krzyżyk stoi w miejscu hamburgera do okna 1920 px; szerzej zostałby poza panelem, a pole szukania bez miejsca */
-  .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: min(340px, max(64px, calc((100vw - var(--kol)) / 2))); }
+  .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: min(340px, max(var(--marg-min), calc((100vw - var(--kol)) / 2))); }
   /* pole szukania w jednym rzędzie z krzyżykiem, bez nachodzenia na niego (także na okładce) */
   .z-menu-szukaj { margin-right: calc(max(24px, var(--marg, 64px) - 2px) + 24px); }
   .z-menu ul { display: flex; flex-wrap: wrap; gap: 2px 16px; }

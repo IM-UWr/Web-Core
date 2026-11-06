@@ -8,7 +8,7 @@
 /* reguły na każdej szerokości; telefon (≤ 1023 px) nadpisuje src/styles/zal-telefon.css */
 @media all {
 
-  .z-dz { --marg: max(64px, calc((100% - var(--kol)) / 2)); font-size: 16px; line-height: 1.6; color: var(--text); }
+  .z-dz { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); font-size: 16px; line-height: 1.6; color: var(--text); }
   .z-dz :is(h2, h3) { line-height: 1.6; letter-spacing: normal; }
   .z-dz a { text-decoration: none; }
   .z-dz ul { list-style: none; margin: 0; padding: 0; }
