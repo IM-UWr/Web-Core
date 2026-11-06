@@ -160,7 +160,7 @@ const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.l
 //   co 4 px, najwyżej do 44 px; przy dwóch liniach na podstronie sygnet (z podpisem) podnosi się o pół linii — środek blisko środka dwóch linii tytułu;
 // - hasło: szerokość do granicy, zawija się;
 // - liczby zawsze w jednym rzędzie (CSS: zawijanie i wysokość jednego rzędu): szerokość rzędu do granicy; poniżej 1368 px liczą się tylko te prostokąty,
-//   które nachodzą na rząd w pionie, od 1368 px wszystkie, jak przed zleceniem 24 (nagłówek tam bez zmian, punkt 2); liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy. Pierwsza liczba
+//   które nachodzą na rząd w pionie, od 1368 px wszystkie, razem z pudełkami akapitów notki, jak przed zleceniem 24 (nagłówek tam bez zmian, punkt 2); liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy. Pierwsza liczba
 //   nigdy ucięta: gdy nie mieści się w całości, znika cały rząd razem z kreską (zlecenie 24, punkt 4);
 // - bezpiecznik (zlecenie 24, punkt 4): gdy mimo tego tekst nagłówka dotyka opisu ciekawostki albo akapitu notki o patronie, hasło ma ponad dwie linie
 //   albo tytuł przy 44 px dalej się nie mieści, dodatek się chowa (symbol, imię i linia z latami zostają) i układ liczy się od nowa, już bez niego;
@@ -181,7 +181,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   `zaDlugi=lin>2||h1.scrollWidth>h1.clientWidth;if(g)g.style.setProperty('--syg-podnies',Math.max(0,lin-1)*lh/2+'px')}else if(g)g.style.removeProperty('--syg-podnies');` +
   `n.classList.toggle('z-tyt-dlugi',lin>1)}` +
   `if(hs){hs.style.maxWidth='';if(!tel){hs.style.maxWidth=Math.max(0,gt-hs.getBoundingClientRect().left)+'px';if(Math.round(hs.offsetHeight/px(getComputedStyle(hs).lineHeight))>2)zaDlugi=true}}` +
-  `if(ul){ul.style.maxWidth='';ul.classList.remove('z-bez-liczb');if(!tel){var ur=ul.getBoundingClientRect(),gl=gk;pola.forEach(function(r){if(innerWidth>=1368||(r.top<ur.bottom&&ur.top<r.bottom))gl=Math.min(gl,r.left-20)});ul.style.maxWidth=Math.max(0,gl-ur.left)+'px';` +
+  `if(ul){ul.style.maxWidth='';ul.classList.remove('z-bez-liczb');if(!tel){var ur=ul.getBoundingClientRect(),gl=gk;var sz=innerWidth>=1368;pola.forEach(function(r){if(sz||(r.top<ur.bottom&&ur.top<r.bottom))gl=Math.min(gl,r.left-20)});if(sz)n.querySelectorAll('.z-patron').forEach(function(e){var q=document.createRange();q.selectNodeContents(e);[].forEach.call(q.getClientRects(),function(r){if(r.width&&r.height)gl=Math.min(gl,r.left-20)})});ul.style.maxWidth=Math.max(0,gl-ur.left)+'px';` +
   `if(ul.children.length&&ul.children[0].getBoundingClientRect().right>ul.getBoundingClientRect().right+.5)ul.classList.add('z-bez-liczb')}var li=ul.children,t0=li.length?li[0].offsetTop:0;` +
   `for(var i=0;i<li.length;i++){if(tel?i>2:li[i].offsetTop>t0+4)li[i].setAttribute('aria-hidden','true');else li[i].removeAttribute('aria-hidden')}}return zaDlugi}` +
   `if(dod)dod.classList.remove('z-brak-miejsca');var zaDlugi=uklad();` +
