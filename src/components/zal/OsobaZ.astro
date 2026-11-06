@@ -19,7 +19,8 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
   {/* największe pole zdjęcia w schemacie Władz: 120 × 150 (dyrektor; zalozyciele-strony.css) */}
   {o.zdjecie && <ZdjecieZ class="fot" src={o.zdjecie} sizes={rozmiarPola([null, 120, 150])} />}
   {o.rola && <div class="rola">{o.rola}</div>}
-  <div class="imie" data-limit-linii="2">{o.strona ? <Link href={o.strona}>{o.nazwa}</Link> : o.nazwa}</div>
+  {/* limit 3, nie 2: nazwa zawiera tytuły; „dr hab. Piotr Borodulin-Nadzieja, prof. UWr” ma 3 linie w kolumnie 219 px przy każdym oknie (imię i nazwisko bez tytułów mieszczą się w 2) */}
+  <div class="imie" data-limit-linii="3">{o.strona ? <Link href={o.strona}>{o.nazwa}</Link> : o.nazwa}</div>
   {o.zaklad && <div class="zakl"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></div>}
   {zakres && o.zakres && <p class="opis">{o.zakres}</p>}
   <div class="kont">
