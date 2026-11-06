@@ -129,9 +129,12 @@
   html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek:not(.jasny)::before { opacity: 1; visibility: visible; transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
   @media (prefers-reduced-motion: reduce) { html.js .z-pasek, html.js .z-pasek::before, html.js .z-pasek::after { transition: none !important; } }
   .z-marka { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
-  /* najechanie: kolor bez zmian (globalne a:hover dawało granat na granacie), podkreślona nazwa (zlecenie 13, punkt 10) */
+  /* najechanie: nazwa przygasa do koloru podpisu, bez podkreślenia (zlecenie 18, punkt 1); kolor na jasnym pasku niżej.
+     color: inherit na linku, bo globalne a:hover dawało granat na granacie */
   .z-marka:hover { color: inherit; }
-  .z-marka:hover b { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .z-marka b { transition: color var(--t-krotki) var(--rytm); }
+  .z-marka:hover b { color: var(--na-ciemnym-2); }
+  @media (prefers-reduced-motion: reduce) { .z-marka b { transition: none; } }
   .z-logo { display: block; height: 40px; aspect-ratio: 500 / 160; background: #fff;
     -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
   .z-marka > span:last-child { padding-left: 12px; border-left: 1px solid rgb(255 255 255 / .25); }
@@ -499,7 +502,7 @@
      w ciemnym motywie w jasnym */
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-logo { background: var(--uwr); }
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka > span:last-child { border-left-color: var(--line); }
-  :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka small { color: var(--muted); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka small, :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka:hover b { color: var(--muted); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a, :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button { color: color-mix(in srgb, var(--ink) 76%, transparent); }
   :is(.z-pasek-jasny, .z-pasek.jasny) nav a:hover, :is(.z-pasek-jasny, .z-pasek.jasny) nav a[aria-current],
   :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button:hover { color: var(--ink); }
