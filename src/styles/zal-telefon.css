@@ -149,6 +149,12 @@
   .z-nagl.z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--g-pod) 70%, var(--granat)); }
   .z-nagl.z-nagl-pod::before { content: ''; position: absolute; inset: 0; z-index: -1;
     background: linear-gradient(90deg, color-mix(in srgb, var(--g-pod) 92%, transparent) 0, color-mix(in srgb, var(--g-pod) 70%, transparent) 60%, color-mix(in srgb, var(--g-pod) 55%, transparent) 100%); }
+  /* Aktualności (zlecenie 18, punkt 7): zdjęcie od prawej, skacząca osoba obok krótkiego tytułu; ciemniej z lewej, pod tekstem.
+     Lekkie przyciemnienie i cień napisu na całości: długi tytuł wpisu przechodzi przez zdjęcie */
+  .z-nagl.z-nagl-pod.z-foto-nat::before { content: none; }
+  .z-nagl.z-nagl-pod.z-foto-nat .z-foto { left: auto; right: 0; width: 78%; }
+  .z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { background: linear-gradient(to right, var(--g-pod) 0, color-mix(in srgb, var(--g-pod) 65%, transparent) 22%, color-mix(in srgb, var(--g-pod) 22%, transparent) 42%, color-mix(in srgb, var(--g-pod) 18%, transparent) 100%); }
+  .z-nagl.z-nagl-pod.z-foto-nat :is(h1, .z-haslo, .z-sciezka a) { text-shadow: 0 1px 8px rgb(13 24 48 / .75); }
   .z-nagl.z-nagl-pod .z-tyt { position: relative; z-index: 1; margin: 0; max-width: none; padding: 0; }
   .z-nagl.z-nagl-pod .z-tyt-g { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: end; max-width: none; }
   .z-nagl.z-nagl-pod:not(:has(.z-sygnet-nagl)) .z-tyt-g { display: block; }

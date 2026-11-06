@@ -8,7 +8,8 @@
 // rodzaj „podstrona” — nagłówek podstrony: głęboki kolor działu na zdjęciu działu (mocniej z lewej, słabiej w prawo),
 //   „← Dział”, sygnet z małym podpisem w lewym marginesie i znak patrona z opisem przy prawej krawędzi. Bez animacji.
 //   Znak i opis (ciekawostka) tylko na podstronach z menu działu; strony głębiej mają sygnet i tytuł. Hasło i liczby — gdy są.
-//   Strony bez działu (Aktualności, Kalendarz, strony ogólne) — granat, bez sygnetu i znaku.
+//   Strony bez działu (Kalendarz, strony ogólne) — granat, bez sygnetu i znaku. Aktualności (lista i wpisy; zlecenie 18, punkt 7): też bez
+//   sygnetu i znaku, ale granat przechodzi w zdjęcie po prawej, w naturalnych kolorach (klasa z-foto-nat).
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { u, stripBase } from '../../lib/url';
@@ -54,6 +55,8 @@ if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola
 // Zdjęcia działów (na razie z public/pliki/naglowki, repozytorium treści Web-Ustawienia): kadr i jasność dobrane w prototypie.
 // Studia (zlecenie 11, zalecenie 17): sala HS od tyłu (3200 px), domyślny filtr bez rozjaśnienia; na komputerze zdjęcie przypięte
 // do szkicu patrona (zalozyciele.css), na telefonie zwykłe object-fit: cover.
+const strona = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
+const fotoNat = !P && /^\/aktualnosci(\/|$)/.test(strona);
 const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?: { pl: string; en: string } }> = {
   instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: '50% 42%' },
   nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: '50% 30%', filtr: 'grayscale(1) contrast(1.15) brightness(1.45)' },
@@ -62,10 +65,13 @@ const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?
     en: 'Lecture room HS: a lecture at the blackboards, students in the benches seen from behind' } },
   popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: '50% 40%' },
   granat: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: '50% 40%' },
+  aktualnosci: { zdjecie: '/pliki/naglowki/aktualnosci-skok.jpg', kadr: '48% 63%', alt: {
+    pl: 'Hol Wydziału Matematyki i Informatyki: student w skoku pod tablicą kierunkową',
+    en: 'The hall of the Faculty of Mathematics and Computer Science: a student jumping under the direction sign' } },
 };
-const f = FOTO[dzial ?? 'granat'];
+const f = FOTO[fotoNat ? 'aktualnosci' : (dzial ?? 'granat')];
 const altFoto = f.alt ? f.alt[lang] : '';
-const styl = `object-position:${rodzaj === 'podstrona' ? '50% 40%' : f.kadr}${f.filtr ? `;--filtr:${f.filtr}` : ''}`;
+const styl = `object-position:${rodzaj === 'podstrona' && !fotoNat ? '50% 40%' : f.kadr}${f.filtr ? `;--filtr:${f.filtr}` : ''}`;
 // szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6) — jak w zalozyciele.css: baner działu od 36% szerokości, Studia
 // w szerokości --sz przypiętej do szkicu (zlecenie 11, zalecenie 17), podstrona Studiów 122% (same tablice), telefon — cały ekran.
 // Zdjęcie wypełnia pole przez object-fit: cover, więc gdy pole jest wyższe niż zdjęcie w tej szerokości, potrzebna szerokość
@@ -77,13 +83,13 @@ const rozmiar = (p: number) => rodzaj === 'dzial'
   ? (dzial === 'studia'
     ? `${KOMPUTER} max(1454px, calc((max(64px, (100vw - 1240px) / 2) + 155px) / .4025)), max(100vw, ${px(410, p)})`
     : `${KOMPUTER} max(64vw, ${px(370, p)}), max(100vw, ${px(410, p)})`)
-  : (dzial === 'studia' ? `${KOMPUTER} 122vw, max(100vw, ${px(300, p)})` : `max(100vw, ${px(300, p)})`);
+  : (fotoNat ? `${KOMPUTER} min(62vw, 1270px), max(78vw, ${px(300, p)})`
+    : dzial === 'studia' ? `${KOMPUTER} 122vw, max(100vw, ${px(300, p)})` : `max(100vw, ${px(300, p)})`);
 
 // Ciekawostka patrona (zalecenie 19): każda podstrona z menu działu dostaje inną ciekawostkę patrona, losowaną raz na wizytę
 // (sessionStorage „im-ciek-zestaw”: {dział: {strona: id}}) skryptem w linii za znakiem, zanim strona się narysuje; pula działu
 // w linii (tylko to, co widać). Bez JS albo bez sessionStorage: ciekawostka stała z budowania (ukladStaly). Pusta pula:
 // dawny stały znak działu.
-const strona = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
 const pulaCk = P && znak ? pulaDzialu(P.dzial) : [];
 let ck: Ciekawostka | undefined;
 let ckDane = '';
@@ -195,7 +201,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   </div>
 )}
 {rodzaj === 'podstrona' && (
-  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', bezPodpisu && 'z-bez-podpisu', !P && 'z-granat', ck && 'z-ck-losuje']} data-dzial={P?.dzial} data-ck={ck?.id} data-pagefind-ignore>
+  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', bezPodpisu && 'z-bez-podpisu', !P && 'z-granat', fotoNat && 'z-foto-nat', ck && 'z-ck-losuje']} data-dzial={P?.dzial} data-ck={ck?.id} data-pagefind-ignore>
     <div class="z-foto"><span class="z-foto-obr"><ZdjecieZ src={f.zdjecie} alt={altFoto} sizes={rozmiar} loading="eager" fetchpriority="high" style={styl} zastepczy /></span></div>
     <div class="z-tyt">
       <div class="z-tyt-g">

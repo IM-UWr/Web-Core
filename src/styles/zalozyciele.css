@@ -61,6 +61,14 @@
 :root[data-theme="dark"] .z-nagl .z-foto { background: color-mix(in oklab, var(--d-j) 55%, var(--granat)); }
 /* nagłówek podstrony: głęboki kolor działu z domieszką granatu zamiast jaskrawej cegły / ochry (gradienty te same) */
 :root[data-theme="dark"] .z-nagl.z-nagl-pod { --g-pod: color-mix(in oklab, var(--d-g) 72%, var(--granat)); }
+/* baner Aktualności (zlecenie 18, punkt 7; układ niżej, telefon w zal-telefon.css): zdjęcie w naturalnych kolorach, bez mnożenia
+   z kolorem i bez filtrów, w obu motywach */
+/* overflow: rozmyta mała wersja zdjęcia nie wychodzi na granat przy lewej krawędzi */
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto { overflow: hidden; background: none; }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto-obr { mix-blend-mode: normal; }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto img { filter: none; }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto img.z-lqip { filter: blur(14px); }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { mix-blend-mode: normal; }
 /* zwykłe zdjęcia: lekko przygaszone (okładka, portrety, miniatury) */
 :root[data-theme="dark"] .z-okl-foto { filter: brightness(.92) saturate(.92); }
 :root[data-theme="dark"] .z-okl-foto.z-lqip { filter: brightness(.92) saturate(.92) blur(14px); }
@@ -273,6 +281,16 @@
     radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--g-pod) 70%, transparent), transparent 100%),
     linear-gradient(90deg, color-mix(in srgb, var(--g-pod) 90%, transparent) 0, color-mix(in srgb, var(--g-pod) 72%, transparent) 45%, color-mix(in srgb, var(--g-pod) 56%, transparent) 100%); }
   .z-nagl-pod.z-granat { --d-g: var(--granat); --d-j: #c9d0de; }
+  /* Aktualności: pełny granat z lewej przechodzi w zdjęcie po prawej (jak na banerach działów), przyciemnione tylko pod paskiem i przy
+     tekście. Górna granica szerokości: szersze zdjęcie jest wyższe, a skacząca osoba musi się zmieścić w wysokości banera.
+     Długi tytuł wpisu kończy się przed jasną częścią zdjęcia. */
+  .z-nagl.z-nagl-pod.z-foto-nat::before { background: linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)); }
+  .z-nagl.z-nagl-pod.z-foto-nat .z-foto { left: auto; width: min(62%, 1270px); }
+  .z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { background: linear-gradient(to right, var(--g-pod) 0, color-mix(in srgb, var(--g-pod) 60%, transparent) 26%, color-mix(in srgb, var(--g-pod) 12%, transparent) 55%, transparent 75%); }
+  .z-nagl.z-nagl-pod.z-foto-nat h1 { text-shadow: 0 1px 12px rgb(13 24 48 / .55); }
+  @media (min-width: 1100px) { .z-nagl.z-nagl-pod.z-foto-nat h1 { max-width: min(860px, 70%) !important; } }
+  /* węższe okno: tytuł idzie przez zdjęcie (inaczej długi tytuł wpisu miałby kilka linii więcej), więc całe zdjęcie trochę ciemniejsze */
+  @media (max-width: 1099px) { .z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { background: linear-gradient(to right, var(--g-pod) 0, color-mix(in srgb, var(--g-pod) 70%, transparent) 26%, color-mix(in srgb, var(--g-pod) 40%, transparent) 55%, color-mix(in srgb, var(--g-pod) 30%, transparent) 100%); } }
   .z-tyt { position: relative; z-index: 1; margin-left: var(--marg); max-width: calc(100% - 2 * var(--marg)); }
   /* tytuł nie wchodzi pod opis znaku; liczby pod nim mogą iść dalej w prawo (jak w prototypie) */
   /* bez JS; z JS szerokość tytułu do ciekawostki (minus 40 px) liczy skrypt w nagłówku */
