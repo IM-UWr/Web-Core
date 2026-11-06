@@ -25,15 +25,31 @@
   body[data-tlo] { background: var(--bg); }
   body[data-tlo]::before, body[data-tlo]::after { content: none !important; }
 
-  /* ---------- nagłówek strony: granat, nazwa Brygadą (pasek menu komputera schowany) ---------- */
+  /* ---------- nagłówek strony: nazwa Brygadą (pasek menu komputera schowany). Kolor według tych samych zasad co pasek komputera
+     (zlecenie 21, punkt 2, zmienia „pełny granat” ze zlecenia 18, punkt 10; wartości jak w zalozyciele.css, stany: src/scripts/zal/pasek.ts).
+     Bez klas, czyli na górze strony i bez JS: pełny granat, bo pasek stoi tu w układzie i nie ma pod sobą banera, prześwit dałby szarość ---------- */
   .z-pasek { display: none !important; }
-  .hdr, .hdr.menu-otwarte {
+  .hdr { --pasek-krycie: 45%;
     background: var(--granat) !important; border-bottom-color: rgb(255 255 255 / .12) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; }
+  body:has(.z-nagl-pod[data-dzial]) .hdr { --pasek-krycie: 40%; }
+  body:has(.z-foto-nat) .hdr { --pasek-krycie: 60%; }
+  /* nad banerem po przewinięciu i nad stopką; strona bez banera i główna zostają przy pełnym granacie */
+  body:has(.z-nagl) .hdr.przewiniety:not(.jasny) { background: color-mix(in srgb, var(--granat) var(--pasek-krycie), transparent) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.1) !important; backdrop-filter: blur(14px) saturate(1.1) !important; border-bottom-color: rgb(255 255 255 / .1) !important; box-shadow: 0 8px 24px rgb(0 0 0 / .18) !important; }
+  /* nad treścią */
+  .hdr.jasny { background: color-mix(in srgb, var(--bg) 95%, transparent) !important;
+    -webkit-backdrop-filter: blur(8px) !important; backdrop-filter: blur(8px) !important; border-bottom-color: var(--line) !important; box-shadow: 0 6px 18px rgb(13 24 48 / .06) !important; }
   .hdr .brand-name { font-family: var(--f-display); font-weight: 600; letter-spacing: 0; color: #fff !important; }
   .hdr .brand-sub { color: var(--na-ciemnym-2) !important; }
-  .hdr .brand-logo { background: #fff !important; }
+  .hdr .brand-logo { background: #fff !important; transition: background-color var(--t-sredni) var(--rytm); }
   .hdr .icon-btn { color: #fff !important; background: transparent; }
   .hdr .icon-btn.burger { background: rgb(255 255 255 / .14) !important; color: #fff !important; }
+  .hdr.jasny .brand-name { color: var(--ink) !important; }
+  .hdr.jasny .brand-sub { color: var(--muted) !important; }
+  .hdr.jasny .brand-logo { background: var(--uwr) !important; }
+  .hdr.jasny .icon-btn { color: color-mix(in srgb, var(--ink) 76%, transparent) !important; }
+  .hdr.jasny .icon-btn.burger { background: var(--surface) !important; color: var(--ink) !important; }
+  @media (prefers-reduced-motion: reduce) { .hdr, .hdr .brand-name, .hdr .brand-sub, .hdr .brand-logo, .hdr .icon-btn { transition: none; } }
   /* strona główna: Wydział albo Instytut w tym samym miejscu, widoczny jeden; ukryty bez fokusu i poza czytnikami (zlecenie 18, punkt 12) */
   .brand-okladka { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
   .hdr-row:has(.brand-okladka) { gap: 6px; }

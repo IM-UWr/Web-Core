@@ -5,8 +5,9 @@
      (.z-menu-jasny, ustawia src/scripts/zal/pasek.ts), własny krzyżyk. Pismo, sygnet i szerokość rosną z wysokością okna, rzędy
      dzielą między siebie jego wolną wysokość (zlecenie 20, punkt 1), a każdy dział mieści się bez przewijania także przy
      oknie 1366×640 (linki w grupie obok siebie, z zawijaniem). Kolor działu: sygnet, kreska pod nazwą i bieżąca strona.
-   - Telefon (≤ 760 px): pod nagłówkiem, zawsze granatowy, strona przyciemniona (.z-menu-tlo) i nieprzewijalna, krzyżykiem
-     staje się hamburger w nagłówku (Naglowek.astro), więc własny krzyżyk panelu jest schowany.
+   - Telefon (≤ 760 px): pod nagłówkiem, w kolorze nagłówka (granat, przy jasnym nagłówku jasny na pełnym tle: .z-menu-jasny, ustawia
+     src/scripts/zal/pasek.ts; zlecenie 21, punkt 2), strona przyciemniona (.z-menu-tlo) i nieprzewijalna, krzyżykiem staje się hamburger
+     w nagłówku (Naglowek.astro), więc własny krzyżyk panelu jest schowany.
    ========================================================================== */
 .z-menu { overflow-y: auto; overscroll-behavior: contain; text-align: left; color: #fff;
   transform: translateX(100%); visibility: hidden; transition: transform var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi), background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
@@ -83,25 +84,6 @@
   .z-menu .z-zamknij button:hover { background: rgb(255 255 255 / .16); }
   .z-menu .z-zamknij button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
   .z-menu .z-zamknij svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
-
-  /* jasny panel (przy jasnym pasku): tło strony, tekst w kolorze tekstu, sygnety, kreski i bieżąca strona w kolorze działu */
-  .z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
-  .z-menu-jasny h2 a { color: var(--ink); }
-  .z-menu-jasny h2 a::after { background: var(--d-a, var(--line)); }
-  .z-menu-jasny ul a { color: var(--text); }
-  .z-menu-jasny ul a:hover { color: var(--ink); }
-  .z-menu-jasny ul a[aria-current='page'], .z-menu-jasny section[data-dzial] h2 a[aria-current='page'] { color: var(--d-a); }
-  .z-menu-jasny section { border-bottom-color: var(--line); }
-  .z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }
-  .z-menu-jasny .z-menu-szukaj { border-color: var(--line); color: var(--muted); }
-  .z-menu-jasny .z-menu-szukaj:focus-within { border-color: var(--ink); }
-  .z-menu-jasny .z-menu-szukaj input { color: var(--ink); }
-  .z-menu-jasny .z-menu-szukaj input::placeholder { color: var(--muted); }
-  .z-menu-jasny .z-zamknij button { background: var(--surface); color: var(--ink); }
-  .z-menu-jasny .z-zamknij button:hover { background: var(--line); }
-  .z-menu-jasny .z-menu-grupa h3 { color: var(--muted); }
-  .z-menu-jasny .z-menu-rozwin { color: var(--ink); }
-  .z-menu-jasny .z-menu-rozwin:hover { background: var(--surface); }
 }
 
 @media (min-width: 761px) {
@@ -184,6 +166,28 @@
   .z-menu-tlo.otwarte { opacity: 1; visibility: visible; transition: opacity var(--t-dlugi) var(--rytm), visibility 0s; }
   html.menu-otwarte { overflow: hidden; }
 }
+
+/* ---------- jasny panel przy jasnym pasku, na komputerze i telefonie: tło strony, tekst w kolorze tekstu, sygnety, kreski i bieżąca strona w kolorze działu.
+   Po bloku telefonu, żeby wygrywał kolejnością z jego kolorami. ---------- */
+.z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
+.z-menu-jasny h2 a { color: var(--ink); }
+.z-menu-jasny h2 a::after { background: var(--d-a, var(--line)); }
+.z-menu-jasny ul a { color: var(--text); }
+.z-menu-jasny ul a:hover { color: var(--ink); }
+.z-menu-jasny ul a[aria-current='page'], .z-menu-jasny section[data-dzial] h2 a[aria-current='page'] { color: var(--d-a); }
+.z-menu-jasny section { border-bottom-color: var(--line); }
+.z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }
+.z-menu-jasny .z-menu-szukaj { border-color: var(--line); color: var(--muted); }
+.z-menu-jasny .z-menu-szukaj:focus-within { border-color: var(--ink); }
+.z-menu-jasny .z-menu-szukaj input { color: var(--ink); }
+.z-menu-jasny .z-menu-szukaj input::placeholder { color: var(--muted); }
+.z-menu-jasny .z-zamknij button { background: var(--surface); color: var(--ink); }
+.z-menu-jasny .z-zamknij button:hover { background: var(--line); }
+.z-menu-jasny .z-menu-grupa h3 { color: var(--muted); }
+.z-menu-jasny .z-menu-rozwin { color: var(--ink); }
+.z-menu-jasny .z-menu-rozwin:hover { background: var(--surface); }
+/* telefon: tło pełne, bo przy 97% prześwituje tekst strony */
+@media (max-width: 760px) { .z-menu.z-menu-jasny { background: var(--bg); } }
 
 /* na końcu: wygrywa kolejnością z regułą przyciemnienia w bloku telefonu */
 @media (prefers-reduced-motion: reduce) {

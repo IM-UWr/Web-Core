@@ -1,16 +1,26 @@
-// Kolor przyklejonego paska menu (src/components/zal/PasekMenu.astro; zlecenie 11, zalecenie 6):
+// Kolor paska u góry strony. Te same zasady na komputerze i na telefonie (zlecenie 21, punkt 2), inne tylko elementy i położenie.
+// Komputer: przyklejony pasek menu (src/components/zal/PasekMenu.astro; zlecenie 11, zalecenie 6):
 // - na samej górze, nad banerem — lekkie rozmycie i lekkie tło granatu (bez klasy; także bez JS; zlecenie 18, punkt 10);
 // - po przewinięciu, dopóki pod paskiem jest baner — mocniejsze rozmycie z tym samym tłem, cień (.przewiniety);
 // - nad treścią — jasny (.jasny); nad stopką — znowu jak nad banerem. Strona bez banera: pełny granat zamiast rozmycia.
 // Co jest pod paskiem, mówi IntersectionObserver: obszar obserwacji to linia okna na dolnej krawędzi paska, bo prześwitujący pasek
 // może stać tylko nad samym banerem: gdy pod pasek wchodzi jasna treść, jest już jasny (zlecenie 18, punkt 10). Panel hamburgera
 // przy pasku dostaje ten sam kolor (.z-menu-jasny). Strona główna ma własny, zawsze jasny pasek — tu pomijany.
+// Telefon (≤ 760 px): nagłówek .hdr (src/components/Naglowek.astro), style w src/styles/zal-telefon.css. Stoi w układzie strony, więc:
+// - strona z banerem: na górze pełny granat (pod paskiem nie ma jeszcze banera, prześwit dałby szarość), dalej jak na komputerze;
+// - strona bez banera: na górze pełny granat, po przewinięciu jasny, nad stopką znowu granat, bez rozmycia;
+// - strona główna: nad okładką pełny granat, od krawędzi Szybkiego dostępu zawsze jasny, także nad stopką;
+// - co jest pod paskiem, sprawdza linia 1 px tuż pod jego dolną krawędzią (na komputerze tuż nad nią): przy scrollY 0 baner zaczyna się
+//   dokładnie na tej krawędzi, a na krawędzi Szybkiego dostępu okładka dokładnie na niej się kończy.
+// Panel hamburgera ma kolor nagłówka. Panel strony głównej ma klasę .z-menu-jasny na stałe: na telefonie przełącza ją skrypt,
+// a na komputerze panel zostaje jasny, także po obróceniu telefonu lub zmianie szerokości okna.
+const TELEFON = matchMedia('(max-width: 760px)');
+const baner = document.querySelector<HTMLElement>('.z-nagl');
+const stopka = document.querySelector<HTMLElement>('.z-stopka');
 const pasek = document.querySelector<HTMLElement>('[data-z-pasek]:not(.z-pasek-jasny)');
 
 if (pasek) {
   const panel = document.getElementById(pasek.querySelector('[data-z-menu-otworz]')?.getAttribute('aria-controls') || '');
-  const baner = document.querySelector<HTMLElement>('.z-nagl');
-  const stopka = document.querySelector<HTMLElement>('.z-stopka');
   const pod = new Set<Element>();
   let obs: IntersectionObserver | null = null;
 
@@ -20,7 +30,7 @@ if (pasek) {
     const ciemny = pod.size > 0 || (!baner && !przewiniety);
     pasek.classList.toggle('przewiniety', przewiniety);
     pasek.classList.toggle('jasny', !ciemny);
-    panel?.classList.toggle('z-menu-jasny', !ciemny);
+    if (!TELEFON.matches) panel?.classList.toggle('z-menu-jasny', !ciemny);
   };
 
   const obserwuj = () => {
@@ -40,6 +50,43 @@ if (pasek) {
   window.addEventListener('scroll', () => { cancelAnimationFrame(rama); rama = requestAnimationFrame(ustaw); }, { passive: true });
   let czas = 0;
   window.addEventListener('resize', () => { clearTimeout(czas); czas = window.setTimeout(obserwuj, 150); });
+  TELEFON.addEventListener('change', ustaw);
   obserwuj();
+  ustaw();
+}
+
+const hdr = document.querySelector<HTMLElement>('.hdr');
+
+if (hdr) {
+  const okladka = document.querySelector<HTMLElement>('.z-okladka');
+  const panel = document.getElementById(hdr.querySelector('[data-z-menu-otworz]')?.getAttribute('aria-controls') || '');
+  const pod = (el: Element | null, h: number) => {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return Math.round(r.top) <= h && Math.round(r.bottom) > h;
+  };
+
+  const ustaw = () => {
+    if (!TELEFON.matches) {
+      if (okladka) panel?.classList.add('z-menu-jasny');
+      return;
+    }
+    const h = hdr.offsetHeight;
+    const y = window.scrollY;
+    let przewiniety = false;
+    let ciemny: boolean;
+    if (okladka) ciemny = pod(okladka, h);
+    else if (baner) { przewiniety = y > h; ciemny = pod(baner, h) || pod(stopka, h); }
+    else { przewiniety = y > 2; ciemny = !przewiniety || pod(stopka, h); }
+    hdr.classList.toggle('przewiniety', przewiniety);
+    hdr.classList.toggle('jasny', !ciemny);
+    panel?.classList.toggle('z-menu-jasny', !ciemny);
+  };
+
+  let rama = 0;
+  window.addEventListener('scroll', () => { cancelAnimationFrame(rama); rama = requestAnimationFrame(ustaw); }, { passive: true });
+  window.addEventListener('resize', ustaw);
+  window.addEventListener('pageshow', ustaw);
+  TELEFON.addEventListener('change', ustaw);
   ustaw();
 }
