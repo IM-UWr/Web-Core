@@ -67,12 +67,12 @@
 
 /* ---------- komputer ---------- */
 @media (min-width: 761px) {
-  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 20px 36px 14px;
+  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 20px 28px 14px;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
   /* --marg z górną granicą: krzyżyk stoi w miejscu hamburgera do okna 1920 px; szerzej zostałby poza panelem, a pole szukania bez miejsca */
   .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: min(340px, max(64px, calc((100vw - var(--kol)) / 2))); }
   /* pole szukania w jednym rzędzie z krzyżykiem, bez nachodzenia na niego (także na okładce) */
-  .z-menu-szukaj { margin-right: calc(max(24px, var(--marg, 64px) - 2px) + 16px); }
+  .z-menu-szukaj { margin-right: calc(max(24px, var(--marg, 64px) - 2px) + 24px); }
   .z-menu ul { display: flex; flex-wrap: wrap; gap: 2px 16px; }
   .z-menu ul a { display: inline-block; padding: 3px 0; }
   .z-menu .z-zamknij { position: absolute; top: 18px; right: 32px; }
@@ -112,7 +112,7 @@
     --m-l: calc(14.5px + var(--mw) / 53);   /* link: 14,5 → 17,5 */
     --m-g: calc(12.5px + var(--mw) / 80);   /* nazwa grupy: 12,5 → 14,5 */
     --m-s: calc(40px + var(--mw) / 11.5);   /* sygnet: 40 → 54 */
-    width: min(calc(640px + var(--mw) / 2), calc(100vw - 64px)); /* 640 → 720 */
+    width: min(calc(610px + var(--mw) * 3 / 8), calc(100vw - 64px)); /* 610 → 670 */
     display: flex; flex-direction: column;
   }
   .z-menu-szukaj { flex: none; margin-bottom: calc(8px + var(--mw) / 15); padding: calc(8px + var(--mw) / 53) 13px; }
@@ -150,8 +150,8 @@
   .z-menu.zwijane .z-menu-grupy-w::before { content: ''; display: block; height: calc(4px + var(--mw) / 26); }
 }
 
-/* niskie okna (1366×640): Studia po angielsku mają o jeden rząd linków więcej niż po polsku */
-@media (min-width: 761px) and (max-height: 660px) {
+/* okna do 800 px wysokości: ciaśniejsze rzędy, bo w wąskim panelu rozwinięte Studia mają więcej rzędów linków niż wyższe okna */
+@media (min-width: 761px) and (max-height: 800px) {
   .z-menu { padding-bottom: 10px; }
   .z-menu section { padding-block: 6px; }
   .z-menu section.duza { padding-block: 8px; }
