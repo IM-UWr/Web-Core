@@ -3,9 +3,9 @@
 // (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). W nagłówku hasło (pole struktura_haslo /
 // struktura_haslo_en w src/data/dzialy/instytut.json) i liczby kadry (liczone z tabeli pracowników).
 // Treść: tekst o organizacji Instytutu (pole struktura_tekst, akapity oddzielone pustą linią; pierwszy akapit .wst) i sekcja
-// „Zakłady i pracownia” — lista w dwóch kolumnach (ul.dwa): nazwa zakładu (link), opis, obszary badań, kierownik i liczba osób;
+// „Zakłady i pracownia” — siatka boksów (ul.boksy, zlecenie 17, punkt 6): etykieta, krótka nazwa (link na cały boks), opis, obszary badań, kierownik i liczba osób;
 // pod listą obszary badań Instytutu. Jedna sekcja z nagłówkiem — bez spisu „Na tej stronie”.
-// Jedna wersja HTML: komputer — dwie kolumny; telefon (≤ 760 px) — jedna kolumna (wzorzec treści).
+// Jedna wersja HTML: komputer — trzy albo dwie kolumny; telefon (≤ 760 px) — jedna kolumna (wzorzec treści).
 import Podstrona from '../components/zal/Podstrona.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, odmiana } from '../lib/i18n';
@@ -29,23 +29,29 @@ const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], [
 
   <section id="z-zaklady" aria-labelledby="z-zaklady-h">
     <h2 id="z-zaklady-h">{T('Zakłady i pracownia', 'Departments and unit')}</h2>
-    <ul class="dwa zs-lista">
-      {lista.map((z) => {
-        const n = osoby.filter((o) => o.data.zaklad === z.id).length;
-        const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
-        return (
-          <li>
-            <b><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{wybierz(z.data, 'nazwa', lang)}</a></b>
-            {z.data.opis && <span>{wybierz(z.data, 'opis', lang)}</span>}
-            {obszary.length > 0 && <span class="zs-obszary">{obszary.slice(0, 4).join(' · ')}</span>}
-            <dl class="para">
-              {z.data.kierownik && <><dt>{T('Kierownik', 'Head')}</dt><dd>{tytulyWJezyku(z.data.kierownik, lang)}</dd></>}
-              <dt>{T('Skład', 'Members')}</dt><dd>{ileOsob(n)}</dd>
-            </dl>
-          </li>
-        );
-      })}
-    </ul>
+    <div class="boksy-ramka">
+      <ul class="boksy zs-lista">
+        {lista.map((z) => {
+          const n = osoby.filter((o) => o.data.zaklad === z.id).length;
+          const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
+          const opisZ = (wybierz(z.data, 'opis', lang) as string | undefined) || (lang === 'en' ? z.data.haslo_en : z.data.haslo);
+          // etykieta mówi „Zakład” albo „Pracownia”, więc nazwa krótka w mianowniku („Geometria”); bez niej pełna nazwa
+          const nazwaZ = lang === 'en' ? z.data.nazwa_krotka_en || z.data.nazwa_en || z.data.nazwa : z.data.nazwa_krotka || z.data.nazwa;
+          return (
+            <li class="boks">
+              <p class="etyk">{z.data.nazwa.startsWith('Pracownia') ? T('Pracownia', 'Unit') : T('Zakład', 'Department')}</p>
+              <h3><a href={u(wJezyku(`/instytut/zaklady/${z.id}`, lang))}>{nazwaZ}</a></h3>
+              {opisZ && <p>{opisZ}</p>}
+              {obszary.length > 0 && <p class="zs-obszary">{obszary.slice(0, 4).join(' · ')}</p>}
+              <dl class="para">
+                {z.data.kierownik && <><dt>{T('Kierownik', 'Head')}</dt><dd>{tytulyWJezyku(z.data.kierownik, lang)}</dd></>}
+                <dt>{T('Skład', 'Members')}</dt><dd>{ileOsob(n)}</dd>
+              </dl>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
     <p class="zs-obszary-inst">
       {T('Obszary badań Instytutu: podstawy matematyki, teoria modeli, algebra, kombinatoryka, teoria liczb, geometria i topologia różniczkowa, geometryczna teoria grup, równania różniczkowe, analiza harmoniczna, teoria miary, analiza funkcjonalna, teoria prawdopodobieństwa, procesy stochastyczne, statystyka matematyczna.',
          'Research areas of the Institute: foundations of mathematics, model theory, algebra, combinatorics, number theory, differential geometry and topology, geometric group theory, differential equations, harmonic analysis, measure theory, functional analysis, probability theory, stochastic processes, mathematical statistics.')}
@@ -55,10 +61,7 @@ const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], [
 
 <style>
   /* obszary badań zakładu pod opisem: przygaszone, jedna linia z „·” */
-  .zs-lista .zs-obszary { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
-  .zs-lista .para { margin-top: 8px; }
-  /* nazwa zakładu bez podkreślenia, jak lista linków wzorca; po najechaniu kolor działu */
-  .zs-lista b a { text-decoration: none; }
+  .zs-lista .zs-obszary { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
   /* obszary badań Instytutu pod listą zakładów */
   .zs-obszary-inst { margin: 24px 0 0; font-size: 15px; line-height: 1.6; color: var(--muted); }
 </style>

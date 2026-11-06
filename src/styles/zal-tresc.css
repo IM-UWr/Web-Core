@@ -9,7 +9,7 @@
    - tekst ciągły 17 px / 1,68, najwyżej 70 znaków (42,7em = 70ch w Manrope — w em, nie w ch, żeby kroje zastępcze przed
      wczytaniem Manrope łamały tekst tak samo; zlecenie 13, punkt 3); pierwszy akapit (.wst) w kolorze nagłówków; tekst w elementach
      z danymi 15,5 px / 1,55; linki: kolor tekstu, podkreślenie 1 px w kolorze działu (55%), po najechaniu kolor działu;
-   - elementy: lista z kreskami (ul.kreski), ramka uwagi (.uwaga), dwie kolumny cech (ul.dwa), lista linków (ul.linki),
+   - elementy: lista z kreskami (ul.kreski), ramka uwagi (.uwaga), dwie kolumny cech (ul.dwa), siatka boksów (ul.boksy), lista linków (ul.linki),
      ścieżka etapów (ol.etapy), pary etykieta–wartość (dl.para), tabela (table.tab), przełącznik wariantów (.tresc-taby),
      pliki do pobrania (ul.pliki), pytania (.faq details), kontakt (.kontakty);
    - nigdy: kafelki, cienie, zaokrąglenia, tła sekcji (wyjątek: ramka uwagi), ikony ozdobne (wyjątek: ikona pliku).
@@ -104,6 +104,27 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
 .tresc .faq summary:hover { color: var(--d-a); }
 .tresc .faq summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
 .tresc .faq details > :not(summary) { margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; }
+/* siatka boksów (zlecenie 17, punkt 6; zakłady, seminaria): trzy kolumny, przy kolumnie treści węższej niż 880 px dwie, poniżej 560 px i na telefonie jedna.
+   Boks na tle papieru, po najechaniu tło działu; cały klikalny (link nazwy rozciągnięty na boks), dolna linia wyrównana w rzędzie. */
+.tresc .boksy-ramka { container-type: inline-size; }
+.tresc ul.boksy { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+@container (max-width: 879.98px) { .tresc ul.boksy { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 559.98px) { .tresc ul.boksy { grid-template-columns: minmax(0, 1fr); } } /* w dwóch kolumnach długie słowa wyszłyby poza boks */
+.tresc ul.boksy > .boks { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: none; margin: 0; padding: 22px 24px 24px; border-radius: 5px;
+  background: var(--surface); font-size: 15px; line-height: 1.55; transition: background-color var(--t-krotki) var(--rytm); }
+.tresc ul.boksy > .boks:hover { background: var(--d-t); }
+.tresc .boks p { margin: 0; max-width: none; }
+.tresc .boks .etyk { margin: 0; }
+.tresc .boks h3 { margin: 0; font-size: 22px; line-height: 1.22; color: var(--ink); text-wrap: balance; }
+.tresc .boks h3 a { color: inherit; text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
+.tresc .boks h3 a::after { content: ''; position: absolute; inset: 0; border-radius: 5px; }
+.tresc .boks:hover h3 a { color: var(--d-a); }
+.tresc .boks h3 a:focus-visible { outline: none; }
+.tresc .boks h3 a:focus-visible::after { outline: 2px solid var(--d-a); outline-offset: 2px; }
+.tresc .boks .haslo { font-size: 14px; font-weight: 600; color: var(--d-a); }
+.tresc .boks dl.para { margin-top: auto; padding-top: 6px; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .tresc ul.boksy > .boks:active { transform: translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .tresc ul.boksy > .boks, .tresc .boks h3 a { transition: none; } }
 /* kontakt: kolumny po 3, kreska 2 px nad każdą, etykieta roli, nazwisko Brygadą, pary e-mail / tel. / pokój */
 .tresc .kontakty { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; }
 .tresc .kontakty > div { padding-top: 12px; border-top: 2px solid var(--rule); }
@@ -119,6 +140,7 @@ body .tresc.z-proza .prose > p:first-child { color: inherit; }
   .tresc h2 { font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
   .tresc h3 { font-size: 20px; margin-top: 24px; }
   .tresc ul.dwa, .tresc ul.linki, .tresc .kontakty { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .tresc ul.boksy { grid-template-columns: minmax(0, 1fr); }
   .tresc .kontakty > div + div { margin-top: 20px; }
   .tresc ul.linki a { font-size: 19px; }
   .tresc ol.etapy li { padding-left: 32px; }

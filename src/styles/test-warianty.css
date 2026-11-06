@@ -44,6 +44,7 @@
   html:where([data-t-nagl]) .z-dz-rekr,
   html:where([data-t-nagl]) body:where(:not(:has([data-z-plan]))) .z-nast-link { font-size: calc(22 * var(--t-n)); }
   html:where([data-t-nagl]) :is(.tresc ul.dwa b, .tresc .faq summary, .tresc .kontakty b) { font-size: calc(20 * var(--t-n)); }
+  html:where([data-t-nagl]) body .tresc .boks h3 { font-size: calc(22 * var(--t-n)); }
   html:where([data-t-nagl]) :is(.tresc ul.linki a, .tresc ol.etapy .t),
   html:where([data-t-nagl]) body .tresc .prose ol.etapy .t { font-size: calc(21 * var(--t-n)); }
   html:where([data-t-nagl]) .z-os .imie { font-size: calc(21 * var(--t-n)); }

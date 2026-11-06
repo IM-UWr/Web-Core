@@ -3,7 +3,7 @@
 // na telefonie zwijany nad treścią). Jedna wersja HTML: komputer (≥ 761 px) i telefon (≤ 760 px) — style na końcu pliku.
 // Sekcje: najbliższe referaty (tydzień albo przyszły tydzień), tekst wprowadzający z CMS (src/data/dzialy/nauka.json,
 // pola seminaria_tekst / _en; akapity oddzielone pustą linią, puste pole = bez tekstu), seminaria zakładów i niezależne
-// z najbliższym referatem, pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
+// z najbliższym referatem (siatka boksów ul.boksy, zlecenie 17, punkt 6), pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
 // bez zakładu (pole puste albo zakład, którego nie ma na stronie) to seminarium niezależne.
 // Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
@@ -13,7 +13,7 @@ import TytulReferatu from '../components/TytulReferatu.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
-import { t, wJezyku, wybierz, langPola } from '../lib/i18n';
+import { t, wJezyku, wybierz, langPola, odmiana } from '../lib/i18n';
 import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
 import { sala, salaReferatu, type Seminarium } from '../lib/tresci';
 import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
@@ -36,6 +36,10 @@ const spis = [
 ];
 // część wiersza: godzina i sala (puste pomijane)
 const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
+// prowadzący w boksie: do dwóch nazwisk, przy większej liczbie „i N innych” (cały skład jest na stronie seminarium)
+const osoby = (l: string[]) => l.length <= 2
+  ? l.join(', ')
+  : `${l.slice(0, 2).join(', ')} ${T('i', 'and')} ${l.length - 2} ${odmiana(l.length - 2, ['inna osoba', 'inne osoby', 'innych osób'], ['other', 'others'], lang)}`;
 ---
 <Podstrona lang={lang} tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
   wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} dzial="nauka" spis={spis} klasa="tresc z-sem">
@@ -65,31 +69,35 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
   {grupy.map((g) => (
     <section id={idGrupy(g.id)} aria-labelledby={g.id}>
       <h2 id={g.id}>{g.tytul}</h2>
-      <ul class="wiersze dwie">
-        {g.lista.map((s) => {
-          const r = nastepny(s.id);
-          const zs = zakladySem(s);
-          return (
-            <li class="wiersz klik">
-              {r
-                ? <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
-                : <span class="dz" aria-hidden="true"></span>}
-              <div>
+      <div class="boksy-ramka">
+        <ul class="boksy">
+          {g.lista.map((s) => {
+            const r = nastepny(s.id);
+            const zs = zakladySem(s);
+            const hasloSem = (lang === 'en' ? s.data.haslo_en : s.data.haslo)?.trim();
+            const prow = s.data.prowadzacy.map((p) => p.trim()).filter(Boolean);
+            return (
+              <li class="boks">
                 {zs.length > 0 && <p class="etyk">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</p>}
                 <h3 lang={langPola(s.data, 'nazwa', lang)}><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{nazwa(s)}</a></h3>
+                {hasloSem && <p class="haslo">{hasloSem}</p>}
                 {r ? (
-                  <p class="ref">
-                    {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang)) && <span class="kiedy">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang))}</span>}
-                    <TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /> <span class="kto">({r.data.prelegent})</span>
-                  </p>
+                  <div class="b-ref">
+                    <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
+                    <p>
+                      {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang)) && <span class="kiedy">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang))}</span>}
+                      <TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /> <span class="kto">({r.data.prelegent})</span>
+                    </p>
+                  </div>
                 ) : (
-                  <p class="ref pusto">{t(lang, 'brakNadchodzacych')}</p>
+                  <p class="b-brak pusto">{t(lang, 'brakNadchodzacych')}</p>
                 )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+                {prow.length > 0 && <dl class="para"><dt>{prow.length > 1 ? T('Prowadzą', 'Led by') : T('Prowadzi', 'Led by')}</dt><dd>{osoby(prow)}</dd></dl>}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </section>
   ))}
 
@@ -114,9 +122,8 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
   .wiersz p { margin: 0; max-width: none; }
   .wiersz h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .wiersz h3 a { color: inherit; text-decoration: none; }
-  .wiersz .kto, .wiersz .ref { font-size: 15.5px; line-height: 1.55; color: var(--text); }
-  .wiersz .sem, .wiersz .ref .kto { color: var(--muted); }
-  .wiersz .kiedy { margin-right: 8px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .wiersz .kto { font-size: 15.5px; line-height: 1.55; color: var(--text); }
+  .wiersz .sem { color: var(--muted); }
   .pusto { font-style: italic; color: var(--muted); }
   /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
   .klik { position: relative; }
@@ -125,10 +132,14 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
   .klik h3 a:focus-visible { outline: none; }
   .klik:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
 
-  /* ---------- komputer (≥ 761 px): seminaria w dwóch kolumnach ---------- */
-  @media (min-width: 761px) {
-    .wiersze.dwie { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
-  }
+  /* najbliższy referat w boksie seminarium (siatka: src/styles/zal-tresc.css): dzień jak w wierszach, mniejszy, jak na telefonie */
+  .b-ref { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 12px; margin-top: 6px; }
+  .b-ref .dz { font-family: var(--f-display); font-size: 28px; line-height: 1; color: var(--d-a); }
+  .b-ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .b-ref p { line-height: 1.5; color: var(--text); }
+  .b-ref .kiedy { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .b-ref .kto { color: var(--muted); }
+  .b-brak { margin-top: 6px !important; }
 
   /* ---------- telefon (≤ 760 px): jedna kolumna, mniejszy dzień ---------- */
   @media (max-width: 760px) {
@@ -136,6 +147,6 @@ const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) 
     .wiersz .dz { font-size: 28px; }
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
     .wiersz h3 { font-size: 18.5px; }
-    .wiersz .kto, .wiersz .ref { font-size: 15px; }
+    .wiersz .kto { font-size: 15px; }
   }
 </style>
