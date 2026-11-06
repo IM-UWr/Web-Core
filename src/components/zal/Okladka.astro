@@ -3,13 +3,13 @@
 // - bez paska menu; w lewym górnym rogu logo UWr i „Wydział Matematyki / i Informatyki” (link do strony wydziału),
 //   w prawym tryb ciemny, przełącznik języka z flagą języka docelowego i hamburger (panel PanelMenu.astro: Szukaj, 4 działy
 //   z sygnetami i podstronami, duże „Aktualności” i „Rekrutacja ↗”) — zlecenie 11, zalecenia 6–8;
-// - blok tytułu z równymi końcami: „Instytut” i „Matematyczny”; prawe końce na jednej prostej o nachyleniu 0,32,
-//   która jest granicą ciemnego pola po skosie (układ liczy src/scripts/zal/okladka.ts; bez JS — zwykły gradient);
+// - tytuł „Instytut Matematyczny” i ciemne pole kończą się na jednym łuku koła wygiętym w stronę zdjęcia, jak „(”, 58 px za końcami
+//   nazwy wydziału i obu linii tytułu (układ liczy skrypt ULOZ niżej, zlecenie 19, punkt 2; bez JS zwykły gradient);
 // - zdjęcie gmachu przesunięte w prawo i w górę; rząd 4 działów nisko: szkic („duch” w spoczynku, po najechaniu kontur się
 //   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron; całe zdjęcie lekko barwi się na jasny kolor
 //   działu — zalecenie 1); nad strzałką „Szybki dostęp” przygaszone liczby (wydarzenia, seminaria, nowe aktualności —
 //   zalecenie 15); okładka ↔ Szybki dostęp bez zatrzymywania w połowie (src/scripts/zal/przejazd.ts, zalecenie 20).
-// Telefon (≤ 760 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez skosu.
+// Telefon (≤ 760 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez łuku.
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import Flaga from './Flaga.astro';
@@ -67,29 +67,58 @@ const liczby = (['wyd', 'sem', 'akt'] as const).filter((k) => ile[k] > 0).map((k
 const ZERUJ = `(function(){function z(){try{sessionStorage.removeItem('im-wizyta-dzialy')}catch(e){}}` +
   `if(document.prerendering)document.addEventListener('prerenderingchange',z,{once:true});else z();` +
   `addEventListener('pageshow',function(e){if(e.persisted)z()})})();`;
-// Blok tytułu i skos (komputer), w linii na końcu okładki — zanim strona się narysuje (zlecenie 13, punkt 5: dawniej w module
-// okladka.ts, więc zdjęcie przesuwało się po pierwszej klatce), potem przy zmianie rozmiaru i po wczytaniu krojów.
-// „Instytut” i „Matematyczny” zaczynają się od lewej, a ich prawe końce leżą na jednej prostej o nachyleniu S (px w prawo na
-// px w dół): stopień „Matematyczny” dobrany do „Instytut” (po angielsku drugie słowo krótsze — wtedy stopnie z CSS, a skos od
-// końca pierwszej linii). Prosta (plus odstęp) to granica ciemnego pola po skosie (--skos), za nią krótki gradient
-// w zdjęcie; zdjęcie zaczyna się tak, żeby jego lewa krawędź była schowana w pełnym ciemnym polu (--foto-x).
+// Stałe łuku okładki (zlecenie 19, punkt 2), osobno dla każdego języka. Żeby zmienić układ, wystarczy zmienić te liczby, wzorów nie trzeba ruszać.
+// ODSTEP: o ile px łuk przechodzi za końcami napisów (wspólne). MAT: stopień mniejszego słowa / stopień większego („Matematyczny” / „Instytut”,
+// EN „Mathematical” / „Institute”). ODST: odstęp między liniami / stopień większego słowa. K: wygięcie, czyli nachylenie odcinka marka→koniec
+// pierwszej linii = K × nachylenie odcinka między końcami linii (K = 1 daje prostą). GORA: góra tytułu / wysokość okładki.
+const ODSTEP = 58;
+const UKLAD = {
+  pl: { MAT: 0.62, ODST: 0.23, K: 0.6, GORA: 0.29 },
+  en: { MAT: 0.55, ODST: 0.23, K: 0.6, GORA: 0.29 },
+};
+// Blok tytułu i łuk (komputer), w linii na końcu okładki, zanim strona się narysuje (zlecenie 13, punkt 5), potem przy zmianie rozmiaru i po
+// wczytaniu krojów. Ciemne pole kończy się łukiem koła wygiętym w stronę zdjęcia, jak „(”, 58 px za końcami trzech napisów: nazwy wydziału
+// w marce, „Instytut” i „Matematyczny”. W dół łuk zawsze idzie w prawo: środek koła leży z prawej i nie niżej niż środek marki.
+// 1. Stopnie i odstęp liczone ze stałych i szerokości słów przy 100 px (0,49 to połowa line-height 0,98, czyli środek linii); po polsku duże jest
+//    pierwsze słowo, po angielsku drugie. 2. Gdy tytuł (+ 24 px) wypada niżej niż szkice działów, top idzie w górę, ale nie wyżej niż dół marki + 40 px
+//    (stopnie zależą od top liniowo, więc wystarczy jedno przeliczenie). 3. Koło przez trzy prawdziwe końce napisów. 4. Ciemne pole (--skos) i maska
+//    (--skos-maska), żeby na prawo od środka koła nic się nie przyciemniało. 5. Lewa krawędź zdjęcia schowana w ciemnym polu (--foto-x).
+// Gdyby koło wyszło złe (nie powinno się zdarzyć), zostaje dawny skos o nachyleniu 0,32. Bez JS zwykły gradient z CSS.
 // Kadr zdjęcia (zlecenie 18, punkt 13), ta sama kompozycja na każdym ekranie. Środek budynku Instytutu leży na 47% wysokości zdjęcia.
 // Komputer: szerokość tak, by przy prawej krawędzi ekranu wypadało 92% zdjęcia, ale zdjęcie sięga pełnego granatu u dołu (77% wysokości
 // okładki); środek budynku na 34,5% wysokości okładki, u góry bez pustego miejsca. Telefon: rozmiar i poziomo w CSS (zal-telefon.css), tu
 // tylko pionowo: środek budynku w połowie między paskiem a górą liter „Instytut”. Bez JS kadr z CSS.
-const ULOZ = `(function(ok){var S=.32,f=ok.querySelector('.z-okl-foto:not(.z-lqip)');function uloz(){if(!ok.offsetHeight)return;` +
+const OSTRZEZ = import.meta.env.DEV ? `console.warn('Okładka: łuk poza zakresem, zostaje skos',cx,cy,R);` : '';
+const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)');function uloz(){if(!ok.offsetHeight)return;` +
   `if(matchMedia('(max-width: 760px)').matches){var l=ok.querySelector('.w1');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,(l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
-  `var tyt=ok.querySelector('.z-okl-tytul'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2');if(!tyt||!w1||!w2)return;` +
-  `var H=ok.clientHeight,W=ok.clientWidth,i,A,M,f2;tyt.style.removeProperty('--f2');var f1=parseFloat(getComputedStyle(w1).fontSize),o=ok.getBoundingClientRect();` +
-  `function b(el){var r=el.getBoundingClientRect();return{x2:r.right-o.left,yc:(r.top+r.bottom)/2-o.top}}` +
-  `var lewa=tyt.getBoundingClientRect().left-o.left,wyr=(w2.textContent||'').trim().length>=(w1.textContent||'').trim().length;` +
-  `for(i=0;wyr&&i<4;i++){A=b(w1);M=b(w2);f2=parseFloat(getComputedStyle(w2).fontSize);tyt.style.setProperty('--f2',Math.max(24,f2*(A.x2+S*(M.yc-A.yc)-lewa)/(M.x2-lewa))+'px')}` +
-  `A=b(w1);var od=Math.max(24,f1*.34),zanik=Math.max(90,W*.06),x0=A.x2-S*A.yc+od*Math.sqrt(1+S*S),nl=Math.hypot(1,S),n=[1/nl,-S/nl],` +
-  `kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],` +
-  `g='rgb(9 16 34',k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
-  `ok.style.setProperty('--skos','linear-gradient('+kat.toFixed(2)+'deg, '+g+' / .97) 0px, '+k.map(function(p){return g+' / '+p[1]+') '+(t1+p[0]*zanik).toFixed(1)+'px'}).join(', ')+')');` +
-  `var X=Math.max(0,x0-150),r=f&&(f.getAttribute('width')/f.getAttribute('height')||f.naturalWidth/f.naturalHeight);ok.style.setProperty('--foto-x',X+'px');` +
-  `if(r){var D=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',D+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*D/r)+'px');ok.classList.add('z-kadr')}` +
+  `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
+  `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
+  // szerokość słowa przy 100 px, ukryta miarka w stylu h1
+  `function szer(el){var m=document.createElement('span');m.textContent=el.textContent;m.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;letter-spacing:-.012em';h1.appendChild(m);var v=m.getBoundingClientRect().width/100;h1.removeChild(m);return v}` +
+  `var w_1=szer(w1),w_2=szer(w2),c=u-lewa-ODSTEP;` +
+  // stopnie i odstęp dla danego top
+  `function licz(top){var s,F;if(EN){s=(w_2-w_1*U.MAT)/(.49*U.MAT+U.ODST+.49);F=(c+U.K*s*(top-yM))/(w_1*U.MAT-.49*U.MAT*U.K*s);return{f1:U.MAT*F,f2:F,od:U.ODST*F}}` +
+  `s=(w_2*U.MAT-w_1)/(.49*(1+U.MAT)+U.ODST);F=(U.K*s*(top-yM)+c)/(w_1-.49*U.K*s);return{f1:F,f2:U.MAT*F,od:U.ODST*F}}` +
+  `function dol(t){var m=licz(t);return t+.98*m.f1+m.od+.98*m.f2}` +
+  // tytuł nad szkicami działów
+  `var top=U.GORA*H,d=sz?dol(top)+24-(sz.getBoundingClientRect().top-o.top):0;if(d>0)top=Math.max(rm.bottom-o.top+40,top-d/(dol(top)-dol(top-1)));` +
+  `var m=licz(top);tyt.style.setProperty('--f1',m.f1+'px');tyt.style.setProperty('--f2',m.f2+'px');tyt.style.setProperty('--w2-odst',m.od+'px');tyt.style.setProperty('--tyt-top',top+'px');` +
+  // koło przez trzy końce napisów
+  `function kon(el){var r=el.getBoundingClientRect();return[r.right-o.left+ODSTEP,(r.top+r.bottom)/2-o.top]}` +
+  `var p1=kon(w1),p2=kon(w2),ax=u,ay=yM,bx=p1[0],by=p1[1],gx=p2[0],gy=p2[1],a2=ax*ax+ay*ay,b2=bx*bx+by*by,g2=gx*gx+gy*gy,D=2*(ax*(by-gy)+bx*(gy-ay)+gx*(ay-by)),` +
+  `cx=(a2*(by-gy)+b2*(gy-ay)+g2*(ay-by))/D,cy=(a2*(gx-bx)+b2*(ax-gx)+g2*(bx-ax))/D,R=Math.hypot(ax-cx,ay-cy),g='rgb(9 16 34',X;` +
+  `function luk(y){return cx-Math.sqrt(Math.max(0,R*R-(y-cy)*(y-cy)))}` +
+  `if(isFinite(R)&&cx>ax&&cx>bx&&cx>gx&&cy<=yM+1){` +
+  `ok.style.setProperty('--skos','radial-gradient(circle at '+cx.toFixed(1)+'px '+cy.toFixed(1)+'px, '+g+' / 0) '+(R-30).toFixed(1)+'px, '+g+' / .62) '+R.toFixed(1)+'px, '+g+' / .97) '+(R+30).toFixed(1)+'px)');` +
+  `ok.style.setProperty('--skos-maska','linear-gradient(90deg, #000 '+cx.toFixed(1)+'px, transparent '+cx.toFixed(1)+'px)');X=Math.max(0,Math.min(koniec,luk(0))-130);` +
+  // flaga „wyróżnione” stoi nad tytułem; gdy sięgałaby łuku, łamie się (--flaga-max)
+  `var fl=tyt.querySelector('.z-okl-flaga');if(fl){tyt.style.removeProperty('--flaga-max');ok.classList.add('z-ulozona');for(var j=0;j<2;j++)tyt.style.setProperty('--flaga-max',Math.max(160,luk(fl.getBoundingClientRect().top-o.top)-lewa-24)+'px')}` +
+  `}else{${OSTRZEZ}` +
+  // dawny skos: prosta o nachyleniu S od końca pierwszej linii
+  `var S=.32,od=Math.max(24,m.f1*.34),zanik=Math.max(90,W*.06),x0=bx-ODSTEP-S*by+od*Math.sqrt(1+S*S),nl=Math.hypot(1,S),n=[1/nl,-S/nl],kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
+  `ok.style.setProperty('--skos','linear-gradient('+kat.toFixed(2)+'deg, '+g+' / .97) 0px, '+k.map(function(q){return g+' / '+q[1]+') '+(t1+q[0]*zanik).toFixed(1)+'px'}).join(', ')+')');ok.style.removeProperty('--skos-maska');X=Math.max(0,x0-150)}` +
+  `var r=f&&(f.getAttribute('width')/f.getAttribute('height')||f.naturalWidth/f.naturalHeight);ok.style.setProperty('--foto-x',X+'px');` +
+  `if(r){var Sz=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',Sz+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*Sz/r)+'px');ok.classList.add('z-kadr')}` +
   `ok.classList.add('z-ulozona')}` +
   `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 
