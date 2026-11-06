@@ -116,6 +116,15 @@ export function dzialZeSciezki(sciezka: string): Dzial | undefined {
   return CZLONY[czlon];
 }
 
+// Dział wiersza wydarzenia (kolumna „Nadchodzące wydarzenia” na stronie głównej, „Najbliższe wydarzenia” na wpisie o wydarzeniu; zlecenie 21, punkt 6):
+// obrona i konferencja → Nauka, termin → Studia, wydarzenie → dział jego wpisu, reszta (referat) z adresu; adres poza stronę nie ma działu.
+export function dzialWydarzenia(w: { rodzaj: string; href?: string }, wpis?: { rodzaj: string; dla: string[]; zaklad?: string }): Dzial | undefined {
+  if (w.rodzaj === 'obrona' || w.rodzaj === 'konferencja') return 'nauka';
+  if (w.rodzaj === 'termin') return 'studia';
+  if (wpis) return dzialWpisu(wpis);
+  return w.href ? dzialZeSciezki(w.href) : undefined;
+}
+
 // ---------- szkice (src/assets/szkice/szkice.json: wyciąg z plików SVG w tym samym folderze, jak w prototypie) ----------
 // k — kontur (kreski w kolejności rysowania), dt — detale (pojawiają się), s — sygnet (uproszczony szkic),
 // p — podpis: vb (viewBox), o (obrys atramentu ze skanu), pr (niewidoczne linie prowadzące, maska odsłaniająca obrys)

@@ -26,7 +26,7 @@ import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { listaKierunkow } from '../../lib/menu';
 import { tekstDnia } from '../../lib/kolory-dni';
 import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU } from '../../lib/tresci';
-import { dzialWpisu, dzialZeSciezki, skrotNazwy, type Dzial } from '../../lib/patroni';
+import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -40,7 +40,6 @@ const DNI = { pl: ['niedz.', 'pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.'], en: 
 const data = (s: string) => { const p = parse(s); return { d: String(p.d), m: `${MIES[lang][p.m - 1]} · ${DNI[lang][weekday(s)]}` }; };
 const godzina = (s: string) => (s.includes('T') ? s.slice(11, 16).replace(/^0/, '') : '');
 const krotkaSala = (s?: string) => (s ? (/^[\w.\-]{1,6}$/.test(s) ? `${en ? 'room' : 's.'} ${s}` : s) : '');
-const dzialZ = (adres?: string): Dzial | undefined => (adres && !isExternal(adres) ? dzialZeSciezki(adres) : undefined);
 const NAZWY_DZ: Record<Dzial, [string, string]> = { instytut: ['Instytut', 'Institute'], nauka: ['Nauka', 'Research'], studia: ['Studia', 'Studies'], popularyzacja: ['Popularyzacja', 'Outreach'] };
 
 type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; tytulLang?: string; polski?: boolean; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean; wyr?: boolean; zaj?: string; zajLang?: string; koniec?: string };
@@ -52,8 +51,7 @@ const wpisy = new Map((await wszystkieAktualnosci()).map((a) => [`/aktualnosci/$
 // „sala HS, Instytut Matematyczny UWr” → „s. HS” (jak w prototypie); inne miejsca bez zmian
 const krotkieMiejsce = (m?: string) => (m ?? '').replace(/,\s*(Instytut Matematyczny UWr|Mathematical Institute, University of Wrocław)$/, '').replace(/^(sala|room)\s+/, en ? 'room ' : 's. ');
 const wydarzenia: Wiersz[] = (await wydarzeniaNaTelefon(10, lang, dniTel)).map((w) => {
-  const wpis = w.href ? wpisy.get(w.href) : undefined;
-  const dz: Dzial | undefined = w.rodzaj === 'obrona' || w.rodzaj === 'konferencja' ? 'nauka' : w.rodzaj === 'termin' ? 'studia' : wpis ? dzialWpisu(wpis) : dzialZ(w.href);
+  const dz = dzialWydarzenia(w, w.href ? wpisy.get(w.href) : undefined);
   return {
     dzial: dz, ...data(w.poczatek), gdzie: dz ? T(...NAZWY_DZ[dz]) : T('Wydarzenie', 'Event'),
     co: [RODZ_WYD[w.rodzaj] ? T(...RODZ_WYD[w.rodzaj]) : '', godzina(w.poczatek), krotkieMiejsce(w.miejsce)].filter(Boolean).join(' · '),

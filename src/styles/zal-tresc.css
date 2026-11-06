@@ -181,6 +181,9 @@ body .tresc .prose blockquote a { color: var(--ink); }
 body .tresc .prose a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
   text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); }
 body .tresc .prose a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
+/* wpis o wydarzeniu (zlecenie 21, punkt 6): linki w tekście w kolorze wiersza listy; zmienne w zalozyciele.css, .akt-wydarzenie */
+body .tresc.akt-wydarzenie .prose a { color: var(--d-a); text-decoration-color: currentColor; }
+body .tresc.akt-wydarzenie .prose a:hover { color: var(--d-a); text-decoration-thickness: 2px; }
 body .tresc .prose table { display: table; width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15.5px; line-height: 1.5; }
 body .tresc .prose th { padding: 0 18px 8px 0; border: 0; border-bottom: 2px solid var(--rule); background: none; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
 body .tresc .prose td { padding: 11px 18px 11px 0; border: 0; border-bottom: 1px solid var(--line); vertical-align: top; }

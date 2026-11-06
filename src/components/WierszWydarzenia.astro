@@ -11,9 +11,11 @@ import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE } from '../lib/i18n';
 import { dayNum, monthShort, dayShort, parse, range, time, hasTime, type Lang } from '../lib/daty';
 import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
+import type { Dzial } from '../lib/patroni';
 
-interface Props { w: Wydarzenie; lang: Lang; poziom?: 'h2' | 'h3' }
-const { w, lang, poziom = 'h3' } = Astro.props;
+// dzial — własny kolor wiersza pod wpisem o wydarzeniu (zlecenie 21, punkt 6); bez niego kolor otoczenia
+interface Props { w: Wydarzenie; lang: Lang; poziom?: 'h2' | 'h3'; dzial?: Dzial }
+const { w, lang, poziom = 'h3', dzial } = Astro.props;
 const H = poziom;
 const zewn = !!w.href && isExternal(w.href);
 const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
@@ -21,7 +23,7 @@ const minione = !trwaLubBedzie(w);
 const kiedy = hasTime(w.poczatek) ? `${dayShort(w.poczatek, lang)} ${time(w.poczatek)}` : range(w.poczatek, w.koniec, lang);
 const etykieta = [RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce].filter(Boolean).join(' · ');
 ---
-<article class:list={['ww', adres && 'ww-klik', minione && 'ww-minione']} data-ww data-rodzaj={w.rodzaj}>
+<article class:list={['ww', adres && 'ww-klik', minione && 'ww-minione']} data-ww data-rodzaj={w.rodzaj} data-dzial={dzial}>
   <time class="ww-data" datetime={w.poczatek.slice(0, 10)}>{dayNum(w.poczatek)}<small>{monthShort(w.poczatek, lang)} {parse(w.poczatek).y}</small></time>
   <div class="ww-tresc">
     <div class="ww-rodz">{etykieta}</div>

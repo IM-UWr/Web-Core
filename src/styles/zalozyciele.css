@@ -57,6 +57,12 @@
 :root[data-theme="dark"] [data-dzial]:is([data-dzial="instytut"], [data-dzial="nauka"], [data-dzial="studia"], [data-dzial="popularyzacja"]) {
   --d-a: color-mix(in oklab, var(--d-j) 78%, #e4eaf5); --d-t: color-mix(in oklab, var(--d-j) 11%, #222e46);
 }
+/* wpis o wydarzeniu (zlecenie 21, punkt 6): .z-pd ma data-dzial, ale kolor działu mają tylko etykieta, data i linki w tekście.
+   Reszta treści zostaje w kolorach poza działami (wartości jak w :root wyżej), wiersze „Najbliższych wydarzeń” mają własne data-dzial. */
+.akt-wydarzenie { --d-wpisu: var(--d-a); }
+.akt-wydarzenie > * { --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de; --accent: var(--d-a); }
+:root[data-theme="dark"] .akt-wydarzenie > * { --d-a: #e4eaf5; --d-t: #222e46; }
+.akt-wydarzenie :is(.akt-meta, .akt-wyd-data, .prose a) { --d-a: var(--d-wpisu); --accent: var(--d-wpisu); }
 /* zdjęcia w dwóch kolorach: światła w kolorze działu przygaszonym granatem (cienie bez zmian — bez szwu z granatem z lewej) */
 :root[data-theme="dark"] .z-nagl .z-foto { background: color-mix(in oklab, var(--d-j) 55%, var(--granat)); }
 /* nagłówek podstrony: głęboki kolor działu z domieszką granatu zamiast jaskrawej cegły / ochry (gradienty te same) */
@@ -528,6 +534,6 @@
    Strony poza działami (Aktualności, Kalendarz, wpisy — .z-pd bez data-dzial): kolor akcentu (--d-a) jest tam kolorem
    tekstu, więc reguły „po najechaniu na kolor działu” nie zmieniają wyglądu — linki i przyciski dostają podkreślenie.
    Linki w kolorze działu z podkreśleniem (kontakt Władz, „Zgłoś błąd”, archiwum) — grubsza kreska. Selektor od #tresc,
-   bo style komponentów Astro mają w każdym członie [data-astro-cid-…] (wyższa szczegółowość). */
-#tresc .z-pd:not([data-dzial]) :is(a[href], button, summary):hover { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: .2em; }
+   bo style komponentów Astro mają w każdym członie [data-astro-cid-…] (wyższa szczegółowość). Wpis o wydarzeniu ma data-dzial, ale kolory jak poza działami. */
+#tresc :is(.z-pd:not([data-dzial]), .akt-wydarzenie) :is(a[href], button, summary):hover { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: .2em; }
 :is(#tresc :is(.z-kont dd, .z-link-dalej, .ak-archiwum), .z-nast-meta) a:hover { text-decoration-line: underline; text-decoration-thickness: 2px; }
