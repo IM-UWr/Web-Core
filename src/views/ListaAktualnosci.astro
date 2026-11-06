@@ -5,10 +5,14 @@
 // Filtr rodzaju i szukanie (filtrowanie w przeglądarce, także bez polskich znaków); ?dla=studenci itp. z linków zawęża listę
 // (z przyciskiem „Pokaż wszystkie”), ?rodzaj=… wybiera rodzaj. Wpisy po miesiącach: nagłówek miesiąca Brygadą, wiersze
 // z cienkimi liniami i datą jak na stronach działów (WierszAktualnosci.astro, wzór: zal/dzial/Wiersz.astro). Pierwszy widoczny wpis
-// powiększony (zlecenie 14, zalecenie 22): w HTML najnowszy, po filtrze albo szukaniu skrypt przestawia klasę.
-// Jedna wersja HTML: komputer (≥ 761 px) — przyklejony pasek: przyciski rodzajów i pole szukania w jednym wierszu (jak pasek
-// Planu zajęć); telefon (≤ 760 px) — rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
-// Bez JS: pasek schowany, widać całą listę.
+// wyróżniony (zlecenie 14, zalecenie 22; zlecenie 18, punkt 3): w HTML najnowszy, po filtrze albo szukaniu skrypt przestawia klasę.
+// Jedna wersja HTML (zlecenie 18, punkt 3; podgląd: wariant B „na papierze”):
+// - okno ≥ 980 px: lista w kolumnie treści (948 px), filtry w prawej kolumnie (236 px), przyklejone jak spis „Na tej stronie”;
+// - okno 761–979 px: prawa kolumna zabrałaby liście za dużo, więc filtry jako nieprzyklejony pasek nad listą;
+// - kolumna listy ≥ 760 px (okno ≥ 1180 px, przy pasku ≥ 888 px): wpisy w dwóch kolumnach, węższa: w jednej;
+// - telefon (≤ 760 px): rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
+// „… czytaj dalej” dopisuje skrypt, tylko gdy zajawka się nie mieści (wygląd w WierszAktualnosci.astro).
+// Bez JS: filtry schowane, widać całą listę.
 import Podstrona from '../components/zal/Podstrona.astro';
 import Link from '../components/Link.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
@@ -23,40 +27,47 @@ const { ustawienia, grupy, rodzaje, lead, haslo, filtrEtykieta, szukajDlugo } = 
 const tytul = t(lang, 'aktualnosci');
 ---
 <Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
-  okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-bez-boku" atrybuty={{ 'data-lista': '' }}>
+  okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-filtry" atrybuty={{ 'data-lista': '', 'data-dalej': en ? '… read more' : '… czytaj dalej' }}>
 
-  <div class="ak-narz" data-pagefind-ignore>
-    <div class="ak-rodzaje" role="group" aria-label={filtrEtykieta}>
-      <button type="button" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
-      {rodzaje.map((r) => <button type="button" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
+  <div class="ak-uklad">
+    <div class="ak-panel">
+      <div class="ak-narz" data-pagefind-ignore>
+        <p class="ak-pokaz" aria-hidden="true">{en ? 'Show' : 'Pokaż'}</p>
+        <div class="ak-rodzaje" role="group" aria-label={filtrEtykieta}>
+          <button type="button" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
+          {rodzaje.map((r) => <button type="button" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
+        </div>
+        {/* telefon: rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), zsynchronizowana z przyciskami */}
+        <label class="z-pole-wyboru ak-rodzaj-lista">
+          <span class="sr-only">{filtrEtykieta}</span>
+          <select data-rodzaj-lista autocomplete="off">
+            <option value="">{t(lang, 'wszystkie')}</option>
+            {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
+          </select>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </label>
+        <input type="search" class="ak-szukaj" placeholder={szukajDlugo} aria-label={szukajDlugo} autocomplete="off" data-szukaj />
+      </div>
+      <p class="ak-dla" data-dla-info data-pagefind-ignore hidden>
+        <span>{en ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
+        <button type="button" data-dla-wyczysc>{en ? 'Show all' : 'Pokaż wszystkie'}</button>
+      </p>
     </div>
-    {/* telefon: rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), zsynchronizowana z przyciskami */}
-    <label class="z-pole-wyboru ak-rodzaj-lista">
-      <span class="sr-only">{filtrEtykieta}</span>
-      <select data-rodzaj-lista autocomplete="off">
-        <option value="">{t(lang, 'wszystkie')}</option>
-        {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
-      </select>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-    </label>
-    <input type="search" class="ak-szukaj" placeholder={szukajDlugo} aria-label={szukajDlugo} autocomplete="off" data-szukaj />
-  </div>
-  <p class="ak-dla" data-dla-info data-pagefind-ignore hidden>
-    <span>{en ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
-    <button type="button" data-dla-wyczysc>{en ? 'Show all' : 'Pokaż wszystkie'}</button>
-  </p>
 
-  {grupy.map((g, nrGrupy) => (
-    <section class="ak-mies" data-grupa>
-      <h2>{g.miesiac}</h2>
-      {g.pozycje.map((p, i) => <WierszAktualnosci p={p} lang={lang} wyr={nrGrupy === 0 && i === 0} />)}
-    </section>
-  ))}
-  <p class="ak-pusto" role="status" data-pusto hidden>{en ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
-  <p class="ak-archiwum">
-    {en ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
-    <Link href={ustawienia.archiwum}>{en ? 'archive of the old website' : 'archiwum starej strony'}</Link>.
-  </p>
+    <div class="ak-lista">
+      {grupy.map((g, nrGrupy) => (
+        <section class="ak-mies" data-grupa>
+          <h2>{g.miesiac}</h2>
+          {g.pozycje.map((p, i) => <WierszAktualnosci p={p} lang={lang} wyr={nrGrupy === 0 && i === 0} />)}
+        </section>
+      ))}
+      <p class="ak-pusto" role="status" data-pusto hidden>{en ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
+      <p class="ak-archiwum">
+        {en ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
+        <Link href={ustawienia.archiwum}>{en ? 'archive of the old website' : 'archiwum starej strony'}</Link>.
+      </p>
+    </div>
+  </div>
 </Podstrona>
 
 <script>
@@ -72,9 +83,11 @@ const tytul = t(lang, 'aktualnosci');
   let dla = '';
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
   const znanyRodzaj = (r: string) => rodzajBtn.some((b) => (b.dataset.rodzaj ?? '') === r);
+  // tekst do szukania: raz, przed pierwszym dopiskiem „… czytaj dalej”, żeby dopisek nie pasował do szukanego słowa
+  const tekstWpisu = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
   // rozmiar zdjęcia przy przełożeniu powiększenia na inny wpis (te same pola co w WierszAktualnosci.astro)
-  const ROZMIAR_DUZY = '(max-width: 760px) calc(100vw - 98px), 360px';
-  const ROZMIAR_MALY = '(max-width: 760px) 81px, 120px';
+  const ROZMIAR_DUZY = '(max-width: 760px) calc(100vw - 98px), 200px';
+  const ROZMIAR_MALY = '(max-width: 760px) 81px, 72px';
   function powieksz(w: HTMLElement, tak: boolean) {
     w.classList.toggle('wyr', tak);
     w.querySelectorAll<HTMLImageElement | HTMLSourceElement>('source, img').forEach((e) => { e.sizes = tak ? ROZMIAR_DUZY : ROZMIAR_MALY; });
@@ -82,11 +95,30 @@ const tytul = t(lang, 'aktualnosci');
     if (tak) w.querySelector('img')?.setAttribute('loading', 'eager');
   }
 
+  // „… czytaj dalej” (zlecenie 18, punkt 3): tylko w zajawce, która się nie mieści; bez znaczenia dla czytnika ekranu,
+  // bo klikalny jest cały wiersz. Tolerancja 1 px na zaokrąglenie wysokości linii (ucięta linia to co najmniej 20 px).
+  const dopisek = lista instanceof HTMLElement ? lista.dataset.dalej ?? '' : '';
+  function dalej() {
+    for (const p of pozycje) {
+      const z = p.querySelector<HTMLElement>('.wa-zaj');
+      if (!z || p.hidden) continue;
+      const d = z.querySelector('.wa-dalej');
+      const ucieta = z.scrollHeight > z.clientHeight + 1;
+      if (ucieta && !d) {
+        const s = document.createElement('span');
+        s.className = 'wa-dalej';
+        s.setAttribute('aria-hidden', 'true');
+        s.textContent = dopisek;
+        z.append(s);
+      } else if (!ucieta && d) d.remove();
+    }
+  }
+
   function filtruj() {
     const q = norm(szukaj?.value.trim() ?? '');
     let ile = 0;
     for (const p of pozycje) {
-      const ok = (!rodzaj || p.dataset.rodzaj === rodzaj) && (!dla || (p.dataset.dla ?? '').split(' ').includes(dla)) && (!q || norm(p.textContent ?? '').includes(q));
+      const ok = (!rodzaj || p.dataset.rodzaj === rodzaj) && (!dla || (p.dataset.dla ?? '').split(' ').includes(dla)) && (!q || (tekstWpisu.get(p) ?? '').includes(q));
       p.hidden = !ok;
       if (ok) ile++;
     }
@@ -94,6 +126,7 @@ const tytul = t(lang, 'aktualnosci');
     for (const p of pozycje) if (p.classList.contains('wyr') !== (p === pierwszy)) powieksz(p, p === pierwszy);
     for (const g of grupy) g.hidden = !g.querySelector('[data-wa]:not([hidden])');
     if (pusto) pusto.hidden = ile > 0;
+    dalej();
   }
   function ustawRodzaj(r: string) {
     rodzaj = znanyRodzaj(r) ? r : '';
@@ -127,17 +160,21 @@ const tytul = t(lang, 'aktualnosci');
     const r = p.get('rodzaj');
     // (filtruje też według tekstu, który przeglądarka przywróciła w polu szukania po powrocie na stronę)
     ustawRodzaj(r && znanyRodzaj(r) ? r : '');
+    // dopisek zależy od szerokości i fontu: po narysowaniu, po załadowaniu fontów i po zmianie rozmiaru okna
+    requestAnimationFrame(dalej);
+    document.fonts?.ready.then(dalej);
+    let klatka = 0;
+    addEventListener('resize', () => { cancelAnimationFrame(klatka); klatka = requestAnimationFrame(dalej); });
   }
 </script>
 
 <style>
   [hidden] { display: none !important; }
-  /* bez JS: bez paska filtrów (cała lista widoczna) */
+  /* bez JS: bez filtrów (cała lista widoczna) */
   :global(html:not(.js)) .ak-narz { display: none; }
 
   .ak-rodzaje { display: flex; border: 1px solid var(--line-ui); }
   .ak-rodzaje button { margin: 0; font: inherit; font-weight: 600; border: 0; border-radius: 0; background: transparent; color: var(--text); cursor: pointer; }
-  .ak-rodzaje button + button { border-left: 1px solid var(--line-ui); }
   .ak-rodzaje button:hover { color: var(--d-a); }
   .ak-rodzaje button[aria-pressed='true'] { background: var(--d-a); color: var(--bg); }
   .ak-rodzaje button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
@@ -161,14 +198,46 @@ const tytul = t(lang, 'aktualnosci');
   .ak-archiwum { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
   .ak-archiwum a { color: var(--d-a); }
 
-  /* ---------- komputer (≥ 761 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
+  /* „Pokaż” tylko w panelu z prawej */
+  @media (max-width: 979.98px) { .ak-pokaz { display: none; } }
+
+  /* ---------- komputer (≥ 761 px): lista w dwóch kolumnach, gdy ma co najmniej 760 px ---------- */
   @media (min-width: 761px) {
     .ak-rodzaj-lista { display: none; }
-    .ak-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
-      background: var(--bg); border-bottom: 2px solid var(--rule); }
+    .ak-lista { container-type: inline-size; min-width: 0; }
+    @container (min-width: 760px) {
+      .ak-mies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+      .ak-mies h2 { grid-column: 1 / -1; }
+    }
+  }
+
+  /* ---------- okno 761–979 px: filtry jako pasek nad listą (przyciski rodzajów i pole szukania), nieprzyklejony ---------- */
+  @media (min-width: 761px) and (max-width: 979.98px) {
+    .ak-narz { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 0 0 12px; border-bottom: 2px solid var(--rule); }
     .ak-rodzaje button { font-size: 14px; padding: 7px 12px; }
+    .ak-rodzaje button + button { border-left: 1px solid var(--line-ui); }
     .ak-szukaj { flex: 1; min-width: 220px; font-size: 15px; padding: 8px 12px; }
     .ak-dla { font-size: 15px; }
+  }
+
+  /* ---------- okno ≥ 980 px: filtry w prawej kolumnie, układ jak spis „Na tej stronie” (zal-podstrona.css) ---------- */
+  @media (min-width: 980px) {
+    .ak-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px; }
+    .ak-lista { grid-column: 1; grid-row: 1; }
+    .ak-panel { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: calc(var(--gora) + 16px);
+      max-height: calc(100vh - var(--gora) - 32px); overflow-y: auto; overscroll-behavior: contain; }
+    .ak-narz { display: grid; gap: 10px; }
+    .ak-pokaz { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--muted); }
+    .ak-rodzaje { display: grid; gap: 2px; border: 0; border-left: 1px solid var(--line); }
+    .ak-rodzaje button { width: calc(100% + 1px); margin-left: -1px; padding: 3px 0 3px 14px; border: 0; border-left: 2px solid transparent;
+      font-size: 15px; font-weight: 400; line-height: 1.55; text-align: left; }
+    .ak-rodzaje button:hover { color: var(--ink); }
+    .ak-rodzaje button[aria-pressed='true'] { border-left-color: var(--ink); background: transparent; font-weight: 700; color: var(--ink); }
+    .ak-rodzaje button:focus-visible { outline-offset: -2px; }
+    .ak-szukaj { width: 100%; margin-top: 6px; padding: 7px 10px; border-radius: 5px; font-size: 14px; }
+    .ak-dla { display: grid; justify-items: start; gap: 8px; margin: 16px 0 0; font-size: 14px; line-height: 1.45; }
+    .ak-dla button { border-radius: 5px; }
+    .ak-dla button:focus-visible { outline-offset: -2px; }
   }
 
   /* ---------- telefon (≤ 760 px): rodzaje w dwóch rzędach, pole szukania pod nimi ---------- */

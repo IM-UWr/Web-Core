@@ -51,8 +51,9 @@
   html:where([data-t-nagl]) .z-drzewo .z-dyr .imie { font-size: calc(30 * var(--t-n)); }
   html:where([data-t-nagl]) :is(.z-sek-osoby .z-os .imie, .z-pd-tresc .z-zob a) { font-size: calc(19 * var(--t-n)); }
   /* style komponentów Astro mają w każdym członie [data-astro-cid-…]: stąd #tresc */
-  html:where([data-t-nagl]) #tresc :is(.wa h3, .wiersz h3, .wiersz h4, .ref h3, .zk-daty .t, .ww-t, .ww-tr .t) { font-size: calc(21 * var(--t-n)); }
-  html:where([data-t-nagl]) #tresc .wa.wyr h3 { font-size: calc(30 * var(--t-n)); }
+  html:where([data-t-nagl]) #tresc :is(.wiersz h3, .wiersz h4, .ref h3, .zk-daty .t, .ww-t, .ww-tr .t) { font-size: calc(21 * var(--t-n)); }
+  html:where([data-t-nagl]) #tresc .wa h3 { font-size: calc(18.5 * var(--t-n)); }
+  html:where([data-t-nagl]) #tresc .wa.wyr h3 { font-size: calc(24 * var(--t-n)); }
   html:where([data-t-nagl]) #tresc :is(.zk-sem .t, .akt-pn a) { font-size: calc(20 * var(--t-n)); }
   html:where([data-t-nagl]) #tresc :is(.ak-mies h2, .kal-mies h2) { font-size: calc(23 * var(--t-n)); }
 
@@ -107,14 +108,8 @@
   html[data-t-akt] .z-kolumna[data-key="akt"] .z-w.wyr .t { font-size: 18px; }
   html[data-t-akt] .z-kolumna[data-key="akt"] .z-w.wyr .zaj { -webkit-line-clamp: 1; }
   html[data-t-akt] .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min { width: 56px; height: 42px; }
-  /* strona Aktualności: zdjęcie pierwszej 280 px zamiast 360, ciaśniejsze wiersze */
-  html[data-t-akt] #tresc .wa { padding-block: 11px; }
-  html[data-t-akt] #tresc .wa.wyr { padding-block: 16px 18px; }
-  html[data-t-akt] #tresc .wa.wyr .wa-fot { width: 280px; }
-  html[data-t-akt] #tresc .ak-mies h2 { margin-top: 18px; }
   /* bardzo zwarte: jak zwarte, ale pozostałe pozycje bez miniatur */
-  html[data-t-akt="bardzo"] .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min,
-  html[data-t-akt="bardzo"] #tresc .wa:not(.wyr) .wa-fot { display: none; }
+  html[data-t-akt="bardzo"] .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min { display: none; }
 
   /* ---------- przycisk przy lewej krawędzi i panel (segmenty jak w prototypie, .seg) ---------- */
   .t-zakladka { position: fixed; z-index: 9000; left: 0; top: 50%; translate: 0 -50%; margin: 0; padding: 12px 5px; border: 1px solid var(--line-ui); border-left: 0; background: var(--bg);

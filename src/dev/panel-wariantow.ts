@@ -15,7 +15,7 @@ const GRUPY: { id: Grupa; nazwa: string; opcje: [string, string][] }[] = [
   { id: 'nagl', nazwa: 'Nagłówki', opcje: [['', '100%'], ['90', '90%'], ['80', '80%'], ['plynne', 'płynne']] },
   { id: 'odst', nazwa: 'Odstępy', opcje: [['', 'obecne'], ['25', '−25%'], ['40', '−40%'], ['plynne', 'płynne']] },
   { id: 'baner', nazwa: 'Banery', opcje: [['', 'obecne'], ['25', 'niższe'], ['40', 'niskie'], ['plynne', 'płynne']] },
-  { id: 'akt', nazwa: 'Aktualności', opcje: [['', 'obecne'], ['zwarte', 'zwarte'], ['bardzo', 'bardzo zwarte']] },
+  { id: 'akt', nazwa: 'Aktualności na Szybkim dostępie', opcje: [['', 'obecne'], ['zwarte', 'zwarte'], ['bardzo', 'bardzo zwarte']] },
 ];
 
 const ZESTAWY: { nazwa: string; stan: Stan }[] = [
