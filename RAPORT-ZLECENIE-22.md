@@ -134,6 +134,8 @@ Pola `*_haslo` nazywają w etykiecie stronę, np. „Hasło na banerze: Projekty
 
 Właściciel odłożył ją 6.11: „testy edycji zrobimy później”. Gałęzie `test-cms` zostają do tego czasu.
 
+**Pierwsza próba zapisu (6.11): odrzucona.** CMS pokazał „Resource not accessible by integration” przy zapisie pliku. Przyczyna: aplikacja Pages CMS nie jest zainstalowana w organizacji IM-UWr (są tylko `claude` i `im-uwr-strona-powiadomienia`). Repozytoria są publiczne, więc formularze się otwierają, ale zapis wymaga instalacji. Bez niej nie zapisze też żaden edytor, także po etapie 10. Instalację robi właściciel. Żaden zapis nie doszedł: wszystkie 6 gałęzi `test-cms` bez zmian.
+
 **Co mówi kod Pages CMS.** W zamian przeczytałem publiczny kod (`pagescms/pagescms`, gałąź `main`). Formularz wczytuje wartości wszystkich pól ze schematu, także ukrytych, a pola ukrytego po prostu nie rysuje (`components/entry/entry-form.tsx`). Serwer sprawdza i zapisuje je razem z resztą (`app/api/[owner]/[repo]/[branch]/files/[path]/route.ts`). Znikają tylko wartości spoza schematu, bo żaden nasz `.pages.yml` nie ma opcji `settings.content.merge`, która by je zachowała. Według kodu pola ukryte powinny więc przetrwać zapis. **To nie zastępuje próby:** nie wiem, czy `app.pagescms.org` działa dokładnie na tej wersji, a czytanie kodu nie odpowiada na pytanie o bloki z kilkoma akapitami ani o formatowanie plików.
 
 Gałęzie `test-cms` założone i wypchnięte. Właściciel w każdym wpisie zmienia jedno słowo i zapisuje. Potem porównuję `wyglad/zlecenie-16` z `origin/test-cms`. Wpisy testowe nie dotykają tych sześciu repozytoriów, więc porównanie pokaże tylko zapisy z CMS.
