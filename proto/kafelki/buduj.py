@@ -1,34 +1,41 @@
-# Składa kafelki-dzialow.html z szablon.html i dane.json. Uruchamiać z katalogu web-core (czyta proto/).
-import json, os, re
+# Składa kafelki-dzialow.html: szablon.html + opisy z dane.json + prawdziwe strony działów ze strona.json (zbierz.js).
+import base64, json, os, re
 
 S = os.path.dirname(os.path.abspath(__file__))
 D = json.load(open(S + '/dane.json', encoding='utf-8'))
-d = json.load(open('proto/zasoby/dane-dzialow.json', encoding='utf-8'))
-t = open('proto/zalozyciele.src.html', encoding='utf-8').read()
-m = re.search(r"IN_INST = \{.*?tekst: \[\s*'((?:[^'\\]|\\.)*)'", t, re.S)
+ST = json.load(open(S + '/strona.json', encoding='utf-8'))
+
+opisy = dict(D['O'])
+# opisy Popularyzacji: partnerzy jak w prototypie, grupa „Dla kogo” z leadu działu
+for _, lista in D['G']['popularyzacja']:
+    for x in lista:
+        if '|' in x:
+            n, o = x.split('|', 1)
+            opisy.setdefault(n, o.replace(' ↗', ''))
+opisy.update({'Dla uczniów': 'kółka, obozy i konkursy', 'Dla nauczycieli': 'szkolenia', 'Dla wszystkich': 'wykłady popularnonaukowe'})
+grupy = dict(D['S'])
+grupy.update({'Dla kogo': 'uczniowie, nauczyciele, wszyscy', 'Partnerzy': 'fundacja, portal, PTM'})
 
 
-def pierwsze(s, n=2):
-    # „m.in.” nie kończy zdania
-    return ' '.join(re.split(r'(?<=[.!?])(?<!m\.in\.)\s+', s)[:n])
+def js(o):
+    # literał JS w <script>: nie może zamknąć skryptu ani wejść w stan „<!--”
+    return json.dumps(o, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/').replace('<!--', '<\\!--')
 
 
-D['H'] = {
-    'instytut': 'Wrocławska szkoła matematyczna',
-    'nauka': 'Poznaj nasze badania na A+',
-    'studia': 'Studiuj matematykę we Wrocławiu',
-    'popularyzacja': 'Matematyka dla wszystkich ciekawych',
-}
-D['T'] = {
-    'instytut': ['O Instytucie', pierwsze(m.group(1))],
-    'nauka': ['Badania w Instytucie', pierwsze(d['nauka']['tekst'][0])],
-    'studia': ['O studiach', pierwsze(d['studia']['tekst'][0])],
-    'popularyzacja': ['O popularyzacji', d['popularyzacja']['lead']],
-}
-js = json.dumps(D, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
-h = open(S + '/szablon.html', encoding='utf-8').read().replace('/*DANE*/null', js)
+# Obrazki używane jako maski (logo, fale tła) przeglądarka pobiera z CORS, więc idą w treści strony jako data:.
+wzorce = [r"--logo[\w-]*:url\((zas/strona/[^)]+)\)", r"mask-image:\s*url\('?(zas/strona/[^')]+)'?\)"]
+nazwy = set()
+for w in wzorce:
+    for c in ST['STY']:
+        nazwy.update(re.findall(w, c))
+    for s in ST['STRONY'].values():
+        for t in s['tresc'].values():
+            nazwy.update(re.findall(w, t))
+TYP = {'.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg'}
+ST['INL'] = {n: f"data:{TYP[os.path.splitext(n)[1]]};base64,{base64.b64encode(open(os.path.join(S, n), 'rb').read()).decode()}" for n in sorted(nazwy)}
+print('maski', {n: len(v) // 1024 for n, v in ST['INL'].items()})
+
+h = open(S + '/szablon.html', encoding='utf-8').read()
+h = h.replace('/*DANE*/null', js({'O': opisy, 'S': grupy})).replace('/*STRONA*/null', js(ST))
 open(S + '/kafelki-dzialow.html', 'w', encoding='utf-8').write(h)
 print(len(h) // 1024, 'KB')
-for k, v in D['T'].items():
-    print(k, '|', v[1])
-print({k: [len(g[1]) for g in v] for k, v in D['G'].items()})
