@@ -15,11 +15,14 @@ import panelWariantow from './src/plugins/panel-wariantow.mjs';
 const site = process.env.SITE_URL || 'https://im-uwr.github.io';
 const base = process.env.BASE_PATH !== undefined ? process.env.BASE_PATH || '/' : '/Web-Core';
 
+// Panel wariantów skali (tylko `astro dev`) ukryty 6.11.2026 na prośbę właściciela. Żeby wrócił: true.
+const PANEL_WARIANTOW = false;
+
 export default defineConfig({
   site,
   base,
   trailingSlash: 'ignore',
-  integrations: [react(), panelWariantow()],
+  integrations: [react(), ...(PANEL_WARIANTOW ? [panelWariantow()] : [])],
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex, rehypeBloki, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
