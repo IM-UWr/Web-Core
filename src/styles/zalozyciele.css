@@ -243,6 +243,9 @@
   .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }
   .z-slot .ww-meta a, .z-slot .pr-akcje a { color: #fff; }
   .z-slot .pt-liczby + .pt-liczby { display: none !important; }
+  /* bezpiecznik dopasowania (NaglowekZ.astro; zlecenie 24, punkt 4): pierwsza liczba się nie mieści, więc znika cały rząd z kreską; nie ma miejsca na opis ciekawostki albo akapit notki o patronie */
+  .z-slot .pt-liczby.z-bez-liczb { display: none !important; }
+  .z-nagl :is(.z-znak-opis, .z-patron p).z-brak-miejsca { display: none; }
 
   /* ---------- baner strony działu („opcja 4”) ---------- */
   .z-baner-dzialu { --szk: clamp(140px, calc(230 * var(--jn)), 230px); --odst: clamp(14px, calc(40 * var(--jn)), 40px); --patron-w: clamp(200px, calc(270 * var(--jn)), 270px);

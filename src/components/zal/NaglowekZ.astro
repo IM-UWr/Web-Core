@@ -160,22 +160,31 @@ const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.l
 //   co 4 px, najwyżej do 44 px; przy dwóch liniach na podstronie sygnet (z podpisem) podnosi się o pół linii — środek blisko środka dwóch linii tytułu;
 // - hasło: szerokość do granicy, zawija się;
 // - liczby zawsze w jednym rzędzie (CSS: zawijanie i wysokość jednego rzędu): szerokość rzędu do granicy, ale tylko tych prostokątów, które
-//   nachodzą na rząd w pionie; liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy.
+//   nachodzą na rząd w pionie; liczby z drugiego rzędu są niewidoczne w całości i dostają aria-hidden. Telefon: najwyżej trzy. Pierwsza liczba
+//   nigdy ucięta: gdy nie mieści się w całości, znika cały rząd razem z kreską (zlecenie 24, punkt 4);
+// - bezpiecznik (zlecenie 24, punkt 4): gdy mimo tego tekst nagłówka dotyka opisu ciekawostki albo akapitu notki o patronie, hasło ma ponad dwie linie
+//   albo tytuł przy 44 px dalej się nie mieści, dodatek się chowa (symbol, imię i linia z latami zostają) i układ liczy się od nowa, już bez niego.
 const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   // prostokąty linii tekstu elementu (nie jego pudełka; tytuł ciekawostki ma pudełko wysunięte o 160 px w lewo, zalecenie 19)
   `function linie(e){var w=document.createTreeWalker(e,4),t,g,rs=[];while(t=w.nextNode())if(t.nodeValue.trim()){g=document.createRange();g.selectNodeContents(t);rs.push.apply(rs,[].slice.call(g.getClientRects()))}return rs.filter(function(r){return r.width&&r.height})}` +
   `function dopasuj(){var tel=matchMedia('${MQ_TELEFON}').matches,h1=n.querySelector('h1'),ul=n.querySelector('.z-slot .pt-liczby'),g=n.querySelector('.z-tyt-g'),hs=n.querySelector('.z-haslo'),` +
-  `ty=n.querySelector('.z-tyt,.z-tytul'),nr=n.getBoundingClientRect(),pola=[],gk=nr.right-(ty?ty.getBoundingClientRect().left-nr.left:64),gr=Infinity;` +
+  `ty=n.querySelector('.z-tyt,.z-tytul'),nr=n.getBoundingClientRect(),gk=nr.right-(ty?ty.getBoundingClientRect().left-nr.left:64),dod=n.querySelector('.z-znak-opis,.z-patron p.tylko-komputer');` +
+  `function teksty(){var rs=[];n.querySelectorAll('.z-wstecz,.z-sciezka a,h1,.z-haslo,.z-slot li:not([aria-hidden])').forEach(function(e){rs.push.apply(rs,linie(e))});return rs}` +
+  `function uklad(){var pola=[],gr=Infinity,lin=1,fs=0,lh=0,zaDlugi=false;` +
   `n.querySelectorAll('.z-znak,.z-znak-opis,.z-patron').forEach(function(e){if(e instanceof SVGElement){var r=e.getBoundingClientRect();if(r.width&&r.height)pola.push(r)}else pola.push.apply(pola,linie(e))});` +
   `pola.forEach(function(r){gr=Math.min(gr,r.left)});var gt=gr===Infinity?gk:gr-40;` +
-  `if(h1){h1.style.fontSize='';h1.style.maxWidth='';var lin=1;` +
-  `if(!tel){h1.style.maxWidth=Math.max(0,gt-h1.getBoundingClientRect().left)+'px';var fs=px(getComputedStyle(h1).fontSize),lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh);` +
+  `if(h1){h1.style.fontSize='';h1.style.maxWidth='';` +
+  `if(!tel){h1.style.maxWidth=Math.max(0,gt-h1.getBoundingClientRect().left)+'px';fs=px(getComputedStyle(h1).fontSize);lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh);` +
   `while((lin>2||h1.scrollWidth>h1.clientWidth)&&fs>44){fs=Math.max(44,fs-4);h1.style.fontSize=fs+'px';lh=px(getComputedStyle(h1).lineHeight);lin=Math.round(h1.offsetHeight/lh)}` +
-  `if(g)g.style.setProperty('--syg-podnies',Math.max(0,lin-1)*lh/2+'px')}else if(g)g.style.removeProperty('--syg-podnies');` +
+  `zaDlugi=lin>2||h1.scrollWidth>h1.clientWidth;if(g)g.style.setProperty('--syg-podnies',Math.max(0,lin-1)*lh/2+'px')}else if(g)g.style.removeProperty('--syg-podnies');` +
   `n.classList.toggle('z-tyt-dlugi',lin>1)}` +
-  `if(hs){hs.style.maxWidth='';if(!tel)hs.style.maxWidth=Math.max(0,gt-hs.getBoundingClientRect().left)+'px'}` +
-  `if(ul){ul.style.maxWidth='';if(!tel){var ur=ul.getBoundingClientRect(),gl=gk;pola.forEach(function(r){if(r.top<ur.bottom&&ur.top<r.bottom)gl=Math.min(gl,r.left-20)});ul.style.maxWidth=Math.max(0,gl-ur.left)+'px'}var li=ul.children,t0=li.length?li[0].offsetTop:0;` +
-  `for(var i=0;i<li.length;i++){if(tel?i>2:li[i].offsetTop>t0+4)li[i].setAttribute('aria-hidden','true');else li[i].removeAttribute('aria-hidden')}}}` +
+  `if(hs){hs.style.maxWidth='';if(!tel){hs.style.maxWidth=Math.max(0,gt-hs.getBoundingClientRect().left)+'px';if(Math.round(hs.offsetHeight/px(getComputedStyle(hs).lineHeight))>2)zaDlugi=true}}` +
+  `if(ul){ul.style.maxWidth='';ul.classList.remove('z-bez-liczb');if(!tel){var ur=ul.getBoundingClientRect(),gl=gk;pola.forEach(function(r){if(r.top<ur.bottom&&ur.top<r.bottom)gl=Math.min(gl,r.left-20)});ul.style.maxWidth=Math.max(0,gl-ur.left)+'px';` +
+  `if(ul.children.length&&ul.children[0].getBoundingClientRect().right>ul.getBoundingClientRect().right+.5)ul.classList.add('z-bez-liczb')}var li=ul.children,t0=li.length?li[0].offsetTop:0;` +
+  `for(var i=0;i<li.length;i++){if(tel?i>2:li[i].offsetTop>t0+4)li[i].setAttribute('aria-hidden','true');else li[i].removeAttribute('aria-hidden')}}return zaDlugi}` +
+  `if(dod)dod.classList.remove('z-brak-miejsca');var zaDlugi=uklad();` +
+  `if(dod&&!tel&&getComputedStyle(dod).display!=='none'){var rd=linie(dod);` +
+  `if(zaDlugi||teksty().some(function(t){return rd.some(function(r){return t.left<r.right&&r.left<t.right&&t.top<r.bottom&&r.top<t.bottom})})){dod.classList.add('z-brak-miejsca');uklad()}}}` +
   `dopasuj();var cz;addEventListener('resize',function(){cancelAnimationFrame(cz);cz=requestAnimationFrame(dopasuj)});` +
   `if(document.fonts)document.fonts.ready.then(dopasuj)})(document.currentScript.parentElement);`;
 ---
