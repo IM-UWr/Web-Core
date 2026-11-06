@@ -1,6 +1,6 @@
 # Raport: zlecenie 22 — wszystkie pola w CMS i praca edytorów na gałęzi (6.11.2026)
 
-**Etapy 0–8 są zrobione i wypchnięte. Etap 9: gałęzie `test-cms` założone, czekam na zapisy właściciela w CMS.** Etap 10 czeka na słowo „przełącz”, etap 11 to sam dokument. Numer 22 był wolny. Zlecenie 22 ma osobne commity, zlecenia 21 w nich nie ma.
+**Etapy 0–8 są zrobione i wypchnięte, etap 11 (`dok/start-strony.md`) napisany. Etap 9: gałęzie `test-cms` czekają, właściciel odłożył zapisy w CMS na później.** Etap 10 czeka na słowo „przełącz”, a jego warunkiem w zleceniu jest udany etap 9. Numer 22 był wolny. Zlecenie 22 ma osobne commity, zlecenia 21 w nich nie ma.
 
 Skrypt kontrolny daje **0 problemów przy 575 plikach**: 567 po etapach 0–7 i 8 wpisów testowych, o które właściciel poprosił później. Żadnego formularza nie sprawdzono jeszcze w prawdziwym Pages CMS: to etap 9.
 
@@ -46,6 +46,7 @@ Zniknęły dane testowe, więc niektóre miejsca były uboższe albo puste. To s
 | 7 | Raport | Web-Core, `wyglad/zlecenie-16` | `22b02dde` |
 | 8 | Push | 21 repozytoriów treści, Web-Core | `main` Web-Core: `446e98e3` |
 | 9 | Gałęzie `test-cms` | 6 repozytoriów | od `wyglad/zlecenie-16`, tabela niżej |
+| 11 | `dok/start-strony.md`, procedura bez wykonania | Web-Core, `wyglad/zlecenie-16` | `e790df80` |
 | — | Wpisy testowe, prośba właściciela | 5 repozytoriów | tabela niżej |
 
 **Etap 1, commity:** Web-Instytut `418bf10`, Web-Nauka `13a8ef4`, Web-Studia `8dabf71`, Web-Ustawienia `045b2f3`, Web-Spec-Aktuarialno-Finansowa `a6aa522`, Web-Spec-Analiza-Danych `2f6e60d`, Web-Spec-Nauczycielska `78e9ca4`, Web-Spec-Stosowana `07d8459`, Web-Spec-Teoretyczna `f44f914`, Web-Sem-Analiza-Harmoniczna `c8a1a9c`, Web-Sem-Dydaktyka `009f7b5`, Web-Sem-Dyskretna-Analiza-Harmoniczna `7ef5606`, Web-Sem-Geometria `b99d156`, Web-Sem-Prawdopodobienstwo `0f91315`, Web-Sem-Rownania-Rozniczkowe `db9108c`, Web-Sem-Statystyka `731ef74`, Web-Sem-Teoria-Modeli `311a148`, Web-Sem-Topologia `2d5387c`.
@@ -109,7 +110,8 @@ Pola `*_haslo` nazywają w etykiecie stronę, np. „Hasło na banerze: Projekty
 | `main` repozytoriów treści | Nieruszony: po etapie 8 i po wpisach testowych 21 repozytoriów ma ten sam `main` co przed pushem |
 | Wygląd | Kod strony bez zmian. 72 zrzuty komputera względem zlecenia 21: 40 różnych, opis niżej |
 | Etap 8 | Zrobiony, wyniki niżej |
-| Etapy 9, 10; `dok/start-strony.md` | W toku: etap 9 czeka na zapisy właściciela, reszta na bramki |
+| Etapy 9, 10 | Niezrobione: próbę w CMS właściciel odłożył, etap 10 czeka na „przełącz” |
+| `dok/start-strony.md` | Jest. Zgodnie ze zleceniem procedury nie wykonano |
 | `.przekazanie\pola-do-cms.md` zaktualizowany | Tak |
 
 **Zrzuty.** Web-Core zmienia w tym zleceniu tylko `skrypty/` i README, więc wygląd może się zmienić tylko przez dane. Tak też jest: 32 z 40 różnic to strona główna PL i EN, Aktualności i wpis (po usunięciu danych testowych pierwszy na liście jest inny wpis, więc te 8 zrzutów pokazuje inną stronę), 4 to licznik referatów na Seminariach, a 4 to banery Instytutu (szkic, różnica do 16 na 255, ten sam rodzaj szumu co w próbie kontrolnej). Na telefonie osobnego porównania całości nie robiłem, bo kod strony się nie zmienił.
@@ -128,7 +130,11 @@ Pola `*_haslo` nazywają w etykiecie stronę, np. „Hasło na banerze: Projekty
 
 **Harmonogram Web-Podglad nie działa co godzinę.** Zlecenie zakłada przebieg co godzinę, o :23, a `podglad.yml` ma taki cron, ale GitHub uruchamiał go nieregularnie: ostatnio o 08:04, 00:27, 18:52, 11:15, 02:37, 21:59 UTC. Workflow zostawiłem bez zmian. Ręcznie uruchomiłem dwa przebiegi: do sprawdzenia etapu 8 i po wpisach testowych. Zmiana treści może więc na podglądzie pojawić się dopiero po wielu godzinach, chyba że ktoś uruchomi przebieg ręcznie.
 
-## Etap 9: próba w CMS (w toku)
+## Etap 9: próba w CMS (odłożona)
+
+Właściciel odłożył ją 6.11: „testy edycji zrobimy później”. Gałęzie `test-cms` zostają do tego czasu.
+
+**Co mówi kod Pages CMS.** W zamian przeczytałem publiczny kod (`pagescms/pagescms`, gałąź `main`). Formularz wczytuje wartości wszystkich pól ze schematu, także ukrytych, a pola ukrytego po prostu nie rysuje (`components/entry/entry-form.tsx`). Serwer sprawdza i zapisuje je razem z resztą (`app/api/[owner]/[repo]/[branch]/files/[path]/route.ts`). Znikają tylko wartości spoza schematu, bo żaden nasz `.pages.yml` nie ma opcji `settings.content.merge`, która by je zachowała. Według kodu pola ukryte powinny więc przetrwać zapis. **To nie zastępuje próby:** nie wiem, czy `app.pagescms.org` działa dokładnie na tej wersji, a czytanie kodu nie odpowiada na pytanie o bloki z kilkoma akapitami ani o formatowanie plików.
 
 Gałęzie `test-cms` założone i wypchnięte. Właściciel w każdym wpisie zmienia jedno słowo i zapisuje. Potem porównuję `wyglad/zlecenie-16` z `origin/test-cms`. Wpisy testowe nie dotykają tych sześciu repozytoriów, więc porównanie pokaże tylko zapisy z CMS.
 
