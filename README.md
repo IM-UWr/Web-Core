@@ -64,6 +64,13 @@ npm run build      # pełna wersja do katalogu dist/ (z wyszukiwarką)
 npm run preview
 ```
 
+Bez opcji `skrypty/pobierz_tresci.py` bierze treści z gałęzi `main`. Na czas pracy na gałęzi uruchamiaj go z opcją
+`--galaz`, bo bez niej nadpisze nakładkę treściami z `main`:
+
+```bash
+python3 skrypty/pobierz_tresci.py --galaz wyglad/zlecenie-16
+```
+
 ## Kalendarz
 
 - `/kalendarz/wszystko.ics` — wydarzenia, obrony i referaty

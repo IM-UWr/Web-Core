@@ -5,6 +5,9 @@ Uruchamiane przed każdym budowaniem (workflow „Budowanie i publikacja strony�
 jakości”) i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
 
 - Repozytoria są publiczne — pobieranie bez klucza (git clone --depth 1), kopie w .tresci/ (pomijane przez git).
+- Pobierana jest gałąź main, także gdy gałąź domyślna repozytorium jest inna. Opcja --galaz <nazwa>: pobiera wskazaną
+  gałąź; repozytorium bez tej gałęzi daje main. Lokalnie, na czas pracy na gałęzi, trzeba jej użyć, bo inaczej skrypt
+  nadpisze nakładkę treściami z main:  python3 skrypty/pobierz_tresci.py --galaz wyglad/zlecenie-16
 - Każdy plik może pochodzić tylko z jednego miejsca: jeśli dwa repozytoria (albo repozytorium i Web-Core) mają ten sam
   plik, skrypt kończy się błędem i wypisuje oba źródła.
 - Pliki nałożone poprzednim razem są najpierw usuwane (lista w .tresci/nalozone.json), więc usunięcie pliku
@@ -26,6 +29,7 @@ cfg = json.load(open(os.path.join(ROOT, 'tresci.json'), encoding='utf-8'))
 ORG = cfg['organizacja']
 REPOS = cfg['repozytoria']
 lokalnie = sys.argv[sys.argv.index('--lokalnie') + 1] if '--lokalnie' in sys.argv else None
+GALAZ = sys.argv[sys.argv.index('--galaz') + 1] if '--galaz' in sys.argv else 'main'
 
 
 def git(*a, cwd=None):
@@ -38,16 +42,20 @@ def pobierz(repo):
     cel = os.path.join(CACHE, repo)
     url = f'https://github.com/{ORG}/{repo}.git'
     try:
+        if not git('ls-remote', '--heads', url):
+            return repo, None, 'puste'
+        galaz = GALAZ
+        if galaz != 'main' and not git('ls-remote', '--heads', url, galaz):
+            print(f'  {repo}: brak gałęzi {galaz}, biorę main')
+            galaz = 'main'
         if os.path.isdir(os.path.join(cel, '.git')):
-            git('fetch', '-q', '--depth', '1', 'origin', 'HEAD', cwd=cel)
+            git('fetch', '-q', '--depth', '1', 'origin', galaz, cwd=cel)
             git('reset', '-q', '--hard', 'FETCH_HEAD', cwd=cel)
         else:
             shutil.rmtree(cel, ignore_errors=True)
-            git('clone', '-q', '--depth', '1', url, cel)
+            git('clone', '-q', '--depth', '1', '--branch', galaz, url, cel)
         return repo, cel, git('rev-parse', '--short', 'HEAD', cwd=cel)
     except subprocess.CalledProcessError as e:
-        if 'empty repository' in (e.stderr or '') or (os.path.isdir(cel) and not os.listdir(cel)):
-            return repo, None, 'puste'
         raise SystemExit(f'Nie udało się pobrać {url}:\n{e.stderr}')
 
 
