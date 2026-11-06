@@ -22,10 +22,11 @@
   .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: 20px; }
 
   /* „Na tej stronie”: przyklejony, nie wychodzi poza kolumnę treści (sticky w komórce siatki); dłuższy niż okno — przewija się */
-  .z-spis { position: sticky; top: calc(var(--gora) + 24px); align-self: start; max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; overscroll-behavior: contain;
+  .z-spis { position: sticky; top: calc(var(--gora) + 24px); align-self: start; max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain;
     font-size: 14px; line-height: 1.35; }
+  .z-spis::-webkit-scrollbar { display: none; } /* bez paska także przy nadmiarze ułamka piksela (zlecenie 21, punkt 8); długi spis dalej przewija się kółkiem */
   .z-spis-h { margin: 0 0 10px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-  .z-spis-lista { position: relative; list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+  .z-spis-lista { position: relative; list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); overflow-y: clip; } /* znacznik nie powiększa obszaru przewijania; w lewo wystaje dalej, bo overflow-x zostaje visible */
   .z-spis-lista li { margin: 0; }
   .z-spis-lista li[hidden] { display: none; }
   .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
