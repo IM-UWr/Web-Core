@@ -89,10 +89,10 @@ const UKLAD = {
 // Kadr zdjęcia (zlecenie 18, punkt 13), ta sama kompozycja na każdym ekranie. Środek budynku Instytutu leży na 47% wysokości zdjęcia.
 // Komputer: szerokość tak, by przy prawej krawędzi ekranu wypadało 92% zdjęcia, ale zdjęcie sięga pełnego granatu u dołu (77% wysokości
 // okładki); środek budynku na 34,5% wysokości okładki, u góry bez pustego miejsca. Telefon: rozmiar i poziomo w CSS (zal-telefon.css), tu
-// tylko pionowo: środek budynku w połowie między paskiem a górą liter „Instytut”. Bez JS kadr z CSS.
+// tylko pionowo: środek budynku w połowie między dolną krawędzią paska a górą liter „Instytut”; okładka sięga pod pasek, więc jego wysokość też się liczy (zlecenie 23, punkt 4). Bez JS kadr z CSS.
 const OSTRZEZ = import.meta.env.DEV ? `console.warn('Okładka: łuk poza zakresem, zostaje skos',cx,cy,R);` : '';
 const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)');function uloz(){if(!ok.offsetHeight)return;` +
-  `if(matchMedia('${MQ_TELEFON}').matches){var l=ok.querySelector('.w1');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,(l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
+  `if(matchMedia('${MQ_TELEFON}').matches){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
   `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
   `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
   // szerokość słowa przy 100 px, ukryta miarka w stylu h1

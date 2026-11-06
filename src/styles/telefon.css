@@ -239,18 +239,4 @@
   @keyframes hero-b2-wejscie { from { opacity: .01; transform: translateY(10px); } }
   @keyframes hero-b2-podskok { 0%, 100% { transform: none; } 50% { transform: translateY(5px); } }
 
-  /* Nagłówek strony głównej (.hdr-glowna) — przez cały czas ciemny, półprzezroczysty i rozmyty (na zdjęciu i nad pasem);
-     dzisiejsze bielenie po przewinięciu (.przewiniety) i animacja hero-hdr wyłączone. Na zdjęciu bez dolnej linii
-     i bez nazwy Instytutu; po zwinięciu banera (.hdr-zwiniety, p > .8) — cienka linia i nazwa jak na podstronach. Logo,
-     lupa, motyw i menu białe. Przy stopce (.hdr-stopka) i z otwartym menu (.menu-otwarte) — jak dotąd. */
-  .js .hdr.hdr-glowna.hdr-foto { animation: none; }
-  .js .hdr.hdr-glowna:not(.hdr-stopka):not(.menu-otwarte) { background: rgb(10 18 38 / .58); -webkit-backdrop-filter: blur(10px) saturate(1.15); backdrop-filter: blur(10px) saturate(1.15);
-    border-bottom-color: transparent; box-shadow: none; }
-  .js .hdr.hdr-glowna.hdr-zwiniety:not(.hdr-stopka):not(.menu-otwarte) { box-shadow: 0 1px 0 rgb(255 255 255 / .06); }
-  .js .hdr.hdr-glowna:not(.menu-otwarte) :is(.brand-name, .icon-btn:not(.burger)) { color: #fff; }
-  .js .hdr.hdr-glowna:not(.menu-otwarte) .brand-sub { color: rgb(255 255 255 / .82); }
-  .js .hdr.hdr-glowna:not(.menu-otwarte) .brand-logo { background: #fff; }
-  .js .hdr.hdr-glowna:not(.menu-otwarte) .icon-btn:not(.burger):hover { background: rgb(255 255 255 / .16); color: #fff; }
-  .hdr-glowna .brand-txt { transition: opacity var(--t-sredni) var(--rytm), transform var(--t-sredni) var(--rytm), visibility 0s; }
-  .js .hdr-glowna:not(.hdr-zwiniety) .brand-txt { opacity: 0; transform: translateY(4px); visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), transform var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
 }

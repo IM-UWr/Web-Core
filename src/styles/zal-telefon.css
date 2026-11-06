@@ -29,16 +29,19 @@
   /* ---------- nagłówek strony: nazwa Brygadą (pasek menu komputera schowany). Kolor według tych samych zasad co pasek komputera
      (zlecenie 21, punkt 2, zmienia „pełny granat” ze zlecenia 18, punkt 10; wartości jak w zalozyciele.css, stany: src/scripts/zal/pasek.ts).
      Bez klas na stronie bez banera: pełny granat, bo pasek stoi tu w układzie i nie ma nic pod sobą, prześwit dałby szarość.
-     Strona z banerem: baner zaczyna się pod paskiem już na górze (zlecenie 23, punkt 3), więc pasek prześwituje od początku, także bez JS ---------- */
+     Strona z banerem i okładka: sięgają pod pasek już na górze (zlecenie 23, punkty 3 i 4), więc pasek prześwituje od początku, także bez JS ---------- */
   .z-pasek { display: none !important; }
   .hdr { --pasek-krycie: 45%;
     background: var(--granat) !important; border-bottom-color: rgb(255 255 255 / .12) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; }
   body:has(.z-nagl-pod[data-dzial]) .hdr { --pasek-krycie: 40%; }
   body:has(.z-foto-nat) .hdr { --pasek-krycie: 60%; }
-  /* nad banerem; strona bez banera, główna i pasek przy stopce (w jej kolorze) zostają przy pełnym granacie. Cień dopiero po przewinięciu */
+  /* nad banerem; strona bez banera i pasek przy stopce (w jej kolorze) zostają przy pełnym granacie. Cień dopiero po przewinięciu */
   body:has(.z-nagl) .hdr:not(.jasny):not(.przy-stopce) { background: color-mix(in srgb, var(--granat) var(--pasek-krycie), transparent) !important;
     -webkit-backdrop-filter: blur(14px) saturate(1.1) !important; backdrop-filter: blur(14px) saturate(1.1) !important; border-bottom-color: rgb(255 255 255 / .1) !important; }
   body:has(.z-nagl) .hdr.przewiniety:not(.jasny):not(.przy-stopce) { box-shadow: 0 8px 24px rgb(0 0 0 / .18) !important; }
+  /* nad okładką (zlecenie 23, punkt 4); od krawędzi Szybkiego dostępu jasny, z otwartym menu pełny granat, jak dotąd */
+  body:has(.z-okladka) .hdr:not(.jasny):not(.menu-otwarte) { background: color-mix(in srgb, var(--granat) 30%, transparent) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.1) !important; backdrop-filter: blur(14px) saturate(1.1) !important; border-bottom-color: rgb(255 255 255 / .12) !important; }
   /* nad treścią */
   .hdr.jasny { background: color-mix(in srgb, var(--bg) 95%, transparent) !important;
     -webkit-backdrop-filter: blur(8px) !important; backdrop-filter: blur(8px) !important; border-bottom-color: var(--line) !important; box-shadow: 0 6px 18px rgb(13 24 48 / .06) !important; }
@@ -106,9 +109,15 @@
   @keyframes z-pisz-zast { to { stroke-dashoffset: 0; } }
 
   /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
-  /* dvh: przy schowanym pasku adresu okno jest wyższe niż 100svh i pod okładką widać byłoby początek Szybkiego dostępu (zlecenie 21, punkt 9); svh dla starszych przeglądarek */
-  .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100svh - var(--hdr-h)); min-height: calc(100dvh - var(--hdr-h));
-    padding: 0 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
+  /* dvh: przy schowanym pasku adresu okno jest wyższe niż 100svh i pod okładką widać byłoby początek Szybkiego dostępu (zlecenie 21, punkt 9); svh dla starszych przeglądarek.
+     Okładka sięga pod pasek i kończy się na dole okna (zlecenie 23, punkt 4) */
+  .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: 100svh; min-height: 100dvh; margin-top: calc(-1 * var(--hdr-h));
+    padding: var(--hdr-h) 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
+  /* przy wejściu strony okładka stoi, a wjeżdżają napisy i działy, jak w pasach podstron (przejscia.css): gdyby gasła cała, przez prześwitujący pasek mignęłoby jasne tło strony */
+  @media (prefers-reduced-motion: no-preference) {
+    #tresc > .z-okladka.z-okladka { animation: none; }
+    html:not(.bez-wejscia) .z-okladka > :is(.z-okl-tytul, .z-okl-dzialy, .z-strzalka) { animation: wejscie var(--t-dlugi) var(--rytm) backwards; }
+  }
   /* środek ekranu na 38% szerokości zdjęcia, czyli na budynku Instytutu; pionowo liczy ULOZ w Okladka.astro (zlecenie 18, punkt 13) */
   .z-okl-foto { position: absolute; top: var(--foto-top, -12%); left: 50%; right: auto; width: auto; max-width: none; height: 62%; object-fit: fill; transform: translateX(-38%); z-index: -2;
     /* na niskich ekranach dół zdjęcia wypada powyżej końca gradientu z ::after: bez zaniku byłoby widać jego krawędź */

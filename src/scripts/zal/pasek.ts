@@ -11,7 +11,7 @@
 // Telefon (widok telefonu, src/lib/media.ts): nagłówek .hdr (src/components/Naglowek.astro), style w src/styles/zal-telefon.css. Stoi w układzie strony, więc:
 // - strona z banerem: baner zaczyna się pod paskiem już na górze (zlecenie 23, punkt 3), więc pasek prześwituje od początku, cień po przewinięciu, dalej jak na komputerze;
 // - strona bez banera: na górze pełny granat, po przewinięciu jasny;
-// - strona główna: nad okładką pełny granat, od krawędzi Szybkiego dostępu zawsze jasny, także przy stopce;
+// - strona główna: okładka sięga pod pasek (zlecenie 23, punkt 4), więc nad nią prześwituje, od krawędzi Szybkiego dostępu zawsze jasny, także przy stopce;
 // - co jest pod paskiem, sprawdza linia 1 px tuż pod jego dolną krawędzią (na komputerze tuż nad nią): na krawędzi Szybkiego dostępu
 //   okładka dokładnie na niej się kończy.
 // Panel hamburgera ma kolor nagłówka. Panel strony głównej ma klasę .z-menu-jasny na stałe: na telefonie przełącza ją skrypt,
