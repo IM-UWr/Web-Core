@@ -65,3 +65,28 @@ Właściciel (6.11, 16:20): „na głównym ekranie trzeba przeciągnąć scroll
 **Wzór:** prototyp do wypróbowania na telefonie (link dopisze rozmowa w claude.ai).
 
 **Odbiór** (uzupełni się po prototypie): emulacja Pixel 7 i iPhone 13, prawdziwe zdarzenia dotyku przez CDP (`Input.dispatchTouchEvent`). Ciągnięcia 100, 200, 260, 300, 400 px wolno (okno 839, próg ok. 280): przejście tylko od progu. Machnięcie 150 px w 80 ms: bez przejścia. Na Szybkim dostępie machnięcie w górę z +600 px kończy się na górze, okładki nie widać. Nazwa w pasku: okładka. „Wstecz” z podstrony otwartej z +800 px: +800, okładka schowana. Nowe wejście: okładka. Bez JS: zwykłe przewijanie. Brak nasłuchów dotyku z `passive: false` (CDP `DOMDebugger.getEventListeners`). Komputer: kółko i klawisze jak dziś.
+
+## 3. Telefon: pasek u samej góry podstrony w kolorze banera — GOTOWE (decyzja 6.11, 16:45)
+Właściciel (zrzut `/obrony-doktorskie/` przy 400 px): „Navbar na podstronach dalej ma swój własny kolor, a nie motyw banera. Przy zjechaniu kawałek jest ok, ale na samej górze też powinno być z motywem banera.”
+
+**Przyczyna:** na telefonie pasek `.hdr` stoi w układzie nad banerem, więc na górze strony nie ma pod sobą banera i dostaje pełny granat (`src/styles/zal-telefon.css:30–33`, opis w `src/scripts/zal/pasek.ts:13`). Kolor banera prześwituje dopiero po przewinięciu (`.przewiniety`).
+
+**Zmiana** (tylko telefon, strony z banerem `.z-nagl`: działy i podstrony): baner zaczyna się pod paskiem już na górze strony, a pasek ma na górze to samo półprzezroczyste tło z rozmyciem co po przewinięciu, bez cienia. Treść banera stoi tam, gdzie dziś. Sprawdzone w emulacji wstrzykniętym CSS:
+```css
+@media (max-width: 760px) {   /* po punkcie 1: nowa definicja „telefonu” */
+  .z-nagl.z-nagl-pod { margin-top: calc(-1 * var(--hdr-h)); padding-top: calc(16px + var(--hdr-h)); }
+  .z-nagl.z-baner-dzialu { margin-top: calc(-1 * var(--hdr-h)); padding-top: calc(18px + var(--hdr-h)); }
+  body:has(.z-nagl) .hdr:not(.jasny):not(.przy-stopce) { background: color-mix(in srgb, var(--granat) var(--pasek-krycie), transparent) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.1) !important; backdrop-filter: blur(14px) saturate(1.1) !important; border-bottom-color: rgb(255 255 255 / .1) !important; }
+}
+```
+Wpisz to w istniejące reguły (`zal-telefon.css`: 30–37, 145, 190), nie jako osobną łatkę, i popraw komentarze w `zal-telefon.css` i `pasek.ts` („na górze pełny granat” przestaje dotyczyć stron z banerem). Strony bez banera, strona główna (okładka) i pasek przy stopce bez zmian. Komputer bez zmian.
+
+**Wzór:** `23-zalaczniki/23-pasek-na-banerze.png` (przed: góra i +70 px; po: góra i +70 px; Obrony doktorskie, Nauka, Władze, Matematyka, Popularyzacja).
+
+**Odbiór**
+- Telefon 390 i 412 px, PL i EN, jasny i ciemny motyw: na górze każdej strony z banerem (4 działy, Obrony doktorskie, Władze, Matematyka, seminarium, Aktualności, Kalendarz, Pracownicy) górna krawędź banera = 0, pasek półprzezroczysty, pod nim zdjęcie i kolor banera; po przewinięciu do końca banera pasek jasny jak dziś.
+- Położenie tytułu, linku „←”, sygnetu, hasła i liczb w banerze: to samo co przed zmianą (±1 px), zmienia się tylko pas pod paskiem.
+- Przejścia między stronami (pasek stoi) bez mignięcia granatem; wejście na adres z kotwicą (`#…`) kończy z nagłówkiem sekcji pod paskiem jak dziś.
+- Strony bez banera i strona główna: piksel w piksel bez zmian; komputer bez zmian.
+- Zrzuty: `raport-zrzuty/z23-pasek-*`.
