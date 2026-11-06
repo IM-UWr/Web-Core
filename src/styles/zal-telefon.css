@@ -109,10 +109,12 @@
   @keyframes z-pisz-zast { to { stroke-dashoffset: 0; } }
 
   /* ---------- okładka strony głównej: zdjęcie u góry, tytuł, cztery działy jeden pod drugim ---------- */
-  /* dvh: przy schowanym pasku adresu okno jest wyższe niż 100svh i pod okładką widać byłoby początek Szybkiego dostępu (zlecenie 21, punkt 9); svh dla starszych przeglądarek.
-     Okładka sięga pod pasek i kończy się na dole okna (zlecenie 23, punkt 4) */
-  .z-okladka { position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: 100svh; min-height: 100dvh; margin-top: calc(-1 * var(--hdr-h));
-    padding: var(--hdr-h) 16px 52px; overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
+  /* Okładka sięga pod pasek (zlecenie 23, punkt 4) i zawsze trochę wychodzi poza dół widocznego okna: wysokość największego okna (lvh) plus 1 px.
+     Wysokość okna bywa ułamkowa i zmienia się z paskiem adresu, a w szczelinę weszłoby jasne tło Szybkiego dostępu (punkt 5). Tytuł, działy i strzałka
+     zostają w widocznej części (dvh), nadmiar pod nimi to sam granat, a strona na okładce się nie przewija, więc go nie widać. */
+  .z-okladka { --z-nadmiar: calc(100lvh - 100dvh + 1px); position: relative; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: calc(100vh + 1px); min-height: calc(100lvh + 1px); margin-top: calc(-1 * var(--hdr-h));
+    padding: var(--hdr-h) 16px calc(52px + var(--z-nadmiar)); overflow: hidden; isolation: isolate; background: var(--granat); color: #fff; }
+  @supports not (height: 1lvh) { .z-okladka { --z-nadmiar: 1px; } } /* starsze przeglądarki: bez tego padding z var() byłby nieprawidłowy */
   /* przy wejściu strony okładka stoi, a wjeżdżają napisy i działy, jak w pasach podstron (przejscia.css): gdyby gasła cała, przez prześwitujący pasek mignęłoby jasne tło strony */
   @media (prefers-reduced-motion: no-preference) {
     #tresc > .z-okladka.z-okladka { animation: none; }
@@ -148,7 +150,7 @@
   .z-okl-dz .slot { grid-column: 2; margin-top: 3px; font-size: 13px; line-height: 1.35; color: var(--na-ciemnym-2); }
   .z-okl-dz .slot .patron { display: none; }
   .z-okl-dz:focus-visible { outline: 2px solid var(--d-j); outline-offset: 2px; }
-  .z-strzalka { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;
+  .z-strzalka { position: absolute; left: 50%; bottom: calc(14px + var(--z-nadmiar)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px;
     color: rgb(255 255 255 / .78); text-decoration: none; white-space: nowrap; }
   .z-strzalka svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob-tel 2.6s ease-in-out infinite; }
   @keyframes z-bob-tel { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
