@@ -1,0 +1,332 @@
+diff --git a/.pages.yml b/.pages.yml
+index 615bf92..5aec2cd 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -354,6 +354,12 @@ content:
+         - name: nazwa_en
+           label: 'EN: nazwa grupy'
+           type: string
++        - name: opis
++          label: Krótki opis na kafelku strony działu (komputer; puste = bez opisu)
++          type: string
++        - name: opis_en
++          label: 'EN: krótki opis'
++          type: string
+         - name: kierunki
+           label: Na początku grupy wstaw automatycznie kierunki studiów (z sekcji Kierunki)
+           type: boolean
+@@ -368,6 +374,12 @@ content:
+           - name: etykieta_en
+             label: 'EN: etykieta'
+             type: string
++          - name: opis
++            label: Krótki opis w polu ze stronami na stronie działu (komputer; puste = bez opisu)
++            type: string
++          - name: opis_en
++            label: 'EN: krótki opis'
++            type: string
+           - name: adres
+             label: Adres
+             type: string
+diff --git a/src/data/nawigacja.json b/src/data/nawigacja.json
+index c3c9f99..61cd441 100644
+--- a/src/data/nawigacja.json
++++ b/src/data/nawigacja.json
+@@ -7,15 +7,21 @@
+         {
+           "nazwa": "Ludzie",
+           "nazwa_en": "People",
++          "opis": "władze i pracownicy",
++          "opis_en": "management and staff",
+           "linki": [
+             {
+               "etykieta": "Władze",
+               "etykieta_en": "Management",
++              "opis": "dyrekcja i Rada Instytutu",
++              "opis_en": "directors and Institute Council",
+               "adres": "/instytut/wladze"
+             },
+             {
+               "etykieta": "Pracownicy",
+               "etykieta_en": "Staff",
++              "opis": "spis osób, pokoje, kontakt",
++              "opis_en": "people, rooms, contact",
+               "adres": "/pracownicy"
+             }
+           ]
+@@ -23,15 +29,21 @@
+         {
+           "nazwa": "Organizacja",
+           "nazwa_en": "Organisation",
++          "opis": "zakłady i kontakt",
++          "opis_en": "departments and contact",
+           "linki": [
+             {
+               "etykieta": "Struktura i zakłady",
+               "etykieta_en": "Structure and departments",
++              "opis": "osiem zakładów i pracownia",
++              "opis_en": "eight departments and a unit",
+               "adres": "/instytut/struktura"
+             },
+             {
+               "etykieta": "Kontakt",
+               "etykieta_en": "Contact",
++              "opis": "adres, sekretariat, dojazd",
++              "opis_en": "address, office, directions",
+               "adres": "/instytut/kontakt"
+             }
+           ]
+@@ -39,15 +51,21 @@
+         {
+           "nazwa": "Więcej",
+           "nazwa_en": "More",
++          "opis": "informatyka i biblioteka",
++          "opis_en": "IT and library",
+           "linki": [
+             {
+               "etykieta": "Infrastruktura informatyczna",
+               "etykieta_en": "IT infrastructure",
++              "opis": "konta, sieć, drukarki",
++              "opis_en": "accounts, network, printers",
+               "adres": "/instytut/infrastruktura-informatyczna"
+             },
+             {
+               "etykieta": "Biblioteka",
+               "etykieta_en": "Library (in Polish)",
++              "opis": "Biblioteka Matematyczna",
++              "opis_en": "Mathematics Library",
+               "adres": "https://wmi.uwr.edu.pl/biblioteka-wydzialowa/"
+             }
+           ]
+@@ -62,20 +80,28 @@
+         {
+           "nazwa": "Wydarzenia naukowe",
+           "nazwa_en": "Research events",
++          "opis": "seminaria, konferencje, obrony",
++          "opis_en": "seminars, conferences, defences",
+           "linki": [
+             {
+               "etykieta": "Seminaria",
+               "etykieta_en": "Seminars",
++              "opis": "cotygodniowe seminaria zakładów",
++              "opis_en": "weekly department seminars",
+               "adres": "/seminaria"
+             },
+             {
+               "etykieta": "Konferencje",
+               "etykieta_en": "Conferences",
++              "opis": "organizowane przez Instytut",
++              "opis_en": "organised by the Institute",
+               "adres": "/nauka/konferencje"
+             },
+             {
+               "etykieta": "Obrony doktorskie",
+               "etykieta_en": "PhD defences",
++              "opis": "rozprawy i terminy obron",
++              "opis_en": "theses and defence dates",
+               "adres": "/obrony-doktorskie"
+             }
+           ]
+@@ -83,20 +109,28 @@
+         {
+           "nazwa": "Badania",
+           "nazwa_en": "Research",
++          "opis": "projekty, publikacje, sukcesy",
++          "opis_en": "grants, publications, achievements",
+           "linki": [
+             {
+               "etykieta": "Projekty i granty",
+               "etykieta_en": "Grants",
++              "opis": "realizowane i zakończone",
++              "opis_en": "ongoing and completed",
+               "adres": "/nauka/granty"
+             },
+             {
+               "etykieta": "Publikacje",
+               "etykieta_en": "Publications",
++              "opis": "wykazy roczne",
++              "opis_en": "annual lists",
+               "adres": "/nauka/publikacje"
+             },
+             {
+               "etykieta": "Sukcesy",
+               "etykieta_en": "Achievements",
++              "opis": "nagrody i wyróżnienia",
++              "opis_en": "awards and distinctions",
+               "adres": "/nauka/sukcesy"
+             }
+           ]
+@@ -104,15 +138,21 @@
+         {
+           "nazwa": "Stopnie naukowe",
+           "nazwa_en": "Degrees",
++          "opis": "doktorat i habilitacja",
++          "opis_en": "PhD and habilitation",
+           "linki": [
+             {
+               "etykieta": "Szkoła doktorska",
+               "etykieta_en": "Doctoral school",
++              "opis": "Kolegium Doktorskie Matematyki",
++              "opis_en": "Doctoral College of Mathematics",
+               "adres": "/studia/szkola-doktorska"
+             },
+             {
+               "etykieta": "Rada Dyscypliny Matematyka",
+               "etykieta_en": "Mathematics Discipline Council (in Polish)",
++              "opis": "doktoraty i habilitacje",
++              "opis_en": "PhDs and habilitations",
+               "adres": "https://bip.uni.wroc.pl/1436/237/sklad-rady-dyscypliny-naukowej-matematyka.html"
+             }
+           ]
+@@ -127,10 +167,14 @@
+         {
+           "nazwa": "Kierunki",
+           "nazwa_en": "Programmes",
++          "opis": "matematyka, SIAD, ISIM, doktorat",
++          "opis_en": "mathematics, SIAD, ISIM, PhD",
+           "linki": [
+             {
+               "etykieta": "Studia podyplomowe",
+               "etykieta_en": "Postgraduate studies",
++              "opis": "kwalifikacje do nauczania",
++              "opis_en": "teaching qualifications",
+               "adres": "/studia/podyplomowe"
+             }
+           ],
+@@ -139,25 +183,35 @@
+         {
+           "nazwa": "Na co dzień",
+           "nazwa_en": "Everyday",
++          "opis": "plan, kalendarz, zajęcia, pierwszy rok",
++          "opis_en": "timetable, calendar, classes, first year",
+           "linki": [
+             {
+               "etykieta": "Plan zajęć",
+               "etykieta_en": "Timetable",
++              "opis": "przedmioty, terminy, sale",
++              "opis_en": "courses, times, rooms",
+               "adres": "/studia/plan-zajec"
+             },
+             {
+               "etykieta": "Rok akademicki",
+               "etykieta_en": "Academic year",
++              "opis": "semestry, sesje, przerwy",
++              "opis_en": "semesters, exam sessions, breaks",
+               "adres": "/studia/rok-akademicki"
+             },
+             {
+               "etykieta": "Zajęcia i konsultacje",
+               "etykieta_en": "Classes and office hours",
++              "opis": "zapisy i dyżury",
++              "opis_en": "enrolment and office hours",
+               "adres": "/studia/zajecia"
+             },
+             {
+               "etykieta": "Pierwszy rok",
+               "etykieta_en": "First year",
++              "opis": "pierwsze kroki na studiach",
++              "opis_en": "first steps at university",
+               "adres": "/studia/pierwszy-rok"
+             }
+           ]
+@@ -165,30 +219,42 @@
+         {
+           "nazwa": "Dyplom i sprawy",
+           "nazwa_en": "Diploma and student affairs",
++          "opis": "egzaminy, dyplom, wnioski, wyjazdy",
++          "opis_en": "exams, diploma, requests, exchanges",
+           "linki": [
+             {
+               "etykieta": "Egzaminy i dyplom",
+               "etykieta_en": "Exams and diploma",
++              "opis": "sesja i egzamin dyplomowy",
++              "opis_en": "exam session and final exam",
+               "adres": "/studia/egzaminy-i-dyplom"
+             },
+             {
+               "etykieta": "Procedura dyplomowania",
+               "etykieta_en": "Diploma procedure",
++              "opis": "praca, recenzje, obrona",
++              "opis_en": "thesis, reviews, defence",
+               "adres": "/studia/procedura-dyplomowania"
+             },
+             {
+               "etykieta": "Sprawy studenckie",
+               "etykieta_en": "Student affairs",
++              "opis": "wnioski, stypendia, dziekanat",
++              "opis_en": "requests, scholarships, dean’s office",
+               "adres": "/studia/sprawy-studenckie"
+             },
+             {
+               "etykieta": "Program MOST",
+               "etykieta_en": "MOST programme",
++              "opis": "semestr na innej polskiej uczelni",
++              "opis_en": "a semester at another Polish university",
+               "adres": "/studia/program-most"
+             },
+             {
+               "etykieta": "Skrypty i materiały",
+               "etykieta_en": "Lecture notes and materials",
++              "opis": "materiały do przedmiotów",
++              "opis_en": "course materials",
+               "adres": "/studia/skrypty"
+             }
+           ]
+@@ -208,20 +274,28 @@
+         {
+           "nazwa": "Dla kogo",
+           "nazwa_en": "Who it’s for",
++          "opis": "uczniowie, nauczyciele, wszyscy",
++          "opis_en": "pupils, teachers, everyone",
+           "linki": [
+             {
+               "etykieta": "Dla uczniów",
+               "etykieta_en": "For pupils",
++              "opis": "kółka, obozy i konkursy",
++              "opis_en": "clubs, camps and competitions",
+               "adres": "/popularyzacja/uczniowie"
+             },
+             {
+               "etykieta": "Dla nauczycieli",
+               "etykieta_en": "For teachers",
++              "opis": "szkolenia",
++              "opis_en": "training",
+               "adres": "/popularyzacja/nauczyciele"
+             },
+             {
+               "etykieta": "Dla wszystkich",
+               "etykieta_en": "For everyone",
++              "opis": "wykłady popularnonaukowe",
++              "opis_en": "popular science lectures",
+               "adres": "/popularyzacja/wszyscy"
+             }
+           ]
+@@ -229,20 +303,28 @@
+         {
+           "nazwa": "Partnerzy",
+           "nazwa_en": "Partners",
++          "opis": "fundacja, portal, PTM",
++          "opis_en": "foundation, portal, PTM",
+           "linki": [
+             {
+               "etykieta": "Fundacja Matematyków Wrocławskich",
+               "etykieta_en": "Wrocław Mathematicians Foundation (in Polish)",
++              "opis": "fmw.math.uni.wroc.pl",
++              "opis_en": "fmw.math.uni.wroc.pl",
+               "adres": "https://fmw.math.uni.wroc.pl/"
+             },
+             {
+               "etykieta": "Wrocławski Portal Matematyczny",
+               "etykieta_en": "Wrocław Mathematical Portal (in Polish)",
++              "opis": "matematyka.wroc.pl",
++              "opis_en": "matematyka.wroc.pl",
+               "adres": "https://www.matematyka.wroc.pl/"
+             },
+             {
+               "etykieta": "Wrocławski Oddział PTM",
+               "etykieta_en": "Polish Mathematical Society, Wrocław Branch (in Polish)",
++              "opis": "ptm.math.uni.wroc.pl",
++              "opis_en": "ptm.math.uni.wroc.pl",
+               "adres": "https://ptm.math.uni.wroc.pl/"
+             }
+           ]

@@ -5,10 +5,12 @@ import nawigacja from '../data/nawigacja.json';
 import { wybierz } from './i18n';
 import { isExternal } from './url';
 import { semestry } from './kolory-dni';
+import { skrotNazwy } from './patroni';
 import type { Lang } from './daty';
 
-export type Link = { etykieta: string; etykieta_en?: string; adres: string };
-export type Grupa = { nazwa: string; nazwa_en?: string; kierunki?: boolean; linki: Link[] };
+// opis, opis_en: krótki opis pod nazwą w pasie działu na komputerze (zlecenie 20, punkt 2); pusty = bez opisu
+export type Link = { etykieta: string; etykieta_en?: string; opis?: string; opis_en?: string; adres: string };
+export type Grupa = { nazwa: string; nazwa_en?: string; opis?: string; opis_en?: string; kierunki?: boolean; linki: Link[] };
 export type Pozycja = { etykieta: string; etykieta_en?: string; adres?: string; grupy?: Grupa[] };
 
 /** Ścieżka strony bez przedrostka języka i końcowego ukośnika (strona główna: „/”). */
@@ -33,11 +35,18 @@ export async function menuGlowne(): Promise<Pozycja[]> {
   if (pamiec) return pamiec;
   const kierunki: Link[] = (await listaKierunkow())
     .filter((k) => k.data.w_menu)
-    .map((k) => ({
-      etykieta: k.data.menu_etykieta || k.data.nazwa,
-      etykieta_en: k.data.menu_etykieta_en || k.data.nazwa_en || k.data.menu_etykieta || k.data.nazwa,
-      adres: `/studia/${k.id}`,
-    }));
+    .map((k) => {
+      const e = k.data.menu_etykieta || k.data.nazwa;
+      const eEn = k.data.menu_etykieta_en || k.data.nazwa_en || e;
+      return {
+        etykieta: e,
+        etykieta_en: eEn,
+        // kierunek ze skrótem w menu i bez własnego opisu (SIAD, ISIM): opisem jest pełna nazwa
+        opis: k.data.menu_opis || (skrotNazwy(e) || e !== k.data.nazwa ? k.data.nazwa : undefined),
+        opis_en: k.data.menu_opis_en || (k.data.nazwa_en && eEn !== k.data.nazwa_en ? k.data.nazwa_en : undefined),
+        adres: `/studia/${k.id}`,
+      };
+    });
   pamiec = (nawigacja.menu as Pozycja[]).map((m) => ({
     ...m,
     grupy: m.grupy?.map((g) => (g.kierunki ? { ...g, linki: [...kierunki, ...g.linki.filter((l) => !kierunki.some((k) => k.adres === l.adres))] } : g)),

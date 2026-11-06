@@ -216,6 +216,8 @@ const kierunki = defineCollection({
     w_menu: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
     menu_etykieta: optStr,
     menu_etykieta_en: optStr,
+    menu_opis: optStr,
+    menu_opis_en: optStr,
     na_stronie_glownej: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
     kafelek_poziom: optStr,
     kafelek_poziom_en: optStr,

@@ -1,6 +1,6 @@
 /* ==========================================================================
    Strona działu na komputerze (≥ 761 px), kierunek „Założyciele” (dok/estetyka.md, „Strona działu na komputerze”):
-   pod banerem podstrony w trzech grupach jak w menu, tekst działu z „W skrócie” i sekcje działu.
+   pod banerem pas z kafelkami grup jak w menu (zlecenie 20, punkt 2; bez JS wiersze grup), tekst działu z „W skrócie” i sekcje działu.
    Komponenty: src/components/zal/TrescDzialu.astro i src/components/zal/dzial/*. Wartości przeniesione z prototypu
    (proto/zalozyciele.src.html: .in-pod, .in-tresc, .in-sek, .in-suk, .in-kont, .in-mapa, .in-kart, .in-wiersz, .in-tba).
    Telefon (≤ 760 px) bez zmian: blok ma klasę .tylko-komputer, a wszystkie reguły siedzą w @media (min-width: 761px).
@@ -13,12 +13,16 @@
   .z-dz a { text-decoration: none; }
   .z-dz ul { list-style: none; margin: 0; padding: 0; }
 
-  /* ---------- podstrony: pas w jasnym kolorze działu z wierszami grup (zlecenie 11, zalecenie 5; prototyp: menu E) ----------
+  /* ---------- podstrony bez JS: pas w jasnym kolorze działu z wierszami grup (zlecenie 11, zalecenie 5; prototyp: menu E) ----------
      Nazwa grupy z lewej (kolumna 140 px), strony jako zwykłe linki Brygadą 21 px; wiersze rozdziela kreska w kolorze działu.
      Linki się nie łamią w środku — za długi wiersz zawija się pod sobą. Na Studiach z prawej przycisk rekrutacji (zalecenie 13):
      stoi obok wszystkich wierszy, pionowo na środku; najdłuższy wiersz może się wtedy złamać na dwie linie (zamierzone). */
   .z-dz-pas { padding: 12px var(--marg); background: var(--d-t); }
-  .z-dz-karty { display: none; } /* tylko telefon z JS (koniec pliku) */
+  .z-dz-karty { display: none; } /* tylko z JS (bloki komputera i telefonu niżej) */
+  /* elementy pasa z kafelkami: bez JS i na telefonie ich nie ma; otoczka grupy nie zmienia układu wiersza */
+  .z-dz-szew, .z-dz-karta em, .z-dz-l-opis, .z-dz-kart-rekr { display: none; }
+  .z-dz-rzad-w { display: contents; }
+  .z-dz-rzad a b { font-weight: inherit; }
   .z-dz-pas:has(.z-dz-rekr) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 36px; }
   .z-dz-rzad { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 8px 0; }
   .z-dz-rzad + .z-dz-rzad { border-top: 1px solid color-mix(in srgb, var(--d-a) 20%, transparent); }
@@ -138,6 +142,62 @@
   @media (prefers-reduced-motion: reduce) {
     .z-dz-fot img { transition: none; }
     .z-dz-suk article:hover .z-dz-fot img { transform: none; }
+  }
+}
+
+/* ---------- komputer z JS: pas z kafelkami i pole ze stronami (zlecenie 20, punkt 2) ---------- */
+@media (min-width: 761px) {
+  html.js .z-dz .z-dz-pas { display: block; padding: 0; background: none; }
+  html.js .z-dz .z-dz-pas > .z-dz-rekr { display: none; }
+
+  /* pas na całą szerokość, tekst równo z kolumną; komórka wystaje z kolumny o 20 px w lewo */
+  html.js .z-dz-karty { --ton: color-mix(in srgb, var(--d-a) 15%, var(--d-t)); --kreska: color-mix(in srgb, var(--d-a) 34%, transparent);
+    position: relative; z-index: 1; display: grid; grid-template-columns: repeat(var(--nk), minmax(0, 1fr)); min-height: 98px; padding-inline: calc(var(--marg) - 20px);
+    background: var(--d-t); box-shadow: 0 1px 0 var(--kreska); }
+  .z-dz-karta { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "nz sz" "op op" "ile ile"; grid-template-rows: auto 1fr auto; gap: 3px 10px;
+    min-width: 0; margin: 0; padding: 13px 20px 12px; border: 0; background: none; color: var(--ink); font-family: var(--f-text); line-height: 1.3; text-align: left; cursor: pointer;
+    transition: background-color .3s var(--rytm); }
+  .z-dz-karta + .z-dz-karta { box-shadow: inset 1px 0 0 var(--kreska); }
+  .z-dz-karta b { grid-area: nz; justify-self: start; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.15; }
+  .z-dz-szew { display: block; grid-area: sz; margin-top: 8px; width: 12px; height: 7px; fill: none; stroke: currentColor; stroke-width: 1.6; opacity: .65; transition: transform .3s var(--rytm); }
+  .z-dz-karta[aria-expanded="true"] .z-dz-szew { transform: rotate(180deg); }
+  .z-dz-karta em { display: block; grid-area: op; font-style: normal; font-size: 13.5px; line-height: 1.35; color: var(--muted); }
+  .z-dz-karta small { grid-area: ile; margin-top: 5px; font-size: 12.5px; font-weight: 600; color: var(--d-a); }
+  /* po najechaniu i po rozwinięciu ten sam kolor; strzałka też */
+  .z-dz-karta:hover, .z-dz-karta[aria-expanded="true"] { background-color: var(--ton); }
+  .z-dz-karta[aria-expanded="true"] em { color: var(--text); }
+  .z-dz-karta[aria-expanded="true"]::after { content: ''; position: absolute; left: 24px; bottom: -7px; width: 14px; height: 14px; background: var(--ton); transform: rotate(45deg); }
+  .z-dz-karta:focus-visible { outline: 2px solid var(--d-a); outline-offset: -3px; }
+
+  /* Rekrutacja: pusta, sam obrys; prawa krawędź równo z kolumną */
+  html.js .z-dz-kart-rekr { display: grid; align-content: center; gap: 3px; margin: 8px 20px 8px 12px; padding: 13px 8px 12px 14px; background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--d-a); color: var(--d-a); line-height: 1.3; text-decoration: none; transition: background-color .3s var(--rytm); }
+  .z-dz-kart-rekr:hover { background-color: color-mix(in srgb, var(--d-a) 7%, var(--bg)); }
+  .z-dz-kart-rekr:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .z-dz-kart-rekr b { font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.15; white-space: nowrap; }
+  .z-dz-kart-rekr span { font-family: var(--f-text); font-size: 13.5px; line-height: 1.35; color: var(--muted); }
+  .z-dz-kart-rekr.zew::after { content: none; }
+  .z-dz-kart-rekr.zew b::after { content: '\00a0↗'; font-family: var(--f-text); font-size: .72em; }
+
+  /* pole ze stronami: 12 px pod pasem, od lewej krawędzi pierwszej komórki do końca kolumny tekstu, bez podziałów */
+  html.js .z-dz .z-dz-rzad { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 0fr; gap: 0; padding: 0; border: 0; transition: grid-template-rows .3s var(--rytm); }
+  html.js .z-dz .z-dz-rzad.z-otwarta { grid-template-rows: 1fr; }
+  html.js .z-dz .z-dz-rzad h3 { display: none; }
+  html.js .z-dz .z-dz-rzad-w { display: block; min-height: 0; overflow: hidden; }
+  html.js .z-dz .z-dz-rzad ul { display: grid; grid-template-columns: repeat(var(--m), minmax(0, 1fr)); gap: 10px 22px; margin: 12px var(--marg) 0 calc(var(--marg) - 20px); padding: 16px 20px 18px; background: var(--d-t);
+    opacity: 0; transform: translateY(-8px); visibility: hidden; transition: opacity .3s linear, transform .3s var(--rytm), visibility 0s linear .3s; }
+  html.js .z-dz .z-dz-rzad.z-otwarta ul { opacity: 1; transform: none; visibility: visible; transition: opacity .3s linear, transform .3s var(--rytm), visibility 0s; }
+  html.js .z-dz .z-dz-rzad a { display: block; margin: -5px -10px; padding: 5px 10px 6px; font-family: var(--f-text); font-size: 13.5px; line-height: 1.3; }
+  html.js .z-dz .z-dz-rzad a b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.2; white-space: nowrap; color: var(--ink); transition: color var(--t-krotki) var(--rytm); }
+  /* po angielsku długie nazwy (Partners, Lecture notes and materials) w jednej linii wchodziłyby na następną kolumnę i poza pole */
+  html.js .z-dz .z-dz-rzad a:lang(en) b { white-space: normal; }
+  html.js .z-dz .z-dz-l-opis { display: block; margin-top: 2px; font-weight: 400; line-height: 1.35; color: var(--muted); }
+  html.js .z-dz .z-dz-rzad a:is(:hover, :focus-visible) { background-color: color-mix(in srgb, var(--d-a) 10%, var(--d-t)); }
+  html.js .z-dz .z-dz-rzad a:is(:hover, :focus-visible) b { color: var(--d-a); }
+  html.js .z-dz .z-dz-rzad a.zew::after { content: none; }
+  html.js .z-dz .z-dz-rzad a.zew b::after { content: '\00a0↗'; font-family: var(--f-text); font-size: .72em; color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .z-dz-karta, .z-dz-szew, .z-dz-kart-rekr, html.js .z-dz .z-dz-rzad, html.js .z-dz .z-dz-rzad ul, html.js .z-dz .z-dz-rzad.z-otwarta ul { transition: none; }
   }
 }
 
