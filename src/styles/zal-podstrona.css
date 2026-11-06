@@ -25,7 +25,6 @@
   .z-spis { position: sticky; top: calc(var(--gora) + 24px); align-self: start; max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; overscroll-behavior: contain;
     font-size: 14px; line-height: 1.35; }
   .z-spis-h { margin: 0 0 10px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-  .z-spis-przelacz { display: none !important; }
   .z-spis-lista { position: relative; list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
   .z-spis-lista li { margin: 0; }
   .z-spis-lista li[hidden] { display: none; }
@@ -51,21 +50,8 @@
   .z-pd-prawa { display: contents; }
   .z-pd-bok { order: 1; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
 
-  /* spis „Na tej stronie”: zwijany nad treścią, lista z cienką kreską po lewej */
-  .z-spis { margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
-  .z-spis-h { margin: 12px 0 6px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
-  html.js .z-spis-h { display: none; }
-  html:not(.js) .z-spis-przelacz { display: none; }
-  .z-spis-przelacz { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; margin: 0; padding: 0;
-    border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; }
-  .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform var(--t-sredni) var(--rytm); }
-  .z-spis-otwarty .z-spis-przelacz svg { transform: rotate(180deg); }
-  .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
-  .z-spis-lista { list-style: none; margin: 0 0 14px; padding: 0; border-left: 1px solid var(--line); }
-  html.js .z-spis:not(.z-spis-otwarty) .z-spis-lista { display: none; }
-  .z-spis-lista li[hidden], .z-spis-znacznik { display: none; }
-  .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; }
-  .z-spis-lista a:hover, .z-spis-lista a[aria-current] { color: var(--ink); }
+  /* „Na tej stronie” tylko na komputerze (zlecenie 18, punkt 18) */
+  .z-spis { display: none; }
   .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: calc(var(--hdr-h) + 16px); }
   /* treść bez kafelków (jak Władze z łatki telefonu): sekcje rozdzielone cienką linią, nagłówki Brygadą */
   /* sekcje według wzorca treści na telefonie (zalecenie 14): 30 px nad kreską, 28 px pod nią, nagłówek 26 px, 12 px pod nim */
@@ -84,5 +70,5 @@
   .z-nast-meta a { color: var(--d-a); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .z-spis-lista a, .z-spis-znacznik, .z-spis-przelacz svg { transition: none; }
+  .z-spis-lista a, .z-spis-znacznik { transition: none; }
 }
