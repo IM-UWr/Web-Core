@@ -40,6 +40,7 @@ Thumbs.db
 /src/content/aktualnosci/
 /src/content/granty/
 /src/content/kierunki/
+/src/content/kierunki-baner/
 /src/content/konferencje/
 /src/content/obrony/
 /src/content/pracownicy/
@@ -80,6 +81,7 @@ Thumbs.db
 /src/data/kolory-dni.json
 /src/data/nawigacja.json
 /src/data/popularyzacja.json
+/src/data/przypomnienia.json
 /src/data/publikacje/
 /src/data/publikacje.json
 /src/data/rok-akademicki.md

@@ -1,19 +1,15 @@
 // Dane strony działu „Studia” (DzialStudia.astro): liczby w banerze, kafelki z menu „Studia”, „O studiach” i aktualności.
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import tekst from '../../data/dzialy/studia.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
-import { listaKierunkow, menuGlowne } from '../menu';
+import { menuGlowne } from '../menu';
+import { listaKierunkow, jestSzkolaDoktorska, stopnieKierunku } from '../kierunki';
 import { listaAktualnosci } from '../tresci';
 
 // polska odmiana: 1 kierunek, 2–4 kierunki, 5+ kierunków
 const odm = (n: number, jeden: string, kilka: string, wiele: string) =>
   n === 1 ? jeden : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? kilka : wiele;
-
-type Kierunek = CollectionEntry<'kierunki'>;
-const stopnie = (k: Kierunek) => new Set(k.data.etapy.map((e) => e.stopien.trim()));
-// szkoła doktorska = same etapy III stopnia
-const doktorat = (k: Kierunek) => { const s = stopnie(k); return s.has('III') && !s.has('I') && !s.has('II'); };
 
 // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
 type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
@@ -29,8 +25,9 @@ export async function daneDzialuStudia(lang: Lang) {
   const specjalnosci = (await getCollection('specjalnosci')).filter(
     (s) => s.data.opublikowany !== false && s.data.na_stronie_kierunku && !s.data.wygaszana && idKierunkow.has(s.data.kierunek),
   );
-  const wszystkieStopnie = [...new Set(kierunki.flatMap((k) => [...stopnie(k)]))].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
-  const nKierunkow = kierunki.filter((k) => !doktorat(k)).length;
+  // stopnie z nadtytułu banera i treści kierunku („I i II stopnia”), szkoła doktorska = III (zlecenie 28: pól etapów już nie ma)
+  const wszystkieStopnie = [...new Set((await Promise.all(kierunki.map(stopnieKierunku))).flat())].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
+  const nKierunkow = kierunki.filter((k) => !jestSzkolaDoktorska(k)).length;
   // Liczby w banerze: kierunki, specjalności, stopnie studiów. Bez liczby nauczycieli akademickich — jest na stronie
   // „Instytut” (decyzja 31.10.2026: bez powtórzeń między działami). Krótkie etykiety, bez „do wyboru” i „(I, II, III)”
   // (decyzja 31.10.2026: na telefonie każda w jednej linijce; po angielsku „programmes” zamiast „degree programmes”).

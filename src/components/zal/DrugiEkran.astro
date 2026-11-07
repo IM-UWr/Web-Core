@@ -24,7 +24,7 @@ import { getCollection } from 'astro:content';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
-import { listaKierunkow } from '../../lib/menu';
+import { pozycjeKierunkow } from '../../lib/kierunki';
 import { tekstDnia } from '../../lib/kolory-dni';
 import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU } from '../../lib/tresci';
 import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
@@ -105,17 +105,15 @@ const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
   return { adres, kd: false, tytul: wybierz(k, 'etykieta', lang) as string, opis };
 });
 
-// Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi), opis i rekrutacja z Ustawień
+// Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi) z listy w Ustawieniach (studia.kierunki, kolejność listy;
+// kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28), opis i rekrutacja z Ustawień
 const st = ustawienia.studia as any;
-const kierunki = [
-  ...(await listaKierunkow()).filter((k) => k.data.na_stronie_glownej).map((k) => ({
-    poziom: (en && k.data.kafelek_poziom_en) || k.data.kafelek_poziom || T('Kierunek', 'Programme'),
-    nazwa: (en && (k.data.menu_etykieta_en || k.data.nazwa_en)) || k.data.menu_etykieta || k.data.nazwa,
-    opis: (en && k.data.kafelek_opis_en) || k.data.kafelek_opis || '',
-    adres: `/studia/${k.id}`,
-  })),
-  ...((st.kierunki ?? []) as any[]).map((k) => ({ poziom: wybierz(k, 'poziom', lang), nazwa: wybierz(k, 'nazwa', lang), opis: wybierz(k, 'opis', lang), adres: k.adres })),
-].map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
+const kierunki = (await pozycjeKierunkow()).filter((p) => p.na_stronie_glownej !== false).map((p) => ({
+  poziom: wybierz(p, 'poziom', lang) || (p.kierunek ? T('Kierunek', 'Programme') : ''),
+  nazwa: wybierz(p, 'nazwa', lang) || (p.kierunek ? wybierz(p.kierunek.data, 'nazwa', lang) : ''),
+  opis: wybierz(p, 'opis', lang),
+  adres: p.adres,
+})).map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
 
 // Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł). Jak dotąd na stronie głównej (decyzja 30.10.2026, WartoWiedziec.astro):
 // w HTML wszystkie pozycje „na głównej”, widoczne pierwsze cztery („Zawsze pokazuj” najpierw, dalej wg kolejności — to widzą

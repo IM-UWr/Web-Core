@@ -206,84 +206,33 @@ const dokument = z
   .refine((d) => !!(d.wgraj || d.plik), { message: 'Dokument: wgraj plik albo podaj link' })
   .transform((d) => ({ ...d, plik: (d.wgraj || d.plik) as string }));
 
+// Kierunek (zlecenie 28): jeden Markdown — treść polska w pliku (body), angielska w tresc_en (puste = polska z lang="pl").
+// Sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs), wygląd w src/views/Kierunek.astro.
+// Baner w kolekcji kierunki_baner (ten sam id), menu i kafelki w Ustawieniach (studia.kierunki), przypomnienia o terminach
+// w src/data/przypomnienia.json (src/lib/kierunki.ts, src/lib/tresci.ts).
 const kierunki = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/kierunki' }),
   schema: z.object({
     nazwa: z.string(),
     nazwa_en: optStr,
-    // gdzie kierunek pojawia się automatycznie: menu „Studia” i kafelki na stronie głównej (kolejność rosnąco)
-    kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
-    w_menu: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
-    menu_etykieta: optStr,
-    menu_etykieta_en: optStr,
-    menu_opis: optStr,
-    menu_opis_en: optStr,
-    na_stronie_glownej: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
-    kafelek_poziom: optStr,
-    kafelek_poziom_en: optStr,
-    kafelek_opis: optStr,
-    kafelek_opis_en: optStr,
+    tresc_en: optStr,
+    opublikowany: published,
+  }),
+});
+
+// Baner kierunku (src/content/kierunki-baner/<id kierunku>.json; osobny formularz, bo Pages CMS przy zapisie usuwa z pliku pola
+// spoza formularza). Brak pliku: baner z samą nazwą, zdanie pod nazwą = pierwsze zdanie treści, bez liczb i hasła.
+// liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
+// na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
+const kierunki_baner = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
+  schema: z.object({
     podtytul: optStr,
     podtytul_en: optStr,
     opis: optStr,
     opis_en: optStr,
-    // wartosc_en — wartość w wersji angielskiej (np. „3 years”; puste = jak po polsku)
-    // etykieta_krotka(_en) — krótsza etykieta do liczb w banerze na telefonie (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
-    fakty: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr, etykieta_krotka: optStr, etykieta_krotka_en: optStr })),
-    przyciski: lista(link),
-    dlaczego: lista(z.object({ tytul: z.string(), tytul_en: optStr, opis: z.string(), opis_en: optStr, ikona: optStr })),
-    etapy: lista(z.object({
-      stopien: z.string(),
-      kiedy: z.string(),
-      kiedy_en: optStr,
-      tytul: z.string(),
-      tytul_en: optStr,
-      opis: optStr,
-      opis_en: optStr,
-      termin: optStr,
-      termin_en: optStr,
-      formularz: optStr,
-      // nazwa formularza po angielsku (opcjonalnie; np. „Formularz C1” → „Form C1”); puste = na /en nazwa polska
-      formularz_en: optStr,
-      formularz_adres: optStr,
-    })),
-    programy: lista(z.object({
-      nazwa: z.string(),
-      nazwa_en: optStr,
-      dotyczy: optStr,
-      dotyczy_en: optStr,
-      od_roku: z.preprocess(empty, z.coerce.number().int().optional()),
-      do_roku: z.preprocess(empty, z.coerce.number().int().optional()),
-      dokumenty: lista(dokument),
-    })),
-    terminy: lista(z.object({
-      co: z.string(),
-      co_en: optStr,
-      kogo: optStr,
-      kogo_en: optStr,
-      termin: optStr,
-      termin_en: optStr,
-      formularz: optStr,
-      // nazwa formularza po angielsku (opcjonalnie; np. „Formularz C1” → „Form C1”); puste = na /en nazwa polska
-      formularz_en: optStr,
-      formularz_adres: optStr,
-      // przypomnienie w „Najbliższych wydarzeniach” (strona główna, aktualności) przed terminem
-      data: optDate,
-      przypomnienie: z.preprocess(empty, z.boolean().default(false)),
-      dni_przed: z.preprocess(empty, z.coerce.number().int().min(0).default(14)),
-      co_roku: z.preprocess(empty, z.boolean().default(true)),
-    })),
-    praktyki: optStr,
-    praktyki_en: optStr,
-    praktyki_dokumenty: lista(dokument),
-    kariera: optStr,
-    kariera_en: optStr,
-    faq: lista(z.object({ pytanie: z.string(), pytanie_en: optStr, odpowiedz: z.string(), odpowiedz_en: optStr })),
-    kontakt: lista(z.object({ rola: z.string(), rola_en: optStr, osoba: z.string(), email: optStr, telefon: optStr, pokoj: optStr })),
-    akty: lista(dokument),
-    tresc_en: optStr,
     ...haslo,
-    opublikowany: published,
+    liczby: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr, etykieta_krotka: optStr, etykieta_krotka_en: optStr })),
   }),
 });
 
@@ -404,4 +353,4 @@ const warto_wiedziec = defineCollection({
   }),
 });
 
-export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, specjalnosci, warto_wiedziec };
+export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, warto_wiedziec };

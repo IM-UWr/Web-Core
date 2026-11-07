@@ -283,30 +283,32 @@ async function wydarzeniaDo(granica: string, limit: number, lang: Lang): Promise
   return [...blisko, ...terminy].sort((x, y) => (x.poczatek < y.poczatek ? -1 : 1)).slice(0, limit);
 }
 
-// Terminy z tabel „Terminy i formularze” kierunków (pole „Przypomnienie”): wydarzenie typu „Termin”,
-// widoczne od `dni_przed` dni (kalendarzowych) przed terminem do dnia terminu. „Co roku” = najbliższe wystąpienie tego dnia i miesiąca.
+// Przypomnienia o terminach (src/data/przypomnienia.json w Web-Studia, formularz „Przypomnienia o terminach”; zlecenie 28 —
+// dawniej pole „Przypomnienie” w tabeli terminów kierunku): wydarzenie typu „Termin”, widoczne od `dni_przed` dni (kalendarzowych)
+// przed terminem do dnia terminu. „Co roku” = najbliższe wystąpienie tego dnia i miesiąca. UID: ukryte pole `uid` (trzy dawne
+// przypomnienia Matematyki zachowują „termin-matematyka-<indeks>”, żeby subskrybenci kalendarza nie dostali duplikatów),
+// nowe pozycje — z adresu i sprawy; na końcu data wystąpienia.
+type Przypomnienie = { sprawa?: string; sprawa_en?: string; podpis?: string; podpis_en?: string; data?: string; co_roku?: boolean; dni_przed?: number; adres?: string; uid?: string };
+const PLIK_PRZYPOMNIEN = import.meta.glob('../data/przypomnienia.json', { eager: true, import: 'default' });
+const czescUid = (s?: string) => (s ?? '').toLocaleLowerCase('pl').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 export async function przypomnieniaTerminow(lang: Lang = 'pl'): Promise<Wydarzenie[]> {
   const dzis = today();
   const out: Wydarzenie[] = [];
-  for (const k of await getCollection('kierunki')) {
-    if (k.data.opublikowany === false) continue;
-    k.data.terminy.forEach((t, i) => {
-      if (!t.przypomnienie || !t.data) return;
-      let d = t.data.slice(0, 10);
-      if (t.co_roku) {
-        const md = d.slice(4);
-        d = `${dzis.slice(0, 4)}${md}`;
-        if (d < dzis) d = `${Number(dzis.slice(0, 4)) + 1}${md}`;
-      }
-      if (d < dzis) return;
-      const pl = lang !== 'en';
-      const kogo = (pl ? t.kogo : t.kogo_en || t.kogo) || '';
-      // po angielsku nazwa z pola formularz_en (np. „Form C1”), a bez niego „form <nazwa polska>”
-      const form = t.formularz ? (pl ? `formularz ${t.formularz}` : t.formularz_en || `form ${t.formularz}`) : '';
-      out.push({
-        rodzaj: 'termin', tytul: (pl ? t.co : t.co_en || t.co), podtytul: [kogo, form].filter(Boolean).join(' · ') || undefined,
-        poczatek: d, href: `/studia/${k.id}#terminy`, uid: `termin-${k.id}-${i}-${d}`, widoczneOd: addDays(d, -t.dni_przed),
-      });
+  const lista = ((Object.values(PLIK_PRZYPOMNIEN)[0] as any)?.przypomnienia ?? []) as Przypomnienie[];
+  for (const t of lista) {
+    if (!t?.sprawa || !t.data) continue;
+    let d = String(t.data).slice(0, 10);
+    if (t.co_roku !== false) {
+      const md = d.slice(4);
+      d = `${dzis.slice(0, 4)}${md}`;
+      if (d < dzis) d = `${Number(dzis.slice(0, 4)) + 1}${md}`;
+    }
+    if (d < dzis) continue;
+    const pl = lang !== 'en';
+    const dni = t.dni_przed == null || String(t.dni_przed) === '' || Number.isNaN(Number(t.dni_przed)) ? 14 : Number(t.dni_przed);
+    out.push({
+      rodzaj: 'termin', tytul: (pl ? t.sprawa : t.sprawa_en || t.sprawa), podtytul: (pl ? t.podpis : t.podpis_en || t.podpis) || undefined,
+      poczatek: d, href: t.adres || undefined, uid: `${t.uid || `termin-${czescUid(t.adres)}-${czescUid(t.sprawa)}`}-${d}`, widoczneOd: addDays(d, -dni),
     });
   }
   return out.sort((a, b) => (a.poczatek < b.poczatek ? -1 : 1));

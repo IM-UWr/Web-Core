@@ -1,7 +1,7 @@
-// Menu główne: dane z src/data/nawigacja.json + kierunki studiów wstawiane automatycznie
-// (w grupie z "kierunki": true) z kolekcji src/content/kierunki — jedno miejsce edycji kierunku.
-import { getCollection } from 'astro:content';
+// Menu główne: dane z src/data/nawigacja.json + kierunki studiów wstawiane automatycznie (w grupie z "kierunki": true)
+// z listy w Ustawieniach (studia.kierunki; kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28).
 import nawigacja from '../data/nawigacja.json';
+import { pozycjeKierunkow } from './kierunki';
 import { wybierz } from './i18n';
 import { isExternal } from './url';
 import { semestry } from './kolory-dni';
@@ -22,29 +22,26 @@ export const pasujeDoSciezki = (sciezka: string, adres: string): boolean => {
   return !isExternal(adres) && !!a && (sciezka === a || sciezka.startsWith(`${a}/`));
 };
 
-/** Kierunki w kolejności (pole „kolejność”), tylko opublikowane. */
-export async function listaKierunkow() {
-  return (await getCollection('kierunki'))
-    .filter((k) => k.data.opublikowany !== false)
-    .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
-}
+export { listaKierunkow } from './kierunki';
 
 let pamiec: Pozycja[] | undefined;
 
 export async function menuGlowne(): Promise<Pozycja[]> {
   if (pamiec) return pamiec;
-  const kierunki: Link[] = (await listaKierunkow())
-    .filter((k) => k.data.w_menu)
-    .map((k) => {
-      const e = k.data.menu_etykieta || k.data.nazwa;
-      const eEn = k.data.menu_etykieta_en || k.data.nazwa_en || e;
+  const kierunki: Link[] = (await pozycjeKierunkow())
+    .filter((p) => p.w_menu !== false)
+    .map((p) => {
+      const pelna = p.kierunek?.data.nazwa;
+      const pelnaEn = p.kierunek?.data.nazwa_en;
+      const e = p.nazwa || pelna || p.adres;
+      const eEn = p.nazwa_en || pelnaEn || e;
       return {
         etykieta: e,
         etykieta_en: eEn,
         // kierunek ze skrótem w menu i bez własnego opisu (SIAD, ISIM): opisem jest pełna nazwa
-        opis: k.data.menu_opis || (skrotNazwy(e) || e !== k.data.nazwa ? k.data.nazwa : undefined),
-        opis_en: k.data.menu_opis_en || (k.data.nazwa_en && eEn !== k.data.nazwa_en ? k.data.nazwa_en : undefined),
-        adres: `/studia/${k.id}`,
+        opis: p.opis_menu || (pelna && (skrotNazwy(e) || e !== pelna) ? pelna : undefined),
+        opis_en: p.opis_menu_en || (pelnaEn && eEn !== pelnaEn ? pelnaEn : undefined),
+        adres: p.adres,
       };
     });
   pamiec = (nawigacja.menu as Pozycja[]).map((m) => ({
