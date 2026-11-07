@@ -1,147 +1,120 @@
 ---
-// Kalendarz: nadchodzące wydarzenia, obrony i referaty (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta jak w „Zwarta” (uklad="zwarta portal-baner"),
-// miesiące jako sekcje z kreską jak na stronach działów, pozycje jako osobne białe karty (.karty-lista w global.css). Filtry rodzaju w banerze;
-// pod banerem przyciski widoku „Nadchodzące” / „Archiwum”. Telefon (≤ 760 px): poza przyciskami widoku bez zmian.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import Ikona from '../components/Ikona.astro';
-import TytulZewn from '../components/TytulZewn.astro';
-import { u, absolute, isExternal } from '../lib/url';
-import { t, wJezyku, RODZAJE } from '../lib/i18n';
-import { monthYear, dayNum, monthShort, dayShort, range, time, hasTime, type Lang } from '../lib/daty';
-import { wszystkieWydarzenia, trwaLubBedzie, seminaria } from '../lib/tresci';
-import { adresIcs } from '../lib/kalendarz';
+// Kalendarz (/kalendarz, EN /en/kalendarz): nadchodzące i minione wydarzenia, obrony, konferencje i referaty seminaryjne
+// (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują). Wspólny szablon podstrony
+// (zal/Podstrona.astro; zlecenie 12, etap 3). W stylu listy Aktualności (zlecenie 27, punkt 1): ten sam baner (granat przechodzi
+// w zdjęcie Aktualności, bez liczb, samo hasło), panel „Pokaż” z prawej (zal/ListaPokaz.astro) z rodzajami i polem szukania, data
+// i etykieta wiersza w kolorze działu pozycji (WierszWydarzenia.astro, wariant zwarty), bez spisu „Na tej stronie” (miesiące to grupy listy).
+// Widok „Nadchodzące” / „Archiwum” (w adresie #archiwum): szeroki przełącznik nad listą (dwie równe połówki, wybrana wypełniona),
+// filtr rodzaju (w adresie także ?rodzaj=…) i szukanie po tekście pozycji działają razem. Pozycje po miesiącach: nagłówek miesiąca
+// Brygadą, wiersze z cienkimi liniami. Jedna wersja HTML: komputer (≥ 1024 px) — panel przyklejony z prawej; telefon (≤ 1023 px) —
+// przełącznik, rodzaje (lista wyboru) i pole szukania nad listą. Bez JS: bez przełącznika i filtrów, oba widoki jeden pod drugim (z podpisami).
+import Podstrona from '../components/zal/Podstrona.astro';
+import ListaPokaz from '../components/zal/ListaPokaz.astro';
+import WierszWydarzenia from '../components/WierszWydarzenia.astro';
+import { t, RODZAJE_FILTRY } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import { daneKalendarza } from '../lib/widoki/kalendarz';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-// Dwa widoki: „Nadchodzące” (trwające i przyszłe, od najbliższego) i „Archiwum” (cała historia, od najnowszego).
-const wszystkie = await wszystkieWydarzenia(lang);
-type W = (typeof wszystkie)[number];
-// Adres pozycji: nasza podstrona albo strona zewnętrzna (konferencje nie mają naszych podstron — link prowadzi na stronę
-// konferencji, z ikoną przy tytule); konferencja bez podanej strony — pozycja bez linku (<div>, bez podświetlenia).
-const adres = (w: W) => (w.href ? (isExternal(w.href) ? w.href : u(wJezyku(w.href, lang))) : undefined);
-const poMiesiacach = (lista: W[]) => {
-  const grupy: { miesiac: string; pozycje: W[] }[] = [];
-  for (const w of lista) {
-    const m = monthYear(w.poczatek, lang);
-    const ost = grupy[grupy.length - 1];
-    if (ost && ost.miesiac === m) ost.pozycje.push(w);
-    else grupy.push({ miesiac: m, pozycje: [w] });
-  }
-  return grupy;
-};
-const widoki = [
-  { id: 'nadchodzace', etykieta: lang === 'en' ? 'Upcoming' : 'Nadchodzące', grupy: poMiesiacach(wszystkie.filter(trwaLubBedzie)), pusty: t(lang, 'brakWydarzen') },
-  { id: 'archiwum', etykieta: lang === 'en' ? 'Archive' : 'Archiwum', grupy: poMiesiacach(wszystkie.filter((w) => !trwaLubBedzie(w)).reverse()), pusty: lang === 'en' ? 'No past events.' : 'Brak minionych wydarzeń.' },
-];
-const sem = (await seminaria()).filter((s) => s.data.aktywne);
-const kanaly = [
-  { nazwa: t(lang, 'wszystkieWydarzeniaKal'), plik: 'wszystko' },
-  { nazwa: t(lang, 'tylkoWydarzenia'), plik: 'wydarzenia' },
-  ...sem.map((s) => ({ nazwa: `${RODZAJE.referat[lang]}: ${(lang === 'en' && s.data.nazwa_en) || s.data.nazwa}`, plik: `seminarium-${s.id}` })),
-];
-const webcal = (plik: string) => absolute(adresIcs(plik), Astro.site).replace(/^https?:/, 'webcal:');
-const lead = lang === 'en'
-  ? 'Events, PhD defences, conferences and seminar talks at the Mathematical Institute — upcoming and past.'
-  : 'Wydarzenia, obrony doktorskie, konferencje i referaty seminaryjne w Instytucie Matematycznym — nadchodzące i archiwalne.';
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const { widoki, lead, haslo, filtrEtykieta, szukajDlugo } = await daneKalendarza(lang);
+const tytul = t(lang, 'kalendarz');
+// rodzaje w kolejności dotychczasowych przycisków na komputerze, nazwy w liczbie mnogiej jak w Aktualnościach (referaty — „Seminaria”)
+const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
 ---
-<Baza tytul={t(lang, 'kalendarz')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'kalendarz')} lead={lead} lang={lang} wstecz={{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }}>
-    <div class="filters">
-      <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter' : 'Filtruj'}>
-        <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="wydarzenie">{RODZAJE.wydarzenie[lang]}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="obrona">{RODZAJE.obrona[lang]}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="konferencja">{RODZAJE.konferencja[lang]}</button>
-        <button type="button" class="chip" aria-pressed="false" data-rodzaj="referat">{t(lang, 'seminaria')}</button>
-      </div>
-    </div>
-  </NaglowekStrony>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
+  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} klasa="z-kal" klasaRamy="z-pd-pelna" atrybuty={{ 'data-kalendarz': '' }}>
 
-  <div class="wrap layout kal-wrap">
-    <div class="main">
-      {/* widok pod banerem: nadchodzące / archiwum (przyciski jak w tabeli pracowników) */}
-      <div class="chips kal-widok" role="group" aria-label={lang === 'en' ? 'View' : 'Widok'}>
-        {widoki.map((v, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
-      </div>
-      {widoki.map((v, i) => (
-        <div data-widok={v.id} hidden={i > 0} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
-          {v.grupy.length === 0 && <p class="muted kal-pusto">{v.pusty}</p>}
-          {v.grupy.map((g) => (
-            <section class="lista-miesiac" data-grupa>
-              <h2 class="month">{g.miesiac}</h2>
-              <div class="karty-lista">
-              {g.pozycje.map((w) => { const Tag = w.href ? 'a' : 'div'; return (
-                <Tag class:list={['row-item', !w.href && 'kal-bez-linku']} href={adres(w)} data-rodzaj={w.rodzaj}>
-                  <span class={`datebox small${trwaLubBedzie(w) ? '' : ' minione'}`} aria-hidden="true">
-                    <span class="d">{dayNum(w.poczatek)}</span><span class="m">{monthShort(w.poczatek, lang)}</span>
-                  </span>
-                  <span class="body">
-                    <span class="news-meta">
-                      <span class={`badge badge-${w.rodzaj}`}>{RODZAJE[w.rodzaj][lang]}</span>
-                      <span>{dayShort(w.poczatek, lang)} {hasTime(w.poczatek) ? time(w.poczatek) : range(w.poczatek, w.koniec, lang)}</span>
-                      {w.miejsce && <span>· {w.miejsce}</span>}
-                    </span>
-                    <span class="t" style="font-size:18px"><TytulZewn tekst={w.tytul} zewn={!!w.href && isExternal(w.href)} /></span>
-                    {w.podtytul && <span class="x">{w.podtytul}</span>}
-                    {w.rodzaj === 'referat' && w.opis && <span class="x muted" style="font-size:14px">{w.opis}</span>}
-                  </span>
-                </Tag>
-              ); })}
-              </div>
-            </section>
-          ))}
-          <p class="muted kal-pusto" data-pusty-filtr hidden>{lang === 'en' ? 'Nothing of this kind here.' : 'Brak pozycji tego rodzaju.'}</p>
-        </div>
-      ))}
+  <ListaPokaz lang={lang} etykieta={filtrEtykieta} opcje={rodzaje.map((r) => ({ wartosc: r, etykieta: RODZAJE_FILTRY[r][lang] }))} szukaj={szukajDlugo}>
+    <div slot="nad" class="kal-widok" role="group" aria-label={T('Widok', 'View')} data-pagefind-ignore>
+      {widoki.map((v, i) => <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
     </div>
 
-  </div>
-</Baza>
+    {widoki.map((v, i) => (
+      <div class="kal-panel" data-widok={v.id} data-aktywny={i === 0 ? '' : undefined} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
+        <p class="kal-podpis">{v.etykieta}</p>
+        {v.grupy.length === 0 && <p class="kal-pusto">{v.pusty}</p>}
+        {v.grupy.map((g) => (
+          <section class="kal-mies" data-grupa>
+            <h2>{g.miesiac}</h2>
+            {g.pozycje.map((w) => <WierszWydarzenia w={w} lang={lang} dzial={w.dzial} zwarty />)}
+          </section>
+        ))}
+        <p class="kal-pusto" role="status" data-pusty-filtr data-pusty-rodzaj={T('Brak pozycji tego rodzaju.', 'Nothing of this kind here.')} data-pusty-szukaj={T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')} hidden></p>
+      </div>
+    ))}
+  </ListaPokaz>
+</Podstrona>
 
 <script>
-  // Widok (Nadchodzące / Archiwum, w adresie #archiwum) i filtr rodzaju — działają razem.
-  const btnRodzaj = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
-  const btnWidok = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
-  const widoki = Array.from(document.querySelectorAll<HTMLElement>('[data-widok]'));
-  let rodzaj = '';
-  let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
-  const pokaz = () => {
-    btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
-    btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
-    widoki.forEach((v) => {
-      v.hidden = v.dataset.widok !== widok;
-      v.querySelectorAll<HTMLElement>('.row-item[data-rodzaj]').forEach((p) => (p.hidden = !!rodzaj && p.dataset.rodzaj !== rodzaj));
-      const grupy = Array.from(v.querySelectorAll<HTMLElement>('[data-grupa]'));
-      grupy.forEach((g) => (g.hidden = !g.querySelector('.row-item:not([hidden])')));
-      // komunikat „brak pozycji tego rodzaju” tylko, gdy widok ma pozycje, ale filtr wszystkie schował
-      const pf = v.querySelector<HTMLElement>('[data-pusty-filtr]');
-      if (pf) pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
-    });
-  };
-  btnRodzaj.forEach((b) => b.addEventListener('click', () => { rodzaj = b.dataset.rodzaj ?? ''; pokaz(); }));
-  btnWidok.forEach((b) => b.addEventListener('click', () => {
-    widok = b.dataset.widokBtn ?? 'nadchodzace';
-    history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
-    pokaz();
-  }));
-  pokaz();
+  // Widok (Nadchodzące / Archiwum, w adresie #archiwum), filtr rodzaju z panelu „Pokaż” (?rodzaj=… z adresu) i szukanie po tekście pozycji
+  // (etykieta, termin, miejsce, tytuł, prelegent, seminarium — bez daty z lewej) działają razem.
+  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
+  const kal = document.querySelector<HTMLElement>('[data-kalendarz]');
+  if (kal) {
+    const btnWidok = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
+    const widoki = Array.from(kal.querySelectorAll<HTMLElement>('[data-widok]'));
+    let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
+    const pokaz = () => {
+      const rodzaj = panel.filtr();
+      const q = panel.szukane();
+      btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
+      widoki.forEach((v) => {
+        v.toggleAttribute('data-aktywny', v.dataset.widok === widok);
+        v.querySelectorAll<HTMLElement>('[data-ww]').forEach((p) => {
+          p.hidden = (!!rodzaj && p.dataset.rodzaj !== rodzaj) || (!!q && !norm(p.querySelector('.ww-tresc')?.textContent ?? '').includes(q));
+        });
+        const grupy = Array.from(v.querySelectorAll<HTMLElement>('[data-grupa]'));
+        grupy.forEach((g) => (g.hidden = !g.querySelector('[data-ww]:not([hidden])')));
+        // komunikat „brak pozycji” tylko, gdy widok ma pozycje, ale filtr (albo szukanie) wszystkie schował
+        const pf = v.querySelector<HTMLElement>('[data-pusty-filtr]');
+        if (pf) {
+          pf.textContent = (q ? pf.dataset.pustySzukaj : pf.dataset.pustyRodzaj) ?? '';
+          pf.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
+        }
+      });
+    };
+    const panel = panelPokaz(kal, pokaz);
+    btnWidok.forEach((b) => b.addEventListener('click', () => {
+      widok = b.dataset.widokBtn ?? 'nadchodzace';
+      history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
+      pokaz();
+    }));
+    panel.ustaw(new URLSearchParams(location.search).get('rodzaj'));
+  }
 </script>
 
 <style>
-  /* ---------- komputer (≥ 761 px): wygląd „Zwarta” jak na stronach działów ----------
-     24 px od banera; miesiąc = sekcja z kreską (.lista-miesiac, global.css — jak .zsec przy oprawie „linia”;
-     klasy .zsec nie dajemy, bo zmieniłaby telefon);
-     pozycje miesiąca jako osobne białe karty (.karty-lista, global.css); pusty kalendarz — komunikat w takiej karcie. */
-  @media (min-width: 761px) {
-    .kal-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
-    .kal-pusto { border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-    .kal-pusto { margin: 0; padding: 16px 18px; }
+  [hidden] { display: none !important; }
+  /* bez JS: bez przełącznika, oba widoki jeden pod drugim z podpisami; z JS — tylko wybrany widok, bez podpisu */
+  :global(html:not(.js)) .kal-widok { display: none; }
+  :global(html.js) .kal-panel:not([data-aktywny]) { display: none; }
+  :global(html.js) .kal-podpis { display: none; }
+  .kal-podpis { margin: 30px 0 0; font-size: 13px; font-weight: 700; color: var(--d-a); }
+
+  /* przełącznik Nadchodzące / Archiwum (zlecenie 27, punkt 1): na całą szerokość kolumny listy, dwie równe połówki, wybrana wypełniona
+     (granat na jasnym tle; w ciemnym motywie odwrotnie, bo --ink i --bg zamieniają się w motywie), druga z obrysem */
+  .kal-widok { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kal-widok button { min-height: 44px; margin: 0; padding: 8px 14px; border: 1px solid var(--ink); border-radius: 0; background: transparent;
+    font: inherit; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); cursor: pointer; }
+  .kal-widok button:first-child { border-radius: 5px 0 0 5px; }
+  .kal-widok button:last-child { border-radius: 0 5px 5px 0; }
+  .kal-widok button + button { border-left: 0; }
+  .kal-widok button:hover { background: var(--surface); }
+  .kal-widok button[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
+  .kal-widok button:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* miesiąc: nagłówek Brygadą, wiersze z cienkimi liniami (jak w Aktualnościach) */
+  .kal-mies { margin: 0; padding: 0; border: 0; }
+  .kal-mies h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
+    font-size: 23px; line-height: 1.4; color: var(--d-a); }
+  .kal-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  /* ---------- telefon (≤ 1023 px): przełącznik nad filtrami ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .kal-widok { margin-bottom: 10px; }
+    .kal-mies h2 { margin-top: 22px; font-size: 20px; }
   }
-  /* pozycja bez linku (konferencja bez strony): bez podświetlenia ramki i podkreślenia po najechaniu */
-  .karty-lista > .kal-bez-linku:hover { border-color: var(--line); }
-  .kal-bez-linku:hover :global(.t) { text-decoration: none; }
-  /* przyciski widoku pod banerem, nad listą miesięcy */
-  .kal-widok { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
 </style>

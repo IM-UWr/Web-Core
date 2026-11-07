@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — wspólny szablon podstrony (zal/Podstrona.astro): treść i spis „Na tej stronie”
+   (zal/SpisStrony.astro). Zlecenie 11, zalecenie 3; wzór: prototyp, „Nawigacja na podstronie: A” (.pd.bok-prawy, .spis-p).
+   Komputer (≥ 1024 px): treść i kolumna spisu 236 px z prawej, odstęp 56 px; spis przyklejony, wariant „kreska”.
+   Strona bez spisu (mniej niż 2 sekcje) ma tę samą szerokość treści, a miejsce po prawej puste.
+   Wyjątek: .z-pd-pelna (lista Aktualności, wpis z kartą boczną), treść na całą szerokość ramy, a prawą kolumnę układa sam widok.
+   Telefon (≤ 1023 px): jedna kolumna, bez spisu.
+   ========================================================================== */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-pd { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 56px;
+    padding: 40px var(--marg) 30px; }
+  .z-pd.z-pd-pelna { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .z-pd > .z-pd-tresc { grid-column: 1; grid-row: 1; min-width: 0; }
+  .z-pd > .z-spis { grid-column: 2; grid-row: 1; }
+  /* prawa kolumna ze spisem i blokiem pod nim (slot „bok” w Podstrona.astro): przyklejona jako całość */
+  .z-pd > .z-pd-prawa { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--gora) + 24px); align-self: start;
+    max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; overscroll-behavior: contain; }
+  .z-pd-prawa > .z-spis { position: static; max-height: none; overflow: visible; }
+  /* (między spisem a blokiem stoi skrypt spisu — stąd ~, nie +) */
+  .z-spis ~ .z-pd-bok { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+  /* sekcje przewijane spisem: 20 px zapasu nad nagłówkiem */
+  .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: 20px; }
+
+  /* „Na tej stronie”: przyklejony, nie wychodzi poza kolumnę treści (sticky w komórce siatki); dłuższy niż okno — przewija się */
+  .z-spis { position: sticky; top: calc(var(--gora) + 24px); align-self: start; max-height: calc(100vh - var(--gora) - 48px); overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain;
+    font-size: 14px; line-height: 1.35; }
+  .z-spis.z-spis-wiecej { -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent); }
+  .z-spis::-webkit-scrollbar { display: none; } /* bez paska także przy nadmiarze ułamka piksela (zlecenie 21, punkt 8); długi spis dalej przewija się kółkiem */
+  .z-spis-h { margin: 0 0 10px; font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-spis-lista { position: relative; list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); overflow-y: clip; } /* znacznik nie powiększa obszaru przewijania; w lewo wystaje dalej, bo overflow-x zostaje visible */
+  .z-spis-lista li { margin: 0; }
+  .z-spis-lista li[hidden] { display: none; }
+  .z-spis-lista a { display: block; padding: 6px 0 6px 16px; color: var(--muted); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
+  .z-spis-lista a:hover { color: var(--ink); }
+  .z-spis-lista a[aria-current] { color: var(--ink); font-weight: 700; }
+  .z-spis-lista a:focus-visible { outline: 2px solid var(--d-a); outline-offset: -2px; }
+  /* znacznik bieżącej sekcji: odcinek 3 px na linii, przesuwa się między pozycjami — pasek 1 px wysokości rozciągany
+     i przesuwany przez transform (translateY + scaleY z SpisStrony.astro; zlecenie 13, punkt 8 — bez przeliczania układu) */
+  .z-spis-znacznik { position: absolute; top: 0; left: 0; width: 3px; height: 1px; margin-left: -2px; background: var(--d-a); pointer-events: none;
+    transform-origin: 0 0; transition: transform .25s var(--rytm); }
+  .z-spis-znacznik[hidden] { display: none; }
+
+  /* Pole zwinięte nad treścią, gdy na tej podstronie brakuje miejsca (zlecenie 25, punkt 1; pomiar w zal/Podstrona.astro). Prawa kolumna ustępuje treści. */
+  .z-spis-przelacz { display: none; }
+  .z-pd[data-pole="zwiniete"] { display: block; }
+  .z-pd[data-pole="zwiniete"]:has(> .z-pd-prawa) { display: flex; flex-direction: column; }
+  .z-pd[data-pole="zwiniete"] > .z-pd-prawa { display: contents; }
+  .z-pd[data-pole="zwiniete"] .z-pd-bok { order: 1; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .z-pd[data-pole="zwiniete"] .z-spis { position: static; max-height: none; overflow: visible; margin: 0 0 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
+  .z-pd[data-pole="zwiniete"] .z-spis-h { display: none; }
+  .z-pd[data-pole="zwiniete"] .z-spis-przelacz { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; margin: 0; padding: 0; border: 0; border-radius: 0;
+    background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; }
+  .z-pd[data-pole="zwiniete"] .z-spis-przelacz svg { flex: none; color: var(--d-a); transition: transform var(--t-krotki) var(--rytm); }
+  .z-pd[data-pole="zwiniete"] .z-spis-otwarty .z-spis-przelacz svg { transform: rotate(180deg); }
+  .z-pd[data-pole="zwiniete"] .z-spis-przelacz:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .z-pd[data-pole="zwiniete"] .z-spis-lista { margin: 0 0 14px; overflow-y: visible; }
+  .z-pd[data-pole="zwiniete"] .z-spis:not(.z-spis-otwarty) .z-spis-lista { display: none; }
+  .z-pd[data-pole="zwiniete"] .z-spis-znacznik { display: none; }
+  body:has(.z-pd[data-pole="zwiniete"]) .z-nast { margin-right: var(--marg); }
+
+  /* dół podstrony („Następna strona w dziale”, „Zgłoś błąd”) wyrównany do kolumny treści */
+  body:has(.z-pd) .z-nast { margin-top: 0; margin-left: var(--marg); margin-right: calc(var(--marg) + 292px); }
+}
+
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  /* rama podstrony: jedna kolumna */
+  .z-pd { display: block; padding: 18px 16px 24px; }
+  /* blok z prawej kolumny (slot „bok”) na telefonie pod treścią */
+  .z-pd:has(> .z-pd-prawa) { display: flex; flex-direction: column; }
+  .z-pd-prawa { display: contents; }
+  .z-pd-bok { order: 1; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+
+  /* „Na tej stronie” tylko na komputerze (zlecenie 18, punkt 18) */
+  .z-spis { display: none; }
+  .z-pd-tresc :is(section[id], [id].pl-kat, h2[id], h3[id]) { scroll-margin-top: calc(var(--hdr-h) + 16px); }
+  /* treść bez kafelków (jak Władze z łatki telefonu): sekcje rozdzielone cienką linią, nagłówki Brygadą */
+  /* sekcje według wzorca treści na telefonie (zalecenie 14): 30 px nad kreską, 28 px pod nią, nagłówek 26 px, 12 px pod nim */
+  .z-pd-tresc > section { padding-bottom: 30px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .z-pd-tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .z-pd-tresc h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
+  .z-pd-tresc :is(p, li) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-pd-tresc a { color: var(--d-a); }
+
+  /* „Następna strona w dziale” i „Zgłoś błąd” pod treścią */
+  .z-nast { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0 16px 28px; padding-top: 14px; border-top: 2px solid var(--rule); }
+  .z-nast-link { font-family: var(--f-display); font-size: 20px; line-height: 1.25; color: var(--ink); text-decoration: none; }
+  .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .z-nast-meta a { color: var(--d-a); }
+}
+/* Bez JavaScriptu nie ma pomiaru (zlecenie 25, punkt 1): na podstronach z pozycjami z limitem pole zwinięte poniżej 1300 px, lista otwarta nad treścią; widok telefonu treści się nie włącza. */
+@media (min-width: 1024px) and (max-width: 1299px) {
+  html:not(.js) .z-pd:not(.z-pd-pelna):has([data-limit-linii]) { display: block; }
+  html:not(.js) .z-pd:has([data-limit-linii]) > .z-pd-prawa { display: contents; }
+  html:not(.js) .z-pd:has([data-limit-linii]) .z-spis { position: static; max-height: none; overflow: visible; margin: 0 0 18px; padding-bottom: 6px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  html:not(.js) .z-pd:has([data-limit-linii]) .z-spis-h { margin-top: 12px; }
+  html:not(.js) body:has(.z-pd [data-limit-linii]) .z-nast { margin-right: var(--marg); }
+}
+
+/* Widok telefonu dla samej treści (zlecenie 25, punkt 1): reguły telefonu i wyłączenie reguł komputera robi przy budowaniu src/plugins/postcss-tresc-telefon.mjs. Tu tylko to, czego reguły
+   telefonu nie mają: kolumna tekstu jak w widoku telefonu 753–1023 px, wysokość przyklejonego paska komputera, dół strony w tej samej kolumnie. Poza @media: atrybut stawia tylko pomiar na komputerze. */
+.z-pd[data-tresc="telefon"] { --hdr-h: var(--gora); padding-inline: max(16px, calc((100% - 720px) / 2)); }
+body:has(.z-pd[data-tresc="telefon"]) .z-nast { margin-inline: max(16px, calc((100% - 720px) / 2)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .z-spis-lista a, .z-spis-znacznik { transition: none; }
+}

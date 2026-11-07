@@ -1,0 +1,52 @@
+diff --git a/src/data/nawigacja.json b/src/data/nawigacja.json
+index 1b0bde5..664a754 100644
+--- a/src/data/nawigacja.json
++++ b/src/data/nawigacja.json
+@@ -47,7 +47,7 @@
+             },
+             {
+               "etykieta": "Biblioteka",
+-              "etykieta_en": "Library",
++              "etykieta_en": "Library (in Polish)",
+               "adres": "https://wmi.uwr.edu.pl/biblioteka-wydzialowa/"
+             }
+           ]
+@@ -112,7 +112,7 @@
+             },
+             {
+               "etykieta": "Rada Dyscypliny Matematyka",
+-              "etykieta_en": "Mathematics Discipline Council",
++              "etykieta_en": "Mathematics Discipline Council (in Polish)",
+               "adres": "https://bip.uni.wroc.pl/1436/237/sklad-rady-dyscypliny-naukowej-matematyka.html"
+             }
+           ]
+@@ -237,17 +237,17 @@
+           "linki": [
+             {
+               "etykieta": "Fundacja Matematyków Wrocławskich",
+-              "etykieta_en": "Wrocław Mathematicians Foundation",
++              "etykieta_en": "Wrocław Mathematicians Foundation (in Polish)",
+               "adres": "https://fmw.math.uni.wroc.pl/"
+             },
+             {
+               "etykieta": "Wrocławski Portal Matematyczny",
+-              "etykieta_en": "Wrocław Mathematical Portal",
++              "etykieta_en": "Wrocław Mathematical Portal (in Polish)",
+               "adres": "https://www.matematyka.wroc.pl/"
+             },
+             {
+               "etykieta": "Wrocławski Oddział PTM",
+-              "etykieta_en": "Polish Mathematical Society, Wrocław Branch",
++              "etykieta_en": "Polish Mathematical Society, Wrocław Branch (in Polish)",
+               "adres": "https://ptm.math.uni.wroc.pl/"
+             }
+           ]
+@@ -257,7 +257,7 @@
+     },
+     {
+       "etykieta": "Rekrutacja",
+-      "etykieta_en": "Admissions",
++      "etykieta_en": "Admissions (in Polish)",
+       "adres": "https://studia-wmi.uwr.edu.pl/"
+     }
+   ]

@@ -1,18 +1,35 @@
 ---
 // Wspólny szkielet każdej strony: <head>, nagłówek, stopka.
-import '@fontsource-variable/manrope';
+// Kroje (Brygada 1918, Manrope): tylko potrzebne podzbiory, preload i kroje zastępcze z dopasowanymi metrykami — Fonty.astro
+// (zlecenie 13, punkt 3; dawniej import całych arkuszy @fontsource-variable).
 import 'katex/dist/katex.min.css';
+// Podstawy (tokeny, typografia, .prose) i resztki dawnego wyglądu, które nowy wygląd jeszcze wykorzystuje (pliki przycięte
+// do reguł trafiających w elementy stron — zlecenie 12, etap 4; opis w nagłówkach plików).
 import '../styles/global.css';
 import '../styles/tlo.css';
-// Komputer (≥ 761 px): wygląd wybrany dla danej podstrony (prop `uklad` → <body data-uklad>; bez niego — wygląd z main).
+// Komputer (≥ 1024 px): przełącznik prop `uklad` → <body data-uklad> (interlinia nagłówka i treści na części podstron).
 import '../styles/uklad-zwarta.css';
 import '../styles/uklad-portal.css';
-// Telefon (≤ 760 px): wygląd wariantu „Portal” — klocki (portal.css) i nadpisania odstępów i skali (telefon.css).
 import '../styles/portal.css';
 import '../styles/telefon.css';
+// Cała strona: przejścia między stronami i łagodne wejście treści (bez ruchu przy „ogranicz ruch”).
 import '../styles/przejscia.css';
+// Kierunek „Założyciele” — Brygada 1918 w nagłówkach, Manrope w tekście (fonty w projekcie, @fontsource; Fonty.astro), paleta „Lazur i malina”,
+// pasek menu, nagłówki, stopka (src/styles/zalozyciele.css, src/components/zal/), szablon podstrony i spis (zal-podstrona.css),
+// wzorzec treści (zal-tresc.css; zlecenie 11, zalecenie 14), telefon ≤ 1023 px (zal-telefon.css i końce plików bloków).
+import '../styles/zalozyciele.css';
+import '../styles/zal-przejscia.css';
+import '../styles/zal-podstrona.css';
+import '../styles/zal-tresc.css';
+import '../styles/zal-telefon.css';
+import '../styles/zal-menu.css';
+import '../styles/zal-niski.css';
+import PasekMenu from '../components/zal/PasekMenu.astro';
+import StopkaZ from '../components/zal/StopkaZ.astro';
+import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
+import { dzialZeSciezki } from '../lib/patroni';
 import Naglowek from '../components/Naglowek.astro';
-import Stopka from '../components/Stopka.astro';
+import Fonty from '../components/Fonty.astro';
 import { u, absolute, stripBase } from '../lib/url';
 import { t, jezykZeSciezki, drugiJezyk } from '../lib/i18n';
 import ustawienia from '../data/ustawienia.json';
@@ -23,22 +40,29 @@ interface Props {
   obraz?: string;
   // false = strona w trybie podglądu (pole „Opublikowany” odznaczone)
   opublikowany?: boolean;
+  // true = strona poza wyszukiwarkami i indeksem Pagefind (noindex, bez canonical i hreflang), ale bez paska podglądu —
+  // strona błędu 404 (zlecenie 01)
+  pozaIndeksem?: boolean;
   // adres strony w drugim języku, jeśli inny niż domyślny /en/...
   alternatywa?: string | null;
   typ?: 'website' | 'article';
   stronaGlowna?: boolean;
   // czy indeksować treść w wyszukiwarce (Pagefind)
   szukaj?: boolean;
-  // Wygląd tej podstrony na komputerze (≥ 761 px), słowa oddzielone spacją → <body data-uklad="…">; telefon bez zmian.
+  // Wygląd tej podstrony na komputerze (≥ 1024 px), słowa oddzielone spacją → <body data-uklad="…">; telefon bez zmian.
   // zwarta — treść pod banerem jak w wariancie Zwarta (src/styles/uklad-zwarta.css); zwarta-baner — baner jak w Zwarta;
   // portal-baner — baner jak w Portal (src/styles/uklad-portal.css). Np. uklad="zwarta portal-baner". Bez propu — jak dotąd.
   uklad?: string;
 }
 
-const { tytul, opis, obraz, opublikowany = true, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true, uklad } = Astro.props;
+const { tytul, opis, obraz, opublikowany = true, pozaIndeksem = false, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true, uklad } = Astro.props;
+// do indeksu (canonical, hreflang, Pagefind) — tylko strony opublikowane i nie oznaczone jako poza indeksem
+const wIndeksie = opublikowany && !pozaIndeksem;
 const sciezka = stripBase(Astro.url.pathname);
 const lang = jezykZeSciezki(sciezka);
-const pelnyTytul = stronaGlowna ? `${t(lang, 'instytut')} · ${t(lang, 'uwr')}` : `${tytul} · ${t(lang, 'instytut')} UWr`;
+// Po angielsku pełna nazwa bez skrótu UWr (decyzja D2, zlecenie 16).
+const nazwaStrony = lang === 'en' ? `${t(lang, 'instytut')}, ${t(lang, 'uwr')}` : `${t(lang, 'instytut')} UWr`;
+const pelnyTytul = stronaGlowna ? (lang === 'en' ? nazwaStrony : `${t(lang, 'instytut')} · ${t(lang, 'uwr')}`) : `${tytul} · ${nazwaStrony}`;
 const opisMeta = opis || (lang === 'en' ? ustawienia.wstep_en : ustawienia.wstep);
 const kanoniczny = absolute(sciezka, Astro.site);
 const inny = alternatywa === null ? null : alternatywa ?? drugiJezyk(sciezka);
@@ -54,6 +78,8 @@ const tlo = tloUst === true ? 'pole' : ['pole', 'kratka', 'penrose', 'zmierzch',
 // sekcje: pasy | linia | karty | brak (bez pola w ustawieniach — pasy).
 const sekcjeUst = (ustawienia as any).sekcje ?? 'pasy';
 const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : undefined;
+// dział strony (kolory działu na komputerze); strona główna, Aktualności i strony ogólne — bez działu (granat)
+const dzialStrony = dzialZeSciezki(sciezka);
 ---
 <!doctype html>
 <html lang={lang}>
@@ -61,54 +87,63 @@ const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : unde
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pelnyTytul}</title>
+    <Fonty />
     <meta name="description" content={opisMeta} />
-    {opublikowany && <link rel="canonical" href={kanoniczny} />}
-    {(!opublikowany || testowa) && <meta name="robots" content="noindex, nofollow" />}
-    {opublikowany && plAdres && <link rel="alternate" hreflang="pl" href={absolute(plAdres, Astro.site)} />}
-    {opublikowany && enAdres && <link rel="alternate" hreflang="en" href={absolute(enAdres, Astro.site)} />}
+    {wIndeksie && <link rel="canonical" href={kanoniczny} />}
+    {(!wIndeksie || testowa) && <meta name="robots" content="noindex, nofollow" />}
+    {wIndeksie && plAdres && <link rel="alternate" hreflang="pl" href={absolute(plAdres, Astro.site)} />}
+    {wIndeksie && enAdres && <link rel="alternate" hreflang="en" href={absolute(enAdres, Astro.site)} />}
     <meta property="og:type" content={typ} />
     <meta property="og:title" content={stronaGlowna ? t(lang, 'instytut') : tytul} />
     <meta property="og:description" content={opisMeta} />
     <meta property="og:url" content={kanoniczny} />
     <meta property="og:image" content={ogObraz} />
     <meta property="og:locale" content={lang === 'en' ? 'en_GB' : 'pl_PL'} />
-    <meta property="og:site_name" content={`${t(lang, 'instytut')} UWr`} />
+    <meta property="og:site_name" content={nazwaStrony} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'aktualnosci')} — ${t(lang, 'instytut')}`} href={u('/rss.xml')} />
+    <link rel="alternate" type="application/rss+xml" title={`${t(lang, 'aktualnosci')} — ${t(lang, 'instytut')}`} href={u(lang === 'en' ? '/en/rss.xml' : '/rss.xml')} />
     <meta name="theme-color" content="#1b2d52" />
     <script is:inline>
       (function () {
         var d = document.documentElement, m;
         d.classList.add('js');
+        // stan :active także po dotknięciu na iOS (bez nasłuchu touchstart Safari go nie zgłasza; zlecenie 13, punkt 10)
+        document.addEventListener('touchstart', function () {}, { passive: true });
         try { m = localStorage.getItem('motyw'); } catch (e) {}
         // Domyślnie tryb jasny (także na telefonach z ciemnym motywem systemu); ciemny tylko po wybraniu przyciskiem.
         if (m !== 'dark' && m !== 'light') m = 'light';
         d.setAttribute('data-theme', m);
       })();
     </script>
-    {/* Wczytywanie z wyprzedzeniem stron, nad którymi stoi kursor (Chrome/Edge; inne przeglądarki pomijają). Bez plików z /pliki i /grafiki. */}
-    <script type="speculationrules" is:inline set:html={JSON.stringify({
-      prefetch: [{
-        where: { and: [
-          { href_matches: u('/*') },
-          { not: { href_matches: [u('/pliki/*'), u('/grafiki/*'), u('/pagefind/*'), u('/*.xml'), u('/*.pdf')] } },
-          { not: { selector_matches: '[download], [target=_blank]' } },
-        ] },
-        eagerness: 'moderate',
-      }],
-    })} />
+    {/* Następna strona gotowa przed kliknięciem (Chrome/Edge; inne przeglądarki pomijają): po chwili najechania kursorem
+        (eagerness „moderate”, na dotyku — przy naciśnięciu) strona składa się w tle (prerender; zlecenie 13, punkt 4), a gdy
+        przeglądarka nie może jej złożyć — przynajmniej się pobiera (prefetch). Bez plików z /pliki i /grafiki. Skrypty, które
+        coś zapisują albo animują (szkic na banerze działu, ciekawostki patronów), czekają na pokazanie strony
+        (document.prerendering, zdarzenie prerenderingchange) — NaglowekZ.astro. */}
+    <script type="speculationrules" is:inline set:html={JSON.stringify(((gdzie) => ({
+      prerender: [{ where: gdzie, eagerness: 'moderate' }],
+      prefetch: [{ where: gdzie, eagerness: 'moderate' }],
+    }))({ and: [
+      { href_matches: u('/*') },
+      { not: { href_matches: [u('/pliki/*'), u('/grafiki/*'), u('/pagefind/*'), u('/*.xml'), u('/*.pdf'), u('/*.ics')] } },
+      { not: { selector_matches: '[download], [target=_blank]' } },
+    ] }))} />
     <slot name="head" />
   </head>
-  <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined}>
+  <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
     <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
-    <Naglowek lang={lang} sciezka={sciezka} inny={inny} naZdjeciu={stronaGlowna && !!ustawienia.baner?.zdjecie} />
+    {/* komputer: pasek menu na banerze (strona główna ma go pod okładką); telefon: nagłówek (Naglowek.astro). Panel menu jest jeden, przy pasku (PanelMenu.astro) */}
+    {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} />}
+    <Naglowek lang={lang} sciezka={sciezka} inny={inny} idPanelu={stronaGlowna ? 'z-menu-druga' : 'z-menu-pasek'} naOkladce={stronaGlowna} />
     {!opublikowany && (
       <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>
     )}
-    <main id="tresc" {...(opublikowany && szukaj ? { 'data-pagefind-body': '' } : {})}>
+    <main id="tresc" {...(wIndeksie && szukaj ? { 'data-pagefind-body': '' } : {})}>
       <slot />
     </main>
-    <Stopka lang={lang} />
+    {/* komputer: „Następna strona w dziale” i „Zgłoś błąd” pod treścią podstron z menu działu */}
+    {dzialStrony && <NastepnaStrona dzial={dzialStrony} lang={lang} tytul={tytul} />}
+    <StopkaZ lang={lang} />
   </body>
 </html>

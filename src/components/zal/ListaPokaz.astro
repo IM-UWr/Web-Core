@@ -1,0 +1,104 @@
+---
+// Lista z panelem „Pokaż” z prawej (zlecenie 27; wzór: lista Aktualności, zlecenie 18, punkt 3). Wspólna dla Aktualności, Kalendarza,
+// Obron doktorskich i „Warto wiedzieć”, żeby panel wszędzie wyglądał i działał tak samo. Skrypt: src/scripts/zal/panel-pokaz.ts.
+// Jedna wersja HTML:
+// - komputer (≥ 1024 px): lista w kolumnie treści, panel w prawej kolumnie (236 px, odstęp 56 px), przyklejony jak spis „Na tej stronie”:
+//   nad filtrami mały „Pokaż”, opcje jako lista z kreską przy wybranej, pod nią pole szukania;
+// - telefon (≤ 1023 px): panel nad listą — opcje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, kreska pod spodem.
+// Bez JS: filtry schowane, widać całą listę.
+// Sloty: domyślny — lista; „nad” — blok nad listą w kolumnie listy (np. przełącznik Nadchodzące / Archiwum w Kalendarzu; na telefonie
+// nad filtrami); „panel” — dodatek w panelu pod filtrami (np. „Pokazuję wpisy dla:” w Aktualnościach).
+// Właściwości: etykieta — nazwa grupy filtrów (dla czytnika ekranu i listy wyboru); opcje — wartości filtra bez „Wszystkie” (dodawane tu,
+// wartość ''); szukaj — podpowiedź w polu szukania. Przyciski mają data-filtr (wartość), lista wyboru data-filtr-lista, pole data-szukaj.
+import { t } from '../../lib/i18n';
+import type { Lang } from '../../lib/daty';
+
+interface Props { lang: Lang; etykieta: string; opcje: { wartosc: string; etykieta: string }[]; szukaj: string }
+const { lang, etykieta, opcje, szukaj } = Astro.props;
+// slot „nad” podany warunkowo ({html && <div slot="nad">…}, zlecenie 30) też „jest” — liczy się to, co wyrenderował
+const nad = Astro.slots.has('nad') ? await Astro.slots.render('nad') : '';
+const maNad = nad.trim() !== '';
+const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
+---
+<div class:list={['lp-uklad', maNad && 'lp-z-nad']}>
+  {maNad && <div class="lp-nad" set:html={nad} />}
+  <div class="lp-panel">
+    <div class="lp-narz" data-pagefind-ignore>
+      <p class="lp-pokaz" aria-hidden="true">{lang === 'en' ? 'Show' : 'Pokaż'}</p>
+      <div class="lp-opcje" role="group" aria-label={etykieta}>
+        {wszystkie.map((o, i) => <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-filtr={o.wartosc}>{o.etykieta}</button>)}
+      </div>
+      {/* telefon: opcje jako lista wyboru (zlecenie 11, zalecenie 4), zsynchronizowana z przyciskami */}
+      <label class="z-pole-wyboru lp-lista">
+        <span class="sr-only">{etykieta}</span>
+        <select data-filtr-lista autocomplete="off">
+          {wszystkie.map((o) => <option value={o.wartosc}>{o.etykieta}</option>)}
+        </select>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </label>
+      <input type="search" class="lp-szukaj" placeholder={szukaj} aria-label={szukaj} autocomplete="off" data-szukaj />
+    </div>
+    <slot name="panel" />
+  </div>
+  <div class="lp-tresc"><slot /></div>
+</div>
+
+<style>
+  /* tekst nad listą (slot „nad”, div.lp-wstep z Markdownu — Obrony, Aktualności, „Warto wiedzieć”; jak .wst wzorca treści) */
+  .lp-nad :global(.lp-wstep p) { margin: 0 0 10px; max-width: 46em; font-size: 16px; line-height: 1.6; color: var(--text); }
+  .lp-nad :global(.lp-wstep p:last-child) { margin-bottom: 0; }
+  /* kolory poza działami (jak w Aktualnościach, wartości jak w :root w zalozyciele.css): panel, nagłówki grup i linki pod listą także na Obronach
+     i „Warto wiedzieć”, gdzie <body> ma data-dzial działu, w którego menu stoją; kolor działu mają tylko wiersze z własnym data-dzial */
+  .lp-uklad { --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de; --accent: var(--d-a); }
+  :global(:root[data-theme='dark']) .lp-uklad { --d-a: #e4eaf5; --d-t: #222e46; }
+  /* bez JS: bez filtrów (cała lista widoczna) */
+  :global(html:not(.js)) .lp-narz { display: none; }
+
+  .lp-opcje { display: flex; border: 1px solid var(--line-ui); }
+  .lp-opcje button { margin: 0; font: inherit; font-weight: 600; border: 0; border-radius: 0; background: transparent; color: var(--text); cursor: pointer; }
+  .lp-opcje button:hover { color: var(--d-a); }
+  .lp-opcje button[aria-pressed='true'] { background: var(--d-a); color: var(--bg); }
+  .lp-opcje button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .lp-szukaj { min-width: 0; margin: 0; font: inherit; border: 1px solid var(--line-ui); border-radius: 0; background: var(--bg); color: var(--ink); }
+  .lp-szukaj::placeholder { color: var(--muted); opacity: 1; }
+  .lp-szukaj:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+
+  /* „Pokaż” tylko w panelu z prawej */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .lp-pokaz { display: none; } }
+
+  /* ---------- komputer (≥ 1024 px): filtry w prawej kolumnie, układ jak spis „Na tej stronie” (zal-podstrona.css) ---------- */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    .lp-lista { display: none; }
+    .lp-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 0 56px; }
+    /* kontener: lista Aktualności w dwóch kolumnach, gdy ma co najmniej 880 px (ListaAktualnosci.astro, WierszAktualnosci.astro) */
+    .lp-tresc { grid-column: 1; grid-row: 1; container-type: inline-size; min-width: 0; }
+    .lp-panel { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: calc(var(--gora) + 16px);
+      max-height: calc(100vh - var(--gora) - 32px); overflow-y: auto; overscroll-behavior: contain; }
+    /* blok nad listą (slot „nad”): w kolumnie listy, panel obok niego i listy */
+    .lp-z-nad .lp-nad { grid-column: 1; grid-row: 1; min-width: 0; }
+    .lp-z-nad .lp-tresc { grid-row: 2; }
+    .lp-z-nad .lp-panel { grid-row: 1 / span 2; }
+    .lp-nad :global(.lp-wstep) { padding-bottom: 4px; }
+    .lp-narz { display: grid; gap: 10px; }
+    .lp-pokaz { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--muted); }
+    .lp-opcje { display: grid; gap: 2px; border: 0; border-left: 1px solid var(--line); }
+    .lp-opcje button { width: calc(100% + 1px); margin-left: -1px; padding: 3px 0 3px 14px; border: 0; border-left: 2px solid transparent;
+      font-size: 15px; font-weight: 400; line-height: 1.55; text-align: left; }
+    .lp-opcje button:hover { color: var(--ink); }
+    .lp-opcje button[aria-pressed='true'] { border-left-color: var(--ink); background: transparent; font-weight: 700; color: var(--ink); }
+    .lp-opcje button:focus-visible { outline-offset: -2px; }
+    .lp-szukaj { width: 100%; margin-top: 6px; padding: 7px 10px; border-radius: 5px; font-size: 14px; }
+  }
+
+  /* ---------- telefon (≤ 1023 px): lista wyboru, pole szukania pod nią ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    /* tekst nad listą: mniejszy, odstęp nad filtrami (dawniej .ob-wstep w ListaObron.astro) */
+    .lp-nad :global(.lp-wstep) { margin-bottom: 18px; }
+    .lp-nad :global(.lp-wstep p) { font-size: 15px; }
+    .lp-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
+    .lp-opcje { display: none; }
+    .lp-lista { display: flex; width: 100%; }
+    .lp-szukaj { width: 100%; padding: 8px 10px; font-size: 16px; }
+  }
+</style>

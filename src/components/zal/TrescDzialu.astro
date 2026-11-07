@@ -1,0 +1,140 @@
+---
+// Strona działu na komputerze (≥ 1024 px; kierunek „Założyciele”, dok/estetyka.md): blok pod banerem działu.
+// Podstrony, komputer z JS (zlecenie 20, punkt 2): pas pod banerem na całą szerokość, po jednym kafelku na grupę z menu (nazwa, krótki
+// opis, liczba stron), domyślnie wszystko zwinięte; naciśnięcie otwiera niżej pole ze stronami tej grupy, na szerokość tekstu. Studia: na końcu
+// pasa pusty kafelek „Rekrutacja RRRR/RR ↗”. Pas nie trzyma się paska menu.
+// Komputer bez JS (zlecenie 11, zalecenie 5 — wariant E prototypu): po jednym wierszu na grupę (nazwa grupy z lewej, strony jako zwykłe
+// linki Brygadą), Studia (zalecenie 13): z prawej przycisk Rekrutacji (.z-dz-rekr).
+// Kolejność jak w prototypie: podstrony w grupach jak w menu, tekst działu
+// z „W skrócie” (wartości Brygadą w kolorze działu, pierwszy akapit większy) i sekcje działu (slot; src/components/zal/dzial/).
+// Wstawiany na końcu <main> (za dotychczasową treścią, która na komputerze znika — src/styles/zal-dzialy.css).
+// Jedna wersja na każdą szerokość; telefon (≤ 1023 px) — jedna kolumna (koniec zal-dzialy.css). Lista podstron poza indeksem wyszukiwarki.
+// Telefon (zlecenie 18, punkt 16, wariant I): w pasie po jednej karcie na grupę, naciśnięcie pokazuje niżej strony tej grupy, bez przycisku
+// Rekrutacji (jest w menu), bez opisów. Bez JS karty schowane i wszystkie grupy z nagłówkami widoczne, jak na komputerze jedna pod drugą.
+import Link from '../Link.astro';
+import '../../styles/zal-dzialy.css';
+import { u, isExternal } from '../../lib/url';
+import { wJezyku, wybierz } from '../../lib/i18n';
+import { skrotNazwy } from '../../lib/patroni';
+import { rekrutacja, rokRekrutacji } from '../../lib/menu';
+import type { Dzial } from '../../lib/patroni';
+import type { Lang } from '../../lib/daty';
+
+// Grupa podstron: grupa z menu działu (src/lib/menu.ts).
+export type LinkPod = { etykieta: string; etykieta_en?: string; opis?: string; opis_en?: string; adres: string };
+export type GrupaPod = { nazwa: string; nazwa_en?: string; opis?: string; opis_en?: string; linki: LinkPod[] };
+export type Fakt = { w: string; o?: string };
+
+interface Props {
+  dzial: Dzial;
+  lang: Lang;
+  grupy: GrupaPod[];
+  // tekst działu: tytuł sekcji, akapity (pierwszy większy) i „W skrócie”; puste akapity = bez sekcji;
+  // html — tekst gotowy z Markdownu zamiast akapitów (Popularyzacja, zlecenie 29; pierwszy akapit z klasą wst)
+  tekst?: { tytul: string; akapity: string[]; html?: string; fakty?: Fakt[] };
+}
+const { dzial, lang, grupy, tekst } = Astro.props;
+const en = lang === 'en';
+const href = (a: string) => (isExternal(a) || a.startsWith('#') ? a : u(wJezyku(a, lang)));
+const zGrupami = grupy.filter((g) => g.linki.length > 0);
+const fakty = tekst?.fakty ?? [];
+const rek = dzial === 'studia' ? await rekrutacja(lang) : undefined;
+const rokRek = rokRekrutacji();
+const DOPISEK_RE = /\s*\(in Polish\)\s*$/;
+const rekPoPolsku = !!rek && DOPISEK_RE.test(rek.etykieta);
+const etykietaRek = rek?.etykieta.replace(DOPISEK_RE, '');
+const ileStron = (n: number) => en
+  ? `${n} ${n === 1 ? 'page' : 'pages'}`
+  : `${n} ${n === 1 ? 'strona' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'strony' : 'stron'}`;
+// opis z danych bez zastępowania polskim: puste pole po angielsku to brak opisu
+const opisW = (o: { opis?: string; opis_en?: string }) => (en ? o.opis_en : o.opis);
+// liczba kolumn pola ze stronami: do 5 linków w jednym rzędzie (co najmniej 3 kolumny), 6 w dwóch rzędach po 3, więcej po 4
+const kolumny = (n: number) => (n <= 5 ? Math.max(n, 3) : n === 6 ? 3 : 4);
+---
+<div class="z-dz" data-dzial={dzial}>
+  {zGrupami.length > 0 && (
+    <nav class="z-dz-pas" aria-labelledby="z-dz-pod-h" data-pagefind-ignore>
+      <h2 class="sr-only" id="z-dz-pod-h">{en ? 'In this section' : 'W tym dziale'}</h2>
+      <div class="z-dz-karty" style={`--n:${zGrupami.length};--nk:${zGrupami.length + (rek ? 1 : 0)}`} data-z-dz-karty>
+        {zGrupami.map((g, i) => (
+          <button type="button" class="z-dz-karta" aria-expanded="false" aria-controls={`z-dz-gr-${i}`}>
+            <b>{wybierz(g, 'nazwa', lang)}</b>
+            <svg class="z-dz-szew" viewBox="0 0 12 7" aria-hidden="true"><path d="M1 1l5 5 5-5" /></svg>
+            {opisW(g) && <em>{opisW(g)}</em>}
+            <small>{ileStron(g.linki.length)}</small>
+          </button>
+        ))}
+        {rek && (
+          <Link class="z-dz-kart-rekr" href={rek.adres}>
+            <b>{etykietaRek}{rokRek && ` ${rokRek}`}</b>
+            <span>{en ? `for applicants${rekPoPolsku ? ' · in Polish' : ''}` : 'dla kandydatów'}</span>
+          </Link>
+        )}
+      </div>
+      <div class="z-dz-rzedy">
+        {zGrupami.map((g, i) => (
+          <section class="z-dz-rzad" id={`z-dz-gr-${i}`}>
+            <div class="z-dz-rzad-w">
+              <h3>{wybierz(g, 'nazwa', lang)}</h3>
+              <ul style={`--m:${kolumny(g.linki.length)};--m3:${Math.min(kolumny(g.linki.length), 3)}`}>
+                {g.linki.map((l) => {
+                  const e = wybierz(l, 'etykieta', lang) as string;
+                  const sk = skrotNazwy(e);
+                  return (
+                    <li><Link href={href(l.adres)} title={sk ? e : undefined}><b>{sk ?? e}</b>{opisW(l) && <span class="z-dz-l-opis">{opisW(l)}</span>}</Link></li>
+                  );
+                })}
+              </ul>
+            </div>
+          </section>
+        ))}
+      </div>
+      {rek && (
+        <Link class="z-dz-rekr" href={rek.adres}>
+          <small>{en ? `For applicants${rekPoPolsku ? ' · in Polish' : ''}` : 'Dla kandydatów'}</small>
+          <span class="z-dz-rekr-t">{etykietaRek}{rokRek && ` ${rokRek}`}</span>
+        </Link>
+      )}
+    </nav>
+  )}
+  {tekst && (tekst.akapity.length > 0 || tekst.html) && (
+    <section class="z-dz-tresc" aria-labelledby="z-dz-tresc-h">
+      <div>
+        <h2 id="z-dz-tresc-h">{tekst.tytul}</h2>
+        {tekst.html ? <Fragment set:html={tekst.html} /> : tekst.akapity.map((a, i) => <p class:list={[i === 0 && 'wst']}>{a}</p>)}
+      </div>
+      {fakty.length > 0 && (
+        <aside class="z-dz-skrot" aria-labelledby="z-dz-skrot-h">
+          <h3 id="z-dz-skrot-h">{en ? 'At a glance' : 'W skrócie'}</h3>
+          <dl>
+            {fakty.map((f) => <div><dt>{f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
+          </dl>
+        </aside>
+      )}
+    </section>
+  )}
+
+  <slot />
+</div>
+
+<script>
+  // Karty grup w pasie działu (komputer i telefon). Otwarta jedna grupa naraz, ponowne naciśnięcie zamyka.
+  // Esc zamyka otwartą grupę, gdy fokus jest w pasie, i oddaje fokus karcie.
+  document.querySelectorAll('[data-z-dz-karty]').forEach((pas) => {
+    const karty = [...pas.querySelectorAll('button')];
+    karty.forEach((b) => b.addEventListener('click', () => {
+      const otworz = b.getAttribute('aria-expanded') !== 'true';
+      karty.forEach((k) => {
+        const ta = k === b && otworz;
+        k.setAttribute('aria-expanded', String(ta));
+        document.getElementById(k.getAttribute('aria-controls') ?? '')?.classList.toggle('z-otwarta', ta);
+      });
+    }));
+    pas.closest<HTMLElement>('.z-dz-pas')?.addEventListener('keydown', (e) => {
+      const otwarta = karty.find((k) => k.getAttribute('aria-expanded') === 'true');
+      if (e.key !== 'Escape' || !otwarta) return;
+      otwarta.click();
+      otwarta.focus();
+    });
+  });
+</script>

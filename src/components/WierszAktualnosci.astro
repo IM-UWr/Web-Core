@@ -1,50 +1,98 @@
 ---
-// Pozycja na liście aktualności.
-// Telefon (≤ 760 px) — wygląd „Portal”: zwarty wiersz — data (przed plakietkami) i plakietki w lewej kolumnie albo
-// (≤ 640 px) w jednym wierszu nad tytułem, z prawej mała miniatura; znaczniki te same co na komputerze.
+// Wiersz listy aktualności (ListaAktualnosci.astro) w języku podstron „Założycieli”: data jak na stronach działów
+// (zal/dzial/Wiersz.astro — dzień dużą Brygadą, pod nim „mie rrrr”), obok mała etykieta „Rodzaj · odbiorcy”, tytuł Brygadą,
+// „Kiedy:” przy wydarzeniach i zajawka; miniatura zdjęcia wpisu z prawej. Cały wiersz klikalny (link w tytule), wiersze
+// rozdzielone cienką linią. Dział wiersza z dzialWpisu (src/lib/patroni.ts; ta sama reguła co na Szybkim dostępie, zlecenie 19, punkt 1):
+// jego kolor mają data, etykieta, tytuł po najechaniu, „… czytaj dalej” i obrys fokusu; w ciemnym motywie reguła [data-dzial] z zalozyciele.css.
+// Jedna wersja HTML: komputer (≥ 1024 px; zlecenie 18, punkt 3: zwarty wiersz, zajawka najwyżej w 2 liniach, układ listy
+// w dwóch kolumnach w ListaAktualnosci.astro) i telefon (≤ 1023 px, węższa kolumna daty i mniejsza miniatura).
+// data-wa, data-rodzaj, data-dla — filtr i szukanie listy (skrypt w ListaAktualnosci.astro).
+// wyr — pierwszy widoczny wpis listy wyróżniony, tylko na komputerze; na telefonie wiersz jak każdy inny (zlecenie 14, zalecenie 22; wariant B „na papierze”, zlecenie 18, punkty 3 i 11).
+// Skrypt listy przestawia klasę po filtrze albo szukaniu i zmienia wtedy `sizes` zdjęcia, dlatego każde zdjęcie ma w srcset
+// także większą szerokość. Dopisek „… czytaj dalej” (.wa-dalej) wstawia ten sam skrypt, gdy zajawka się nie mieści.
 import { u, isExternal } from '../lib/url';
-import { wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
-import { short, range, type Lang } from '../lib/daty';
+import ZdjecieZ from './ZdjecieZ.astro';
+import { rozmiarPola } from '../lib/zdjecia';
+import { sizesTelefon } from '../lib/media';
+import { wJezyku, RODZAJE, odbiorcyMalymi } from '../lib/i18n';
+import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
+import { dzialWpisu } from '../lib/patroni';
 import type { PozycjaListy } from '../lib/tresci';
 
-interface Props { p: PozycjaListy; lang: Lang }
-const { p, lang } = Astro.props;
+interface Props { p: PozycjaListy; lang: Lang; wyr?: boolean }
+const { p, lang, wyr = false } = Astro.props;
 const href = isExternal(p.href) ? p.href : u(wJezyku(p.href, lang));
+const SZEROKOSCI = [54, 72, 81, 120, 144, 160, 216, 240, 360, 400, 540, 720];
+const etykieta = [RODZAJE[p.rodzaj]?.[lang], p.dla.map((d) => odbiorcyMalymi(d, lang)).join(', ')].filter(Boolean).join(' · ');
 ---
-<a class="row-item wa-row" href={href} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
-  <span class="body">
-    <span class="news-meta wa-meta">
-      <span class={`badge badge-${p.rodzaj}`}>{RODZAJE[p.rodzaj]?.[lang]}</span>
-      {p.dla.map((d) => <span class="badge">{ODBIORCY[d]?.[lang]}</span>)}
-      <time datetime={p.data}>{short(p.data)}</time>
-    </span>
-    <span class="t">{p.tytul}</span>
-    {p.wydarzenie && <span class="news-meta wa-kiedy"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</span>}
-    {p.zajawka && <span class="x">{p.zajawka}</span>}
-  </span>
-  {p.zdjecie && <span class="thumb"><img src={u(p.zdjecie)} alt="" loading="lazy" /></span>}
-</a>
+<article class:list={['wa', wyr && 'wyr']} data-wa data-dzial={dzialWpisu(p)} data-rodzaj={p.rodzaj} data-dla={p.dla.join(' ')}>
+  <time class="wa-data" datetime={p.data.slice(0, 10)}>{dayNum(p.data)}<small>{monthShort(p.data, lang)} {parse(p.data).y}</small></time>
+  <div class="wa-tresc">
+    <div class="wa-rodz">{etykieta}</div>
+    <h3 lang={p.tytulLang}><a href={href}>{p.tytul}</a></h3>
+    {p.wydarzenie && <p class="wa-kiedy"><strong>{lang === 'en' ? 'When:' : 'Kiedy:'}</strong> {range(p.wydarzenie, undefined, lang)}</p>}
+    {p.zajawka && <p class="wa-zaj" lang={p.zajawkaLang}>{p.zajawka}</p>}
+  </div>
+  {p.zdjecie && <span class="wa-fot" aria-hidden="true">{wyr
+    ? <ZdjecieZ src={p.zdjecie} loading="eager" sizes={(pr) => `${sizesTelefon(`${Math.ceil(Math.max(54, 54 * pr))}px`)}, ${Math.ceil(Math.max(200, 134 * pr))}px`} szerokosci={SZEROKOSCI} />
+    : <ZdjecieZ src={p.zdjecie} sizes={rozmiarPola(['telefon', 54, 54], [null, 72, 48])} szerokosci={SZEROKOSCI} />}</span>}
+</article>
 
 <style>
-  /* ---------- telefon (≤ 760 px): wygląd „Portal” ---------- */
-  @media (max-width: 760px) {
-    .wa-row { display: grid; grid-template-columns: 136px minmax(0, 1fr) auto; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 18px; row-gap: 0; align-items: start; }
-    .wa-row > .body { display: contents; }
-    .wa-meta { grid-column: 1; grid-row: 1 / 4; flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 2px; }
-    .wa-meta time { order: -1; font-size: 14px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .wa-meta .badge { padding: 1px 8px; font-size: 12.5px; white-space: nowrap; }
-    .wa-row .t { grid-column: 2; grid-row: 1; }
-    .wa-kiedy { grid-column: 2; grid-row: 2; margin-top: 3px; }
-    .wa-row .x { grid-column: 2; grid-row: 3; margin-top: 3px; }
-    .wa-row .thumb { grid-column: 3; grid-row: 1 / 4; display: block; width: 104px; height: 70px; }
+  .wa { position: relative; display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .wa[hidden] { display: none; }
+  .wa-data { font-family: var(--f-display); font-weight: 500; font-size: 34px; line-height: 1; color: var(--d-a); font-variant-numeric: lining-nums; }
+  .wa-data small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .wa-rodz { font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+  .wa h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; letter-spacing: normal; color: var(--ink); }
+  .wa h3 a { color: inherit; text-decoration: none; }
+  /* cały wiersz klikalny; fokus rysowany na całym wierszu */
+  .wa h3 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
+  .wa h3 a:focus-visible { outline: none; }
+  .wa:has(h3 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; }
+  .wa:hover h3 a { color: var(--d-a); }
+  .wa p { margin: 0; max-width: none; font-size: 15.5px; line-height: 1.55; color: var(--text); }
+  .wa .wa-kiedy { margin-bottom: 2px; font-size: 14px; color: var(--muted); }
+  .wa .wa-kiedy strong { font-weight: 700; color: var(--ink); }
+  .wa-fot { display: block; width: 120px; aspect-ratio: 3 / 2; overflow: hidden; background: var(--d-t); }
+  .wa-fot :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* komputer (zlecenie 18, punkt 3): tytuł zawsze w całości, zajawka najwyżej w 2 liniach */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    .wa { --tlo-wa: var(--bg); grid-template-columns: 58px minmax(0, 1fr) auto; gap: 12px; padding: 14px 0; }
+    .wa-data { font-size: 26px; }
+    .wa-data small { font-size: 12px; white-space: nowrap; }
+    .wa h3 { margin: 1px 0 3px; font-size: 18.5px; line-height: 1.28; }
+    .wa .wa-kiedy { font-size: 13px; }
+    .wa .wa-zaj { position: relative; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 14.5px; line-height: 1.5; }
+    .wa-fot { width: 72px; }
+    /* wyróżniony: boks „na papierze” na całą szerokość listy, jak boksy zakładów; bez zdjęcia większe tylko data i tytuł */
+    .wa.wyr { --tlo-wa: var(--surface); grid-column: 1 / -1; grid-template-columns: 76px minmax(0, 1fr) auto; gap: 18px; margin: 12px 0 4px; padding: 16px 20px;
+      border-bottom: 0; border-radius: 5px; background: var(--surface); }
+    .wa.wyr .wa-data { font-size: 38px; }
+    .wa.wyr .wa-data small { font-size: 13px; }
+    .wa.wyr h3 { margin: 3px 0 5px; font-size: 24px; line-height: 1.22; }
+    .wa.wyr:has(.wa-fot) .wa-zaj { font-size: 15.5px; line-height: 1.55; }
+    .wa.wyr .wa-fot { width: 200px; border-radius: 3px; }
+    /* wąska kolumna listy: przy zdjęciu 200 px na tytuł zostawało 208 px */
+    @container (max-width: 679.98px) { .wa.wyr .wa-fot { width: 120px; } }
+    /* „… czytaj dalej” na końcu ostatniej widocznej linii, na tle wiersza */
+    .wa :global(.wa-dalej) { position: absolute; right: 0; bottom: 0; padding-left: 30px; background: linear-gradient(to right, transparent, var(--tlo-wa) 26px);
+      font-weight: 700; color: var(--d-a); white-space: nowrap; }
+    .wa:hover :global(.wa-dalej) { text-decoration: underline; text-underline-offset: 3px; }
   }
-  @media (max-width: 640px) {
-    .wa-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto minmax(0, 1fr); }
-    .wa-meta { grid-column: 1 / -1; grid-row: 1; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 4px; padding-top: 0; }
-    .wa-meta time { margin-right: 6px; }
-    .wa-row .t { grid-column: 1; grid-row: 2; }
-    .wa-kiedy { grid-column: 1; grid-row: 3; }
-    .wa-row .x { grid-column: 1; grid-row: 4; }
-    .wa-row .thumb { grid-column: 2; grid-row: 2 / 5; width: 72px; height: 54px; }
+
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    /* miniatura pod datą (kolumna daty), żeby tekst miał całą szerokość */
+    .wa { grid-template-columns: 54px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 0 12px; padding: 13px 0; }
+    .wa-data { grid-column: 1; grid-row: 1; font-size: 28px; }
+    .wa-tresc { grid-column: 2; grid-row: 1 / 3; }
+    .wa-fot { grid-column: 1; grid-row: 2; align-self: start; margin-top: 10px; }
+    .wa-data small { font-size: 12px; }
+    .wa h3 { font-size: 18.5px; }
+    .wa p { font-size: 15px; }
+    .wa .wa-kiedy { font-size: 13.5px; }
+    .wa-fot { width: 54px; aspect-ratio: 1; }
   }
 </style>

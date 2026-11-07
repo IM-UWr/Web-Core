@@ -1,0 +1,68 @@
+---
+// „Kontakt i dojazd” na stronie działu „Instytut” (komputer; TrescDzialu.astro): nazwa, lista z podpisami zamiast ikon
+// (Adres, Telefon, E-mail, Godziny) i mapa Google ładowana dopiero po kliknięciu przycisku — tak jak dotąd
+// (zgoda zapamiętana w tej przeglądarce pod tym samym kluczem „mapa-google” co mapa w dotychczasowym bloku).
+import Sekcja from './Sekcja.astro';
+import { t } from '../../../lib/i18n';
+import { mailHtml } from '../../../lib/limity.mjs';
+import type { Lang } from '../../../lib/daty';
+
+interface Props {
+  lang: Lang;
+  k: { adres?: string; telefon?: string; email?: string };
+  godziny?: string;
+  mapa?: string;
+  mapaEmbed?: string;
+}
+const { lang, k, godziny, mapa, mapaEmbed } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const linki = [
+  { etykieta: T('Wszystkie dane kontaktowe', 'Full contact details'), adres: '/instytut/kontakt' },
+  ...(mapa ? [{ etykieta: T('Pokaż na mapie', 'Show on map'), adres: mapa }] : []),
+];
+---
+<Sekcja id="z-dz-kontakt" tytul={T('Kontakt i dojazd', 'Contact and getting here')} lang={lang} linki={linki}>
+  <div class="z-dz-kont">
+    <div>
+      <p class="nazwa">{t(lang, 'instytut')}, {t(lang, 'uwr')}</p>
+      <dl>
+        {k.adres && <div><dt>{T('Adres', 'Address')}</dt><dd>{k.adres}</dd></div>}
+        {k.telefon && <div><dt>{T('Telefon', 'Phone')}</dt><dd><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></dd></div>}
+        {k.email && <div><dt>E-mail</dt><dd><a href={`mailto:${k.email}`} data-limit-linii="2" set:html={mailHtml(k.email)} /></dd></div>}
+        {godziny && <div><dt>{T('Godziny', 'Hours')}</dt><dd>{godziny}</dd></div>}
+      </dl>
+    </div>
+    {mapaEmbed && (
+      <div class="z-dz-mapa" data-z-mapa={mapaEmbed} data-tytul={T('Mapa: Instytut Matematyczny, pl. Grunwaldzki 2, Wrocław', 'Map: Mathematical Institute, pl. Grunwaldzki 2, Wrocław')}>
+        <button type="button" data-z-mapa-pokaz>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.4" /></svg>
+          <span class="t">{T('Pokaż mapę Google', 'Show Google map')}</span>
+          <span class="s">{T('Mapa załaduje się z serwisu Google Maps — Google może zapisać pliki cookies.', 'The map loads from Google Maps — Google may set cookies.')}</span>
+        </button>
+      </div>
+    )}
+  </div>
+</Sekcja>
+
+<script>
+  // Mapa Google: ładowana dopiero po kliknięciu; zgoda zapamiętana w tej przeglądarce (ten sam klucz co w DzialInstytut.astro).
+  // Po zgodzie mapa wczytuje się sama tylko wtedy, gdy blok jest widoczny (na telefonie ten blok jest ukryty).
+  const pokaz = (box: HTMLElement) => {
+    const f = document.createElement('iframe');
+    f.src = box.dataset.zMapa || '';
+    f.title = box.dataset.tytul || 'Mapa';
+    f.loading = 'lazy';
+    f.referrerPolicy = 'no-referrer-when-downgrade';
+    f.allowFullscreen = true;
+    box.replaceChildren(f);
+  };
+  document.querySelectorAll<HTMLElement>('[data-z-mapa]').forEach((box) => {
+    let zgoda = false;
+    try { zgoda = localStorage.getItem('mapa-google') === '1'; } catch (e) {}
+    if (zgoda && box.getClientRects().length) pokaz(box);
+    box.querySelector('[data-z-mapa-pokaz]')?.addEventListener('click', () => {
+      try { localStorage.setItem('mapa-google', '1'); } catch (e) {}
+      pokaz(box);
+    });
+  });
+</script>

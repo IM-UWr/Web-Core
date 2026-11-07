@@ -1,227 +1,43 @@
 ---
-// Strona działu „Studia” (/studia, /en/studia): wstęp, liczby, kafelki z menu „Studia”, krótki tekst „O studiach”
-// z ramką „W skrócie” i aktualności dla studentów (bez sekcji „Kontakt” — kontakty są w „Sprawach studenckich”, decyzja 30.10.2026)
-// („Warto wiedzieć” tylko na stronie głównej i na /warto-wiedziec — decyzja 30.10.2026). Teksty: src/data/dzialy/studia.json;
-// reszta z kolekcji i menu, więc nowy kierunek, specjalność czy link w menu „Studia” sam pojawia się na tej stronie.
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby działu w jednym wierszu w banerze),
-// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej).
-// Telefon (≤ 760 px): wygląd „Portal” (bloki .tylko-telefon i style w @media (max-width: 760px)).
-// „W tym dziale” i „O studiach” — ten sam układ co na stronach „Instytut” i „Nauka” (DzialInstytut.astro, DzialNauka.astro).
-import { getCollection, type CollectionEntry } from 'astro:content';
+// Strona działu „Studia” (/studia, /en/studia): baner działu z liczbami, pod nim blok TrescDzialu — podstrony w grupach jak
+// w menu, „O studiach” z „W skrócie” i aktualności dla studentów. Teksty: src/data/studia.md (Web-Studia, „Strona działu
+// Studia”; zlecenie 30); reszta z kolekcji
+// i menu, więc nowy kierunek, specjalność czy link w menu „Studia” sam pojawia się na tej stronie.
+// Jedna wersja HTML: komputer i telefon (≤ 1023 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
-import Ikona from '../components/Ikona.astro';
-import KartaAktualnosci from '../components/KartaAktualnosci.astro';
-import tekst from '../data/dzialy/studia.json';
-import { u, isExternal } from '../lib/url';
-import { wJezyku, wybierz, RODZAJE } from '../lib/i18n';
-import { short, type Lang } from '../lib/daty';
-import { listaKierunkow, menuGlowne } from '../lib/menu';
-import { listaAktualnosci, pracownicy } from '../lib/tresci';
+import TrescDzialu from '../components/zal/TrescDzialu.astro';
+import Sekcja from '../components/zal/dzial/Sekcja.astro';
+import Wiersz from '../components/zal/dzial/Wiersz.astro';
+import { RODZAJE, bezSierotek } from '../lib/i18n';
+import { type Lang } from '../lib/daty';
+import { daneDzialuStudia } from '../lib/widoki/dzialStudia';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
 const T = (pl: string, angielski: string) => (en ? angielski : pl);
-const w = (o: any, pole: string) => wybierz(o, pole, lang);
-const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
-// polska odmiana: 1 kierunek, 2–4 kierunki, 5+ kierunków
-const odm = (n: number, jeden: string, kilka: string, wiele: string) =>
-  n === 1 ? jeden : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? kilka : wiele;
-
-type Kierunek = CollectionEntry<'kierunki'>;
-const kierunki = await listaKierunkow();
-const stopnie = (k: Kierunek) => new Set(k.data.etapy.map((e) => e.stopien.trim()));
-// szkoła doktorska = same etapy III stopnia
-const doktorat = (k: Kierunek) => { const s = stopnie(k); return s.has('III') && !s.has('I') && !s.has('II'); };
-
-// Pasek liczb (liczone z kolekcji).
-const idKierunkow = new Set(kierunki.map((k) => k.id));
-const specjalnosci = (await getCollection('specjalnosci')).filter(
-  (s) => s.data.opublikowany !== false && s.data.na_stronie_kierunku && !s.data.wygaszana && idKierunkow.has(s.data.kierunek),
-);
-const wszystkieStopnie = [...new Set(kierunki.flatMap((k) => [...stopnie(k)]))].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
-const nKierunkow = kierunki.filter((k) => !doktorat(k)).length;
-const nNauczycieli = (await pracownicy()).filter((o) => o.data.grupa === 'nauczyciel').length;
-const liczby = [
-  { n: nKierunkow, l: T(odm(nKierunkow, 'kierunek studiów', 'kierunki studiów', 'kierunków studiów'), nKierunkow === 1 ? 'degree programme' : 'degree programmes') },
-  { n: specjalnosci.length, l: T(odm(specjalnosci.length, 'specjalność do wyboru', 'specjalności do wyboru', 'specjalności do wyboru'), specjalnosci.length === 1 ? 'specialisation' : 'specialisations') },
-  { n: wszystkieStopnie.length, l: `${T(odm(wszystkieStopnie.length, 'stopień studiów', 'stopnie studiów', 'stopni studiów'), wszystkieStopnie.length === 1 ? 'level of study' : 'levels of study')} (${wszystkieStopnie.join(', ')})` },
-  { n: nNauczycieli, l: T(odm(nNauczycieli, 'nauczyciel akademicki', 'nauczycieli akademickich', 'nauczycieli akademickich'), nNauczycieli === 1 ? 'academic teacher' : 'academic teachers') },
-].filter((x) => x.n > 0);
-
-// Kafelki: grupy i linki z menu „Studia” (kierunki wstawiane automatycznie; nowy link w menu sam pojawi się tutaj).
-const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Studia' || m.etykieta_en === 'Study');
-const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
-
-// „O studiach” — akapity z CMS (oddzielone pustą linią) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”
-// na stronie „Instytut”): lista {wartosc, opis, opis_en}, fakty jeden pod drugim; pozycje bez wartości pomijamy.
-const oStudiach = ((w(tekst, 'o_studiach') as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
-// wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
-type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
-const fakty = (((tekst as any).o_studiach_fakty ?? []) as Fakt[])
-  .filter((f) => f?.wartosc?.trim())
-  .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
-// (zakres lat, np. 2022–2025, nie łamie się po półpauzie — wąska kolumna ramki, 300 px)
-
-// Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;
-// telefon — wygląd „Portal”: zwarta lista sześciu).
-const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
-const aktualnosci = dlaStudentow.slice(0, 4);
-const aktualnosciTel = dlaStudentow.slice(0, 6);
-
-const tytul = T('Studia', 'Study');
-const wstep = w(tekst, 'wstep');
+const { liczby, grupy, oStudiach, fakty, aktualnosci, tytul, wstep, haslo } = await daneDzialuStudia(lang);
 ---
 <Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
-  {/* Liczby działu w jednym wierszu w banerze (komputer i telefon, jak w wariancie „Portal”).
-       Telefon (≤ 760 px) — wygląd „Portal”: „W tym dziale” w jednej ramce, tekst „O studiach” (bez ramki „W skrócie”),
-       aktualności (sześć) — osobny blok .tylko-telefon (inna kolejność i liczba pozycji).
-       Link do pełnej listy („Wszystkie”) — zawsze w nagłówku sekcji
-       (komputer: .zsec-head w global.css; telefon: nagłówek ramki .pt-h), z prawej. */}
-  <NaglowekStrony tytul={tytul} lead={wstep} lang={lang} okruszki={[{ etykieta: tytul }]}>
+  <NaglowekStrony tytul={tytul} lead={wstep} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">
-        {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
       </ul>
     )}
   </NaglowekStrony>
-  <div class="wrap dz-wrap">
-    {grupy.length > 0 && (
-      <section class="zsec dz-pierwsza" aria-labelledby="w-dziale">
-        <h2 id="w-dziale">{T('W tym dziale', 'In this section')}</h2>
-        <div class="dz-groups">
-          {grupy.map((g) => (
-            <div class="dz-g">
-              <h3>{wybierz(g, 'nazwa', lang)}</h3>
-              <div class="tiles dz-tiles">
-                {g.linki.map((l) => (
-                  <a class="tile dz-tile" href={href(l.adres)}>
-                    <span>{wybierz(l, 'etykieta', lang)}</span>
-                    <Ikona nazwa={isExternal(l.adres) ? 'zewnetrzny' : 'strzalka'} rozmiar={20} />
-                  </a>
-                ))}
-              </div>
-            </div>
+  <TrescDzialu dzial="studia" lang={lang} grupy={grupy} tekst={{ tytul: T('O studiach', 'About our programmes'), akapity: [], html: oStudiach, fakty }}>
+    <Sekcja id="z-dz-aktualnosci" tytul={T('Aktualności dla studentów', 'News for students')} lang={lang}
+      linki={[{ etykieta: T('Wszystkie', 'All'), adres: '/aktualnosci?dla=studenci' }]}
+      opis={aktualnosci.length ? undefined : T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}>
+      {aktualnosci.length > 0 && (
+        <div class="z-dz-wiersze">
+          {aktualnosci.map((p) => (
+            <Wiersz data={p.data} lang={lang} etykieta={RODZAJE[p.rodzaj]?.[lang]} tytul={p.tytul} adres={p.href} zajawka={p.zajawka} />
           ))}
         </div>
-      </section>
-    )}
-
-    {/* „O studiach” — kilka zdań z CMS (Ustawienia → Strona działu „Studia”, pole „O studiach”; akapity oddzielone
-         pustą linią) i ramka „W skrócie” obok (pole o_studiach_fakty; tylko komputer). */}
-    {oStudiach.length > 0 && (
-      <section class="zsec dz-o" aria-labelledby="o-studiach">
-        <h2 id="o-studiach">{T('O studiach', 'About our programmes')}</h2>
-        <div class="dz-o-uklad">
-          <div class="dz-o-tekst">{oStudiach.map((a) => <p>{a}</p>)}</div>
-          {fakty.length > 0 && (
-            <aside class="dz-o-fakty tylko-komputer" aria-labelledby="w-skrocie">
-              <p class="dz-o-fakty-h" id="w-skrocie">{T('W skrócie', 'At a glance')}</p>
-              <dl>
-                {fakty.map((f) => <div><dt>{f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
-              </dl>
-            </aside>
-          )}
-        </div>
-      </section>
-    )}
-
-    <section class="zsec tylko-komputer" aria-labelledby="aktualnosci" style="margin-bottom:0">
-      <div class="zsec-head">
-        <h2 id="aktualnosci">{T('Aktualności dla studentów', 'News for students')}</h2>
-        <a class="link-arrow" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-      </div>
-      {aktualnosci.length > 0 ? (
-        <div class="news-grid">
-          {aktualnosci.map((p) => <KartaAktualnosci p={p} lang={lang} />)}
-        </div>
-      ) : (
-        <p class="muted" style="margin:0">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
       )}
-    </section>
-
-    <div class="dz-tel tylko-telefon" data-pagefind-ignore>
-      <section class="pt-box" aria-labelledby="aktualnosci-tel">
-        <div class="pt-h">
-          <h2 id="aktualnosci-tel">{T('Aktualności dla studentów', 'News for students')}</h2>
-          <a class="pt-all" href={`${u(wJezyku('/aktualnosci', lang))}?dla=studenci`}>{T('Wszystkie', 'All')}<Ikona nazwa="strzalka" rozmiar={14} /></a>
-        </div>
-        {aktualnosciTel.length > 0 ? (
-          <ul class="pt-list">
-            {aktualnosciTel.map((p) => (
-              <li>
-                <a class="pt-item" href={href(p.href)}>
-                  <time class="pt-d" datetime={p.data}>{short(p.data).slice(0, 5)}</time>
-                  <span class="pt-b">
-                    <span class="pt-k">{RODZAJE[p.rodzaj]?.[lang]}</span>
-                    <span class="pt-t">{p.tytul}</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p class="pt-pusto">{T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}</p>
-        )}
-      </section>
-    </div>
-
-  </div>
+    </Sekcja>
+  </TrescDzialu>
 </Baza>
-
-<style>
-  /* „W tym dziale” i „O studiach” — układ wspólny ze stronami działów „Instytut” i „Nauka”. */
-  .dz-wrap { padding-top: 32px; padding-bottom: 64px; }
-  /* „W tym dziale” zaraz pod banerem — bez kreski sekcji nad nagłówkiem (komputer i telefon; jak „Najbliższe seminaria”
-     w ListaSeminariow.astro): tytuł zaczyna się w odstępie .dz-wrap od banera */
-  .zsec.dz-pierwsza { border-top: 0; padding-top: 0; }
-  .zsec.dz-pierwsza::before, .zsec.dz-pierwsza > h2::before { display: none; }
-  .dz-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px 16px; }
-  .dz-g h3 { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-tiles { grid-template-columns: 1fr; gap: 8px; padding-top: 0; }
-  .dz-tile { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
-  /* „O studiach”: zwykłe akapity w wygodnej szerokości do czytania */
-  .dz-o-tekst p { max-width: 820px; margin: 0 0 12px; font-size: 16px; line-height: 1.65; }
-  .dz-o-tekst p:last-child { margin-bottom: 0; }
-  /* ramka „W skrócie” (tylko komputer): duże wartości z bursztynową kreską, opis pod spodem, fakty jeden pod drugim —
-     jak „O Instytucie” na stronie „Instytut” (DzialInstytut.astro) */
-  .dz-o-fakty { padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-  .dz-o-fakty-h { margin: 0 0 12px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-  .dz-o-fakty dl { display: grid; gap: 14px; margin: 0; }
-  .dz-o-fakty dl > div { padding-left: 12px; border-left: 3px solid var(--accent); }
-  .dz-o-fakty dt { font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--ink); }
-  .dz-o-fakty dd { margin: 3px 0 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
-  /* komputer: tekst i ramka obok siebie (ramka 300 px po prawej) */
-  @media (min-width: 761px) {
-    .dz-o-uklad { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
-  }
-
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” — mniejsze odstępy, niższe kafelki (jak na „Instytucie” i „Nauce”) ----------
-     Odstęp nad pierwszą sekcją stały (24 px): bursztynowy początek kreski sekcji nie przylega do dolnej krawędzi banera. */
-  @media (min-width: 761px) {
-    .dz-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); }
-    .dz-groups { gap: 12px 16px; }
-    .dz-g h3 { margin: 0 0 6px; }
-    .dz-tiles { gap: 6px; }
-    .dz-tile { display: flex; min-height: 42px; padding-block: 6px; }
-  }
-
-  /* ---------- telefon (≤ 760 px): wygląd „Portal” (wspólny ze stronami „Instytut” i „Nauka”) ---------- */
-  @media (max-width: 760px) {
-    .dz-wrap { padding-top: 4px; padding-bottom: 36px; }
-    /* „W tym dziale”: jedna ramka, grupy oddzielone małymi szarymi podtytułami (jak na komputerze), linki jako wiersze */
-    .dz-groups { display: block; padding: 2px 14px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
-    .dz-g + .dz-g { margin-top: 6px; }
-    .dz-g h3 { margin: 12px 0 2px; }
-    .dz-tiles { display: block; }
-    .dz-tile { gap: 10px; min-height: 40px; padding: 6px 4px; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.3; }
-    .dz-tile + .dz-tile { min-height: 41px; border-top: 1px solid var(--line); }
-    .dz-tile:hover { background: var(--tint); }
-    .dz-tile :global(svg) { width: 16px !important; height: 16px !important; color: var(--muted); }
-    :global(:root[data-theme='dark']) .dz-tile :global(svg) { color: var(--muted); }
-    .dz-o-tekst p { font-size: 15px; line-height: 1.55; }
-    /* aktualności (blok tylko na telefon) */
-    .dz-tel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-  }
-</style>

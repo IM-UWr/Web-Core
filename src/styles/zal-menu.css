@@ -1,0 +1,203 @@
+/* ==========================================================================
+   Panel menu z hamburgera (src/components/zal/PanelMenu.astro): jeden na komputerze i telefonie (zlecenie 18, punkt 6).
+   Z prawej strony, na granacie (na komputerze w ciemnym motywie --panel). Otwieranie i zamykanie: src/scripts/zal/menu.ts.
+   - Komputer (≥ 1024 px): na okładce w obrębie okładki, przy pasku stały na całą wysokość okna; przy jasnym pasku jasny
+     (.z-menu-jasny, ustawia src/scripts/zal/pasek.ts), własny krzyżyk. Pismo, sygnet i szerokość rosną z wysokością okna, rzędy
+     dzielą między siebie jego wolną wysokość (zlecenie 20, punkt 1), a każdy dział mieści się bez przewijania także przy
+     oknie 1366×640 (linki w grupie obok siebie, z zawijaniem). Kolor działu: sygnet, kreska pod nazwą i bieżąca strona.
+   - Telefon (≤ 1023 px): pod nagłówkiem, w kolorze nagłówka (granat, przy jasnym nagłówku jasny na pełnym tle: .z-menu-jasny, ustawia
+     src/scripts/zal/pasek.ts; zlecenie 21, punkt 2), strona przyciemniona (.z-menu-tlo) i nieprzewijalna, krzyżykiem staje się hamburger
+     w nagłówku (Naglowek.astro), więc własny krzyżyk panelu jest schowany.
+   ========================================================================== */
+.z-menu { overflow-y: auto; overscroll-behavior: contain; text-align: left; color: #fff;
+  transform: translateX(100%); visibility: hidden; transition: transform var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi), background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
+.z-menu.otwarte { transform: none; visibility: visible; transition: transform var(--t-dlugi) var(--rytm), visibility 0s, background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
+.z-menu:focus { outline: none; }
+
+/* ---------- pole szukania ---------- */
+.z-menu-szukaj { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 9px 12px; border: 1px solid rgb(255 255 255 / .3); color: rgb(255 255 255 / .75); }
+.z-menu-szukaj svg { flex: none; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+.z-menu-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-appearance: none; appearance: none;
+  font: inherit; font-size: 15px; color: #fff; outline: none; }
+.z-menu-szukaj input::placeholder { color: rgb(255 255 255 / .6); opacity: 1; }
+.z-menu-szukaj:focus-within { border-color: #fff; }
+
+/* ---------- działy: mała twarz patrona (sygnet, kreska w kolorze działu) przed nazwą i listą ---------- */
+.z-menu section { padding: 7px 0; border-bottom: 1px solid rgb(255 255 255 / .12); }
+.z-menu section[data-dzial] { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 14px; align-items: start; }
+.z-menu section[data-dzial] > :not(.z-menu-sygnet) { grid-column: 2; }
+.z-menu .z-menu-sygnet { grid-row: 1 / span 2; display: block; width: 40px; height: 48px; margin-top: 2px; }
+.z-menu .z-menu-sygnet path { fill: none; stroke: var(--d-j); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.z-menu h2 { margin: 0 0 3px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.1; letter-spacing: -0.01em; }
+.z-menu h2 a { color: #fff; text-decoration: none; }
+.z-menu h2 a::after { content: ''; display: block; width: 28px; height: 2px; margin-top: 4px; background: var(--d-j); }
+
+/* ---------- grupy podstron: nazwa grupy bez koloru działu; linki na komputerze obok siebie, na telefonie każdy w osobnym wierszu ---------- */
+.z-menu .z-menu-grupa + .z-menu-grupa { margin-top: 5px; }
+.z-menu .z-menu-grupa h3 { margin: 0; font-family: var(--f-text); font-size: 12.5px; font-weight: 600; line-height: 1.6; letter-spacing: .02em; text-transform: none; color: rgb(255 255 255 / .58); }
+.z-menu ul { list-style: none; margin: 0; padding: 0; font-size: 14.5px; }
+.z-menu ul a { font-weight: 500; color: var(--na-ciemnym-2); text-decoration: none; }
+.z-menu ul a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.z-menu ul a.zew::after { font-size: .85em; opacity: .7; }
+
+/* ---------- bieżąca strona: ta sama grubość co reszta, oznacza ją kolor działu; Aktualności bez koloru działu mają krótką kreskę (zlecenie 21, punkt 5).
+   Tylko komputer: na telefonie menu nie wskazuje, gdzie jesteś (prośba właściciela, 6.11). ---------- */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-menu ul a[aria-current='page'], .z-menu section[data-dzial] h2 a[aria-current='page'] { color: var(--d-j); }
+  .z-menu section.duza h2 a[aria-current='page']::after { content: ''; background: currentColor; }
+}
+
+/* ---------- Aktualności i Rekrutacja: duże, z większym oddechem, wyrównane do tekstu działów (za sygnetem) ---------- */
+.z-menu section.duza { padding: 10px 0 10px 54px; }
+.z-menu section[data-dzial] + section.duza { margin-top: 4px; }
+.z-menu section.duza h2 { margin: 0; font-size: 24px; }
+.z-menu section.duza h2 a::after { content: none; }
+.z-menu section.duza h2 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+/* „Rekrutacja ↗”: strzałka w linii, bez kreski działu z .z-menu h2 a::after (blok 28×2 px) */
+.z-menu section.duza h2 a.zew::after { content: '\00a0↗'; font-family: var(--f-text); font-size: 18px; opacity: .7; display: inline; width: auto; height: auto; margin: 0; background: none; }
+
+/* ---------- zwijane działy (zlecenie 14, zalecenie 24): przycisk ze strzałką z prawej przy nazwie działu (obraca się o 180°).
+   Bez JS grupy widoczne, przycisk schowany; zwijanie włącza skrypt (.zwijane). Na komputerze panel otwiera się z rozwiniętym bieżącym działem, na telefonie złożony. ---------- */
+.z-menu section[data-dzial] h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.z-menu-rozwin { display: none; flex: none; place-items: center; width: 30px; height: 30px; margin-top: -1px; padding: 0; border: 0; border-radius: 3px; background: none; color: #fff; cursor: pointer;
+  transition: background-color var(--t-krotki) var(--rytm); }
+.z-menu.zwijane .z-menu-rozwin { display: inline-grid; }
+.z-menu-rozwin svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s var(--rytm); }
+.z-menu-rozwin[aria-expanded='true'] svg { transform: rotate(180deg); }
+.z-menu-rozwin:hover { background: rgb(255 255 255 / .1); }
+.z-menu-rozwin:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: none; }
+.z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
+
+/* ---------- komputer ---------- */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 16px 28px 14px;
+    background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
+  .z-menu.z-menu-pasek { position: fixed; z-index: 40; }
+  /* Krzyżyk w prawym górnym rogu panelu, 24 px od górnej i prawej krawędzi, przy pasku i na okładce (zlecenie 27, punkt 5; wcześniej
+     przy pasku w miejscu hamburgera). Pole szukania w jednym rzędzie z nim: na całą szerokość panelu bez krzyżyka i 12 px odstępu
+     (24 + 40 + 12 − 28 px wcięcia panelu = 48 px z prawej), środek pola na wysokości środka krzyżyka (24 + 40 / 2 = 44 px od góry). */
+  .z-menu-szukaj { margin-right: 48px; }
+  .z-menu ul { display: flex; flex-wrap: wrap; gap: 2px 16px; }
+  .z-menu ul a { display: inline-block; padding: 3px 0; }
+  .z-menu .z-zamknij { position: absolute; top: 24px; right: 24px; }
+  .z-menu .z-zamknij button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px;
+    color: #fff; background: rgb(255 255 255 / .08); cursor: pointer; }
+  .z-menu .z-zamknij button:hover { background: rgb(255 255 255 / .16); }
+  .z-menu .z-zamknij button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  .z-menu .z-zamknij svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+}
+
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  /* wielkości rosną z wysokością okna: przy 640 px jak dotąd, pełne przy 800 px i wyżej */
+  .z-menu {
+    --mw: clamp(0px, calc(100vh - 640px), 160px);
+    --m-h2: calc(23px + var(--mw) / 23);    /* nazwa działu: 23 → 30 */
+    --m-l: calc(14.5px + var(--mw) / 53);   /* link: 14,5 → 17,5 */
+    --m-g: calc(12.5px + var(--mw) / 80);   /* nazwa grupy: 12,5 → 14,5 */
+    --m-s: calc(40px + var(--mw) / 11.5);   /* sygnet: 40 → 54 */
+    width: min(calc(610px + var(--mw) * 3 / 8), calc(100vw - 64px)); /* 610 → 670 */
+    display: flex; flex-direction: column;
+  }
+  /* wysokość pola jak dotąd (42 → 50 px z wysokością okna), podana wprost, żeby środek pola stał 44 px od góry panelu, jak środek krzyżyka */
+  .z-menu-szukaj { --szuk-h: calc(42px + var(--mw) / 19); flex: none; height: var(--szuk-h); margin-top: calc(28px - var(--szuk-h) / 2);
+    margin-bottom: calc(8px + var(--mw) / 15); padding: 0 13px; }
+  .z-menu-szukaj input { font-size: calc(15px + var(--mw) / 106); }
+
+  /* rzędy dzielą między siebie wolną wysokość panelu; rozwinięcie działu samo ściska pozostałe */
+  .z-menu section { flex: 1 0 auto; }
+  /* transition: bez niej przy zwijaniu rząd skacze od razu do niższej granicy, a grupy na chwilę wystają na następny rząd */
+  .z-menu.zwijane section { max-height: calc(var(--m-s) * 1.2 + 90px); transition: max-height .32s var(--rytm); }
+  .z-menu.zwijane section.rozwiniety { max-height: calc(var(--m-s) * 1.2 + 360px); }
+  .z-menu section[data-dzial] { grid-template-columns: var(--m-s) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: calc(14px + var(--mw) / 53); align-content: center; }
+  .z-menu section.duza { flex-grow: .72; display: flex; flex-direction: column; justify-content: center; padding-left: calc(var(--m-s) + 14px + var(--mw) / 53); }
+  .z-menu.zwijane section.duza { max-height: calc(var(--m-h2) + 76px); }
+  .z-menu .z-menu-sygnet { grid-row: 1; width: var(--m-s); height: calc(var(--m-s) * 1.2); }
+  /* rozwinięty: sygnet nie rozpycha rzędu, grupy stoją tuż pod nazwą działu */
+  .z-menu section.rozwiniety .z-menu-sygnet { grid-row: 1 / span 2; margin-bottom: calc(var(--m-s) * -1.2); }
+  .z-menu h2 { font-size: var(--m-h2); }
+  .z-menu h2 a::after { width: calc(28px + var(--mw) / 32); margin-top: calc(4px + var(--mw) / 53); }
+  .z-menu section.duza h2 { font-size: calc(var(--m-h2) + 1px); }
+  .z-menu section.duza h2 a.zew::after { font-size: .72em; }
+  .z-menu-rozwin { width: calc(30px + var(--mw) / 30); height: calc(30px + var(--mw) / 30); }
+  .z-menu-rozwin svg { width: calc(18px + var(--mw) / 53); height: calc(18px + var(--mw) / 53); }
+
+  .z-menu .z-menu-grupa h3 { font-size: var(--m-g); }
+  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: calc(5px + var(--mw) / 21); }
+  .z-menu ul { font-size: var(--m-l); gap: 2px calc(16px + var(--mw) / 53); }
+
+  /* rozwijanie płynne: wysokość grup przechodzi przez 0fr → 1fr. Warunek .zwijane: bez JS grupy widoczne, nic nie jest ucięte.
+     Pierwszy stan po otwarciu panelu bez animacji (.bez-animacji, menu.ts): skrypt od razu mierzy bieżący link. */
+  .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: grid; grid-template-rows: 0fr; visibility: hidden; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s linear .32s; }
+  .z-menu.zwijane section[data-dzial].rozwiniety .z-menu-grupy { display: grid; grid-template-rows: 1fr; visibility: visible; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s; }
+  .z-menu.zwijane.bez-animacji :is(section, section[data-dzial] .z-menu-grupy) { transition: none !important; }
+  /* position: bez niego dopiski .sr-only linków poza stronę (absolutne) wystają ze zwiniętej grupy i panel zyskuje pasek przewijania */
+  .z-menu.zwijane .z-menu-grupy-w { position: relative; min-height: 0; overflow: hidden; }
+  .z-menu.zwijane .z-menu-grupy-w::before { content: ''; display: block; height: calc(4px + var(--mw) / 26); }
+}
+
+/* okna do 800 px wysokości: ciaśniejsze rzędy, bo w wąskim panelu rozwinięte Studia mają więcej rzędów linków niż wyższe okna */
+@media (min-width: 1024px) and (min-height: 501px) and (max-height: 800px), (min-width: 1024px) and (pointer: fine) and (max-height: 800px) {
+  .z-menu { padding-bottom: 10px; }
+  .z-menu section { padding-block: 6px; }
+  .z-menu section.duza { padding-block: 8px; }
+}
+
+/* ---------- telefon: wysuwa się pod nagłówkiem (--menu-top: dół nagłówka, ustawiany skryptem przy otwarciu) ---------- */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  .z-menu { position: fixed; top: var(--menu-top, var(--hdr-h)); right: 0; bottom: 0; z-index: 31; width: min(86vw, 420px); padding: 14px clamp(16px, 5vw, 24px) 24px;
+    background: var(--granat); border-left: 1px solid rgb(255 255 255 / .12); box-shadow: -14px 0 36px rgb(0 0 0 / .2); }
+  .z-menu .z-zamknij { display: none; }
+  .z-menu-szukaj input { font-size: 16px; } /* mniej niż 16 px: iOS przybliża stronę przy wejściu w pole */
+  .z-menu section { padding: 8px 0; }
+  .z-menu section[data-dzial] { grid-template-columns: 34px minmax(0, 1fr); column-gap: 12px; }
+  .z-menu .z-menu-sygnet { width: 34px; height: 41px; margin-top: 2px; }
+  .z-menu .z-menu-sygnet path { stroke: color-mix(in srgb, var(--d-j) 80%, #fff); stroke-width: 1.4px; }
+  .z-menu h2 { margin: 0; font-size: 24px; }
+  .z-menu h2 a::after { width: 26px; margin-top: 5px; }
+  .z-menu section[data-dzial] h2 { align-items: center; min-height: 44px; }
+  .z-menu-rozwin { width: 44px; height: 44px; margin: 0 -10px 0 0; }
+  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: 10px; }
+  .z-menu ul { font-size: 16px; }
+  .z-menu ul a { display: block; min-height: 40px; padding: 9px 0; line-height: 22px; }
+  .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding: 6px 0 4px; }
+  .z-menu section[data-dzial] + section.duza { margin-top: 0; }
+  .z-menu section.duza { padding: 14px 0 14px 46px; }
+  .z-menu section.duza h2 { font-size: 24px; }
+  /* po lewej przyciemniony pasek strony: klik w niego zamyka panel; strona pod spodem się nie przewija */
+  .z-menu-tlo { position: fixed; inset: var(--menu-top, var(--hdr-h)) 0 0 0; z-index: 29; background: rgb(6 11 22 / .5);
+    opacity: 0; visibility: hidden; transition: opacity var(--t-dlugi) var(--rytm), visibility 0s linear var(--t-dlugi); }
+  .z-menu-tlo.otwarte { opacity: 1; visibility: visible; transition: opacity var(--t-dlugi) var(--rytm), visibility 0s; }
+  html.menu-otwarte { overflow: hidden; }
+}
+
+/* ---------- jasny panel przy jasnym pasku, na komputerze i telefonie: tło strony, tekst w kolorze tekstu, sygnety, kreski i bieżąca strona w kolorze działu.
+   Po bloku telefonu, żeby wygrywał kolejnością z jego kolorami. ---------- */
+.z-menu.z-menu-jasny { background: color-mix(in srgb, var(--bg) 97%, transparent); color: var(--ink); box-shadow: -18px 0 40px rgb(13 24 48 / .14); border-left: 1px solid var(--line); }
+.z-menu-jasny h2 a { color: var(--ink); }
+.z-menu-jasny h2 a::after { background: var(--d-a, var(--line)); }
+.z-menu-jasny ul a { color: var(--text); }
+.z-menu-jasny ul a:hover { color: var(--ink); }
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-menu-jasny ul a[aria-current='page'], .z-menu-jasny section[data-dzial] h2 a[aria-current='page'] { color: var(--d-a); }
+}
+.z-menu-jasny section { border-bottom-color: var(--line); }
+.z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }
+.z-menu-jasny .z-menu-szukaj { border-color: var(--line); color: var(--muted); }
+.z-menu-jasny .z-menu-szukaj:focus-within { border-color: var(--ink); }
+.z-menu-jasny .z-menu-szukaj input { color: var(--ink); }
+.z-menu-jasny .z-menu-szukaj input::placeholder { color: var(--muted); }
+.z-menu-jasny .z-zamknij button { background: var(--surface); color: var(--ink); }
+.z-menu-jasny .z-zamknij button:hover { background: var(--line); }
+.z-menu-jasny .z-menu-grupa h3 { color: var(--muted); }
+.z-menu-jasny .z-menu-rozwin { color: var(--ink); }
+.z-menu-jasny .z-menu-rozwin:hover { background: var(--surface); }
+/* telefon: tło pełne, bo przy 97% prześwituje tekst strony */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .z-menu.z-menu-jasny { background: var(--bg); } }
+
+/* na końcu: wygrywa kolejnością z regułą przyciemnienia w bloku telefonu */
+@media (prefers-reduced-motion: reduce) {
+  .z-menu, .z-menu.otwarte, .z-menu-rozwin svg, .z-menu-tlo, .z-menu-tlo.otwarte { transition: none; }
+  .z-menu.zwijane :is(section, section[data-dzial] .z-menu-grupy) { transition: none !important; } /* !important: reguły rozwijania mają wyższą szczegółowość */
+}

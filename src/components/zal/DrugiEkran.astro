@@ -1,0 +1,202 @@
+---
+// Drugi ekran strony głównej na komputer (≥ 1024 px; kierunek „Założyciele”, dok/estetyka.md „Drugi ekran”):
+// - pasek „Szybki dostęp”: Plan zajęć, kolor dnia („Dziś brak zajęć” / „Dziś: dzień …”), Pracownicy, Seminaria;
+// - trzy kolumny: sloty 0 i 1 — krótkie kolumny po 3 pozycje (na niskim oknie po 2: drabinka wysokości, zlecenie 26, punkt 3) i „Zobacz więcej (N)”, slot 2 — długa kolumna na całą
+//   wysokość (tyle pozycji, ile się zmieści). „Zobacz więcej” płynnie zamienia klikniętą kolumnę z długą (FLIP 0,52 s,
+//   bez ruchu przy prefers-reduced-motion; fokus na nagłówek rozwiniętej kolumny) — src/scripts/zal/drugi-ekran.ts;
+// - jeden wzór daty we wszystkich kolumnach (dzień dużą Brygadą, pod nim „lis · pon.”); prelegent po tytule seminarium
+//   (półpauza, nazwisko kursywą Brygady, bez łamania, bez afiliacji); miniatury aktualności 56×42 (bez zdjęcia — sygnet działu);
+// - pierwszy wpis kolumny „Aktualności” zawsze wyróżniony (zlecenie 14, zalecenie 22; kolumna zwarta: zlecenie 18, punkt 8): tytuł Brygadą
+//   18 px, zajawka w jednej linii z „… czytaj dalej”, gdy się nie mieści, zdjęcie albo sygnet 78×59; bez znacznika i bez pola w CMS;
+// - Studia: klikalne „Studiuj matematykę we Wrocławiu ↗” (strona rekrutacji), kierunki (SIAD jako skrót); Warto wiedzieć;
+// - pod spodem odchudzona stopka (StopkaZ w Baza.astro).
+// Telefon (≤ 1023 px): kolumny jedna pod drugą, po 3 pozycje, pierwsza aktualność bez wyróżnienia (zlecenie 18, punkt 11), „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
+import Link from '../Link.astro';
+import '../../styles/zalozyciele-strony.css';
+import Szkic from './Szkic.astro';
+import ZdjecieZ from '../ZdjecieZ.astro';
+import { rozmiarPola } from '../../lib/zdjecia';
+import { MQ_KOMPUTER, sizesTelefon } from '../../lib/media';
+import ustawienia from '../../data/ustawienia.json';
+import skroty from '../../data/skroty.json';
+import plan from '../../data/plan/plan.json';
+import { getCollection } from 'astro:content';
+import { u, isExternal } from '../../lib/url';
+import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
+import { today, parse, weekday, type Lang } from '../../lib/daty';
+import { pozycjeKierunkow } from '../../lib/kierunki';
+import { tekstDnia } from '../../lib/kolory-dni';
+import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU } from '../../lib/tresci';
+import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const en = lang === 'en';
+const T = (pl: string, a: string) => (en ? a : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+
+// jeden wzór daty: dzień i „lis · pon.”
+const MIES = { pl: ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'], en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] };
+const DNI = { pl: ['niedz.', 'pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.'], en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
+const data = (s: string) => { const p = parse(s); return { d: String(p.d), m: `${MIES[lang][p.m - 1]} · ${DNI[lang][weekday(s)]}` }; };
+const godzina = (s: string) => (s.includes('T') ? s.slice(11, 16).replace(/^0/, '') : '');
+const krotkaSala = (s?: string) => (s ? (/^[\w.\-]{1,6}$/.test(s) ? `${en ? 'room' : 's.'} ${s}` : s) : '');
+const NAZWY_DZ: Record<Dzial, [string, string]> = { instytut: ['Instytut', 'Institute'], nauka: ['Nauka', 'Research'], studia: ['Studia', 'Studies'], popularyzacja: ['Popularyzacja', 'Outreach'] };
+
+type Wiersz = { dzial?: Dzial; d: string; m: string; gdzie: string; co: string; tytul: string; tytulLang?: string; polski?: boolean; kto?: string; adres?: string; min?: string; minelo?: boolean; szkic?: boolean; wyr?: boolean; zaj?: string; zajLang?: string; koniec?: string };
+
+// Nadchodzące wydarzenia (jak na telefonie: 30 dni i przypomnienia terminów)
+const dniTel = Number((ustawienia as any).wydarzenia_dni_telefon ?? 30) || 30;
+const RODZ_WYD: Record<string, [string, string]> = { obrona: ['obrona doktorska', 'PhD defence'], konferencja: ['konferencja', 'conference'], termin: ['termin', 'deadline'] };
+const wpisy = new Map((await wszystkieAktualnosci()).map((a) => [`/aktualnosci/${slugOf(a.id)}`, a.data]));
+// „sala HS, Instytut Matematyczny UWr” → „s. HS” (jak w prototypie); inne miejsca bez zmian
+const krotkieMiejsce = (m?: string) => (m ?? '').replace(/,\s*(Instytut Matematyczny UWr|Mathematical Institute, University of Wrocław)$/, '').replace(/^(sala|room)\s+/, en ? 'room ' : 's. ');
+const wydarzenia: Wiersz[] = (await wydarzeniaNaTelefon(10, lang, dniTel)).map((w) => {
+  const dz = dzialWydarzenia(w, w.href ? wpisy.get(w.href) : undefined);
+  return {
+    dzial: dz, ...data(w.poczatek), gdzie: dz ? T(...NAZWY_DZ[dz]) : T('Wydarzenie', 'Event'),
+    co: [RODZ_WYD[w.rodzaj] ? T(...RODZ_WYD[w.rodzaj]) : '', godzina(w.poczatek), krotkieMiejsce(w.miejsce)].filter(Boolean).join(' · '),
+    tytul: w.rodzaj === 'obrona' && w.podtytul ? w.podtytul : w.tytul, tytulLang: w.tytulLang, adres: w.href,
+    koniec: w.koniec || w.koniecIcs || w.poczatek,
+  };
+});
+
+// Seminaria najbliższych 7 dni: prelegent po tytule
+const tydzien = tydzienSeminariow();
+const MIES_D = { pl: ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'], en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] };
+const zakres = (() => {
+  const a = parse(tydzien.od), b = parse(tydzien.do);
+  return a.m === b.m ? `${a.d}–${b.d} ${MIES_D[lang][a.m - 1]}` : `${a.d} ${MIES_D[lang][a.m - 1]} – ${b.d} ${MIES_D[lang][b.m - 1]}`;
+})();
+const seminaria: Wiersz[] = (await referatyWTygodniu(lang)).map((r) => ({
+  dzial: 'nauka', ...data(r.termin), gdzie: r.seminarium, co: [godzina(r.termin), krotkaSala(r.sala)].filter(Boolean).join(' · '),
+  tytul: r.tytul, polski: poPolskuNaEn(r.jezyk, lang), kto: r.prelegent, adres: r.href,
+}));
+
+// Aktualności: miniatura 56×42, bez zdjęcia — sygnet działu wpisu. Pierwszy wpis wyróżniony (data nieprzygaszona, zajawka)
+const akt = await aktualnosciNaGlowna(12, lang);
+const aktualnosci: Wiersz[] = akt.map((p, i) => {
+  const dz = dzialWpisu(p);
+  const etyk = p.rodzaj !== 'ogloszenie' ? RODZAJE[p.rodzaj]?.[lang] : p.dla[0] ? ODBIORCY[p.dla[0]]?.[lang] : RODZAJE.ogloszenie[lang];
+  return { dzial: dz, ...data(p.data), gdzie: T(...NAZWY_DZ[dz]), co: (etyk ?? '').toLowerCase(), tytul: p.tytul, tytulLang: p.tytulLang, adres: p.href, min: p.zdjecie, szkic: !p.zdjecie, minelo: i > 0, wyr: i === 0, zaj: i === 0 ? p.zajawka : undefined, zajLang: p.zajawkaLang };
+});
+
+const KOL = {
+  wyd: { tytul: T('Nadchodzące wydarzenia', 'Upcoming events'), link: T('Kalendarz →', 'Calendar →'), adres: '/kalendarz', wsz: T('Cały kalendarz →', 'Full calendar →'), pozycje: wydarzenia, pusto: T('Brak wydarzeń w najbliższych tygodniach.', 'No events in the coming weeks.') },
+  sem: { tytul: T('Seminaria', 'Seminars'), zakres, link: T('Wszystkie →', 'All →'), adres: '/seminaria', wsz: T('Wszystkie seminaria →', 'All seminars →'), pozycje: seminaria, pusto: T('W tym tygodniu nie ma referatów.', 'No talks this week.'), prelegent: true },
+  akt: { tytul: T('Aktualności', 'News'), link: T('Wszystkie →', 'All →'), adres: '/aktualnosci', wsz: T('Wszystkie aktualności →', 'All news →'), pozycje: aktualnosci, pusto: T('Brak aktualności.', 'No news.'), min: true },
+} as const;
+const SLOTY = ['wyd', 'sem', 'akt'] as const;
+
+// Szybki dostęp: kafelki z Ustawień („Na skróty”, pierwsze cztery); kolor dnia jak w kafelku KafelekKoloryDni
+const KOLORY_DNI = '/studia/rok-akademicki';
+const dzis = tekstDnia(today(), lang);
+const osob = (await pracownicy()).filter((p) => p.data.grupa !== 'emeryt').length;
+const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
+  const adres = k.adres as string;
+  if (adres === KOLORY_DNI) return { adres, kd: true, tytul: !dzis.kolor && !dzis.nastepny ? (wybierz(k, 'etykieta', lang) as string) : dzis.tytul, opis: dzis.opis };
+  const sem = (plan.semestry as any[]).find((x) => x.od <= today() && today() <= x.do) ?? (plan.semestry as any[])[0];
+  const opis = adres === '/studia/plan-zajec' && sem ? ((en && sem.nazwa_en) || sem.nazwa).replace(/^Semestr/, 'semestr').replace(/^Winter/, 'winter').replace(/^Summer/, 'summer')
+    // „e-maile”: po łączniku U+2060 (łącznik słów, bez szerokości), żeby wyraz się nie łamał (zlecenie 26, punkt 4.2); łącznika niełamiącego
+    // U+2011 Manrope nie ma, przeglądarka wzięłaby go z innego kroju
+    : adres === '/pracownicy' ? T(`${osob} osób, pokoje, e-⁠maile`, `${osob} people, rooms, e-⁠mails`)
+    : adres === '/seminaria' ? T(`${seminaria.length} ${seminaria.length === 1 ? 'referat' : 'referatów'} w tym tygodniu`, `${seminaria.length} talks this week`)
+    : (wybierz(k, 'opis', lang) as string) || '';
+  return { adres, kd: false, tytul: wybierz(k, 'etykieta', lang) as string, opis };
+});
+
+// Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi) z listy w Ustawieniach (studia.kierunki, kolejność listy;
+// kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28), opis i rekrutacja z Ustawień
+const st = ustawienia.studia as any;
+const kierunki = (await pozycjeKierunkow()).filter((p) => p.na_stronie_glownej !== false).map((p) => ({
+  poziom: wybierz(p, 'poziom', lang) || (p.kierunek ? T('Kierunek', 'Programme') : ''),
+  nazwa: wybierz(p, 'nazwa', lang) || (p.kierunek ? wybierz(p.kierunek.data, 'nazwa', lang) : ''),
+  opis: wybierz(p, 'opis', lang),
+  adres: p.adres,
+})).map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
+
+// Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł). Jak dotąd na stronie głównej (decyzja 30.10.2026, WartoWiedziec.astro):
+// w HTML wszystkie pozycje „na głównej”, widoczne pierwsze cztery („Zawsze pokazuj” najpierw, dalej wg kolejności — to widzą
+// przeglądarki bez JS), a skrypt w linii zaraz pod listą losuje pozostałe miejsca przed narysowaniem strony.
+const WARTO_ILE = 4;
+const warto = (await getCollection('warto_wiedziec'))
+  .filter((w) => w.data.opublikowany !== false && w.data.na_glownej)
+  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
+  .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze))
+  .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: w.body?.trim() ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
+// (tylko na komputerze — na telefonie ten blok jest schowany i losuje własna lista w StronaGlowna.astro)
+const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOMPUTER}').matches)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
+  `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
+  `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
+  `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
+---
+<section class="z-druga" aria-label={T('Szybki dostęp', 'Quick access')}>
+  <nav class="z-skr" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
+    <h2>{T('Szybki dostęp', 'Quick access')}</h2>
+    {skr.map((k) => k.kd ? (
+      <a class="z-skr-kd" href={href(k.adres)} data-kd-kafelek data-etykieta={k.tytul} data-kolor={dzis.kolor ?? 'brak'} data-zamiana={dzis.zamiana ?? ''} data-nastepny={dzis.nastepnyKolor ?? ''}>
+        <b data-kd-tytul>{k.tytul}</b><small><span class="z-kd-kropka" aria-hidden="true" data-kd-litera>{dzis.litera}</span><span data-kd-opis>{k.opis}</span></small>
+      </a>
+    ) : (
+      <Link href={href(k.adres)}><b>{k.tytul}</b>{k.opis && <small>{k.opis}</small>}</Link>
+    ))}
+  </nav>
+  <div class="z-siatka" data-z-siatka data-dalej={T('… czytaj dalej', '… read more')}>
+    {SLOTY.map((key, slot) => {
+      const k = KOL[key];
+      // na komputerze wyróżniony wpis liczy się za dwa: w krótkiej kolumnie obok niego jeszcze jeden zwykły wiersz; na telefonie zawsze trzy wiersze
+      const ileWidac = (k.pozycje[0] as Wiersz | undefined)?.wyr ? 2 : 3;
+      const wiersze = k.pozycje.map((o) => (
+        <Link class:list={['z-w', o.minelo && 'minelo', o.wyr && 'wyr']} href={o.adres ? href(o.adres) : undefined} data-dzial={o.dzial} data-koniec={o.koniec}>
+          <span class="kiedy"><b>{o.d}</b>{o.m}</span>
+          <span class="tr">
+            <span class="gdzie">{o.gdzie}{o.co && <i> · {o.co}</i>}</span>
+            <span class="t">{o.polski ? <><span lang="pl">{o.tytul}</span>{' '}{DOPISEK_PO_POLSKU}</> : o.tytulLang ? <span lang={o.tytulLang}>{o.tytul}</span> : o.tytul}{o.kto && <> <span class="kto">– {o.kto}</span></>}</span>
+            {o.zaj && <span class="zaj" lang={o.zajLang}>{o.zaj}</span>}
+          </span>
+          {'min' in k && (o.min
+            ? <span class="min">{o.wyr
+                ? <ZdjecieZ src={o.min} sizes={(p) => `${sizesTelefon(`${Math.ceil(Math.max(64, 48 * p))}px`)}, (max-width: 1179px) 280px, ${Math.ceil(Math.max(78, 59 * p))}px`} szerokosci={[240, 336, 480, 640, 960]} />
+                : <ZdjecieZ src={o.min} sizes={rozmiarPola(['telefon', 64, 48], [null, 56, 42])} />}</span>
+            : <span class="min zastepcza">{o.dzial && <Szkic dzial={o.dzial} rodzaj="sygnet" />}</span>)}
+        </Link>
+      ));
+      return (
+        <section class="z-kolumna" data-key={key} data-slot={slot} aria-labelledby={`z-h-${key}`}>
+          <div class="z-h"><h2 id={`z-h-${key}`} tabindex="-1">{k.tytul}{'zakres' in k && <>{' '}<small>{k.zakres}</small></>}</h2><a href={href(k.adres)}>{k.link}</a></div>
+          <div class="lista"><div class="lista-in">
+            <div class="pozycje">{wiersze}{(k.pozycje.length === 0 || key === 'wyd') && <p class="z-pusto" hidden={k.pozycje.length > 0}>{k.pusto}</p>}</div>
+            <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze {n}', '{n} more')}>{k.wsz}</a>
+          </div></div>
+          {/* N na komputerze (.z-ile-k) i telefonie (.z-ile-t, zawsze 3 widoczne); przycisk jest też przy jednej pozycji mniej, bo na niskim oknie
+              krótka kolumna pokazuje o jedną mniej (zlecenie 26, punkt 3) — wtedy schowany, dopóki nic nie jest ukryte (liczWiecej() w drugi-ekran.ts) */}
+          {k.pozycje.length >= ileWidac && (
+            <button type="button" class="z-wiecej" data-key={key} hidden={k.pozycje.length <= ileWidac}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'Show more')} (<span class="z-ile-k">{Math.max(0, k.pozycje.length - ileWidac)}</span><span class="z-ile-t">{Math.max(0, k.pozycje.length - 3)}</span>)</span></button>
+          )}
+        </section>
+      );
+    })}
+    <section class="z-studia" data-dzial="studia" aria-labelledby="z-h-studia">
+      <div>
+        <span class="gdzie">{T('Studia', 'Studies')}</span>
+        <h2 id="z-h-studia"><Link class="h-link" href={st.rekrutacja}>{T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}</Link></h2>
+        <p>{wybierz(st, 'opis', lang)}</p>
+        <Link class="z-rekr-link" href={st.rekrutacja}>{T('Rekrutacja na studia', 'Admission')}{!isExternal(st.rekrutacja) && <span aria-hidden="true"> →</span>}</Link>
+      </div>
+      <nav class="z-kier" aria-label={T('Kierunki', 'Programmes')}>
+        {kierunki.map((k) => (
+          <Link href={href(k.adres)}><small>{k.poziom}</small><b title={k.skrot ? k.pelna : undefined}>{k.skrot ?? k.nazwa}</b><span>{k.opis}</span></Link>
+        ))}
+      </nav>
+    </section>
+    {warto.length > 0 && (
+      <section class="z-warto" data-dzial="instytut" aria-labelledby="z-h-warto">
+        <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Did you know')}</h2><a href={href('/warto-wiedziec')}>{T('Wszystkie →', 'All →')}</a></div>
+        <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((w, i) => <Link href={href(w.adres)} data-zawsze={w.zawsze ? '' : undefined} hidden={i >= WARTO_ILE}><span>{w.rok}</span><b class="t">{w.tytul}</b></Link>)}</div>
+        <script is:inline set:html={LOSUJ} />
+      </section>
+    )}
+  </div>
+</section>
+<script>import '../../scripts/zal/drugi-ekran';</script>
+<script>import '../../scripts/zal/kolor-dnia';</script>

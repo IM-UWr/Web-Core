@@ -1,0 +1,82 @@
+---
+// Władze Instytutu na komputer (kierunek „Założyciele”, prototyp: Instytut → Władze): schemat dyrekcji — dyrektor wyróżniony,
+// pod nim zastępcy połączeni cienkimi liniami; zdjęcia osób (dyrektor 120×150, zastępcy 96×120, władze Wydziału 76×95),
+// dalej Władze Wydziału w dwóch kolumnach, Sekretariat jako blok kontaktu (bez zdjęć), Kadencja, Rada Instytutu, Zobacz też.
+// Dane przygotowuje src/lib/widoki/wladze.ts (to samo co dla telefonu), tu tylko wyświetlanie.
+import Link from '../Link.astro';
+import '../../styles/zalozyciele-strony.css';
+import OsobaZ from './OsobaZ.astro';
+import { u, isExternal } from '../../lib/url';
+import { wJezyku } from '../../lib/i18n';
+import { mailHtml } from '../../lib/limity.mjs';
+import type { Lang } from '../../lib/daty';
+
+type Os = { rola: string; nazwa: string; inicjaly: string; email: string; pokoj: string; strona: string; zakres: string; dyzur: string; zdjecie: string; zaklad?: { nazwa: string; adres: string } };
+interface Props {
+  lang: Lang;
+  wstep?: string;
+  dyrektor?: Os; zastepcy: Os[];
+  wydzial: { tytul: string; opis: string; osoby: Os[]; link?: { etykieta: string; adres: string } };
+  sekretariat?: { nazwa: string; opis: string; email?: string; telefony: string[]; adres: string; pokoj?: string; godziny: string; osoby: { nazwa: string; email: string; telefon: string }[] };
+  kadencjaHtml?: string; radaHtml?: string; radaTytul: string;
+  linki: { etykieta: string; adres: string }[];
+}
+const { lang, wstep, dyrektor, zastepcy, wydzial, sekretariat, kadencjaHtml, radaHtml, radaTytul, linki } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
+const tel = (n: string) => { const c = n.replace(/[^\d+]/g, ''); return `tel:${c.startsWith('+') ? c : `+48${c}`}`; };
+const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
+---
+{dyrektor && (
+  <section id="z-dyrekcja" aria-labelledby="z-dyrekcja-h">
+    <h2 id="z-dyrekcja-h">{T('Dyrekcja', 'Management')}</h2>
+    {wstep && <p class="wst">{wstep}</p>}
+    <div class="z-drzewo">
+      <OsobaZ o={dyrektor} lang={lang} class="z-dyr" />
+      {zastepcy.length > 0 && <div class="z-zast">{zastepcy.map((o) => <OsobaZ o={o} lang={lang} />)}</div>}
+    </div>
+  </section>
+)}
+{wydzial.osoby.length > 0 && (
+  <section id="z-wydzial" aria-labelledby="z-wydzial-h">
+    <h2 id="z-wydzial-h">{wydzial.tytul}</h2>
+    {wydzial.opis && <p class="wst">{wydzial.opis}</p>}
+    <div class="z-dwie">
+      {wydzial.osoby.map((o) => <OsobaZ o={o} lang={lang} zakres={false} />)}
+    </div>
+    {wydzial.link && <p class="z-link-dalej"><Link href={href(wydzial.link.adres)}>{wydzial.link.etykieta}</Link></p>}
+  </section>
+)}
+{sekretariat && (
+  <section id="z-sekretariat" aria-labelledby="z-sekretariat-h">
+    <h2 id="z-sekretariat-h">{sekretariat.nazwa}</h2>
+    {sekretariat.opis && <p class="wst">{sekretariat.opis}</p>}
+    <div class="z-kont">
+      <dl>
+        {sekretariat.email && <div><dt>{T('E-mail', 'E-mail')}</dt><dd><a href={`mailto:${sekretariat.email}`} data-limit-linii="2" set:html={mailHtml(sekretariat.email)} /></dd></div>}
+        {sekretariat.telefony.length > 0 && <div><dt>{T('Telefon', 'Phone')}</dt><dd>{sekretariat.telefony.map((n, i) => <>{i > 0 && ', '}<a href={tel(n)}>{n}</a></>)}</dd></div>}
+        {(sekretariat.adres || sekretariat.pokoj) && <div><dt>{T('Adres', 'Address')}</dt><dd>{[sekretariat.adres, sekretariat.pokoj && pok(sekretariat.pokoj)].filter(Boolean).join(', ')}</dd></div>}
+        {sekretariat.godziny && <div><dt>{T('Godziny', 'Hours')}</dt><dd>{sekretariat.godziny}</dd></div>}
+      </dl>
+      {sekretariat.osoby.length > 0 && (
+        <div class="z-sek-osoby">
+          {sekretariat.osoby.map((o) => (
+            <div class="z-os"><div class="imie" data-limit-linii="2">{o.nazwa}</div><div class="kont">{o.email && <a href={`mailto:${o.email}`} data-limit-linii="2" set:html={mailHtml(o.email)} />}{o.telefon && <> · <a href={tel(o.telefon)}>{o.telefon}</a></>}</div></div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+)}
+{kadencjaHtml && (
+  <section id="z-kadencja" aria-labelledby="z-kadencja-h"><h2 id="z-kadencja-h">{T('Kadencja', 'Term of office')}</h2><div class="z-proza tresc"><div class="prose" set:html={kadencjaHtml} /></div></section>
+)}
+{radaHtml && (
+  <section id="z-rada" aria-labelledby="z-rada-h"><h2 id="z-rada-h">{radaTytul}</h2><div class="z-proza tresc"><div class="prose" set:html={radaHtml} /></div></section>
+)}
+{linki.length > 0 && (
+  <section id="z-zobacz" aria-labelledby="z-zobacz-h">
+    <h2 id="z-zobacz-h">{T('Zobacz też', 'See also')}</h2>
+    <ul class="z-zob">{linki.map((l) => <li><Link href={href(l.adres)}>{l.etykieta}</Link></li>)}</ul>
+  </section>
+)}

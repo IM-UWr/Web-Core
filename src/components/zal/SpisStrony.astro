@@ -1,0 +1,109 @@
+---
+// „Na tej stronie” — spis sekcji podstrony (kierunek „Założyciele”; zlecenie 11, zalecenie 3: wariant „kreska”, wzór
+// w prototypie: zbudujSpis / odswiezSpis, .spis-p, [data-bok="A"]). Jedna wersja HTML (style: src/styles/zal-podstrona.css):
+// - komputer: kolumna z prawej (236 px), przyklejona; nad listą „Na tej stronie” w kolorze działu, lista z cienką linią
+//   po lewej, bieżąca sekcja pogrubiona, a na linii odcinek 3 px w kolorze działu, który przesuwa się między pozycjami;
+// - telefon (≤ 1023 px): bez spisu (zlecenie 18, punkt 18).
+// - gdy na podstronie brakuje miejsca (.z-pd[data-pole="zwiniete"], pomiar w zal/Podstrona.astro; zlecenie 25, punkt 1): pole zwinięte nad treścią, wygląd i działanie sprzed
+//   punktu 18: przycisk z nazwą, lista po rozwinięciu, kliknięcie w pozycję zwija. Bez JS lista otwarta.
+// Bieżąca sekcja: ostatnia, której początek minął ok. 30% wysokości okna (aria-current="location"). Kliknięcie — płynne
+// przewinięcie (20 px zapasu; przy „ogranicz ruch” od razu). Zwykłe linki #kotwica, więc działają też bez JS.
+// Sekcje schowane (filtr planu, inny semestr) znikają ze spisu; widok może poprosić o odświeżenie zdarzeniem `z-spis`.
+// spis: { id, etykieta, krotka? } — w spisie krótka etykieta (np. kategorie planu), w nagłówku sekcji pełna.
+// Strony z mniej niż 2 sekcjami nie mają spisu (komponent nic nie wstawia; kolumna treści zostaje tej samej szerokości).
+import type { Lang } from '../../lib/daty';
+
+interface Props { spis: { id: string; etykieta: string; krotka?: string }[]; lang: Lang }
+const { spis, lang } = Astro.props;
+const tytul = lang === 'en' ? 'On this page' : 'Na tej stronie';
+---
+{spis.length >= 2 && (
+  <nav class="z-spis" aria-labelledby="z-spis-h" data-pagefind-ignore data-z-spis>
+    <p class="z-spis-h" id="z-spis-h">{tytul}</p>
+    <button type="button" class="z-spis-przelacz" aria-expanded="false" aria-controls="z-spis-lista">{tytul}<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <ul class="z-spis-lista" id="z-spis-lista">
+      {spis.map((s) => <li><a href={`#${s.id}`} title={s.krotka && s.krotka !== s.etykieta ? s.etykieta : undefined}>{s.krotka ?? s.etykieta}</a></li>)}
+      <li class="z-spis-znacznik" aria-hidden="true"></li>
+    </ul>
+  </nav>
+)}
+
+<script>
+  import { MQ_TELEFON } from '../../lib/media';
+
+  const spis = document.querySelector<HTMLElement>('[data-z-spis]');
+  const lista = spis?.querySelector<HTMLElement>('.z-spis-lista');
+  const znacznik = spis?.querySelector<HTMLElement>('.z-spis-znacznik');
+  if (spis && lista && znacznik) {
+    const telefon = matchMedia(MQ_TELEFON);
+    const bezRuchu = matchMedia('(prefers-reduced-motion: reduce)');
+
+    const pozycje = Array.from(lista.querySelectorAll<HTMLAnchorElement>('li > a')).map((a) => ({ a, li: a.parentElement as HTMLElement }));
+    const cel = (a: HTMLAnchorElement) => {
+      try { return document.getElementById(decodeURIComponent(a.hash.slice(1))); } catch { return null; }
+    };
+    const widoczny = (el: HTMLElement | null): el is HTMLElement => !!el && el.getClientRects().length > 0;
+
+    // stan zwinięty nad treścią: przycisk rozwija listę, wybór pozycji ją zwija
+    const przelacz = spis.querySelector<HTMLButtonElement>('.z-spis-przelacz');
+    const ustawOtwarty = (otwarty: boolean) => {
+      przelacz?.setAttribute('aria-expanded', String(otwarty));
+      spis.classList.toggle('z-spis-otwarty', otwarty);
+    };
+    przelacz?.addEventListener('click', () => ustawOtwarty(!spis.classList.contains('z-spis-otwarty')));
+
+    let ramka = 0;
+    const zaplanuj = () => { cancelAnimationFrame(ramka); ramka = requestAnimationFrame(odswiez); };
+
+    // pozycja wybrana kliknięciem zostaje bieżąca do następnego przewinięcia przez użytkownika (krótka ostatnia sekcja
+    // może nie dojść do linii 30% okna, a płynne przewijanie nie powinno „przeskakiwać” znacznikiem po drodze)
+    let wybrana: (typeof pozycje)[number] | undefined;
+    const zwolnij = () => { if (wybrana) { wybrana = undefined; zaplanuj(); } };
+    ['wheel', 'touchstart', 'keydown'].forEach((t) => window.addEventListener(t, zwolnij, { passive: true }));
+
+    // spis dłuższy niż okno: zanikanie przy dolnej krawędzi pokazuje, że jest więcej (zlecenie 25, punkt 2.15)
+    const wiecej = () => spis.classList.toggle('z-spis-wiecej', spis.scrollHeight - spis.clientHeight - spis.scrollTop > 1);
+    spis.addEventListener('scroll', wiecej, { passive: true });
+
+    const odswiez = () => {
+      if (telefon.matches) return; // na telefonie spis jest schowany
+      wiecej();
+      // pozycje, których sekcja jest schowana (filtr, inny semestr), znikają ze spisu
+      pozycje.forEach((p) => { p.li.hidden = !widoczny(cel(p.a)); });
+      const widoczne = pozycje.filter((p) => !p.li.hidden);
+      const dol = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      const prog = window.innerHeight * 0.3;
+      let biezaca = widoczne[0];
+      for (const p of widoczne) if ((cel(p.a)?.getBoundingClientRect().top ?? Infinity) <= prog) biezaca = p;
+      // na samym dole strony krótka ostatnia sekcja nie dojdzie do linii — wtedy ostatnia
+      if (dol && widoczne.length) biezaca = widoczne[widoczne.length - 1];
+      if (wybrana && !wybrana.li.hidden) biezaca = wybrana;
+      pozycje.forEach((p) => (p === biezaca ? p.a.setAttribute('aria-current', 'location') : p.a.removeAttribute('aria-current')));
+      if (biezaca) {
+        // położenie i długość przez transform (zlecenie 13, punkt 8: przesuwanie bez przeliczania układu)
+        znacznik.style.transform = `translateY(${biezaca.li.offsetTop}px) scaleY(${biezaca.li.offsetHeight})`;
+        znacznik.hidden = false;
+      } else znacznik.hidden = true;
+    };
+
+    // kliknięcie: płynne przewinięcie do sekcji (20 px zapasu), przy „ogranicz ruch” od razu
+    pozycje.forEach(({ a }) => a.addEventListener('click', (e) => {
+      ustawOtwarty(false);
+      const el = cel(a);
+      if (!el) return;
+      e.preventDefault();
+      wybrana = pozycje.find((p) => p.a === a);
+      const zapas = parseFloat(getComputedStyle(el).scrollMarginTop) || 20;
+      window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top - zapas, behavior: bezRuchu.matches ? 'auto' : 'smooth' });
+      history.replaceState(history.state, '', a.hash);
+      el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
+    }));
+
+    window.addEventListener('scroll', zaplanuj, { passive: true });
+    window.addEventListener('resize', zaplanuj);
+    document.addEventListener('z-spis', zaplanuj);
+    document.fonts?.ready.then(zaplanuj);
+    odswiez();
+  }
+</script>

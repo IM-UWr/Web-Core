@@ -1,0 +1,56 @@
+diff --git a/.pages.yml b/.pages.yml
+index 3b7ac7b..1f61753 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -228,6 +228,9 @@ content:
+     - name: opis
+       label: Dopisek (np. rok, poziom)
+       type: string
++    - name: opis_en
++      label: 'EN: dopisek (puste = wersja angielska pokaże dopisek po polsku; temat zostaje w oryginale)'
++      type: string
+   - name: dokumenty
+     label: Dokumenty
+     type: object
+diff --git a/src/content/specjalnosci/matematyka-nauczycielska.md b/src/content/specjalnosci/matematyka-nauczycielska.md
+index a49add5..5055ced 100644
+--- a/src/content/specjalnosci/matematyka-nauczycielska.md
++++ b/src/content/specjalnosci/matematyka-nauczycielska.md
+@@ -310,26 +310,37 @@ kariera_en: |-
+ tematy_prac:
+ - tytul: Klasyfikacja parkietaży izohedralnych o niesymetrycznych płytkach
+   opis: praca absolwentki specjalności, promotor prof. Jacek Świątkowski; wyróżnienie w konkursie mBanku „Krok w Przyszłość” (2019; źródło — aktualności IM)
++  opis_en: "thesis by a graduate of the specialisation, supervisor: Prof. Jacek Świątkowski; honourable mention in mBank’s “Krok w Przyszłość” (Step into the Future) competition (2019; source: Institute news)"
+ - tytul: Metody rozwiązywania zadań z teorii liczb na Olimpiadzie Matematycznej
+   opis: temat pracy magisterskiej, promotor dr Jarosław Wróblewski (listy tematów z 2022 i 2024 r.)
++  opis_en: "master’s thesis topic, supervisor: Dr Jarosław Wróblewski (2022 and 2024 topic lists)"
+ - tytul: Rozwiązywanie zadań z wykorzystaniem niezmienników na Olimpiadzie Matematycznej
+   opis: temat pracy magisterskiej, promotor dr Jarosław Wróblewski (listy tematów z 2022 i 2024 r.)
++  opis_en: "master’s thesis topic, supervisor: Dr Jarosław Wróblewski (2022 and 2024 topic lists)"
+ - tytul: Metody rozwiązywania zadań z nierównościami na Olimpiadzie Matematycznej
+   opis: temat pracy magisterskiej, promotor dr Jarosław Wróblewski (listy tematów z 2022 i 2024 r.)
++  opis_en: "master’s thesis topic, supervisor: Dr Jarosław Wróblewski (2022 and 2024 topic lists)"
+ - tytul: Pałeczki Nepera i maszyna Schickarda
+   opis: praca licencjacka na specjalności, historia matematyki (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, history of mathematics (2017 list)"
+ - tytul: Maszyna arytmetyczna Słonimskiego
+   opis: praca licencjacka na specjalności, historia matematyki (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, history of mathematics (2017 list)"
+ - tytul: Strategie sprytnych rachunków
+   opis: praca licencjacka na specjalności, arytmetyka (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, arithmetic (2017 list)"
+ - tytul: Metody trysekcji kąta
+   opis: praca licencjacka na specjalności, geometria (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, geometry (2017 list)"
+ - tytul: Parkietaże wielokątowe odbiciowe
+   opis: praca licencjacka na specjalności, geometria (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, geometry (2017 list)"
+ - tytul: Symetrie „Linii rytmicznych” Wacława Szpakowskiego
+   opis: praca licencjacka na specjalności, matematyka i sztuka (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, mathematics and art (2017 list)"
+ - tytul: Gotycka geometria (rozety, maswerki, ostrołuki)
+   opis: praca licencjacka na specjalności, matematyka i sztuka (lista z 2017 r.)
++  opis_en: "bachelor’s thesis in the specialisation, mathematics and art (2017 list)"
+ dokumenty:
+ - nazwa: Zasady realizacji kształcenia przygotowującego do wykonywania zawodu nauczyciela (program z 2022 r.)
+   nazwa_en: Rules for teacher training (2022 curriculum, Polish)

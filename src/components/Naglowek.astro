@@ -1,98 +1,53 @@
 ---
-// Nagłówek: logo, menu z rozwijanymi grupami (dane w src/data/nawigacja.json),
-// wyszukiwarka, przełącznik języka i trybu ciemnego, menu na telefon.
+// Nagłówek na telefon (≤ 1023 px; na komputerze schowany — tam jest pasek menu zal/PasekMenu.astro): logo, nazwa, przełącznik
+// języka z flagą języka docelowego, tryb ciemny i hamburger. Menu to ten sam panel co na komputerze (zal/PanelMenu.astro,
+// zlecenie 18, punkt 6); renderuje go PasekMenu, id przychodzi z Baza.astro, otwiera src/scripts/zal/menu.ts.
+// Kolor według zasad paska komputera (zlecenie 21, punkt 2): klasy .przewiniety i .jasny ustawia src/scripts/zal/pasek.ts, style w zal-telefon.css.
+// Strona główna: na okładce zamiast nazwy Instytutu nazwa Wydziału (link na jego stronę), krojem z okładki komputera; po zjechaniu
+// z okładki znów Instytut (zlecenie 18, punkt 12). Dwa linki w jednym miejscu, widoczny jeden (zal-telefon.css); bez JS zostaje Wydział.
 import Ikona from './Ikona.astro';
-import { menuGlowne, type Pozycja } from '../lib/menu';
+import Flaga from './zal/Flaga.astro';
 import ustawienia from '../data/ustawienia.json';
-import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz } from '../lib/i18n';
+import { u } from '../lib/url';
+import { t, wJezyku, wydzialLinie, WMI_ADRES } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
-// naZdjeciu: strona główna z banerem — nagłówek leży na przyciemnionym zdjęciu, po przewinięciu robi się zwykły (biały)
-interface Props { lang: Lang; sciezka: string; inny: string | null; naZdjeciu?: boolean }
-const { lang, sciezka, inny, naZdjeciu = false } = Astro.props;
-
-const menu: Pozycja[] = await menuGlowne();
-
-const bezJezyka = sciezka.replace(/^\/en(?=\/|$)/, '') || '/';
-const pasuje = (adres: string) => !isExternal(adres) && adres !== '/' && (bezJezyka === adres || bezJezyka.startsWith(adres.replace(/#.*$/, '') + '/'));
-const aktywna = (p: Pozycja) => (p.adres ? pasuje(p.adres) : false) || (p.grupy ?? []).some((g) => g.linki.some((l) => pasuje(l.adres)));
-const tuJestem = (adres?: string) => !!adres && !isExternal(adres) && bezJezyka.replace(/\/$/, '') === adres.replace(/\/$/, '');
-const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
+interface Props { lang: Lang; sciezka: string; inny: string | null; idPanelu: string; naOkladce?: boolean }
+const { lang, inny, idPanelu, naOkladce = false } = Astro.props;
+const [wydz1, wydz2] = wydzialLinie(lang);
 const logo = (ustawienia as any).logo as string | undefined;
 // logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
 const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
+const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
-<header class:list={['hdr', { 'hdr-foto': naZdjeciu }]}>
+<header class="hdr">
   <div class="wrap hdr-row">
-    <div class="brand">
+    <div class:list={['brand', { 'brand-okladka': naOkladce }]}>
       <a class:list={['brand-uwr', { 'brand-uwr-logo': !logo }]} href={uwrAdres} aria-label={t(lang, 'uwrStronaGlowna')}>
         {logo
           ? <img src={u(logo)} alt="" width="44" height="44" />
           : <span class="brand-logo" aria-hidden="true" style={`--logo-pelne:url(${u('/pliki/uwr-logo.png')});--logo-godlo:url(${u('/pliki/uwr-godlo.png')})`}></span>}
       </a>
+      {naOkladce && (
+        <a class="brand-txt z-wydzial" href={WMI_ADRES}>
+          {/* jak znak wydziału na okładce komputera: bez widocznej ↗ (wyjątek z zalecenia 23), dopisek tylko dla czytników ekranu */}
+          <span class="sr-only">{lang === 'en' ? '(external site) ' : '(inna strona) '}</span>
+          <span class="z-wydzial-nazwa">{wydz1}{wydz2 && <>{' '}<br />{wydz2}</>}</span>
+        </a>
+      )}
       <a class="brand-txt" href={u(wJezyku('/', lang))}>
         <span class="brand-name">{t(lang, 'instytut')}</span>
         <span class="brand-sub">{t(lang, 'wydzial')}</span>
       </a>
     </div>
 
-    <nav class="nav" aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
-      {menu.map((p, i) =>
-        p.grupy ? (
-          <div class:list={['nav-item', { 'is-current': aktywna(p) }]}>
-            <span class="nav-pill">
-              {p.adres
-                ? <a class="nav-top" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
-                : <button type="button" class="nav-top" data-rozwin aria-expanded="false" aria-controls={`menu-${i}`}>{wybierz(p, 'etykieta', lang)}</button>}
-              <button type="button" class="nav-arrow" data-rozwin aria-expanded="false" aria-controls={`menu-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={14} /></button>
-            </span>
-            <div class="dropdown" id={`menu-${i}`}>
-              {p.grupy.map((g) => (
-                <div class="dropdown-group">
-                  <h3>{wybierz(g, 'nazwa', lang)}</h3>
-                  {g.linki.map((l) => {
-                    // Ikonka linku zewnętrznego stoi tuż za ostatnim słowem (sklejona z nim, żeby nie spadła sama
-                    // do nowej linii) — także gdy długi napis się zawija.
-                    const tekst = wybierz(l, 'etykieta', lang) as string;
-                    const s = tekst.lastIndexOf(' ');
-                    return isExternal(l.adres) ? (
-                      <a class="zew" href={href(l.adres)}>
-                        {s > 0 && tekst.slice(0, s + 1)}<span class="nw">{tekst.slice(s + 1)}<Ikona nazwa="zewnetrzny" rozmiar={13} /></span>
-                      </a>
-                    ) : (
-                      <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>{tekst}</a>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <a href={href(p.adres!)} aria-current={aktywna(p) ? 'page' : undefined}>
-            {wybierz(p, 'etykieta', lang)}
-            {isExternal(p.adres!) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-          </a>
-        )
-      )}
-    </nav>
-
     <div class="hdr-tools">
-      <form class="hdr-search" role="search" action={u(wJezyku('/szukaj', lang))} method="get">
-        <Ikona nazwa="szukaj" rozmiar={18} />
-        <label class="sr-only" for="szukaj-naglowek">{t(lang, 'szukaj')}</label>
-        <input id="szukaj-naglowek" type="search" name="q" placeholder={t(lang, 'szukaj')} />
-        <button type="submit" class="sr-only">{t(lang, 'szukaj')}</button>
-      </form>
-      <a class="icon-btn search-narrow" href={u(wJezyku('/szukaj', lang))} aria-label={t(lang, 'szukaj')}><Ikona nazwa="szukaj" /></a>
-      {inny && (
-        <a class="icon-btn hide-narrow" href={u(inny)} hreflang={lang === 'pl' ? 'en' : 'pl'} lang={lang === 'pl' ? 'en' : 'pl'} aria-label={t(lang, 'innyJezyk')}>{t(lang, 'innyJezykKrotko')}</a>
-      )}
+      {inny && <a class="icon-btn z-jezyk" href={u(inny)} hreflang={doJezyka} lang={doJezyka} aria-label={t(lang, 'innyJezyk')}><Flaga jezyk={doJezyka} />{t(lang, 'innyJezykKrotko')}</a>}
       <button type="button" class="icon-btn" data-motyw aria-label={t(lang, 'motyw')}>
         <Ikona nazwa="ksiezyc" class="when-light" />
         <Ikona nazwa="slonce" class="when-dark" />
       </button>
-      <button type="button" class="icon-btn burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls="menu-telefon" data-burger data-otworz={t(lang, 'otworzMenu')} data-zamknij={t(lang, 'zamknijMenu')}>
+      <button type="button" class="icon-btn burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls={idPanelu} data-burger data-z-menu-otworz data-otworz={t(lang, 'otworzMenu')} data-zamknij={t(lang, 'zamknijMenu')}>
         <Ikona nazwa="menu" class="when-closed" />
         <Ikona nazwa="zamknij" class="when-open" />
       </button>
@@ -100,48 +55,12 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
   </div>
 </header>
 
-{/* Menu na telefon: panel wysuwany z prawej pod nagłówkiem, nad treścią strony (strona się nie przesuwa).
-     Po lewej zostaje przyciemniony pasek strony (.mnav-tlo) — klik w niego zamyka menu. Poza <header>, żeby
-     panel zawsze liczył położenie od okna (nagłówek na zdjęciu ma chwilami backdrop-filter). */}
-<div class="mnav-tlo" data-mnav-tlo aria-hidden="true"></div>
-<nav class="mnav" id="menu-telefon" aria-label={lang === 'en' ? 'Main menu (mobile)' : 'Menu główne (telefon)'}>
-  {/* Dział z listą: napis prowadzi na stronę działu (jak na komputerze), strzałka za kreską rozwija listę.
-       Otwarta jest tylko jedna lista naraz (skrypt niżej). Dział bez własnej strony: cały wiersz rozwija listę.
-       Na pierwszej pozycji „Strona główna” — na wszystkich stronach poza samą stroną główną. */}
-  {bezJezyka !== '/' && <a href={u(wJezyku('/', lang))}>{t(lang, 'stronaGlowna')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
-  {menu.map((p, i) =>
-    p.grupy ? (
-      <div class="mitem">
-        <div class="mrow">
-          {p.adres ? (
-            <a class="mrow-link" href={href(p.adres)} aria-current={tuJestem(p.adres) ? 'page' : undefined}>{wybierz(p, 'etykieta', lang)}</a>
-          ) : (
-            <button type="button" class="mrow-link" data-mrozwin aria-expanded="false" aria-controls={`mgroup-${i}`}>{wybierz(p, 'etykieta', lang)}</button>
-          )}
-          <button type="button" class="mrow-btn" data-mrozwin aria-expanded="false" aria-controls={`mgroup-${i}`} aria-label={`${wybierz(p, 'etykieta', lang)}: ${lang === 'en' ? 'show links' : 'pokaż listę'}`}><Ikona nazwa="dol" class="chev" rozmiar={18} /></button>
-        </div>
-        <div class="mgroup" id={`mgroup-${i}`} hidden>
-          {p.grupy.map((g) => (
-            <>
-              <h3>{wybierz(g, 'nazwa', lang)}</h3>
-              {g.linki.map((l) => (
-                <a href={href(l.adres)} aria-current={pasuje(l.adres) ? 'page' : undefined}>
-                  {wybierz(l, 'etykieta', lang)}
-                  {isExternal(l.adres) && <Ikona nazwa="zewnetrzny" rozmiar={13} />}
-                </a>
-              ))}
-            </>
-          ))}
-        </div>
-      </div>
-    ) : (
-      <a href={href(p.adres!)}>{wybierz(p, 'etykieta', lang)}<Ikona nazwa="strzalka" rozmiar={18} /></a>
-    )
-  )}
-  {inny && <a href={u(inny)} lang={lang === 'pl' ? 'en' : 'pl'}>{t(lang, 'innyJezyk')}<Ikona nazwa="strzalka" rozmiar={18} /></a>}
-</nav>
+{/* przyciemnienie strony pod panelem menu: panel to zal/PanelMenu.astro, przy pasku menu (src/styles/zal-menu.css) */}
+<div class="z-menu-tlo" data-z-menu-tlo aria-hidden="true"></div>
 
 <script>
+  import '../scripts/zal/menu';
+
   // Tryb ciemny
   document.querySelectorAll<HTMLButtonElement>('[data-motyw]').forEach((b) =>
     b.addEventListener('click', () => {
@@ -152,139 +71,15 @@ const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/
     })
   );
 
-  // Pływający nagłówek: cień po przewinięciu; na stronie głównej przezroczysty na zdjęciu tylko u góry strony
-  // a na samym dole każdej strony przyjmuje kolor stopki
-  const hdr = document.querySelector<HTMLElement>('.hdr');
-  const stopka = document.querySelector<HTMLElement>('.ftr');
-  const odswiezNaglowek = () => {
-    if (!hdr) return;
-    // na stronie ze zdjęciem nagłówek zostaje przezroczysty, dopóki nie zbliżymy się do końca zdjęcia
-    // (strona główna: cały ciemny pas .hero — na telefonie zdjęcie jest tylko w jego górnej części, niżej granat;
-    // podstrony: granatowy pas .ph na samej górze) — nagłówek bieleje dopiero, gdy pas prawie schowa się pod nim
-    const foto = hdr.classList.contains('hdr-foto') ? document.querySelector<HTMLElement>('#tresc > .hero, #tresc > .ph') : null;
-    const zapas = foto?.classList.contains('ph') ? 16 : 8;
-    const przewiniety = foto ? foto.getBoundingClientRect().bottom <= hdr.offsetHeight + zapas : window.scrollY > 40;
-    hdr.classList.toggle('przewiniety', przewiniety);
-    if (stopka) {
-      const naDole = przewiniety && (stopka.getBoundingClientRect().top < window.innerHeight - 80
-        || window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4);
-      hdr.classList.toggle('hdr-stopka', naDole);
-    }
-  };
-  window.addEventListener('scroll', odswiezNaglowek, { passive: true });
-  window.addEventListener('resize', odswiezNaglowek, { passive: true });
-  odswiezNaglowek();
-
-  // Menu na telefon
-  // Panel wysuwa się z prawej nad stroną; strona pod spodem się nie przewija. Otwiera się ze zwiniętymi listami.
-  // Gdy góra ekranu jest ciemna (nagłówek przezroczysty na zdjęciu, granatowy pas pod nagłówkiem u góry podstrony,
-  // nagłówek w kolorze stopki na dole), nagłówek i panel dostają kolory trybu ciemnego (.menu-ciemne) — zostają do
-  // końca chowania panelu, żeby nie mignęła biel.
-  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
-  const mnav = document.getElementById('menu-telefon');
-  const mtlo = document.querySelector<HTMLElement>('[data-mnav-tlo]');
-  const ciemnyNaglowek = () => {
-    if (!hdr) return false;
-    if (hdr.classList.contains('hdr-stopka') || (hdr.classList.contains('hdr-foto') && !hdr.classList.contains('przewiniety'))) return true;
-    // granatowy pas na górze podstrony (.ph-granat) jeszcze widoczny pod nagłówkiem
-    const pas = document.querySelector<HTMLElement>('#tresc > .ph-granat:first-child');
-    return !!pas && pas.getBoundingClientRect().bottom > hdr.getBoundingClientRect().bottom + 24;
-  };
-  let zdejmijCiemne: number | undefined;
-  const ustawMenu = (otwarte: boolean) => {
-    if (!mnav || !burger || !hdr) return;
-    if (otwarte) {
-      window.clearTimeout(zdejmijCiemne);
-      mpozycje.forEach((x) => ustawM(x, false));
-      const ciemne = ciemnyNaglowek();
-      [hdr, mnav, mtlo].forEach((el) => el?.classList.toggle('menu-ciemne', ciemne));
-      document.documentElement.style.setProperty('--menu-top', `${Math.max(0, Math.round(hdr.getBoundingClientRect().bottom))}px`);
-    } else {
-      zdejmijCiemne = window.setTimeout(() => [hdr, mnav, mtlo].forEach((el) => el?.classList.remove('menu-ciemne')), 320);
-    }
-    mnav.classList.toggle('open', otwarte);
-    mtlo?.classList.toggle('open', otwarte);
-    hdr.classList.toggle('menu-otwarte', otwarte);
-    document.documentElement.classList.toggle('menu-otwarte', otwarte);
-    burger.setAttribute('aria-expanded', String(otwarte));
-    burger.setAttribute('aria-label', (otwarte ? burger.dataset.zamknij : burger.dataset.otworz) || '');
-  };
-  const menuOtwarte = () => !!mnav?.classList.contains('open');
-  burger?.addEventListener('click', () => ustawMenu(!menuOtwarte()));
-  mtlo?.addEventListener('click', () => ustawMenu(false));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && menuOtwarte()) { ustawMenu(false); burger?.focus(); }
-  });
-  // powrót przyciskiem „wstecz” na stronę zapamiętaną z otwartym menu (bfcache): menu zamknięte, strona się przewija
-  window.addEventListener('pageshow', (e) => { if (e.persisted && menuOtwarte()) ustawMenu(false); });
-  // po przejściu do szerokiego ekranu (menu komputerowe) panel się zamyka, żeby strona znów się przewijała
-  window.matchMedia('(min-width: 1181px)').addEventListener('change', (m) => { if (m.matches && menuOtwarte()) ustawMenu(false); });
-
-  // Menu na telefonie: strzałka rozwija listę działu, otwarcie jednej zamyka poprzednią
-  const mpozycje = Array.from(document.querySelectorAll<HTMLElement>('.mnav .mitem'));
-  const ustawM = (m: HTMLElement, otwarta: boolean) => {
-    m.classList.toggle('open', otwarta);
-    m.querySelector('.mgroup')?.toggleAttribute('hidden', !otwarta);
-    m.querySelectorAll('[data-mrozwin]').forEach((b) => b.setAttribute('aria-expanded', String(otwarta)));
-  };
-  mpozycje.forEach((m) =>
-    m.querySelectorAll<HTMLButtonElement>('[data-mrozwin]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const otworz = !m.classList.contains('open');
-        mpozycje.forEach((x) => x !== m && ustawM(x, false));
-        ustawM(m, otworz);
-      })
-    )
-  );
-
-  // Menu działów: klik w napis otwiera stronę działu, lista rozwija się po najechaniu myszką
-  // albo strzałką (klawiatura, ekrany dotykowe). Tylko jedna otwarta; Esc i klik obok zamykają.
-  const pozycje = Array.from(document.querySelectorAll<HTMLElement>('.nav-item'));
-  const ustaw = (p: HTMLElement, otwarta: boolean) => {
-    p.classList.toggle('open', otwarta);
-    p.querySelectorAll('[data-rozwin]').forEach((b) => b.setAttribute('aria-expanded', String(otwarta)));
-  };
-  const zamknijMenu = (poza?: HTMLElement) => pozycje.forEach((p) => p !== poza && ustaw(p, false));
-  pozycje.forEach((p) =>
-    p.querySelectorAll<HTMLButtonElement>('[data-rozwin]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const otworz = !p.classList.contains('open');
-        zamknijMenu(p);
-        ustaw(p, otworz);
-      })
-    )
-  );
-  document.addEventListener('click', (e) => {
-    if (!(e.target as Element).closest('.nav-item')) zamknijMenu();
-  });
-  // Lista pod pozycją menu: wyśrodkowana pod nią, ale nie wychodzi poza ekran (margines 16 px)
-  const dopasuj = (p: HTMLElement) => {
-    const lista = p.querySelector<HTMLElement>('.dropdown');
-    if (!lista) return;
-    lista.style.setProperty('--dx', '0px');
-    const r = lista.getBoundingClientRect();
-    if (!r.width) return;
-    const m = 16;
-    const dx = r.left < m ? m - r.left : r.right > window.innerWidth - m ? window.innerWidth - m - r.right : 0;
-    lista.style.setProperty('--dx', `${Math.round(dx)}px`);
-  };
-  const dopasujListy = () => pozycje.forEach(dopasuj);
-  pozycje.forEach((p) => {
-    p.addEventListener('pointerenter', () => dopasuj(p));
-    p.addEventListener('focusin', () => dopasuj(p));
-  });
-  dopasujListy();
-  window.addEventListener('resize', dopasujListy, { passive: true });
-  document.fonts?.ready.then(dopasujListy);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    const otwarta = pozycje.find((p) => p.classList.contains('open') || p.contains(document.activeElement));
-    if (otwarta) {
-      ustaw(otwarta, false);
-      otwarta.querySelector<HTMLElement>('.nav-arrow')?.focus();
-      otwarta.classList.add('bez-hover');
-      otwarta.addEventListener('mouseleave', () => otwarta.classList.remove('bez-hover'), { once: true });
-    }
-  });
+  // Strona główna: Wydział w pasku, dopóki tytuł okładki nie schowa się pod paskiem (61 px, --hdr-h w telefon.css). Obserwator liczy
+  // stan od razu, więc także przy wejściu w środku strony; po powrocie z pamięci przeglądarki liczy go od nowa.
+  const hdr = document.querySelector('.hdr');
+  const tytul = document.querySelector('.z-okl-tytul');
+  if (hdr?.querySelector('.brand-okladka') && tytul) {
+    const obs = new IntersectionObserver(([w]) => {
+      hdr.classList.toggle('po-okladce', !w.isIntersecting && w.boundingClientRect.bottom <= 61);
+    }, { rootMargin: '-61px 0px 0px 0px' });
+    obs.observe(tytul);
+    addEventListener('pageshow', (e) => { if (e.persisted) { obs.unobserve(tytul); obs.observe(tytul); } });
+  }
 </script>

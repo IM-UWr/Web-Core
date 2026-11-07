@@ -1,148 +1,43 @@
 ---
-// Popularyzacja matematyki: linki do stron partnerów (Fundacja, Portal, PTM), potem karty inicjatyw w grupach
-// (dla uczniów, nauczycieli…). Grupa bez kart pokazuje „To be announced”.
-// Dane: src/data/popularyzacja.json (edycja w Pages CMS, repozytorium Web-Popularyzacja).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian.
+// Strona działu „Popularyzacja” (/popularyzacja, /en/popularyzacja): baner działu z latami tradycji, pod nim blok TrescDzialu —
+// podstrony w grupach jak w menu, „O popularyzacji” z „W skrócie”, karty „Dla kogo” (po jednej na stronę działu).
+// Dane: src/data/popularyzacja.md (tekst „O popularyzacji” jako Markdown) i nagłówki stron src/content/strony/popularyzacja/ (edycja w Pages CMS, repozytorium
+// Web-Popularyzacja). Jedna wersja HTML: komputer i telefon (≤ 1023 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
-import Ikona from '../components/Ikona.astro';
-import SpisTresci from '../components/SpisTresci.astro';
-import { u, isExternal } from '../lib/url';
-import { wJezyku, wybierz } from '../lib/i18n';
+import TrescDzialu from '../components/zal/TrescDzialu.astro';
+import Sekcja from '../components/zal/dzial/Sekcja.astro';
+import { u } from '../lib/url';
+import { wJezyku, bezSierotek } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import popularyzacja from '../data/popularyzacja.json';
-
-type Tekst = string | null | undefined;
-type Pozycja = {
-  nazwa: string; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; dla?: Tekst; dla_en?: Tekst;
-  adres?: Tekst; przycisk?: Tekst; przycisk_en?: Tekst; zdjecie?: Tekst; archiwalne?: boolean | null;
-};
-type Grupa = { nazwa: string; nazwa_en?: Tekst; opis?: Tekst; opis_en?: Tekst; pozycje?: Pozycja[] | null };
-type Link = { nazwa: string; nazwa_en?: Tekst; adres?: Tekst };
-type Dane = { tytul: string; tytul_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; linki?: Link[] | null; grupy?: Grupa[] | null };
+import { danePopularyzacji } from '../lib/widoki/popularyzacja';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const w = (o: any, pole: string) => wybierz(o, pole, lang);
-const d = popularyzacja as Dane;
-
-// Pliki (/pliki/...) nie mają wersji językowych — bez prefiksu /en.
-const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
-const host = (a: string) => {
-  try { return new URL(a).hostname.replace(/^www\./, ''); } catch { return ''; }
-};
-// Kotwica sekcji z polskiej nazwy grupy (ta sama w obu wersjach językowych).
-const slug = (s: string) =>
-  s.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'grupa';
-
-const linki = (d.linki ?? [])
-  .filter((l) => l && l.nazwa && (l.adres ?? '').trim())
-  .map((l) => ({ ...l, adres: (l.adres ?? '').trim() }));
-// Grupy bez kart zostają na stronie (nagłówek + „To be announced”).
-const grupy = (d.grupy ?? [])
-  .filter((g) => g && g.nazwa)
-  .map((g) => ({ ...g, slug: slug(g.nazwa), pozycje: (g.pozycje ?? []).filter((p) => p && p.nazwa) }));
-const sekcje = grupy.map((g) => ({ depth: 2, slug: g.slug, text: w(g, 'nazwa') }));
-const tytul = w(d, 'tytul') || T('Popularyzacja matematyki', 'Mathematics outreach');
-const lead = w(d, 'wstep');
+const { tytul, lead, haslo, liczby, grupy, html, fakty, karty } = await danePopularyzacji(lang);
 ---
 <Baza tytul={tytul} opis={lead || undefined} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={tytul} lead={lead || undefined} lang={lang} okruszki={[{ etykieta: tytul }]} />
-  <div class="wrap layout">
-    <div class="main">
-      {linki.length > 0 && (
-        <nav class="pop-linki" aria-label={T('Partnerzy', 'Partners')}>
-          {linki.map((l) => {
-            const zew = isExternal(l.adres);
-            return (
-              <a class="pop-link" href={href(l.adres)}>
-                <span class="pop-link-t">{w(l, 'nazwa')}{zew && <span class="sr-only"> {T('(strona zewnętrzna)', '(external website)')}</span>}</span>
-                <span class="pop-host" aria-hidden="true">{zew ? host(l.adres) : T('Przejdź do strony', 'Visit page')}<Ikona nazwa={zew ? 'zewnetrzny' : 'strzalka'} rozmiar={14} /></span>
-              </a>
-            );
-          })}
-        </nav>
-      )}
-
-      <SpisTresci naglowki={sekcje} lang={lang} wariant="gora" />
-
-      {grupy.map((g) => (
-        <section class="zsec" aria-labelledby={g.slug}>
-          <h2 id={g.slug}>{w(g, 'nazwa')}</h2>
-          {g.opis && <p class="muted pop-lead">{w(g, 'opis')}</p>}
-          {g.pozycje.length === 0 ? (
-            <p class="spec spec-off pop-tba" lang={lang === 'pl' ? 'en' : undefined}>To be announced</p>
-          ) : (
-          <div class="spec-grid">
-            {g.pozycje.map((p) => {
-              const adres = (p.adres ?? '').trim();
-              const zew = isExternal(adres);
-              return (
-                <article class={`spec pop${adres ? ' spec-link' : ''}${p.archiwalne ? ' spec-off' : ''}`}>
-                  {p.zdjecie && <img class="pop-img" src={u(p.zdjecie)} alt="" loading="lazy" decoding="async" />}
-                  {p.archiwalne && <div class="news-meta"><span class="badge">{T('archiwum', 'archive')}</span></div>}
-                  <h3>
-                    {adres ? (
-                      <a href={href(adres)}>{w(p, 'nazwa')}{zew && <span class="sr-only"> {T('(strona zewnętrzna)', '(external website)')}</span>}</a>
-                    ) : w(p, 'nazwa')}
-                  </h3>
-                  {p.opis && <p>{w(p, 'opis')}</p>}
-                  {p.dla && <p><span class="lbl">{T('Dla kogo', 'For whom')}</span>{w(p, 'dla')}</p>}
-                  {adres && (
-                    <p class="pop-cta" aria-hidden="true">
-                      <span class="link-arrow">{w(p, 'przycisk') || T('Przejdź do strony', 'Visit website')}<Ikona nazwa={zew ? 'zewnetrzny' : 'strzalka'} rozmiar={15} /></span>
-                      {zew && host(adres) && <span class="pop-host">{host(adres)}</span>}
-                    </p>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-          )}
-        </section>
-      ))}
-    </div>
-
-    <aside class="side" data-pagefind-ignore>
-      <SpisTresci naglowki={sekcje} lang={lang} wariant="bok" />
-    </aside>
-  </div>
+  <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
+    {liczby.length > 0 && (
+      <ul class="pt-liczby">
+        {liczby.map((x) => <li><span class="n">{x.n}</span>{bezSierotek(x.l)}</li>)}
+      </ul>
+    )}
+  </NaglowekStrony>
+  <TrescDzialu dzial="popularyzacja" lang={lang} grupy={grupy} tekst={{ tytul: T('O popularyzacji', 'About outreach'), akapity: [], html, fakty }}>
+    {karty.length > 0 && (
+      <Sekcja id="z-dz-dla-kogo" tytul={T('Dla kogo', 'Who it’s for')} lang={lang}>
+        <div class="z-dz-kart">
+          {karty.map((k) => (
+            <article class="z-dz-klik">
+              <div class="gora">{k.nazwa}</div>
+              <h3><a href={u(wJezyku(k.adres, lang))}>{k.tytul}</a></h3>
+              {k.opis && <p>{k.opis}</p>}
+            </article>
+          ))}
+        </div>
+      </Sekcja>
+    )}
+  </TrescDzialu>
 </Baza>
-
-<style>
-  .pop-lead { margin: -6px 0 16px; font-size: 16px; max-width: 70ch; }
-  .pop-cta { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; }
-  .pop-host { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
-
-  /* Linki do stron partnerów nad sekcjami: rząd kafelków (na wąskim ekranie jeden pod drugim). */
-  .pop-linki { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 14px; margin: 0 0 36px; }
-  .pop-link { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--radius-l); text-decoration: none; color: var(--ink); transition: border-color .15s, box-shadow .15s, background-color .15s, transform .15s; }
-  .pop-link:hover, .pop-link:focus-visible { border-color: var(--ink); background: var(--tint); box-shadow: 0 6px 20px rgb(0 0 0 / .08); transform: translateY(-2px); color: var(--ink); }
-  .pop-link:hover .pop-link-t { text-decoration: underline; text-underline-offset: 4px; }
-  .pop-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .pop-link-t { font-size: 18px; font-weight: 800; line-height: 1.3; }
-  .pop-link .pop-host { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; }
-  .pop-tba { margin: 0; color: var(--muted); font-weight: 700; }
-  .pop-img { display: block; width: calc(100% + 40px); max-width: none; margin: -20px -20px 4px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-l) var(--radius-l) 0 0; background: var(--photo); }
-
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
-     Odstęp treści od banera stały (24 px), jak na stronach działów: bursztynowy początek kreski pierwszej sekcji
-     nie przylega do banera. Opis grupy ciaśniej; zdjęcie karty dosunięte do brzegów mniejszej ramki (.spec: 12px 16px). */
-  @media (min-width: 761px) {
-    .layout { padding-top: 24px; }
-    .pop-lead { margin: -4px 0 10px; font-size: 15px; line-height: 1.5; }
-    .pop-img { width: calc(100% + 32px); margin: -12px -16px 4px; }
-    .pop-linki { gap: 10px; margin-bottom: 24px; }
-    .pop-link { gap: 4px; padding: 12px 16px; }
-    .pop-link-t { font-size: 17px; }
-  }
-
-  /* telefon: jak karty .spec w telefon.css */
-  @media (max-width: 760px) {
-    .pop-linki { gap: 10px; margin-bottom: 24px; }
-    .pop-link { gap: 4px; padding: 13px 16px; }
-    .pop-link-t { font-size: 17px; }
-  }
-</style>

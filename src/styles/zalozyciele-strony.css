@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — strony z prototypu na komputer (≥ 1024 px): drugi ekran strony głównej, strony działów,
+   Władze, Projekty i granty, Plan zajęć. Zmienne i elementy wspólne: zalozyciele.css. Telefon bez zmian.
+   ========================================================================== */
+/* reguły na każdej szerokości; telefon (≤ 1023 px) nadpisuje src/styles/zal-telefon.css */
+@media all {
+  /* ---------- drugi ekran strony głównej ---------- */
+  /* 100svh pod CSS zoom też rośnie k razy, dlatego dzielone przez --z-k (zlecenie 26, punkt 2); przy k = 1 wartość jak dawniej */
+  .z-druga { --marg: 48px; display: flex; flex-direction: column; min-height: calc(100svh / var(--z-k, 1) - var(--gora) - 47px); padding: 22px var(--marg); font-size: 14.5px; line-height: 1.4; color: var(--text); }
+  .z-druga a { color: inherit; text-decoration: none; }
+  /* strona główna: drugi ekran na całą szerokość (jak w prototypie), pasek i stopka z marginesem 40/48 px */
+  .z-pasek.z-pasek-jasny { padding-inline: 40px; }
+  body:has(.z-druga) .z-stopka { padding-inline: 48px; }
+  .z-druga a:hover .t, .z-druga a.t:hover { text-decoration: underline; text-underline-offset: 3px; }
+  /* od 22 px w dół na wąskich oknach (zlecenie 26, punkt 4.1): „Nadchodzące wydarzenia” nie łamie się wcześniej niż inne nagłówki, kreski stoją na jednej wysokości */
+  .z-druga h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(18px, 1.7vw, 22px); line-height: 1.15; color: var(--ink); }
+  /* Szybki dostęp: jeden pasek, cztery pozycje rozdzielone kreskami */
+  .z-skr { display: grid; grid-template-columns: auto repeat(4, minmax(0, 1fr)); align-items: stretch; border-top: 2px solid var(--rule); border-bottom: 1px solid var(--line); }
+  .z-skr h2 { padding: 10px 22px 10px 0; align-self: center; white-space: nowrap; }
+  .z-skr a { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-width: 0; padding: 9px 16px; border-left: 1px solid var(--line); }
+  .z-skr a b { font-weight: 700; color: var(--ink); font-size: 15px; }
+  .z-skr a small { font-size: 12.5px; color: var(--muted); }
+  .z-skr a:hover { background: var(--surface); }
+  .z-skr-kd { --kd-n: #0e9cbc; --kd-p: #e0841b; }
+  .z-kd-kropka { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: var(--muted); font-size: 0; vertical-align: 0; }
+  .z-skr-kd[data-kolor="niebieski"] .z-kd-kropka, .z-skr-kd[data-kolor="brak"][data-nastepny="niebieski"] .z-kd-kropka { background: var(--kd-n); }
+  .z-skr-kd[data-kolor="pomaranczowy"] .z-kd-kropka, .z-skr-kd[data-kolor="brak"][data-nastepny="pomaranczowy"] .z-kd-kropka { background: var(--kd-p); }
+  .z-skr-kd:not([data-zamiana=""]) .z-kd-kropka { width: auto; height: auto; padding: 0 6px; border-radius: 999px; font-size: 11px; font-weight: 800; color: #fff; }
+  /* trzy kolumny: dwie krótkie po 3 pozycje (sloty 0 i 1), pod nimi Studia i Warto wiedzieć na 2/3, z prawej długa (slot 2) */
+  .z-siatka { flex: 1 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; align-content: space-between; gap: 22px 36px; margin-top: 22px; }
+  .z-kolumna { position: relative; isolation: isolate; min-width: 0; background: var(--bg); }
+  /* kliknięta liczba na okładce (zlecenie 11, zalecenie 15): krótkie podświetlenie kolumny; przy ograniczonym ruchu — obrys.
+     Tło i obwódka w warstwie pod treścią kolumny, która gaśnie przez opacity (zlecenie 13, punkt 8; dawniej animacja
+     box-shadow i background całej kolumny) */
+  .z-kolumna::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+    background: color-mix(in srgb, var(--d-j, #c9d0de) 12%, var(--bg)); box-shadow: 0 0 0 10px color-mix(in srgb, var(--d-j, #c9d0de) 22%, transparent); }
+  .z-kolumna.z-podswietl::before { animation: z-podswietl 1.6s ease; }
+  @keyframes z-podswietl { 0%, 35% { opacity: 1; } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .z-kolumna.z-podswietl::before { animation: none; } .z-kolumna.z-podswietl { outline: 2px solid var(--d-a); outline-offset: 8px; } }
+  .z-druga-obszar:focus { outline: none; }
+  .z-kolumna[data-slot="0"] { grid-column: 1; grid-row: 1; }
+  .z-kolumna[data-slot="1"] { grid-column: 2; grid-row: 1; }
+  .z-kolumna[data-slot="2"] { grid-column: 3; grid-row: 1 / span 3; display: flex; flex-direction: column; }
+  .z-kolumna:not([data-slot="2"]) .z-w:nth-child(n+4) { display: none; }
+  .z-kolumna:not([data-slot="2"]) .reszta, .z-kolumna[data-slot="2"] .z-wiecej { display: none; }
+  .z-kolumna[data-slot="2"] > .lista { position: relative; flex: 1 1 auto; min-height: 200px; }
+  .z-kolumna[data-slot="2"] .lista-in { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .z-kolumna[data-slot="2"] .pozycje { flex: 0 1 auto; min-height: 0; overflow: hidden; }
+  .z-kolumna .reszta { flex: none; display: block; padding: 9px 0 0; font-size: 13px; font-weight: 700; color: var(--ink); }
+  .z-kolumna .reszta:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .z-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--rule); }
+  .z-h h2:focus { outline: none; }
+  .z-h h2:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  /* zakres dat seminariów w całości (dawniej „6– / 12 listopada”); przed nim spacja w HTML (miejsce na złamanie, czytnik ekranu), więc margines
+     8 px minus jej szerokość (0,218 em Brygady przy 22 px = 4,796875 px): przy 22 px odstęp jak dotąd */
+  .z-h h2 small { margin-left: 3.203125px; font-family: var(--f-text); font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .z-h > a { font-size: 13px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .z-h > a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .z-w { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; align-items: start; gap: 0 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .z-w .kiedy { font-size: 12px; line-height: 1.25; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .z-w .kiedy b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 25px; line-height: 1; color: var(--ink); }
+  .z-w.minelo .kiedy b { color: var(--muted); }
+  .z-w .tr { min-width: 0; }
+  .z-w .gdzie { display: block; font-size: 12px; font-weight: 700; color: var(--d-a, var(--muted)); }
+  .z-w .gdzie i { font-style: normal; font-weight: 500; color: var(--muted); }
+  .z-w .t { display: block; font-weight: 600; color: var(--ink); }
+  /* prelegent: zaraz po tytule, kursywą Brygady, szary; nazwisko nigdy się nie łamie */
+  .z-w .kto { font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 1.04em; color: var(--muted); white-space: nowrap; }
+  .z-w .min { display: block; width: 72px; height: 54px; border-radius: 4px; overflow: hidden; background: var(--surface); }
+  .z-w .min img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .z-w .min.zastepcza { display: grid; place-items: center; background: var(--d-t); }
+  .z-w .min.zastepcza svg { width: 40px; height: 48px; }
+  .z-w .min.zastepcza path { fill: none; stroke: var(--d-a); stroke-width: 1.6px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+  .z-pusto { margin: 10px 0; color: var(--muted); font-style: italic; }
+  .z-wiecej { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; text-align: left; }
+  /* bez ukrytych pozycji (liczWiecej() w drugi-ekran.ts) */
+  .z-wiecej[hidden] { display: none !important; }
+  .z-wiecej:hover { color: var(--ink); }
+  .z-wiecej:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .z-wiecej .kropki3 { letter-spacing: .12em; color: var(--ink); }
+  /* Studia: klikalny nagłówek ze znakiem linku zewnętrznego, kierunki w pięciu kolumnach */
+  .z-studia { grid-column: 1 / span 2; grid-row: 2; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 0 36px; padding: 10px 0 0; border-top: 2px solid var(--rule); }
+  .z-studia .gdzie { display: block; font-size: 12px; font-weight: 700; color: var(--d-a); }
+  .z-studia .h-link:hover { color: var(--d-a); }
+  .z-studia .h-link.zew::after { margin-left: 3px; font-family: var(--f-text); font-size: .7em; font-weight: 600; color: var(--d-a); vertical-align: .15em; }
+  .z-studia p { margin: 6px 0 12px; color: var(--text); }
+  .z-rekr-link { font-size: 14px; font-weight: 700; color: var(--ink) !important; text-decoration: underline !important; text-decoration-color: var(--line) !important; text-decoration-thickness: 2px !important; text-underline-offset: 4px; }
+  .z-rekr-link:hover { text-decoration-color: var(--d-a) !important; }
+  /* kierunki nie węższe niż 110 px, liczba kolumn sama z szerokości (zlecenie 26, punkt 4.3; dawniej zawsze pięć, tuż nad progiem 1366 px po ok. 95–100 px
+     i „Szkoła / doktorska”). auto-fit, nie auto-fill: puste tory znikają, więc pięć kierunków wypełnia szerokość jak dotąd (przy 1920 px auto-fill dałby
+     siedem torów i kierunki ściśnięte z lewej). Odstęp między rzędami, gdy się zawiną */
+  .z-kier { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px 14px; align-content: start; }
+  .z-kier a { display: flex; flex-direction: column; gap: 2px; padding-top: 2px; }
+  .z-kier small { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .z-kier b { font-weight: 700; color: var(--ink); line-height: 1.25; }
+  .z-kier span { font-size: 13px; color: var(--muted); }
+  .z-kier a:hover b { color: var(--d-a); }
+  /* Warto wiedzieć: cztery pozycje w rzędzie */
+  .z-warto { grid-column: 1 / span 2; grid-row: 3; }
+  .z-warto .rzad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 28px; }
+  .z-warto .rzad a { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .z-warto .rzad a[hidden] { display: none; }
+  .z-warto .rzad span { font-family: var(--f-display); font-size: 18px; color: var(--d-a); }
+  .z-warto .rzad .t { font-weight: 600; color: var(--ink); }
+
+
+  /* ---------- osoby (Władze): schemat dyrekcji, dwie kolumny, kontakt ---------- */
+  .z-os .rola { font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-os .imie { margin: 4px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.25; color: var(--ink); }
+  .z-os .imie a { color: inherit; text-decoration: none; }
+  .z-os .imie a:hover { color: var(--d-a); }
+  .z-os .zakl { font-size: 14px; color: var(--muted); }
+  .z-os .zakl a { color: inherit; text-decoration: none; }
+  .z-os .zakl a:hover { color: var(--d-a); text-decoration: underline; }
+  .z-pd-tresc .z-os .opis { margin: 6px 0 0; font-size: 14px; line-height: 1.5; }
+  .z-os .kont { margin-top: 8px; font-size: 13.5px; line-height: 1.55; color: var(--text); }
+  .z-os .kont a { text-decoration: none; }
+  .z-os .kont a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .z-os .fot { display: block; object-fit: cover; background: var(--surface); }
+  .z-drzewo { position: relative; }
+  .z-drzewo .z-dyr { position: relative; width: min(560px, 100%); margin: 0 auto 44px; padding: 16px 22px 18px; text-align: center; border-top: 3px solid var(--d-a); background: var(--surface); }
+  .z-drzewo .z-dyr .imie { font-size: 30px; }
+  .z-drzewo .z-dyr:has(.fot) { display: grid; grid-template-columns: 120px minmax(0, 1fr); column-gap: 24px; width: min(660px, 100%); text-align: left; }
+  .z-drzewo .z-dyr .fot { grid-row: 1 / span 6; width: 120px; height: 150px; }
+  .z-drzewo .z-dyr:has(.fot) > :not(.fot) { grid-column: 2; }
+  .z-drzewo .z-dyr:has(+ .z-zast)::after { content: ''; position: absolute; left: 50%; bottom: -44px; height: 44px; border-left: 1px solid var(--muted); }
+  .z-zast { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; padding-top: 22px; }
+  .z-zast::before { content: ''; position: absolute; top: 0; left: calc((100% - 72px) / 8); right: calc((100% - 72px) / 8); border-top: 1px solid var(--muted); }
+  .z-zast .z-os { position: relative; text-align: center; padding-top: 12px; }
+  .z-zast .z-os::before { content: ''; position: absolute; left: 50%; top: -22px; height: 22px; border-left: 1px solid var(--muted); }
+  .z-zast .z-os::after { content: ''; position: absolute; left: calc(50% - 4px); top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--d-a); }
+  .z-zast .z-os .fot { width: 96px; height: 120px; margin: 0 auto 12px; }
+  .z-dwie { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+  .z-dwie .z-os { padding: 14px 0; border-top: 1px solid var(--line); }
+  .z-dwie .z-os:has(.fot) { display: grid; grid-template-columns: 76px minmax(0, 1fr); column-gap: 18px; align-content: start; }
+  .z-dwie .z-os .fot { grid-row: 1 / span 6; width: 76px; height: 95px; }
+  .z-dwie .z-os:has(.fot) > :not(.fot) { grid-column: 2; }
+  .z-link-dalej { margin: 14px 0 0; }
+  .z-kont { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px; }
+  .z-kont dl { margin: 0; }
+  .z-kont dl div { display: grid; grid-template-columns: 90px minmax(0, 1fr); padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .z-kont dt { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .z-kont dd { margin: 0; font-size: 16px; color: var(--ink); }
+  .z-sek-osoby .z-os { padding: 10px 0; border-top: 1px solid var(--line); }
+  .z-sek-osoby .z-os .imie { font-size: 19px; }
+  .z-zob { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 40px; }
+  .z-zob li { break-inside: avoid; }
+  .z-pd-tresc .z-zob a { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-size: 19px; color: var(--ink); text-decoration: none; }
+  .z-zob a::after { content: '→'; font-family: var(--f-text); color: var(--muted); }
+  .z-zob a.zew::after { content: '↗'; }
+  .z-zob a:hover { color: var(--d-a) !important; }
+
+}
+
+/* ---------- telefon (≤ 1023 px): drugi ekran strony głównej i Władze ---------- */
+/* Powiększona aktualność na węższym oknie komputera: zdjęcie 3:2 na całą szerokość kolumny tekstu, nad etykietą */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1179px), (min-width: 1024px) and (pointer: fine) and (max-width: 1179px) {
+  .z-druga .z-w.wyr { grid-template-columns: 50px minmax(0, 1fr); }
+  .z-druga .z-w.wyr .kiedy { grid-column: 1; grid-row: 1 / span 2; }
+  .z-druga .z-w.wyr .min { grid-column: 2; grid-row: 1; width: 100%; height: auto; aspect-ratio: 3 / 2; margin-bottom: 8px; }
+  .z-druga .z-w.wyr .tr { grid-column: 2; grid-row: 2; }
+}
+/* Szybki dostęp poniżej 1100 px (zlecenie 26, punkt 4.2): napis w osobnym wierszu, jak na telefonie, cztery pozycje pod nim w jednym rzędzie */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1099px), (min-width: 1024px) and (pointer: fine) and (max-width: 1099px) {
+  .z-skr { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .z-skr h2 { grid-column: 1 / -1; padding: 10px 0 6px; }
+  .z-skr a { border-top: 1px solid var(--line); }
+  .z-skr a:first-of-type { border-left: 0; padding-left: 0; }
+}
+/* Studia: opis nad kierunkami, gdy pięć kierunków po co najmniej 110 px (.z-kier) nie mieści się obok opisu (250 px + 36 px), czyli poniżej 1452 px
+   (zlecenie 26, punkt 4.3; dawniej poniżej 1366 px, a tuż nad progiem kierunki miały ok. 98 px). Bez przesunięcia progu przy 1366–1451 px kierunki
+   układały się 4 + 1 (ostatni sam w drugim rzędzie, Studia o 55–92 px wyższe niż dawniej; z opisem nad kierunkami o 43–61 px). Inna liczba kierunków na stronie głównej: próg = 250 + 36 +
+   n × 110 + (n − 1) × 14 px szerokości Studiów (dwie z trzech kolumn siatki). */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1451px), (min-width: 1024px) and (pointer: fine) and (max-width: 1451px) {
+  .z-studia { grid-template-columns: minmax(0, 1fr); gap: 12px 0; }
+}
+/* Warto wiedzieć: poniżej 1366 px długie słowa nie mieściły się w czterech kolumnach, więc dwie. Telefon ma własny układ (niżej). */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1365px), (min-width: 1024px) and (pointer: fine) and (max-width: 1365px) {
+  .z-warto .rzad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  /* Ekrany większe od Full HD (zlecenie 26, punkt 2): drugi ekran, pasek menu i stopka strony głównej rosną tą samą skalą co okładka. --z-k ustawia tylko strona główna (ULOZ w Okladka.astro); przy s ≤ 1 równe 1 */
+  .z-druga, .z-pasek.z-pasek-jasny, body:has(.z-druga) .z-stopka { zoom: var(--z-k, 1); }
+  .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
+  .z-wiecej .z-ile-t { display: none; }
+
+  /* Drabinka wysokości na niskim oknie (zlecenie 26, punkt 3): krok i wysokości ustawia drabinka() w src/scripts/zal/drugi-ekran.ts.
+     0: drugi ekran dokładnie do stopki; 1: stopka pod ekranem; 2: „Warto wiedzieć” pod ekranem — długa kolumna kończy się ze Studiami, które
+     stoją na dole pierwszego ekranu; 3: jak 2, krótkie kolumny po 2 pozycje (powiększony wpis za dwie); 4: układ z kroku 3, który się nie mieści, i zwykłe przewijanie. */
+  .z-druga[data-krok] { min-height: var(--z-druga-h, 0px); }
+  .z-druga:is([data-krok="2"], [data-krok="3"], [data-krok="4"]) .z-kolumna[data-slot="2"] { grid-row: 1 / span 2; min-height: var(--z-siatka-h, 0px); }
+  .z-druga:is([data-krok="2"], [data-krok="3"], [data-krok="4"]) .z-studia { align-self: end; }
+  .z-druga:is([data-krok="3"], [data-krok="4"]) .z-kolumna:not([data-slot="2"]) .z-w:nth-child(n+3),
+  .z-druga:is([data-krok="3"], [data-krok="4"]) .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+2) { display: none; }
+
+  /* Powiększona pierwsza aktualność (zlecenie 14, zalecenie 22; wzór: prototyp v92, .ok-w.wyr): wartości z prototypu (50 | tekst | 168×126,
+     tytuł 21 px) przy kolumnie 584 px, czyli 1920 px strony. Węższe kolumny: zdjęcie proporcjonalnie, tytuł od 18 px, żeby tekst nie zszedł
+     do wąskiego słupka; poniżej 1180 px zdjęcie nad tekstem. Na telefonie wyróżnienia nie ma (zlecenie 18, punkt 11). */
+  .z-w.wyr { grid-template-columns: 50px minmax(0, 1fr) clamp(112px, 28.8%, 168px); padding: 9px 0 10px; }
+  .z-w.wyr .min { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+  .z-w.wyr .min.zastepcza svg { width: 56%; height: 80%; }
+  .z-w.wyr .t { margin-top: 3px; font-family: var(--f-display); font-weight: 500; font-size: clamp(18px, 1.094vw, 21px); line-height: 1.25; }
+  .z-w.wyr .zaj { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--text); }
+  /* Kolumna Aktualności, zwarta (zlecenie 18, punkt 8, wariant A): więcej wpisów na ekranie. Wydarzenia i Seminaria bez zmian. Pierwszy wpis
+     wyróżniają tytuł Brygadą, zajawka w jednej linii i miniatura o 40% większa od zwykłych (obok tekstu od 1180 px, węziej nad tekstem) */
+  .z-kolumna[data-key="akt"] .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; padding: 6px 0; }
+  .z-kolumna[data-key="akt"] .z-w .kiedy b { font-size: 22px; }
+  .z-kolumna[data-key="akt"] .z-w .t { font-size: 14px; }
+  .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min { width: 56px; height: 42px; }
+  .z-kolumna[data-key="akt"] .z-w:not(.wyr) .min.zastepcza svg { width: 31px; height: 37px; }
+  .z-kolumna[data-key="akt"] .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr); padding: 8px 0; }
+  .z-kolumna[data-key="akt"] .z-w.wyr .t { font-size: 18px; }
+  .z-kolumna[data-key="akt"] .z-w.wyr .zaj { position: relative; -webkit-line-clamp: 1; }
+  /* „… czytaj dalej” (wstawia src/scripts/zal/drugi-ekran.ts, gdy zajawka się nie mieści), na tle strony */
+  .z-w .dalej { position: absolute; right: 0; bottom: 0; padding-left: 26px; background: linear-gradient(to right, transparent, var(--bg) 22px); font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .z-druga a:hover .dalej { text-decoration: underline; text-underline-offset: 3px; }
+}
+@media (min-width: 1180px) and (min-height: 501px), (min-width: 1180px) and (pointer: fine) {
+  .z-kolumna[data-key="akt"] .z-w.wyr { grid-template-columns: 44px minmax(0, 1fr) 78px; }
+  .z-kolumna[data-key="akt"] .z-w.wyr .min { width: 78px; height: 59px; }
+}
+/* Władze na komputerze: gdy zastępcy nie mieszczą się w 4 kolumnach, kreski schematu nie mają czego łączyć (zlecenie 25, punkt 2.7) */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-drzewo { container-type: inline-size; }
+  @container (max-width: 871.98px) {
+    .z-zast { padding-top: 0; }
+    .z-drzewo .z-dyr:has(+ .z-zast)::after, .z-zast::before, .z-zast .z-os::before, .z-zast .z-os::after { display: none; }
+    .z-zast .z-os { padding-top: 0; }
+  }
+}
+
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  /* ---------- drugi ekran: kolumny jedna pod drugą, po 3 pozycje i „Zobacz więcej” ---------- */
+  .z-druga { display: block !important; min-height: 0; padding: 18px 16px 26px !important; font-size: 14.5px; line-height: 1.4; }
+  body:has(.z-druga) .z-stopka { padding-inline: 16px !important; }
+  .z-druga h2 { font-size: 22px; }
+  .z-druga .z-skr { grid-template-columns: 1fr 1fr; }
+  .z-druga .z-skr h2 { grid-column: 1 / -1; padding: 10px 0 6px; }
+  .z-druga .z-skr a { border-left: 0; border-top: 1px solid var(--line); padding: 9px 2px; }
+  .z-druga .z-skr a:nth-of-type(even) { border-left: 1px solid var(--line); padding-left: 12px; }
+  .z-druga .z-siatka { display: block; margin-top: 20px; }
+  .z-druga .z-kolumna { display: block !important; margin-bottom: 24px; }
+  .z-druga .z-kolumna :is(.lista, .lista-in, .pozycje) { position: static; display: block; min-height: 0; overflow: visible; }
+  .z-druga .z-kolumna .z-w:nth-child(n+4) { display: none; }
+  .z-druga .z-kolumna.z-rozwin .z-w { display: grid; }
+  .z-druga .z-kolumna .z-w[hidden] { display: none !important; }
+  .z-druga .z-kolumna .reszta { display: none; }
+  .z-druga .z-kolumna .z-wiecej { display: flex; }
+  .z-wiecej .z-ile-k { display: none; }
+  .z-druga .z-kolumna.z-rozwin .z-wiecej { display: none; }
+  .z-druga .z-w { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 0 10px; }
+  .z-druga .z-w .min { width: 64px; height: 48px; }
+  /* pierwsza aktualność jak każdy inny wiersz (zlecenie 18, punkt 11) */
+  .z-druga .z-w .zaj { display: none; }
+  .z-druga .z-w.wyr .kiedy b { color: var(--muted); }
+  .z-druga .z-studia { display: block; padding-top: 10px; margin-bottom: 24px; }
+  .z-druga .z-kier { grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 12px; }
+  .z-druga .z-warto .rzad { grid-template-columns: 1fr; }
+
+  /* ---------- podstrona z nowym układem (Władze): bez bocznej nawigacji, schemat dyrekcji w dwóch kolumnach ---------- */
+  .z-pd.z-wladze { padding: 18px 16px 24px; }
+  .z-pd.z-wladze .z-pd-tresc .wst { margin: 0 0 18px; font-size: 15px; color: var(--text); }
+  .z-pd.z-wladze .z-pd-tresc :is(p, li):not(.tresc *) { font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-pd.z-wladze .z-pd-tresc a:not(.tresc *) { color: var(--d-a); }
+  .z-pd.z-wladze .z-drzewo .z-dyr { width: 100%; margin-bottom: 30px; padding: 14px; }
+  .z-pd.z-wladze .z-drzewo .z-dyr:has(.fot) { grid-template-columns: 84px minmax(0, 1fr); column-gap: 14px; width: 100%; }
+  .z-pd.z-wladze .z-drzewo .z-dyr .fot { width: 84px; height: 105px; }
+  .z-pd.z-wladze .z-drzewo .z-dyr .imie { font-size: 22px; }
+  .z-pd.z-wladze .z-drzewo .z-dyr::after { bottom: -30px; height: 30px; }
+  .z-pd.z-wladze .z-zast { grid-template-columns: 1fr 1fr; gap: 22px 14px; }
+  .z-pd.z-wladze .z-zast::before { left: 25%; right: 25%; }
+  .z-pd.z-wladze .z-zast .z-os:nth-child(n+3)::before, .z-pd.z-wladze .z-zast .z-os:nth-child(n+3)::after { display: none; }
+  .z-pd.z-wladze .z-zast .z-os .fot { width: 76px; height: 95px; }
+  .z-pd.z-wladze .z-os .imie { font-size: 18px; }
+  .z-pd.z-wladze .z-dwie, .z-pd.z-wladze .z-kont { grid-template-columns: 1fr; gap: 0; }
+  .z-pd.z-wladze .z-kont dl > div { grid-template-columns: 76px 1fr; }
+  .z-pd.z-wladze .z-zob { columns: 1; }
+  .z-pd.z-wladze .z-pd-tresc .z-zob a { font-size: 17px; }
+}
+
+/* Strona główna: okładka i Szybki dostęp (zlecenie 23, punkt 2; src/scripts/zal/przejazd.ts). Na Szybkim dostępie okładki nie ma
+   w układzie (html.bez-okladki), więc przewijanie jest zwykłe i kończy się na górze Szybkiego dostępu. Z okładki: na dotyku „na próg”
+   (palec przesuwa okładkę i treść Szybkiego dostępu, --z-ciag; strzałka reaguje, --z-postep), na komputerze tylko kliknięciem. */
+:root { --z-prog: .333; --z-opor: .55; }
+/* !important: zal-telefon.css daje okładce display: flex !important */
+html.bez-okladki .z-okladka { display: none !important; }
+/* wejście strony (przejscia.css) tylko raz: przesunięcie o 12 px psuje też odtworzenie położenia po powrocie „wstecz” */
+html.bez-wejscia #tresc > * { animation: none !important; }
+/* przesuwane: okładka oraz pasek i treść Szybkiego dostępu, nie sam obszar — w nim stoi panel menu (position: fixed), który pod
+   przesuniętym rodzicem wychodziłby w bok poza stronę, a telefon oddalałby wtedy widok */
+html.z-ciagnie .z-okladka { transform: translateY(calc(var(--z-ciag, 0px) * -1)); will-change: transform; }
+/* pod CSS zoom (zlecenie 26, punkt 2) przesunięcie też rośnie k razy; dzielone, żeby pasek i treść jechały równo z okładką */
+html.z-ciagnie .z-druga-obszar > :is(.z-pasek, .z-druga) { transform: translateY(calc(var(--z-ciag, 0px) * -1 / var(--z-k, 1))); will-change: transform; }
+html.z-jedzie :is(.z-okladka, .z-druga-obszar > :is(.z-pasek, .z-druga)) { transition: transform var(--z-czas, .4s) cubic-bezier(.22, .8, .2, 1); }
+/* strzałka reaguje na ciągnięcie: jaśnieje, podjeżdża do 10 px, za progiem grot w górę */
+html.z-ciagnie .z-strzalka { color: rgb(255 255 255 / calc(.76 + var(--z-postep, 0) * .24)); transform: translateX(-50%) translateY(calc(var(--z-postep, 0) * -10px)); }
+html.z-ciagnie .z-strzalka svg { animation: none; }
+.z-strzalka svg { transition: rotate .2s cubic-bezier(.22, .8, .2, 1); }
+.z-strzalka.z-za-progiem svg { rotate: 180deg; }
+/* okładka nie przewija się palcem (klasa z-prog ze skryptu — bez JS zwykłe przewijanie; także ekran dotykowy laptopa); szczypanie zostaje */
+html.z-prog:not(.bez-okladki) :is(.z-okladka, .hdr) { touch-action: pinch-zoom; }
+/* telefon: pod przyklejonym nagłówkiem (Naglowek.astro) */
+@media (hover: none) and (pointer: coarse) and (max-width: 1023px), (hover: none) and (pointer: coarse) and (max-height: 500px) {
+  html:has(.z-okladka) { scroll-padding-top: var(--hdr-h); }
+}
+
+/* kafelki drugiego ekranu z adresem poza stronę (zlecenie 14, zalecenie 23): strzałka przy tytule kafelka */
+:is(.z-skr > a, a.z-w, .z-kier > a, .z-warto .rzad > a).zew::after { content: none; }
+:is(.z-skr > a.zew > b, a.z-w.zew .t, .z-kier > a.zew > b, .z-warto .rzad > a.zew .t)::after { content: '\00a0↗'; font-size: .8em; }

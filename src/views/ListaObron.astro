@@ -1,57 +1,100 @@
 ---
-// Obrony doktorskie: nadchodzące i odbyte — sekcje .zsec jak na stronach działów (kreska sekcji, tytuł h2);
-// na komputerze obrony jako osobne białe karty, jak w kalendarzu (.karty-lista w global.css; telefon — wiersze jak dotąd).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola obrony_tekst / obrony_tekst_en; puste = brak).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import TekstWstepny from '../components/TekstWstepny.astro';
-import ustawienia from '../data/ustawienia.json';
-import Ikona from '../components/Ikona.astro';
-import { u } from '../lib/url';
-import { t, wJezyku } from '../lib/i18n';
-import { dayNum, monthShort, longWithDay, short, type Lang } from '../lib/daty';
-import { miejsce, obrony, slugOf, trwaLubBedzie, type Obrona } from '../lib/tresci';
+// Obrony doktorskie (/obrony-doktorskie), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro. W stylu listy Aktualności
+// (zlecenie 27, punkt 2): ten sam baner (granat przechodzi w zdjęcie Aktualności, bez liczb, z hasłem), panel „Pokaż” z prawej
+// (zal/ListaPokaz.astro) z filtrem lat (lata, w których są obrony, od najnowszego; w adresie ?rok=2026) i polem szukania (kandydat,
+// tytuł rozprawy, promotor), bez spisu „Na tej stronie”. Nad listą tekst wprowadzający (Treść strony Web-Aktualnosci → Strony →
+// Obrony doktorskie; zlecenie 30; brak = bez tekstu), pod nim nadchodzące i odbyte obrony (grupy jak miesiące w Aktualnościach) i link do archiwum.
+// Wiersze: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie) — dzień w kolorze Nauki (obrona doktorska, jak w Aktualnościach),
+// obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy, promotor.
+// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px; filtry nad listą). Bez JS: bez filtrów, cała lista.
+import Podstrona from '../components/zal/Podstrona.astro';
+import ListaPokaz from '../components/zal/ListaPokaz.astro';
+import Link from '../components/Link.astro';
+import WierszWydarzenia from '../components/WierszWydarzenia.astro';
+import { t } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import { miejsce, slugOf, type Obrona, type Wydarzenie } from '../lib/tresci';
+import { tytulyWJezyku } from '../lib/osoby';
+import { daneListyObron } from '../lib/widoki/listaObron';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const wszystkie = await obrony();
-const przyszle = wszystkie.filter((o) => trwaLubBedzie({ poczatek: o.data.termin })).reverse();
-const odbyte = wszystkie.filter((o) => !trwaLubBedzie({ poczatek: o.data.termin }));
-const lead = lang === 'en'
-  ? 'Public defences of doctoral theses in mathematics: notices, theses, abstracts and reviews.'
-  : 'Publiczne obrony rozpraw doktorskich z matematyki: zawiadomienia, rozprawy, streszczenia i recenzje.';
+const en = lang === 'en';
+// html — tekst nad listą — Treść strony (Web-Aktualnosci → Strony → Obrony doktorskie; zlecenie 30), nad listą w kolumnie listy
+const { przyszle, odbyte, lata, tytul, lead, haslo, html, ustawienia } = await daneListyObron(lang);
+// obrona jako pozycja kalendarza (ten sam wiersz co w Kalendarzu)
+const wiersz = (o: Obrona): Wydarzenie => ({
+  rodzaj: 'obrona', tytul: o.data.kandydat, podtytul: o.data.tytul_rozprawy, poczatek: o.data.termin, miejsce: miejsce(o.data.miejsce, lang),
+  href: `/obrony-doktorskie/${slugOf(o.id)}`, uid: `obr-${slugOf(o.id)}`,
+});
+const grupy = [
+  { h: t(lang, 'nadchodzaceObrony'), lista: przyszle },
+  { h: t(lang, 'odbyteObrony'), lista: odbyte },
+].filter((g) => g.lista.length > 0);
+const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`;
 ---
-<Baza tytul={t(lang, 'obrony')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'obrony')} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} />
-  <div class="wrap layout">
-    <div class="main">
-    <TekstWstepny pole="obrony_tekst" lang={lang} />
-    {[{ h: t(lang, 'nadchodzaceObrony'), lista: przyszle }, { h: t(lang, 'odbyteObrony'), lista: odbyte }].map(({ h, lista }) => lista.length > 0 && (
-      <section class="zsec">
-        <h2>{h}</h2>
-        <div class="karty-lista">
-        {lista.map((o: Obrona) => (
-          <a class="row-item" href={u(wJezyku(`/obrony-doktorskie/${slugOf(o.id)}`, lang))}>
-            <span class:list={['datebox small', { minione: !trwaLubBedzie({ poczatek: o.data.termin }) }]} aria-hidden="true"><span class="d">{dayNum(o.data.termin)}</span><span class="m">{monthShort(o.data.termin, lang)}</span></span>
-            <span class="body">
-              <span class="news-meta"><span>{longWithDay(o.data.termin, lang)}</span>{o.data.miejsce && <span>· {miejsce(o.data.miejsce, lang)}</span>}</span>
-              <span class="t" style="font-size:19px">{o.data.kandydat}</span>
-              <span class="x" lang="en">{o.data.tytul_rozprawy}</span>
-            </span>
-          </a>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
+  okruszki={[{ etykieta: en ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} klasa="z-ob" klasaRamy="z-pd-pelna" atrybuty={{ 'data-obrony': '' }}>
+
+  <ListaPokaz lang={lang} etykieta={en ? 'Filter by year' : 'Filtruj według roku'} opcje={lata.map((r) => ({ wartosc: r, etykieta: r }))}
+    szukaj={en ? 'Search defences' : 'Szukaj w obronach'}>
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
+
+    {grupy.map((g) => (
+      <section class="ob-grupa" data-grupa>
+        <h2>{g.h}</h2>
+        {g.lista.map((o) => (
+          <WierszWydarzenia w={wiersz(o)} lang={lang} dzial="nauka" zwarty bezRodzaju>
+            {o.data.promotorzy.length > 0 && (
+              <p class="ob-prom"><strong>{o.data.promotorzy.length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {o.data.promotorzy.map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
+            )}
+          </WierszWydarzenia>
         ))}
-        </div>
       </section>
     ))}
-    <p class="muted">{t(lang, 'archiwumObron')} <a href={`${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`}>{t(lang, 'archiwum')}</a>.</p>
-    </div>
-  </div>
-</Baza>
+    <p class="ob-pusto" role="status" data-pusto hidden>{en ? 'No defences match the selected filters.' : 'Brak obron spełniających wybrane kryteria.'}</p>
+    <p class="ob-archiwum">{t(lang, 'archiwumObron')} <Link href={archiwum}>{t(lang, 'archiwum')}</Link>.</p>
+  </ListaPokaz>
+</Podstrona>
+
+<script>
+  // Filtr lat z panelu „Pokaż” (?rok=… z adresu) i szukanie po tekście wiersza (kandydat, tytuł rozprawy, promotor, termin, miejsce).
+  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
+  const lista = document.querySelector<HTMLElement>('[data-obrony]');
+  if (lista) {
+    const pozycje = Array.from(lista.querySelectorAll<HTMLElement>('[data-ww]'));
+    const tekst = new Map(pozycje.map((p) => [p, norm(p.querySelector('.ww-tresc')?.textContent ?? '')]));
+    const grupy = Array.from(lista.querySelectorAll<HTMLElement>('[data-grupa]'));
+    const pusto = lista.querySelector<HTMLElement>('[data-pusto]');
+    const pokaz = () => {
+      const rok = panel.filtr();
+      const q = panel.szukane();
+      for (const p of pozycje) p.hidden = (!!rok && !(p.querySelector('time')?.dateTime ?? '').startsWith(rok)) || (!!q && !(tekst.get(p) ?? '').includes(q));
+      grupy.forEach((g) => (g.hidden = !g.querySelector('[data-ww]:not([hidden])')));
+      if (pusto) pusto.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
+    };
+    const panel = panelPokaz(lista, pokaz);
+    panel.ustaw(new URLSearchParams(location.search).get('rok'));
+  }
+</script>
 
 <style>
-  /* komputer (≥ 761 px): odstęp nad pierwszym blokiem stały (24 px), jak na stronie działu „Nauka” — treść nie przylega
-     do banera (reszta odstępów .layout — uklad-zwarta.css) */
-  @media (min-width: 761px) { .layout { padding-top: 24px; } }
+  [hidden] { display: none !important; }
+  /* grupa (nadchodzące, odbyte): nagłówek jak miesiąc w Aktualnościach */
+  .ob-grupa { margin: 0; padding: 0; border: 0; }
+  .ob-grupa h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
+    font-size: 23px; line-height: 1.4; color: var(--d-a); }
+  /* promotor: jak „Kiedy:” w wierszu Aktualności */
+  .ob-prom { margin: 2px 0 0; max-width: none; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .ob-prom strong { font-weight: 700; color: var(--ink); }
+  .ob-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+  .ob-archiwum { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
+  .ob-archiwum :global(a) { color: var(--d-a); }
+
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1).
+     Tekst nad listą (dawniej .ob-wstep) — style .lp-wstep w ListaPokaz.astro (zlecenie 30). */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .ob-grupa h2 { margin-top: 22px; font-size: 20px; }
+    .ob-prom { font-size: 13.5px; }
+  }
 </style>

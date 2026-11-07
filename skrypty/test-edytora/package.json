@@ -1,0 +1,19 @@
+{
+  "name": "test-edytora",
+  "private": true,
+  "type": "module",
+  "description": "Zlecenie 28, etap 6a: wczytanie i zapis treści kierunków edytorem TipTap (@tiptap/markdown), jak w Pages CMS. Zależności tylko tutaj, nie w stronie.",
+  "scripts": { "test": "node symulacja.mjs" },
+  "dependencies": {
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/pm": "^3.0.0",
+    "@tiptap/starter-kit": "^3.0.0",
+    "@tiptap/extension-underline": "^3.0.0",
+    "@tiptap/extension-link": "^3.0.0",
+    "@tiptap/extension-image": "^3.0.0",
+    "@tiptap/extension-table": "^3.0.0",
+    "@tiptap/markdown": "^3.0.0",
+    "happy-dom": "^15.11.7",
+    "yaml": "^2.6.1"
+  }
+}

@@ -3,76 +3,59 @@
 // Tekst z szablonu w src/data/kolory-dni.json (pole „aktualnosci”, Pages CMS → Kalendarz zajęć), dane z tej samej zamiany.
 // Na listach aktualności pozycja jest tylko w oknie widoczności (od N dni roboczych przed zamianą do dnia zamiany);
 // sama strona istnieje zawsze (stare linki działają), poza oknem bez indeksowania i bez wyszukiwarki strony.
-// Wygląd na komputerze (≥ 761 px): jak w wariancie „Zwarta” (uklad="zwarta", style: src/styles/uklad-zwarta.css i blok niżej);
-// tekst ogłoszenia i przycisk kalendarza w białej ramce .zd-ramka (jak treść zwykłej aktualności) — wzór tła nie prześwituje
-// pod tekstem. Telefon (≤ 760 px) bez zmian: ramka nie ma tam żadnego stylu.
+// Układ wspólnego szablonu podstrony (rama .z-pd i treść .z-pd-tresc jak w zal/Podstrona.astro, bez spisu; zlecenie 12,
+// etap 3) i wzorzec treści (zalecenie 14, src/styles/zal-tresc.css): granatowy nagłówek z tytułem i „← Wszystkie aktualności”,
+// etykieta wpisu, ramka uwagi po zamianie, dzień zamiany (kółko w kolorze dnia ze skrótem planu, data, plan, kolor dnia
+// i semestr) między cienkimi liniami, tekst, przycisk-link do kalendarza, sekcja „Zobacz też” (ul.linki).
+// Szablon Podstrona.astro nie przekazuje do Baza.astro `szukaj` ani slotu „head” (noindex poza oknem), dlatego rama jest
+// tu złożona z tych samych elementów ręcznie. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Baza from '../layouts/Baza.astro';
-import Wstecz from '../components/Wstecz.astro';
-import Ikona from '../components/Ikona.astro';
+import NaglowekStrony from '../components/NaglowekStrony.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
-import { short, longWithDay, today, type Lang } from '../lib/daty';
-import { renderMarkdown } from '../lib/markdown';
-import { aktualnoscZamiany, nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
+import { short, longWithDay, type Lang } from '../lib/daty';
+import { nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
+import { daneAktualnosciZamianyDni } from '../lib/widoki/aktualnoscZamianaDni';
 
 interface Props { data: string; lang: Lang }
 const { data, lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const dzis = today();
-const a = aktualnoscZamiany(data, lang, dzis)!;
-const d = a.dzien;
-const html = await renderMarkdown(a.tresc);
-const minela = dzis > a.data;
-const dla = ['studenci', 'pracownicy'];
+const { a, d, html, minela, dla, kalendarz } = await daneAktualnosciZamianyDni(data, lang);
 const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dni', 'day-swaps')}`;
 ---
 <Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie} uklad="zwarta">
   {!a.wOknie && <meta slot="head" name="robots" content="noindex" />}
-  <div class="wrap crumbs-inline">
-    <Wstecz etykieta={t(lang, 'wszystkieAktualnosci')} adres="/aktualnosci" lang={lang} />
-  </div>
+  <NaglowekStrony tytul={a.tytul} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} />
+  <div class="z-pd">
+    <div class="z-pd-tresc tresc">
+      <section class="zd">
+        <p class="etyk zd-meta"><span>{RODZAJE.ogloszenie[lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od, lang)}</time></span> · <span>{t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span></p>
 
-  <div class="wrap layout zd" style="padding-top:16px">
-    <article class="main zd-main">
-      <header class="article-head">
-        <div class="news-meta">
-          <span class="badge badge-ogloszenie">{RODZAJE.ogloszenie[lang]}</span>
-          <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od)}</time></span>
-          <span>· {t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span>
+        {minela && <div class="uwaga"><p>{T('Ta zamiana dni już się odbyła.', 'This day swap has already taken place.')}</p></div>}
+
+        <div class="zd-dzien" data-kolor={d.kolor ?? 'brak'} role="group" aria-label={T('Zamiana dni', 'Day swap')}>
+          <span class="zd-skrot" aria-hidden="true">{SKROT_PLANU[lang][d.plan ?? d.dzienTygodnia]}</span>
+          <div>
+            <span class="etyk">{wielka(longWithDay(a.data, lang))}</span>
+            <p class="zd-plan">{wielka(opisZamiany(d.plan ?? d.dzienTygodnia, lang))}</p>
+            {d.kolor && <p class="zd-kolor">{T(`Dzień ${NAZWA_KOLORU.pl[d.kolor]}`, `${wielka(NAZWA_KOLORU.en[d.kolor])} day`)} · {nazwaSemestru(a.semestr, lang)}</p>}
+          </div>
         </div>
-        <h1>{a.tytul}</h1>
-      </header>
 
-      {minela && <p class="notice">{T('Ta zamiana dni już się odbyła.', 'This day swap has already taken place.')}</p>}
-
-      <section class="zd-dzien" data-kolor={d.kolor ?? 'brak'} aria-label={T('Zamiana dni', 'Day swap')}>
-        <span class="zd-skrot" aria-hidden="true">{SKROT_PLANU[lang][d.plan ?? d.dzienTygodnia]}</span>
-        <div>
-          <p class="zd-data">{wielka(longWithDay(a.data, lang))}</p>
-          <p class="zd-plan">{wielka(opisZamiany(d.plan ?? d.dzienTygodnia, lang))}</p>
-          {d.kolor && <p class="zd-kolor">{T(`Dzień ${NAZWA_KOLORU.pl[d.kolor]}`, `${wielka(NAZWA_KOLORU.en[d.kolor])} day`)} · {nazwaSemestru(a.semestr, lang)}</p>}
-        </div>
-      </section>
-
-      {/* Tekst ogłoszenia w ramce (na komputerze biała karta; na telefonie zwykły blok bez stylu). */}
-      <div class="zd-ramka">
         <div class="prose">
           <Fragment set:html={html} />
         </div>
+        <p class="akcja"><a href={kalendarz}>{T('Kalendarz zajęć — rok akademicki', 'Class calendar — academic year')}</a></p>
+      </section>
 
-        <p><a class="btn" href={kalendarz}><Ikona nazwa="kalendarz" rozmiar={18} />{T('Kalendarz zajęć — rok akademicki', 'Class calendar — academic year')}</a></p>
-      </div>
-    </article>
-
-    <aside class="side" data-pagefind-ignore>
-      <div class="side-box">
-        <h2>{T('Zobacz też', 'See also')}</h2>
-        <a class="link-arrow" href={u(wJezyku('/studia/rok-akademicki', lang))}><Ikona nazwa="kalendarz" rozmiar={16} />{T('Rok akademicki i kolory dni', 'Academic year and day colours')}</a>
-        <a class="link-arrow" href={u(wJezyku('/studia/plan-zajec', lang))}><Ikona nazwa="zegar" rozmiar={16} />{T('Plan zajęć', 'Timetable')}</a>
-      </div>
-      <a class="link-arrow" href={u(wJezyku('/aktualnosci', lang))}><Ikona nazwa="wstecz" rozmiar={16} />{t(lang, 'wszystkieAktualnosci')}</a>
-    </aside>
+      <section aria-labelledby="zd-tez-h" data-pagefind-ignore>
+        <h2 id="zd-tez-h">{T('Zobacz też', 'See also')}</h2>
+        <ul class="linki">
+          <li><a href={u(wJezyku('/studia/rok-akademicki', lang))}>{T('Rok akademicki i kolory dni', 'Academic year and day colours')}</a></li>
+          <li><a href={u(wJezyku('/studia/plan-zajec', lang))}>{T('Plan zajęć', 'Timetable')}</a></li>
+        </ul>
+      </section>
+    </div>
   </div>
 </Baza>
 
@@ -85,28 +68,26 @@ const kalendarz = u(wJezyku('/studia/rok-akademicki', lang)) + `#${T('zamiany-dn
     --kd-n: #0d4a58; --kd-n-ink: #cdf5fe; --kd-n-mocny: #3cc8e6;
     --kd-p: #5c3708; --kd-p-ink: #ffe1b3; --kd-p-mocny: #f2a33a;
   }
-  .zd-dzien { display: flex; align-items: center; gap: 20px; margin: 0 0 24px; padding: 20px 22px; border-radius: var(--radius-l); border: 2px solid var(--line); background: var(--surface); color: var(--ink); max-width: 760px; }
-  .zd-dzien[data-kolor='niebieski'] { background: var(--kd-n); border-color: var(--kd-n-mocny); color: var(--kd-n-ink); }
-  .zd-dzien[data-kolor='pomaranczowy'] { background: var(--kd-p); border-color: var(--kd-p-mocny); color: var(--kd-p-ink); }
-  .zd-skrot { flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--bg); font-size: 24px; font-weight: 900; letter-spacing: .02em; line-height: 1; }
-  [data-kolor='niebieski'] > .zd-skrot { background: var(--kd-n-mocny); color: #04222b; }
-  [data-kolor='pomaranczowy'] > .zd-skrot { background: var(--kd-p-mocny); color: #2b1700; }
-  .zd-data { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-  .zd-plan { margin: 2px 0 0; font-size: clamp(22px, 3.4vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
-  .zd-kolor { margin: 4px 0 0; font-size: 15px; font-weight: 600; }
-  @media (max-width: 520px) {
-    .zd-dzien { align-items: flex-start; gap: 14px; padding: 16px; }
-    .zd-skrot { width: 56px; height: 56px; font-size: 19px; }
-  }
+  .zd-meta { margin-bottom: 14px; }
+  .zd-meta span:not(:first-child) { color: var(--muted); }
+  .zd .uwaga { margin: 0 0 18px; }
 
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta”, tekst w białej ramce ----------
-     Ramka jak treść zwykłej aktualności (Aktualnosc.astro, .ak-ramka): tło strony, cienka ramka, zaokrąglenie --radius-l.
-     Kolumna wpisu najwyżej na szerokość ramki z tekstem; karta dnia na całą szerokość kolumny, równo z ramką. */
-  @media (min-width: 761px) {
-    .zd-main { --zd-odstep: clamp(20px, 2.2vw, 32px); max-width: calc(800px + 2 * var(--zd-odstep) + 2px); }
-    .zd-dzien { margin-bottom: 16px; padding: 16px 20px; max-width: none; }
-    .zd-skrot { width: 64px; height: 64px; font-size: 22px; }
-    .zd-ramka { padding: var(--zd-odstep); border: 1px solid var(--line); border-radius: var(--radius-l); background: var(--bg); }
-    .zd-ramka > :last-child { margin-bottom: 0; }
+  /* dzień zamiany: kółko w kolorze dnia ze skrótem planu, obok data, plan i kolor — między cienkimi liniami, bez karty */
+  .zd-dzien { display: flex; align-items: center; gap: 20px; max-width: 800px; margin: 4px 0 22px; padding: 16px 0;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .zd-skrot { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 2px dashed var(--line);
+    font-size: 22px; font-weight: 900; letter-spacing: .02em; line-height: 1; color: var(--muted); }
+  [data-kolor='niebieski'] > .zd-skrot { border: 0; background: var(--kd-n-mocny); color: #04222b; }
+  [data-kolor='pomaranczowy'] > .zd-skrot { border: 0; background: var(--kd-p-mocny); color: #2b1700; }
+  .zd-dzien p { margin: 0; }
+  .zd-dzien .zd-plan { font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  .zd-dzien .zd-kolor { margin-top: 4px; font-size: 15.5px; line-height: 1.55; }
+  .zd .akcja { margin-top: 18px; }
+
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .zd-dzien { align-items: flex-start; gap: 14px; }
+    .zd-skrot { width: 54px; height: 54px; font-size: 18px; }
+    .zd-dzien .zd-plan { font-size: 22px; }
   }
 </style>

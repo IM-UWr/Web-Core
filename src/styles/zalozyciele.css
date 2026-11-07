@@ -1,0 +1,548 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — wygląd na komputer (≥ 1024 px). Specyfikacja: dok/estetyka.md (gałąź kopia/2026-11-01-estetyka-prototypy),
+   wzorzec: prototyp proto/zalozyciele.src.html (ustawienia domyślne).
+   Telefon (≤ 1023 px) bez zmian: tu poza @media komputera są wyłącznie nowe zmienne (nieużywane na telefonie).
+   ========================================================================== */
+
+/* ---------- zmienne: paleta »Lazur i malina« (jasny / głęboki / atrament / tło), granat, kroje, kolumna ----------
+   Zlecenie 14, zalecenie 25 (decyzja 5.11, 10:32): Instytut bursztyn, Nauka szmaragd, Studia lazur, Popularyzacja malina.
+   W OKLCH każda rola ma tę samą jasność i nasycenie we wszystkich działach — różni się tylko odcień (prototyp: PALETY.lazur). */
+:root {
+  --granat: #0d1830;
+  --granat-2: #142241;
+  --na-ciemnym: #ffffff;
+  --na-ciemnym-2: #c9d0de;
+  --instytut-j: #e4a550; --instytut-g: #523300; --instytut-a: #845502; --instytut-t: #faefe1;
+  --nauka-j: #61cb97; --nauka-g: #00472c; --nauka-a: #03734a; --nauka-t: #e5f6ec;
+  --studia-j: #50c0f4; --studia-g: #004059; --studia-a: #00698f; --studia-t: #e3f4fd;
+  --popularyzacja-j: #ef90bb; --popularyzacja-g: #59273f; --popularyzacja-a: #953c68; --popularyzacja-t: #feebf2;
+  /* kolor mocny działu (zlecenie 11, zalecenie 16): jasny (-j) w OKLCH — nasycenie ×1,45, jasność +0,02 (najwyżej 0,86), przycięty
+     do sRGB; szkic patrona i podpis na banerze działu */
+  --instytut-jm: #faa401; --nauka-jm: #03da91; --studia-jm: #4cc7ff; --popularyzacja-jm: #ff8fc3;
+  --f-display: 'Brygada 1918 Variable', 'Brygada zast', 'Brygada 1918', 'Iowan Old Style', Georgia, serif;
+  --f-text: 'Manrope Variable', 'Manrope zast', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --kol: 1240px;
+  --gora: 66px;
+  /* kolory poza działami: neutralnie (bursztyn jest tylko kolorem Instytutu) */
+  --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de;
+}
+[data-dzial="instytut"] { --d-j: var(--instytut-j); --d-g: var(--instytut-g); --d-a: var(--instytut-a); --d-t: var(--instytut-t); --d-jm: var(--instytut-jm); }
+[data-dzial="nauka"] { --d-j: var(--nauka-j); --d-g: var(--nauka-g); --d-a: var(--nauka-a); --d-t: var(--nauka-t); --d-jm: var(--nauka-jm); }
+[data-dzial="studia"] { --d-j: var(--studia-j); --d-g: var(--studia-g); --d-a: var(--studia-a); --d-t: var(--studia-t); --d-jm: var(--studia-jm); }
+[data-dzial="popularyzacja"] { --d-j: var(--popularyzacja-j); --d-g: var(--popularyzacja-g); --d-a: var(--popularyzacja-a); --d-t: var(--popularyzacja-t); --d-jm: var(--popularyzacja-jm); }
+/* kolor nagłówka podstrony (głęboki kolor działu; w ciemnym motywie z domieszką granatu) — na elemencie nagłówka, po --d-g */
+.z-nagl-pod { --g-pod: var(--d-g); }
+/* Zmienne interfejsu (zlecenie 11, zalecenie 10): --line-ui — ramki przycisków i pól; --rule — grube kreski 2 px;
+   --panel — panel menu z hamburgera. W jasnym motywie bez zmian względem dotychczasowych kolorów (ramki przycisków
+   = --line; propozycja ≥ 3:1 także w jasnym czeka na decyzję — RAPORT-ZLECENIE-11.md). */
+:root { --line-ui: var(--line); --rule: var(--ink); --panel: rgb(9 16 34); }
+
+/* ---------- ciemny motyw „Nocny granat” (zlecenie 11, zalecenie 10; wariant A z dok/ciemny/RAPORT-CIEMNY.md) ----------
+   Głęboki granat zamiast czerni: banery, stopka i okładka w granacie marki są o ton ciemniejsze od treści (jak w jasnym),
+   powierzchnie pół tonu jaśniejsze, panel menu jeszcze jaśniejszy. Jedna definicja dla komputera i telefonu.
+   Tylko forma [data-theme="dark"]: skrypt w <head> zawsze ustawia data-theme (domyślnie jasny, także przy ciemnym
+   systemie — decyzja z Baza.astro), więc forma z prefers-color-scheme nie miałaby kiedy zadziałać. */
+:root[data-theme="dark"] {
+  --bg: #18243b; --surface: #222e46; --line: #3a465c;
+  --ink: #e4eaf5; --text: #ced5e3; --muted: #a5afc1;
+  --line-ui: #727c8f; --rule: #7d8697; --panel: #24324f;
+  --tint: #222e46; --tint-ink: #e4eaf5;
+  --primary: #ced5e3; --accent: var(--d-a); --accent-ink: #18243b;
+  --uwr: #e4eaf5;
+  /* kolory poza działami: wybrany przycisk i akcenty w kolorze tekstu (jasnym) */
+  --d-a: #e4eaf5; --d-t: #222e46;
+}
+/* kolor działu: jasny kolor działu z 22% koloru nagłówków (pastel, nie neon, ≥ 4,5:1 na tle, powierzchni i --d-t);
+   tło działu: 11% koloru działu w powierzchni (zamiast przyciemnionego głębokiego, który dawał brudny brąz) */
+:root[data-theme="dark"] [data-dzial]:is([data-dzial="instytut"], [data-dzial="nauka"], [data-dzial="studia"], [data-dzial="popularyzacja"]) {
+  --d-a: color-mix(in oklab, var(--d-j) 78%, #e4eaf5); --d-t: color-mix(in oklab, var(--d-j) 11%, #222e46);
+}
+/* wpis o wydarzeniu (zlecenie 21, punkt 6): .z-pd ma data-dzial, ale kolor działu mają tylko etykieta, data i linki w tekście.
+   Reszta treści zostaje w kolorach poza działami (wartości jak w :root wyżej), wiersze „Najbliższych wydarzeń” mają własne data-dzial. */
+.akt-wydarzenie { --d-wpisu: var(--d-a); }
+.akt-wydarzenie > * { --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de; --accent: var(--d-a); }
+:root[data-theme="dark"] .akt-wydarzenie > * { --d-a: #e4eaf5; --d-t: #222e46; }
+.akt-wydarzenie :is(.akt-meta, .akt-wyd-data, .prose a) { --d-a: var(--d-wpisu); --accent: var(--d-wpisu); }
+/* zdjęcia w dwóch kolorach: światła w kolorze działu przygaszonym granatem (cienie bez zmian — bez szwu z granatem z lewej) */
+:root[data-theme="dark"] .z-nagl .z-foto { background: color-mix(in oklab, var(--d-j) 55%, var(--granat)); }
+/* nagłówek podstrony: głęboki kolor działu z domieszką granatu zamiast jaskrawej cegły / ochry (gradienty te same) */
+:root[data-theme="dark"] .z-nagl.z-nagl-pod { --g-pod: color-mix(in oklab, var(--d-g) 72%, var(--granat)); }
+/* baner Aktualności (zlecenie 18, punkt 7; układ niżej, telefon w zal-telefon.css): zdjęcie w naturalnych kolorach, bez mnożenia
+   z kolorem i bez filtrów, w obu motywach */
+/* overflow: rozmyta mała wersja zdjęcia nie wychodzi na granat przy lewej krawędzi */
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto { overflow: hidden; background: none; }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto-obr { mix-blend-mode: normal; }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto img { filter: none; }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto img.z-lqip { filter: blur(14px); }
+.z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { mix-blend-mode: normal; }
+/* zwykłe zdjęcia: lekko przygaszone (okładka, portrety, miniatury) */
+:root[data-theme="dark"] .z-okl-foto { filter: brightness(.92) saturate(.92); }
+:root[data-theme="dark"] .z-okl-foto.z-lqip { filter: brightness(.92) saturate(.92) blur(14px); }
+/* malutka rozmyta wersja zdjęcia okładki pod pełnym (zlecenie 13, punkt 6) — komputer i telefon */
+.z-okl-foto.z-lqip { filter: blur(14px); }
+:root[data-theme="dark"] :is(.z-os .fot, .z-dz-fot img, .z-w .min img, .z-min img, .tresc .fot img, .galeria img) { filter: brightness(.88) saturate(.94); }
+/* „W skrócie” na stronie działu: powierzchnia pół tonu nad tłem (w ciemnym kreska 2 px nie wystarcza) */
+:root[data-theme="dark"] .z-dz-skrot { padding: 10px 20px 6px; background: var(--surface); }
+:root[data-theme="dark"] .z-dz-skrot dl > div:last-child { border-bottom: 0; }
+
+/* Jeden tekst naraz, także dla czytników ekranu (zlecenie 18, punkt 14) */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) { .tylko-telefon { display: none !important; } }
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .tylko-komputer { display: none !important; } }
+
+/* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); na okładce stopień idzie za skalą okładki (zlecenie 26, punkt 1), na telefonie stały */
+.z-okl-marka > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
+
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
+  /* Nagłówki poniżej 1368 px (zlecenie 24, punkt 2): każdy rozmiar to wartość przy 1368 px × szerokość / 1368, z dolnym progiem:
+     clamp(próg, calc(wartość * var(--jn)), wartość). Od 1368 px clamp daje samą wartość, więc nic się tam nie zmienia. --marg-min: margines maleje z 64 do 24 px. */
+  :root { --jn: calc(100vw / 1368); --marg-min: clamp(24px, calc(64 * var(--jn)), 64px); }
+  :root {
+    --bg: #fcfaf6; --surface: #f4f1ea; --line: #e5e0d6;
+    --ink: #131c31; --text: #2b3245; --muted: #5b6375;
+    --tint: #efeae0; --tint-ink: #131c31;
+    --primary: var(--granat); --accent: var(--d-a); --accent-ink: #ffffff;
+    --font: var(--f-text);
+    --radius-s: 4px; --radius: 6px; --radius-l: 8px;
+    --shadow: none;
+  }
+  /* ciemny motyw: tokeny poza @media (na górze pliku), wspólne z telefonem */
+  [data-dzial] { --accent: var(--d-a); }
+  body { font-family: var(--f-text); font-size: 16px; }
+  main :is(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; letter-spacing: -0.005em; }
+
+  /* ozdobne tło obecnej strony (Ustawienia → „Tło strony”) — w nowym wyglądzie gładkie ciepłe tło */
+  body[data-tlo] { background: var(--bg); }
+  body[data-tlo]::before, body[data-tlo]::after { content: none !important; }
+  /* stary nagłówek i przyciemnienie pod panelem menu — tylko na telefonie */
+  .hdr, .z-menu-tlo { display: none !important; }
+
+  /* dotychczasowy baner: na komputerze zostaje tylko nowy nagłówek wstawiony na jego końcu (NaglowekZ.astro) */
+  .ph.ph-z, .page-head.ph-z { display: contents; }
+  .ph.ph-z::before, .ph.ph-z::after, .page-head.ph-z::before, .page-head.ph-z::after { content: none !important; display: none !important; }
+  .ph.ph-z > :not(.z-nagl), .page-head.ph-z > :not(.z-nagl) { display: none !important; }
+
+  /* ---------- pasek menu na banerze ---------- */
+  .z-pasek { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: var(--gora); color: #fff;
+    --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); border-bottom: 1px solid rgb(255 255 255 / .14);
+    --pasek-krycie: 30%; }
+  .z-pasek-in { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 100%; }
+  /* strona bez banera (np. pojedyncza aktualność): pasek na granacie, w zwykłym układzie, przyklejony u góry */
+  body:not(:has(.z-nagl, .z-okladka)) .z-pasek { position: sticky; top: 0; background: var(--granat); }
+  /* przyklejony u góry (zlecenie 11, zalecenie 6): z JS stały nad banerem i treścią, kolor według tego, co pod nim
+     (src/scripts/zal/pasek.ts). Bez JS zostaje na banerze (position: absolute), bo nie miałby kiedy zmienić koloru. */
+  html.js body:has(.z-nagl) .z-pasek:not(.z-pasek-jasny) { position: fixed; }
+  /* Tło stanów to trzy warstwy pod treścią paska (.z-pasek-tlo na górze nad banerem, ::before po przewinięciu, ::after jasna;
+     każda z tłem, rozmyciem i dolną linią), które wchodzą i gasną przez opacity (zlecenie 13, punkt 8: dawniej przejście
+     background-color i box-shadow samego paska z backdrop-filter, czyli odmalowywanie rozmycia w każdej klatce). Ukryta warstwa ma
+     visibility: hidden, więc jej rozmycie nie jest liczone. */
+  /* na samej górze nad banerem (także bez JS; zlecenie 18, punkt 10): lekkie rozmycie, żeby napisy ze zdjęcia nie mieszały się z menu */
+  body:has(.z-nagl) .z-pasek:not(.z-pasek-jasny):not(.przewiniety) { border-bottom-color: transparent; }
+  .z-pasek-tlo { display: none; }
+  body:has(.z-nagl) .z-pasek-tlo { display: block; position: absolute; inset: 0 0 -1px; z-index: -1; pointer-events: none;
+    background: color-mix(in srgb, var(--granat) 30%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid rgb(255 255 255 / .16);
+    transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
+  html.js .z-pasek.przewiniety .z-pasek-tlo { opacity: 0; visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
+  html.js .z-pasek:not(.z-pasek-jasny)::before, html.js .z-pasek:not(.z-pasek-jasny)::after { content: ''; position: absolute; inset: 0 0 -1px; z-index: -1;
+    pointer-events: none; opacity: 0; visibility: hidden; transition: opacity var(--t-sredni) var(--rytm), visibility 0s linear var(--t-sredni); }
+  /* po przewinięciu nad banerem: rozmycie z tym samym lekkim tłem co na górze, bez przyciemnienia (zlecenie 18, punkt 10).
+     Krycie tylko tak duże, żeby tekst menu miał kontrast 4,5:1 z najjaśniejszym miejscem pod paskiem (pomiary w RAPORT-ZLECENIE-18.md):
+     banery działów i ich podstron mają przy dolnej krawędzi jaśniejszy kolor, a zdjęcie Aktualności jasną podłogę */
+  body:has(.z-nagl:not(.z-nagl-pod)) .z-pasek { --pasek-krycie: 45%; }
+  body:has(.z-nagl-pod[data-dzial]) .z-pasek { --pasek-krycie: 40%; }
+  body:has(.z-foto-nat) .z-pasek { --pasek-krycie: 60%; }
+  html.js .z-pasek::before { background: color-mix(in srgb, var(--granat) var(--pasek-krycie), transparent); -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1);
+    border-bottom: 1px solid rgb(255 255 255 / .1); box-shadow: 0 8px 24px rgb(0 0 0 / .18); }
+  /* nad treścią: jasny — tło strony z lekką przezroczystością i rozmyciem, tekst i logo w kolorze tekstu, cienka linia u dołu */
+  html.js .z-pasek::after { background: color-mix(in srgb, var(--bg) 95%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line); box-shadow: 0 6px 18px rgb(13 24 48 / .06); }
+  /* stopka w oknie: pasek w jej kolorze, bez rozmycia (src/scripts/zal/pasek.ts) */
+  html.js .z-pasek.przy-stopce::before { background: var(--granat); -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom-color: rgb(255 255 255 / .14); box-shadow: none; }
+  html.js .z-pasek.przewiniety:not(.jasny)::before, html.js .z-pasek.jasny::after { opacity: 1; visibility: visible; transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
+  html.js .z-pasek { transition: color var(--t-sredni) var(--rytm); }
+  html.js .z-pasek.jasny { color: var(--ink); }
+  /* strona bez banera: na górze i przy stopce pasek na granacie (warstwa ciemna bez rozmycia), nad treścią jasny */
+  html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek { background: none; }
+  html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek::before { background: var(--granat); -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-bottom-color: rgb(255 255 255 / .14); box-shadow: none; }
+  html.js body:not(:has(.z-nagl, .z-okladka)) .z-pasek:not(.jasny)::before { opacity: 1; visibility: visible; transition: opacity var(--t-sredni) var(--rytm), visibility 0s; }
+  @media (prefers-reduced-motion: reduce) { html.js .z-pasek, html.js .z-pasek::before, html.js .z-pasek::after, .z-pasek-tlo { transition: none !important; } }
+  .z-marka { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+  /* najechanie: nazwa przygasa do koloru podpisu, bez podkreślenia (zlecenie 18, punkt 1); kolor na jasnym pasku niżej.
+     color: inherit na linku, bo globalne a:hover dawało granat na granacie */
+  .z-marka:hover { color: inherit; }
+  .z-marka b { transition: color var(--t-krotki) var(--rytm); }
+  .z-marka:hover b { color: var(--na-ciemnym-2); }
+  @media (prefers-reduced-motion: reduce) { .z-marka b { transition: none; } }
+  .z-logo { display: block; height: 40px; aspect-ratio: 500 / 160; background: #fff;
+    -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
+  .z-marka > span:last-child { padding-left: 12px; border-left: 1px solid rgb(255 255 255 / .25); }
+  .z-marka b { display: block; font-family: var(--f-display); font-weight: 600; font-size: 19px; line-height: 1.1; }
+  .z-marka small { display: block; font-size: 12px; line-height: 1.3; color: var(--na-ciemnym-2); }
+  .z-pasek nav { display: flex; align-items: center; gap: 2px; font-size: 15px; font-weight: 500; }
+  .z-pasek nav a { position: relative; padding: 8px 11px; color: rgb(255 255 255 / .8); text-decoration: none; white-space: nowrap; }
+  .z-pasek nav a:hover, .z-pasek nav a[aria-current] { color: #fff; }
+  .z-pasek nav a[aria-current] { font-weight: 700; }
+  .z-pasek nav a[data-dzial]::after { content: ''; position: absolute; left: 11px; bottom: 3px; width: 18px; height: 2px; background: var(--d-j); }
+  .z-pasek nav a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+  /* za cienką kreską: tryb ciemny, język i hamburger (Rekrutacja i Szukaj są w panelu hamburgera) */
+  .z-pasek-narz { position: relative; display: flex; align-items: center; margin-left: 12px; }
+  .z-pasek-narz::before { content: ''; position: absolute; left: -6px; top: 13px; bottom: 13px; width: 1px; background: rgb(255 255 255 / .25); }
+  .z-pasek-narz button { display: grid; place-items: center; width: 38px; height: 38px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none;
+    color: rgb(255 255 255 / .8); cursor: pointer; }
+  .z-pasek-narz button:hover { color: #fff; }
+  .z-pasek-narz button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .z-pasek-narz button[data-motyw] svg { width: 17px; height: 17px; }
+  .z-pasek-narz .z-burger svg { width: 21px; height: 21px; }
+  .z-pasek-narz :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 1px; border-radius: 4px; }
+  /* przycisk trybu: księżyc w jasnym, słońce w ciemnym (pasek i okładka) */
+  [data-motyw] .z-sl { display: none; }
+  :root[data-theme="dark"] [data-motyw] .z-ks { display: none; }
+  :root[data-theme="dark"] [data-motyw] .z-sl { display: block; }
+  .z-jezyk { display: inline-flex !important; align-items: center; gap: 6px; }
+  .z-flaga { flex: none; width: 20px; height: 10px; border-radius: 1px; box-shadow: 0 0 0 1px rgb(0 0 0 / .12); }
+
+  /* ---------- wspólne: zdjęcie w dwóch kolorach (cienie granatowe, światła w jasnym kolorze działu) ---------- */
+  .z-nagl { position: relative; overflow: hidden; color: #fff; isolation: isolate; background: var(--granat);
+    --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); box-shadow: 0 1px 0 var(--line); }
+  .z-foto { position: absolute; top: 0; bottom: 0; left: 36%; right: 0; z-index: -2; background: var(--d-j); }
+  /* zdjęcie (i jego malutka wersja, zlecenie 13) w opakowaniu .z-foto-obr, które mnoży się z kolorem działu (mix-blend-mode);
+     filtr z --filtr (np. Nauka) albo domyślny */
+  .z-foto-obr { position: absolute; inset: 0; mix-blend-mode: multiply; }
+  .z-foto img { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--filtr, grayscale(1) contrast(1.2) brightness(1.04)); }
+  .z-foto img.z-lqip { position: absolute; inset: 0; filter: var(--filtr, grayscale(1) contrast(1.2) brightness(1.04)) blur(14px); }
+  .z-foto img.z-pelne { position: relative; }
+  .z-foto::after { content: ''; position: absolute; inset: 0; background: var(--granat); mix-blend-mode: lighten; }
+  /* Studia (zlecenie 11, zalecenie 17; prototyp v79): zdjęcie z sali HS przypięte do szkicu patrona, nie do szerokości okna — twarz
+     Knastera wypada między głowami w ławkach na każdym ekranie. Środek szkicu: --m + odstęp + połowa szkicu od prawej (--c, przy 1368 px i wyżej 40 + 115 = 155 px);
+     zdjęcie maleje poniżej 1368 px razem ze szkicem (zlecenie 24, punkt 2), więc twarz stoi na tym samym tle; .4425 (= 1 − .5575) — miejsce zdjęcia pod środkiem szkicu od lewej; .4025 pilnuje, żeby z prawej nie wszedł baner z portretem;
+     .2951 — wysokość kadru; .5631 — proporcje pliku (3200×1802). Margines liczony w cqw kontenera zdjęcia (szerokość banera), bo
+     „100%” z --marg w `top` liczyłoby się względem wysokości. */
+  .z-baner-dzialu[data-dzial="studia"] .z-foto { left: 0; container-type: inline-size; }
+  .z-baner-dzialu[data-dzial="studia"] .z-foto img { --m: max(var(--marg-min), calc((100cqw - var(--kol)) / 2)); --c: calc(var(--m) + var(--odst) + var(--szk) / 2);
+    --sz: max(min(1454px, calc(1454 * var(--jn))), calc(var(--c) / .4025));
+    position: absolute; top: calc(50% - .2951 * var(--sz)); right: calc(var(--c) - .5575 * var(--sz)); left: auto; bottom: auto;
+    width: var(--sz); max-width: none; height: calc(.5631 * var(--sz)); object-fit: fill; }
+  .z-nagl h1 { margin: 0; color: #fff; font-family: var(--f-display); font-weight: 500; letter-spacing: -0.012em; }
+  .z-nagl a { color: inherit; }
+  .z-wstecz, .z-sciezka a { font-size: 14px; font-weight: 600; color: var(--na-ciemnym-2) !important; text-decoration: none; }
+  .z-wstecz:hover, .z-sciezka a:hover { color: #fff !important; }
+  .z-sciezka { margin: 0; }
+  .z-haslo { margin: 10px 0 0; font-size: clamp(15px, calc(19 * var(--jn)), 19px); font-weight: 500; color: var(--d-j); }
+  /* liczby pod hasłem: lista przekazana przez widok (.pt-liczby) */
+  /* liczby zawsze w jednym rzędzie (zlecenie 11, zalecenie 2): rząd zawija się, ale ma wysokość jednego rzędu — liczby, które
+     przeszłyby do drugiego, znikają w całości (kolejność z danych: pierwsze najważniejsze). Szerokość rzędu do ciekawostki
+     lub notki o patronie (minus 20 px) i aria-hidden ukrytych ustawia skrypt w nagłówku (NaglowekZ.astro). */
+  .z-slot .pt-liczby { display: flex !important; flex-wrap: wrap; gap: 60px 34px; width: fit-content; max-width: 100%; max-height: 52px; overflow: hidden; margin: 20px 0 0; padding: 12px 0 0; list-style: none; border-top: 1px solid rgb(255 255 255 / .2); }
+  .z-baner-dzialu .z-slot .pt-liczby { max-width: calc(100vw - 2 * var(--marg) - var(--szk) - var(--odst) - var(--patron-w) - 20px); } /* bez JS: notka ze szkicem + 20 px odstępu */
+  .z-slot .pt-liczby li { display: flex; align-items: baseline; gap: 9px; margin: 0; font-size: clamp(13px, calc(14 * var(--jn)), 14px); font-weight: 500; white-space: nowrap; color: var(--na-ciemnym-2); }
+  .z-slot .pt-liczby .n { font-family: var(--f-display); font-size: clamp(22px, calc(30 * var(--jn)), 30px); font-weight: 500; line-height: 1.1; color: #fff; }
+  .z-slot .lead { margin: 10px 0 0; max-width: 640px; font-size: 15.5px; color: var(--na-ciemnym-2); }
+  .z-slot .tags, .z-slot .ww-meta, .z-slot .pr-akcje { margin: 14px 0 0; }
+  .z-slot .badge { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .25); }
+  .z-slot .ww-meta a, .z-slot .pr-akcje a { color: #fff; }
+  .z-slot .pt-liczby + .pt-liczby { display: none !important; }
+  /* bezpiecznik dopasowania (NaglowekZ.astro; zlecenie 24, punkt 4): pierwsza liczba się nie mieści, więc znika cały rząd z kreską; nie ma miejsca na opis ciekawostki albo akapit notki o patronie */
+  .z-slot .pt-liczby.z-bez-liczb { display: none !important; }
+  .z-nagl :is(.z-znak-opis, .z-patron p).z-brak-miejsca { display: none; }
+
+  /* ---------- baner strony działu („opcja 4”) ---------- */
+  .z-baner-dzialu { --szk: clamp(140px, calc(230 * var(--jn)), 230px); --odst: clamp(14px, calc(40 * var(--jn)), 40px); --patron-w: clamp(200px, calc(270 * var(--jn)), 270px);
+    height: calc(clamp(230px, calc(300 * var(--jn)), 300px) + var(--gora)); }
+  .z-baner-dzialu::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
+    linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
+    radial-gradient(300px 230px at 76% 52%, rgb(13 24 48 / .62), rgb(13 24 48 / 0) 100%),
+    radial-gradient(330px 210px at 62% 40%, rgb(13 24 48 / .6), rgb(13 24 48 / 0) 100%),
+    linear-gradient(100deg, var(--granat) 0, var(--granat) 41%, rgb(13 24 48 / .86) 47%, rgb(13 24 48 / .4) 58%, rgb(13 24 48 / 0) 70%); }
+  .z-baner-dzialu .z-tytul { position: absolute; z-index: 3; left: var(--marg); top: calc(clamp(34px, calc(50 * var(--jn)), 50px) + var(--gora)); }
+  .z-baner-dzialu h1 { margin-top: 6px; font-size: clamp(44px, calc(76 * var(--jn)), 76px); line-height: 1; }
+  /* długi tytuł z danych (np. „Popularyzacja matematyki”) nie wchodzi pod notkę o patronie: łamie się i jest mniejszy */
+  .z-baner-dzialu h1 { max-width: min(660px, calc(100vw - 2 * var(--marg-min) - var(--szk) - var(--odst) - var(--patron-w) - 60px)); text-wrap: balance; }
+  .z-baner-dzialu:not(:has(.z-slot)) h1 { font-size: clamp(44px, max(min(calc(56 * var(--jn)), 56px), 4vw), 76px); }
+  .z-szkic-ramka { position: absolute; z-index: 1; right: calc(var(--marg) + var(--odst)); top: calc(50% - var(--szk) * .6 + var(--gora) / 2); width: var(--szk); height: calc(var(--szk) * 1.2);
+    filter: drop-shadow(0 0 7px color-mix(in srgb, var(--d-j) 55%, transparent)); }
+  .z-podpis-ramka { position: absolute; z-index: 3; right: calc(var(--marg) + clamp(22px, calc(60 * var(--jn)), 60px)); bottom: 20px; height: clamp(30px, calc(46 * var(--jn)), 46px); line-height: 0;
+    color: color-mix(in srgb, var(--d-j) 72%, #fff); transform: rotate(-4deg); filter: drop-shadow(0 1px 6px rgb(13 24 48 / .8)); }
+  .z-podpis-ramka svg { display: block; height: 100%; width: auto; }
+  /* szkic patrona na banerze działu bez plamy (zlecenie 11, zalecenie 16; prototyp „mocniejszy + cień kreski”): kreski i podpis
+     w mocniejszym kolorze działu (--d-jm), wzdłuż kresek wąski ciemny cień — szkic odcina się od zdjęcia (np. od tłumu na Nauce) */
+  .z-baner-dzialu .z-szkic :is(.tusz, .detale) path { stroke: var(--d-jm); }
+  .z-baner-dzialu .z-szkic .tusz path { stroke-width: 2px; }
+  .z-baner-dzialu .z-szkic-ramka { filter: drop-shadow(0 0 1.5px rgb(9 16 34 / .95)) drop-shadow(0 0 4px rgb(9 16 34 / .7))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--d-jm) 40%, transparent)); }
+  .z-baner-dzialu .z-podpis-ramka { color: var(--d-jm); }
+  .z-patron { position: absolute; z-index: 2; top: calc(clamp(40px, calc(58 * var(--jn)), 58px) + var(--gora)); right: calc(var(--marg) + var(--szk) + var(--odst)); width: var(--patron-w); text-align: right; text-shadow: 0 1px 10px rgb(13 24 48 / .9); }
+  .z-patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(18px, calc(23 * var(--jn)), 23px); color: #fff; }
+  /* lata · patron działu · sala — zawsze w jednej linii (zlecenie 14, zalecenie 26); dłuższa wychodzi w lewo poza blok 270 px,
+     nie w prawo (flex-end). Pudełko zostaje szerokości bloku: skrypt dopasowania liczb (NaglowekZ.astro) liczy granicę z pudełek. */
+  .z-patron span { display: flex; justify-content: flex-end; margin-top: 2px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--d-j) 75%, #fff); }
+  .z-patron p { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--d-j) 45%, transparent); font-size: clamp(13px, calc(14 * var(--jn)), 14px); line-height: 1.5; color: rgb(255 255 255 / .86); }
+
+  /* szkic: kontur rysuje się (pathLength=1, dasharray/dashoffset), detale pojawiają się; po narysowaniu jednolity */
+  .z-szkic { display: block; width: 100%; height: 100%; overflow: visible; }
+  .z-szkic path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .z-szkic .tusz path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.3; stroke-dasharray: 1 1; stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.5s cubic-bezier(.35,.6,.2,1) calc(var(--i, 0) * 45ms), opacity .35s; }
+  .z-szkic .detale path { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.1; }
+  .z-szkic .detale { transition: opacity .7s ease .55s; }
+  /* Stan banera ustawia skrypt w linii na końcu banera — zanim strona się narysuje (bez skoku przy wejściu i w przejściu
+     między stronami): .z-czeka — pierwsze wejście, szkic czeka niewidoczny i rysuje się po dodaniu .z-rysuj;
+     .z-gotowe — powrót, ograniczony ruch albo telefon. Bez JS — od razu gotowy. */
+  [data-z-baner-dzialu].z-czeka .z-szkic .tusz path { stroke-dashoffset: 1; opacity: 0; }
+  [data-z-baner-dzialu].z-czeka .z-szkic .detale { opacity: 0; }
+  [data-z-baner-dzialu]:not(.z-czeka, .z-rysuj) .z-szkic :is(.tusz path, .detale) { transition: none; }
+  /* podpis: obrys odsłaniany liniami prowadzącymi (maska); tempo ustawia src/scripts/zal/szkice.ts */
+  [data-z-baner-dzialu]:is(.z-czeka, .z-rysuj) .z-podpis.pisze mask path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+  /* zastępczo, gdy moduł z tempem podpisu nie zdąży przed końcem szkicu (wolna sieć): podpis pisze się zaraz po szkicu */
+  [data-z-baner-dzialu].z-rysuj .z-podpis.pisze mask path { animation: z-pisz-zast .45s linear 2.3s forwards; }
+  @keyframes z-pisz { to { stroke-dashoffset: 0; } }
+  @keyframes z-pisz-zast { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .z-szkic .tusz path, .z-szkic .detale { transition: none !important; }
+    .z-podpis.pisze mask path { animation: none !important; }
+    [data-z-baner-dzialu].z-gotowe .z-szkic-ramka, [data-z-baner-dzialu].z-gotowe .z-podpis-ramka { animation: z-rozjasnij var(--t-krotki) var(--rytm); }
+  }
+  @keyframes z-rozjasnij { from { opacity: 0; } }
+
+  /* ---------- nagłówek podstrony: głęboki kolor działu na zdjęciu działu ---------- */
+  .z-nagl-pod { min-height: calc(190px + var(--gora)); padding: calc(52px + var(--gora)) 0 34px; background: var(--g-pod); }
+  .z-nagl-pod.z-liczbami { min-height: calc(268px + var(--gora)); padding-top: calc(30px + var(--gora)); }
+  .z-nagl-pod .z-foto { left: 0; }
+  /* podstrony Studiów: same tablice, kadr bez ściany z napisem i portretu (cqw — szerokość nagłówka) */
+  .z-nagl-pod[data-dzial="studia"] .z-foto { container-type: inline-size; }
+  .z-nagl-pod[data-dzial="studia"] .z-foto img { position: absolute; left: 0; top: calc(50% - 18.55cqw); width: 122cqw; max-width: none; height: 68.7cqw; object-fit: fill; }
+  .z-nagl-pod .z-foto::after { background: color-mix(in srgb, var(--g-pod) 70%, var(--granat)); }
+  .z-nagl-pod::before { content: ''; position: absolute; inset: 0; z-index: -1; background:
+    linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)),
+    radial-gradient(360px 170px at 74% 58%, color-mix(in srgb, var(--g-pod) 70%, transparent), transparent 100%),
+    linear-gradient(90deg, color-mix(in srgb, var(--g-pod) 90%, transparent) 0, color-mix(in srgb, var(--g-pod) 72%, transparent) 45%, color-mix(in srgb, var(--g-pod) 56%, transparent) 100%); }
+  .z-nagl-pod.z-granat { --d-g: var(--granat); --d-j: #c9d0de; }
+  /* Aktualności i listy w ich stylu (zlecenie 27): pełny granat z lewej przechodzi w zdjęcie po prawej (jak na banerach działów), przyciemnione
+     tylko pod paskiem i przy tekście. Górna granica szerokości: szersze zdjęcie jest wyższe, a skacząca osoba musi się zmieścić pod paskiem
+     (zlecenie 27, punkt 3): postać zajmuje 39% wysokości zdjęcia, nad treścią banera zostaje ok. 215 px, więc zdjęcie najwyżej 980 px
+     szerokości, kadr 48% 52% (NaglowekZ.astro) — od 1024 do 2560 px ręce co najmniej 12 px pod paskiem, stopy co najmniej 10 px nad dołem banera.
+     Długi tytuł wpisu kończy się przed jasną częścią zdjęcia. */
+  .z-nagl.z-nagl-pod.z-foto-nat::before { background: linear-gradient(180deg, rgb(13 24 48 / .7) 0, rgb(13 24 48 / 0) calc(var(--gora) * 1.7)); }
+  .z-nagl.z-nagl-pod.z-foto-nat .z-foto { left: auto; width: min(62%, 980px); }
+  .z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { background: linear-gradient(to right, var(--g-pod) 0, color-mix(in srgb, var(--g-pod) 60%, transparent) 26%, color-mix(in srgb, var(--g-pod) 12%, transparent) 55%, transparent 75%); }
+  .z-nagl.z-nagl-pod.z-foto-nat h1 { text-shadow: 0 1px 12px rgb(13 24 48 / .55); }
+  @media (min-width: 1100px) { .z-nagl.z-nagl-pod.z-foto-nat h1 { max-width: min(860px, 70%) !important; } }
+  /* węższe okno: tytuł idzie przez zdjęcie (inaczej długi tytuł wpisu miałby kilka linii więcej), więc całe zdjęcie trochę ciemniejsze */
+  @media (max-width: 1099px) { .z-nagl.z-nagl-pod.z-foto-nat .z-foto::after { background: linear-gradient(to right, var(--g-pod) 0, color-mix(in srgb, var(--g-pod) 70%, transparent) 26%, color-mix(in srgb, var(--g-pod) 40%, transparent) 55%, color-mix(in srgb, var(--g-pod) 30%, transparent) 100%); } }
+  .z-tyt { position: relative; z-index: 1; margin-left: var(--marg); max-width: calc(100% - 2 * var(--marg)); }
+  /* tytuł nie wchodzi pod opis znaku; liczby pod nim mogą iść dalej w prawo (jak w prototypie) */
+  /* bez JS; z JS szerokość tytułu do ciekawostki (minus 40 px) liczy skrypt w nagłówku */
+  html:not(.js) .z-nagl-pod:has(.z-znak) .z-tyt-g { max-width: calc(100% - max(clamp(400px, calc(570 * var(--jn)), 570px), clamp(470px, calc(676 * var(--jn)), 676px) - var(--marg))); }
+  /* w wąskim oknie (mały margines) rząd liczb łamie się przed znakiem, zamiast na niego wchodzić */
+  html:not(.js) .z-nagl-pod:has(.z-znak) .z-slot { max-width: calc(100% - max(0px, var(--zn) - var(--marg) + var(--znak-p))); }
+  .z-tyt-g { position: relative; }
+  .z-nagl-pod h1 { margin-top: 6px; font-size: clamp(40px, calc(58 * var(--jn)), 58px); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+  /* sygnet w lewym marginesie przed tytułem, oddzielony pionową kreską; pod nim mały podpis (ok. 56 px) */
+  .z-sygnet-nagl { position: absolute; right: calc(100% + clamp(14px, calc(22 * var(--jn)), 22px)); bottom: -14px; width: clamp(52px, calc(74 * var(--jn)), 74px); height: clamp(62px, calc(89 * var(--jn)), 89px); padding-right: clamp(12px, calc(18 * var(--jn)), 18px); box-sizing: content-box;
+    border-right: 1px solid rgb(255 255 255 / .28); }
+  .z-nagl-pod:not(.z-liczbami) .z-sygnet-nagl { bottom: 26px; }
+  .z-nagl-pod.z-bez-podpisu .z-sygnet-nagl { bottom: -5px; } /* bez podpisu: na środku bloku z linkiem i tytułem (seminarium) */
+  .z-sygnet-nagl path { fill: none; stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+  .z-podpis-maly { position: absolute; right: calc(100% + clamp(30px, calc(47 * var(--jn)), 47px)); top: calc(100% + 20px); line-height: 0; color: color-mix(in srgb, var(--d-j) 72%, #fff);
+    filter: drop-shadow(0 1px 4px rgb(13 24 48 / .7)); }
+  .z-nagl-pod:not(.z-liczbami) .z-podpis-maly { top: calc(100% - 21px); }
+  /* tytuł w dwóch liniach: sygnet z podpisem podniesiony o pół linii (skrypt ustawia --syg-podnies), środek blisko środka
+     dwóch linii tytułu; kreska obok sygnetu dłuższa w górę o tyle samo (zlecenie 11, zalecenie 9, doprecyzowanie 5.11) */
+  .z-sygnet-nagl, .z-podpis-maly { translate: 0 calc(-1 * var(--syg-podnies, 0px)); }
+  .z-nagl-pod.z-tyt-dlugi .z-sygnet-nagl { padding-block: calc(var(--syg-podnies, 0px) / 2); translate: 0 calc(-.5 * var(--syg-podnies, 0px)); }
+  .z-podpis-maly svg { display: block; width: clamp(40px, calc(56 * var(--jn)), 56px); height: auto; }
+  /* znak patrona z opisem: grafika na zewnątrz (wysunięta ok. 90 px w prawy margines), tekst do środka */
+  .z-nagl-pod { --znak-p: max(16px, calc(var(--marg) - 90px)); --zn: clamp(120px, calc(200 * var(--jn)), 200px); }
+  /* nad blokiem tytułu (.z-tyt, z-index 1, pełna szerokość kolumny), żeby kursor trafiał w znak (rysowanie po najechaniu) */
+  .z-znak { position: absolute; z-index: 2; right: var(--znak-p); top: calc(var(--gora) + 10px); width: calc(var(--zn) * .725); height: calc(var(--zn) * .85); }
+  .z-znak path { fill: none; stroke: color-mix(in srgb, var(--d-j) 60%, #fff); stroke-opacity: .7; stroke-width: 1.3px; vector-effect: non-scaling-stroke;
+    stroke-linecap: round; stroke-linejoin: round; }
+  .z-znak path.gruba { stroke: color-mix(in srgb, var(--d-j) 70%, #fff); stroke-opacity: 1; stroke-width: 2px; filter: drop-shadow(0 0 4px rgb(13 24 48 / .8)); }
+  /* ciekawostka (zalecenie 19): zdanie w kolumnie 300 px, tytuł (nazwa, rok) zawsze w jednej linii — wychodzi w lewo poza
+     kolumnę, jak .pd-b .znak-podpis b w prototypie; granicę tytułu strony i liczb liczy skrypt w nagłówku */
+  .z-znak-opis { position: absolute; z-index: 1; right: calc(var(--znak-p) + var(--zn) * .8); top: calc(var(--gora) + 62px); width: clamp(210px, calc(300 * var(--jn)), 300px); margin: 0; text-align: right;
+    font-size: 12.5px; line-height: 1.45; color: rgb(255 255 255 / .85); text-shadow: 0 1px 8px rgb(13 24 48 / .9); }
+  .z-znak-opis b { display: block; margin-left: -160px; white-space: nowrap; font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: 15px; color: #fff; }
+  .z-liczby-pod, .z-nagl-pod.z-liczbami .z-znak { width: var(--zn); height: var(--zn); top: calc(var(--gora) + 34px); }
+  .z-nagl-pod.z-liczbami .z-znak-opis { top: calc(var(--gora) + 102px); right: calc(var(--znak-p) + var(--zn) + 16px); }
+  /* poniżej 1368 px kursywny tytuł ciekawostki łamie się w swojej kolumnie, a drobny tekst ma co najmniej 13 px (zlecenie 24, punkt 2) */
+  @media (max-width: 1367px) {
+    .z-znak-opis { font-size: 13px; }
+    .z-znak-opis b { margin-left: 0; white-space: normal; font-size: clamp(13.5px, calc(15 * var(--jn)), 15px); }
+    .z-patron span { font-size: 13px; }
+  }
+  /* ciekawostka losowana na wizytę: do końca skryptu za znakiem niewidoczna (bez mignięcia stałej z budowania) */
+  html.js .z-nagl-pod.z-ck-losuje :is(.z-znak, .z-znak-opis) { visibility: hidden; }
+  /* po najechaniu znak rysuje się od nowa (~1 s): cienkie linie, na końcu gruba; sam CSS (pathLength="1"); bez animacji przy
+     ograniczonym ruchu i bez kursora */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .z-znak:hover path { stroke-dasharray: 1 1; animation: z-ck-rysuj .7s cubic-bezier(.22, .8, .2, 1) both; }
+    .z-znak:hover path.gruba { animation-duration: .35s; animation-delay: .65s; }
+  }
+  @keyframes z-ck-rysuj { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+  /* wąskie okno (np. laptop 1366 px): margines za mały na sygnet — sygnet z podpisem wchodzi do kolumny, tytuł przesuwa się w prawo */
+  @media (max-width: 1499px) {
+    .z-nagl-pod .z-tyt:has(.z-sygnet-nagl) { padding-left: clamp(84px, calc(122 * var(--jn)), 122px); }
+  }
+
+
+  /* ---------- okładka strony głównej (pierwszy ekran, jedna kompozycja skalowana od Full HD, zlecenie 26, punkt 1) ----------
+     --sk: skala s = min(szerokość okna / 1920, wysokość okna / 950), liczona w skrypcie ULOZ (Okladka.astro); bez JS 1, czyli rozmiary od wysokości okna jak dawniej.
+     --hp: wysokość okładki w „pikselach projektu” (co najmniej 950, więc dolne wartości w clamp() działają tylko bez JS). Rozmiar = s × wartość z projektu, drobny tekst z progiem. */
+  .z-okladka { --h: max(600px, 100svh); --sk: var(--z-s, 1); --hp: calc(var(--h) / var(--sk)); --okl-marg: max(24px, calc(48px * var(--sk))); position: relative; height: var(--h); overflow: hidden; background: var(--granat); color: #fff; isolation: isolate; font-family: var(--f-text); }
+  .z-okl-foto { position: absolute; top: -13%; left: var(--foto-x, 24%); width: calc(100% - var(--foto-x, 24%)); max-width: none; height: 100%; object-fit: cover; object-position: 2% 50%; z-index: -3;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 calc(140px * var(--sk))); mask-image: linear-gradient(90deg, transparent 0, #000 calc(140px * var(--sk))); }
+  /* kadr z naturalnych proporcji zdjęcia, rozmiar i położenie liczy skrypt ULOZ w Okladka.astro (zlecenie 18, punkt 13); bez JS reguła wyżej */
+  .z-okladka.z-kadr .z-okl-foto { top: var(--foto-top); width: var(--foto-w); height: auto; object-fit: fill; }
+  /* ciemne pole pod tytułem z krawędzią na łuku koła (--skos i --skos-maska liczy skrypt ULOZ w Okladka.astro, zlecenie 19, punkt 2; bez JS gradient z lewej) */
+  .z-skos { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: var(--skos, linear-gradient(90deg, rgb(9 16 34 / .97) 0, rgb(9 16 34 / .86) 30%, rgb(9 16 34 / 0) 55%));
+    -webkit-mask-image: var(--skos-maska, none); mask-image: var(--skos-maska, none); }
+  .z-okladka::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background:
+    linear-gradient(180deg, rgb(9 16 34 / .5) 0, rgb(9 16 34 / 0) 16%),
+    linear-gradient(0deg, var(--granat) 0, var(--granat) 33%, rgb(13 24 48 / .8) 46%, rgb(13 24 48 / 0) 64%); }
+  /* narzędzia na wysokości marki: powyżej Full HD rosną razem z nią (--z-k), poniżej zostają 40 px i tylko ich środek idzie za środkiem logo */
+  .z-narz { --marka-h: max(30px, calc(40px * var(--sk))); position: absolute; z-index: 5; top: calc((18px * var(--sk) + (var(--marka-h) - 40px * var(--z-k, 1)) / 2) / var(--z-k, 1)); right: 32px; display: flex; gap: 6px; zoom: var(--z-k, 1); }
+  .z-narz a, .z-narz button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; min-width: 40px; padding: 0 14px; border: 0; border-radius: 6px;
+    font: inherit; font-size: 14.5px; font-weight: 600; color: #fff; text-decoration: none; background: rgb(9 16 34 / .42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer; }
+  .z-narz button { padding: 0; width: 40px; }
+  .z-narz :is(a, button):hover { background: rgb(9 16 34 / .7); }
+  .z-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .z-narz svg:not(.z-flaga) { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+  /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
+  .z-okl-marka { position: absolute; z-index: 5; top: calc(18px * var(--sk)); left: var(--okl-marg); display: flex; align-items: center; gap: calc(14px * var(--sk)); color: #fff; text-decoration: none; }
+  .z-okl-marka .z-okl-logo { height: max(30px, calc(40px * var(--sk))); }
+  .z-okl-marka > span:last-child { padding-left: calc(14px * var(--sk)); border-left: 1px solid rgb(255 255 255 / .35); font-size: max(12px, calc(14px * var(--sk))); }
+  .z-okl-marka:hover > span:last-child { color: #fff; }
+  .z-okl-marka:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+  /* tytuł: końce „Instytut” i „Matematyczny” na łuku; top, stopnie i odstęp liczy ULOZ (--tyt-top, --f1, --f2, --w2-odst), bez JS wartości z CSS */
+  .z-okl-tytul { position: absolute; left: var(--okl-marg); top: var(--tyt-top, clamp(84px, calc(var(--h) * .2), 220px)); }
+  .z-okl-logo { display: block; height: var(--logo-h, clamp(42px, calc(var(--h) * .074), 70px)); aspect-ratio: 500 / 160; background: #fff;
+    -webkit-mask: var(--logo) left center / contain no-repeat; mask: var(--logo) left center / contain no-repeat; }
+  .z-okl-tytul h1 { margin: 0; font-family: var(--f-display); font-weight: 500; line-height: .98; letter-spacing: -.012em; white-space: nowrap; color: #fff; }
+  /* letter-spacing liczony od stopnia każdej linii: dziedziczony z h1 byłby stały w px, a wzory łuku (ULOZ) skalują szerokość słowa ze stopniem */
+  .z-okl-tytul h1 > span { display: block; width: fit-content; letter-spacing: -.012em; }
+  .z-okl-tytul .w1 { font-size: var(--f1, clamp(56px, calc(var(--h) * .11), 116px)); }
+  .z-okl-tytul .w2 { font-size: var(--f2, clamp(40px, calc(var(--h) * .074), 80px)); margin-top: var(--w2-odst, .04em); }
+  /* cztery działy nisko: szkic, nazwa i hasło; lewa krawędź nazw na jednej linii z tytułem (dwa razy po połowie marginesu okładki) */
+  .z-okl-dzialy { position: absolute; left: calc(var(--okl-marg) / 2); right: calc(var(--okl-marg) / 2); bottom: calc(var(--sk) * clamp(54px, calc(var(--hp) * .115), 124px)); display: grid; grid-template-columns: repeat(4, 1fr); }
+  .z-okl-dz { position: relative; display: flex; flex-direction: column; padding: calc(var(--sk) * clamp(8px, calc(var(--hp) * .016), 18px)) calc(var(--okl-marg) / 2) calc(4px * var(--sk)); color: #fff; text-decoration: none; outline: none; }
+  /* po najechaniu nazwa zostaje biała (globalne a:hover dawało granat na granacie) */
+  .z-okl-dz:hover { color: #fff; }
+  .z-okl-dz::before { content: ''; position: absolute; inset: 0; background: radial-gradient(52% 50% at 50% 34%, color-mix(in srgb, var(--d-g) 95%, transparent) 0, color-mix(in srgb, var(--d-g) 40%, transparent) 58%, transparent 100%);
+    opacity: 0; transition: opacity .6s var(--rytm); pointer-events: none; }
+  .z-okl-dz:hover::before, .z-okl-dz:focus-visible::before { opacity: 1; }
+  .z-okl-dz > * { position: relative; }
+  .z-okl-szkic { --sz: calc(var(--sk) * clamp(84px, calc(var(--hp) * .18), 176px)); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto calc(var(--sk) * clamp(4px, calc(var(--hp) * .01), 10px)); }
+  .z-okl-szkic .duch path { stroke: rgb(255 255 255 / .2); stroke-width: 1.25; }
+  .z-okl-szkic .tusz path { stroke: var(--d-j); stroke-width: 1.25; stroke-dashoffset: 1; opacity: 0; }
+  .z-okl-szkic .detale path { stroke: var(--d-j); stroke-width: 1.05; }
+  .z-okl-szkic .detale { opacity: 0; }
+  .z-okl-dz:is(:hover, :focus-visible) .tusz path { stroke-dashoffset: 0; opacity: 1; }
+  .z-okl-dz:is(:hover, :focus-visible) .detale { opacity: 1; }
+  /* suma szerokości czterech nazw to około 16 × czcionka: przy węższym oknie czcionka maleje, żeby „Popularyzacja” nie wychodziła poza okno (działa bez JS; ze skalą szerokość w pikselach projektu jest co najmniej 1920) */
+  .z-okl-nazwa { display: block; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: calc(var(--sk) * clamp(30px, min(calc(var(--hp) * .056), calc((100vw / var(--sk) - 260px) / 16)), 54px)); line-height: 1.05; letter-spacing: -.01em; }
+  /* po najechaniu: kreska pod nazwą wysuwa się od lewej i nazwa lekko świeci kolorem działu — kreska (::after) przez
+     transform: scaleX, poświata (::before: ten sam tekst, przezroczysty, z cieniem, pod właściwym) przez opacity
+     (zlecenie 13, punkt 8: animacje tylko transform i opacity; dawniej background-size i text-shadow) */
+  .z-okl-nazwa span { position: relative; z-index: 0; padding-bottom: calc(3px * var(--sk)); }
+  .z-okl-nazwa span::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: max(1.5px, calc(2px * var(--sk))); background: var(--d-j);
+    transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--t-dlugi) var(--rytm); }
+  .z-okl-nazwa span::before { content: attr(data-t); position: absolute; z-index: -1; left: 0; top: 0; white-space: nowrap; line-height: normal; color: transparent;
+    text-shadow: 0 0 22px color-mix(in srgb, var(--d-j) 55%, transparent); opacity: 0; transition: opacity var(--t-dlugi) var(--rytm); pointer-events: none; }
+  .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::after { transform: none; }
+  .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::before { opacity: 1; }
+  .z-okl-dz:focus-visible .z-okl-nazwa span { outline: 2px solid var(--d-j); outline-offset: 6px; }
+  .z-okl-dz .slot { position: relative; display: block; height: 2.8em; margin-top: calc(6px * var(--sk)); font-size: max(13px, calc(var(--sk) * clamp(13.5px, calc(var(--hp) * .021), 16px))); line-height: 1.4; }
+  .z-okl-dz .slot > span { position: absolute; inset: 0; transition: opacity var(--t-dlugi) var(--rytm), transform var(--t-dlugi) var(--rytm); }
+  .z-okl-dz .haslo-dz { color: var(--na-ciemnym-2); text-wrap: balance; }
+  .z-okl-dz .patron { opacity: 0; transform: translateY(4px); color: var(--na-ciemnym-2); }
+  .z-okl-dz .patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; color: #fff; }
+  .z-okl-dz:is(:hover, :focus-visible) .haslo-dz { opacity: 0; transform: translateY(-4px); }
+  .z-okl-dz:is(:hover, :focus-visible) .patron { opacity: 1; transform: none; }
+  /* barwienie zdjęcia po najechaniu na dział (zlecenie 11, zalecenie 1; prototyp „Barwione”): warstwa nad zdjęciem, pod
+     ciemnym polem; kolor --d-j z data-dzial warstwy (okladka.ts) */
+  .z-barwa { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: var(--d-j, transparent); mix-blend-mode: soft-light; opacity: 0; transition: opacity .6s var(--rytm); }
+  .z-okladka.zabarwione .z-barwa { opacity: .5; }
+  /* liczby nad „Szybkim dostępem” (zlecenie 11, zalecenie 15; prototyp v75, wariant „przygaszone”): nie konkurują z działami */
+  .z-okl-liczby { position: absolute; left: 50%; bottom: calc(var(--sk) * (clamp(10px, calc(var(--hp) * .022), 24px) + 36px)); transform: translateX(-50%); display: flex; align-items: baseline; white-space: nowrap; }
+  .z-okl-liczby a { position: relative; display: inline-flex; align-items: baseline; gap: calc(6px * var(--sk)); padding: calc(3px * var(--sk)) calc(16px * var(--sk)); font-size: max(12.5px, calc(12.5px * var(--sk))); color: rgb(255 255 255 / .5); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
+  .z-okl-liczby a + a::before { content: ''; position: absolute; left: 0; top: calc(7px * var(--sk)); bottom: calc(5px * var(--sk)); width: 1px; background: rgb(255 255 255 / .14); }
+  .z-okl-liczby b { font-family: var(--f-text); font-weight: 700; font-size: max(14px, calc(14px * var(--sk))); color: rgb(255 255 255 / .72); transition: color var(--t-krotki) var(--rytm); }
+  .z-okl-liczby a:hover, .z-okl-liczby a:hover b { color: #fff; }
+  .z-okl-liczby a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+  /* opis patrona środkowych działów (3 linie) sięga przy niższych oknach (np. 1366×768, 1280×720) do linii liczb —
+     wtedy liczby na chwilę gasną; dział ma pierwszeństwo */
+  .z-okl-liczby { transition: opacity var(--t-sredni) var(--rytm); }
+  .z-okladka:has(.z-okl-dz:is(:nth-child(2), :nth-child(3)):is(:hover, :focus-visible)) .z-okl-liczby { opacity: 0; }
+  .z-strzalka { position: absolute; left: 50%; bottom: calc(var(--sk) * clamp(10px, calc(var(--hp) * .022), 24px)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: calc(10px * var(--sk));
+    padding: calc(6px * var(--sk)) calc(12px * var(--sk)); font-size: max(13px, calc(14px * var(--sk))); color: rgb(255 255 255 / .74); text-decoration: none; white-space: nowrap; }
+  .z-strzalka:hover { color: #fff; }
+  .z-strzalka:focus-visible { outline: 2px solid #fff; border-radius: 6px; }
+  .z-strzalka svg { width: max(14px, calc(18px * var(--sk))); height: max(14px, calc(18px * var(--sk))); fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob 2.6s ease-in-out infinite; }
+  @keyframes z-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .z-strzalka svg { animation: none; }
+    .z-barwa, .z-okl-liczby, .z-okl-liczby :is(a, b) { transition: none; }
+    .z-okl-dz::before, .z-okl-dz .slot > span, .z-okl-nazwa span, .z-okl-nazwa span::before, .z-okl-nazwa span::after, .z-okl-szkic :is(.tusz path, .detale) { transition: none !important; }
+  }
+  /* strona główna: pasek menu na górze drugiego ekranu, zwykły (jasny) */
+  .z-pasek.z-pasek-jasny { position: sticky; top: 0; color: var(--ink); background: var(--bg); border-bottom-color: var(--line); }
+  /* jasny pasek: na stronie głównej zawsze, na pozostałych nad treścią (.jasny); kreski działów jak na ciemnym pasku,
+     w jasnym kolorze działu (--d-j), bo głęboki (--d-g) wyglądał na czarny */
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-logo { background: var(--uwr); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka > span:last-child { border-left-color: var(--line); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka small, :is(.z-pasek-jasny, .z-pasek.jasny) .z-marka:hover b { color: var(--muted); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a, :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button { color: color-mix(in srgb, var(--ink) 76%, transparent); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a:hover, :is(.z-pasek-jasny, .z-pasek.jasny) nav a[aria-current],
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz button:hover { color: var(--ink); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) .z-pasek-narz::before { background: var(--line); }
+  :is(.z-pasek-jasny, .z-pasek.jasny) nav a:focus-visible { outline-color: var(--ink); }
+  /* najwęższe okno komputera: nazwa Instytutu nie wystaje z paska. Poniżej 1024 px jest już widok telefonu (zlecenie 24, punkt 1). */
+  @media (max-width: 1119px) {
+    .z-marka small { display: none; }
+    .z-pasek nav > a { padding-inline: 9px; }
+    .z-pasek nav > a[data-dzial]::after { left: 9px; }
+  }
+
+
+  /* ---------- podstrona działu: treść bez kafelków (układ ze spisem z prawej — zal-podstrona.css) ---------- */
+  .z-pd-tresc { min-width: 0; }
+  /* sekcje i ich nagłówki według wzorca treści (zal-tresc.css) także na stronach z własnym blokiem (Władze, Projekty i granty —
+     zlecenie 11, zalecenie 14): kreska 1 px, 44 px nad nią i 40 px pod nią, nagłówek 32 px / 1,2, 16 px pod nim */
+  .z-pd-tresc > section { padding-bottom: 44px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
+  .z-pd-tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .z-pd-tresc h2 { margin: 0 0 16px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -.005em; color: var(--ink); }
+  .z-pd-tresc .wst { margin: 0 0 26px; font-size: 17px; color: var(--text); }
+  .z-pd-tresc :is(p, li) { font-size: 16.5px; line-height: 1.65; color: var(--text); max-width: 43.92em; }
+  .z-pd-tresc a { color: var(--d-a); }
+  .z-nast { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); display: flex; justify-content: space-between; align-items: center; gap: 24px;
+    margin: 32px var(--marg) 40px; padding-top: 18px; border-top: 2px solid var(--rule); }
+  .z-nast-link { font-family: var(--f-display); font-size: 22px; color: var(--ink); text-decoration: none; }
+  .z-nast-link small { display: block; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-nast-meta { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .z-nast-meta a { color: var(--d-a); }
+
+  /* ---------- odchudzona stopka w jednej linii ---------- */
+  .z-stopka { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); padding: 13px var(--marg); background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.4; }
+  .z-stopka-in { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 24px; }
+  .z-stopka b { color: #fff; font-family: var(--f-display); font-weight: 500; font-size: 15.5px; }
+  .z-stopka a { color: inherit; text-decoration: none; }
+  .z-stopka a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+  .z-stopka nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
+  .z-autor { padding-left: 18px; border-left: 1px solid rgb(255 255 255 / .2); color: rgb(201 208 222 / .75); }
+
+  /* treść stron bez szablonu podstrony (Szukaj, 404) w linii kolumny strony, jak tytuł w nagłówku, pasek i stopka (zlecenie 27,
+     punkt 6.2; wcześniej .wrap z --gutter, który przy 1024–1280 px stał 8–20 px w lewo od tytułu, a przy 1920 px 20 px w prawo) */
+  .z-w-kolumnie { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); }
+}
+
+/* ---------- najechanie tam, gdzie zmiana koloru nic nie daje (zlecenie 13, punkt 10) ----------
+   Strony poza działami (Aktualności, Kalendarz, wpisy — .z-pd bez data-dzial): kolor akcentu (--d-a) jest tam kolorem
+   tekstu, więc reguły „po najechaniu na kolor działu” nie zmieniają wyglądu — linki i przyciski dostają podkreślenie.
+   Linki w kolorze działu z podkreśleniem (kontakt Władz, „Zgłoś błąd”, archiwum) — grubsza kreska. Selektor od #tresc,
+   bo style komponentów Astro mają w każdym członie [data-astro-cid-…] (wyższa szczegółowość). Wpis o wydarzeniu ma data-dzial, ale kolory jak poza działami. */
+#tresc :is(.z-pd:not([data-dzial]), .akt-wydarzenie) :is(a[href], button, summary):hover { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: .2em; }
+:is(#tresc :is(.z-kont dd, .z-link-dalej, .ak-archiwum), .z-nast-meta) a:hover { text-decoration-line: underline; text-decoration-thickness: 2px; }

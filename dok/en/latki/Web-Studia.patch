@@ -1,0 +1,90 @@
+diff --git a/.pages.yml b/.pages.yml
+index 371dee0..f181f6e 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -148,6 +148,9 @@ content:
+     - name: formularz
+       label: Formularz (np. Formularz C2)
+       type: string
++    - name: formularz_en
++      label: 'EN: nazwa formularza (np. Form C2; puste = wersja angielska pokaże nazwę po polsku)'
++      type: string
+     - name: formularz_adres
+       label: Link do formularza
+       type: string
+@@ -230,6 +233,9 @@ content:
+     - name: formularz
+       label: Formularz (np. C2)
+       type: string
++    - name: formularz_en
++      label: 'EN: nazwa formularza (np. Form C2; puste = wersja angielska pokaże nazwę po polsku)'
++      type: string
+     - name: formularz_adres
+       label: Link do formularza
+       type: string
+@@ -858,6 +864,9 @@ content:
+     - name: opis
+       label: Dopisek (np. rok, poziom)
+       type: string
++    - name: opis_en
++      label: 'EN: dopisek (puste = wersja angielska pokaże dopisek po polsku; temat zostaje w oryginale)'
++      type: string
+   - name: dokumenty
+     label: Dokumenty
+     type: object
+diff --git a/src/content/kierunki/isim.md b/src/content/kierunki/isim.md
+index 64db640..589ff0a 100644
+--- a/src/content/kierunki/isim.md
++++ b/src/content/kierunki/isim.md
+@@ -92,6 +92,7 @@ etapy:
+   termin: Promotor z Instytutu Matematycznego — zgłoszenie na początku 6. semestru
+   termin_en: Supervisor from the Mathematical Institute — report at the start of the 6th semester
+   formularz: Formularz E
++  formularz_en: "Form E"
+   formularz_adres: https://forms.office.com/Pages/ResponsePage.aspx?id=-b5xKxM7MkS19B9awieNDLjzAPP4phpMtcTE0K7u9RpUNkVPUVc4SUxCTkQ5MzdSQTYyS0YxTzBHMy4u
+ programy:
+ - nazwa: Program od 2022/23
+@@ -169,6 +170,7 @@ terminy:
+   kogo: dyplomanci
+   kogo_en: final-year students
+   formularz: System Zapisów
++  formularz_en: "Enrolment System"
+   formularz_adres: https://zapisy.ii.uni.wroc.pl/theses/
+ - co: Wprowadzenie pracy dyplomowej do systemu APD
+   co_en: Uploading the thesis to the APD system
+diff --git a/src/content/kierunki/matematyka.md b/src/content/kierunki/matematyka.md
+index 3e4e8e0..e460a74 100644
+--- a/src/content/kierunki/matematyka.md
++++ b/src/content/kierunki/matematyka.md
+@@ -69,6 +69,7 @@ etapy:
+   termin: 'Specjalność nauczycielska: deklaracja do 31 grudnia (1. semestr)'
+   termin_en: 'Teaching specialisation: declare by 31 December (1st semester)'
+   formularz: Formularz C1
++  formularz_en: "Form C1"
+ - stopien: I
+   kiedy: Semestry 3–4
+   kiedy_en: Semesters 3–4
+@@ -79,6 +80,7 @@ etapy:
+   termin: Deklaracja specjalności do 30 czerwca (4. semestr)
+   termin_en: Declare your specialisation by 30 June (4th semester)
+   formularz: Formularz C2
++  formularz_en: "Form C2"
+   formularz_adres: https://forms.cloud.microsoft/e/SWEQQ1YF5L
+ - stopien: I
+   kiedy: Semestry 5–6
+@@ -97,6 +99,7 @@ etapy:
+   termin: Deklaracja specjalności do 15 października
+   termin_en: Declare your specialisation by 15 October
+   formularz: Formularz C3
++  formularz_en: "Form C3"
+   formularz_adres: https://forms.cloud.microsoft/e/LKA4mEgVtN
+ - stopien: II
+   kiedy: Semestry 2–3
+@@ -108,6 +111,7 @@ etapy:
+   termin: Zgłoszenie promotora do 31 października (rekrutacja letnia) lub 31 marca (zimowa)
+   termin_en: Report your supervisor by 31 October (summer admission) or 31 March (winter admission)
+   formularz: Formularz E
++  formularz_en: "Form E"
+   formularz_adres: https://forms.office.com/Pages/ResponsePage.aspx?id=-b5xKxM7MkS19B9awieNDLjzAPP4phpMtcTE0K7u9RpUNkVPUVc4SUxCTkQ5MzdSQTYyS0YxTzBHMy4u
+ - stopien: II
+   kiedy: Semestr 4

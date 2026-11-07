@@ -28,6 +28,8 @@ const IKONY: Record<string, string> = {
   facebook: '<path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H7v4h3v7h4v-7h3l1-4h-4V8z"/>',
   youtube: '<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.5v5l4.5-2.5z"/>',
   czapka: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c2 2 10 2 12 0v-5M22 9v6"/>',
+  // biret z wypełnionym denkiem — etykieta „Obrona doktorska” (EtykietaRodzaju.astro; decyzja 31.10.2026)
+  biret: '<path d="M12 4 2 9l10 5 10-5-10-5z" fill="currentColor" stroke="none"/><path d="M6 11.2V15c0 1.4 2.7 2.8 6 2.8s6-1.4 6-2.8v-3.8M21 9v5"/>',
 };
 
 const svg = IKONY[nazwa] ?? IKONY.strzalka;

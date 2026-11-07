@@ -69,9 +69,11 @@ export function time(s: string): string {
   return p.hh === undefined ? '' : `${pad(p.hh)}:${pad(p.mm ?? 0)}`;
 }
 
-export function short(s: string): string {
+// Krótka data: po polsku „29.10.2026”, po angielsku „29 Oct 2026” (bez roku: „29.10” / „29 Oct”).
+export function short(s: string, lang: Lang = 'pl', zRokiem = true): string {
   const p = parse(s);
-  return `${pad(p.d)}.${pad(p.m)}.${p.y}`;
+  if (lang === 'en') return zRokiem ? `${p.d} ${MON_EN_S[p.m - 1]} ${p.y}` : `${p.d} ${MON_EN_S[p.m - 1]}`;
+  return zRokiem ? `${pad(p.d)}.${pad(p.m)}.${p.y}` : `${pad(p.d)}.${pad(p.m)}`;
 }
 
 export function long(s: string, lang: Lang = 'pl', withTime = true): string {

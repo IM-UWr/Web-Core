@@ -1,121 +1,110 @@
 ---
-// Konferencje: nadchodzące u góry (sekcja .zsec jak na stronach działów), minione według lat.
-// Konferencje nie mają naszych podstron: każda pozycja prowadzi od razu na stronę konferencji (pole `strona`, ta sama
-// karta przeglądarki, ikona „zewnętrzny” przy tytule); konferencja bez strony — pozycja bez linku (<div>, bez podświetlenia).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku); lista jak w kalendarzu — wspólny
-// styl list z global.css: rok = sekcja z kreską (.lista-miesiac), konferencje = osobne białe karty (.karty-lista);
-// nadchodzące (.event) w takich samych kartach, jedna pod drugą.
-// Telefon (≤ 760 px): lata jako małe etykiety, konferencje jako wiersze (cały wiersz jest linkiem); „Nadchodzące”
-// z kreską sekcji.
-// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola konferencje_tekst / konferencje_tekst_en; puste = brak).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import TekstWstepny from '../components/TekstWstepny.astro';
-import TytulZewn from '../components/TytulZewn.astro';
-import { dayNum, monthShort, range, type Lang } from '../lib/daty';
-import { miejsce, konferencje, trwaLubBedzie, type Konferencja } from '../lib/tresci';
+// Konferencje (/nauka/konferencje), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: tekst wprowadzający
+// (Treść strony Web-Nauka → Strony → Konferencje; zlecenie 30, src/lib/tekstyStron.ts; brak = bez tekstu), nadchodzące u góry, minione według lat
+// (rok jako nagłówek Brygadą w kolorze działu, kotwice #rok-RRRR bez zmian). Spis „Na tej stronie”: Nadchodzące i lata.
+// Konferencje nie mają naszych podstron: tytuł prowadzi od razu na stronę konferencji (pole `strona`, ↗; cały wiersz
+// klikalny); konferencja bez strony — wiersz bez linku. Wiersze jak na stronie działu (zal/dzial/Wiersz.astro): dzień
+// początku dużą Brygadą w kolorze działu, pod nim „mie rrrr”, nad tytułem daty i miejsce.
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
+// lata jako podsekcje h3, etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wiersza z datą.
+// Jedna wersja HTML: komputer (≥ 1024 px; minione w dwóch kolumnach) i telefon (≤ 1023 px, jedna kolumna).
+import Link from '../components/Link.astro';
+import Podstrona from '../components/zal/Podstrona.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import { odmiana, langPola } from '../lib/i18n';
+import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
+import { miejsce, type Konferencja } from '../lib/tresci';
+import { daneListyKonferencji } from '../lib/widoki/listaKonferencji';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const wszystkie = await konferencje();
-const przyszle = wszystkie.filter((k) => trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec })).reverse();
-const minione = wszystkie.filter((k) => !przyszle.includes(k));
-const lata: { rok: string; lista: Konferencja[] }[] = [];
-for (const k of minione) {
-  const r = k.data.poczatek.slice(0, 4);
-  const ost = lata[lata.length - 1];
-  if (ost && ost.rok === r) ost.lista.push(k);
-  else lata.push({ rok: r, lista: [k] });
-}
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const tytul = (k: Konferencja) => (lang === 'en' && k.data.tytul_en) || k.data.tytul;
-// adres strony konferencji (zewnętrzny) albo brak — wtedy pozycja bez linku
-const href = (k: Konferencja) => k.data.strona || undefined;
-const Tag = (k: Konferencja) => (href(k) ? 'a' : 'div');
-const odwolana = lang === 'en' ? 'cancelled' : 'odwołana';
-const naglowek = lang === 'en' ? 'Conferences' : 'Konferencje';
-const lead = lang === 'en'
-  ? 'Conferences and workshops organised or co-organised by members of the Mathematical Institute.'
-  : 'Konferencje i warsztaty organizowane lub współorganizowane przez pracowników Instytutu Matematycznego.';
+// html — tekst nad listą — Treść strony (Web-Nauka → Strony → Konferencje; zlecenie 30)
+const { przyszle, lata, odwolana, naglowek, lead, haslo, html, liczby } = await daneListyKonferencji(lang);
+const etykieta = (k: Konferencja) => [range(k.data.poczatek, k.data.koniec, lang), miejsce(k.data.miejsce, lang)].filter(Boolean).join(' · ');
+const ileKonf = (n: number) => `${n} ${odmiana(n, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'], lang)}`;
+const tytulNadch = T('Nadchodzące', 'Upcoming');
+// sekcje: nadchodzące i minione (lata jako podsekcje); wspólny wzór wiersza
+const sekcje = [
+  { id: 'z-nadchodzace', tytul: tytulNadch, grupy: [{ rok: '', lista: przyszle }] },
+  ...(lata.length > 0 ? [{ id: 'z-minione', tytul: T('Minione', 'Past'), grupy: lata }] : []),
+];
+// spis „Na tej stronie”: Nadchodzące i lata (kotwice #rok-RRRR jak dotąd)
+const spis = [
+  { id: 'z-nadchodzace', etykieta: tytulNadch },
+  ...lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok })),
+];
 ---
-<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: lang === 'en' ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: naglowek }]} />
-  <div class="wrap layout">
-    <div class="main">
-      <TekstWstepny pole="konferencje_tekst" lang={lang} />
-      <section class="zsec kf-nadch" aria-labelledby="h-nadch">
-        <h2 id="h-nadch">{lang === 'en' ? 'Upcoming' : 'Nadchodzące'}</h2>
-        {przyszle.length === 0 && <p class="muted kf-brak">{lang === 'en' ? 'No upcoming conferences announced.' : 'Nie zapowiedziano jeszcze kolejnych konferencji.'}</p>}
-        <div class="event-grid">
-          {przyszle.map((k) => { const T = Tag(k); return (
-            <T class:list={['event event-szare', !href(k) && 'kf-bez-linku']} href={href(k)}>
-              <span class="datebox" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
-              <span class="event-body">
-                <span class="k">{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                <span class="t"><TytulZewn tekst={tytul(k)} zewn={!!href(k)} /></span>
-                {k.data.miejsce && <span class="s">{miejsce(k.data.miejsce, lang)}</span>}
-              </span>
-            </T>
-          ); })}
-        </div>
-      </section>
+<Podstrona lang={lang} tytul={naglowek} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} dzial="nauka" spis={spis} klasa="tresc z-kf">
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
-      {lata.map((g) => (
-        <section class="lista-miesiac" aria-labelledby={`rok-${g.rok}`}>
-          <h2 id={`rok-${g.rok}`} class="month kf-rok">{g.rok}</h2>
-          <div class="karty-lista">
-            {g.lista.map((k) => { const T = Tag(k); return (
-              <T class:list={['row-item conf-row', !href(k) && 'kf-bez-linku']} href={href(k)}>
-                <span class="datebox small minione" aria-hidden="true"><span class="d">{dayNum(k.data.poczatek)}</span><span class="m">{monthShort(k.data.poczatek, lang)}</span></span>
-                <span class="body">
-                  <span class="t"><TytulZewn tekst={tytul(k)} zewn={!!href(k)} /></span>
-                  <span class="news-meta">
-                    <span>{range(k.data.poczatek, k.data.koniec, lang)}</span>
-                    {k.data.miejsce && <span>· {miejsce(k.data.miejsce, lang)}</span>}
-                    {k.data.odwolana && <span class="badge">{odwolana}</span>}
-                  </span>
-                </span>
-              </T>
-            ); })}
-          </div>
-        </section>
+  {html && <section set:html={html} />}
+
+  {sekcje.map((sek) => (
+    <section id={sek.id} aria-labelledby={`h-${sek.id}`}>
+      <h2 id={`h-${sek.id}`}>{sek.tytul}</h2>
+      {sek.grupy.every((g) => g.lista.length === 0) && <p class="pusto">{T('Nie zapowiedziano jeszcze kolejnych konferencji.', 'No upcoming conferences announced.')}</p>}
+      {sek.grupy.filter((g) => g.lista.length > 0).map((g) => (
+        <>
+          {g.rok && <h3 id={`rok-${g.rok}`}>{g.rok}<span class="sr-only">, </span> <small>{ileKonf(g.lista.length)}</small></h3>}
+          <ul class:list={['wiersze', g.rok && 'dwie']}>
+            {g.lista.map((k) => (
+              <li class:list={['wiersz', k.data.strona && 'klik']}>
+                <time class="dz" datetime={k.data.poczatek.slice(0, 10)}>{dayNum(k.data.poczatek)}<small> {monthShort(k.data.poczatek, lang)} {parse(k.data.poczatek).y}</small></time>
+                <div>
+                  <p class="etyk">{etykieta(k)}{k.data.odwolana && <span class="odw">{odwolana}</span>}</p>
+                  <h4 lang={langPola(k.data, 'tytul', lang)}>
+                    {k.data.strona
+                      ? <Link href={k.data.strona}>{tytul(k)}</Link>
+                      : tytul(k)}
+                  </h4>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       ))}
-    </div>
-
-    <aside class="side" data-pagefind-ignore>
-      <nav class="side-box toc toc-side" aria-label={lang === 'en' ? 'Years' : 'Lata'}>
-        <h2>{lang === 'en' ? 'Years' : 'Lata'}</h2>
-        <ol style="flex-direction:row;flex-wrap:wrap;gap:6px">
-          {lata.map((g) => <li><a href={`#rok-${g.rok}`} class="chip" style="display:inline-flex;align-items:center;border-left:1.5px solid var(--line);padding:0 12px;min-height:36px">{g.rok}</a></li>)}
-        </ol>
-      </nav>
-    </aside>
-  </div>
-</Baza>
+    </section>
+  ))}
+</Podstrona>
 
 <style>
-  .kf-brak { margin: 0; }
-  .conf-row .t { font-size: 18px; }
-  /* konferencja bez strony: bez podświetlenia i podkreślenia po najechaniu */
-  .kf-bez-linku:hover { box-shadow: none; }
-  .kf-bez-linku:hover .t { text-decoration: none; }
-  /* telefon (≤ 760 px): lata jako małe etykiety nad wierszami, jak dotąd (na komputerze — .lista-miesiac w global.css) */
-  @media (max-width: 760px) { .kf-rok { margin-top: 28px; font-size: 15px; } }
+  /* Wiersz z datą (jak zal/dzial/Wiersz.astro): dzień | etykieta, tytuł. Reszta (sekcje, podsekcje h3, etykieta .etyk,
+     akapity) — wzorzec treści .tresc (src/styles/zal-tresc.css). */
+  .wiersze { list-style: none; margin: 0; padding: 0; }
+  .wiersze > li { max-width: none; margin: 0; font-size: inherit; }
+  .wiersz { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .wiersz .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .wiersz .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .wiersz .etyk { margin: 0; }
+  .wiersz .odw { margin-left: 8px; padding: 1px 7px; border: 1px solid var(--line); border-radius: 3px; font-size: 11.5px; font-weight: 700; color: var(--muted); }
+  .wiersz h4 { margin: 2px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .wiersz h4 a { color: inherit; text-decoration: none; }
+  .wiersz a.zew::after { font-family: var(--f-text); font-size: .75em; color: var(--muted); }
+  .pusto { font-style: italic; color: var(--muted); }
+  /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
+  .klik { position: relative; }
+  .klik h4 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
+  .klik:hover h4 a { color: var(--d-a); }
+  .klik h4 a:focus-visible { outline: none; }
+  .klik:has(h4 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
+  /* rok (podsekcja): liczba konferencji małym krojem tekstu */
+  h3 small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
 
-  /* ---------- komputer (≥ 761 px) ----------
-     Odstęp nad pierwszą sekcją stały (24 px), jak na stronie działu „Nauka” (reszta odstępów .layout — uklad-zwarta.css).
-     Minione: karty .karty-lista (global.css), jak w kalendarzu. Nadchodzące (.event, tło i ramka z .event-szare) —
-     takie same karty jedna pod drugą: odstęp 10 px, wnętrze i data jak w kalendarzu (.row-item z .datebox.small). */
-  @media (min-width: 761px) {
-    .layout { padding-top: 24px; }
-    .karty-lista > .kf-bez-linku:hover { border-color: var(--line); }
-    .kf-nadch .event-grid { display: flex; flex-direction: column; gap: 10px; }
-    .kf-nadch .event { align-items: flex-start; gap: 14px; padding: 16px 20px; border-radius: var(--radius-l); transition: border-color .15s; }
-    .kf-nadch .event:hover { border-color: var(--ink); box-shadow: none; }
-    .kf-nadch .event.kf-bez-linku:hover { border-color: var(--line); }
-    .kf-nadch .datebox { flex: 0 0 46px; height: 50px; border-radius: 9px; }
-    .kf-nadch .datebox .d { font-size: 19px; }
-    .kf-nadch .event .t { font-size: 18px; }
+  /* ---------- komputer (≥ 1024 px): minione w dwóch kolumnach ---------- */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    .wiersze.dwie { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(300px, 45%), 1fr)); gap: 0 48px; }
+    .wiersze.dwie .wiersz h4 { font-size: 19px; }
   }
-  @media (min-width: 761px) and (prefers-reduced-motion: reduce) { .kf-nadch .event { transition: none; } }
+
+  /* ---------- telefon (≤ 1023 px): jedna kolumna, mniejszy dzień ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .wiersz .dz { font-size: 28px; }
+    .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
+    .wiersz h4 { font-size: 18.5px; }
+  }
 </style>

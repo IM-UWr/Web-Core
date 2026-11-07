@@ -1,0 +1,32 @@
+diff --git a/src/data/nawigacja.json b/src/data/nawigacja.json
+index e9b581f..1b0bde5 100644
+--- a/src/data/nawigacja.json
++++ b/src/data/nawigacja.json
+@@ -210,6 +210,27 @@
+       "etykieta": "Popularyzacja",
+       "etykieta_en": "Outreach",
+       "grupy": [
++        {
++          "nazwa": "Dla kogo",
++          "nazwa_en": "Who it’s for",
++          "linki": [
++            {
++              "etykieta": "Dla uczniów",
++              "etykieta_en": "For pupils",
++              "adres": "/popularyzacja/uczniowie"
++            },
++            {
++              "etykieta": "Dla nauczycieli",
++              "etykieta_en": "For teachers",
++              "adres": "/popularyzacja/nauczyciele"
++            },
++            {
++              "etykieta": "Dla wszystkich",
++              "etykieta_en": "For everyone",
++              "adres": "/popularyzacja/wszyscy"
++            }
++          ]
++        },
+         {
+           "nazwa": "Partnerzy",
+           "nazwa_en": "Partners",

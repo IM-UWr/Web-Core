@@ -2,21 +2,21 @@
 // Statyczne przekierowanie ze starego adresu (np. /studia/kalendarz-zajec → /studia/rok-akademicki).
 // GitHub Pages nie obsługuje przekierowań serwera: <meta http-equiv="refresh"> + skrypt (zachowuje #kotwicę) + zwykły link.
 // noindex — wyszukiwarki mają indeksować tylko adres docelowy (canonical).
-import { u, absolute } from '../lib/url';
+import { absolute } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
+import { danePrzekierowania } from '../lib/widoki/przekierowanie';
 
 interface Props { cel: string; tytul: string; lang: Lang }
 const { cel, tytul, lang } = Astro.props;
-const adres = u(wJezyku(cel, lang));
-const en = lang === 'en';
+const { adres, en } = await danePrzekierowania(cel, lang);
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{tytul} · {en ? 'Mathematical Institute' : 'Instytut Matematyczny'} UWr</title>
+    <title>{tytul} · {en ? 'Mathematical Institute, University of Wrocław' : 'Instytut Matematyczny UWr'}</title>
     <meta name="robots" content="noindex" />
     <link rel="canonical" href={absolute(wJezyku(cel, lang), Astro.site)} />
     <meta http-equiv="refresh" content={`0; url=${adres}`} />

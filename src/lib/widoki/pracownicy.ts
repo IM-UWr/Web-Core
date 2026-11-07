@@ -1,0 +1,82 @@
+// Dane spisu pracowników: osoby, grupy i zakłady do filtrów, napisy tabeli, hasło, liczby i dane animacji banera.
+import { getCollection } from 'astro:content';
+import type { Osoba } from '../../components/TabelaPracownikow.tsx';
+import { t, wybierz, wJezyku } from '../i18n';
+import { u } from '../url';
+import { zaklady as pobierzZaklady } from '../tresci';
+import type { Lang } from '../daty';
+import { stronaListy } from '../tekstyStron';
+
+export async function danePracownikow(lang: Lang) {
+  const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
+  const osoby: Osoba[] = (await getCollection('pracownicy'))
+    .filter((p) => p.data.opublikowany !== false)
+    // funkcja (np. „Sekretariat”) po angielsku z pola funkcja_en, a gdy puste — po polsku
+    .map((p) => {
+      const funkcja = wybierz(p.data, 'funkcja', lang);
+      return { id: p.id, ...p.data, ...(funkcja ? { funkcja } : {}) };
+    })
+    .sort((a, b) => nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl'))
+    .map(({ opublikowany, funkcja_en, ...o }: any) => o);
+  // krotko: nazwa grupy w liście rozwijanej na telefonie (grupa „Kto”; krócej, żeby mieściła się w wąskim polu)
+  const KROTKO: Record<string, [string, string]> = { emeryt: ['Emerytowani', 'Retired'] };
+  const grupy = (['nauczyciel', 'doktorant', 'administracja', 'emeryt'] as const)
+    .filter((g) => osoby.some((o) => o.grupa === g))
+    .map((g) => ({ id: g, nazwa: t(lang, `g_${g}`), krotko: KROTKO[g]?.[lang === 'en' ? 1 : 0] ?? t(lang, `g_${g}`) }));
+  const listaZakladow = await pobierzZaklady();
+  const zaklady = listaZakladow.map((z) => ({ id: z.id, nazwa: wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang), href: u(wJezyku(`/instytut/zaklady/${z.id}`, lang)) }));
+
+  // Baner na telefonie: hasło (po angielsku tylko pole _en — bez polskich resztek) i liczby z danych: osoby w spisie ·
+  // zakłady naukowe (bez Pracowni Dydaktyki — liczymy wpisy, których nazwa zaczyna się od „Zakład”) · doktoranci
+  // (męskoosobowy — przy 2–4 też dopełniacz: „dwóch doktorantów”, „22 doktorantów”).
+  const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
+    { n: osoby.length, pl: ['osoba', 'osoby', 'osób'], en: ['person', 'people'] },
+    { n: listaZakladow.filter((z) => /^zakład/i.test(z.data.nazwa.trim())).length, pl: ['zakład', 'zakłady', 'zakładów'], en: ['department', 'departments'] },
+    { n: osoby.filter((o) => o.grupa === 'doktorant').length, pl: ['doktorant', 'doktorantów', 'doktorantów'], en: ['PhD student', 'PhD students'] },
+  ];
+  // Animacja w tle banera na telefonie (motyw „luki”, src/scripts/baner/motywy/luki.ts): kropki to osoby ze spisu w grupach —
+  // najpierw osoby bez zakładu (administracja, doktoranci, pozostali), potem zakłady w kolejności obszarów z tekstu strony
+  // „Struktura i zakłady” (ta sama kolejność co w ListaZakladow.astro; zakłady spoza listy i pracownia na końcu).
+  // { g: liczby osób w grupach (bez pustych), b: ile pierwszych grup to osoby bez zakładu }.
+  const OBSZARY = ['algebra-i-teoria-modeli', 'teoria-mnogosci-i-topologia', 'geometria', 'analiza-funkcjonalna', 'analiza-matematyczna', 'rownania-rozniczkowe', 'teoria-prawdopodobienstwa', 'statystyka'];
+  const miejsce = (id: string) => (OBSZARY.includes(id) ? OBSZARY.indexOf(id) : OBSZARY.length);
+  const zakladyMotywu = [...listaZakladow].sort((a, b) => miejsce(a.id) - miejsce(b.id));
+  const bezZakladu = osoby.filter((o) => !o.zaklad || !zakladyMotywu.some((z) => z.id === o.zaklad));
+  const grupyBez = [
+    bezZakladu.filter((o) => o.grupa === 'administracja').length,
+    bezZakladu.filter((o) => o.grupa === 'doktorant').length,
+    bezZakladu.filter((o) => o.grupa !== 'administracja' && o.grupa !== 'doktorant').length,
+  ].filter((n) => n > 0);
+  const motywDane = { g: [...grupyBez, ...zakladyMotywu.map((z) => osoby.filter((o) => o.zaklad === z.id).length).filter((n) => n > 0)], b: grupyBez.length };
+  const napisy = {
+    szukaj: lang === 'en' ? 'Search by name, room, e-mail…' : 'Szukaj: nazwisko, pokój, e-mail…',
+    grupa: lang === 'en' ? 'Group' : 'Grupa',
+    wszyscy: t(lang, 'wszyscy'),
+    osob: t(lang, 'osob'),
+    imie: t(lang, 'imieNazwisko'),
+    rok: t(lang, 'rok'),
+    rokBrak: lang === 'en' ? 'Year not specified' : 'Rok nieokreślony',
+    email: t(lang, 'email'),
+    telefon: t(lang, 'telefon'),
+    pokoj: t(lang, 'pokoj'),
+    strona: t(lang, 'strona'),
+    link: 'WWW',
+    zewn: lang === 'en' ? ' (external site)' : ' (inna strona)',
+    brak: lang === 'en' ? 'Nobody matches the search.' : 'Nikogo nie znaleziono.',
+    zaklad: lang === 'en' ? 'Department' : 'Zakład',
+    wszystkieZaklady: lang === 'en' ? 'All departments' : 'Wszystkie zakłady',
+    // telefon: wiersz filtrów (lista „Wszyscy ▾” z grupami „Kto” i „Zakład” + pole „Szukaj”) i licznik po przefiltrowaniu
+    filtr: lang === 'en' ? 'Filter by group or department' : 'Filtruj według grupy albo zakładu',
+    kto: lang === 'en' ? 'Who' : 'Kto',
+    szukajKrotko: lang === 'en' ? 'Search' : 'Szukaj',
+    znaleziono: lang === 'en' ? 'Found' : 'Znaleziono',
+    // forma rzeczownika po liczebniku: 1 · 2–4 (bez 12–14) · 5+ (po angielsku dwie ostatnie takie same)
+    osoba1: lang === 'en' ? 'person' : 'osobę',
+    osoba2: lang === 'en' ? 'people' : 'osoby',
+    osoba5: lang === 'en' ? 'people' : 'osób',
+  };
+  // tytuł, opis, hasło i tekst nad listą (html): Web-Pracownicy → Strony → Pracownicy (src/content/strony/pracownicy.md; zlecenie 30)
+  const { tytul, opis: lead, haslo, html } = await stronaListy('pracownicy', lang, { wst: true });
+
+  return { osoby, grupy, zaklady, tytul, haslo, html, liczby, motywDane, napisy, lead };
+}

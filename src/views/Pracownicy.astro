@@ -1,67 +1,111 @@
 ---
-// Lista pracowników. Każda osoba to osobny plik w src/content/pracownicy (edycja w Pages CMS).
-// Kolejność: alfabetycznie po nazwisku; doktorantów komponent dzieli dodatkowo według roku studiów.
-// Telefony podajemy tylko przy administracji (pilnuje tego skrypty/sprawdz_tresci.py).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
-import { getCollection } from 'astro:content';
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import TabelaPracownikow, { type Osoba } from '../components/TabelaPracownikow.tsx';
-import { t, wybierz, wJezyku } from '../lib/i18n';
-import { u } from '../lib/url';
-import { zaklady as pobierzZaklady } from '../lib/tresci';
+// Lista pracowników (/pracownicy), kierunek „Założyciele”, szablon podstrony (zal/Podstrona.astro). Każda osoba to osobny
+// plik w src/content/pracownicy (edycja w Pages CMS). Kolejność: alfabetycznie po nazwisku; doktorantów komponent dzieli
+// dodatkowo według roku studiów. Telefony podajemy tylko przy administracji (pilnuje tego skrypty/sprawdz_tresci.py).
+// Wzorzec treści (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14): sekcja h2, podsekcja h3 (rok studiów
+// doktorantów), kreski między sekcjami; tu własne style tylko na pasek filtrów i wiersze osób (w duchu tabeli wzorca).
+// W nagłówku hasło (Web-Pracownicy → Strony → Pracownicy, src/content/strony/pracownicy.md; zlecenie 30) i liczby (osoby · zakłady ·
+// doktoranci). Treść: pasek filtrów (szukaj, grupa, zakład) i grupy osób jako sekcje — spis „Na tej stronie” prowadzi do
+// grup (TabelaPracownikow.tsx, wyspa React). Jedna wersja HTML: komputer — wiersz osoby w kolumnach (imię i nazwisko,
+// e-mail, telefon, pokój, strona); telefon (≤ 1023 px) — wiersz w jednej kolumnie, pasek filtrów w dwóch rzędach.
+import Podstrona from '../components/zal/Podstrona.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
+import TabelaPracownikow from '../components/TabelaPracownikow.tsx';
+import { t } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
+import { danePracownikow } from '../lib/widoki/pracownicy';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
-const osoby: Osoba[] = (await getCollection('pracownicy'))
-  .filter((p) => p.data.opublikowany !== false)
-  // funkcja (np. „Sekretariat”) po angielsku z pola funkcja_en, a gdy puste — po polsku
-  .map((p) => {
-    const funkcja = wybierz(p.data, 'funkcja', lang);
-    return { id: p.id, ...p.data, ...(funkcja ? { funkcja } : {}) };
-  })
-  .sort((a, b) => nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl'))
-  .map(({ opublikowany, funkcja_en, ...o }: any) => o);
-const grupy = (['nauczyciel', 'doktorant', 'administracja', 'emeryt'] as const)
-  .filter((g) => osoby.some((o) => o.grupa === g))
-  .map((g) => ({ id: g, nazwa: t(lang, `g_${g}`) }));
-const zaklady = (await pobierzZaklady()).map((z) => ({ id: z.id, nazwa: wybierz(z.data, 'nazwa_krotka', lang) || wybierz(z.data, 'nazwa', lang), href: u(wJezyku(`/instytut/zaklady/${z.id}`, lang)) }));
-const napisy = {
-  szukaj: lang === 'en' ? 'Search by name, room, e-mail…' : 'Szukaj: nazwisko, pokój, e-mail…',
-  grupa: lang === 'en' ? 'Group' : 'Grupa',
-  wszyscy: t(lang, 'wszyscy'),
-  osob: t(lang, 'osob'),
-  imie: t(lang, 'imieNazwisko'),
-  rok: t(lang, 'rok'),
-  rokBrak: lang === 'en' ? 'Year not specified' : 'Rok nieokreślony',
-  email: t(lang, 'email'),
-  telefon: t(lang, 'telefon'),
-  pokoj: t(lang, 'pokoj'),
-  strona: t(lang, 'strona'),
-  link: 'WWW',
-  brak: lang === 'en' ? 'Nobody matches the search.' : 'Nikogo nie znaleziono.',
-  zaklad: lang === 'en' ? 'Department' : 'Zakład',
-  wszystkieZaklady: lang === 'en' ? 'All departments' : 'Wszystkie zakłady',
-};
-const lead = lang === 'en'
-  ? 'Contact details of the staff, PhD students and administration of the Mathematical Institute.'
-  : 'Dane kontaktowe pracowników, doktorantów i administracji Instytutu Matematycznego.';
+const { osoby, grupy, zaklady, tytul, haslo, html, liczby, napisy, lead } = await danePracownikow(lang);
+// spis „Na tej stronie”: grupy osób (sekcje #zp-<grupa> w TabelaPracownikow.tsx), krótka nazwa grupy w spisie
+const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.krotko }));
 ---
-<Baza tytul={t(lang, 'pracownicy')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'pracownicy')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]} />
-  <div class="wrap pr-wrap">
-    <TabelaPracownikow client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
-  </div>
-</Baza>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: tytul }]}
+  dzial="instytut" spis={spis} klasa="tresc z-prac">
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
+  {html && <section set:html={html} />}
+  <TabelaPracownikow lang={lang} client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
+</Podstrona>
 
-<style>
-  .pr-wrap { padding-top: 28px; padding-bottom: 64px; }
-  /* telefon (≤ 760 px): wygląd „Portal” — mniej miejsca nad i pod spisem */
-  @media (max-width: 760px) { .pr-wrap { padding-top: 16px; padding-bottom: 40px; } }
-  /* komputer (≥ 761 px), wariant „Zwarta”: odstęp od stopki jak na innych podstronach (uklad-zwarta.css);
-     nad wyszukiwarką stały odstęp 24 px, jak na stronie działu „Instytut” */
-  @media (min-width: 761px) { .pr-wrap { padding-top: 24px; padding-bottom: var(--tresc-dol); } }
+<style is:global>
+  /* Pracownicy (blok .z-prac w .z-pd-tresc.tresc; elementy wyspy TabelaPracownikow.tsx). Nagłówki h2/h3, linki i kolory —
+     wzorzec treści (zal-tresc.css); sekcje grup nie są dziećmi .z-pd-tresc (siedzą w wyspie), więc kreski między nimi
+     ustawione tu tymi samymi wartościami. Wiersze osób jak tabela wzorca: nagłówek kolumn 13 px przygaszony z kreską
+     2 px, wiersze oddzielone 1 px. Komputer ≥ 1024 px, telefon ≤ 1023 px. */
+  .z-prac [hidden] { display: none !important; }
+  /* bez JS filtry nie działają — pasek schowany, lista pełna */
+  html:not(.js) .z-prac .zp-narz { display: none; }
+  .z-prac .zp-sek { padding: 0 0 44px; margin: 0 0 40px; border-bottom: 1px solid var(--line); }
+  .z-prac .zp-sek:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+  .z-prac .zp-lista { list-style: none; margin: 0; padding: 0; }
+  .z-prac .zp-w { position: relative; max-width: none; margin: 0; border-bottom: 1px solid var(--line); font-size: 15.5px; line-height: 1.5; color: var(--text); overflow-wrap: anywhere; }
+  .z-prac .zp-imie { font-family: var(--f-display); font-weight: 500; color: var(--ink); text-decoration: none; }
+  .z-prac .zp-n small { display: block; color: var(--muted); }
+  .z-prac .zp-n small a { position: relative; z-index: 1; color: inherit; text-decoration: none; }
+  .z-prac .zp-n small a:hover { color: var(--d-a); text-decoration: underline; text-underline-offset: 3px; }
+  .z-prac :is(.zp-mail, .zp-tel) a { position: relative; z-index: 1; }
+  .z-prac .zp-pok { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .z-prac .zp-www { display: flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; overflow-wrap: normal; color: var(--muted); }
+  /* strona domowa poza naszą stroną (zlecenie 14, zalecenie 23): strzałka z CSS przy „WWW” (dawniej ikona SVG) */
+  .z-prac .zp-www-l.zew::after { content: '\00a0↗'; }
+  .z-prac .zp-lbl { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  /* osoba ze stroną domową: link na imieniu i nazwisku obejmuje cały wiersz (e-mail, telefon i zakład nad nim) */
+  .z-prac .zp-klik .zp-imie::after { content: ''; position: absolute; inset: 0; }
+  .z-prac .zp-klik:hover :is(.zp-imie, .zp-www) { color: var(--d-a); }
+  .z-prac .zp-klik .zp-imie:focus-visible { outline: none; }
+  .z-prac .zp-klik:has(.zp-imie:focus-visible) { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  /* pasek filtrów: pole szukania i dwie listy (grupa, zakład) w cienkich ramkach, jak przełączniki we wzorcu i w Planie zajęć */
+  .z-prac .zp-szukaj { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0 12px; border: 1px solid var(--line-ui); background: var(--bg); color: var(--muted); }
+  .z-prac .zp-szukaj input { flex: 1; min-width: 0; margin: 0; padding: 8px 0; border: 0; border-radius: 0; background: transparent; font: inherit; color: var(--ink); outline: none; }
+  .z-prac .zp-szukaj input::placeholder { color: var(--muted); opacity: 1; }
+  .z-prac .zp-wybor { position: relative; display: flex; align-items: center; min-width: 0; margin: 0; border: 1px solid var(--line-ui); background: var(--bg); }
+  .z-prac .zp-wybor select { appearance: none; -webkit-appearance: none; width: 100%; min-width: 0; margin: 0; padding: 8px 34px 8px 12px; border: 0; border-radius: 0;
+    background: transparent; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer; text-overflow: ellipsis; }
+  .z-prac .zp-wybor svg { position: absolute; right: 10px; pointer-events: none; color: var(--d-a); }
+  .z-prac :is(.zp-szukaj, .zp-wybor):focus-within { outline: 2px solid var(--d-a); outline-offset: -1px; }
+  .z-prac .zp-wybor select:focus { outline: none; }
+  .z-prac .zp-ile { max-width: none; margin: 0; color: var(--muted); }
+
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    .z-prac .zp-narz { display: flex; flex-wrap: wrap; align-items: stretch; gap: 12px; }
+    .z-prac .zp-szukaj { flex: 1 1 240px; }
+    .z-prac .zp-szukaj input { font-size: 15px; line-height: 1.6; }
+    .z-prac .zp-wybor { flex: 0 1 auto; max-width: 280px; }
+    .z-prac .zp-wybor select { font-size: 15px; line-height: 1.6; }
+    .z-prac .zp-ile { margin: 10px 0 30px; font-size: 13.5px; line-height: 1.6; }
+    .z-prac .zp-sek { --zp-kol: minmax(0, 1.55fr) minmax(0, 1.4fr) 56px 60px; }
+    .z-prac .zp-sek.zp-z-tel { --zp-kol: minmax(0, 1.55fr) minmax(0, 1.4fr) 116px 56px 60px; }
+    .z-prac .zp-nagl, .z-prac .zp-w { display: grid; grid-template-columns: var(--zp-kol); gap: 2px 18px; }
+    .z-prac .zp-nagl { padding: 0 0 8px; border-bottom: 2px solid var(--rule); font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--muted); }
+    .z-prac .zp-w { align-items: baseline; padding: 10px 0; }
+    .z-prac .zp-imie { font-size: 18px; line-height: 1.3; }
+    .z-prac .zp-n small { margin-top: 1px; font-size: 13.5px; line-height: 1.45; }
+  }
+
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    /* pasek: pole szukania w pierwszym rzędzie, zakład w drugim (bez wyboru grupy — zalecenie 4 zlecenia 11) */
+    .z-prac .zp-narz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .z-prac .zp-szukaj { grid-column: 1 / -1; min-height: 44px; }
+    .z-prac .zp-narz:not(:has(.zp-wybor + .zp-wybor)) .zp-wybor { grid-column: 1 / -1; }
+    .z-prac .zp-szukaj input { font-size: 16px; }
+    .z-prac .zp-wybor select { min-height: 42px; font-size: 14.5px; }
+    .z-prac .zp-ile { margin: 8px 0 22px; font-size: 13.5px; line-height: 1.5; }
+    .z-prac .zp-sek { padding-bottom: 30px; margin-bottom: 28px; }
+    .z-prac .zp-nagl { display: none; }
+    .z-prac .zp-lista { border-top: 1px solid var(--line); }
+    /* wiersz osoby (jak blok tabeli wzorca): imię i nazwisko, funkcja · zakład, e-mail, w ostatniej linii telefon · pokój · WWW */
+    .z-prac .zp-w { display: flex; flex-wrap: wrap; align-items: baseline; padding: 10px 0; font-size: 15px; }
+    .z-prac .zp-n, .z-prac .zp-mail { flex: 0 0 100%; }
+    .z-prac .zp-c:empty { display: none; }
+    .z-prac .zp-imie { font-size: 18.5px; line-height: 1.3; }
+    .z-prac .zp-n small { margin-top: 1px; font-size: 13.5px; line-height: 1.45; }
+    .z-prac .zp-mail { margin-top: 3px; }
+    .z-prac :is(.zp-tel, .zp-pok, .zp-www) { font-size: 13.5px; }
+    .z-prac :is(.zp-tel, .zp-pok) .zp-lbl { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; color: var(--muted); }
+    .z-prac :is(.zp-tel, .zp-pok):not(:empty) ~ .zp-c:not(:empty)::before { content: '·'; margin: 0 7px; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+    .z-prac .zp-www::before { margin-right: 3px !important; }
+  }
 </style>

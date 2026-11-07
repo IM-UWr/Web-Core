@@ -1,124 +1,105 @@
 ---
-// Sukcesy: aktualności z rodzajem „sukces”, pogrupowane według lat (najnowsze na górze). Na komputerze jak w kalendarzu
-// (wspólny styl list z global.css): rok = sekcja z kreską (.lista-miesiac), wpisy = osobne białe karty (.karty-lista);
-// telefon — lata jako małe etykiety i wiersze, jak dotąd.
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal” (liczby w jednym wierszu w banerze),
-// reszta strony jak w wariancie „Zwarta” (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok na końcu pliku).
-// Telefon (≤ 760 px): liczby w kafelkach .stats pod banerem (blok .tylko-telefon).
-// Tekst wprowadzający zaraz pod banerem (TekstWstepny: src/data/dzialy/nauka.json, pola sukcesy_tekst / sukcesy_tekst_en; puste = brak).
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import TekstWstepny from '../components/TekstWstepny.astro';
-import Ikona from '../components/Ikona.astro';
+// Sukcesy (/nauka/sukcesy), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: aktualności z rodzajem „sukces”
+// według lat (najnowsze na górze; rok jako podsekcja h3 z liczbą wpisów, kotwice #rok-RRRR bez zmian). Spis „Na tej
+// stronie”: lata. Ramka „Wcześniejsze sukcesy” usunięta (zlecenie 11, zalecenie 4).
+// Tekst wprowadzający pod banerem (Treść strony Web-Nauka → Strony → Sukcesy; zlecenie 30; brak = bez tekstu).
+// Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”;
+// tytuł Brygadą (cały wiersz prowadzi do wpisu), zajawka, z prawej miniatura zdjęcia wpisu (jeśli jest; na telefonie bez).
+// Baner (bez zmian): hasło (pole Hasło tej strony) i liczby w jednej liście .pt-liczby — na telefonie
+// pokazywała się już ta sama lista (zal-telefon.css), więc dawnej listy telefonu (LiczbyBanera, liczbyTelefon) nie ma.
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); własne style (na końcu pliku)
+// tylko dla wierszy z datą. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
+import Podstrona from '../components/zal/Podstrona.astro';
+import ZdjecieZ from '../components/ZdjecieZ.astro';
+import { rozmiarPola } from '../lib/zdjecia';
 import { u, isExternal } from '../lib/url';
-import { wJezyku } from '../lib/i18n';
-import { short, type Lang } from '../lib/daty';
-import { aktualnosci, slugOf, type Aktualnosc } from '../lib/tresci';
+import { odmiana, wJezyku } from '../lib/i18n';
+import { dayNum, monthShort, parse, type Lang } from '../lib/daty';
+import { slugOf, type Aktualnosc } from '../lib/tresci';
+import { daneListySukcesow } from '../lib/widoki/listaSukcesow';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-
-const sukcesy = (await aktualnosci()).filter((a) => a.data.rodzaj === 'sukces');
-const lata: { rok: string; lista: Aktualnosc[] }[] = [];
-for (const a of sukcesy) {
-  const r = a.data.data.slice(0, 4);
-  const ost = lata[lata.length - 1];
-  if (ost && ost.rok === r) ost.lista.push(a);
-  else lata.push({ rok: r, lista: [a] });
-}
 const tytul = (a: Aktualnosc) => (lang === 'en' && a.data.tytul_en) || a.data.tytul;
 const zajawka = (a: Aktualnosc) => (lang === 'en' && a.data.zajawka_en) || a.data.zajawka;
 const href = (a: Aktualnosc) => u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang));
 const zdjecie = (a: Aktualnosc) => (a.data.zdjecie ? (isExternal(a.data.zdjecie) ? a.data.zdjecie : u(a.data.zdjecie)) : undefined);
 
-const naglowek = T('Sukcesy', 'Achievements');
-const lead = T(
-  'Nagrody, wyróżnienia, granty i stypendia pracowników, doktorantów, studentów i absolwentów Instytutu Matematycznego.',
-  'Prizes, distinctions, grants and scholarships awarded to staff, PhD students, students and graduates of the Mathematical Institute.',
-);
-const najstarszy = lata.length ? lata[lata.length - 1].rok : '';
-const najnowszy = lata.length ? lata[0].rok : '';
-const archiwumStarejStrony = 'https://www.math.uni.wroc.pl/sukcesy';
-// Liczby: na komputerze w banerze (.pt-liczby), na telefonie w kafelkach .stats pod banerem.
-const liczby = sukcesy.length > 0 ? [
-  { n: String(sukcesy.length), l: T('wpisów o sukcesach', 'achievement posts') },
-  { n: najstarszy === najnowszy ? najnowszy : `${najstarszy}–${najnowszy}`, l: T('lata', 'years') },
-] : [];
+// html — tekst nad listą — Treść strony (Web-Nauka → Strony → Sukcesy; zlecenie 30)
+const { sukcesy, lata, naglowek, lead, html, liczby, haslo } = await daneListySukcesow(lang);
+const ileWpisow = (n: number) => `${n} ${odmiana(n, ['wpis', 'wpisy', 'wpisów'], ['post', 'posts'], lang)}`;
+// bez ramki „Wcześniejsze sukcesy” (zlecenie 11, zalecenie 4); strona /nauka/sukcesy/historia zostaje — decyzja właściciela
+const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
 ---
-<Baza tytul={naglowek} opis={lead} uklad="zwarta portal-baner">
-  {/* Komputer: liczby w jednym wierszu w banerze (.pt-liczby, jak na stronie działu „Nauka”).
-       Telefon: jak dotąd — kafelki .stats pod banerem (liczby nie idą do banera, żeby telefon się nie zmienił). */}
-  <NaglowekStrony tytul={naglowek} lead={lead} lang={lang} okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]}>
+<Podstrona lang={lang} tytul={naglowek} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} dzial="nauka" spis={spis} klasa="tresc z-suk">
+  <Fragment slot="baner">
     {liczby.length > 0 && (
-      <ul class="pt-liczby tylko-komputer">
+      <ul class="pt-liczby">
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
     )}
-  </NaglowekStrony>
-  <div class="wrap layout">
-    <div class="main">
-      <TekstWstepny pole="sukcesy_tekst" lang={lang} />
-      {liczby.length > 0 && (
-        <div class="stats tylko-telefon" data-pagefind-ignore>
-          {liczby.map((x) => <div class="stat"><span class="n">{x.n}</span><span class="l">{x.l}</span></div>)}
-        </div>
-      )}
-      {sukcesy.length === 0 && <p class="muted">{T('Brak wpisów o sukcesach.', 'No achievement posts yet.')}</p>}
+  </Fragment>
 
-      {lata.map((g) => (
-        <section aria-labelledby={`rok-${g.rok}`} class="lista-miesiac sukcesy-rok">
-          <h2 id={`rok-${g.rok}`} class="month sukcesy-rok-h">{g.rok}<span class="sukcesy-ile">{g.lista.length}</span></h2>
-          <div class="karty-lista">
+  {html && <section set:html={html} />}
+
+  <section id="z-wpisy" aria-labelledby="h-wpisy">
+    <h2 id="h-wpisy">{T('Według lat', 'By year')}</h2>
+    {sukcesy.length === 0 && <p class="pusto">{T('Brak wpisów o sukcesach.', 'No achievement posts yet.')}</p>}
+    {lata.map((g) => (
+      <>
+        <h3 id={`rok-${g.rok}`}>{g.rok}<span class="sr-only">, </span> <small>{ileWpisow(g.lista.length)}</small></h3>
+        <ul class="wiersze">
           {g.lista.map((a) => (
-            <a class="row-item" href={href(a)}>
-              <span class="body">
-                <span class="news-meta"><time datetime={a.data.data}>{short(a.data.data)}</time></span>
-                <span class="t">{tytul(a)}</span>
-                {zajawka(a) && <span class="x">{zajawka(a)}</span>}
-              </span>
-              {zdjecie(a) && <span class="thumb sukcesy-thumb"><img src={zdjecie(a)} alt="" loading="lazy" /></span>}
-            </a>
+            <li class:list={['wiersz', 'klik', zdjecie(a) && 'z-min']}>
+              <time class="dz" datetime={a.data.data.slice(0, 10)}>{dayNum(a.data.data)}<small> {monthShort(a.data.data, lang)} {parse(a.data.data).y}</small></time>
+              <div>
+                <h4><a href={href(a)}>{tytul(a)}</a></h4>
+                {zajawka(a) && <p>{zajawka(a)}</p>}
+              </div>
+              {a.data.zdjecie && <ZdjecieZ class="min" src={a.data.zdjecie} sizes={rozmiarPola([null, 112, 112])} />}
+            </li>
           ))}
-          </div>
-        </section>
-      ))}
-    </div>
+        </ul>
+      </>
+    ))}
+  </section>
 
-    <aside class="side" data-pagefind-ignore>
-      {lata.length > 1 && (
-        <nav class="side-box toc toc-side" aria-label={T('Lata', 'Years')}>
-          <h2>{T('Lata', 'Years')}</h2>
-          <ol style="flex-direction:row;flex-wrap:wrap;gap:6px">
-            {lata.map((g) => <li><a href={`#rok-${g.rok}`} class="chip" style="display:inline-flex;align-items:center;border-left:1.5px solid var(--line);padding:0 12px;min-height:36px">{g.rok}</a></li>)}
-          </ol>
-        </nav>
-      )}
-      <div class="side-box">
-        <h2>{T('Wcześniejsze sukcesy', 'Earlier achievements')}</h2>
-        <p style="margin:0;font-size:15px">{T(
-          'Wybrane wyróżnienia pracowników i absolwentów Instytutu do 2014 roku zebraliśmy w zestawieniu historycznym.',
-          'Selected distinctions of the Institute’s staff and graduates up to 2014 are listed in a historical overview.',
-        )}</p>
-        <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy/historia', lang))}>{T('Zestawienie historyczne', 'Historical overview')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
-        <a class="link-arrow" href={archiwumStarejStrony}>{T('Archiwum starej strony', 'Archive of the old website')}<Ikona nazwa="zewnetrzny" rozmiar={13} /></a>
-      </div>
-    </aside>
-  </div>
-</Baza>
+</Podstrona>
 
 <style>
-  .sukcesy-rok-h { display: flex; align-items: center; gap: 10px; scroll-margin-top: 16px; }
-  /* telefon (≤ 760 px): rok jako mała etykieta nad wierszami (na komputerze — .lista-miesiac w global.css) */
-  @media (max-width: 760px) { .sukcesy-rok-h { margin-top: 28px; font-size: 15px; } }
-  .sukcesy-ile { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 12px; letter-spacing: 0; }
-  .sukcesy-thumb { flex-basis: 112px; height: 112px; }
-  .sukcesy-thumb img { object-position: center top; }
+  /* Wiersze z datą (jak zal/dzial/Wiersz.astro): dzień | tytuł, zajawka | miniatura. Reszta (sekcje, lata h3, akapity,
+     ul.linki) — wzorzec treści .tresc (src/styles/zal-tresc.css). */
+  .wiersze { list-style: none; margin: 0; padding: 0; }
+  .wiersze > li { max-width: none; margin: 0; font-size: inherit; }
+  .wiersz { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .wiersz.z-min { grid-template-columns: 76px minmax(0, 1fr) 112px; }
+  .wiersz .dz { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--d-a); }
+  .wiersz .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .wiersz p { margin: 0; max-width: 42.7em; font-size: 15.5px; line-height: 1.55; color: var(--text); }
+  .wiersz h4 { margin: 0 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .wiersz h4 a { color: inherit; text-decoration: none; }
+  .wiersz :global(.min) { display: block; width: 112px; height: 112px; object-fit: cover; object-position: center top; background: var(--d-t); }
+  .pusto { font-style: italic; color: var(--muted); }
+  /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
+  .klik { position: relative; }
+  .klik h4 a::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
+  .klik:hover h4 a { color: var(--d-a); }
+  .klik h4 a:focus-visible { outline: none; }
+  .klik:has(h4 a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; border-radius: 2px; }
+  /* rok (podsekcja): liczba wpisów małym krojem tekstu */
+  h3 small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
 
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
-     Odstęp nad listą stały (24 px), jak na stronie działu „Nauka”; licznik wpisów przy roku w linii tytułu sekcji. */
-  @media (min-width: 761px) {
-    .layout { padding-top: 24px; }
-    .sukcesy-ile { font-weight: 800; }
+  /* ---------- telefon (≤ 1023 px): mniejszy dzień, bez miniatur (jak dotąd na telefonie; obok dnia za mało miejsca) ---------- */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .wiersz { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
+    .wiersz.z-min { grid-template-columns: 54px minmax(0, 1fr); }
+    .wiersz .dz { font-size: 28px; }
+    .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
+    .wiersz h4 { font-size: 18px; }
+    .wiersz p { font-size: 15px; }
+    .wiersz :global(.min) { display: none; }
   }
 </style>

@@ -1,0 +1,59 @@
+diff --git a/.pages.yml b/.pages.yml
+index 5a00ec1..6714d97 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -228,6 +228,9 @@ content:
+     - name: opis
+       label: Dopisek (np. rok, poziom)
+       type: string
++    - name: opis_en
++      label: 'EN: dopisek (puste = wersja angielska pokaże dopisek po polsku; temat zostaje w oryginale)'
++      type: string
+   - name: dokumenty
+     label: Dokumenty
+     type: object
+diff --git a/src/content/specjalnosci/matematyka-aktuarialno-finansowa.md b/src/content/specjalnosci/matematyka-aktuarialno-finansowa.md
+index d275a39..05e89a4 100644
+--- a/src/content/specjalnosci/matematyka-aktuarialno-finansowa.md
++++ b/src/content/specjalnosci/matematyka-aktuarialno-finansowa.md
+@@ -250,28 +250,40 @@ kariera_en: |
+ tematy_prac:
+   - tytul: Williamson transforms of probability distributions and their inversions
+     opis: praca magisterska, 2024; wyróżnienie w wydziałowym konkursie na najlepszą pracę dyplomową; promotor Marek Arendarczyk
++    opis_en: "master’s thesis, 2024; honourable mention in the Faculty competition for the best diploma thesis; supervisor: Marek Arendarczyk"
+   - tytul: Zastosowania procesów Markowa w ubezpieczeniach
+     opis: praca magisterska; promotor Marek Arendarczyk; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "master’s thesis; supervisor: Marek Arendarczyk; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Ubezpieczeniowe modele wielostanowe
+     opis: praca magisterska; promotor Marek Arendarczyk; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "master’s thesis; supervisor: Marek Arendarczyk; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Miary ryzyka w modelach wielowymiarowych
+     opis: praca magisterska; promotor Marek Arendarczyk; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "master’s thesis; supervisor: Marek Arendarczyk; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Symultaniczna ruina w gaussowskim modelu ryzyka
+     opis: praca magisterska; promotor Krzysztof Dębicki; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "master’s thesis; supervisor: Krzysztof Dębicki; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Ubezpieczenia małżeńskie ze stochastyczną stopą dyskonta
+     opis: praca magisterska; promotor Krzysztof Dębicki; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "master’s thesis; supervisor: Krzysztof Dębicki; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Modelowanie przyszłego czasu życia
+     opis: praca licencjacka (stary program); promotor Marek Arendarczyk; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "bachelor’s thesis (previous curriculum); supervisor: Marek Arendarczyk; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Składki i rezerwy w ubezpieczeniach wieloosobowych
+     opis: praca licencjacka (stary program); promotor Marek Arendarczyk; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "bachelor’s thesis (previous curriculum); supervisor: Marek Arendarczyk; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Prawdopodobieństwo ruiny firmy w warunkach inflacji
+     opis: praca licencjacka (stary program); promotor Krzysztof Dębicki; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "bachelor’s thesis (previous curriculum); supervisor: Krzysztof Dębicki; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Modele wyceny kapitału
+     opis: praca licencjacka (stary program); promotor Roman Urban; lista tematów Komisji Prac Dyplomowych (2022 i 2024)
++    opis_en: "bachelor’s thesis (previous curriculum); supervisor: Roman Urban; Diploma Theses Committee list of topics (2022 and 2024)"
+   - tytul: Obligacje na egzaminie aktuarialnym
+     opis: praca licencjacka (stary program); promotor Anna Wysoczańska-Kula; lista tematów Komisji Prac Dyplomowych (2024)
++    opis_en: "bachelor’s thesis (previous curriculum); supervisor: Anna Wysoczańska-Kula; Diploma Theses Committee list of topics (2024)"
+   - tytul: Renty na egzaminie aktuarialnym
+     opis: praca licencjacka (stary program); promotor Anna Wysoczańska-Kula; lista tematów Komisji Prac Dyplomowych (2024)
++    opis_en: "bachelor’s thesis (previous curriculum); supervisor: Anna Wysoczańska-Kula; Diploma Theses Committee list of topics (2024)"
+ dokumenty:
+   - nazwa: Przewodnik po programie studiów I stopnia (od 2026/27)
+     nazwa_en: Guide to the first-cycle programme (from 2026/27)

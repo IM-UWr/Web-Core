@@ -1,0 +1,21 @@
+---
+// Flaga języka docelowego 20×10 px z cienką obwódką przy przełączniku języka (dok/estetyka.md, 23:00; zlecenie 11, zalecenie 8):
+// na stronach polskich brytyjska przy „EN”, na angielskich polska przy „PL” — ten sam rozmiar we wszystkich miejscach
+// (pasek, okładka, panel menu, telefon). Brytyjska uproszczona (czerwone skosy bez przesunięcia) — przy 20 px różnicy nie widać.
+interface Props { jezyk?: 'en' | 'pl' }
+const { jezyk = 'en' } = Astro.props;
+---
+{jezyk === 'pl' ? (
+  <svg class="z-flaga" viewBox="0 0 60 30" width="20" height="10" aria-hidden="true" focusable="false">
+    <path d="M0,0 h60 v15 h-60 z" fill="#fff" />
+    <path d="M0,15 h60 v15 h-60 z" fill="#DC143C" />
+  </svg>
+) : (
+  <svg class="z-flaga" viewBox="0 0 60 30" width="20" height="10" aria-hidden="true" focusable="false">
+    <path d="M0,0 v30 h60 v-30 z" fill="#012169" />
+    <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6" />
+    <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2" />
+    <path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10" />
+    <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6" />
+  </svg>
+)}

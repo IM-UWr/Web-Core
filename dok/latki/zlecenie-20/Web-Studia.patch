@@ -1,0 +1,43 @@
+diff --git a/.pages.yml b/.pages.yml
+index f181f6e..20ef9a9 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -360,6 +360,12 @@ content:
+   - name: menu_etykieta_en
+     label: '⑦ EN: krótka nazwa'
+     type: string
++  - name: menu_opis
++    label: ⑦ Krótki opis w polu ze stronami na stronie działu Studia (puste = przy krótkiej nazwie pełna nazwa, inaczej bez opisu)
++    type: string
++  - name: menu_opis_en
++    label: '⑦ EN: krótki opis'
++    type: string
+   - name: na_stronie_glownej
+     label: ⑦ Pokaż kafelek na stronie głównej (sekcja Studia)
+     type: boolean
+diff --git a/src/content/kierunki/matematyka.md b/src/content/kierunki/matematyka.md
+index 1a03c3f..1cf6ad0 100644
+--- a/src/content/kierunki/matematyka.md
++++ b/src/content/kierunki/matematyka.md
+@@ -4,6 +4,8 @@ nazwa_en: Mathematics
+ kolejnosc: 1
+ menu_etykieta: "Matematyka"
+ menu_etykieta_en: "Mathematics"
++menu_opis: "I i II stopień, pięć specjalności"
++menu_opis_en: "BSc and MSc, five specialisations"
+ kafelek_poziom: "I i II stopień"
+ kafelek_poziom_en: "BSc and MSc"
+ kafelek_opis: "Nowy program studiów od roku 2026/27."
+diff --git a/src/content/kierunki/szkola-doktorska.md b/src/content/kierunki/szkola-doktorska.md
+index 0217560..727bd31 100644
+--- a/src/content/kierunki/szkola-doktorska.md
++++ b/src/content/kierunki/szkola-doktorska.md
+@@ -4,6 +4,8 @@ nazwa_en: Doctoral school
+ kolejnosc: 4
+ menu_etykieta: "Szkoła doktorska"
+ menu_etykieta_en: "Doctoral school"
++menu_opis: "Kolegium Doktorskie Matematyki"
++menu_opis_en: "Doctoral College of Mathematics"
+ kafelek_poziom: "III stopień"
+ kafelek_poziom_en: "PhD"
+ kafelek_opis: "Kolegium Doktorskie Matematyki."

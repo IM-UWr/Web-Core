@@ -28,6 +28,17 @@ const published = z.preprocess((v) => (v == null || v === '' ? true : v), z.bool
 const plik = z.object({ nazwa: optStr, nazwa_en: optStr, plik: z.string() });
 const plikList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(plik));
 
+// Baner podstrony na telefonie (zlecenie 01, decyzje 31.10.2026): krótkie bursztynowe hasło zamiast opisu (puste = opis
+// jak dotąd albo reguła widoku) i — tylko tam, gdzie liczb nie da się policzyć z danych — stałe liczby pod kreską
+// (wartość, np. „8” albo „3 lata”, i etykieta). Komputer bez zmian.
+const haslo = { haslo: optStr, haslo_en: optStr };
+const liczbyBanera = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.object({
+  n: z.preprocess((v) => (typeof v === 'number' ? String(v) : v), z.string()),
+  n_en: optStr,
+  etykieta: z.string(),
+  etykieta_en: optStr,
+})));
+
 const aktualnosci = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/aktualnosci' }),
   schema: z.object({
@@ -45,7 +56,6 @@ const aktualnosci = defineCollection({
     wydarzenie_poczatek: optDate,
     wydarzenie_koniec: optDate,
     wydarzenie_miejsce: optStr,
-    wyroznij_do: optDate,
     tytul_en: optStr,
     zajawka_en: optStr,
     tresc_en: optStr,
@@ -65,6 +75,13 @@ const strony = defineCollection({
     // prawy pasek: spis „Na tej stronie”, menu działu (podstrony) albo oba
     // puste = domyślnie tylko spis „Na tej stronie” (bez menu działu)
     pasek_boczny: z.preprocess(empty, z.enum(['oba', 'spis', 'menu', 'brak']).optional()),
+    // listy Markdown jako bloki wzorca treści: dwie kolumny, kontakty, etapy, linki (src/plugins/rehype-bloki.mjs)
+    bloki: z.boolean().optional(),
+    ...haslo,
+    // strona z listą (zlecenie 30, src/lib/tekstyStron.ts): hasło stron pojedynczych wpisów (rocznik publikacji, obrona)
+    haslo_podstron: optStr,
+    haslo_podstron_en: optStr,
+    liczby: liczbyBanera,
     opublikowany: published,
   }),
 });
@@ -102,6 +119,7 @@ const seminaria = defineCollection({
     aktywne: published,
     do_uzupelnienia: strList,
     tresc_en: optStr,
+    ...haslo,
     opublikowany: published,
   }),
 });
@@ -114,8 +132,15 @@ const referaty = defineCollection({
     tytul: z.string(),
     prelegent: z.string(),
     afiliacja: optStr,
+    // afiliacja, sala i streszczenie (Markdown) po angielsku — opcjonalne; puste = na /en wartość polska (sala: jak dotąd,
+    // „605” → „room 605”). Tytuł referatu zostaje w języku oryginału (zlecenie 11, zalecenie 12).
+    afiliacja_en: optStr,
+    // język referatu: „pl” = na /en po tytule dopisek „(talk in Polish)” (decyzja D10, zlecenie 16); puste = bez dopisku
+    jezyk: z.preprocess(empty, z.enum(['pl', 'en']).optional()),
     termin: date,
     sala: optStr,
+    sala_en: optStr,
+    tresc_en: optStr,
     pliki: plikList,
     opublikowany: published,
   }),
@@ -126,6 +151,8 @@ const obrony = defineCollection({
   schema: z.object({
     kandydat: z.string(),
     tytul_rozprawy: z.string(),
+    // treść po angielsku (Markdown, opcjonalnie); pusta = na /en zaproszenie składane z danych obrony (src/lib/widoki/obrona.ts)
+    tresc_en: optStr,
     // zdjęcie (opcjonalne) — na karcie na stronie głównej, na liście aktualności i na stronie obrony
     zdjecie: optStr,
     zdjecie_opis: optStr,
@@ -148,9 +175,17 @@ const obrony = defineCollection({
 
 const rok = z.preprocess(empty, z.coerce.number().int().optional());
 
+// Grupa pól „Karta” w formularzu Pages CMS (zlecenie 30; zakłady, „Warto wiedzieć”): Pages CMS grupuje pola tylko polem typu object,
+// więc w pliku leżą pod kluczem karta. Strona czyta je jak dotąd z wierzchu — przy wczytaniu karta jest spłaszczana.
+const zKarta = <T extends z.ZodRawShape>(pola: T) => z.preprocess((v) => {
+  if (!v || typeof v !== 'object' || !('karta' in v)) return v;
+  const { karta, ...reszta } = v as Record<string, unknown>;
+  return { ...(karta && typeof karta === 'object' ? karta : {}), ...reszta };
+}, z.object(pola));
+
 const zaklady = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/zaklady' }),
-  schema: z.object({
+  schema: zKarta({
     nazwa: z.string(),
     nazwa_en: optStr,
     nazwa_krotka: optStr,
@@ -167,98 +202,66 @@ const zaklady = defineCollection({
     zdjecie_opis: optStr,
     zdjecie_opis_en: optStr,
     tresc_en: optStr,
+    ...haslo,
     opublikowany: published,
   }),
 });
 
-// Kierunek studiów (np. matematyka): treść w polach, a wygląd w szablonie src/views/Kierunek.astro.
+// lista z pola CMS (puste = brak pozycji)
 const lista = <T extends z.ZodTypeAny>(item: T) => z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(item));
-const link = z.object({ etykieta: z.string(), etykieta_en: optStr, adres: z.string() });
-// Dokument: plik wgrany w CMS (pole „wgraj”) albo link (pole „plik”, np. do BIP). Szablony używają zawsze „plik”.
-const dokument = z
-  .object({ nazwa: z.string(), nazwa_en: optStr, wgraj: optStr, plik: optStr, opis: optStr, opis_en: optStr })
-  .refine((d) => !!(d.wgraj || d.plik), { message: 'Dokument: wgraj plik albo podaj link' })
-  .transform((d) => ({ ...d, plik: (d.wgraj || d.plik) as string }));
 
+// Kierunek (zlecenie 28): jeden Markdown — treść polska w pliku (body), angielska w tresc_en (puste = polska z lang="pl").
+// Sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs), wygląd w src/views/Kierunek.astro.
+// Baner w kolekcji kierunki_baner (ten sam id), menu i kafelki w Ustawieniach (studia.kierunki), przypomnienia o terminach
+// w src/data/przypomnienia.json (src/lib/kierunki.ts, src/lib/tresci.ts).
 const kierunki = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/kierunki' }),
   schema: z.object({
     nazwa: z.string(),
     nazwa_en: optStr,
-    // gdzie kierunek pojawia się automatycznie: menu „Studia” i kafelki na stronie głównej (kolejność rosnąco)
-    kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
-    w_menu: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
-    menu_etykieta: optStr,
-    menu_etykieta_en: optStr,
-    na_stronie_glownej: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
-    kafelek_poziom: optStr,
-    kafelek_poziom_en: optStr,
-    kafelek_opis: optStr,
-    kafelek_opis_en: optStr,
-    podtytul: optStr,
-    podtytul_en: optStr,
-    opis: optStr,
-    opis_en: optStr,
-    // wartosc_en — wartość w wersji angielskiej (np. „3 years”; puste = jak po polsku)
-    fakty: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr })),
-    przyciski: lista(link),
-    dlaczego: lista(z.object({ tytul: z.string(), tytul_en: optStr, opis: z.string(), opis_en: optStr, ikona: optStr })),
-    etapy: lista(z.object({
-      stopien: z.string(),
-      kiedy: z.string(),
-      kiedy_en: optStr,
-      tytul: z.string(),
-      tytul_en: optStr,
-      opis: optStr,
-      opis_en: optStr,
-      termin: optStr,
-      termin_en: optStr,
-      formularz: optStr,
-      formularz_adres: optStr,
-    })),
-    programy: lista(z.object({
-      nazwa: z.string(),
-      nazwa_en: optStr,
-      dotyczy: optStr,
-      dotyczy_en: optStr,
-      od_roku: z.preprocess(empty, z.coerce.number().int().optional()),
-      do_roku: z.preprocess(empty, z.coerce.number().int().optional()),
-      dokumenty: lista(dokument),
-    })),
-    terminy: lista(z.object({
-      co: z.string(),
-      co_en: optStr,
-      kogo: optStr,
-      kogo_en: optStr,
-      termin: optStr,
-      termin_en: optStr,
-      formularz: optStr,
-      formularz_adres: optStr,
-      // przypomnienie w „Najbliższych wydarzeniach” (strona główna, aktualności) przed terminem
-      data: optDate,
-      przypomnienie: z.preprocess(empty, z.boolean().default(false)),
-      dni_przed: z.preprocess(empty, z.coerce.number().int().min(0).default(14)),
-      co_roku: z.preprocess(empty, z.boolean().default(true)),
-    })),
-    praktyki: optStr,
-    praktyki_en: optStr,
-    praktyki_dokumenty: lista(dokument),
-    kariera: optStr,
-    kariera_en: optStr,
-    faq: lista(z.object({ pytanie: z.string(), pytanie_en: optStr, odpowiedz: z.string(), odpowiedz_en: optStr })),
-    kontakt: lista(z.object({ rola: z.string(), rola_en: optStr, osoba: z.string(), email: optStr, telefon: optStr, pokoj: optStr })),
-    akty: lista(dokument),
     tresc_en: optStr,
     opublikowany: published,
   }),
 });
 
-// Podstrona specjalności (np. /studia/matematyka/analiza-danych).
+// Baner kierunku (src/content/kierunki-baner/<id kierunku>.json; osobny formularz, bo Pages CMS przy zapisie usuwa z pliku pola
+// spoza formularza). Brak pliku: baner z samą nazwą (bez zdania, liczb i hasła), opis strony (meta) = pierwsze zdanie treści.
+// kierunek — nazwa pliku kierunku (w formularzu z niej powstaje nazwa nowego pliku banera; strona bierze id z nazwy pliku).
+// liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
+// na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
+const kierunki_baner = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
+  schema: z.object({
+    kierunek: optStr,
+    podtytul: optStr,
+    podtytul_en: optStr,
+    opis: optStr,
+    opis_en: optStr,
+    ...haslo,
+    liczby: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr, etykieta_krotka: optStr, etykieta_krotka_en: optStr })),
+  }),
+});
+
+// Podstrona specjalności (np. /studia/matematyka/analiza-danych), zlecenie 29: formularz „Treść” — jeden Markdown jak kierunek
+// (body po polsku, tresc_en po angielsku; puste = polska z lang="pl"), sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs,
+// kotwice typu „specjalnosc” w kotwice.mjs), wygląd w src/views/Specjalnosc.astro. Pola banera i kafelka na stronie kierunku —
+// osobny formularz i plik w kolekcji specjalnosci_baner (ten sam id; src/lib/specjalnosci.ts).
 const specjalnosci = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/specjalnosci' }),
   schema: z.object({
     nazwa: z.string(),
     nazwa_en: optStr,
+    tresc_en: optStr,
+    opublikowany: published,
+  }),
+});
+
+// „Baner i kafelek” specjalności (src/content/specjalnosci-baner/<id specjalności>.json; osobny formularz, bo Pages CMS przy zapisie
+// usuwa z pliku pola spoza formularza). Brak pliku: wartości domyślne (kierunek matematyka, kafelek na stronie kierunku, bez
+// banera i opiekunów) — src/lib/specjalnosci.ts. zrodla i do_uzupelnienia — pola ukryte w formularzu (notatki redakcyjne).
+const specjalnosci_baner = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/specjalnosci-baner' }),
+  schema: z.object({
     kierunek: z.preprocess((v) => idWpisu(empty(v)), z.string().default('matematyka')),
     // kafelek na stronie kierunku budowany z tego pliku (jedno miejsce edycji)
     kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
@@ -275,32 +278,12 @@ const specjalnosci = defineCollection({
     opis_en: optStr,
     zaklad: optId,
     opiekunowie: lista(z.object({ imie_nazwisko: z.string(), rola: optStr, rola_en: optStr })),
-    wygaszana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
-    dla_kogo: optStr,
-    dla_kogo_en: optStr,
-    // „Co wyróżnia specjalność” — kafelki jak na stronie kierunku
-    dlaczego: lista(z.object({ tytul: z.string(), tytul_en: optStr, opis: z.string(), opis_en: optStr, ikona: optStr })),
-    // „Jak przebiega specjalność” — oś semestrów/etapów
-    etapy: lista(z.object({ kiedy: z.string(), kiedy_en: optStr, tytul: z.string(), tytul_en: optStr, opis: optStr, opis_en: optStr })),
-    // identyfikatory seminariów (pliki z src/content/seminaria) związanych ze specjalnością
+    // identyfikatory seminariów (pliki z src/content/seminaria) związanych ze specjalnością — sekcja „Seminaria”
     seminaria: idList,
-    przedmioty: lista(z.object({
-      grupa: z.string(),
-      grupa_en: optStr,
-      lista: lista(z.object({ nazwa: z.string(), nazwa_en: optStr, opis: optStr, opis_en: optStr })),
-    })),
-    umiejetnosci: strList,
-    umiejetnosci_en: strList,
-    kariera: optStr,
-    kariera_en: optStr,
-    tematy_prac: lista(z.object({ tytul: z.string(), opis: optStr })),
-    dokumenty: lista(dokument),
-    linki: lista(link),
-    faq: lista(z.object({ pytanie: z.string(), pytanie_en: optStr, odpowiedz: z.string(), odpowiedz_en: optStr })),
-    tresc_en: optStr,
+    wygaszana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
     zrodla: strList,
     do_uzupelnienia: strList,
-    opublikowany: published,
+    ...haslo,
   }),
 });
 
@@ -344,7 +327,7 @@ const granty = defineCollection({
 // Pozycja z treścią (body) dostaje własną podstronę /warto-wiedziec/<plik>; bez treści karta prowadzi do pola „link”.
 const warto_wiedziec = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/warto_wiedziec' }),
-  schema: z.object({
+  schema: zKarta({
     tytul: z.string(),
     tytul_en: optStr,
     // rok jako tekst (np. „2017” albo „2010, 2018”) — liczba z YAML-a też przejdzie
@@ -368,4 +351,4 @@ const warto_wiedziec = defineCollection({
   }),
 });
 
-export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, specjalnosci, warto_wiedziec };
+export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, specjalnosci_baner, warto_wiedziec };

@@ -1,0 +1,245 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — wzorzec treści podstron (zlecenie 11, zalecenie 14; decyzja 4.11, 23:58).
+   Jeden styl sekcji i elementów na wszystkich podstronach. Wartości z prototypu (proto/zalozyciele.src.html, blok
+   „wzorzec treści”, klasy .tresc …), w prototypie sekcja to h3, a podsekcja h4 — tu sekcja h2, podsekcja h3.
+   Użycie: element treści szablonu z klasą .tresc (zal/Podstrona.astro: klasa="tresc"), sekcje strony jako <section>
+   z <h2> (spis „Na tej stronie” bierze ich id).
+   - sekcja: Brygada 32 px w kolorze tekstu; między sekcjami kreska 1 px (44 px nad, 40 px pod), nad pierwszą i pod
+     ostatnią bez kreski; podsekcja (h3): Brygada 23 px w kolorze działu; etykieta .etyk: 13 px pogrubiona w kolorze działu;
+   - tekst ciągły 17 px / 1,68, najwyżej 70 znaków (42,7em = 70ch w Manrope — w em, nie w ch, żeby kroje zastępcze przed
+     wczytaniem Manrope łamały tekst tak samo; zlecenie 13, punkt 3); pierwszy akapit (.wst) w kolorze nagłówków; tekst w elementach
+     z danymi 15,5 px / 1,55; linki: kolor tekstu, podkreślenie 1 px w kolorze działu (55%), po najechaniu kolor działu;
+   - elementy: lista z kreskami (ul.kreski), ramka uwagi (.uwaga), dwie kolumny cech (ul.dwa), siatka boksów (ul.boksy), lista linków (ul.linki),
+     ścieżka etapów (ol.etapy), pary etykieta–wartość (dl.para), tabela (table.tab), przełącznik wariantów (.tresc-taby),
+     pliki do pobrania (ul.pliki), pytania (.faq details), kontakt (.kontakty);
+   - nigdy: kafelki, cienie, zaokrąglenia, tła sekcji (wyjątek: ramka uwagi), ikony ozdobne (wyjątek: ikona pliku).
+   Telefon (≤ 1023 px): sekcja 26 px, podsekcja 20 px, tekst 16 px, dwie kolumny → jedna, kontakt w jednej kolumnie,
+   tabela w bloki (pierwsza kolumna pogrubiona, reszta pod nią).
+   ========================================================================== */
+.tresc { font-size: 17px; line-height: 1.68; color: var(--text); }
+.z-pd-tresc.tresc > section { padding: 0 0 44px; margin: 0 0 40px; border-bottom: 1px solid var(--line); }
+.z-pd-tresc.tresc > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+.tresc h2 { margin: 0 0 16px; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -.005em; color: var(--ink); }
+.tresc h3 { margin: 30px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.3; color: var(--d-a); }
+.tresc h2 + p + h3, .tresc h2 + h3 { margin-top: 10px; }
+.tresc .etyk { display: block; margin: 0 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+.tresc p { margin: 0 0 14px; max-width: 42.7em; font-size: inherit; line-height: inherit; color: inherit; }
+.tresc p.wst { color: var(--ink); }
+/* pierwszy akapit: odstęp i stopień jak reszta tekstu (bez .z-pd-tresc .wst z zalozyciele.css i zal-podstrona.css) */
+:is(.z-pd-tresc.tresc, .z-pd-tresc .tresc) .wst { margin: 0 0 14px; font-size: inherit; }
+/* proza z CMS w sekcji strony z własnym blokiem (Władze: Kadencja, Rada): pierwszy akapit bez wyróżnienia — to nie początek strony */
+body .tresc.z-proza .prose > p:first-child { color: inherit; }
+.tresc a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); transition: color var(--t-krotki) var(--rytm); }
+.tresc a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
+/* lista: krótka kreska 12×2 px w kolorze działu zamiast kropki */
+.tresc ul.kreski { list-style: none; margin: 0 0 16px; padding: 0; max-width: 42.7em; }
+.tresc ul.kreski li { position: relative; margin: 6px 0; padding-left: 24px; font-size: inherit; line-height: inherit; }
+.tresc ul.kreski li::before { content: ''; position: absolute; left: 0; top: .84em; width: 12px; height: 2px; background: var(--d-a); }
+/* ramka uwagi: kreska 3 px z lewej, tło w odcieniu działu */
+.tresc .uwaga { max-width: 42.7em; margin: 12px 0 0; padding: 16px 20px 6px; border-left: 3px solid var(--d-a); background: var(--d-t); }
+/* dwie kolumny: cechy („dlaczego”) i lista linków do stron powiązanych */
+/* dwie kolumny przy zwykłej kolumnie treści, jedna, gdy na dwie po 280 px brakuje miejsca (zlecenie 25, punkt 2.5; auto-fill zostawia pustą kolumnę przy jednej pozycji) */
+.tresc ul.dwa, .tresc ul.linki { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(280px, 45%), 1fr)); gap: 0 40px; margin: 0; padding: 0; list-style: none; }
+.tresc ul.dwa li { padding: 14px 0 16px; border-top: 1px solid var(--line); }
+.tresc ul.dwa b { display: block; margin-bottom: 4px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--ink); }
+.tresc ul.dwa li > span:not(.etyk) { display: block; font-size: 15.5px; line-height: 1.55; }
+.tresc ul.linki a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line);
+  font-family: var(--f-display); font-size: 21px; line-height: 1.3; text-decoration: none; }
+.tresc ul.linki a::after { content: '→'; font-family: var(--f-text); font-size: 15px; color: var(--muted); }
+.tresc ul.linki a.zew::after { content: '↗'; }
+/* ścieżka etapów: pionowa linia w tonie działu, kółko na każdym etapie, ostatnie wypełnione */
+.tresc ol.etapy { margin: 0; padding: 0; list-style: none; }
+.tresc ol.etapy li { position: relative; padding: 0 0 26px 40px; }
+.tresc ol.etapy li::after { content: ''; position: absolute; left: 7px; top: 8px; bottom: -8px; width: 1.5px; background: color-mix(in srgb, var(--d-a) 35%, var(--line)); }
+.tresc ol.etapy li:last-child::after { display: none; }
+.tresc ol.etapy li::before { content: ''; position: absolute; z-index: 1; left: 0; top: 3px; width: 16px; height: 16px; box-sizing: border-box; border-radius: 50%;
+  border: 3px solid var(--d-a); background: var(--bg); }
+.tresc ol.etapy li:last-child::before { background: var(--d-a); }
+.tresc ol.etapy .t { margin: 0 0 4px; font-family: var(--f-display); font-size: 21px; line-height: 1.3; color: var(--ink); }
+.tresc ol.etapy p { font-size: 15.5px; line-height: 1.55; margin-bottom: 8px; }
+.tresc ol.etapy .akcja { margin: 10px 0 0; }
+/* przycisk-link (np. formularz przy etapie): obwódka jak przyciski Planu zajęć */
+.tresc .akcja a, .tresc a.przycisk { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--line-ui); background: transparent;
+  color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.6; text-decoration: none; transition: border-color var(--t-krotki) var(--rytm), color var(--t-krotki) var(--rytm); }
+.tresc .akcja a:hover, .tresc a.przycisk:hover { border-color: var(--d-a); color: var(--d-a); }
+.tresc .akcja a:focus-visible, .tresc a.przycisk:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+/* główny przycisk-link (zlecenie 11, zalecenie 4: „Strona projektu ↗”, link pod wpisem Warto wiedzieć): wypełniony kolorem działu */
+.tresc .akcja.glowny a, .tresc a.przycisk.glowny { border-color: var(--d-a); background: var(--d-a); color: var(--bg); }
+.tresc .akcja.glowny a:hover, .tresc a.przycisk.glowny:hover { border-color: color-mix(in srgb, var(--d-a) 85%, #000); background: color-mix(in srgb, var(--d-a) 85%, #000); color: var(--bg); }
+/* pary etykieta–wartość */
+.tresc dl.para { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 12px; margin: 0; font-size: 14.5px; line-height: 1.5; }
+.tresc dl.para dt { font-weight: 700; color: var(--muted); }
+.tresc dl.para dd { margin: 0; }
+/* tabela: nagłówki przygaszone, pod nimi kreska 2 px, wiersze oddzielone 1 px */
+.tresc table.tab { width: 100%; border-collapse: collapse; font-size: 15.5px; line-height: 1.5; }
+.tresc table.tab th { padding: 0 18px 8px 0; border-bottom: 2px solid var(--rule); text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
+.tresc table.tab td { padding: 11px 18px 11px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tresc table.tab td:first-child { color: var(--ink); }
+.tresc table.tab td:last-child { white-space: normal; min-width: 14em; }
+/* przełącznik wariantów (np. roczniki programu): pasek przycisków jak na Planie zajęć, pod nim panel */
+.tresc .tresc-taby { display: inline-flex; flex-wrap: wrap; margin: 4px 0 16px; border: 1px solid var(--line-ui); }
+.tresc .tresc-taby button { margin: 0; padding: 7px 12px; border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 14px; font-weight: 600; line-height: 1.6;
+  color: var(--text); cursor: pointer; }
+.tresc .tresc-taby button + button { border-left: 1px solid var(--line-ui); }
+.tresc .tresc-taby button:hover { color: var(--d-a); }
+.tresc .tresc-taby button[aria-pressed="true"], .tresc .tresc-taby button[aria-selected="true"] { background: var(--d-a); color: var(--bg); }
+.tresc .tresc-taby button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
+.tresc .dotyczy { font-size: 15.5px; color: var(--muted); }
+/* pliki do pobrania: ikona dokumentu w kolorze działu, nazwa, typ z prawej */
+.tresc ul.pliki { margin: 0; padding: 0; list-style: none; }
+.tresc :is(ul.pliki, ol.etapy, ul.dwa, ul.linki) li { max-width: none; font-size: inherit; }
+.tresc ul.pliki li { border-top: 1px solid var(--line); }
+.tresc ul.pliki li:last-child { border-bottom: 1px solid var(--line); }
+.tresc ul.pliki a { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 14px; align-items: baseline; padding: 11px 0; font-size: 15.5px; line-height: 1.45; text-decoration: none; }
+.tresc ul.pliki a svg { width: 18px; height: 18px; align-self: start; margin-top: 2px; fill: none; stroke: var(--d-a); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tresc ul.pliki .typ { font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+/* pytania: details/summary, „+” / „−” w kolorze działu */
+.tresc .faq details { border-top: 1px solid var(--line); }
+.tresc .faq details:last-child { border-bottom: 1px solid var(--line); }
+.tresc .faq summary { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; min-height: 0; padding: 14px 0; list-style: none;
+  cursor: pointer; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.35; color: var(--ink); background: none; }
+.tresc .faq summary::-webkit-details-marker { display: none; }
+.tresc .faq summary::after { content: '+'; flex: none; font-family: var(--f-text); font-size: 24px; line-height: 1; color: var(--d-a); }
+.tresc .faq details[open] summary::after { content: '−'; }
+.tresc .faq summary:hover { color: var(--d-a); }
+.tresc .faq summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+.tresc .faq details > :not(summary) { margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; }
+/* siatka boksów (zlecenie 17, punkt 6; zakłady, seminaria): trzy kolumny, przy kolumnie treści węższej niż 880 px dwie, poniżej 560 px i na telefonie jedna.
+   Boks na tle papieru, po najechaniu tło działu; cały klikalny (link nazwy rozciągnięty na boks), dolna linia wyrównana w rzędzie. */
+.tresc .boksy-ramka { container-type: inline-size; }
+.tresc ul.boksy { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+@container (max-width: 879.98px) { .tresc ul.boksy { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 559.98px) { .tresc ul.boksy { grid-template-columns: minmax(0, 1fr); } } /* w dwóch kolumnach długie słowa wyszłyby poza boks */
+.tresc ul.boksy > .boks { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; max-width: none; margin: 0; padding: 22px 24px 24px; border-radius: 5px;
+  background: var(--surface); font-size: 15px; line-height: 1.55; transition: background-color var(--t-krotki) var(--rytm); }
+.tresc ul.boksy > .boks:hover { background: var(--d-t); }
+.tresc .boks p { margin: 0; max-width: none; }
+.tresc .boks .etyk { margin: 0; }
+.tresc .boks h3 { margin: 0; font-size: 22px; line-height: 1.22; color: var(--ink); text-wrap: balance; }
+.tresc .boks h3 a { color: inherit; text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
+.tresc .boks h3 a::after { content: ''; position: absolute; inset: 0; border-radius: 5px; }
+.tresc .boks:hover h3 a { color: var(--d-a); }
+.tresc .boks h3 a:focus-visible { outline: none; }
+.tresc .boks h3 a:focus-visible::after { outline: 2px solid var(--d-a); outline-offset: 2px; }
+.tresc .boks .haslo { font-family: var(--f-display); font-style: italic; font-size: 16px; font-weight: 400; line-height: 1.3; color: var(--muted); }
+.tresc .boks dl.para { margin-top: auto; padding-top: 6px; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .tresc ul.boksy > .boks:active { transform: translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .tresc ul.boksy > .boks, .tresc .boks h3 a { transition: none; } }
+/* kontakt: kolumny co najmniej 250 px (przy zwykłej kolumnie treści 3), kreska 2 px nad każdą, etykieta roli, nazwisko Brygadą, pary e-mail / tel. / pokój */
+.tresc .kontakty { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0 32px; }
+.tresc .kontakty > div { padding-top: 12px; border-top: 2px solid var(--rule); }
+.tresc .kontakty b { display: block; margin: 2px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+  .tresc a, .tresc .akcja a, .tresc a.przycisk { transition: none; }
+}
+
+/* ---------- telefon (≤ 1023 px) ---------- */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  .tresc { font-size: 16px; line-height: 1.65; }
+  .z-pd-tresc.tresc > section { padding-bottom: 30px; margin-bottom: 28px; }
+  .tresc h2 { font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
+  .tresc h3 { font-size: 20px; margin-top: 24px; }
+  .tresc ul.dwa, .tresc ul.linki, .tresc .kontakty { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .tresc ul.boksy { grid-template-columns: minmax(0, 1fr); }
+  .tresc .kontakty > div + div { margin-top: 20px; }
+  .tresc ul.linki a { font-size: 19px; }
+  .tresc ol.etapy li { padding-left: 32px; }
+  .tresc ol.etapy .t { font-size: 19px; }
+  /* tabela w bloki: każdy wiersz osobno, pierwsza kolumna pogrubiona, reszta pod nią */
+  .tresc table.tab, .tresc table.tab tbody, .tresc table.tab tr, .tresc table.tab td { display: block; width: auto; }
+  .tresc table.tab thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .tresc table.tab tr { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .tresc table.tab td { padding: 0; border: 0; min-width: 0; }
+  .tresc table.tab td:first-child { font-weight: 700; }
+  .tresc table.tab td:last-child { min-width: 0; }
+}
+
+/* ---------- treść z Markdown (strony tekstowe i opisy w widokach): .prose w .tresc ----------
+   Ten sam wzorzec: ## — sekcja (kreska nad każdą poza pierwszą: 44 px nad, 40 px pod), ### — podsekcja, lista z kreskami,
+   cytat blokowy (>) — ramka uwagi, tabela jak table.tab, pierwszy akapit w kolorze nagłówków. Selektory z „body”, żeby
+   wygrać ze starymi ozdobami nagłówków sekcji (Ustawienia → „Sekcje”: pasy, linia, karty). */
+body .tresc .prose { max-width: none; font-size: inherit; line-height: inherit; color: inherit; }
+body .tresc .prose > :first-child { margin-top: 0; }
+body .tresc .prose h2 { position: static; margin: 44px 0 16px; padding: 40px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none;
+  box-shadow: none; font-family: var(--f-display); font-weight: 500; font-size: 32px; line-height: 1.2; letter-spacing: -.005em; color: var(--ink); }
+body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+body .tresc .prose h2::before, body .tresc .prose h2::after { content: none; display: none; }
+body .tresc .prose h3 { margin: 30px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.3; color: var(--d-a); }
+body .tresc .prose :is(h2 + h3, h2 + p + h3) { margin-top: 10px; }
+body .tresc .prose h4 { margin: 22px 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
+body .tresc .prose p { margin: 0 0 14px; max-width: 42.7em; font-size: inherit; line-height: inherit; }
+body .tresc .prose > p:first-child { color: var(--ink); }
+body .tresc .prose ul { list-style: none; margin: 0 0 16px; padding: 0; max-width: 42.7em; }
+body .tresc .prose ul > li { position: relative; max-width: none; margin: 6px 0; padding-left: 24px; font-size: inherit; line-height: inherit; }
+body .tresc .prose ul > li::before { content: ''; position: absolute; left: 0; top: .84em; width: 12px; height: 2px; background: var(--d-a); }
+body .tresc .prose ol { margin: 0 0 16px; padding-left: 24px; max-width: 42.7em; }
+body .tresc .prose ol > li { max-width: none; margin: 6px 0; padding-left: 4px; font-size: inherit; line-height: inherit; }
+body .tresc .prose ol > li::marker { font-weight: 700; color: var(--d-a); }
+body .tresc .prose blockquote { max-width: 42.7em; margin: 12px 0 16px; padding: 16px 20px 6px; border: 0; border-left: 3px solid var(--d-a); border-radius: 0;
+  background: var(--d-t); color: inherit; font-size: inherit; }
+body .tresc .prose blockquote a { color: var(--ink); }
+body .tresc .prose a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--d-a) 55%, transparent); }
+body .tresc .prose a:hover { color: var(--d-a); text-decoration-color: var(--d-a); }
+/* wpis o wydarzeniu (zlecenie 21, punkt 6): linki w tekście w kolorze wiersza listy; zmienne w zalozyciele.css, .akt-wydarzenie */
+body .tresc.akt-wydarzenie .prose a { color: var(--d-a); text-decoration-color: currentColor; }
+body .tresc.akt-wydarzenie .prose a:hover { color: var(--d-a); text-decoration-thickness: 2px; }
+body .tresc .prose table { display: table; width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15.5px; line-height: 1.5; }
+body .tresc .prose th { padding: 0 18px 8px 0; border: 0; border-bottom: 2px solid var(--rule); background: none; text-align: left; font-size: 13px; font-weight: 700; color: var(--muted); }
+body .tresc .prose td { padding: 11px 18px 11px 0; border: 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+body .tresc .prose td:first-child { color: var(--ink); }
+body .tresc .prose :is(img, code) { border-radius: 0; }
+/* bloki wzorca z Markdownu (pole „Bloki wzorca”, src/plugins/rehype-bloki.mjs): te same elementy co wyżej, z rozbrojonymi regułami .prose */
+body .tresc .prose :is(ul.dwa, ul.linki) { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(280px, 45%), 1fr)); gap: 0 40px; max-width: none; margin: 0 0 16px; padding: 0; }
+body .tresc .prose :is(ul.dwa, ul.linki) > li { margin: 0; padding: 0; }
+body .tresc .prose ul.dwa > li { padding: 14px 0 16px; }
+body .tresc .prose :is(ul.dwa, ul.linki) > li::before { content: none; }
+body .tresc .prose ul.linki a { text-decoration: none; }
+body .tresc .prose ul.dwa .akcja { margin: 6px 0 0; }
+body .tresc .prose ul.dwa dl.para { margin: 6px 0 0; }
+body .tresc .prose ol.etapy { max-width: none; margin: 0 0 16px; padding: 0; list-style: none; }
+body .tresc .prose ol.etapy > li { margin: 0; padding: 0 0 26px 40px; }
+body .tresc .prose ol.etapy > li:last-child { padding-bottom: 0; }
+body .tresc .prose ol.etapy .t { margin: 0 0 4px; font-size: 21px; line-height: 1.3; }
+body .tresc .prose ol.etapy p:not(.t) { margin: 0 0 8px; font-size: 15.5px; line-height: 1.55; }
+body .tresc .prose ol.etapy p.akcja { margin: 10px 0 0; }
+/* link pod pozycją jak w prototypie (5.11): zwykły podkreślony link, nie przycisk .akcja z widoków */
+body .tresc .prose .akcja a { display: inline; padding: 0; border: 0; font-size: inherit; font-weight: inherit; line-height: inherit; }
+body .tresc .prose .kontakty { margin: 0 0 16px; }
+body .tresc .prose .kontakty p { margin: 0 0 8px; font-size: 15px; line-height: 1.55; }
+body .tresc .prose :is(.kontakty, ul.dwa) .akcja a { color: var(--d-a); font-weight: 600; font-size: 14.5px; }
+body .tresc .prose blockquote .etyk { margin-bottom: 4px; }
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  body .tresc .prose h2 { margin-top: 30px; padding-top: 28px; font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
+  body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; }
+  body .tresc .prose h3 { font-size: 20px; margin-top: 24px; }
+  body .tresc .prose :is(ul.dwa, ul.linki) { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  body .tresc .prose ol.etapy > li { padding-left: 32px; }
+  body .tresc .prose ol.etapy .t { font-size: 19px; }
+  body .tresc .prose :is(table, tbody, tr, td) { display: block; width: auto; }
+  body .tresc .prose thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  body .tresc .prose tr { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  body .tresc .prose td { padding: 0; border: 0; }
+  body .tresc .prose td:first-child { font-weight: 700; }
+}
+
+/* Lista wyboru (zlecenie 11, zalecenie 4): jak pole szukania na Planie zajęć — ramka 1 px, bez zaokrągleń, 15 px, 8 px 12 px,
+   fokus: obrys 2 px w kolorze działu; strzałka w dół w kolorze działu (jak na stronie Pracownicy). Poza .tresc — używają jej
+   też paski narzędzi (Aktualności i Kalendarz na telefonie, wybór roku na stronie kierunku).
+   Znaczniki: <label|span class="z-pole-wyboru"><select>…</select><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></…> */
+.z-pole-wyboru { position: relative; display: inline-flex; align-items: center; min-width: 0; border: 1px solid var(--line-ui); background: var(--bg); }
+.z-pole-wyboru select { appearance: none; -webkit-appearance: none; width: 100%; min-width: 0; margin: 0; padding: 8px 36px 8px 12px; border: 0; border-radius: 0;
+  background: transparent; color: var(--ink); font: inherit; font-size: 15px; font-weight: 600; line-height: 1.6; cursor: pointer; }
+.z-pole-wyboru svg { position: absolute; right: 11px; width: 16px; height: 16px; pointer-events: none; fill: none; stroke: var(--d-a); stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.z-pole-wyboru:focus-within { outline: 2px solid var(--d-a); outline-offset: -1px; }
+.z-pole-wyboru select:focus { outline: none; }
+/* telefon: 16 px, żeby iOS nie powiększał strony przy wyborze */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .z-pole-wyboru select { font-size: 16px; } }
+
+/* linki poza stronę (zlecenie 14, zalecenie 23): w tekście strzałka z global.css (:where(a.zew)::after); na liście plików
+   strzałka przy typie z prawej („strona ↗”), nie po całym wierszu */
+.tresc ul.pliki a.zew::after { content: none; }
+.tresc ul.pliki a.zew .typ::after { content: '\00a0↗'; }

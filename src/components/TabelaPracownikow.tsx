@@ -1,11 +1,19 @@
-// Spis pracowników z wyszukiwarką i filtrami (grupa, zakład). Komponent renderuje się już na serwerze,
-// więc bez JavaScriptu pokazuje pełną, pogrupowaną listę (filtry działają po wczytaniu skryptu).
-// Każda osoba to jedno „pole” (wiersz siatki): gdy ma stronę domową, link na imieniu i nazwisku
-// obejmuje całe pole (klasy .os-link / .os-a w global.css), a e-mail i zakład są osobnymi linkami.
-// Kolumna „Telefon” pojawia się tylko w sekcjach, w których ktoś ma numer (w praktyce: administracja).
-// Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
+// Spis pracowników z wyszukiwarką i filtrem zakładu — kierunek „Założyciele”, szablon podstrony (Pracownicy.astro,
+// blok .z-prac; style w widoku). Komponent renderuje się już na serwerze, więc bez JavaScriptu pokazuje pełną, pogrupowaną
+// listę (pasek filtrów jest wtedy schowany, bo bez skryptu nie działa).
+// Jedna wersja HTML na każdą szerokość: pasek — pole szukania i lista zakładów (filtry można łączyć; bez wyboru grupy —
+// zlecenie 11, zalecenie 4: grupy są sekcjami i są w spisie „Na tej stronie”); pod nim
+// licznik („Liczba osób: N”, po przefiltrowaniu „Znaleziono N osób”, aria-live). Grupy to sekcje z nagłówkiem h2 (id
+// „zp-<grupa>” — do nich prowadzi spis „Na tej stronie”; po filtrowaniu spis dostaje zdarzenie `z-spis` i chowa puste).
+// Każda osoba to wiersz listy: gdy ma stronę domową, link na imieniu i nazwisku obejmuje cały wiersz (e-mail i zakład
+// to osobne linki nad nim). Kolumna „Telefon” pojawia się tylko w sekcjach, w których ktoś ma numer (w praktyce:
+// administracja). Doktoranci są podzieleni według roku studiów (Rok 1, Rok 2, …; bez roku — na końcu).
+// Komputer: wiersz w kolumnach z nagłówkiem nad listą (jak tabela wzorca treści); telefon (≤ 1023 px): wiersz w jednej kolumnie.
 import { zTytulem } from '../lib/osoby';
-import { Fragment, useMemo, useState } from 'react';
+import type { Lang } from '../lib/daty';
+import { isExternal } from '../lib/url';
+import { czesciMaila } from '../lib/limity.mjs';
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export interface Osoba {
   id: string;
@@ -22,8 +30,10 @@ export interface Osoba {
 }
 
 interface Props {
+  lang?: Lang;
   osoby: Osoba[];
-  grupy: { id: string; nazwa: string }[];
+  // krotko: krótsza nazwa grupy (dane: src/lib/widoki/pracownicy.ts) — używa jej spis „Na tej stronie” w widoku
+  grupy: { id: string; nazwa: string; krotko?: string }[];
   zaklady: { id: string; nazwa: string; href: string }[];
   napisy: Record<string, string>;
 }
@@ -35,6 +45,19 @@ const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
 const poNazwisku = (a: Osoba, b: Osoba) =>
   nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl');
 const maRok = (o: Osoba) => typeof o.rok_studiow === 'number' && Number.isFinite(o.rok_studiow);
+// Forma rzeczownika po liczebniku (jak odmiana() w i18n.ts — tu bez importu słowników do skryptu strony):
+// 1 · 2–4 (bez 12–14) · 5 i więcej; po angielsku napisy dają dwie ostatnie formy takie same.
+const forma = (n: number, f1: string, f2: string, f5: string) => {
+  if (n === 1) return f1;
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? f2 : f5;
+};
+// Ikony jak w Ikona.astro („szukaj”, „dol”) — ozdobne
+const ikona = (sciezki: ReactNode, rozmiar = 18) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" width={rozmiar} height={rozmiar}>
+    {sciezki}
+  </svg>
+);
 
 interface Podsekcja { klucz: string; tytul?: string; osoby: Osoba[] }
 
@@ -51,9 +74,8 @@ function wedlugRoku(osoby: Osoba[], napisy: Record<string, string>): Podsekcja[]
   return wynik;
 }
 
-export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Props) {
+export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy, lang = 'pl' }: Props) {
   const [q, setQ] = useState('');
-  const [grupa, setGrupa] = useState('');
   const [zaklad, setZaklad] = useState('');
   const nazwyZakladow = useMemo(() => Object.fromEntries(zaklady.map((z) => [z.id, z.nazwa])), [zaklady]);
   const linkiZakladow = useMemo(() => Object.fromEntries(zaklady.map((z) => [z.id, z.href])), [zaklady]);
@@ -62,11 +84,15 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     const nq = norm(q.trim());
     return osoby.filter(
       (o) =>
-        (!grupa || o.grupa === grupa) &&
         (!zaklad || o.zaklad === zaklad) &&
         (!nq || norm([o.imie_nazwisko, o.stopien, o.funkcja, o.zaklad && nazwyZakladow[o.zaklad], o.email, o.pokoj].filter(Boolean).join(' ')).includes(nq))
     );
-  }, [osoby, q, grupa, zaklad, nazwyZakladow]);
+  }, [osoby, q, zaklad, nazwyZakladow]);
+
+  // spis „Na tej stronie” (zal/SpisStrony.astro) chowa grupy, których po filtrowaniu nie ma na stronie
+  useEffect(() => {
+    document.dispatchEvent(new Event('z-spis'));
+  }, [q, zaklad]);
 
   const sekcje = grupy
     .map((g) => {
@@ -77,122 +103,111 @@ export default function TabelaPracownikow({ osoby, grupy, zaklady, napisy }: Pro
     .filter((g) => g.osoby.length > 0);
 
   const wiersz = (o: Osoba, maTel: boolean) => {
-    const nazwa = zTytulem(o.stopien, o.imie_nazwisko);
+    const nazwa = zTytulem(o.stopien, o.imie_nazwisko, lang);
     const linkZakladu = o.zaklad ? linkiZakladow[o.zaklad] : undefined;
     return (
-      <li key={o.id} className={o.strona ? 'staff-row os-link' : 'staff-row'}>
-        <div className="c n">
-          {o.strona ? <a className="os-a" href={o.strona}>{nazwa}</a> : <span>{nazwa}</span>}
+      <li key={o.id} className={o.strona ? 'zp-w zp-klik' : 'zp-w'}>
+        <div className="zp-n">
+          {o.strona ? (isExternal(o.strona)
+            ? <a className="zp-imie zew" data-limit-linii="2" href={o.strona}>{nazwa}<span className="sr-only">{napisy.zewn}</span></a>
+            : <a className="zp-imie" data-limit-linii="2" href={o.strona}>{nazwa}</a>) : <span className="zp-imie" data-limit-linii="2">{nazwa}</span>}
           {(o.funkcja || linkZakladu) && (
             <small>
               {o.funkcja}
-              {o.funkcja && linkZakladu && ' · '}
+              {/* „·” z niełamliwymi spacjami: nigdy na początku linii (decyzja 31.10.2026) */}
+              {o.funkcja && linkZakladu && ' · '}
               {linkZakladu && <a href={linkZakladu}>{nazwyZakladow[o.zaklad as string]}</a>}
             </small>
           )}
         </div>
-        <div className="c">
+        <div className="zp-c zp-mail">
           {o.email && (
             <>
-              <span className="lbl">{napisy.email}: </span>
-              <a href={`mailto:${o.email}`}>{o.email}</a>
+              <span className="zp-lbl">{napisy.email}: </span>
+              <a href={`mailto:${o.email}`} data-limit-linii="2"><span className="mail-cz">{czesciMaila(o.email)[0]}</span><wbr /><span className="mail-cz">{czesciMaila(o.email)[1]}</span></a>
             </>
           )}
         </div>
         {maTel && (
-          <div className="c">
+          <div className="zp-c zp-tel">
             {o.telefon && (
               <>
-                <span className="lbl">{napisy.telefon}: </span>
+                <span className="zp-lbl">{napisy.telefon}: </span>
                 <a href={`tel:+48${o.telefon.replace(/\s/g, '')}`}>{o.telefon}</a>
               </>
             )}
           </div>
         )}
-        <div className="c">
+        <div className="zp-c zp-pok">
           {o.pokoj && (
             <>
-              <span className="lbl">{napisy.pokoj}: </span>
+              <span className="zp-lbl">{napisy.pokoj}: </span>
               {o.pokoj}
             </>
           )}
         </div>
-        <div className="c www" aria-hidden="true">
+        <div className="zp-c zp-www" aria-hidden="true">
           {o.strona && (
-            <>
-              {napisy.link}
-              <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 13, height: 13 }}>
-                <path d="M14 4h6v6M20 4l-9 9" />
-                <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
-              </svg>
-            </>
+            <span className={isExternal(o.strona) ? 'zp-www-l zew' : 'zp-www-l'}>{napisy.link}</span>
           )}
         </div>
       </li>
     );
   };
 
-  return (
-    <div>
-      <div className="staff-tools">
-        <label className="search">
-          <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 18, height: 18 }}>
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.6-3.6" />
-          </svg>
-          <span className="sr-only">{napisy.szukaj}</span>
-          <input type="search" value={q} placeholder={napisy.szukaj} onChange={(e) => setQ(e.target.value)} />
-        </label>
-        <label className="search" style={{ minWidth: 0 }}>
-          <span className="sr-only">{napisy.zaklad}</span>
-          <select value={zaklad} onChange={(e) => setZaklad(e.target.value)} style={{ border: 0, background: 'transparent', font: 'inherit', fontSize: 15, color: 'var(--ink)', outline: 'none', maxWidth: 260 }}>
-            <option value="">{napisy.wszystkieZaklady}</option>
-            {zaklady.map((z) => (
-              <option key={z.id} value={z.id}>{z.nazwa}</option>
-            ))}
-          </select>
-        </label>
-        <div className="chips" role="group" aria-label={napisy.grupa}>
-          <button type="button" className="chip" aria-pressed={grupa === ''} onClick={() => setGrupa('')}>
-            {napisy.wszyscy}
-          </button>
-          {grupy.map((g) => (
-            <button key={g.id} type="button" className="chip" aria-pressed={grupa === g.id} onClick={() => setGrupa(g.id)}>
-              {g.nazwa}
-            </button>
-          ))}
-        </div>
-      </div>
+  const przefiltrowane = !!(q.trim() || zaklad);
+  const n = widoczne.length;
+  const licznik = !przefiltrowane
+    ? `${napisy.osob}: ${n}`
+    : n === 0 ? napisy.brak : `${napisy.znaleziono} ${n} ${forma(n, napisy.osoba1, napisy.osoba2, napisy.osoba5)}`;
+  const strzalka = ikona(<path d="M6 9l6 6 6-6" />, 16);
 
-      <p className="count staff-count" aria-live="polite">
-        {napisy.osob}: {widoczne.length}
-      </p>
+  return (
+    <div className="zp-spis-osob">
+      <div className="zp-narz" data-pagefind-ignore>
+        <label className="zp-szukaj">
+          {ikona(<><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></>)}
+          <span className="sr-only">{napisy.szukaj}</span>
+          <input type="search" value={q} placeholder={napisy.szukaj} autoComplete="off" onChange={(e) => setQ(e.target.value)} />
+        </label>
+        {/* bez wyboru grupy (zlecenie 11, zalecenie 4): grupy są sekcjami listy, prowadzi do nich spis „Na tej stronie” */}
+        {zaklady.length > 0 && (
+          <label className="zp-wybor">
+            <span className="sr-only">{napisy.zaklad}</span>
+            <select value={zaklad} autoComplete="off" onChange={(e) => setZaklad(e.target.value)}>
+              <option value="">{napisy.wszystkieZaklady}</option>
+              {zaklady.map((z) => (
+                <option key={z.id} value={z.id}>{z.nazwa}</option>
+              ))}
+            </select>
+            {strzalka}
+          </label>
+        )}
+      </div>
+      {/* licznik zawsze w drzewie — region aria-live musi istnieć przed zmianą */}
+      <p className="zp-ile" aria-live="polite" data-pagefind-ignore>{licznik}</p>
 
       {sekcje.map((g) => (
-        <section key={g.id} className={g.maTel ? 'staff-dir z-tel' : 'staff-dir'}>
-          <h2 className="staff-h">{g.nazwa}</h2>
-          <div className="staff-head" aria-hidden="true">
-            <span>{napisy.imie}</span>
-            <span>{napisy.email}</span>
-            {g.maTel && <span>{napisy.telefon}</span>}
-            <span>{napisy.pokoj}</span>
-            <span>{napisy.strona}</span>
-          </div>
+        <section key={g.id} id={`zp-${g.id}`} className={g.maTel ? 'zp-sek zp-z-tel' : 'zp-sek'} aria-labelledby={`zp-h-${g.id}`}>
+          <h2 id={`zp-h-${g.id}`}>{g.nazwa}</h2>
           {g.podsekcje.map((p) => (
             <Fragment key={p.klucz}>
-              {p.tytul && (
-                <h3 className="subhead staff-sub">
-                  {p.tytul}
-                </h3>
-              )}
-              <ul className="staff-list" role="list">
+              {p.tytul && <h3 className="zp-rok">{p.tytul}</h3>}
+              {/* nagłówek kolumn (komputer) nad każdą listą — jak nagłówek tabeli we wzorcu treści */}
+              <div className="zp-nagl" aria-hidden="true">
+                <span>{napisy.imie}</span>
+                <span>{napisy.email}</span>
+                {g.maTel && <span>{napisy.telefon}</span>}
+                <span>{napisy.pokoj}</span>
+                <span>{napisy.strona}</span>
+              </div>
+              <ul className="zp-lista" role="list">
                 {p.osoby.map((o) => wiersz(o, g.maTel))}
               </ul>
             </Fragment>
           ))}
         </section>
       ))}
-      {widoczne.length === 0 && <p style={{ color: 'var(--muted)' }}>{napisy.brak}</p>}
     </div>
   );
 }

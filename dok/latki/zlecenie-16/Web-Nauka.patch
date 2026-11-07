@@ -1,0 +1,13 @@
+diff --git a/src/content/konferencje/2020-model-theory-conference.md b/src/content/konferencje/2020-model-theory-conference.md
+index 527063b..21a2fc3 100644
+--- a/src/content/konferencje/2020-model-theory-conference.md
++++ b/src/content/konferencje/2020-model-theory-conference.md
+@@ -2,7 +2,7 @@
+ tytul: "Model Theory Conference"
+ poczatek: "2020-06-21"
+ koniec: "2020-06-27"
+-miejsce: "Szklarska P."
++miejsce: "Szklarska Poręba"
+ strona: "http://www.math.uni.wroc.pl/~pkowa/ln20.html"
+ odwolana: true
+ zaklad: "algebra-i-teoria-modeli"

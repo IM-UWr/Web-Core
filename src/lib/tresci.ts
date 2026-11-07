@@ -2,7 +2,8 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { now, today, weekday, addDays, hasTime, plusMinutes, type Lang } from './daty';
 import { swietaPanstwowe, pozycjeZamianDni } from './kolory-dni';
-import { zTytulem } from './osoby';
+import { zTytulem, tytulyWJezyku } from './osoby';
+import { langPola } from './i18n';
 
 export type Aktualnosc = CollectionEntry<'aktualnosci'>;
 export type Obrona = CollectionEntry<'obrony'>;
@@ -103,7 +104,7 @@ export const lataGrantu = (g: Grant) => {
 // Fragment z samym tytułem („dr hab. Jan Dymara, prof. UWr”, „dr hab., prof. UWr Jan Dymara”) zostaje przy sąsiedniej osobie.
 // `tekst` — zapis z pola; `nazwa` — imię i nazwisko z tytułem ze spisu (zTytulem), a gdy osoby nie ma w spisie lub nie ma tam tytułu — `tekst`.
 export interface KierownikGrantu { tekst: string; nazwa: string; osoba?: Pracownik }
-export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[]): KierownikGrantu[] {
+export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[], lang: Lang = 'pl'): KierownikGrantu[] {
   const czesci: { tekst: string; osoba?: Pracownik }[] = [];
   let przedrostek = '';
   for (const czesc of (zapis ?? '').split(/[,;]/).map((s) => s.trim()).filter(Boolean)) {
@@ -117,7 +118,7 @@ export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[]):
     przedrostek = '';
   }
   if (!czesci.length && zapis?.trim()) czesci.push({ tekst: zapis.trim() });
-  return czesci.map((k) => ({ ...k, nazwa: k.osoba?.data.stopien ? zTytulem(k.osoba.data.stopien, k.osoba.data.imie_nazwisko) : k.tekst }));
+  return czesci.map((k) => ({ ...k, nazwa: k.osoba?.data.stopien ? zTytulem(k.osoba.data.stopien, k.osoba.data.imie_nazwisko, lang) : tytulyWJezyku(k.tekst, lang) }));
 }
 
 // Kolejność na liście składu: profesorowie, doktorzy habilitowani, doktorzy, magistrzy.
@@ -140,6 +141,11 @@ export async function referaty(wszystkie = false): Promise<Referat[]> {
     .filter((e) => wszystkie || opublikowane(e))
     .sort((a, b) => (a.data.termin < b.data.termin ? -1 : 1));
 }
+
+// Sala i afiliacja referatu w języku strony: pole *_en (opcjonalne), a gdy puste — polskie (sala przechodzi potem przez sala()).
+export const salaReferatu = (d: { sala?: string; sala_en?: string }, lang: Lang): string | undefined => (lang === 'en' && d.sala_en) || d.sala;
+export const afiliacjaReferatu = (d: { afiliacja?: string; afiliacja_en?: string }, lang: Lang): string | undefined =>
+  (lang === 'en' && d.afiliacja_en) || d.afiliacja;
 
 // "605" → "sala 605"; dłuższe opisy miejsca zostają bez zmian.
 export function sala(s: string | undefined, lang: Lang = 'pl'): string | undefined {
@@ -166,9 +172,17 @@ export function miejsce(s: string | null | undefined, lang: Lang = 'pl'): string
 }
 
 // Wspólny format pozycji kalendarza.
+// Referat po polsku na stronie angielskiej (pole jezyk; decyzja D10, zlecenie 16).
+export const DOPISEK_PO_POLSKU = '(talk in Polish)';
+export const poPolskuNaEn = (jezyk: string | undefined, lang: Lang) => lang === 'en' && jezyk === 'pl';
+
 export interface Wydarzenie {
   rodzaj: 'wydarzenie' | 'obrona' | 'referat' | 'konferencja' | 'termin';
   tytul: string;
+  // referat: język (pole jezyk w CMS)
+  jezyk?: string;
+  // 'pl', gdy na /en tytuł to wartość polska (decyzja D14, zlecenie 16)
+  tytulLang?: string;
   podtytul?: string;
   poczatek: string;
   // koniec podany przez redaktora (wyświetlany na stronie)
@@ -194,7 +208,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
   for (const a of akt) {
     if (!a.data.wydarzenie_poczatek) continue;
     out.push({
-      rodzaj: 'wydarzenie', tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, poczatek: a.data.wydarzenie_poczatek,
+      rodzaj: 'wydarzenie', tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), poczatek: a.data.wydarzenie_poczatek,
       koniec: a.data.wydarzenie_koniec, koniecIcs: a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120),
       miejsce: miejsce(a.data.wydarzenie_miejsce, lang), href: `/aktualnosci/${slugOf(a.id)}`, uid: `akt-${slugOf(a.id)}`, opis: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka,
     });
@@ -208,7 +222,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
   for (const k of konf) {
     if (k.data.odwolana) continue;
     out.push({
-      rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, poczatek: k.data.poczatek, koniec: k.data.koniec,
+      rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, tytulLang: langPola(k.data, 'tytul', lang), poczatek: k.data.poczatek, koniec: k.data.koniec,
       miejsce: miejsce(k.data.miejsce, lang), href: k.data.strona || undefined, uid: `konf-${slugOf(k.id)}`,
     });
   }
@@ -216,8 +230,8 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
     const semId = seminariumReferatu(r);
     if (!nazwy.has(semId)) continue;
     out.push({
-      rodzaj: 'referat', tytul: r.data.tytul, podtytul: `${r.data.prelegent}${r.data.afiliacja ? ` (${r.data.afiliacja})` : ''}`,
-      poczatek: r.data.termin, koniecIcs: koniecDomyslny(r.data.termin, 90), miejsce: sala(r.data.sala, lang),
+      rodzaj: 'referat', tytul: r.data.tytul, jezyk: r.data.jezyk, podtytul: `${r.data.prelegent}${afiliacjaReferatu(r.data, lang) ? ` (${afiliacjaReferatu(r.data, lang)})` : ''}`,
+      poczatek: r.data.termin, koniecIcs: koniecDomyslny(r.data.termin, 90), miejsce: sala(salaReferatu(r.data, lang), lang),
       href: `/seminaria/${semId}#${slugOf(r.id)}`, uid: `ref-${semId}-${slugOf(r.id)}`, opis: `${lang === 'en' ? 'Seminar' : 'Seminarium'}: ${nazwy.get(semId)}`,
     });
   }
@@ -252,36 +266,49 @@ export function poDniachRoboczych(od: string, n: number): string {
 // Strona główna: tylko wydarzenia, które trwają albo zaczynają się w ciągu najbliższych `dniRoboczych` dni roboczych
 // (Ustawienia → „Wydarzenia na stronie głównej”). Gdy żadnego nie ma, sekcja się nie pokazuje.
 export async function wydarzeniaNaGlowna(limit = 3, lang: Lang = 'pl', dniRoboczych = 5): Promise<Wydarzenie[]> {
-  const granica = poDniachRoboczych(today(), dniRoboczych);
+  return wydarzeniaDo(poDniachRoboczych(today(), dniRoboczych), limit, lang);
+}
+
+// Telefon (zlecenie 06): nadchodzące wydarzenia z najbliższych `dni` dni kalendarzowych (Ustawienia →
+// wydarzenia_dni_telefon, domyślnie 30) i przypomnienia terminów jak wyżej — chronologicznie, najwyżej `limit`.
+// Na stronie widać pierwsze 3, resztę po „Zobacz więcej”.
+export async function wydarzeniaNaTelefon(limit = 10, lang: Lang = 'pl', dni = 30): Promise<Wydarzenie[]> {
+  return wydarzeniaDo(addDays(today(), dni), limit, lang);
+}
+
+async function wydarzeniaDo(granica: string, limit: number, lang: Lang): Promise<Wydarzenie[]> {
   const blisko = (await najblizszeWydarzenia(100, lang)).filter((w) => w.poczatek.slice(0, 10) <= granica);
   const terminy = (await przypomnieniaTerminow(lang)).filter((w) => today() >= w.widoczneOd! && today() <= w.poczatek);
   // ściśle chronologicznie (obrony razem z innymi wydarzeniami, według terminu)
   return [...blisko, ...terminy].sort((x, y) => (x.poczatek < y.poczatek ? -1 : 1)).slice(0, limit);
 }
 
-// Terminy z tabel „Terminy i formularze” kierunków (pole „Przypomnienie”): wydarzenie typu „Termin”,
-// widoczne od `dni_przed` dni (kalendarzowych) przed terminem do dnia terminu. „Co roku” = najbliższe wystąpienie tego dnia i miesiąca.
+// Przypomnienia o terminach (src/data/przypomnienia.json w Web-Studia, formularz „Przypomnienia o terminach”; zlecenie 28 —
+// dawniej pole „Przypomnienie” w tabeli terminów kierunku): wydarzenie typu „Termin”, widoczne od `dni_przed` dni (kalendarzowych)
+// przed terminem do dnia terminu. „Co roku” = najbliższe wystąpienie tego dnia i miesiąca. UID: ukryte pole `uid` (trzy dawne
+// przypomnienia Matematyki zachowują „termin-matematyka-<indeks>”, żeby subskrybenci kalendarza nie dostali duplikatów),
+// nowe pozycje — z adresu i sprawy; na końcu data wystąpienia.
+type Przypomnienie = { sprawa?: string; sprawa_en?: string; podpis?: string; podpis_en?: string; data?: string; co_roku?: boolean; dni_przed?: number; adres?: string; uid?: string };
+const PLIK_PRZYPOMNIEN = import.meta.glob('../data/przypomnienia.json', { eager: true, import: 'default' });
+const czescUid = (s?: string) => (s ?? '').toLocaleLowerCase('pl').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 export async function przypomnieniaTerminow(lang: Lang = 'pl'): Promise<Wydarzenie[]> {
   const dzis = today();
   const out: Wydarzenie[] = [];
-  for (const k of await getCollection('kierunki')) {
-    if (k.data.opublikowany === false) continue;
-    k.data.terminy.forEach((t, i) => {
-      if (!t.przypomnienie || !t.data) return;
-      let d = t.data.slice(0, 10);
-      if (t.co_roku) {
-        const md = d.slice(4);
-        d = `${dzis.slice(0, 4)}${md}`;
-        if (d < dzis) d = `${Number(dzis.slice(0, 4)) + 1}${md}`;
-      }
-      if (d < dzis) return;
-      const pl = lang !== 'en';
-      const kogo = (pl ? t.kogo : t.kogo_en || t.kogo) || '';
-      const form = t.formularz ? `${pl ? 'formularz' : 'form'} ${t.formularz}` : '';
-      out.push({
-        rodzaj: 'termin', tytul: (pl ? t.co : t.co_en || t.co), podtytul: [kogo, form].filter(Boolean).join(' · ') || undefined,
-        poczatek: d, href: `/studia/${k.id}#terminy`, uid: `termin-${k.id}-${i}-${d}`, widoczneOd: addDays(d, -t.dni_przed),
-      });
+  const lista = ((Object.values(PLIK_PRZYPOMNIEN)[0] as any)?.przypomnienia ?? []) as Przypomnienie[];
+  for (const t of lista) {
+    if (!t?.sprawa || !t.data) continue;
+    let d = String(t.data).slice(0, 10);
+    if (t.co_roku !== false) {
+      const md = d.slice(4);
+      d = `${dzis.slice(0, 4)}${md}`;
+      if (d < dzis) d = `${Number(dzis.slice(0, 4)) + 1}${md}`;
+    }
+    if (d < dzis) continue;
+    const pl = lang !== 'en';
+    const dni = t.dni_przed == null || String(t.dni_przed) === '' || Number.isNaN(Number(t.dni_przed)) ? 14 : Number(t.dni_przed);
+    out.push({
+      rodzaj: 'termin', tytul: (pl ? t.sprawa : t.sprawa_en || t.sprawa), podtytul: (pl ? t.podpis : t.podpis_en || t.podpis) || undefined,
+      poczatek: d, href: t.adres || undefined, uid: `${t.uid || `termin-${czescUid(t.adres)}-${czescUid(t.sprawa)}`}-${d}`, widoczneOd: addDays(d, -dni),
     });
   }
   return out.sort((a, b) => (a.poczatek < b.poczatek ? -1 : 1));
@@ -295,7 +322,7 @@ export function tydzienSeminariow(): { od: string; do: string; przyszly: boolean
   return { od, do: addDays(od, 6), przyszly: false };
 }
 
-export interface ReferatWLiscie { termin: string; sala?: string; seminarium: string; seminariumId: string; tytul: string; prelegent: string; href: string }
+export interface ReferatWLiscie { termin: string; sala?: string; seminarium: string; seminariumId: string; jezyk?: string; tytul: string; prelegent: string; href: string }
 
 export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLiscie[]> {
   const [ref, sem] = await Promise.all([referaty(), seminaria()]);
@@ -306,7 +333,7 @@ export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLisc
     .map((r) => {
       const semId = seminariumReferatu(r);
       return {
-        termin: r.data.termin, sala: r.data.sala, seminarium: nazwy.get(semId)!, seminariumId: semId, tytul: r.data.tytul,
+        termin: r.data.termin, sala: salaReferatu(r.data, lang), seminarium: nazwy.get(semId)!, seminariumId: semId, tytul: r.data.tytul, jezyk: r.data.jezyk,
         prelegent: r.data.prelegent, href: `/seminaria/${semId}#${slugOf(r.id)}`,
       };
     });
@@ -319,6 +346,9 @@ export const ZDJECIE_OBRONY = '/grafiki/obrona-domyslna.jpg';
 export interface PozycjaListy {
   rodzaj: string;
   tytul: string;
+  // 'pl', gdy na /en to wartość polska (decyzja D14, zlecenie 16)
+  tytulLang?: string;
+  zajawkaLang?: string;
   data: string;
   zajawka?: string;
   zdjecie?: string;
@@ -326,12 +356,13 @@ export interface PozycjaListy {
   dla: string[];
   href: string;
   wydarzenie?: string;
-  wyroznij_do?: string;
   id: string;
   // pilne = automatyczne ogłoszenie o zamianie dni (src/lib/kolory-dni.ts) — na stronie głównej zawsze na górze
   pilne?: boolean;
   // koniec wydarzenia (wpis z polem „Wydarzenie: początek” albo obrona) — po nim wpis znika z Aktualności na stronie głównej
   koniec?: string;
+  // zakład z CMS — do reguły działu wpisu (dzialWpisu w src/lib/patroni.ts)
+  zaklad?: string;
 }
 
 // Czy wydarzenie z wpisu już się odbyło (wpis bez wydarzenia — nigdy).
@@ -340,11 +371,11 @@ const odbyloSie = (p: PozycjaListy) => !!p.wydarzenie && !trwaLubBedzie({ poczat
 export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
   const [akt, obr] = await Promise.all([aktualnosci(), obrony()]);
   const items: PozycjaListy[] = akt.map((a) => ({
-    rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, data: a.data.data,
-    zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zdjecie: a.data.zdjecie,
+    rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), data: a.data.data,
+    zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zajawkaLang: langPola(a.data, 'zajawka', lang), zdjecie: a.data.zdjecie,
     zdjecie_opis: (lang === 'en' && a.data.zdjecie_opis_en) || a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
     koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
-    wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`,
+    id: `akt-${slugOf(a.id)}`, zaklad: a.data.zaklad,
   }));
   for (const o of obr) {
     if (o.data.w_aktualnosciach === false) continue;
@@ -363,21 +394,22 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
 
 // Strona główna (decyzja z 30.10.2026): Aktualności to zapowiedzi — chronologicznie według daty publikacji (obrony razem
 // z innymi wpisami), a wpis, którego wydarzenie już się odbyło, znika (liczone przy budowaniu strony, 2× dziennie).
-// Dublowanie z „Najbliższymi wydarzeniami” (kalendarium-przypomnienie) jest dozwolone. Na górze nadal: automatyczne
-// ogłoszenie o zamianie dni, potem wpisy wyróżnione („Wyróżnij na stronie głównej do…”).
+// Dublowanie z „Najbliższymi wydarzeniami” (kalendarium-przypomnienie) jest dozwolone. Na górze nadal automatyczne
+// ogłoszenie o zamianie dni (wyróżniania wpisów nie ma od zlecenia 30).
 export async function aktualnosciNaGlowna(limit = 6, lang: Lang = 'pl'): Promise<PozycjaListy[]> {
   const lista = (await listaAktualnosci(lang)).filter((p) => !odbyloSie(p));
-  const d = today();
-  const wyrozniony = (p: PozycjaListy) => !!p.wyroznij_do && p.wyroznij_do >= d;
   const pilne = lista.filter((p) => p.pilne);
-  const wyroznione = lista.filter((p) => !p.pilne && wyrozniony(p));
-  const reszta = lista.filter((p) => !p.pilne && !wyrozniony(p));
-  return [...pilne, ...wyroznione, ...reszta].slice(0, limit);
+  const reszta = lista.filter((p) => !p.pilne);
+  return [...pilne, ...reszta].slice(0, limit);
 }
 
-// Żółty pasek w banerze: pierwszy wyróżniony wpis (bez wpisów, których wydarzenie już się odbyło).
-export async function wyroznionaAktualnosc(lang: Lang = 'pl'): Promise<PozycjaListy | undefined> {
-  const lista = await listaAktualnosci(lang);
-  const d = today();
-  return lista.find((p) => p.wyroznij_do && p.wyroznij_do >= d && !odbyloSie(p));
+// Liczby na okładce strony głównej nad „Szybkim dostępem” (zlecenie 11, zalecenie 15), z tych samych danych co kolumny
+// drugiego ekranu: wydarzenia w najbliższych 7 dniach (dziś i 6 kolejnych, z przypomnieniami terminów), referaty
+// seminariów z kolumny „Seminaria” (ten sam tydzień) i aktualności z ostatnich 7 dni (bez wpisów, których wydarzenie
+// już się odbyło — jak w kolumnie). Liczone przy budowaniu strony, jak cały drugi ekran.
+export async function liczbyNaOkladke(lang: Lang = 'pl'): Promise<{ wyd: number; sem: number; akt: number }> {
+  const dzis = today(), odDnia = addDays(dzis, -6);
+  const [wyd, sem, akt] = await Promise.all([wydarzeniaNaTelefon(100, lang, 6), referatyWTygodniu(lang), aktualnosciNaGlowna(1000, lang)]);
+  return { wyd: wyd.length, sem: sem.length, akt: akt.filter((p) => p.data.slice(0, 10) >= odDnia && p.data.slice(0, 10) <= dzis).length };
 }
+

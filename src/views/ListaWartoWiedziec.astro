@@ -1,31 +1,62 @@
 ---
 // Lista „Warto wiedzieć” (/warto-wiedziec, /en/warto-wiedziec): wszystkie opublikowane pozycje kolekcji warto_wiedziec.
-import { getCollection } from 'astro:content';
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+// Szablon podstrony (zal/Podstrona.astro). W stylu listy Aktualności (zlecenie 27, punkt 2): ten sam baner (granat przechodzi w zdjęcie
+// Aktualności, bez liczb; tytuł, opis, hasło i tekst nad listą — Web-Instytut → Strony → Warto wiedzieć; zlecenie 30), panel „Pokaż”
+// z prawej (zal/ListaPokaz.astro) z filtrem działu (tylko działy, które mają wpisy; w adresie ?dzial=nauka) i polem szukania.
+// Treść: wiersze pozycji (WartoWiedziec.astro, uklad „lista”: rok w kolorze działu pozycji, tytuł, zajawka, miniatura), pod nimi link
+// do „Sukcesów”. Bez spisu „Na tej stronie”. Jedna wersja HTML: komputer i telefon (≤ 1023 px; filtry nad listą). Bez JS: bez filtrów.
+import Podstrona from '../components/zal/Podstrona.astro';
+import ListaPokaz from '../components/zal/ListaPokaz.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
-import Ikona from '../components/Ikona.astro';
 import { u } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
+import { PATRONI, pole } from '../lib/patroni';
 import type { Lang } from '../lib/daty';
+import { daneListyWartoWiedziec } from '../lib/widoki/listaWartoWiedziec';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const ile = (await getCollection('warto_wiedziec')).filter((w) => w.data.opublikowany !== false).length;
-
-const tytul = T('Warto wiedzieć', 'Highlights');
-const lead = T(
-  'Wyjątkowe wydarzenia i osiągnięcia, którymi Instytut Matematyczny chwali się od lat.',
-  'Exceptional events and achievements the Mathematical Institute has been proud of for years.',
-);
+const { ile, dzialy, tytul, lead, haslo, html } = await daneListyWartoWiedziec(lang);
 ---
-<Baza tytul={tytul} opis={lead}>
-  <NaglowekStrony tytul={tytul} lead={lead} lang={lang} />
-  <div class="wrap" style="padding-top:32px;padding-bottom:64px">
-    {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="muted">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
-    <p style="margin:24px 0 0">
-      <a class="link-arrow" href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}<Ikona nazwa="strzalka" rozmiar={16} /></a>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb klasa="z-wwl" klasaRamy="z-pd-pelna" atrybuty={{ 'data-warto': '' }}>
+  <ListaPokaz lang={lang} etykieta={T('Filtruj według działu', 'Filter by section')} opcje={dzialy.map((d) => ({ wartosc: d, etykieta: pole(PATRONI[d], 'nazwa', lang) }))}
+    szukaj={T('Szukaj w Warto wiedzieć', 'Search highlights')}>
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
+    {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="wwl-pusto">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
+    <p class="wwl-pusto" role="status" data-pusto hidden>{T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')}</p>
+    <p class="wwl-sukcesy">
+      <a href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}</a> →
     </p>
-  </div>
-</Baza>
+  </ListaPokaz>
+</Podstrona>
+
+<script>
+  // Filtr działu z panelu „Pokaż” (?dzial=… z adresu) i szukanie po tekście pozycji (rok, tytuł, zajawka, etykieta linku).
+  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
+  const lista = document.querySelector<HTMLElement>('[data-warto]');
+  if (lista) {
+    const pozycje = Array.from(lista.querySelectorAll<HTMLElement>('[data-ww-poz]'));
+    const tekst = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
+    const pusto = lista.querySelector<HTMLElement>('[data-pusto]');
+    const pokaz = () => {
+      const dzial = panel.filtr();
+      const q = panel.szukane();
+      let ile = 0;
+      for (const p of pozycje) {
+        p.hidden = (!!dzial && p.dataset.dzial !== dzial) || (!!q && !(tekst.get(p) ?? '').includes(q));
+        if (!p.hidden) ile++;
+      }
+      if (pusto) pusto.hidden = pozycje.length === 0 || ile > 0;
+    };
+    const panel = panelPokaz(lista, pokaz);
+    panel.ustaw(new URLSearchParams(location.search).get('dzial'));
+  }
+</script>
+
+<style>
+  [hidden] { display: none !important; }
+  .wwl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+  .wwl-sukcesy { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
+  .wwl-sukcesy a { color: var(--d-a); }
+</style>

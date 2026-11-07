@@ -1,4 +1,5 @@
 import type { Lang } from './daty';
+import { wygladaNaPolski } from './jezykTekstu';
 
 const T = {
   pl: {
@@ -43,9 +44,17 @@ const T = {
     partnerzy: 'Partnerzy',
     deklaracja: 'Deklaracja dostępności',
     prywatnosc: 'Polityka prywatności',
+    oStronie: 'O stronie',
     wersjaPolska: 'Ta treść jest dostępna tylko po polsku.',
     wersjaAngielska: 'This content is available in English only.',
     naSkroty: 'Na skróty',
+    // strona główna na telefonie (zlecenie 06): podtytuł i przycisk w banerze, „Zobacz więcej” w sekcjach;
+    // „Nadchodzące wydarzenia” — nagłówek sekcji na stronie głównej (we wpisie aktualności zostaje „najblizsze”)
+    wydzialUwr: 'Wydział Matematyki i Informatyki UWr',
+    naSkrotyIWydarzenia: 'Na skróty i wydarzenia',
+    nadchodzaceWydarzenia: 'Nadchodzące wydarzenia',
+    zobaczWiecej: 'Zobacz więcej',
+    zwin: 'Zwiń',
     seminariaPrzyszly: 'Seminaria w przyszłym tygodniu',
     brakReferatowPrzyszly: 'Na przyszły tydzień nie zapowiedziano jeszcze referatów.',
     rekrutacja: 'Rekrutacja na studia',
@@ -148,9 +157,15 @@ const T = {
     partnerzy: 'Partners',
     deklaracja: 'Accessibility statement',
     prywatnosc: 'Privacy policy',
+    oStronie: 'About this site',
     wersjaPolska: 'This content is available in Polish only.',
     wersjaAngielska: 'This content is available in English only.',
     naSkroty: 'Quick links',
+    wydzialUwr: 'Faculty of Mathematics and Computer Science, University of Wrocław',
+    naSkrotyIWydarzenia: 'Shortcuts and events',
+    nadchodzaceWydarzenia: 'Upcoming events',
+    zobaczWiecej: 'Show more',
+    zwin: 'Show less',
     seminariaPrzyszly: 'Seminars next week',
     brakReferatowPrzyszly: 'No seminar talks announced for next week yet.',
     rekrutacja: 'Admissions',
@@ -215,6 +230,14 @@ const T = {
 
 export type Klucz = keyof typeof T.pl;
 
+// Wydział: nazwa w dwóch liniach („Wydział Matematyki / i Informatyki”) i adres strony; okładka komputera i pasek telefonu (zlecenie 18, punkt 12)
+export const WMI_ADRES = 'https://wmi.uwr.edu.pl/';
+export function wydzialLinie(lang: Lang): [string, string] {
+  const wydzial = t(lang, 'wydzial');
+  const podzial = wydzial.search(/ (i|and) /);
+  return podzial > 0 ? [wydzial.slice(0, podzial), wydzial.slice(podzial + 1)] : [wydzial, ''];
+}
+
 export function t(lang: Lang, key: Klucz): string {
   return T[lang][key];
 }
@@ -230,6 +253,26 @@ export const RODZAJE: Record<string, { pl: string; en: string }> = {
   termin: { pl: 'Termin', en: 'Deadline' },
 };
 
+// Nazwy rodzajów w filtrach list (Aktualności: przyciski na komputerze, lista rozwijana na telefonie; Kalendarz: lista
+// rozwijana na telefonie) — w liczbie mnogiej; plakietki przy wpisach zostają w liczbie pojedynczej (RODZAJE) — decyzja 31.10.2026.
+export const RODZAJE_FILTRY: Record<string, { pl: string; en: string }> = {
+  ogloszenie: { pl: 'Ogłoszenia', en: 'Announcements' },
+  wydarzenie: { pl: 'Wydarzenia', en: 'Events' },
+  sukces: { pl: 'Sukcesy', en: 'Achievements' },
+  kariera: { pl: 'Kariera', en: 'Careers' },
+  obrona: { pl: 'Obrony', en: 'PhD defences' },
+  referat: { pl: 'Seminaria', en: 'Seminars' },
+  konferencja: { pl: 'Konferencje', en: 'Conferences' },
+};
+
+// Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta — np. liczby w banerach (LiczbyBanera.astro).
+export function odmiana(n: number, pl: [string, string, string], en: [string, string], lang: Lang): string {
+  if (lang === 'en') return n === 1 ? en[0] : en[1];
+  if (n === 1) return pl[0];
+  const j = n % 10, d = n % 100;
+  return j >= 2 && j <= 4 && (d < 12 || d > 14) ? pl[1] : pl[2];
+}
+
 export const RODZAJE_GRANTOW: Record<string, { pl: string; en: string }> = {
   ncn: { pl: 'NCN', en: 'NCN' },
   ue: { pl: 'UE i międzynarodowe', en: 'EU and international' },
@@ -243,6 +286,12 @@ export const ODBIORCY: Record<string, { pl: string; en: string }> = {
   pracownicy: { pl: 'Pracownicy', en: 'Staff' },
   kandydaci: { pl: 'Kandydaci', en: 'Prospective students' },
 };
+
+// Nazwa odbiorców małymi literami w zwykłym tekście („studenci, doktoranci”; decyzja 31.10.2026): wyrazy zaczynające się
+// wielką literą zmniejszone, skróty z wielkimi literami w środku zostają („PhD students”, nie „phd students”).
+export function odbiorcyMalymi(d: string, lang: Lang): string {
+  return (ODBIORCY[d]?.[lang] ?? d).split(' ').map((w) => (/^\p{Lu}\p{Ll}*$/u.test(w) ? w.toLowerCase() : w)).join(' ');
+}
 
 // Wersja angielska ma te same adresy z przedrostkiem /en (np. /en/aktualnosci).
 export function jezykZeSciezki(pathname: string): Lang {
@@ -265,4 +314,21 @@ export function drugiJezyk(pathname: string): string {
 export function wybierz<T extends Record<string, any>>(obj: T, pole: string, lang: Lang): string {
   if (lang === 'en' && obj[pole + '_en']) return obj[pole + '_en'];
   return obj[pole] ?? '';
+}
+
+// Pole z informacją o języku (decyzja D14, zlecenie 16): lang = 'pl', gdy na /en pokazujemy wartość polską w miejsce pustego
+// pola _en. Wartość w polu „polskim” bywa oryginałem po angielsku (tytuły konferencji i grantów), więc liczy się też jej
+// wygląd (src/lib/jezykTekstu.ts). Widok: <h3 lang={langPola(d, 'tytul', lang)}>{wybierz(d, 'tytul', lang)}</h3>; undefined = bez atrybutu.
+export function wybierzZJezykiem<T extends Record<string, any>>(obj: T, pole: string, lang: Lang): { tekst: string; lang: 'pl' | undefined } {
+  const tekst = wybierz(obj, pole, lang);
+  return { tekst, lang: lang === 'en' && !obj[pole + '_en'] && wygladaNaPolski(tekst) ? 'pl' : undefined };
+}
+export const langPola = <T extends Record<string, any>>(obj: T, pole: string, lang: Lang) => wybierzZJezykiem(obj, pole, lang).lang;
+// To samo dla tekstu bez odpowiednika _en (tematy prac, streszczenia).
+export const langTekstu = (tekst: string | undefined | null, lang: Lang): 'pl' | undefined => (lang === 'en' && wygladaNaPolski(tekst) ? 'pl' : undefined);
+
+// Polska typografia (decyzja 31.10.2026): po jednoliterowych wyrazach (a, i, o, u, w, z) twarda spacja, żeby nie
+// zostawały na końcu linijki — np. etykiety liczb w banerach działów: „w ostatnim miesiącu”, „zakłady i pracownie”.
+export function bezSierotek(s: string): string {
+  return s.replace(/(?<=^|[\s\u00a0(„"])([aiouwzAIOUWZ]) +/g, '$1\u00a0');
 }

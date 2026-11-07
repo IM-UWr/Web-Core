@@ -1,6 +1,8 @@
 // Listy adresów do wygenerowania (getStaticPaths) — wspólne dla wersji PL i EN.
 import { getCollection } from 'astro:content';
 import { aktualnosci, obrony, seminaria, konferencje, granty, zaklady, slugOf, opublikowane } from './tresci';
+import { specjalnosci } from './specjalnosci';
+import { jestTekstemListy } from './tekstyStron';
 
 export async function sciezkiAktualnosci() {
   const wszystkie = await aktualnosci(true);
@@ -14,8 +16,9 @@ export async function sciezkiAktualnosci() {
   });
 }
 
+// bez tekstów stron z listą (np. strony/nauka/konferencje.md): wyświetla je sama lista (src/lib/tekstyStron.ts, zlecenie 30)
 export async function sciezkiStron() {
-  const strony = await getCollection('strony');
+  const strony = (await getCollection('strony')).filter((s) => !jestTekstemListy(s.id));
   return strony.map((strona) => ({ params: { slug: strona.id }, props: { strona } }));
 }
 
@@ -50,7 +53,8 @@ export async function sciezkiKierunkow() {
   return k.map((kierunek) => ({ params: { kierunek: kierunek.id }, props: { kierunek } }));
 }
 
+// specjalność z polami banera (src/lib/specjalnosci.ts): kierunek i „bez podstrony” są w formularzu „Baner i kafelek”
 export async function sciezkiSpecjalnosci() {
-  const s = await getCollection('specjalnosci');
+  const s = await specjalnosci();
   return s.filter((x) => !x.data.bez_podstrony).map((specjalnosc) => ({ params: { kierunek: specjalnosc.data.kierunek, specjalnosc: specjalnosc.id }, props: { specjalnosc } }));
 }

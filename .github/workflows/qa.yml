@@ -1,6 +1,7 @@
 name: Kontrola jakości
 
-# Automatyczna kontrola jakości strony: linki (lychee) i dostępność (pa11y-ci: axe + HTML_CodeSniffer).
+# Automatyczna kontrola jakości strony: linki (lychee), dostępność (pa11y-ci: axe + HTML_CodeSniffer) i szerokości okna
+# (skrypty/szerokosci: kolizje tekstu i poziome przewijanie w 12 oknach, PL i EN; zlecenie 27, punkt 7).
 # NICZEGO NIE PUBLIKUJE na GitHub Pages.
 #
 # Uruchamianie:
@@ -11,6 +12,8 @@ name: Kontrola jakości
 # a na gałęziach qa-* dodatkowo pełny raport w pliku qa/raport.md dopisywany do tej gałęzi.
 # Błąd krytyczny (czerwony przebieg) = zepsuty link wewnętrzny. Linki zewnętrzne, linki do starej
 # strony i problemy dostępności to ostrzeżenia/informacje. Skrypt: .github/qa/qa.py
+# Szerokości (osobne zadanie, osobny artefakt „szerokosci-wyniki”: raport.md, wyniki.json, zrzuty z problemami): czerwone,
+# gdy pojawi się kolizja tekstu (K) albo poziome przewijanie (X) spoza skrypty/szerokosci/wzorzec.json.
 
 on:
   push:
@@ -140,6 +143,55 @@ jobs:
         with:
           name: qa-wyniki
           path: qa-wyniki/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # Szerokości okna (zlecenie 27, punkt 7): ta sama strona zbudowana osobno, Playwright instalowany tylko w przebiegu
+  # (poza package.json). Raport w podsumowaniu przebiegu i w artefakcie.
+  szerokosci:
+    name: Szerokości okna
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Treści z repozytoriów IM-UWr/Web-*
+        run: python3 skrypty/pobierz_tresci.py
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Instalacja zależności
+        run: npm install --no-audit --no-fund
+
+      - name: Budowanie strony
+        env:
+          BASE_PATH: ''
+          SITE_URL: http://localhost:8080
+        run: npm run build
+
+      - name: Playwright z Chromium (tylko w przebiegu)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" --no-audit --no-fund --no-save playwright@1.49.1
+          "$RUNNER_TEMP/pw/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Pomiar (12 okien, PL i EN, pula ciekawostek)
+        env:
+          NODE_PATH: ${{ runner.temp }}/pw/node_modules
+          DIST: dist
+          OUT: szerokosci-wyniki
+        run: node skrypty/szerokosci/pomiar.cjs
+
+      - name: Raport i ocena (nowe K albo X = błąd)
+        run: python3 skrypty/szerokosci/podsumuj.py szerokosci-wyniki
+
+      - name: Zachowanie wyników
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: szerokosci-wyniki
+          path: szerokosci-wyniki/
           retention-days: 14
           if-no-files-found: ignore
 

@@ -1,0 +1,31 @@
+---
+// Osoba w schemacie Władz (komputer): zdjęcie, rola, imię i nazwisko (link do strony domowej), zakład, zakres, kontakt.
+import Link from '../Link.astro';
+import { u, isExternal } from '../../lib/url';
+import ZdjecieZ from '../ZdjecieZ.astro';
+import { rozmiarPola } from '../../lib/zdjecia';
+import { wJezyku } from '../../lib/i18n';
+import { mailHtml } from '../../lib/limity.mjs';
+import type { Lang } from '../../lib/daty';
+
+type Os = { rola: string; nazwa: string; email: string; pokoj: string; strona: string; zakres?: string; dyzur: string; zdjecie: string; zaklad?: { nazwa: string; adres: string } };
+interface Props { o: Os; lang: Lang; class?: string; zakres?: boolean }
+const { o, lang, class: klasa, zakres = true } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
+---
+<div class:list={['z-os', klasa]}>
+  {/* największe pole zdjęcia w schemacie Władz: 120 × 150 (dyrektor; zalozyciele-strony.css) */}
+  {o.zdjecie && <ZdjecieZ class="fot" src={o.zdjecie} sizes={rozmiarPola([null, 120, 150])} />}
+  {o.rola && <div class="rola">{o.rola}</div>}
+  {/* limit 3, nie 2: nazwa zawiera tytuły; „dr hab. Piotr Borodulin-Nadzieja, prof. UWr” ma 3 linie w kolumnie 219 px przy każdym oknie (imię i nazwisko bez tytułów mieszczą się w 2) */}
+  <div class="imie" data-limit-linii="3">{o.strona ? <Link href={o.strona}>{o.nazwa}</Link> : o.nazwa}</div>
+  {o.zaklad && <div class="zakl"><a href={href(o.zaklad.adres)}>{o.zaklad.nazwa}</a></div>}
+  {zakres && o.zakres && <p class="opis">{o.zakres}</p>}
+  <div class="kont">
+    {o.email && <a href={`mailto:${o.email}`} data-limit-linii="2" set:html={mailHtml(o.email)} />}{o.pokoj && <>{o.email && ' · '}{pok(o.pokoj)}</>}
+    {o.dyzur && <><br />{T('Dyżur:', 'Office hours:')} {o.dyzur}</>}
+    {o.strona && <> · <Link href={o.strona}>{T('strona domowa', 'website')}</Link></>}
+  </div>
+</div>

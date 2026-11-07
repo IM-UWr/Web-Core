@@ -1,38 +1,26 @@
 ---
-// Plan zajęć Instytutu: /studia/plan-zajec (EN: /en/studia/plan-zajec).
-// Układ jak dawny plan math.uni.wroc.pl/studia/plany_zajec/planZ.php i planL.php: alfabetyczna lista przedmiotów
-// w tych samych sekcjach (O, L, M, E, S, H, N, NP, pozostałe), przy przedmiocie grupy, typ, prowadzący, termin, sala, uwagi.
-// Semestry przełączane pigułkami (PrzelacznikSemestrow.astro; domyślnie wg daty, #zimowy / #letni w adresie otwiera
-// właściwy semestr); bez JavaScriptu oba semestry jeden pod drugim. Prawy pasek: spis sekcji przedmiotów aktywnego
-// semestru z podświetleniem widocznej sekcji (SpisTresci.astro; kotwice #zimowy-o, #letni-l …), na węższych ekranach zwinięty nad planem.
-// Dane: src/data/plan/plan.json — pobierane automatycznie z USOS (anonimowo) przez skrypty/plan/pobierz_plan.py,
-// uruchamiany przez workflow .github/workflows/plan-zajec.yml kilka razy dziennie. Danych nie edytuje się ręcznie.
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css, plan.css i blok na końcu pliku). Telefon (≤ 760 px) bez zmian.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
-import PrzelacznikSemestrow from '../components/PrzelacznikSemestrow.astro';
-import SpisTresci from '../components/SpisTresci.astro';
-import { wybierzSemestr } from '../components/wyborSemestru';
-import surowe from '../data/plan/plan.json';
-import { today, type Lang } from '../lib/daty';
-import '../styles/plan.css';
-
-type Fragm = string | { t: string; a: string };
-interface Zajecie { kod: string; typ: string; grupa?: number | string; prowadzacy?: string[]; dzien?: number; od?: string; do?: string; czestotliwosc?: string; sala?: string; uwagi?: Fragm[] }
-interface Przedmiot { kod: string; nazwa: string; nazwa_en?: string; kategoria: string; usos: string }
-interface Semestr { id: string; nazwa: string; nazwa_en?: string; od?: string | null; do?: string | null; zaktualizowano?: string | null; przedmioty: Przedmiot[]; zajecia: Zajecie[] }
-interface Dane { semestry?: Semestr[]; typy?: Record<string, { pl: string; en: string }>; kategorie?: { id: string; pl: string; en: string }[] }
+// Plan zajęć Instytutu: /studia/plan-zajec (EN: /en/studia/plan-zajec), kierunek „Założyciele” (prototyp: trescPlan).
+// Wszystkie przedmioty semestru w kategoriach (O, L, M, E, S, H, N, NP, pozostałe), przy przedmiocie zajęcia: typ, grupa,
+// prowadzący, dzień, godziny, sala, uwagi. Przyklejony pasek: semestr, wyszukiwarka (przedmiot, prowadzący, sala, uwagi;
+// także bez polskich znaków) i filtr dni. Semestr wg daty albo adresu #zimowy / #letni; bez JS pasek schowany, oba semestry
+// jeden pod drugim. Dane: src/data/plan/plan.json — pobierane automatycznie z USOS (skrypty/plan/pobierz_plan.py,
+// workflow .github/workflows/plan-zajec.yml). Danych nie edytuje się ręcznie.
+// Jedna wersja HTML: komputer — zajęcia w równych kolumnach; telefon (≤ 1023 px) — przedmiot jako blok, zajęcia w jednej linii
+// (typ · grupa · prowadzący · dzień, godziny · sala), prowadzący skrótem, pasek bez wyszukiwarki w dwóch rzędach, bez spisu
+// (zlecenie 18, punkty 18 i 19; src/styles/zal-granty-plan.css).
+import Podstrona from '../components/zal/Podstrona.astro';
+import Link from '../components/Link.astro';
+import type { Lang } from '../lib/daty';
+import { danePlanuZajec } from '../lib/widoki/planZajec';
+import '../styles/zal-granty-plan.css';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const dane = surowe as unknown as Dane;
 const en = lang === 'en';
+const { tytul, lead, html, haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer } = await danePlanuZajec(lang);
 
 const T = en
   ? {
-      tytul: 'Timetable',
-      lead: 'Timetable of the Mathematical Institute, updated automatically from USOS.',
       dni: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       kol: { gr: 'gr.', typ: 'type', prow: 'teacher', dzien: 'day', godz: 'time', sala: 'room', uwagi: 'notes' },
       gr: 'gr.', sala: 'room',
@@ -44,8 +32,6 @@ const T = en
       zrodlo: 'Data source: USOS, University of Wrocław.',
     }
   : {
-      tytul: 'Plan zajęć',
-      lead: 'Plan zajęć Instytutu Matematycznego, aktualizowany automatycznie z USOS.',
       dni: ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'],
       kol: { gr: 'gr.', typ: 'typ', prow: 'prowadzący', dzien: 'dzień', godz: 'godziny', sala: 'sala', uwagi: 'uwagi' },
       gr: 'gr.', sala: 'sala',
@@ -57,134 +43,148 @@ const T = en
       zrodlo: 'Źródło danych: USOS Uniwersytetu Wrocławskiego.',
     };
 
-// krótkie nazwy typów zajęć (pełna nazwa z USOS w podpowiedzi <abbr>)
-const KROTKO: Record<string, [string, string]> = {
-  WYK: ['wyk.', 'lect.'], CW: ['ćw.', 'class'], CW2: ['ćw.', 'class'], KONW: ['konw.', 'conv.'], KONW2: ['konw.', 'conv.'],
-  LAB: ['lab.', 'lab'], PRAC: ['prac.', 'lab'], SEM: ['sem.', 'sem.'], 'SEM-MGR': ['sem. mgr', 'MSc sem.'], 'SEM-PRO': ['prosem.', 'prosem.'],
-  WAR: ['warszt.', 'worksh.'], EGZ: ['egz.', 'exam'], LEK: ['lekt.', 'lang.'], 'PRK-PED': ['prakt.', 'pract.'],
-};
-const typPelny = (t: string) => dane.typy?.[t]?.[lang] || t;
-const typKrotki = (t: string) => KROTKO[t]?.[en ? 1 : 0] ?? typPelny(t).toLowerCase();
-// jak w dawnym planie: przy wykładzie i konwersatorium bez numeru grupy
-const grupa = (z: Zajecie) => (z.typ === 'WYK' || z.typ === 'KONW' || z.grupa == null ? '' : String(z.grupa));
-
-const MIESIACE = en
-  ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-  : ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
-const dataGodzina = (iso?: string | null) => {
-  const m = (iso || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  return m ? `${+m[3]} ${MIESIACE[+m[2] - 1]} ${m[1]}, ${m[4]}:${m[5]}` : '';
-};
-
-const semestry = (dane.semestry || []).map((s) => {
-  const m = s.id.match(/^(\d{4})\/(\d{2})-([ZL])$/);
-  const zimowy = m?.[3] === 'Z';
-  const rok = m ? `${m[1]}/${+m[1] + 1}` : '';
-  const tytul = m
-    ? en
-      ? `Timetable for the ${zimowy ? 'winter' : 'summer'} semester of the academic year ${rok}`
-      : `Plan zajęć w semestrze ${zimowy ? 'zimowym' : 'letnim'} roku akademickiego ${rok}`
-    : (en && s.nazwa_en) || s.nazwa;
-  const sekcje = (dane.kategorie || [])
-    .map((k) => ({
-      id: k.id,
-      nazwa: en ? k.en : k.pl,
-      przedmioty: s.przedmioty
-        .filter((p) => p.kategoria === k.id)
-        .map((p) => ({ ...p, nazwaW: (en && p.nazwa_en) || p.nazwa, zajecia: s.zajecia.filter((z) => z.kod === p.kod) })),
-    }))
-    .filter((k) => k.przedmioty.length);
-  const kotwica = m ? (zimowy ? 'zimowy' : 'letni') : s.id.replace(/[^\w-]/g, '-');
-  // kotwice sekcji: #zimowy-o, #letni-np … (nie kolidują z #zimowy / #letni)
-  const spis = sekcje.map((k) => ({ depth: 2, slug: `${kotwica}-${k.id.toLowerCase().replace(/[^\w-]/g, '-')}`, text: k.nazwa }));
-  return { s, kotwica, krotko: (en && s.nazwa_en) || s.nazwa, tytul, sekcje, spis };
+// Skróty dni w kolumnie „dzień” i w filtrze dni (pon.–pt.), tekst do wyszukiwania.
+const DNI_KROTKO = en ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.'];
+// Prowadzący na telefonie: inicjał imienia i nazwisko; gdy ten sam skrót wypadłby dwóm osobom, pełne imię (zlecenie 18, punkt 19).
+const skrotOsoby = (o: string) => { const [imie, ...nazwisko] = o.split(' '); return nazwisko.length ? `${[...imie][0]}. ${nazwisko.join(' ')}` : o; };
+const ileSkrotow = new Map<string, number>();
+new Set(semestry.flatMap((x) => x.sekcje.flatMap((k) => k.przedmioty.flatMap((p) => p.zajecia.flatMap((z) => z.prowadzacy || []))))).forEach((o) => {
+  ileSkrotow.set(skrotOsoby(o), (ileSkrotow.get(skrotOsoby(o)) ?? 0) + 1);
 });
-// Przełącznik semestrów: wybór podczas budowania (w przeglądarce poprawiany wg daty i adresu).
-const wiele = semestry.length > 1;
-const aktywny = semestry[wybierzSemestr(semestry.map((x) => ({ od: x.s.od, do: x.s.do })), today())]?.kotwica ?? '';
-// identyfikatory nagłówków przedmiotów (do aria-labelledby tabel)
-let licznik = 0;
-const idPrzedmiotu = () => `pz-p${++licznik}`;
+const krotkoOsoba = (o: string) => ((ileSkrotow.get(skrotOsoby(o)) ?? 0) > 1 ? o : skrotOsoby(o));
+const tekstUwag = (u?: (string | { t: string })[]) => (u || []).map((f) => (typeof f === 'string' ? f : f.t)).join('');
+const doSzukania = (...cz: string[]) => cz.join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
+// sekcja kategorii z kotwicą bez semestru (#z-pl-o): w semestrze wybranym podczas budowania; gdy go nie ma — w pierwszym, który ją ma
+const wlascicielKategorii = (kat: string) => (semestry.find((x) => x.kotwica === aktywny && x.sekcje.some((k) => k.id === kat)) ?? semestry.find((x) => x.sekcje.some((k) => k.id === kat)))?.kotwica;
+const L = en
+  ? { semestr: 'Semester', szukaj: 'Search for a course, teacher or room', szukajEt: 'Search the timetable', dni: 'Days', pusto: 'Nothing matches your search.', dane: 'USOS data of', uwagi: 'Click a course name to see its description in USOS. Groups 99 are intended for students repeating a course who have already passed its classes.' }
+  : { semestr: 'Semestr', szukaj: 'Szukaj przedmiotu, prowadzącego albo sali', szukajEt: 'Szukaj w planie', dni: 'Dni', pusto: 'Nic nie pasuje do wyszukiwania.', dane: 'dane z USOS z', uwagi: 'Kliknij nazwę przedmiotu, by zobaczyć opis w USOSie. Grupy 99 przeznaczone są dla powtarzających przedmiot mających zaliczenia ćwiczeń.' };
+
 ---
-<Baza tytul={T.tytul} opis={T.lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={T.tytul} lead={T.lead} lang={lang} okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]} />
-
-  <div class="wrap layout plan-strona">
-    <div class="main">
-    {semestry.length === 0 && <p class="pz-stan">{T.brak}</p>}
-    <PrzelacznikSemestrow semestry={semestry.map((x) => ({ id: x.kotwica, etykieta: x.krotko, od: x.s.od, do: x.s.do }))} aktywny={aktywny} lang={lang} etykieta={en ? 'Semesters' : 'Semestry'} />
-    {semestry.map((x) => (
-      <section class="pz-semestr" id={x.kotwica} data-ps-panel={wiele ? '' : undefined} data-ps-aktywny={wiele && x.kotwica === aktywny ? '' : undefined}>
-        <h2>{x.tytul}</h2>
-        {x.s.zaktualizowano && <p class="pz-data">{T.aktualizacja}: {dataGodzina(x.s.zaktualizowano)}</p>}
-        <ul class="pz-uwagi-ogolne">
-          {T.uwagiOgolne.map((u) => <li>{u}</li>)}
-        </ul>
-        <SpisTresci naglowki={x.spis} lang={lang} wariant="gora" />
-        {x.sekcje.length === 0 && <p class="pz-stan">{T.brakSem}</p>}
-        {x.sekcje.length > 0 && (
-          <table class="pz-tabela pz-naglowek" aria-hidden="true">
-            <colgroup><col class="k-gr" /><col class="k-typ" /><col class="k-prow" /><col class="k-dzien" /><col class="k-godz" /><col class="k-sala" /><col class="k-uwagi" /></colgroup>
-            <thead><tr><th>{T.kol.gr}</th><th>{T.kol.typ}</th><th>{T.kol.prow}</th><th>{T.kol.dzien}</th><th>{T.kol.godz}</th><th>{T.kol.sala}</th><th>{T.kol.uwagi}</th></tr></thead>
-          </table>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: tytul }]} dzial="studia" spis={spisKomputer}
+  klasa="z-pl" atrybuty={{ 'data-z-plan': '' }}>
+  {/* liczby w nagłówku: przedmioty w semestrze i ostatnia aktualizacja z USOS */}
+  <Fragment slot="baner">{liczby.length > 0 && <ul class="pt-liczby">{liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}</ul>}</Fragment>
+    {html && <section class="tresc" set:html={html} />}
+    {semestry.length === 0 && <p class="pl-info">{T.brak}</p>}
+    {semestry.length > 0 && (
+      <div class="pl-narz" data-pagefind-ignore>
+        {wiele && (
+          <div class="pl-sem" role="group" aria-label={L.semestr}>
+            {semestry.map((x) => <button type="button" aria-pressed={x.kotwica === aktywny ? 'true' : 'false'} data-z-sem={x.kotwica}>{x.przycisk}</button>)}
+          </div>
         )}
-        {x.sekcje.map((k, ki) => (
-          <div class="pz-sekcja">
-            <h3 id={x.spis[ki].slug}>{k.nazwa}</h3>
-            {k.przedmioty.map((p) => {
-              const id = idPrzedmiotu();
-              return (
-                <div class="pz-przedmiot">
-                  <h4 id={id}><a href={p.usos}>{p.nazwaW}</a></h4>
-                  <table class="pz-tabela" aria-labelledby={id}>
-                    <colgroup><col class="k-gr" /><col class="k-typ" /><col class="k-prow" /><col class="k-dzien" /><col class="k-godz" /><col class="k-sala" /><col class="k-uwagi" /></colgroup>
-                    <thead class="pz-ukryty">
-                      <tr>
-                        <th scope="col"><span>{T.kol.gr}</span></th><th scope="col"><span>{T.kol.typ}</span></th><th scope="col"><span>{T.kol.prow}</span></th>
-                        <th scope="col"><span>{T.kol.dzien}</span></th><th scope="col"><span>{T.kol.godz}</span></th><th scope="col"><span>{T.kol.sala}</span></th><th scope="col"><span>{T.kol.uwagi}</span></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {p.zajecia.map((z) => (
-                        <tr>
-                          <td class="c-gr">{grupa(z) && <><span class="pz-m">{T.gr} </span>{grupa(z)}</>}</td>
-                          <td class="c-typ"><abbr title={typPelny(z.typ)}>{typKrotki(z.typ)}</abbr></td>
-                          <td class="c-prow">{(z.prowadzacy || []).map((o, i) => <>{i > 0 && <br />}{o}</>)}</td>
-                          <td class="c-dzien">{z.dzien != null ? T.dni[z.dzien] : ''}</td>
-                          <td class="c-godz">
-                            {z.od && z.do ? `${z.od}–${z.do}` : ''}
-                            {z.czestotliwosc && T.czest[z.czestotliwosc] && <small>{T.czest[z.czestotliwosc]}</small>}
-                          </td>
-                          <td class="c-sala">{z.sala && <><span class="pz-m">{T.sala} </span>{z.sala}</>}</td>
-                          <td class="c-uwagi">{(z.uwagi || []).map((f) => (typeof f === 'string' ? f : <a href={f.a}>{f.t}</a>))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </section>
-    ))}
-    {semestry.length > 0 && <p class="pz-zrodlo">{T.zrodlo}</p>}
-    </div>
-
-    {semestry.some((x) => x.spis.length > 1) && (
-      <aside class="side pz-bok" data-pagefind-ignore>
-        {semestry.map((x) => (
-          <div class="pz-spis" data-ps-dla={wiele ? x.kotwica : undefined} data-ps-aktywny={wiele && x.kotwica === aktywny ? '' : undefined}>
-            <SpisTresci naglowki={x.spis} lang={lang} wariant="bok" />
-          </div>
-        ))}
-      </aside>
+        <input type="search" class="pl-szukaj" placeholder={L.szukaj} aria-label={L.szukajEt} autocomplete="off" data-z-szukaj />
+        <div class="pl-dni" role="group" aria-label={L.dni}>
+          {DNI_KROTKO.slice(0, 5).map((d, i) => <button type="button" aria-pressed="false" data-z-dzien={i} title={T.dni[i]}>{d}</button>)}
+        </div>
+      </div>
     )}
-  </div>
-</Baza>
+    {semestry.map((x) => (
+      <div class="pl-semestr" id={x.kotwica} data-z-panel={x.kotwica} data-z-aktywny={x.kotwica === aktywny ? '' : undefined} data-od={x.s.od ?? ''} data-do={x.s.do ?? ''}>
+        <p class="pl-info">{`${x.opis}${x.aktualizacja ? ` · ${L.dane} ${x.aktualizacja.pelna}` : ''}. ${L.uwagi}`}</p>
+        {x.sekcje.length === 0 && <p class="pl-info">{T.brakSem}</p>}
+        {x.sekcje.map((k) => (
+          <section class="pl-kat" id={wlascicielKategorii(k.id) === x.kotwica ? idKategorii(k.id) : `${idKategorii(k.id)}-${x.kotwica}`} data-z-kat={idKategorii(k.id)}>
+            <h2>{k.nazwa}</h2>
+            <div class="pl-nagl" aria-hidden="true"><span>{T.kol.typ}</span><span>{T.kol.gr}</span><span>{T.kol.prow}</span><span>{T.kol.dzien}</span><span>{T.kol.godz}</span><span>{T.kol.sala}</span><span>{T.kol.uwagi}</span></div>
+            {k.przedmioty.map((p) => (
+              <div class="pl-p">
+                <h3 data-limit-linii="3"><Link href={p.usos}>{p.nazwaW}</Link></h3>
+                <div>
+                  {p.zajecia.map((z) => (
+                    <div class="pl-w" data-d={z.dzien ?? ''} data-t={doSzukania(p.nazwaW, p.nazwa, ...(z.prowadzacy || []), z.sala || '', salaW(z.sala) || '', tekstUwag(z.uwagi))}>
+                      <span class="typ"><abbr title={typPelny(z.typ)}>{typKrotki(z.typ)}</abbr></span>
+                      <span class="gr">{grupa(z) && <><span class="sr-only">{T.gr} </span>{grupa(z)}</>}</span>
+                      <span class="prow">{(z.prowadzacy || []).map((o, i) => <>{i > 0 && <><span class="tylko-telefon" aria-hidden="true">, </span><br /></>}<span class="tylko-telefon" aria-hidden="true">{krotkoOsoba(o)}</span><span class="pl-pelne" data-limit-linii="2">{o}</span></>)}</span>
+                      <span class="dz">{z.dzien != null && <abbr title={T.dni[z.dzien]}>{DNI_KROTKO[z.dzien]}</abbr>}</span>
+                      <span class="godz">{z.od && z.do ? `${z.od}–${z.do}` : ''}{z.czestotliwosc && T.czest[z.czestotliwosc] && <small>{T.czest[z.czestotliwosc]}</small>}</span>
+                      <span class="sala">{z.sala && <>{salaW(z.sala) === z.sala && <span class="sr-only">{T.sala} </span>}{salaW(z.sala)}</>}</span>
+                      <span class="uw">{(z.uwagi || []).map((f) => (typeof f === 'string' ? f : <Link href={f.a}>{f.t}</Link>))}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))}
+      </div>
+    ))}
+    <p class="pl-pusto" role="status" data-z-pusto hidden>{L.pusto}</p>
+</Podstrona>
 
-<style>
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” (odstępy .layout — uklad-zwarta.css) ----------
-     Odstęp nad przełącznikiem semestrów stały (24 px), jak na stronie działu „Studia” — treść nie przylega do banera. */
-  @media (min-width: 761px) { .plan-strona { padding-top: 24px; } }
-</style>
+<script>
+  // Plan zajęć (blok .z-pl): semestr, wyszukiwarka i filtr dni. Semestr z adresu (#zimowy / #letni albo kotwica w panelu),
+  // inaczej wg dzisiejszej daty (wyborSemestru.ts); wybrany semestr zapisuje się w adresie.
+  import { today } from '../lib/daty';
+  import { wybierzSemestr } from '../components/wyborSemestru';
+
+  const plan = document.querySelector<HTMLElement>('[data-z-plan]');
+  if (plan) {
+    const panele = Array.from(plan.querySelectorAll<HTMLElement>('[data-z-panel]'));
+    const przyciski = Array.from(plan.querySelectorAll<HTMLButtonElement>('[data-z-sem]'));
+    const dni = Array.from(plan.querySelectorAll<HTMLButtonElement>('[data-z-dzien]'));
+    const szukaj = plan.querySelector<HTMLInputElement>('[data-z-szukaj]');
+    const pusto = plan.querySelector<HTMLElement>('[data-z-pusto]');
+    let biezacy = Math.max(0, panele.findIndex((p) => p.hasAttribute('data-z-aktywny')));
+
+    const filtruj = () => {
+      const q = (szukaj?.value || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
+      const wybrane = new Set(dni.filter((b) => b.getAttribute('aria-pressed') === 'true').map((b) => b.dataset.zDzien));
+      const widoczne = panele.map((panel) => {
+        let wp = 0;
+        panel.querySelectorAll<HTMLElement>('.pl-kat').forEach((kat) => {
+          let wk = 0;
+          kat.querySelectorAll<HTMLElement>('.pl-p').forEach((p) => {
+            let w = 0;
+            p.querySelectorAll<HTMLElement>('.pl-w').forEach((r) => {
+              const ok = (!q || (r.dataset.t || '').includes(q)) && (!wybrane.size || wybrane.has(r.dataset.d));
+              r.hidden = !ok;
+              if (ok) w++;
+            });
+            p.hidden = !w;
+            wk += w;
+          });
+          kat.hidden = !wk;
+          wp += wk;
+        });
+        return wp;
+      });
+      if (pusto) pusto.hidden = !panele.length || widoczne[biezacy] > 0;
+      // spis „Na tej stronie” (zal/SpisStrony.astro) chowa kategorie bez widocznych zajęć
+      document.dispatchEvent(new Event('z-spis'));
+    };
+
+    // pokazany semestr: panel, przyciski, kotwice spisu (#z-pl-o wskazuje sekcję w pokazanym semestrze)
+    const pokaz = (i: number) => {
+      biezacy = i;
+      panele.forEach((p, j) => {
+        p.toggleAttribute('data-z-aktywny', i === j);
+        p.querySelectorAll<HTMLElement>('[data-z-kat]').forEach((s) => { s.id = i === j ? s.dataset.zKat! : `${s.dataset.zKat}-${p.dataset.zPanel}`; });
+      });
+      przyciski.forEach((b, j) => b.setAttribute('aria-pressed', String(i === j)));
+      filtruj();
+    };
+
+    if (panele.length > 1) {
+      // semestr z adresu (#letni, #letni-m — kotwice dotychczasowego planu — albo kotwica sekcji w panelu), inaczej wg daty
+      let h = '';
+      try { h = decodeURIComponent(location.hash.slice(1)); } catch { /* zły adres */ }
+      const zAdresu = h ? panele.findIndex((p) => h === p.dataset.zPanel || h.startsWith(`${p.dataset.zPanel}-`) || !!p.querySelector(`[id="${CSS.escape(h)}"]`)) : -1;
+      pokaz(zAdresu >= 0 ? zAdresu : wybierzSemestr(panele.map((p) => ({ od: p.dataset.od, do: p.dataset.do })), today(), biezacy));
+      przyciski.forEach((b, j) => b.addEventListener('click', () => {
+        pokaz(j);
+        history.replaceState(history.state, '', `#${panele[j].dataset.zPanel}`);
+      }));
+    } else {
+      pokaz(0);
+    }
+
+    szukaj?.addEventListener('input', filtruj);
+    dni.forEach((b) => b.addEventListener('click', () => {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      filtruj();
+    }));
+  }
+</script>

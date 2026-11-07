@@ -1,101 +1,111 @@
 ---
-// Lista aktualności z filtrem rodzaju i szukaniem (filtrowanie w przeglądarce); ?dla=studenci itp. z linków zawęża listę (z przyciskiem „pokaż wszystkie”).
-// Wygląd na komputerze (≥ 761 px): baner jak w wariancie „Portal”, reszta strony jak w wariancie „Zwarta”
-// (uklad="zwarta portal-baner", style: src/styles/uklad-*.css i blok niżej). Telefon (≤ 760 px) bez zmian.
-import Baza from '../layouts/Baza.astro';
-import NaglowekStrony from '../components/NaglowekStrony.astro';
+// Lista aktualności (/aktualnosci, EN /en/aktualnosci) na wspólnym szablonie podstrony (zal/Podstrona.astro; zlecenie 12,
+// etap 3). Strona poza działami: granatowy nagłówek z hasłem, bez liczb (zlecenie 18, punkt 2: zwykła wysokość nagłówka podstrony),
+// bez spisu „Na tej stronie” (miesiące to grupy listy, nie sekcje strony).
+// Filtr rodzaju i szukanie (filtrowanie w przeglądarce, także bez polskich znaków); ?dla=studenci itp. z linków zawęża listę
+// (z przyciskiem „Pokaż wszystkie”), ?rodzaj=… wybiera rodzaj. Wpisy po miesiącach: nagłówek miesiąca Brygadą, wiersze
+// z cienkimi liniami i datą jak na stronach działów (WierszAktualnosci.astro, wzór: zal/dzial/Wiersz.astro). Pierwszy widoczny wpis
+// wyróżniony (zlecenie 14, zalecenie 22; zlecenie 18, punkt 3): w HTML najnowszy, po filtrze albo szukaniu skrypt przestawia klasę.
+// Jedna wersja HTML (zlecenie 18, punkt 3; podgląd: wariant B „na papierze”); panel „Pokaż” i układ wspólne z Kalendarzem, Obronami
+// i „Warto wiedzieć” (zal/ListaPokaz.astro, zlecenie 27):
+// - okno ≥ 1024 px: lista w kolumnie treści, filtry w prawej kolumnie (236 px), przyklejone jak spis „Na tej stronie”;
+// - kolumna listy ≥ 880 px (okno ≥ 1180 px, przy pasku ≥ 888 px): wpisy w dwóch kolumnach, węższa: w jednej;
+// - telefon (≤ 1023 px): rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
+// „… czytaj dalej” dopisuje skrypt, tylko gdy zajawka się nie mieści (wygląd w WierszAktualnosci.astro).
+// Bez JS: filtry schowane, widać całą listę.
+import Podstrona from '../components/zal/Podstrona.astro';
+import ListaPokaz from '../components/zal/ListaPokaz.astro';
+import Link from '../components/Link.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
-import Ikona from '../components/Ikona.astro';
-import ustawienia from '../data/ustawienia.json';
-import { u } from '../lib/url';
-import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
-import { monthYear, type Lang } from '../lib/daty';
-import { listaAktualnosci } from '../lib/tresci';
+import { RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import { daneListyAktualnosci } from '../lib/widoki/listaAktualnosci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const lista = await listaAktualnosci(lang);
-// Bez prawego paska „Najbliższe wydarzenia” (decyzja: lista na całą szerokość; wydarzenia są na głównej i w kalendarzu).
-
-// Grupowanie po miesiącach
-const grupy: { miesiac: string; pozycje: typeof lista }[] = [];
-for (const p of lista) {
-  const m = monthYear(p.data, lang);
-  const ost = grupy[grupy.length - 1];
-  if (ost && ost.miesiac === m) ost.pozycje.push(p);
-  else grupy.push({ miesiac: m, pozycje: [p] });
-}
-const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
-const lead = lang === 'en' ? 'Announcements, events and achievements of the Mathematical Institute.' : 'Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.';
+const en = lang === 'en';
+const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
 ---
-<Baza tytul={t(lang, 'aktualnosci')} opis={lead} uklad="zwarta portal-baner">
-  <NaglowekStrony tytul={t(lang, 'aktualnosci')} lead={lead} lang={lang} okruszki={[{ etykieta: t(lang, 'aktualnosci') }]} />
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
+  okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-pelna" atrybuty={{ 'data-lista': '', 'data-dalej': en ? '… read more' : '… czytaj dalej' }}>
 
-  <div class="wrap layout">
-    <div class="main" data-lista>
-      {/* Rodzaje wpisów i wyszukiwarka w lewej kolumnie, nad listą (wyszukiwarka zaraz za przyciskami; bez wydarzeń kolumna jest szersza). */}
-      <div class="filters filters-lewo">
-        <div class="chips" role="group" aria-label={lang === 'en' ? 'Filter by type' : 'Filtruj według rodzaju'}>
-          <button type="button" class="chip" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
-          {rodzaje.map((r) => <button type="button" class="chip" aria-pressed="false" data-rodzaj={r}>{RODZAJE[r][lang]}</button>)}
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-          <label class="search">
-            <Ikona nazwa="szukaj" rozmiar={18} />
-            <span class="sr-only">{lang === 'en' ? 'Search news' : 'Szukaj w aktualnościach'}</span>
-            <input type="search" data-szukaj placeholder={lang === 'en' ? 'Search news' : 'Szukaj w aktualnościach'} />
-          </label>
-        </div>
-      </div>
-      <p class="dla-info" data-dla-info hidden>
-        <span>{lang === 'en' ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
-        <button type="button" class="chip" data-dla-wyczysc>{lang === 'en' ? 'Show all' : 'Pokaż wszystkie'}</button>
-      </p>
-      {grupy.map((g) => (
-        <section class="lista-miesiac" data-grupa>
-          <h2 class="month">{g.miesiac}</h2>
-          {/* komputer: miesiąc jako sekcja z kreską (.lista-miesiac), wpisy jako osobne białe karty (.karty-lista) — global.css; telefon bez zmian */}
-          <div class="karty-lista">{g.pozycje.map((p) => <WierszAktualnosci p={p} lang={lang} />)}</div>
-        </section>
-      ))}
-      <p class="muted" data-pusto hidden>{lang === 'en' ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
-      <p class="muted la-archiwum">
-        {lang === 'en' ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
-        <a href={ustawienia.archiwum}>{lang === 'en' ? 'archive of the old website' : 'archiwum starej strony'}</a>.
-      </p>
-    </div>
-
-  </div>
-</Baza>
+  <ListaPokaz lang={lang} etykieta={filtrEtykieta} opcje={rodzaje.map((r) => ({ wartosc: r, etykieta: RODZAJE_FILTRY[r][lang] }))} szukaj={szukajDlugo}>
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
+    <p slot="panel" class="ak-dla" data-dla-info data-pagefind-ignore hidden>
+      <span>{en ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
+      <button type="button" data-dla-wyczysc>{en ? 'Show all' : 'Pokaż wszystkie'}</button>
+    </p>
+    {grupy.map((g, nrGrupy) => (
+      <section class="ak-mies" data-grupa>
+        <h2>{g.miesiac}</h2>
+        {g.pozycje.map((p, i) => <WierszAktualnosci p={p} lang={lang} wyr={nrGrupy === 0 && i === 0} />)}
+      </section>
+    ))}
+    <p class="ak-pusto" role="status" data-pusto hidden>{en ? 'No posts match the selected filters.' : 'Brak wpisów spełniających wybrane kryteria.'}</p>
+    <p class="ak-archiwum">
+      {en ? 'Posts published before April 2026 are available in the ' : 'Wpisy sprzed kwietnia 2026 znajdziesz w '}
+      <Link href={ustawienia.archiwum}>{en ? 'archive of the old website' : 'archiwum starej strony'}</Link>.
+    </p>
+  </ListaPokaz>
+</Podstrona>
 
 <script>
+  import { sizesTelefon } from '../lib/media';
+  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
   const lista = document.querySelector('[data-lista]');
-  const pozycje = Array.from(document.querySelectorAll<HTMLElement>('[data-lista] .row-item'));
+  const pozycje = Array.from(document.querySelectorAll<HTMLElement>('[data-lista] [data-wa]'));
   const grupy = Array.from(document.querySelectorAll<HTMLElement>('[data-grupa]'));
   const pusto = document.querySelector<HTMLElement>('[data-pusto]');
-  const szukaj = document.querySelector<HTMLInputElement>('[data-szukaj]');
-  const rodzajBtn = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
   const dlaInfo = document.querySelector<HTMLElement>('[data-dla-info]');
-  let rodzaj = '';
   let dla = '';
-  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
+  // tekst do szukania: raz, przed pierwszym dopiskiem „… czytaj dalej”, żeby dopisek nie pasował do szukanego słowa
+  const tekstWpisu = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
+  // rozmiar zdjęcia przy przełożeniu powiększenia na inny wpis (te same pola co w WierszAktualnosci.astro)
+  const ROZMIAR_DUZY = `${sizesTelefon('81px')}, 200px`;
+  const ROZMIAR_MALY = `${sizesTelefon('81px')}, 72px`;
+  function powieksz(w: HTMLElement, tak: boolean) {
+    w.classList.toggle('wyr', tak);
+    w.querySelectorAll<HTMLImageElement | HTMLSourceElement>('source, img').forEach((e) => { e.sizes = tak ? ROZMIAR_DUZY : ROZMIAR_MALY; });
+    // zdjęcie, które właśnie urosło, widać od razu: bez leniwego wczytywania
+    if (tak) w.querySelector('img')?.setAttribute('loading', 'eager');
+  }
 
+  // „… czytaj dalej” (zlecenie 18, punkt 3): tylko w zajawce, która się nie mieści; bez znaczenia dla czytnika ekranu,
+  // bo klikalny jest cały wiersz. Tolerancja 1 px na zaokrąglenie wysokości linii (ucięta linia to co najmniej 20 px).
+  const dopisek = lista instanceof HTMLElement ? lista.dataset.dalej ?? '' : '';
+  function dalej() {
+    for (const p of pozycje) {
+      const z = p.querySelector<HTMLElement>('.wa-zaj');
+      if (!z || p.hidden) continue;
+      const d = z.querySelector('.wa-dalej');
+      const ucieta = z.scrollHeight > z.clientHeight + 1;
+      if (ucieta && !d) {
+        const s = document.createElement('span');
+        s.className = 'wa-dalej';
+        s.setAttribute('aria-hidden', 'true');
+        s.textContent = dopisek;
+        z.append(s);
+      } else if (!ucieta && d) d.remove();
+    }
+  }
+
+  // rodzaj z panelu „Pokaż” (zal/ListaPokaz.astro)
+  const panel = panelPokaz(document, filtruj);
   function filtruj() {
-    const q = norm(szukaj?.value.trim() ?? '');
+    const rodzaj = panel.filtr();
+    const q = panel.szukane();
     let ile = 0;
     for (const p of pozycje) {
-      const ok = (!rodzaj || p.dataset.rodzaj === rodzaj) && (!dla || (p.dataset.dla ?? '').split(' ').includes(dla)) && (!q || norm(p.textContent ?? '').includes(q));
+      const ok = (!rodzaj || p.dataset.rodzaj === rodzaj) && (!dla || (p.dataset.dla ?? '').split(' ').includes(dla)) && (!q || (tekstWpisu.get(p) ?? '').includes(q));
       p.hidden = !ok;
       if (ok) ile++;
     }
-    for (const g of grupy) g.hidden = !g.querySelector('.row-item:not([hidden])');
+    const pierwszy = pozycje.find((p) => !p.hidden);
+    for (const p of pozycje) if (p.classList.contains('wyr') !== (p === pierwszy)) powieksz(p, p === pierwszy);
+    for (const g of grupy) g.hidden = !g.querySelector('[data-wa]:not([hidden])');
     if (pusto) pusto.hidden = ile > 0;
+    dalej();
   }
-  rodzajBtn.forEach((b) => b.addEventListener('click', () => {
-    rodzaj = b.dataset.rodzaj ?? '';
-    rodzajBtn.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
-    filtruj();
-  }));
   // ?dla=… z linku (np. „Aktualności dla studentów”): zawężenie z informacją i przyciskiem „Pokaż wszystkie”
   const ustawDla = (d: string) => {
     const znane = !!d && !!dlaInfo?.querySelector(`[data-dla-etykieta="${CSS.escape(d)}"]`);
@@ -112,30 +122,55 @@ const lead = lang === 'en' ? 'Announcements, events and achievements of the Math
     url.searchParams.delete('dla');
     history.replaceState(history.state, '', url);
   });
-  szukaj?.addEventListener('input', filtruj);
   if (lista) {
     const p = new URLSearchParams(location.search);
     const d = p.get('dla');
     if (d) ustawDla(d);
-    const r = p.get('rodzaj');
-    if (r) rodzajBtn.find((b) => b.dataset.rodzaj === r)?.click();
+    // (filtruje też według tekstu, który przeglądarka przywróciła w polu szukania po powrocie na stronę)
+    panel.ustaw(p.get('rodzaj'));
+    // dopisek zależy od szerokości i fontu: po narysowaniu, po załadowaniu fontów i po zmianie rozmiaru okna
+    requestAnimationFrame(dalej);
+    document.fonts?.ready.then(dalej);
+    let klatka = 0;
+    addEventListener('resize', () => { cancelAnimationFrame(klatka); klatka = requestAnimationFrame(dalej); });
   }
 </script>
 
 <style>
-  .la-archiwum { margin-top: 28px; }
-  /* ---------- komputer (≥ 761 px): wariant „Zwarta” ----------
-     Odstęp listy od banera stały (24 px), jak na stronach działów; mniej miejsca nad odnośnikiem do archiwum. */
-  @media (min-width: 761px) {
-    .layout { padding-top: 24px; }
-    /* więcej miejsca między przyciskami filtrów a kreską pierwszego miesiąca (jak odstęp między sekcjami) */
-    .filters.filters-lewo { margin-bottom: 22px; }
-    /* przyciski rodzajów i wyszukiwarka w jednym wierszu */
-    .filters.filters-lewo { flex-wrap: nowrap; }
-    .filters.filters-lewo > .chips { flex: 0 1 auto; }
-    /* wyszukiwarka trochę szersza (300 px zamiast ok. 255), żeby podpowiedź „Szukaj w aktualnościach” nie była ucinana
-       przy szerszych czcionkach (np. na Windowsie) */
-    .filters.filters-lewo .search { width: 300px; }
-    .la-archiwum { margin-top: 18px; }
+  [hidden] { display: none !important; }
+  /* panel „Pokaż” (filtry, szukanie, układ z prawą kolumną): zal/ListaPokaz.astro */
+
+  .ak-dla { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 14px 0 0; color: var(--text); }
+  .ak-dla strong { color: var(--ink); }
+  .ak-dla button { margin: 0; padding: 7px 14px; font: inherit; font-size: 14px; font-weight: 600; border: 1px solid var(--line-ui); border-radius: 0;
+    background: transparent; color: var(--ink); cursor: pointer; }
+  /* „Pokaż wszystkie” jako przycisk-link (zlecenie 11, zalecenie 4): po najechaniu ramka i tekst w kolorze */
+  .ak-dla button:hover { border-color: var(--d-a); color: var(--d-a); }
+  .ak-dla button:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+
+  /* miesiąc: nagłówek Brygadą, wiersze z cienkimi liniami (bez kreski i odstępów sekcji szablonu) */
+  .ak-mies { margin: 0; padding: 0; border: 0; }
+  .ak-mies h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
+    font-size: 23px; line-height: 1.4; color: var(--d-a); }
+  .ak-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+  .ak-archiwum { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
+  .ak-archiwum a { color: var(--d-a); }
+
+  /* ---------- komputer (≥ 1024 px): lista w dwóch kolumnach, gdy ma co najmniej 880 px (kontener: kolumna listy w ListaPokaz.astro) ---------- */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    @container (min-width: 880px) {
+      .ak-mies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+      .ak-mies h2 { grid-column: 1 / -1; }
+    }
+    .ak-dla { display: grid; justify-items: start; gap: 8px; margin: 16px 0 0; font-size: 14px; line-height: 1.45; }
+    .ak-dla button { border-radius: 5px; }
+    .ak-dla button:focus-visible { outline-offset: -2px; }
+  }
+
+  /* ---------- telefon (≤ 1023 px) ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .ak-dla { font-size: 14.5px; }
+    .ak-mies h2 { margin-top: 22px; font-size: 20px; }
   }
 </style>

@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Kierunek „Założyciele” — podstrony „Projekty i granty” (ListaGrantow.astro, blok .z-gr) i „Plan zajęć” (PlanZajec.astro,
+   blok .z-pl) na komputerze (≥ 1024 px). Wzorzec: prototyp proto/zalozyciele.src.html (trescGranty, trescPlan, filtrujPlan),
+   specyfikacja: dok/estetyka.md „Podstrony działów”. Wspólny szablon podstrony (.z-pd, spis, .z-pd-tresc, .z-nast) — zal-podstrona.css i zalozyciele.css.
+   Komputer: @media komputera; telefon (≤ 1023 px): bloki na końcu pliku.
+   ========================================================================== */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  :is(.z-gr, .z-pl) [hidden] { display: none !important; }
+  /* interlinia jak w prototypie (treść podstrony 16 px / 1.6, nagłówki sekcji bez własnej interlinii) */
+  .z-gr, .z-pl, .z-gr h2, .z-pl h2 { line-height: 1.6; }
+
+  /* ---------- Projekty i granty: paski czasu na wspólnej osi lat ---------- */
+  /* pasek czasu: 380 px przy zwykłej kolumnie treści, węższy razem z nią, tytuł nie jest ściskany (zlecenie 25, punkt 2.8) */
+  .z-gr .os-lat, .z-gr .gr-w { display: grid; grid-template-columns: minmax(0, 1fr) clamp(160px, 41%, 380px); gap: 32px; align-items: center; }
+  .z-gr .gr-w.maly, .z-gr .os-lat.maly { grid-template-columns: minmax(0, 1fr) clamp(120px, 26%, 240px); }
+  .z-gr .os-lat { margin: 6px 0 4px; }
+  .z-gr .tor-os { position: relative; height: 18px; border-bottom: 1px solid var(--line); }
+  .z-gr .tor-os b { position: absolute; bottom: 3px; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .z-gr .gr-w { padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .z-gr .gr-w.maly { padding: 9px 0; }
+  .z-gr .gr-w .rola { font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-gr .gr-w .imie { margin: 4px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.25; }
+  .z-gr .gr-w .imie a { color: var(--ink); text-decoration: none; }
+  .z-gr .gr-w .imie a:hover { color: var(--d-a); }
+  .z-gr .gr-t { font-family: var(--f-display); font-size: 17.5px; line-height: 1.3; color: var(--ink); text-decoration: none; }
+  .z-gr .gr-t:hover { color: var(--d-a); }
+  /* wiersz tytułu w małych wierszach tak wysoki jak sam tytuł (17,5 px / 1.3), jak w prototypie */
+  .z-gr .gr-w.maly > div { line-height: 1.3; }
+  .z-gr .gr-w .kont { margin-top: 3px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .z-gr .nr { font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+  .z-gr .tor { position: relative; display: block; height: 8px; background: color-mix(in srgb, var(--d-a) 10%, transparent); }
+  .z-gr .tor.duzy { height: 12px; }
+  .z-gr .tor .pas { position: absolute; top: 0; bottom: 0; background: var(--d-a); }
+  .z-gr .tor i { position: absolute; top: -6px; bottom: -6px; width: 0; border-left: 1.5px dashed var(--ink); }
+  /* rok jak podsekcja wzorca treści (zalecenie 14): 23 px / 1,3 w kolorze działu, 30 px nad, 8 px pod */
+  .z-gr .gr-rok { margin: 30px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.3; color: var(--d-a); }
+  .z-gr .gr-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+
+  /* ---------- Plan zajęć: przyklejony pasek (semestr, wyszukiwarka, dni) i zajęcia w równych kolumnach ---------- */
+  .z-pl .pl-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
+    background: var(--bg); border-bottom: 2px solid var(--rule); }
+  /* bez JS: bez paska, wszystkie semestry jeden pod drugim; z JS widać tylko wybrany semestr */
+  html:not(.js) .z-pl .pl-narz { display: none; }
+  html.js .z-pl [data-z-panel]:not([data-z-aktywny]) { display: none; }
+  .z-pl .pl-sem, .z-pl .pl-dni { display: flex; border: 1px solid var(--line-ui); }
+  .z-pl .pl-sem button, .z-pl .pl-dni button { margin: 0; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 12px; border: 0; border-radius: 0;
+    background: transparent; color: var(--text); cursor: pointer; }
+  .z-pl .pl-sem button + button, .z-pl .pl-dni button + button { border-left: 1px solid var(--line-ui); }
+  .z-pl .pl-sem button:hover, .z-pl .pl-dni button:hover { color: var(--d-a); }
+  .z-pl .pl-sem button[aria-pressed="true"], .z-pl .pl-dni button[aria-pressed="true"] { background: var(--d-a); color: var(--bg); }
+  .z-pl .pl-sem button:focus-visible, .z-pl .pl-dni button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; border-radius: 0; }
+  .z-pl .pl-szukaj { flex: 1; min-width: 220px; margin: 0; font: inherit; font-size: 15px; padding: 8px 12px; border: 1px solid var(--line-ui); border-radius: 0;
+    background: var(--bg); color: var(--ink); }
+  .z-pl .pl-szukaj::placeholder { color: var(--muted); opacity: 1; }
+  .z-pl .pl-szukaj:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+  .z-pl .pl-info { margin: 12px 0 8px; font-size: 13.5px; line-height: 1.65; color: var(--muted); max-width: none; }
+  .z-pl .pl-kat { padding-bottom: 10px; margin: 18px 0 0; }
+  .z-pl .pl-kat h2 { margin: 0 0 8px; font-size: 24px; color: var(--d-a); }
+  .z-pl .pl-nagl, .z-pl .pl-w { display: grid; grid-template-columns: 52px 40px minmax(0, 1.25fr) 44px 92px 64px minmax(0, 1fr); gap: 10px; }
+  .z-pl .pl-nagl { padding-left: 244px; font-size: 11.5px; font-weight: 700; color: var(--muted); }
+  /* kolumna nazw 232 px: przy 220 px „Inteligentne systemy decyzyjne…” ma 4 linie, a limit to 3 (zlecenie 25, punkt 1) */
+  .z-pl .pl-p { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .z-pl .pl-p h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 17px; line-height: 1.3; }
+  .z-pl .pl-p h3 a { color: var(--ink); text-decoration: none; }
+  .z-pl .pl-p h3 a:hover { color: var(--d-a); }
+  .z-pl .pl-w { padding: 2px 0; font-size: 13.5px; line-height: 1.45; color: var(--text); }
+  .z-pl .pl-w > span { min-width: 0; }
+  .z-pl .pl-w abbr { text-decoration: none; }
+  .z-pl .pl-w .typ { color: var(--muted); }
+  .z-pl .pl-w .dz { font-weight: 700; color: var(--d-a); }
+  .z-pl .pl-w .godz { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .z-pl .pl-w .godz small { display: block; font-size: 12px; color: var(--muted); }
+  .z-pl .pl-w .uw { font-size: 12.5px; color: var(--muted); }
+  .z-pl .pl-w .uw a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  .z-pl .pl-w .uw a:hover { color: var(--d-a); }
+  .z-pl .pl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+}
+
+/* ---------- telefon (≤ 1023 px): Plan zajęć ----------
+   Przedmiot jako blok (nazwa Brygadą), pod nią zajęcia w dwóch liniach: „wyk. · gr. 1 · pon. · 10:15–12:00 · HS”
+   i prowadzący z uwagami. Przyklejony pasek pod nagłówkiem: semestr i wyszukiwarka w jednym rzędzie, dni w drugim.
+   Spis kategorii zwijany nad planem (zal/SpisStrony.astro, zal-podstrona.css). */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  :is(.z-gr, .z-pl) [hidden] { display: none !important; }
+  .z-gr, .z-pl { line-height: 1.6; }
+
+  .z-pl .pl-narz { position: sticky; top: var(--hdr-h); z-index: 5; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px;
+    margin: 0 -16px; padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--rule); }
+  html:not(.js) .z-pl .pl-narz { display: none; }
+  html.js .z-pl [data-z-panel]:not([data-z-aktywny]) { display: none; }
+  .z-pl .pl-sem, .z-pl .pl-dni { display: flex; border: 1px solid var(--line-ui); }
+  .z-pl .pl-dni { grid-column: 1 / -1; }
+  .z-pl .pl-sem button, .z-pl .pl-dni button { flex: 1 1 auto; margin: 0; min-height: 40px; padding: 6px 10px; border: 0; border-radius: 0; background: transparent;
+    font: inherit; font-size: 13.5px; font-weight: 600; color: var(--text); cursor: pointer; }
+  .z-pl .pl-sem button + button, .z-pl .pl-dni button + button { border-left: 1px solid var(--line-ui); }
+  .z-pl .pl-sem button[aria-pressed="true"], .z-pl .pl-dni button[aria-pressed="true"] { background: var(--d-a); color: var(--bg); }
+  .z-pl .pl-sem button:focus-visible, .z-pl .pl-dni button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
+  /* pasek w dwóch rzędach: semestry po równo, pod nimi dni; wyszukiwarka tylko na komputerze (zlecenie 18, punkt 19) */
+  .z-pl .pl-szukaj { display: none; }
+  .z-pl .pl-sem { grid-column: 1 / -1; }
+  .z-pl .pl-info { margin: 12px 0 6px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+
+  .z-pl .pl-kat { margin: 22px 0 0; scroll-margin-top: calc(var(--hdr-h) + 120px); }
+  .z-pl .pl-kat h2 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.25; color: var(--d-a); }
+  .z-pl .pl-nagl { display: none; }
+  .z-pl .pl-p { padding: 10px 0 8px; border-top: 1px solid var(--line); }
+  .z-pl .pl-p h3 { margin: 0 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.3; }
+  .z-pl .pl-p h3 a { color: var(--ink); text-decoration: none; }
+  /* wiersz zajęć w jednej linii: typ · grupa · prowadzący · dzień, godziny · sala, na końcu uwagi; dłuższy łamie się zwyczajnie (zlecenie 18, punkt 19) */
+  .z-pl .pl-w { display: flex; flex-wrap: wrap; align-items: baseline; padding: 5px 0; font-size: 14.5px; line-height: 1.45; color: var(--text); }
+  .z-pl .pl-w > * { order: 1; min-width: 0; overflow-wrap: anywhere; }
+  .z-pl .pl-w > .uw { order: 3; }
+  .z-pl .pl-w > :is(.gr, .prow, .dz, .sala):not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
+  .z-pl .pl-w > .godz:not(:empty)::before { content: ''; margin-left: 6px; }
+  .z-pl .pl-w > .dz:empty + .godz:not(:empty)::before { content: '·'; margin: 0 6px; font-weight: 400; color: var(--muted); }
+  .z-pl .pl-sem button { flex: 1 1 0; padding: 6px 8px; }
+  .z-pl .pl-w abbr { text-decoration: none; }
+  .z-pl .pl-w .typ { font-weight: 700; color: var(--ink); }
+  .z-pl .pl-w .gr .sr-only { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; clip-path: none; white-space: normal; }
+  .z-pl .pl-w .dz { font-weight: 700; color: var(--d-a); }
+  .z-pl .pl-w .godz { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .z-pl .pl-w .godz small { margin-left: 5px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+  .z-pl .pl-w .prow { color: var(--text); }
+  /* prowadzący: na ekranie skrót, kilku po przecinku; pełne nazwisko tylko dla czytnika ekranu (skrót ma aria-hidden) */
+  .z-pl .pl-w .prow br { display: none; }
+  .z-pl .pl-w .pl-pelne { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .z-pl .pl-w .uw:not(:empty) { margin-left: 8px; font-size: 13px; color: var(--muted); }
+  .z-pl .pl-w .uw a { color: inherit; text-underline-offset: 2px; }
+  .z-pl .pl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+}
+
+/* ---------- telefon (≤ 1023 px): Projekty i granty ----------
+   Wiersz projektu w jednej kolumnie: rodzaj i lata, tytuł, kierownik · zakład · numer, pod spodem pasek czasu na całą
+   szerokość; oś lat nad listą (te same marginesy co paski, żeby skrajne lata się mieściły). */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  /* sekcje, nagłówki i wstęp według wzorca treści na telefonie (zalecenie 14; wstęp to blok .tresc — 16 px / 1,65) */
+  .z-gr > section { padding-bottom: 30px; margin-bottom: 28px; border-bottom: 1px solid var(--line); }
+  .z-gr > section:last-of-type { padding-bottom: 0; border-bottom: 0; margin-bottom: 0; }
+  .z-gr h2 { margin: 0 0 12px; font-family: var(--f-display); font-weight: 500; font-size: 26px; line-height: 1.25; color: var(--ink); }
+  .z-gr p:not(.tresc *) { margin: 0 0 12px; font-size: 15.5px; line-height: 1.6; color: var(--text); }
+  .z-gr .os-lat { display: block; margin: 10px 0 2px; }
+  .z-gr .os-lat > span:first-child { display: none; }
+  .z-gr .tor-os { position: relative; display: block; height: 18px; margin: 0 14px; border-bottom: 1px solid var(--line); }
+  .z-gr .tor-os b { position: absolute; bottom: 3px; transform: translateX(-50%); font-size: 11.5px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .z-gr .gr-w { display: block; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .z-gr .gr-w.maly { padding: 9px 0; }
+  .z-gr .gr-w .rola { font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+  .z-gr .gr-w .imie { margin: 3px 0 2px; font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.25; }
+  .z-gr .gr-w .imie a, .z-gr .gr-t { color: var(--ink); text-decoration: none; }
+  .z-gr .gr-t { font-family: var(--f-display); font-size: 17px; line-height: 1.3; }
+  .z-gr .gr-w .kont { margin-top: 3px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .z-gr .nr { font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+  .z-gr .tor { position: relative; display: block; height: 8px; margin: 9px 14px 2px; background: color-mix(in srgb, var(--d-a) 10%, transparent); }
+  .z-gr .tor.duzy { height: 10px; }
+  .z-gr .tor .pas { position: absolute; top: 0; bottom: 0; background: var(--d-a); }
+  .z-gr .tor i { position: absolute; top: -5px; bottom: -5px; width: 0; border-left: 1.5px dashed var(--ink); }
+  .z-gr .gr-w > span:empty { display: none; }
+  .z-gr .gr-rok { margin: 24px 0 8px; font-family: var(--f-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--d-a); }
+  .z-gr .gr-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+}
+
+/* spis „Na tej stronie” (komputer): nagłówek kategorii planu nie chowa się pod przyklejonym paskiem narzędzi */
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .z-pd-tresc.z-pl .pl-kat[id] { scroll-margin-top: 76px; }
+}

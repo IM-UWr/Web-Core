@@ -1,0 +1,13 @@
+---
+// Wczytywanie zdjęcia z wyprzedzeniem, do <head> (zlecenie 21, punkt 10; dziś tylko okładka strony głównej): ten sam AVIF, który wybierze ZdjecieZ.
+// imagesrcset i imagesizes muszą być równe temu, co <Picture> wpisuje do <source type="image/avif">, inaczej przeglądarka pobierze plik dwa razy:
+// wspólne dane z zestawZdjecia, te same opcje getImage co w <Picture> i ta sama domyślna jakość. Przeglądarka bez AVIF pomija link.
+import { getImage } from 'astro:assets';
+import { zestawZdjecia } from '../lib/zdjecia';
+
+interface Props { src?: string | null; sizes: string | ((proporcje: number) => string); szerokosci?: number[]; jakosc?: number }
+const { src, sizes: rozmiar, szerokosci, jakosc = 60 } = Astro.props;
+const zestaw = src ? await zestawZdjecia(src, rozmiar, szerokosci) : undefined;
+const avif = zestaw?.meta ? await getImage({ src: zestaw.meta, format: 'avif', widths: zestaw.widths, quality: jakosc }) : undefined;
+---
+{avif && <link rel="preload" as="image" type="image/avif" imagesrcset={avif.srcSet.attribute} imagesizes={zestaw!.sizes} fetchpriority="high" />}

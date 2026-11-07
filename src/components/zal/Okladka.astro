@@ -1,0 +1,187 @@
+---
+// Okładka strony głównej na komputer (≥ 1024 px; kierunek „Założyciele”, dok/estetyka.md „Okładka”): pierwszy ekran.
+// - bez paska menu; w lewym górnym rogu logo UWr i „Wydział Matematyki / i Informatyki” (link do strony wydziału),
+//   w prawym tryb ciemny, przełącznik języka z flagą języka docelowego i hamburger (panel PanelMenu.astro: Szukaj, 4 działy
+//   z sygnetami i podstronami, duże „Aktualności” i „Rekrutacja ↗”) — zlecenie 11, zalecenia 6–8;
+// - tytuł „Instytut Matematyczny” i ciemne pole kończą się na jednym łuku koła wygiętym w stronę zdjęcia, jak „(”, 58 px za końcami
+//   nazwy wydziału i obu linii tytułu (układ liczy skrypt ULOZ niżej, zlecenie 19, punkt 2; bez JS zwykły gradient);
+// - zdjęcie gmachu przesunięte w prawo i w górę; rząd 4 działów nisko: szkic („duch” w spoczynku, po najechaniu kontur się
+//   rysuje, detale się pojawiają), nazwa i hasło (po najechaniu: patron; całe zdjęcie lekko barwi się na jasny kolor
+//   działu — zalecenie 1); nad strzałką „Szybki dostęp” przygaszone liczby (wydarzenia, seminaria, nowe aktualności —
+//   zalecenie 15); okładka albo Szybki dostęp, nigdy nic pomiędzy (src/scripts/zal/przejazd.ts, zlecenie 23, punkt 2).
+// Telefon (≤ 1023 px): zdjęcie u góry, tytuł i cztery działy jeden pod drugim z sygnetami (zal-telefon.css), bez łuku.
+import Szkic from './Szkic.astro';
+import ZdjecieZ from '../ZdjecieZ.astro';
+import Flaga from './Flaga.astro';
+import PanelMenu from './PanelMenu.astro';
+import ustawienia from '../../data/ustawienia.json';
+import { frontmatter as dzPopularyzacja } from '../../data/popularyzacja.md';
+import { menuGlowne } from '../../lib/menu';
+import { liczbyNaOkladke } from '../../lib/tresci';
+import { polaDzialu } from '../../lib/tekstyStron';
+import { rozmiarOkl } from '../../lib/zdjecia';
+import { MQ_TELEFON } from '../../lib/media';
+import { u, isExternal } from '../../lib/url';
+import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES } from '../../lib/i18n';
+import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
+import type { Lang } from '../../lib/daty';
+
+interface Props { lang: Lang; inny: string | null; cel?: string; licznik?: string }
+const { lang, inny, cel = '#szybki-dostep', licznik } = Astro.props;
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const menu = await menuGlowne();
+// pola stron działów (zlecenie 30: src/data/<dział>.md w repozytoriach działów)
+const DANE: Record<Dzial, any> = { instytut: polaDzialu('instytut'), nauka: polaDzialu('nauka'), studia: polaDzialu('studia'), popularyzacja: dzPopularyzacja };
+const dzialy = DZIALY.map((dz) => {
+  const P = PATRONI[dz];
+  const m = menu.find((p) => p.adres === P.adres);
+  return {
+    dz, P,
+    nazwa: (m && (wybierz(m, 'etykieta', lang) as string)) || pole(P, 'nazwa', lang),
+    // hasło z danych działu (to samo co w banerze na telefonie), a gdy puste — z prototypu
+    haslo: (wybierz(DANE[dz], 'haslo', lang) as string) || pole(P, 'haslo', lang),
+  };
+});
+const baner = ustawienia.baner;
+const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');
+// górna linia: logo UWr i nazwa wydziału w dwóch liniach („Wydział Matematyki / i Informatyki”), link do strony wydziału
+const [wydz1, wydz2] = wydzialLinie(lang);
+const wmiAdres = WMI_ADRES;
+const doJezyka = lang === 'pl' ? 'en' : 'pl';
+// liczby nad „Szybkim dostępem” (zalecenie 15): pozycja z zerem znika; odmiana jak w prototypie (1 / 2–4 / 5+, bez 12–14)
+const odm = (n: number, f: [string, string, string]) => (n === 1 ? f[0] : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? f[1] : f[2]);
+const ile = await liczbyNaOkladke(lang);
+const FORMY: Record<'wyd' | 'sem' | 'akt', { pl: [string, string, string]; en: [string, string] }> = {
+  wyd: { pl: ['wydarzenie', 'wydarzenia', 'wydarzeń'], en: ['event', 'events'] },
+  sem: { pl: ['seminarium', 'seminaria', 'seminariów'], en: ['seminar', 'seminars'] },
+  akt: { pl: ['nowa aktualność', 'nowe aktualności', 'nowych aktualności'], en: ['new post', 'new posts'] },
+};
+const liczby = (['wyd', 'sem', 'akt'] as const).filter((k) => ile[k] > 0).map((k) => ({
+  key: k, n: ile[k], tekst: lang === 'en' ? FORMY[k].en[ile[k] === 1 ? 0 : 1] : odm(ile[k], FORMY[k].pl),
+}));
+// Zalecenie 28 (zlecenie 14): każde pokazanie strony głównej zeruje „pierwsze wejście” do działów — czyści
+// sessionStorage „im-wizyta-dzialy” (NaglowekZ.astro), więc następne wejście do działu znowu rysuje szkic i podpis.
+// Dopiero gdy strona jest naprawdę pokazana: w czasie wczytywania z wyprzedzeniem (prerender po najechaniu na link)
+// czekamy na prerenderingchange; także powrót „wstecz” z pamięci przeglądarki (pageshow z persisted). Zestaw ciekawostek
+// wizyty („im-ciek-zestaw”) zostaje.
+const ZERUJ = `(function(){function z(){try{sessionStorage.removeItem('im-wizyta-dzialy')}catch(e){}}` +
+  `if(document.prerendering)document.addEventListener('prerenderingchange',z,{once:true});else z();` +
+  `addEventListener('pageshow',function(e){if(e.persisted)z()})})();`;
+// Stałe łuku okładki (zlecenie 19, punkt 2), osobno dla każdego języka. Żeby zmienić układ, wystarczy zmienić te liczby, wzorów nie trzeba ruszać.
+// ODSTEP: o ile px łuk przechodzi za końcami napisów przy Full HD, skrypt mnoży go przez skalę s (wspólne). MAT: stopień mniejszego słowa / stopień większego („Matematyczny” / „Instytut”,
+// EN „Mathematical” / „Institute”). ODST: odstęp między liniami / stopień większego słowa. K: wygięcie, czyli nachylenie odcinka marka→koniec
+// pierwszej linii = K × nachylenie odcinka między końcami linii (K = 1 daje prostą). GORA: góra tytułu / wysokość okładki.
+const ODSTEP = 58;
+const UKLAD = {
+  pl: { MAT: 0.62, ODST: 0.23, K: 0.6, GORA: 0.29 },
+  en: { MAT: 0.55, ODST: 0.23, K: 0.6, GORA: 0.29 },
+};
+// Blok tytułu i łuk (komputer), w linii na końcu okładki, zanim strona się narysuje (zlecenie 13, punkt 5), potem przy zmianie rozmiaru i po
+// wczytaniu krojów. Ciemne pole kończy się łukiem koła wygiętym w stronę zdjęcia, jak „(”, 58 px za końcami trzech napisów: nazwy wydziału
+// w marce, „Instytut” i „Matematyczny”. W dół łuk zawsze idzie w prawo: środek koła leży z prawej i nie niżej niż środek marki.
+// Skala okładki (zlecenie 26, punkt 1): okładka jest jedną kompozycją zaprojektowaną na Full HD, s = min(szerokość okna / 1920, wysokość okna / 950).
+// Skrypt liczy s raz i ustawia je na <html> jako --z-s (i --z-k = s, ale nie mniej niż 1); z --z-s CSS buduje rozmiary marki i rzędu działów, tu mnoży przez nie odstępy łuku.
+// Przy s = 1 wszystko jak przed zmianą. Na telefonie skali nie ma. Liczone także przy schowanej okładce (html.bez-okladki), bo z --z-k korzysta drugi ekran (zlecenie 26, punkt 2).
+// Ręczne powiększanie (Ctrl +, WCAG 1.4.4; zlecenie 26, punkt 2): skala liczona z samego okna w CSS trzymałaby stały rozmiar na ekranie, więc Ctrl + by nie działał. Dlatego przy powiększeniu z
+// skala powstaje z rozmiaru okna sprzed powiększenia (szerokość × z, wysokość × z) i powiększenie mnoży ją jak na każdej innej stronie. Górny limit: po skali zostaje co najmniej 1366 px szerokości
+// projektu, bo od tej szerokości nie zmieniają się progi układu liczone od okna. Skala systemu nie zmienia z, wygląd zależy wtedy od wielkości monitora.
+// Skąd z: Chrome, Edge i (według dokumentacji, niesprawdzone) Safari z outerWidth / innerWidth, ponad 5% różnicy. W Firefoksie outerWidth rośnie razem ze stroną (sprawdzone, Firefox 159), więc tam
+// z = devicePixelRatio / devicePixelRatio przy 100%, zapamiętany w localStorage razem z fizyczną szerokością ekranu; inny ekran zaczyna zapis od nowa.
+// 1. Stopnie i odstęp liczone ze stałych i szerokości słów przy 100 px (0,49 to połowa line-height 0,98, czyli środek linii); po polsku duże jest
+//    pierwsze słowo, po angielsku drugie. 2. Gdy tytuł (+ 24 px) wypada niżej niż szkice działów, top idzie w górę, ale nie wyżej niż dół marki + 40 px
+//    (stopnie zależą od top liniowo, więc wystarczy jedno przeliczenie). 3. Koło przez trzy prawdziwe końce napisów. 4. Ciemne pole (--skos) i maska
+//    (--skos-maska), żeby na prawo od środka koła nic się nie przyciemniało. 5. Lewa krawędź zdjęcia schowana w ciemnym polu (--foto-x).
+// Gdyby koło wyszło złe (nie powinno się zdarzyć), zostaje dawny skos o nachyleniu 0,32. Bez JS zwykły gradient z CSS.
+// Kadr zdjęcia (zlecenie 18, punkt 13), ta sama kompozycja na każdym ekranie. Środek budynku Instytutu leży na 47% wysokości zdjęcia.
+// Komputer: szerokość tak, by przy prawej krawędzi ekranu wypadało 92% zdjęcia, ale zdjęcie sięga pełnego granatu u dołu (77% wysokości
+// okładki); środek budynku na 34,5% wysokości okładki, u góry bez pustego miejsca. Telefon: rozmiar i poziomo w CSS (zal-telefon.css), tu
+// tylko pionowo: środek budynku w połowie między dolną krawędzią paska a górą liter „Instytut”; okładka sięga pod pasek, więc jego wysokość też się liczy (zlecenie 23, punkt 4). Bez JS kadr z CSS.
+const OSTRZEZ = import.meta.env.DEV ? `console.warn('Okładka: łuk poza zakresem, zostaje skos',cx,cy,R);` : '';
+const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)'),rt=document.documentElement;` +
+  `function powiekszenie(){var r=outerWidth/innerWidth;if(outerWidth&&(r>1.05||r<.95))return r;var d=devicePixelRatio,e=Math.round(screen.width*d),b;try{b=JSON.parse(localStorage.getItem('im-dpr-100'))}catch(x){}` +
+  `if(!b||b.e!==e){b={e:e,d:d};try{localStorage.setItem('im-dpr-100',JSON.stringify(b))}catch(x){}}r=d/b.d;return r>1.05||r<.95?r:1}` +
+  `function skala(){var W=innerWidth,H=innerHeight,z=powiekszenie(),s=Math.min(W*z/1920,H*z/950);if(z>1)s=Math.min(s,Math.max(1,W/1366));rt.style.setProperty('--z-s',s);rt.style.setProperty('--z-k',Math.max(1,s));return s}` +
+  `function uloz(){var tel=matchMedia('${MQ_TELEFON}').matches,sk=1;if(tel){rt.style.removeProperty('--z-s');rt.style.removeProperty('--z-k')}else sk=skala();if(!ok.offsetHeight)return;var ODSTEP=${ODSTEP}*sk;` +
+  `if(tel){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
+  `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
+  `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
+  // szerokość słowa przy 100 px, ukryta miarka w stylu h1
+  `function szer(el){var m=document.createElement('span');m.textContent=el.textContent;m.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;letter-spacing:-.012em';h1.appendChild(m);var v=m.getBoundingClientRect().width/100;h1.removeChild(m);return v}` +
+  `var w_1=szer(w1),w_2=szer(w2),c=u-lewa-ODSTEP;` +
+  // stopnie i odstęp dla danego top
+  `function licz(top){var s,F;if(EN){s=(w_2-w_1*U.MAT)/(.49*U.MAT+U.ODST+.49);F=(c+U.K*s*(top-yM))/(w_1*U.MAT-.49*U.MAT*U.K*s);return{f1:U.MAT*F,f2:F,od:U.ODST*F}}` +
+  `s=(w_2*U.MAT-w_1)/(.49*(1+U.MAT)+U.ODST);F=(U.K*s*(top-yM)+c)/(w_1-.49*U.K*s);return{f1:F,f2:U.MAT*F,od:U.ODST*F}}` +
+  `function dol(t){var m=licz(t);return t+.98*m.f1+m.od+.98*m.f2}` +
+  // tytuł nad szkicami działów
+  `var top=U.GORA*H,d=sz?dol(top)+24*sk-(sz.getBoundingClientRect().top-o.top):0;if(d>0)top=Math.max(rm.bottom-o.top+40*sk,top-d/(dol(top)-dol(top-1)));` +
+  `var m=licz(top);tyt.style.setProperty('--f1',m.f1+'px');tyt.style.setProperty('--f2',m.f2+'px');tyt.style.setProperty('--w2-odst',m.od+'px');tyt.style.setProperty('--tyt-top',top+'px');` +
+  // koło przez trzy końce napisów
+  `function kon(el){var r=el.getBoundingClientRect();return[r.right-o.left+ODSTEP,(r.top+r.bottom)/2-o.top]}` +
+  `var p1=kon(w1),p2=kon(w2),ax=u,ay=yM,bx=p1[0],by=p1[1],gx=p2[0],gy=p2[1],a2=ax*ax+ay*ay,b2=bx*bx+by*by,g2=gx*gx+gy*gy,D=2*(ax*(by-gy)+bx*(gy-ay)+gx*(ay-by)),` +
+  `cx=(a2*(by-gy)+b2*(gy-ay)+g2*(ay-by))/D,cy=(a2*(gx-bx)+b2*(ax-gx)+g2*(bx-ax))/D,R=Math.hypot(ax-cx,ay-cy),g='rgb(9 16 34',X;` +
+  `function luk(y){return cx-Math.sqrt(Math.max(0,R*R-(y-cy)*(y-cy)))}` +
+  `if(isFinite(R)&&cx>ax&&cx>bx&&cx>gx&&cy<=yM+1){` +
+  `ok.style.setProperty('--skos','radial-gradient(circle at '+cx.toFixed(1)+'px '+cy.toFixed(1)+'px, '+g+' / 0) '+(R-30*sk).toFixed(1)+'px, '+g+' / .62) '+R.toFixed(1)+'px, '+g+' / .97) '+(R+30*sk).toFixed(1)+'px)');` +
+  `ok.style.setProperty('--skos-maska','linear-gradient(90deg, #000 '+cx.toFixed(1)+'px, transparent '+cx.toFixed(1)+'px)');X=Math.max(0,Math.min(koniec,luk(0))-130*sk);` +
+  `}else{${OSTRZEZ}` +
+  // dawny skos: prosta o nachyleniu S od końca pierwszej linii
+  `var S=.32,od=Math.max(24,m.f1*.34),zanik=Math.max(90,W*.06),x0=bx-ODSTEP-S*by+od*Math.sqrt(1+S*S),nl=Math.hypot(1,S),n=[1/nl,-S/nl],kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
+  `ok.style.setProperty('--skos','linear-gradient('+kat.toFixed(2)+'deg, '+g+' / .97) 0px, '+k.map(function(q){return g+' / '+q[1]+') '+(t1+q[0]*zanik).toFixed(1)+'px'}).join(', ')+')');ok.style.removeProperty('--skos-maska');X=Math.max(0,x0-150)}` +
+  `var r=f&&(f.getAttribute('width')/f.getAttribute('height')||f.naturalWidth/f.naturalHeight);ok.style.setProperty('--foto-x',X+'px');` +
+  `if(r){var Sz=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',Sz+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*Sz/r)+'px');ok.classList.add('z-kadr')}` +
+  `ok.classList.add('z-ulozona')}` +
+  // resize: skala zależy od okna także wtedy, gdy okładka jest schowana albo się nie zmienia (niskie okno, wysokość okładki co najmniej 600 px)
+  `uloz();if(f)f.addEventListener('load',uloz);addEventListener('resize',uloz);addEventListener('pageshow',uloz);document.addEventListener('prerenderingchange',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
+---
+{/* Odświeżenie i powrót „wstecz” z Szybkiego dostępu, a także adres #szybki-dostep: okładkę chowamy przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
+    Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px zmyliłoby przewinięcie do kotwicy. */}
+<script is:inline set:html={`if(location.hash!=='#okladka'){var zk=document.documentElement.classList;if(location.hash)zk.add('bez-wejscia');if(location.hash==='#szybki-dostep'||(history.state&&history.state.zBezOkladki))zk.add('bez-okladki','bez-wejscia')}`} />
+<section class="z-okladka" id="okladka" data-pagefind-ignore>
+  {/* zdjęcie z astro:assets: AVIF/WebP w kilku szerokościach (rozmiarOkl) i malutka rozmyta wersja pod spodem (zlecenie 13, punkt 6) */}
+  {baner.zdjecie && <ZdjecieZ class="z-okl-foto" src={baner.zdjecie} alt={wybierz(baner, 'opis', lang) || ''} sizes={rozmiarOkl} loading="eager" fetchpriority="high" zastepczy szybkieWejscie />}
+  {/* zalecenie 1: po najechaniu na dział zdjęcie lekko barwi się na jasny kolor działu (okladka.ts) */}
+  <span class="z-barwa" aria-hidden="true"></span>
+  <div class="z-skos" aria-hidden="true"></div>
+  <a class="z-okl-marka" href={wmiAdres}>
+    {/* znak wydziału jak logo: bez widocznej ↗ (wyjątek z zalecenia 23), dopisek tylko dla czytników ekranu */}
+    {isExternal(wmiAdres) && <span class="sr-only">{lang === 'en' ? '(external site) ' : '(inna strona) '}</span>}
+    <span class="z-okl-logo" role="img" aria-label={lang === 'en' ? 'University of Wrocław' : 'Uniwersytet Wrocławski'} style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
+    <span>{wydz1}{wydz2 && <><br />{wydz2}</>}</span>
+  </a>
+  <nav class="z-narz" aria-label={lang === 'en' ? 'Tools' : 'Narzędzia'}>
+    <button type="button" data-motyw aria-label={t(lang, 'motyw')}>
+      <svg class="z-ks" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+      <svg class="z-sl" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+    </button>
+    {inny && <a class="z-jezyk" href={u(inny)} hreflang={doJezyka} lang={doJezyka} aria-label={t(lang, 'innyJezyk')}><Flaga jezyk={doJezyka} />{t(lang, 'innyJezykKrotko')}</a>}
+    <button type="button" class="z-burger" aria-label={t(lang, 'otworzMenu')} aria-expanded="false" aria-controls="z-menu" data-z-menu-otworz><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+  </nav>
+  <PanelMenu lang={lang} id="z-menu" sciezka="/" />
+  <div class="z-okl-tytul">
+    <h1><span class="w1">{slowo1}</span> <span class="w2">{reszta.join(' ')}</span></h1>
+  </div>
+  <div class="z-okl-dzialy">
+    {dzialy.map((d) => (
+      <a class="z-okl-dz" href={href(d.P.adres)} data-dzial={d.dz}>
+        <span class="z-okl-szkic"><Szkic dzial={d.dz} rodzaj="pelny" duch /></span>
+        {/* telefon: zamiast pełnego szkicu uproszczony sygnet */}
+        <Szkic dzial={d.dz} rodzaj="sygnet" class="z-okl-sygnet" />
+        <span class="z-okl-nazwa"><span data-t={d.nazwa}>{d.nazwa}</span></span>
+        <span class="slot">
+          <span class="haslo-dz">{d.haslo}</span>
+          <span class="patron"><b>{d.P.patron}</b>{d.P.lata}. {pole(d.P, 'fakt', lang)}</span>
+        </span>
+      </a>
+    ))}
+  </div>
+  {/* zalecenie 15: liczby nad „Szybkim dostępem” (przygaszone); kliknięcie — przejazd na drugi ekran i podświetlenie kolumny */}
+  {liczby.length > 0 && (
+    <div class="z-okl-liczby" role="group" aria-label={lang === 'en' ? 'At a glance' : 'W skrócie'}>
+      {liczby.map((l) => <a href={`#z-h-${l.key}`} data-kol={l.key}><b>{l.n}</b> {l.tekst}</a>)}
+    </div>
+  )}
+  <a class="z-strzalka" href={cel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>{lang === 'en' ? 'Quick access' : 'Szybki dostęp'}{licznik && ` · ${licznik}`}</a>
+  <script is:inline set:html={ULOZ} />
+  <script is:inline set:html={ZERUJ} />
+</section>
+<script>import '../../scripts/zal/okladka'; import '../../scripts/zal/menu'; import '../../scripts/zal/przejazd';</script>

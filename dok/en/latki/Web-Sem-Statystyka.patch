@@ -1,0 +1,199 @@
+diff --git a/.pages.yml b/.pages.yml
+index 559fffb..15502e6 100644
+--- a/.pages.yml
++++ b/.pages.yml
+@@ -103,6 +103,9 @@ content:
+   - name: afiliacja
+     label: Afiliacja
+     type: string
++  - name: afiliacja_en
++    label: 'EN: afiliacja (puste = wersja angielska pokaże afiliację po polsku)'
++    type: string
+   - name: termin
+     label: Termin
+     type: date
+@@ -113,6 +116,9 @@ content:
+   - name: sala
+     label: Sala
+     type: string
++  - name: sala_en
++    label: 'EN: sala (opis miejsca po angielsku, gdy to nie numer sali; puste = wersja angielska pokaże salę po polsku)'
++    type: string
+   - name: pliki
+     label: Pliki (slajdy itp.)
+     type: object
+@@ -131,3 +137,6 @@ content:
+     type: code
+     options:
+       format: markdown
++  - name: tresc_en
++    label: 'EN: streszczenie (Markdown, wzory w $...$; puste = wersja angielska pokaże streszczenie z pola wyżej)'
++    type: text
+diff --git a/src/content/referaty/statystyka/2026-06-22-bogdan.md b/src/content/referaty/statystyka/2026-06-22-bogdan.md
+index 7c9d13a..8c78f76 100644
+--- a/src/content/referaty/statystyka/2026-06-22-bogdan.md
++++ b/src/content/referaty/statystyka/2026-06-22-bogdan.md
+@@ -2,9 +2,11 @@
+ tytul: "From Structured Sparsity to Causal Effects: GSLOPE, PCGLASSO, and SLOPE-Based Doubly Robust Inference"
+ prelegent: "Małgorzata Bogdan"
+ afiliacja: "IM UWr"
++afiliacja_en: "Mathematical Institute, University of Wrocław"
+ termin: "2026-06-22T11:15"
+ sala: "602"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-22-grzesiak.md b/src/content/referaty/statystyka/2026-06-22-grzesiak.md
+index 9f32db1..651c350 100644
+--- a/src/content/referaty/statystyka/2026-06-22-grzesiak.md
++++ b/src/content/referaty/statystyka/2026-06-22-grzesiak.md
+@@ -2,9 +2,11 @@
+ tytul: "Evaluating Imputation Methods"
+ prelegent: "Krystyna Grzesiak"
+ afiliacja: "IM UWr"
++afiliacja_en: "Mathematical Institute, University of Wrocław"
+ termin: "2026-06-22T11:30"
+ sala: "602"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-22-kos.md b/src/content/referaty/statystyka/2026-06-22-kos.md
+index 4debd4d..3c25953 100644
+--- a/src/content/referaty/statystyka/2026-06-22-kos.md
++++ b/src/content/referaty/statystyka/2026-06-22-kos.md
+@@ -2,9 +2,11 @@
+ tytul: "FDR Control via Sorted L-One Penalized Estimator (SLOPE) Method"
+ prelegent: "Michał Kos"
+ afiliacja: "IM UWr"
++afiliacja_en: "Mathematical Institute, University of Wrocław"
+ termin: "2026-06-22T11:00"
+ sala: "602"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-22-nowakowski.md b/src/content/referaty/statystyka/2026-06-22-nowakowski.md
+index 872226d..9a784ea 100644
+--- a/src/content/referaty/statystyka/2026-06-22-nowakowski.md
++++ b/src/content/referaty/statystyka/2026-06-22-nowakowski.md
+@@ -2,9 +2,11 @@
+ tytul: "missKnockoffs: A Model-X Knockoff Framework for Variable Selection with Missing Data"
+ prelegent: "Dominik Nowakowski"
+ afiliacja: "Uniwersytet Medyczny w Białymstoku"
++afiliacja_en: "Medical University of Białystok"
+ termin: "2026-06-22T11:45"
+ sala: "602"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-24-bochenek.md b/src/content/referaty/statystyka/2026-06-24-bochenek.md
+index dc35fa1..e2db85e 100644
+--- a/src/content/referaty/statystyka/2026-06-24-bochenek.md
++++ b/src/content/referaty/statystyka/2026-06-24-bochenek.md
+@@ -2,9 +2,11 @@
+ tytul: "Network flow methods for alignment and deconvolution of multidimensional spectra"
+ prelegent: "Maria Bochenek"
+ afiliacja: "MIM UW"
++afiliacja_en: "Faculty of Mathematics, Informatics and Mechanics, University of Warsaw"
+ termin: "2026-06-24T11:15"
+ sala: "605"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-24-linke.md b/src/content/referaty/statystyka/2026-06-24-linke.md
+index 391add0..c5a97f6 100644
+--- a/src/content/referaty/statystyka/2026-06-24-linke.md
++++ b/src/content/referaty/statystyka/2026-06-24-linke.md
+@@ -2,9 +2,11 @@
+ tytul: "What Counts as Significant? Lessons from Applied Proteomics"
+ prelegent: "Vanessa Linke"
+ afiliacja: "Międzynarodowy Instytut Biologii Molekularnej i Komórkowej"
++afiliacja_en: "International Institute of Molecular and Cell Biology in Warsaw"
+ termin: "2026-06-24T12:00"
+ sala: "605"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-24-pokora.md b/src/content/referaty/statystyka/2026-06-24-pokora.md
+index 0ee4f7b..069a518 100644
+--- a/src/content/referaty/statystyka/2026-06-24-pokora.md
++++ b/src/content/referaty/statystyka/2026-06-24-pokora.md
+@@ -2,9 +2,11 @@
+ tytul: "Adaptive Bayesian SLOPE"
+ prelegent: "Joanna Pokora"
+ afiliacja: "IM UWr"
++afiliacja_en: "Mathematical Institute, University of Wrocław"
+ termin: "2026-06-24T11:00"
+ sala: "605"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-24-staniak.md b/src/content/referaty/statystyka/2026-06-24-staniak.md
+index 0ad64e9..d37d73a 100644
+--- a/src/content/referaty/statystyka/2026-06-24-staniak.md
++++ b/src/content/referaty/statystyka/2026-06-24-staniak.md
+@@ -2,9 +2,11 @@
+ tytul: "Modeling Hydrogen-Deuterium Exchange Mass Spectrometry data via convolutions of exchange probabilities"
+ prelegent: "Mateusz Staniak"
+ afiliacja: "IM UWr"
++afiliacja_en: "Mathematical Institute, University of Wrocław"
+ termin: "2026-06-24T11:30"
+ sala: "605"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-06-24-tracz.md b/src/content/referaty/statystyka/2026-06-24-tracz.md
+index fc668fe..85fcd72 100644
+--- a/src/content/referaty/statystyka/2026-06-24-tracz.md
++++ b/src/content/referaty/statystyka/2026-06-24-tracz.md
+@@ -2,9 +2,11 @@
+ tytul: "Challenges of AP-MS data interpretation in biological relevance driven studies"
+ prelegent: "Michał Tracz"
+ afiliacja: "Wydział Biotechnologii UWr"
++afiliacja_en: "Faculty of Biotechnology, University of Wrocław"
+ termin: "2026-06-24T11:45"
+ sala: "605"
+ opublikowany: true
++tresc_en: "Abstract in the [seminar materials](/aktualnosci/2026-06-19-seminarium-ze-statystyki)."
+ ---
+ 
+ Streszczenie w [materiałach seminarium](/aktualnosci/2026-06-19-seminarium-ze-statystyki).
+diff --git a/src/content/referaty/statystyka/2026-10-13-morzywolek.md b/src/content/referaty/statystyka/2026-10-13-morzywolek.md
+index e2368a0..18734a4 100644
+--- a/src/content/referaty/statystyka/2026-10-13-morzywolek.md
++++ b/src/content/referaty/statystyka/2026-10-13-morzywolek.md
+@@ -2,6 +2,7 @@
+ tytul: "Beyond Average Treatment Effects: Variable Importance for Treatment Effect Heterogeneity"
+ prelegent: "Paweł Morzywołek"
+ afiliacja: "Uniwersytet Kopenhaski"
++afiliacja_en: "University of Copenhagen"
+ termin: "2026-10-13T14:15"
+ sala: "603"
+ opublikowany: true
+diff --git a/src/content/referaty/statystyka/test-2026-11-03-mister-test.md b/src/content/referaty/statystyka/test-2026-11-03-mister-test.md
+index c7b3f3c..35dfb9c 100644
+--- a/src/content/referaty/statystyka/test-2026-11-03-mister-test.md
++++ b/src/content/referaty/statystyka/test-2026-11-03-mister-test.md
+@@ -2,6 +2,7 @@
+ tytul: "Testowe: Conformal prediction for high-dimensional regression with missing covariates"
+ prelegent: "Mister Test"
+ afiliacja: "Uniwersytet Test"
++afiliacja_en: "Test University"
+ termin: "2026-11-03T14:15"
+ sala: "603"
+ opublikowany: true

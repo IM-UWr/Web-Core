@@ -94,7 +94,7 @@ Na stronie każdego seminarium jest formularz „Powiadomienia e-mail”. Zapisa
 - Zapis z podwójnym potwierdzeniem: adres trafia na listę dopiero po kliknięciu linku w e-mailu (nikt nie zapisze cudzego adresu).
 - Duplikaty: wielkość liter jest ignorowana zawsze; kropki i dopiski `+coś` — tylko w adresach Gmaila (`gmail.com`, `googlemail.com`), bo tylko Gmail je ignoruje. Ten sam adres w kilku wersjach dostanie wiadomość raz.
 - Wysyłka: skrypt co 10 minut czyta `/seminaria/powiadomienia.json` (generowany przez stronę). Nowy, przyszły i opublikowany referat → wiadomość do zapisanych (po 15 minutach od pojawienia się, żeby zdążyć poprawić literówki). Referaty dodane po fakcie nie są ogłaszane.
-- Linki z wiadomości prowadzą na stronę `/powiadomienia/` (potwierdzenie zapisu, wypisanie przyciskiem).
+- Linki z wiadomości prowadzą na stronę `/en/powiadomienia/` (potwierdzenie zapisu, wypisanie przyciskiem). Dwujęzyczna `/powiadomienia/` zostaje dla linków z wiadomości wysłanych wcześniej.
 - Limity Google: konto Gmail ok. 100 odbiorców dziennie, konto Google Workspace ok. 1500. Gdy limit się skończy, skrypt dokończy wysyłkę następnego dnia. Do większych list najlepiej osobne konto Workspace Instytutu (np. seminaria@…).
 
 ### Instalacja (jednorazowo, ok. 10 minut)

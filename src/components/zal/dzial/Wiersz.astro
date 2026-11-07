@@ -1,0 +1,37 @@
+---
+// Wiersz listy na stronie działu (komputer; TrescDzialu.astro): duży dzień Brygadą w kolorze działu, pod nim „mie rrrr”,
+// obok mała etykieta (rodzaj albo zakres dat · miejsce), tytuł i zajawka. Z adresem cały wiersz jest klikalny
+// (link w tytule; zewnętrzny z ↗). Używany w „Konferencjach” (Nauka) i „Aktualnościach dla studentów” (Studia).
+import Link from '../../Link.astro';
+import { u, isExternal } from '../../../lib/url';
+import { wJezyku } from '../../../lib/i18n';
+import { dayNum, monthShort, parse, type Lang } from '../../../lib/daty';
+
+interface Props {
+  data: string;
+  lang: Lang;
+  etykieta?: string;
+  tytul: string;
+  adres?: string;
+  zajawka?: string;
+  odwolana?: boolean;
+}
+const { data, lang, etykieta, tytul, adres, zajawka, odwolana = false } = Astro.props;
+const en = lang === 'en';
+const zew = !!adres && isExternal(adres);
+const href = adres ? (zew ? adres : u(wJezyku(adres, lang))) : undefined;
+---
+<article class:list={['z-dz-wiersz', href && 'z-dz-klik']}>
+  <time class="dz" datetime={data.slice(0, 10)}>{dayNum(data)}<small>{monthShort(data, lang)} {parse(data).y}</small></time>
+  <div>
+    {(etykieta || odwolana) && (
+      <div class="rodz">{etykieta}{odwolana && <span class="odw">{en ? 'cancelled' : 'odwołana'}</span>}</div>
+    )}
+    <h3>
+      {href ? (
+        <Link href={href}>{tytul}</Link>
+      ) : tytul}
+    </h3>
+    {zajawka && <p>{zajawka}</p>}
+  </div>
+</article>

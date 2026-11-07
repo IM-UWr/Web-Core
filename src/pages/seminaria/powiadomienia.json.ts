@@ -2,7 +2,7 @@
 // Automat co kilka minut pobiera ten plik i wysyła wiadomość do zapisanych na listę danego seminarium,
 // gdy pojawi się nowy (opublikowany, przyszły) referat. Adres: /seminaria/powiadomienia.json
 import type { APIRoute } from 'astro';
-import { referaty, seminaria, seminariumReferatu, slugOf, sala } from '../../lib/tresci';
+import { referaty, seminaria, seminariumReferatu, slugOf, sala, salaReferatu, afiliacjaReferatu } from '../../lib/tresci';
 import { absolute } from '../../lib/url';
 import { addDays, today } from '../../lib/daty';
 
@@ -40,10 +40,10 @@ export const GET: APIRoute = async ({ site }) => {
         seminarium: semId,
         tytul: r.data.tytul,
         prelegent: r.data.prelegent,
-        afiliacja: r.data.afiliacja ?? '',
+        afiliacja: afiliacjaReferatu(r.data, 'en') ?? '',
         termin: r.data.termin, // czas lokalny Warszawy: RRRR-MM-DD lub RRRR-MM-DDTGG:MM
-        sala: sala(r.data.sala, 'en') ?? '',
-        streszczenie: tekst(r.body),
+        sala: sala(salaReferatu(r.data, 'en'), 'en') ?? '',
+        streszczenie: tekst(r.data.tresc_en?.trim() || r.body),
         adres: absolute(`/en/seminaria/${semId}`, site) + '#' + slugOf(r.id),
       };
     });
