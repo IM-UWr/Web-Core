@@ -23,7 +23,7 @@ import Galeria from '../components/Galeria.tsx';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, langPola } from '../lib/i18n';
-import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, type Lang } from '../lib/daty';
+import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, time, type Lang } from '../lib/daty';
 import { slugOf, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
 import { zdjecie } from '../lib/zdjecia';
@@ -48,6 +48,11 @@ const href = (a: string) => (isExternal(a) ? a : u(a));
 const typPliku = (a: string) => (isExternal(a) && !/\.[a-z0-9]{2,5}$/i.test(a.split(/[?#]/)[0]) ? (en ? 'website' : 'strona') : (a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i)?.[1] ?? '').toUpperCase());
 // karta: zdjęcie nie większe niż plik (małe zdjęcia, np. 400 px, były rozciągane)
 const zKarta = !!d.zdjecie || !!wydarzenie;
+// „Kiedy” w karcie: wydarzenie jednodniowe — dzień i data, a godziny „10:00–14:00” w jednym kawałku, bez łamania przy kresce
+// (zlecenie 27, punkt 6.3); kilkudniowe — przedział dat jak dotąd
+const kilkaDni = !!wydarzenie?.koniec && wydarzenie.koniec.slice(0, 10) !== wydarzenie.poczatek.slice(0, 10);
+const godzOd = wydarzenie && hasTime(wydarzenie.poczatek) ? time(wydarzenie.poczatek) : '';
+const godzDo = wydarzenie?.koniec && hasTime(wydarzenie.koniec) ? time(wydarzenie.koniec) : '';
 const szerPliku = (await zdjecie(d.zdjecie))?.width;
 const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}` : '';
 ---
@@ -64,7 +69,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
         <span class:list={['akt-wyd-data', { minione: minelo && !oWydarzeniu }]} aria-hidden="true">{dayNum(wydarzenie.poczatek)}<small>{monthShort(wydarzenie.poczatek, lang)} {parse(wydarzenie.poczatek).y}</small></span>
         <dl class="para">
           <dt>{t(lang, 'kiedy')}</dt>
-          <dd>{wydarzenie.koniec && wydarzenie.koniec.slice(0, 10) !== wydarzenie.poczatek.slice(0, 10) ? range(wydarzenie.poczatek, wydarzenie.koniec, lang) : longWithDay(wydarzenie.poczatek, lang) + (wydarzenie.koniec && hasTime(wydarzenie.koniec) ? `–${wydarzenie.koniec.slice(11, 16)}` : '')}</dd>
+          <dd>{kilkaDni ? range(wydarzenie.poczatek, wydarzenie.koniec, lang) : <>{longWithDay(wydarzenie.poczatek.slice(0, 10), lang)}{godzOd && ', '}{(godzOd || godzDo) && <span class="akt-godz">{godzOd}{godzDo && `–${godzDo}`}</span>}</>}</dd>
           {wydarzenie.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{wydarzenie.miejsce}</dd></>}
         </dl>
         {/* bez przycisku „Dodaj do kalendarza” (decyzja: nigdzie na stronie); zostaje stan: trwa / odbyło się */}
@@ -135,6 +140,7 @@ const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIO
 </Podstrona>
 
 <style>
+  .akt-godz { white-space: nowrap; }
   .akt-meta span:not(:first-child) { color: var(--muted); }
   .akt-meta { margin-bottom: 8px; }
 

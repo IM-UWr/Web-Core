@@ -16,7 +16,7 @@ const { haslo, bundle, teksty } = await daneWyszukiwarki(lang);
 <Baza tytul={t(lang, 'szukaj')} szukaj={false}>
   <link slot="head" rel="stylesheet" href={u('/pagefind/pagefind-ui.css')} />
   <NaglowekStrony tytul={t(lang, 'szukajNaStronie')} haslo={haslo} lang={lang} okruszki={[{ etykieta: t(lang, 'szukaj') }]} />
-  <div class="wrap" style="padding-top:28px;padding-bottom:72px">
+  <div class="z-w-kolumnie" style="padding-top:28px;padding-bottom:72px">
     <div id="szukajka" style="max-width:900px"></div>
     <noscript><p>{lang === 'en' ? 'Search requires JavaScript.' : 'Wyszukiwarka wymaga włączonej obsługi JavaScript.'}</p></noscript>
   </div>

@@ -538,6 +538,10 @@
   .z-stopka a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
   .z-stopka nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
   .z-autor { padding-left: 18px; border-left: 1px solid rgb(255 255 255 / .2); color: rgb(201 208 222 / .75); }
+
+  /* treść stron bez szablonu podstrony (Szukaj, 404) w linii kolumny strony, jak tytuł w nagłówku, pasek i stopka (zlecenie 27,
+     punkt 6.2; wcześniej .wrap z --gutter, który przy 1024–1280 px stał 8–20 px w lewo od tytułu, a przy 1920 px 20 px w prawo) */
+  .z-w-kolumnie { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); padding-inline: var(--marg); }
 }
 
 /* ---------- najechanie tam, gdzie zmiana koloru nic nie daje (zlecenie 13, punkt 10) ----------

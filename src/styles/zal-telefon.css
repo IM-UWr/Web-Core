@@ -80,6 +80,9 @@
   }
 
 
+  /* treść Szukaj i 404 w linii tytułu nagłówka (zlecenie 27, punkt 6.2; zalozyciele.css) */
+  .z-w-kolumnie { padding-inline: 16px; }
+
   /* ---------- stopka ---------- */
   .z-stopka { padding: 18px 16px 44px !important; background: var(--granat); color: var(--na-ciemnym-2); font-size: 13.5px; line-height: 1.55; }
   .z-stopka-in { display: flex; flex-direction: column; gap: 10px; }
