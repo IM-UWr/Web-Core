@@ -1,6 +1,6 @@
 # Raport: zlecenie 29 — specjalności i strona działu Popularyzacja jako Markdown (7.11.2026)
 
-Etapy 1–4 zrobione, kryteria odbioru lokalnego spełnione (4 akapity EN „No. …” pogrubione po decyzji właściciela). Etap 5: wynik pushu i podglądu jest w sekcji „Push i podgląd”. Test w prawdziwym CMS robi właściciel. Polecenie dotyczyło tylko zlecenia 29, więc nie zaczynam 30.
+Etapy 1–4 zrobione, kryteria odbioru lokalnego spełnione (4 akapity EN „No. …” pogrubione po decyzji właściciela). **Etap 5: wypchnięte 7.11 ok. 14:37 (słowo właściciela „push”), podgląd zbudowany i sprawdzony.** Zostaje test w prawdziwym CMS: robi go właściciel na gałęziach `test-cms` (sekcja „Test w CMS”), potem porównanie i usunięcie `test-cms`. Polecenie dotyczyło tylko zlecenia 29, więc nie zaczynam 30.
 
 ## Etapy i commity
 
@@ -20,9 +20,10 @@ Wszystko na gałęzi `wyglad/zlecenie-16`, tylko lokalnie.
 | 2, 3 | Web-Popularyzacja | `6608b03`, `a4f50c8` | `popularyzacja.md` zamiast `.json`; formularz „Strona działu Popularyzacja” |
 | 4 | Web-Core | `ec2bc857` | Raport i zrzuty |
 | 4 (decyzja 1) | Web-Spec-Analiza-Danych, Web-Spec-Nauczycielska | `eb14354`, `891742b` | Pogrubione „No.” na początku 4 odpowiedzi EN (zapis w edytorze ich nie psuje) |
-| 4 | Web-Core | ten commit | Raport po decyzji i po „push” |
+| 4 | Web-Core | `2dbe75ba` | Raport po decyzji |
+| 5 | Web-Core | ten commit | Raport po „push” |
 
-Nad `origin`: Web-Core 12 commitów (z 28), Web-Studia 5 (z 28), Web-Ustawienia 2 (z 28), Web-Popularyzacja 2, Web-Spec-Analiza-Danych i Web-Spec-Nauczycielska po 3, pozostałe Web-Spec-* po 2. Po „push” wyślę wszystkie 9 repozytoriów razem i sprawdzę przebieg Web-Podglad.
+Nad `origin`: Web-Core 12 commitów (z 28), Web-Studia 5 (z 28), Web-Ustawienia 2 (z 28), Web-Popularyzacja 2, Web-Spec-Analiza-Danych i Web-Spec-Nauczycielska po 3, pozostałe Web-Spec-* po 2. Wszystko wypchnięte (sekcja „Push i podgląd”).
 
 ## Co widzi edytor
 
@@ -113,6 +114,34 @@ Do ściągawki i opisów pola „Treść” (specjalności, Popularyzacja i kier
 - [x] Testy wtyczki: 23/23 (4 nowe dla specjalności).
 - [x] Symulowany zapis w edytorze nie zmienia strony (po pogrubieniu „No.” w 4 odpowiedziach EN, decyzja 1).
 - [ ] Test w prawdziwym CMS: po „push”.
+
+## Push i podgląd (etap 5)
+
+- **Push** 7.11 ok. 14:37: `wyglad/zlecenie-16` w 9 repozytoriach naraz:
+  - Web-Core `2dbe75ba` (z commitami zlecenia 28, bo kod 29 na nich stoi);
+  - Web-Studia `55e1a55`, Web-Ustawienia `09431de`, Web-Popularyzacja `a4f50c8`;
+  - Web-Spec-Analiza-Danych `eb14354`, Web-Spec-Aktuarialno-Finansowa `72bc53e`, Web-Spec-Nauczycielska `891742b`, Web-Spec-Stosowana `4806331`, Web-Spec-Teoretyczna `4f89fa8`.
+- Wszystkie pushe przeszły bez wymuszania. Gałęzi `main` nie ruszałem, więc stara strona się nie przebudowuje.
+- **Web-Podglad:** przebieg uruchomiony ręcznie (run `42377831722`, 13:37–13:42 UTC) zakończył się sukcesem.
+  - Zbudował Web-Core `2dbe75ba` z 1210 plikami treści (tyle samo co lokalnie; każde Web-Spec-* daje 2 pliki: treść i baner).
+  - Błędy „patch does not apply” są w kroku „TEST telefonu” i były już w poprzednim przebiegu (12, tyle samo).
+- **Strony na [podglądzie](https://im-uwr.github.io/Web-Podglad/):** Matematyka stosowana (PL), Analiza danych (EN) i `/popularyzacja` (PL i EN) mają HTML równy lokalnemu buildowi. Różnią się tylko nazwy plików obrazów (hash z innej maszyny). Na stronach specjalności są wszystkie sekcje z kotwicami, a „**No.**” jest pogrubione.
+
+## Test w CMS (właściciel)
+
+Gałęzie `test-cms` założyłem od `wyglad/zlecenie-16`. W Web-Studia, Web-Ustawienia i Web-Popularyzacja były już `test-cms` z testu zlecenia 22 (zapisy właściciela z 6.11). Nie skasowałem ich, tylko zachowałem pod `kopia/test-cms-zlecenie-22`: Web-Studia `dc880b9`, Web-Ustawienia `f181206`, Web-Popularyzacja `c1f3318`. Stare `test-cms` w Web-Nauka, Web-Spec-Aktuarialno-Finansowa i Web-Sem-Topologia zostały bez zmian.
+
+| Repozytorium | Co zrobić (jako edytor) |
+| --- | --- |
+| [Web-Studia](https://app.pagescms.org/IM-UWr/Web-Studia/test-cms) | Zlecenie 28, etap 8. Kierunki → Treść, Matematyka: zapisz **bez zmian**, potem: dodaj wiersz w tabeli terminów, krok osi (zwykłym Enterem), pytanie (Nagłówek 3 z „?”), PDF z „Media” podlinkowany w „Aktach prawnych”, wzór `$\ell^2$` w akapicie, zmień jedno słowo w Treści EN. Kierunki → Baner: zmień hasło Matematyki |
+| [Web-Ustawienia](https://app.pagescms.org/IM-UWr/Web-Ustawienia/test-cms) | Przesuń jeden kierunek na liście kierunków |
+| [Web-Spec-Stosowana](https://app.pagescms.org/IM-UWr/Web-Spec-Stosowana/test-cms) | Specjalność → Treść: zapisz **bez zmian**, potem dodaj temat pracy, krok osi i pytanie |
+| [Web-Popularyzacja](https://app.pagescms.org/IM-UWr/Web-Popularyzacja/test-cms) | Strona działu Popularyzacja: zapisz **bez zmian**, potem zmień jedną liczbę „W skrócie” |
+
+Potem ja:
+- porównam `origin/test-cms` z `wyglad/zlecenie-16` i zbuduję stronę z `test-cms`;
+- sprawdzę każdy punkt: zapis bez zmian ma dać tę samą stronę, a pola, wzór i tabela mają przetrwać;
+- wynik dopiszę tu i usunę `test-cms`.
 
 ## Gałąź domyślna repozytoriów treści
 

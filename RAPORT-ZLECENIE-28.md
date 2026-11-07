@@ -1,5 +1,7 @@
 # Raport: zlecenie 28 — kierunki jako jeden Markdown, bloki z tekstu (7.11.2026)
 
+**Aktualizacja 7.11, ok. 14:40:** etap 7 zrobiony razem z pushem po zleceniu 29. Wszystko jest na `origin/wyglad/zlecenie-16`, podgląd jest zbudowany, a `test-cms` w Web-Studia i Web-Ustawienia czeka na etap 8. Szczegóły: `RAPORT-ZLECENIE-29.md`, sekcje „Push i podgląd” i „Test w CMS”.
+
 Etapy 0–6a zrobione lokalnie, kryteria odbioru lokalnego spełnione. **Nic nie jest wysłane na GitHub.** Czekam na „push” (etap 7), potem test w prawdziwym CMS (etap 8). Polecenie dotyczyło tylko zlecenia 28 (nie tryb bez nadzoru), więc nie zaczynam 29. Numer 28 był wolny.
 
 ## Etapy i commity
