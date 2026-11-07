@@ -9,8 +9,8 @@ WYMAGANE = {
     'zaklady': ['nazwa'], 'kierunki': ['nazwa'], 'specjalnosci': ['nazwa'], 'pracownicy': ['imie_nazwisko'],
     'warto_wiedziec': ['tytul'],
 }
-LISTY_OBIEKTOW = {'specjalnosci': ['opiekunowie', 'dlaczego', 'etapy', 'seminaria', 'przedmioty', 'tematy_prac', 'dokumenty', 'linki', 'faq'],
-                  'kierunki': ['fakty', 'przyciski', 'dlaczego', 'etapy', 'specjalnosci', 'programy', 'terminy', 'faq', 'kontakt', 'akty']}
+# Kierunki (zlecenie 28): treść to Markdown (body i tresc_en), bez list obiektów; baner i przypomnienia — JSON, sprawdzane niżej.
+LISTY_OBIEKTOW = {'specjalnosci': ['opiekunowie', 'dlaczego', 'etapy', 'seminaria', 'przedmioty', 'tematy_prac', 'dokumenty', 'linki', 'faq']}
 
 def sprawdz(p):
     bledy = []
@@ -46,10 +46,6 @@ def sprawdz(p):
                     bledy.append(f'{p}: element listy „{k}” nie jest tekstem (np. „: ” w środku — weź tekst w cudzysłów): {el!r}'[:300])
     # dokumenty: wgrany plik albo link
     dok = []
-    if kol == 'kierunki':
-        for pr in dane.get('programy') or []:
-            dok += (pr or {}).get('dokumenty') or []
-        dok += (dane.get('praktyki_dokumenty') or []) + (dane.get('akty') or [])
     if kol == 'specjalnosci':
         dok += dane.get('dokumenty') or []
     for x in dok:
@@ -87,6 +83,29 @@ for a in sys.argv[1:] or ['src/content']:
     else:
         pliki.append(a)
 wszystkie = [b for p in pliki for b in sprawdz(p)]
+
+# Kierunki (zlecenie 28): baner <id>.json tylko dla istniejącego kierunku; przypomnienia o terminach — sprawa i data RRRR-MM-DD.
+# Tylko bez argumentów (pełna kontrola), jak ciekawostki niżej.
+if not sys.argv[1:]:
+    for p in sorted(glob.glob('src/content/kierunki-baner/*.json')):
+        pliki.append(p)
+        try:
+            b = json.load(open(p, encoding='utf-8'))
+        except ValueError as e:
+            wszystkie.append(f'{p}: błąd JSON: {e}')
+            continue
+        if not os.path.exists(f"src/content/kierunki/{os.path.basename(p)[:-5]}.md"):
+            wszystkie.append(f'{p}: nie ma kierunku o tej nazwie pliku (src/content/kierunki/{os.path.basename(p)[:-5]}.md)')
+        if not isinstance(b.get('liczby', []), list):
+            wszystkie.append(f'{p}: pole „liczby” musi być listą')
+    p = 'src/data/przypomnienia.json'
+    if os.path.exists(p):
+        pliki.append(p)
+        for i, t in enumerate(json.load(open(p, encoding='utf-8')).get('przypomnienia') or []):
+            if not t.get('sprawa'):
+                wszystkie.append(f'{p}: przypomnienie {i + 1}: brak sprawy')
+            if not re.match(r'^\d{4}-\d{2}-\d{2}$', str(t.get('data') or '')[:10]):
+                wszystkie.append(f'{p}: przypomnienie {i + 1} („{t.get("sprawa", "?")}”): data musi mieć postać RRRR-MM-DD')
 
 # Ciekawostki patronów: nazwisko patrona w każdej karcie (src/data/ciekawostki/README.md). Tylko bez argumentów, czyli przy pełnej kontroli.
 # Zaimków nie sprawdzamy: w „kierował nim Marczewski” słowo „nim” to Instytut.

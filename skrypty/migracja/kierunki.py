@@ -343,7 +343,7 @@ def main():
         zapisz(cel_s / 'src/content/kierunki' / f"{d['_id']}.md",
                '---\n' + yaml.safe_dump(front, allow_unicode=True, sort_keys=False, width=10**6) + '---\n\n' + pl)
 
-        baner = {k: d[k] for k in ('podtytul', 'podtytul_en', 'opis', 'opis_en', 'haslo', 'haslo_en') if d.get(k)}
+        baner = {'kierunek': d['_id']} | {k: d[k] for k in ('podtytul', 'podtytul_en', 'opis', 'opis_en', 'haslo', 'haslo_en') if d.get(k)}
         baner['liczby'] = [{k: napis(v) for k, v in f.items() if v not in (None, '')} for f in d.get('fakty') or []]
         tekst_baneru = json.dumps(baner, ensure_ascii=False, indent=2) + '\n'
         zapisz(cel_s / 'src/content/kierunki-baner' / f"{d['_id']}.json", tekst_baneru)

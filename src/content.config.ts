@@ -221,12 +221,14 @@ const kierunki = defineCollection({
 });
 
 // Baner kierunku (src/content/kierunki-baner/<id kierunku>.json; osobny formularz, bo Pages CMS przy zapisie usuwa z pliku pola
-// spoza formularza). Brak pliku: baner z samą nazwą, zdanie pod nazwą = pierwsze zdanie treści, bez liczb i hasła.
+// spoza formularza). Brak pliku: baner z samą nazwą (bez zdania, liczb i hasła), opis strony (meta) = pierwsze zdanie treści.
+// kierunek — nazwa pliku kierunku (w formularzu z niej powstaje nazwa nowego pliku banera; strona bierze id z nazwy pliku).
 // liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
 // na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
 const kierunki_baner = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
   schema: z.object({
+    kierunek: optStr,
     podtytul: optStr,
     podtytul_en: optStr,
     opis: optStr,
