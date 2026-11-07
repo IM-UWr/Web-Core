@@ -195,7 +195,7 @@
   .z-drzewo { container-type: inline-size; }
   @container (max-width: 871.98px) {
     .z-zast { padding-top: 0; }
-    .z-zast::before, .z-zast .z-os::before, .z-zast .z-os::after { display: none; }
+    .z-drzewo .z-dyr:has(+ .z-zast)::after, .z-zast::before, .z-zast .z-os::before, .z-zast .z-os::after { display: none; }
     .z-zast .z-os { padding-top: 0; }
   }
 }
