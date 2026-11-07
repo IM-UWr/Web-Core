@@ -2,13 +2,14 @@
 // „Warto wiedzieć” — pozycje z kolekcji src/content/warto_wiedziec (jedno miejsce edycji w CMS) we wzorcu treści podstron
 // (klasa .tresc na elemencie treści — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). Używają go tylko strony
 // „Warto wiedzieć”: lista (ListaWartoWiedziec.astro) i pozycja (WartoWiedziecWpis.astro, „Zobacz też”).
-// uklad: 'lista' = wiersze: rok dużą Brygadą w kolorze działu (jak dzień w jednym wzorze daty), tytuł Brygadą (link do
-//                  podstrony pozycji albo zewnętrzny z ↗), zajawka, przy pozycji bez podstrony etykieta linku; z prawej
-//                  miniatura zdjęcia (jeśli jest);
+// uklad: 'lista' = wiersze w stylu listy Aktualności (zlecenie 27, punkt 2; wzór: WierszAktualnosci.astro): rok dużą Brygadą
+//                  w kolorze działu pozycji (pole „dział”), tytuł Brygadą (link do podstrony pozycji albo zewnętrzny z ↗; cały wiersz
+//                  klikalny), zajawka, przy pozycji bez podstrony etykieta linku; z prawej miniatura zdjęcia (jeśli jest; na telefonie
+//                  pod rokiem). data-ww-poz i data-dzial — filtr i szukanie na liście (ListaWartoWiedziec.astro);
 //        'linki' = lista linków do stron powiązanych (ul.linki wzorca: dwie kolumny, Brygada, → albo ↗).
 // pomin: identyfikator pozycji do pominięcia (bieżąca podstrona). Kolejność: pole „kolejność”, potem rok (od najnowszego)
 // i tytuł. Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
-// Jedna wersja HTML: komputer i telefon (≤ 1023 px — węższa kolumna roku i mniejsza miniatura).
+// Jedna wersja HTML: komputer i telefon (≤ 1023 px — węższa kolumna roku, miniatura pod rokiem).
 import Link from './Link.astro';
 import { getCollection } from 'astro:content';
 import { u, isExternal } from '../lib/url';
@@ -38,6 +39,7 @@ const pozycje = (await getCollection('warto_wiedziec'))
     const cel = maStrone ? `/warto-wiedziec/${slugOf(w.id)}` : d.link;
     const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
     return {
+      dzial: d.dzial,
       tytul: wybierz(d, 'tytul', lang),
       zajawka: wybierz(d, 'zajawka', lang),
       rok: d.rok,
@@ -60,14 +62,14 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
 {pozycje.length > 0 && uklad === 'lista' && (
   <ul class="ww-lista">
     {pozycje.map((k) => (
-      <li class:list={['ww-w', k.obraz && 'ww-z-min']}>
+      <li class:list={['ww-w', k.obraz && 'ww-z-min', k.cel && 'ww-klik']} data-ww-poz data-dzial={k.dzial}>
         <span class="ww-rok">{k.rok}</span>
         <div class="ww-tr">
           <p class="t">{k.cel ? <Link href={href(k.cel)}>{k.tytul}</Link> : k.tytul}</p>
           {k.zajawka && <p class="x">{k.zajawka}</p>}
           {k.etykieta && <p class:list={['ww-dalej', k.zewnetrzny && 'zew']} aria-hidden="true">{k.etykieta}</p>}
         </div>
-        {k.obraz && <span class="ww-min"><ZdjecieZ src={k.obraz} sizes={rozmiarPola(['telefon', 72, 54], [null, 120, 90])} /></span>}
+        {k.obraz && <span class="ww-min" aria-hidden="true"><ZdjecieZ src={k.obraz} sizes={rozmiarPola(['telefon', 54, 54], [null, 72, 48])} /></span>}
       </li>
     ))}
   </ul>
@@ -76,28 +78,46 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
 <style>
   /* lista linków (ul.linki wzorca): pozycja bez celu — sam tytuł w tym samym kroju */
   .ww-bez { display: block; padding: 11px 0; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-size: 21px; line-height: 1.3; color: var(--ink); }
-  /* wiersze: rok | tytuł, zajawka | miniatura; kreski między pozycjami */
+  /* wiersze: rok | tytuł, zajawka | miniatura; kreski między pozycjami (jak wiersze Aktualności, WierszAktualnosci.astro) */
   .ww-lista { list-style: none; margin: 0; padding: 0; }
-  .ww-w { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; max-width: none; margin: 0; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .ww-w { position: relative; display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 18px; max-width: none; margin: 0; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .ww-w[hidden] { display: none; }
   .ww-w:first-child { border-top: 1px solid var(--line); }
-  .ww-w.ww-z-min { grid-template-columns: 76px minmax(0, 1fr) 120px; }
-  .ww-rok { font-family: var(--f-display); font-size: 30px; line-height: 1.05; color: var(--d-a); font-variant-numeric: lining-nums; }
-  .ww-tr .t { margin: 0 0 4px; max-width: none; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
-  .ww-tr .t a { text-decoration: none; }
+  .ww-w.ww-z-min { grid-template-columns: 76px minmax(0, 1fr) auto; }
+  .ww-rok { font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.05; color: var(--d-a); font-variant-numeric: lining-nums; }
+  .ww-tr .t { margin: 2px 0 4px; max-width: none; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
+  .ww-tr .t :global(a) { color: inherit; text-decoration: none; }
+  /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
+  .ww-tr .t :global(a)::before { content: ''; position: absolute; inset: 0; } /* nakładka na ::before — ::after to strzałka ↗ linku poza stronę */
+  .ww-tr .t :global(a:focus-visible) { outline: none; }
+  .ww-klik:has(.t a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; }
+  .ww-klik:hover .t :global(a) { color: var(--d-a); }
   .ww-tr .x { margin: 0; max-width: 42.7em; font-size: 15.5px; line-height: 1.55; color: var(--text); }
   .ww-dalej { margin: 6px 0 0; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
   .ww-dalej::after { content: '\00a0→'; }
   .ww-dalej.zew::after { content: '\00a0↗'; }
-  .ww-min { display: block; width: 120px; height: 90px; overflow: hidden; background: var(--surface); }
+  .ww-min { display: block; width: 120px; aspect-ratio: 3 / 2; overflow: hidden; background: var(--d-t); }
   .ww-min :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  /* komputer: wymiary wiersza listy Aktualności (zlecenie 18, punkt 3) */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    .ww-w, .ww-w.ww-z-min { gap: 12px; padding: 14px 0; }
+    .ww-w { grid-template-columns: 58px minmax(0, 1fr); }
+    .ww-w.ww-z-min { grid-template-columns: 58px minmax(0, 1fr) auto; }
+    /* rok (4 cyfry) w kolumnie daty 58 px: mniejszy niż dzień w Aktualnościach (26 px) */
+    .ww-rok { font-size: 22px; line-height: 1.15; }
+    .ww-tr .t { margin: 1px 0 3px; font-size: 18.5px; line-height: 1.28; }
+    .ww-tr .x { font-size: 14.5px; line-height: 1.5; }
+    .ww-min { width: 72px; }
+  }
+  /* telefon: miniatura pod rokiem (kolumna roku), żeby tekst miał całą szerokość */
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .ww-bez { font-size: 19px; }
-    .ww-w { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
-    .ww-w.ww-z-min { grid-template-columns: 54px minmax(0, 1fr) 72px; }
-    .ww-rok { font-size: 22px; line-height: 1.2; }
+    .ww-w, .ww-w.ww-z-min { grid-template-columns: 54px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 0 12px; padding: 13px 0; }
+    .ww-rok { grid-column: 1; grid-row: 1; font-size: 22px; line-height: 1.2; }
+    .ww-tr { grid-column: 2; grid-row: 1 / 3; }
+    .ww-min { grid-column: 1; grid-row: 2; align-self: start; width: 54px; aspect-ratio: 1; margin-top: 10px; }
     .ww-tr .t { font-size: 18.5px; }
     .ww-tr .x { font-size: 15px; }
-    .ww-min { width: 72px; height: 54px; }
   }
 </style>
