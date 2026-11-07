@@ -1,7 +1,7 @@
 ---
 // Drugi ekran strony głównej na komputer (≥ 1024 px; kierunek „Założyciele”, dok/estetyka.md „Drugi ekran”):
 // - pasek „Szybki dostęp”: Plan zajęć, kolor dnia („Dziś brak zajęć” / „Dziś: dzień …”), Pracownicy, Seminaria;
-// - trzy kolumny: sloty 0 i 1 — krótkie kolumny po 3 pozycje i „Zobacz więcej (N)”, slot 2 — długa kolumna na całą
+// - trzy kolumny: sloty 0 i 1 — krótkie kolumny po 3 pozycje (na niskim oknie po 2: drabinka wysokości, zlecenie 26, punkt 3) i „Zobacz więcej (N)”, slot 2 — długa kolumna na całą
 //   wysokość (tyle pozycji, ile się zmieści). „Zobacz więcej” płynnie zamienia klikniętą kolumnę z długą (FLIP 0,52 s,
 //   bez ruchu przy prefers-reduced-motion; fokus na nagłówek rozwiniętej kolumny) — src/scripts/zal/drugi-ekran.ts;
 // - jeden wzór daty we wszystkich kolumnach (dzień dużą Brygadą, pod nim „lis · pon.”); prelegent po tytule seminarium
@@ -168,8 +168,10 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOM
             <div class="pozycje">{wiersze}{(k.pozycje.length === 0 || key === 'wyd') && <p class="z-pusto" hidden={k.pozycje.length > 0}>{k.pusto}</p>}</div>
             <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze {n}', '{n} more')}>{k.wsz}</a>
           </div></div>
-          {k.pozycje.length > ileWidac && (
-            <button type="button" class="z-wiecej" data-key={key}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'Show more')} ({ileWidac === 3 ? <span class="z-ile">{k.pozycje.length - 3}</span> : <><span class="z-ile-k">{k.pozycje.length - ileWidac}</span><span class="z-ile-t">{k.pozycje.length - 3}</span></>})</span></button>
+          {/* N na komputerze (.z-ile-k) i telefonie (.z-ile-t, zawsze 3 widoczne); przycisk jest też przy jednej pozycji mniej, bo na niskim oknie
+              krótka kolumna pokazuje o jedną mniej (zlecenie 26, punkt 3) — wtedy schowany, dopóki nic nie jest ukryte (liczWiecej() w drugi-ekran.ts) */}
+          {k.pozycje.length >= ileWidac && (
+            <button type="button" class="z-wiecej" data-key={key} hidden={k.pozycje.length <= ileWidac}><span class="kropki3" aria-hidden="true">•••</span><span>{T('Zobacz więcej', 'Show more')} (<span class="z-ile-k">{Math.max(0, k.pozycje.length - ileWidac)}</span><span class="z-ile-t">{Math.max(0, k.pozycje.length - 3)}</span>)</span></button>
           )}
         </section>
       );

@@ -70,6 +70,8 @@
   .z-w .min.zastepcza path { fill: none; stroke: var(--d-a); stroke-width: 1.6px; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
   .z-pusto { margin: 10px 0; color: var(--muted); font-style: italic; }
   .z-wiecej { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; text-align: left; }
+  /* bez ukrytych pozycji (liczWiecej() w drugi-ekran.ts) */
+  .z-wiecej[hidden] { display: none !important; }
   .z-wiecej:hover { color: var(--ink); }
   .z-wiecej:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .z-wiecej .kropki3 { letter-spacing: .12em; color: var(--ink); }
@@ -166,6 +168,15 @@
   .z-druga, .z-pasek.z-pasek-jasny, body:has(.z-druga) .z-stopka { zoom: var(--z-k, 1); }
   .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
   .z-wiecej .z-ile-t { display: none; }
+
+  /* Drabinka wysokości na niskim oknie (zlecenie 26, punkt 3): krok i wysokości ustawia drabinka() w src/scripts/zal/drugi-ekran.ts.
+     0: drugi ekran dokładnie do stopki; 1: stopka pod ekranem; 2: „Warto wiedzieć” pod ekranem — długa kolumna kończy się ze Studiami, które
+     stoją na dole pierwszego ekranu; 3: jak 2, krótkie kolumny po 2 pozycje (powiększony wpis za dwie); 4: układ z kroku 3, który się nie mieści, i zwykłe przewijanie. */
+  .z-druga[data-krok] { min-height: var(--z-druga-h, 0px); }
+  .z-druga:is([data-krok="2"], [data-krok="3"], [data-krok="4"]) .z-kolumna[data-slot="2"] { grid-row: 1 / span 2; min-height: var(--z-siatka-h, 0px); }
+  .z-druga:is([data-krok="2"], [data-krok="3"], [data-krok="4"]) .z-studia { align-self: end; }
+  .z-druga:is([data-krok="3"], [data-krok="4"]) .z-kolumna:not([data-slot="2"]) .z-w:nth-child(n+3),
+  .z-druga:is([data-krok="3"], [data-krok="4"]) .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+2) { display: none; }
 
   /* Powiększona pierwsza aktualność (zlecenie 14, zalecenie 22; wzór: prototyp v92, .ok-w.wyr): wartości z prototypu (50 | tekst | 168×126,
      tytuł 21 px) przy kolumnie 584 px, czyli 1920 px strony. Węższe kolumny: zdjęcie proporcjonalnie, tytuł od 18 px, żeby tekst nie zszedł
