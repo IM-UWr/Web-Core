@@ -1,8 +1,8 @@
 // Dane listy seminariów (src/views/ListaSeminariow.astro): grupy seminariów z najbliższymi referatami, referaty tygodnia, liczby w banerze.
-import dzial from '../../data/dzialy/nauka.json';
 import { wPrzyszlosci, ETYKIETY } from '../liczbyTerminow';
 import { now, today, hasTime, type Lang } from '../daty';
 import { seminaria, referaty, zaklady, seminariumReferatu, referatyWTygodniu, tydzienSeminariow } from '../tresci';
+import { stronaListy } from '../tekstyStron';
 
 export async function daneListySeminariow(lang: Lang) {
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
@@ -25,13 +25,11 @@ export async function daneListySeminariow(lang: Lang) {
   ].filter((g) => g.lista.length > 0);
   const tydzien = tydzienSeminariow();
   const wTygodniu = await referatyWTygodniu(lang);
-  const lead = lang === 'en'
-    ? 'Research seminars of the Mathematical Institute. Everyone is welcome.'
-    : 'Seminaria naukowe Instytutu Matematycznego. Zapraszamy wszystkich zainteresowanych.';
-  // Telefon (≤ 1023 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (src/data/dzialy/nauka.json, seminaria_haslo / _en)
+  // tytuł, opis, hasło i tekst nad listą: Web-Nauka → Strony → Seminaria (src/content/strony/seminaria.md; zlecenie 30, src/lib/tekstyStron.ts)
+  const { tytul, opis: lead, haslo, html } = await stronaListy('seminaria', lang, { wst: true });
+  // Telefon (≤ 1023 px; zlecenie 01, decyzja 31.10.2026): hasło zamiast opisu (pole Hasło strony)
   // i trzy liczby pod kreską: seminaria (aktywne, jak karty niżej) · zapowiedziane referaty (wszystkich seminariów, definicja
   // wspólna z Kalendarzem — src/lib/liczbyTerminow.ts) · referaty w archiwum (minione referaty opublikowanych seminariów).
-  const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'seminaria_haslo_en' : 'seminaria_haslo'] as string | undefined) || undefined;
   const idSem = new Set(sem.map((s) => s.id));
   const refSem = ref.filter((r) => idSem.has(seminariumReferatu(r)));
   const zapowiedziane = refSem.filter((r) => wPrzyszlosci(r.data.termin)).length;
@@ -41,5 +39,5 @@ export async function daneListySeminariow(lang: Lang) {
     { n: refSem.length - zapowiedziane, ...ETYKIETY.archiwum },
   ];
 
-  return { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, lead, haslo, liczby };
+  return { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, tytul, lead, haslo, html, liczby };
 }

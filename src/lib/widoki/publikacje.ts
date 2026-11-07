@@ -1,10 +1,12 @@
 // Dane strony „Publikacje” (/nauka/publikacje):
-// - src/data/publikacje.json — wstęp, lista lat (PDF), czasopisma (edycja w CMS),
+// - src/data/publikacje.json — lista lat (PDF), czasopisma (edycja w CMS),
+// - Web-Nauka → Strony → Publikacje (src/content/strony/nauka/publikacje.md; zlecenie 30) — tytuł, opis, hasła (strony i rocznika),
+//   tekst nad listą lat i tekst nad czasopismami (sekcja pod nagłówkiem „Czasopisma redagowane w Instytucie”, src/lib/tekstyStron.ts),
 // - src/data/publikacje/RRRR.json — wykaz prac danego roku w HTML (podstrona /nauka/publikacje/RRRR).
 // Liczby prac liczą się z wykazów — nie wpisuje się ich ręcznie.
 import katex from 'katex';
 import glowny from '../../data/publikacje.json';
-import dzial from '../../data/dzialy/nauka.json';
+import { stronaListy } from '../tekstyStron';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { isExternal } from '../url';
@@ -18,7 +20,7 @@ export interface Czasopismo {
   wsparcie?: string; wsparcie_en?: string; kontakt?: string; issn?: string; eissn?: string; adres?: string;
 }
 export interface DanePublikacji {
-  wstep?: string; wstep_en?: string; lata?: RokWpis[]; czasopisma_naglowek?: string; czasopisma_naglowek_en?: string;
+  lata?: RokWpis[];
   czasopisma?: Czasopismo[]; archiwum?: string; archiwum_en?: string;
 }
 
@@ -134,8 +136,7 @@ export async function danePublikacji(lang: Lang) {
   const en = lang === 'en';
   const T = (pl: string, en_: string) => (en ? en_ : pl);
 
-  const tytul = T('Publikacje', 'Publications');
-  const lead = wybierz(dane as any, 'wstep', lang) || undefined;
+  const { tytul, opis: lead, haslo, html, sekcje } = await stronaListy('nauka/publikacje', lang, { wst: true });
   const wszystkie = lata();
   const zWykazem = wszystkie.filter((r) => r.wykaz);
   const suma = zWykazem.reduce((s, r) => s + r.liczba, 0);
@@ -147,10 +148,9 @@ export async function danePublikacji(lang: Lang) {
     ...(najnowszy ? [{ n: najnowszy === najstarszy ? String(najnowszy) : `${najstarszy}–${najnowszy}`, l: T('lata objęte wykazami', 'years covered') }] : []),
     ...(czasopisma.length ? [{ n: String(czasopisma.length), l: T(`${odmiana(czasopisma.length, 'czasopismo redagowane', 'czasopisma redagowane', 'czasopism redagowanych')} w Instytucie`, czasopisma.length === 1 ? 'journal edited at the Institute' : 'journals edited at the Institute') }] : []),
   ];
-  // Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i trzy liczby w banerze.
+  // Telefon: hasło (pole Hasło strony; po angielsku tylko Hasło EN — bez polskich resztek) i trzy liczby w banerze.
   // Roczniki = lata z wykazem prac (HTML), zakres — od najstarszego do najnowszego z nich; suma jak na komputerze
   // (z separatorem tysięcy wg języka), dlatego jako gotowy napis z odmianą.
-  const haslo = ((dzial as any)[en ? 'publikacje_haslo_en' : 'publikacje_haslo'] as string | undefined) || undefined;
   const lataWykazow = zWykazem.length ? (zWykazem.length === 1 ? String(zWykazem[0].rok) : `${zWykazem[zWykazem.length - 1].rok}–${zWykazem[0].rok}`) : '';
   const liczbyTelefon = [
     { n: suma ? suma.toLocaleString('pl-PL') : '', n_en: suma.toLocaleString('en-GB'), pl: `${odmiana(suma, 'pozycja', 'pozycje', 'pozycji')} w wykazach`, en: suma === 1 ? 'entry in the lists' : 'entries in the lists' },
@@ -160,8 +160,10 @@ export async function danePublikacji(lang: Lang) {
   ] as ({ n: string; n_en?: string; pl: string; en?: string } | { n: number; pl: [string, string, string]; en: [string, string] })[];
   // Animacja w tle banera na telefonie (motyw „cytowania”): liczby prac w latach z wykazem, rosnąco — [rok, liczba, rok, …].
   const motywDane = { lata: [...zWykazem].reverse().flatMap((r) => [r.rok, r.liczba]) };
-  const nagCzasopisma = wybierz(dane as any, 'czasopisma_naglowek', lang) || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
+  // sekcja „Czasopisma redagowane w Instytucie” z tekstu strony: nagłówek (jak w tekście) i tekst nad listą czasopism
+  const nagCzasopisma = sekcje.czasopisma?.naglowek || T('Czasopisma redagowane w Instytucie', 'Journals edited at the Institute');
+  const htmlCzasopisma = sekcje.czasopisma?.html ?? '';
   const archiwum = wybierz(dane as any, 'archiwum', lang);
 
-  return { tytul, lead, wszystkie, najnowszy, czasopisma, liczby, haslo, liczbyTelefon, motywDane, nagCzasopisma, archiwum };
+  return { tytul, lead, html, wszystkie, najnowszy, czasopisma, liczby, haslo, liczbyTelefon, motywDane, nagCzasopisma, htmlCzasopisma, archiwum };
 }

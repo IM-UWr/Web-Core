@@ -1,6 +1,6 @@
 ---
 // Konferencje (/nauka/konferencje), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: tekst wprowadzający
-// (src/data/dzialy/nauka.json, pola konferencje_tekst / _en; puste = brak), nadchodzące u góry, minione według lat
+// (Treść strony Web-Nauka → Strony → Konferencje; zlecenie 30, src/lib/tekstyStron.ts; brak = bez tekstu), nadchodzące u góry, minione według lat
 // (rok jako nagłówek Brygadą w kolorze działu, kotwice #rok-RRRR bez zmian). Spis „Na tej stronie”: Nadchodzące i lata.
 // Konferencje nie mają naszych podstron: tytuł prowadzi od razu na stronę konferencji (pole `strona`, ↗; cały wiersz
 // klikalny); konferencja bez strony — wiersz bez linku. Wiersze jak na stronie działu (zal/dzial/Wiersz.astro): dzień
@@ -11,8 +11,7 @@
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import dzialNauka from '../data/dzialy/nauka.json';
-import { odmiana, wybierz, langPola } from '../lib/i18n';
+import { odmiana, langPola } from '../lib/i18n';
 import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
 import { miejsce, type Konferencja } from '../lib/tresci';
 import { daneListyKonferencji } from '../lib/widoki/listaKonferencji';
@@ -21,10 +20,8 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const tytul = (k: Konferencja) => (lang === 'en' && k.data.tytul_en) || k.data.tytul;
-const { przyszle, lata, odwolana, naglowek, lead, haslo, liczby } = await daneListyKonferencji(lang);
-// tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
-const wstep = ((wybierz(dzialNauka as Record<string, any>, 'konferencje_tekst', lang) as string) || '')
-  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+// html — tekst nad listą — Treść strony (Web-Nauka → Strony → Konferencje; zlecenie 30)
+const { przyszle, lata, odwolana, naglowek, lead, haslo, html, liczby } = await daneListyKonferencji(lang);
 const etykieta = (k: Konferencja) => [range(k.data.poczatek, k.data.koniec, lang), miejsce(k.data.miejsce, lang)].filter(Boolean).join(' · ');
 const ileKonf = (n: number) => `${n} ${odmiana(n, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'], lang)}`;
 const tytulNadch = T('Nadchodzące', 'Upcoming');
@@ -43,7 +40,7 @@ const spis = [
   okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: naglowek }]} dzial="nauka" spis={spis} klasa="tresc z-kf">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
-  {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+  {html && <section set:html={html} />}
 
   {sekcje.map((sek) => (
     <section id={sek.id} aria-labelledby={`h-${sek.id}`}>

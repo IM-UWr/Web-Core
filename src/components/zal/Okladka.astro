@@ -15,12 +15,10 @@ import ZdjecieZ from '../ZdjecieZ.astro';
 import Flaga from './Flaga.astro';
 import PanelMenu from './PanelMenu.astro';
 import ustawienia from '../../data/ustawienia.json';
-import dzInstytut from '../../data/dzialy/instytut.json';
-import dzNauka from '../../data/dzialy/nauka.json';
-import dzStudia from '../../data/dzialy/studia.json';
 import { frontmatter as dzPopularyzacja } from '../../data/popularyzacja.md';
 import { menuGlowne } from '../../lib/menu';
 import { liczbyNaOkladke } from '../../lib/tresci';
+import { polaDzialu } from '../../lib/tekstyStron';
 import { rozmiarOkl } from '../../lib/zdjecia';
 import { MQ_TELEFON } from '../../lib/media';
 import { u, isExternal } from '../../lib/url';
@@ -33,7 +31,8 @@ interface Props { lang: Lang; inny: string | null; cel?: string; licznik?: strin
 const { lang, inny, cel = '#szybki-dostep', licznik, wyrozniona } = Astro.props;
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
-const DANE: Record<Dzial, any> = { instytut: dzInstytut, nauka: dzNauka, studia: dzStudia, popularyzacja: dzPopularyzacja };
+// pola stron działów (zlecenie 30: src/data/<dział>.md w repozytoriach działów)
+const DANE: Record<Dzial, any> = { instytut: polaDzialu('instytut'), nauka: polaDzialu('nauka'), studia: polaDzialu('studia'), popularyzacja: dzPopularyzacja };
 const dzialy = DZIALY.map((dz) => {
   const P = PATRONI[dz];
   const m = menu.find((p) => p.adres === P.adres);

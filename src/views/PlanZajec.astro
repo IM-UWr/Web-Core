@@ -17,12 +17,10 @@ import '../styles/zal-granty-plan.css';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer } = await danePlanuZajec(lang);
+const { tytul, lead, html, haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer } = await danePlanuZajec(lang);
 
 const T = en
   ? {
-      tytul: 'Timetable',
-      lead: 'Timetable of the Mathematical Institute, updated automatically from USOS.',
       dni: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       kol: { gr: 'gr.', typ: 'type', prow: 'teacher', dzien: 'day', godz: 'time', sala: 'room', uwagi: 'notes' },
       gr: 'gr.', sala: 'room',
@@ -34,8 +32,6 @@ const T = en
       zrodlo: 'Data source: USOS, University of Wrocław.',
     }
   : {
-      tytul: 'Plan zajęć',
-      lead: 'Plan zajęć Instytutu Matematycznego, aktualizowany automatycznie z USOS.',
       dni: ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'],
       kol: { gr: 'gr.', typ: 'typ', prow: 'prowadzący', dzien: 'dzień', godz: 'godziny', sala: 'sala', uwagi: 'uwagi' },
       gr: 'gr.', sala: 'sala',
@@ -65,11 +61,12 @@ const L = en
   : { semestr: 'Semestr', szukaj: 'Szukaj przedmiotu, prowadzącego albo sali', szukajEt: 'Szukaj w planie', dni: 'Dni', pusto: 'Nic nie pasuje do wyszukiwania.', dane: 'dane z USOS z', uwagi: 'Kliknij nazwę przedmiotu, by zobaczyć opis w USOSie. Grupy 99 przeznaczone są dla powtarzających przedmiot mających zaliczenia ćwiczeń.' };
 
 ---
-<Podstrona lang={lang} tytul={T.tytul} opis={T.lead} uklad="zwarta portal-baner" lead={T.lead} haslo={haslo}
-  okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: T.tytul }]} dzial="studia" spis={spisKomputer}
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: en ? 'Study' : 'Studia', adres: '/studia' }, { etykieta: tytul }]} dzial="studia" spis={spisKomputer}
   klasa="z-pl" atrybuty={{ 'data-z-plan': '' }}>
   {/* liczby w nagłówku: przedmioty w semestrze i ostatnia aktualizacja z USOS */}
   <Fragment slot="baner">{liczby.length > 0 && <ul class="pt-liczby">{liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}</ul>}</Fragment>
+    {html && <section class="tresc" set:html={html} />}
     {semestry.length === 0 && <p class="pl-info">{T.brak}</p>}
     {semestry.length > 0 && (
       <div class="pl-narz" data-pagefind-ignore>

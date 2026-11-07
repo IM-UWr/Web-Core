@@ -1,11 +1,11 @@
 // Dane strony działu „Studia” (DzialStudia.astro): liczby w banerze, kafelki z menu „Studia”, „O studiach” i aktualności.
-import tekst from '../../data/dzialy/studia.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { menuGlowne } from '../menu';
 import { listaKierunkow, jestSzkolaDoktorska, stopnieKierunku } from '../kierunki';
 import { listaAktualnosci } from '../tresci';
 import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
+import { stronaDzialu } from '../tekstyStron';
 
 // polska odmiana: 1 kierunek, 2–4 kierunki, 5+ kierunków
 const odm = (n: number, jeden: string, kilka: string, wiele: string) =>
@@ -41,9 +41,9 @@ export async function daneDzialuStudia(lang: Lang) {
   const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Studia' || m.etykieta_en === 'Study');
   const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
-  // „O studiach” — akapity z CMS (oddzielone pustą linią) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”
+  // „O studiach” — Treść strony działu (zlecenie 30: src/data/studia.md, Web-Studia „Strona działu Studia”, Markdown) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”
   // na stronie „Instytut”): lista {wartosc, opis, opis_en}, fakty jeden pod drugim; pozycje bez wartości pomijamy.
-  const oStudiach = ((w(tekst, 'o_studiach') as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+  const { d: tekst, tytul, html: oStudiach } = await stronaDzialu('studia', lang);
   const fakty = (((tekst as any).o_studiach_fakty ?? []) as Fakt[])
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
@@ -55,7 +55,6 @@ export async function daneDzialuStudia(lang: Lang) {
   const aktualnosci = dlaStudentow.slice(0, 4);
   const aktualnosciTel = dlaStudentow.slice(0, 6);
 
-  const tytul = T('Studia', 'Study');
   const wstep = w(tekst, 'wstep');
   // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
   const haslo = w(tekst, 'haslo');

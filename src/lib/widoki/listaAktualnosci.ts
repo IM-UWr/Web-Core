@@ -2,6 +2,7 @@
 import ustawienia from '../../data/ustawienia.json';
 import { monthYear, type Lang } from '../daty';
 import { listaAktualnosci } from '../tresci';
+import { stronaListy } from '../tekstyStron';
 
 export async function daneListyAktualnosci(lang: Lang) {
   const lista = await listaAktualnosci(lang);
@@ -16,9 +17,9 @@ export async function daneListyAktualnosci(lang: Lang) {
     else grupy.push({ miesiac: m, pozycje: [p] });
   }
   const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
-  const lead = lang === 'en' ? 'Announcements, events and achievements of the Mathematical Institute.' : 'Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.';
-  // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
-  const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w Instytucie';
+  // Tytuł, opis, hasło (na telefonie zamiast opisu — NaglowekStrony.astro; decyzja 31.10.2026) i tekst nad listą:
+  // Web-Aktualnosci → Strony → Aktualności (src/content/strony/aktualnosci.md; zlecenie 30, src/lib/tekstyStron.ts).
+  const { tytul, opis: lead, haslo, html } = await stronaListy('aktualnosci', lang);
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 
   // Filtr rodzaju w panelu „Pokaż” (zal/ListaPokaz.astro, wspólny z Kalendarzem, Obronami i „Warto wiedzieć”; zlecenie 27):
@@ -26,5 +27,5 @@ export async function daneListyAktualnosci(lang: Lang) {
   const filtrEtykieta = T('Filtruj według rodzaju', 'Filter by type');
   const szukajDlugo = T('Szukaj w aktualnościach', 'Search news');
 
-  return { ustawienia, grupy, rodzaje, lead, haslo, filtrEtykieta, szukajDlugo };
+  return { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo };
 }

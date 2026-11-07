@@ -1,17 +1,19 @@
 // Dane strony działu „Instytut”: liczby, kafelki z menu, „O Instytucie”, ostatnie sukcesy i kontakt.
-import dzial from '../../data/dzialy/instytut.json';
+// Teksty (zlecenie 30): src/data/instytut.md (Web-Instytut, „Strona działu Instytut”) — Treść = „O Instytucie”, zdanie nad sukcesami
+// pod nagłówkiem „Ostatnie sukcesy” w treści (kotwica, src/lib/tekstyStron.ts); wstęp, hasło, „W skrócie” i godziny sekretariatu w polach.
 import ustawienia from '../../data/ustawienia.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { menuGlowne } from '../menu';
 import { zaklady, pracownicy, aktualnosci } from '../tresci';
+import { stronaDzialu } from '../tekstyStron';
 
 // Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
 // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
 type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
 
 export async function daneDzialuInstytut(lang: Lang) {
-  const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+  const { d: dzial, tytul, html: oInstytucie, sekcje } = await stronaDzialu('instytut', lang);
 
   // Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta.
   const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
@@ -43,15 +45,15 @@ export async function daneDzialuInstytut(lang: Lang) {
   // Mapa Google osadzana dopiero po kliknięciu (bez cookies Google do czasu zgody — patrz Polityka prywatności)
   const mapaEmbed = k.adres ? `https://www.google.com/maps?q=${encodeURIComponent(`Instytut Matematyczny Uniwersytetu Wrocławskiego, ${k.adres}`)}&output=embed&hl=${lang}` : undefined;
 
-  const naglowek = T('Instytut', 'Institute');
+  const naglowek = tytul;
   const lead = wybierz(dzial, 'wstep', lang);
   // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
   const haslo = wybierz(dzial, 'haslo', lang);
-  const oInstytucie = ((wybierz(dzial, 'o_instytucie', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
   const fakty = (((dzial as any).o_instytucie_fakty ?? []) as Fakt[])
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((lang === 'en' && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
-  const sukcesyOpis = wybierz(dzial, 'sukcesy_opis', lang);
+  // zdanie nad sukcesami: sekcja „Ostatnie sukcesy” z treści (HTML)
+  const sukcesyOpis = sekcje.sukcesy?.html ?? '';
 
   return { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed };
 }

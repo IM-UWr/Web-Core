@@ -1,8 +1,8 @@
 ---
 // Lista seminariów (/seminaria), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro (spis „Na tej stronie” z prawej,
 // na telefonie zwijany nad treścią). Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px) — style na końcu pliku.
-// Sekcje: najbliższe referaty (tydzień albo przyszły tydzień), tekst wprowadzający z CMS (src/data/dzialy/nauka.json,
-// pola seminaria_tekst / _en; akapity oddzielone pustą linią, puste pole = bez tekstu), seminaria zakładów i niezależne
+// Sekcje: najbliższe referaty (tydzień albo przyszły tydzień), tekst wprowadzający z CMS (Treść strony
+// Web-Nauka → Strony → Seminaria, Markdown; zlecenie 30; brak = bez tekstu), seminaria zakładów i niezależne
 // z najbliższym referatem (siatka boksów ul.boksy, zlecenie 17, punkt 6), pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
 // bez zakładu (pole puste albo zakład, którego nie ma na stronie) to seminarium niezależne.
 // Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”.
@@ -11,7 +11,6 @@
 import Podstrona from '../components/zal/Podstrona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import dzialNauka from '../data/dzialy/nauka.json';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, langPola, odmiana } from '../lib/i18n';
 import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
@@ -22,10 +21,8 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const nazwa = (s: Seminarium) => (lang === 'en' && s.data.nazwa_en) || s.data.nazwa;
-const { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, lead, haslo, liczby } = await daneListySeminariow(lang);
-// tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
-const wstep = ((wybierz(dzialNauka as Record<string, any>, 'seminaria_tekst', lang) as string) || '')
-  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+// html — tekst nad listą — Treść strony (Web-Nauka → Strony → Seminaria; zlecenie 30)
+const { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, tytul, lead, haslo, html, liczby } = await daneListySeminariow(lang);
 const tytulTygodnia = t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien');
 // sekcje strony (id w treści) — spis „Na tej stronie”
 const idGrupy = (id: string) => id.replace(/^h-/, 'z-');
@@ -41,7 +38,7 @@ const osoby = (l: string[]) => l.length <= 2
   ? l.join(', ')
   : `${l.slice(0, 2).join(', ')} ${T('i', 'and')} ${l.length - 2} ${odmiana(l.length - 2, ['inna osoba', 'inne osoby', 'innych osób'], ['other', 'others'], lang)}`;
 ---
-<Podstrona lang={lang} tytul={t(lang, 'seminaria')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
   wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} dzial="nauka" spis={spis} klasa="tresc z-sem">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
 
@@ -64,7 +61,7 @@ const osoby = (l: string[]) => l.length <= 2
     )}
   </section>
 
-  {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+  {html && <section set:html={html} />}
 
   {grupy.map((g) => (
     <section id={idGrupy(g.id)} aria-labelledby={g.id}>

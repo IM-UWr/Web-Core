@@ -1,9 +1,9 @@
 // Dane strony działu „Nauka” (src/views/DzialNauka.astro): liczby w banerze (telefon i komputer), kafelki z menu, projekty, konferencje, teksty z CMS.
-import dzial from '../../data/dzialy/nauka.json';
 import { wybierz } from '../i18n';
 import { today, addDays, type Lang } from '../daty';
 import { menuGlowne } from '../menu';
 import { konferencje, granty, obrony, trwaLubBedzie, type Grant, type Konferencja, type Obrona } from '../tresci';
+import { stronaDzialu } from '../tekstyStron';
 
 // Konferencja trwająca albo nadchodząca (używane też w szablonie — wygląd daty).
 export const konfTrwa = (k: Konferencja) => trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec });
@@ -68,12 +68,11 @@ export async function daneDzialuNauka(lang: Lang) {
   const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Nauka' || m.etykieta_en === 'Research');
   const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
-  const naglowek = T('Nauka', 'Research');
+  // Teksty (zlecenie 30): src/data/nauka.md (Web-Nauka, „Strona działu Nauka”) — Treść = „Badania w Instytucie”, reszta w polach.
+  const { d: dzial, tytul: naglowek, html: badania } = await stronaDzialu('nauka', lang);
   const lead = wybierz(dzial, 'wstep', lang);
   // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
   const haslo = wybierz(dzial, 'haslo', lang);
-  // „Badania w Instytucie”: akapity z CMS (pole badania_tekst / badania_tekst_en; akapity oddzielone pustą linią).
-  const badania = ((wybierz(dzial, 'badania_tekst', lang) as string) || '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
   // Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
   // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
   type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };

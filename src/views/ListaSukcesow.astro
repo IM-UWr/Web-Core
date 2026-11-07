@@ -2,19 +2,18 @@
 // Sukcesy (/nauka/sukcesy), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: aktualności z rodzajem „sukces”
 // według lat (najnowsze na górze; rok jako podsekcja h3 z liczbą wpisów, kotwice #rok-RRRR bez zmian). Spis „Na tej
 // stronie”: lata. Ramka „Wcześniejsze sukcesy” usunięta (zlecenie 11, zalecenie 4).
-// Tekst wprowadzający pod banerem (src/data/dzialy/nauka.json, pola sukcesy_tekst / _en; puste = brak).
+// Tekst wprowadzający pod banerem (Treść strony Web-Nauka → Strony → Sukcesy; zlecenie 30; brak = bez tekstu).
 // Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”;
 // tytuł Brygadą (cały wiersz prowadzi do wpisu), zajawka, z prawej miniatura zdjęcia wpisu (jeśli jest; na telefonie bez).
-// Baner (bez zmian): hasło (nauka.json: sukcesy_haslo / _en) i liczby w jednej liście .pt-liczby — na telefonie
+// Baner (bez zmian): hasło (pole Hasło tej strony) i liczby w jednej liście .pt-liczby — na telefonie
 // pokazywała się już ta sama lista (zal-telefon.css), więc dawnej listy telefonu (LiczbyBanera, liczbyTelefon) nie ma.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); własne style (na końcu pliku)
 // tylko dla wierszy z datą. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
 import Podstrona from '../components/zal/Podstrona.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
-import dzialNauka from '../data/dzialy/nauka.json';
 import { u, isExternal } from '../lib/url';
-import { odmiana, wJezyku, wybierz } from '../lib/i18n';
+import { odmiana, wJezyku } from '../lib/i18n';
 import { dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { slugOf, type Aktualnosc } from '../lib/tresci';
 import { daneListySukcesow } from '../lib/widoki/listaSukcesow';
@@ -27,10 +26,8 @@ const zajawka = (a: Aktualnosc) => (lang === 'en' && a.data.zajawka_en) || a.dat
 const href = (a: Aktualnosc) => u(wJezyku(`/aktualnosci/${slugOf(a.id)}`, lang));
 const zdjecie = (a: Aktualnosc) => (a.data.zdjecie ? (isExternal(a.data.zdjecie) ? a.data.zdjecie : u(a.data.zdjecie)) : undefined);
 
-const { sukcesy, lata, naglowek, lead, liczby, haslo } = await daneListySukcesow(lang);
-// tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
-const wstep = ((wybierz(dzialNauka as Record<string, any>, 'sukcesy_tekst', lang) as string) || '')
-  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+// html — tekst nad listą — Treść strony (Web-Nauka → Strony → Sukcesy; zlecenie 30)
+const { sukcesy, lata, naglowek, lead, html, liczby, haslo } = await daneListySukcesow(lang);
 const ileWpisow = (n: number) => `${n} ${odmiana(n, ['wpis', 'wpisy', 'wpisów'], ['post', 'posts'], lang)}`;
 // bez ramki „Wcześniejsze sukcesy” (zlecenie 11, zalecenie 4); strona /nauka/sukcesy/historia zostaje — decyzja właściciela
 const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
@@ -45,7 +42,7 @@ const spis = lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok }));
     )}
   </Fragment>
 
-  {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+  {html && <section set:html={html} />}
 
   <section id="z-wpisy" aria-labelledby="h-wpisy">
     <h2 id="h-wpisy">{T('Według lat', 'By year')}</h2>

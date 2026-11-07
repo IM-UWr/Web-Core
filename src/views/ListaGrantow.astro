@@ -21,7 +21,7 @@ const tytul = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 const adresGrantu = (g: Grant) => u(wJezyku(`/nauka/granty/${slugOf(g.id)}`, lang));
 
 const {
-  realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, naglowek, lead, wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
+  realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, naglowek, lead, html, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
 } = await daneListyGrantow(lang);
 // Wiersz „Kierownik: … · zakład · numer” i krótka linia pod tytułem w małych wierszach.
 const rodzaj = (g: Grant) => RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '';
@@ -41,7 +41,7 @@ const dzisZ = osZakonczonych && dzisNaOsi(osZakonczonych);
         {liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}
       </ul>
   </Fragment>
-    {wstep.length > 0 && <section class="tresc">{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+    {html && <section class="tresc" set:html={html} />}
 
     <section id="z-realizowane" aria-labelledby="z-h-realizowane">
       <h2 id="z-h-realizowane">{T('Realizowane', 'Ongoing')} ({realizowane.length})</h2>

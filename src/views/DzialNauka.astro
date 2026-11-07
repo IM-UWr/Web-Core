@@ -1,7 +1,7 @@
 ---
 // Strona działu „Nauka” (/nauka, /en/nauka): baner działu z liczbami (konferencje w ostatnim roku), pod nim blok TrescDzialu —
 // podstrony w grupach jak w menu, „Badania w Instytucie” z „W skrócie”, realizowane projekty i konferencje.
-// Teksty edytowalne w CMS: src/data/dzialy/nauka.json — reszta wylicza się sama z kolekcji treści.
+// Teksty edytowalne w CMS: src/data/nauka.md (Web-Nauka, „Strona działu Nauka”; zlecenie 30) — reszta wylicza się sama z kolekcji treści.
 // Jedna wersja HTML: komputer i telefon (≤ 1023 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -33,7 +33,7 @@ const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomput
       </ul>
     )}
   </NaglowekStrony>
-  <TrescDzialu dzial="nauka" lang={lang} grupy={grupy} tekst={{ tytul: T('Badania w Instytucie', 'Research at the Institute'), akapity: badania, fakty }}>
+  <TrescDzialu dzial="nauka" lang={lang} grupy={grupy} tekst={{ tytul: T('Badania w Instytucie', 'Research at the Institute'), akapity: [], html: badania, fakty }}>
     <Sekcja id="z-dz-projekty" tytul={`${T('Realizowane projekty', 'Ongoing projects')} (${realizowane.length})`} lang={lang}
       linki={[{ etykieta: T('Wszystkie projekty i granty', 'All projects and grants'), adres: '/nauka/granty' }]}
       opis={realizowane.length === 0 ? T('Obecnie brak realizowanych projektów.', 'No ongoing projects at the moment.')

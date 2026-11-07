@@ -1,6 +1,7 @@
 ---
 // Strona działu „Instytut” (/instytut, /en/instytut): baner działu z liczbami, pod nim blok TrescDzialu — podstrony w grupach
-// jak w menu, „O Instytucie” z „W skrócie”, ostatnie sukcesy z miniaturami, kontakt i dojazd. Teksty: src/data/dzialy/instytut.json.
+// jak w menu, „O Instytucie” z „W skrócie”, ostatnie sukcesy z miniaturami, kontakt i dojazd. Teksty: src/data/instytut.md
+// (Web-Instytut, „Strona działu Instytut”; zlecenie 30, src/lib/tekstyStron.ts).
 // Jedna wersja HTML: komputer i telefon (≤ 1023 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
@@ -36,9 +37,9 @@ const SZEROKOSCI_SUKCESU = [54, 72, 81, 108, 120, 144, 162, 216, 240, 360, 400, 
       </ul>
     )}
   </NaglowekStrony>
-  <TrescDzialu dzial="instytut" lang={lang} grupy={grupy} tekst={{ tytul: T('O Instytucie', 'About the Institute'), akapity: oInstytucie, fakty }}>
+  <TrescDzialu dzial="instytut" lang={lang} grupy={grupy} tekst={{ tytul: T('O Instytucie', 'About the Institute'), akapity: [], html: oInstytucie, fakty }}>
     {sukcesy.length > 0 && (
-      <Sekcja id="z-dz-sukcesy" tytul={T('Ostatnie sukcesy', 'Recent achievements')} lang={lang} opis={sukcesyOpis || undefined}
+      <Sekcja id="z-dz-sukcesy" tytul={T('Ostatnie sukcesy', 'Recent achievements')} lang={lang} opisHtml={sukcesyOpis || undefined}
         linki={[{ etykieta: T('Wszystkie sukcesy', 'All achievements'), adres: '/nauka/sukcesy' }]}>
         <div class="z-dz-suk">
           {sukcesy.map((a) => {

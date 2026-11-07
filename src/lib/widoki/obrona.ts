@@ -1,11 +1,11 @@
 // Dane strony pojedynczej obrony doktorskiej (src/views/Obrona.astro): tytuł, treść, dokumenty, hasło i liczby w banerze.
 import { render } from 'astro:content';
-import dzial from '../../data/dzialy/nauka.json';
 import { t, wybierz } from '../i18n';
 import { renderMarkdown } from '../markdown';
 import { tytulyEn, tytulyWJezyku } from '../osoby';
 import { long, longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
 import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../tresci';
+import { stronaListy } from '../tekstyStron';
 
 export async function daneObrony(obrona: Obrona, lang: Lang) {
   const d = obrona.data;
@@ -26,10 +26,10 @@ export async function daneObrony(obrona: Obrona, lang: Lang) {
     ...d.recenzje.map((r) => ({ nazwa: `${t(lang, 'recenzja')}: ${tytulyWJezyku(r.recenzent, lang)}`, plik: r.plik })),
   ].filter(Boolean) as { nazwa: string; plik: string }[];
   // Telefon (≤ 1023 px; zlecenie 01, decyzja 31.10.2026): baner jak w działach — „← Obrony doktorskie”, imię i nazwisko,
-  // hasło (src/data/dzialy/nauka.json, obrona_haslo / _en), kreska i trzy pozycje: data („20 paź”, pod nią dzień tygodnia
+  // hasło (pole „Hasło stron rocznika / obrony” strony Obrony doktorskie w Web-Aktualnosci; zlecenie 30), kreska i trzy pozycje: data („20 paź”, pod nią dzień tygodnia
   // i rok) · godzina (pod nią sala — pierwszy człon miejsca, gdy to sala; inaczej „godzina”) · liczba recenzji.
   // Tytuł rozprawy na telefonie pod banerem (.ob-rozprawa), w banerze tylko na komputerze.
-  const haslo = ((dzial as Record<string, any>)[lang === 'en' ? 'obrona_haslo_en' : 'obrona_haslo'] as string | undefined) || undefined;
+  const haslo = (await stronaListy('obrony-doktorskie', lang)).hasloPodstron;
   const salaObrony = miejsce(d.miejsce, lang)?.split(',')[0].trim();
   // (napisy i ich etykiety są już w języku strony — LiczbyBanera bierze `pl`, gdy nie ma `en`)
   const liczby = [

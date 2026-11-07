@@ -15,11 +15,13 @@ import type { Lang } from '../../lib/daty';
 
 interface Props { lang: Lang; etykieta: string; opcje: { wartosc: string; etykieta: string }[]; szukaj: string }
 const { lang, etykieta, opcje, szukaj } = Astro.props;
-const maNad = Astro.slots.has('nad');
+// slot „nad” podany warunkowo ({html && <div slot="nad">…}, zlecenie 30) też „jest” — liczy się to, co wyrenderował
+const nad = Astro.slots.has('nad') ? await Astro.slots.render('nad') : '';
+const maNad = nad.trim() !== '';
 const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
 ---
 <div class:list={['lp-uklad', maNad && 'lp-z-nad']}>
-  {maNad && <div class="lp-nad"><slot name="nad" /></div>}
+  {maNad && <div class="lp-nad" set:html={nad} />}
   <div class="lp-panel">
     <div class="lp-narz" data-pagefind-ignore>
       <p class="lp-pokaz" aria-hidden="true">{lang === 'en' ? 'Show' : 'Pokaż'}</p>
@@ -42,6 +44,9 @@ const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
 </div>
 
 <style>
+  /* tekst nad listą (slot „nad”, div.lp-wstep z Markdownu — Obrony, Aktualności, „Warto wiedzieć”; jak .wst wzorca treści) */
+  .lp-nad :global(.lp-wstep p) { margin: 0 0 10px; max-width: 46em; font-size: 16px; line-height: 1.6; color: var(--text); }
+  .lp-nad :global(.lp-wstep p:last-child) { margin-bottom: 0; }
   /* kolory poza działami (jak w Aktualnościach, wartości jak w :root w zalozyciele.css): panel, nagłówki grup i linki pod listą także na Obronach
      i „Warto wiedzieć”, gdzie <body> ma data-dzial działu, w którego menu stoją; kolor działu mają tylko wiersze z własnym data-dzial */
   .lp-uklad { --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de; --accent: var(--d-a); }
@@ -74,6 +79,7 @@ const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
     .lp-z-nad .lp-nad { grid-column: 1; grid-row: 1; min-width: 0; }
     .lp-z-nad .lp-tresc { grid-row: 2; }
     .lp-z-nad .lp-panel { grid-row: 1 / span 2; }
+    .lp-nad :global(.lp-wstep) { padding-bottom: 4px; }
     .lp-narz { display: grid; gap: 10px; }
     .lp-pokaz { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--muted); }
     .lp-opcje { display: grid; gap: 2px; border: 0; border-left: 1px solid var(--line); }
@@ -87,6 +93,9 @@ const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
 
   /* ---------- telefon (≤ 1023 px): lista wyboru, pole szukania pod nią ---------- */
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    /* tekst nad listą: mniejszy, odstęp nad filtrami (dawniej .ob-wstep w ListaObron.astro) */
+    .lp-nad :global(.lp-wstep) { margin-bottom: 18px; }
+    .lp-nad :global(.lp-wstep p) { font-size: 15px; }
     .lp-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
     .lp-opcje { display: none; }
     .lp-lista { display: flex; width: 100%; }

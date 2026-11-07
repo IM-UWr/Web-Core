@@ -4,7 +4,7 @@
 // dodatkowo według roku studiów. Telefony podajemy tylko przy administracji (pilnuje tego skrypty/sprawdz_tresci.py).
 // Wzorzec treści (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14): sekcja h2, podsekcja h3 (rok studiów
 // doktorantów), kreski między sekcjami; tu własne style tylko na pasek filtrów i wiersze osób (w duchu tabeli wzorca).
-// W nagłówku hasło (pole pracownicy_haslo / pracownicy_haslo_en w src/data/dzialy/instytut.json) i liczby (osoby · zakłady ·
+// W nagłówku hasło (Web-Pracownicy → Strony → Pracownicy, src/content/strony/pracownicy.md; zlecenie 30) i liczby (osoby · zakłady ·
 // doktoranci). Treść: pasek filtrów (szukaj, grupa, zakład) i grupy osób jako sekcje — spis „Na tej stronie” prowadzi do
 // grup (TabelaPracownikow.tsx, wyspa React). Jedna wersja HTML: komputer — wiersz osoby w kolumnach (imię i nazwisko,
 // e-mail, telefon, pokój, strona); telefon (≤ 1023 px) — wiersz w jednej kolumnie, pasek filtrów w dwóch rzędach.
@@ -17,14 +17,15 @@ import { danePracownikow } from '../lib/widoki/pracownicy';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const { osoby, grupy, zaklady, haslo, liczby, napisy, lead } = await danePracownikow(lang);
+const { osoby, grupy, zaklady, tytul, haslo, html, liczby, napisy, lead } = await danePracownikow(lang);
 // spis „Na tej stronie”: grupy osób (sekcje #zp-<grupa> w TabelaPracownikow.tsx), krótka nazwa grupy w spisie
 const spis = grupy.map((g) => ({ id: `zp-${g.id}`, etykieta: g.nazwa, krotka: g.krotko }));
 ---
-<Podstrona lang={lang} tytul={t(lang, 'pracownicy')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
-  okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: t(lang, 'pracownicy') }]}
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
+  okruszki={[{ etykieta: t(lang, 'instytut'), adres: '/instytut' }, { etykieta: tytul }]}
   dzial="instytut" spis={spis} klasa="tresc z-prac">
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
+  {html && <section set:html={html} />}
   <TabelaPracownikow lang={lang} client:load osoby={osoby} grupy={grupy} zaklady={zaklady} napisy={napisy} />
 </Podstrona>
 

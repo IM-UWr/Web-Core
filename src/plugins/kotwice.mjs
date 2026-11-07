@@ -1,4 +1,5 @@
-// Kotwice treści z jednego Markdownu (kierunki — zlecenie 28, specjalności — zlecenie 29): nagłówek ## o jednej z tych nazw
+// Kotwice treści z jednego Markdownu (kierunki — zlecenie 28, specjalności — zlecenie 29, strony działów i z listą — zlecenie 30,
+// typ 'strona' na końcu listy, src/lib/tekstyStron.ts): nagłówek ## o jednej z tych nazw
 // (porównanie bez wielkości liter, PL albo EN) dostaje stałe id sekcji (linki z innych stron, np. przypomnienia →
 // /studia/matematyka#terminy), układ i ewentualnie rolę. Jedno miejsce dla wtyczki bloków (rehype-bloki.mjs) i widoków.
 //   typ — strona, na której działa kotwica ('kierunek' | 'specjalnosc'); bez typu — na obu. Kotwica swojego typu ma
@@ -57,9 +58,14 @@ export const KOTWICE = [
     id: 'opiekun', typ: 'specjalnosc', uklad: 'bloki', wstawka: 'opiekun',
     nazwy: ['Opiekun specjalności', 'Opiekunowie specjalności', 'Opiekunka specjalności', 'Opiekunki specjalności', 'Coordinator', 'Coordinators'],
   },
+
+  // Strona działu i strony z listą (zlecenie 30) — typ 'strona', tylko na stronie o adresie `adres` (src/lib/tekstyStron.ts):
+  // sekcja pod tym nagłówkiem (do następnego ##) idzie na miejsce swojej listy; reszta tekstu stoi nad listą.
+  { id: 'sukcesy', typ: 'strona', adres: '/instytut', nazwy: ['Ostatnie sukcesy', 'Recent achievements'] },
+  { id: 'czasopisma', typ: 'strona', adres: '/nauka/publikacje', nazwy: ['Czasopisma redagowane w Instytucie', 'Journals edited at the Institute'] },
 ];
 
-const klucz = (s) => String(s ?? '').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pl');
+export const klucz = (s) => String(s ?? '').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pl');
 const mapa = (typ) => {
   const m = new Map();
   // najpierw kotwice tego typu, potem wspólne

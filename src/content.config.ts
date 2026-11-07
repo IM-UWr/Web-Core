@@ -79,6 +79,9 @@ const strony = defineCollection({
     // listy Markdown jako bloki wzorca treści: dwie kolumny, kontakty, etapy, linki (src/plugins/rehype-bloki.mjs)
     bloki: z.boolean().optional(),
     ...haslo,
+    // strona z listą (zlecenie 30, src/lib/tekstyStron.ts): hasło stron pojedynczych wpisów (rocznik publikacji, obrona)
+    haslo_podstron: optStr,
+    haslo_podstron_en: optStr,
     liczby: liczbyBanera,
     opublikowany: published,
   }),

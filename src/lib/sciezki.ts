@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { aktualnosci, obrony, seminaria, konferencje, granty, zaklady, slugOf, opublikowane } from './tresci';
 import { specjalnosci } from './specjalnosci';
+import { jestTekstemListy } from './tekstyStron';
 
 export async function sciezkiAktualnosci() {
   const wszystkie = await aktualnosci(true);
@@ -15,8 +16,9 @@ export async function sciezkiAktualnosci() {
   });
 }
 
+// bez tekstów stron z listą (np. strony/nauka/konferencje.md): wyświetla je sama lista (src/lib/tekstyStron.ts, zlecenie 30)
 export async function sciezkiStron() {
-  const strony = await getCollection('strony');
+  const strony = (await getCollection('strony')).filter((s) => !jestTekstemListy(s.id));
   return strony.map((strona) => ({ params: { slug: strona.id }, props: { strona } }));
 }
 

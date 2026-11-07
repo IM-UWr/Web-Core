@@ -2,8 +2,8 @@
 // Obrony doktorskie (/obrony-doktorskie), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro. W stylu listy Aktualności
 // (zlecenie 27, punkt 2): ten sam baner (granat przechodzi w zdjęcie Aktualności, bez liczb, z hasłem), panel „Pokaż” z prawej
 // (zal/ListaPokaz.astro) z filtrem lat (lata, w których są obrony, od najnowszego; w adresie ?rok=2026) i polem szukania (kandydat,
-// tytuł rozprawy, promotor), bez spisu „Na tej stronie”. Nad listą tekst wprowadzający (src/data/dzialy/nauka.json, pola obrony_tekst / _en;
-// puste = brak), pod nim nadchodzące i odbyte obrony (grupy jak miesiące w Aktualnościach) i link do archiwum.
+// tytuł rozprawy, promotor), bez spisu „Na tej stronie”. Nad listą tekst wprowadzający (Treść strony Web-Aktualnosci → Strony →
+// Obrony doktorskie; zlecenie 30; brak = bez tekstu), pod nim nadchodzące i odbyte obrony (grupy jak miesiące w Aktualnościach) i link do archiwum.
 // Wiersze: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie) — dzień w kolorze Nauki (obrona doktorska, jak w Aktualnościach),
 // obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy, promotor.
 // Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px; filtry nad listą). Bez JS: bez filtrów, cała lista.
@@ -11,8 +11,7 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import ListaPokaz from '../components/zal/ListaPokaz.astro';
 import Link from '../components/Link.astro';
 import WierszWydarzenia from '../components/WierszWydarzenia.astro';
-import dzialNauka from '../data/dzialy/nauka.json';
-import { t, wybierz } from '../lib/i18n';
+import { t } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { miejsce, slugOf, type Obrona, type Wydarzenie } from '../lib/tresci';
 import { tytulyWJezyku } from '../lib/osoby';
@@ -21,10 +20,8 @@ import { daneListyObron } from '../lib/widoki/listaObron';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { przyszle, odbyte, lata, lead, haslo, ustawienia } = await daneListyObron(lang);
-// tekst wprowadzający z CMS (jak dotychczasowy TekstWstepny.astro)
-const wstep = ((wybierz(dzialNauka as Record<string, any>, 'obrony_tekst', lang) as string) || '')
-  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+// html — tekst nad listą — Treść strony (Web-Aktualnosci → Strony → Obrony doktorskie; zlecenie 30), nad listą w kolumnie listy
+const { przyszle, odbyte, lata, tytul, lead, haslo, html, ustawienia } = await daneListyObron(lang);
 // obrona jako pozycja kalendarza (ten sam wiersz co w Kalendarzu)
 const wiersz = (o: Obrona): Wydarzenie => ({
   rodzaj: 'obrona', tytul: o.data.kandydat, podtytul: o.data.tytul_rozprawy, poczatek: o.data.termin, miejsce: miejsce(o.data.miejsce, lang),
@@ -36,12 +33,12 @@ const grupy = [
 ].filter((g) => g.lista.length > 0);
 const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`;
 ---
-<Podstrona lang={lang} tytul={t(lang, 'obrony')} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
   okruszki={[{ etykieta: en ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} klasa="z-ob" klasaRamy="z-pd-pelna" atrybuty={{ 'data-obrony': '' }}>
 
   <ListaPokaz lang={lang} etykieta={en ? 'Filter by year' : 'Filtruj według roku'} opcje={lata.map((r) => ({ wartosc: r, etykieta: r }))}
     szukaj={en ? 'Search defences' : 'Szukaj w obronach'}>
-    {wstep.length > 0 && <div slot="nad" class="ob-wstep">{wstep.map((a) => <p>{a}</p>)}</div>}
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
 
     {grupy.map((g) => (
       <section class="ob-grupa" data-grupa>
@@ -83,9 +80,6 @@ const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-d
 
 <style>
   [hidden] { display: none !important; }
-  /* tekst wprowadzający nad listą (jak .wst wzorca treści) */
-  .ob-wstep p { margin: 0 0 10px; max-width: 46em; font-size: 16px; line-height: 1.6; color: var(--text); }
-  .ob-wstep p:last-child { margin-bottom: 0; }
   /* grupa (nadchodzące, odbyte): nagłówek jak miesiąc w Aktualnościach */
   .ob-grupa { margin: 0; padding: 0; border: 0; }
   .ob-grupa h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
@@ -97,13 +91,9 @@ const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-d
   .ob-archiwum { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
   .ob-archiwum :global(a) { color: var(--d-a); }
 
-  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-    .ob-wstep { padding-bottom: 4px; }
-  }
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1).
+     Tekst nad listą (dawniej .ob-wstep) — style .lp-wstep w ListaPokaz.astro (zlecenie 30). */
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
-    .ob-wstep { margin-bottom: 18px; }
-    .ob-wstep p { font-size: 15px; }
     .ob-grupa h2 { margin-top: 22px; font-size: 20px; }
     .ob-prom { font-size: 13.5px; }
   }

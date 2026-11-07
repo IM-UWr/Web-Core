@@ -17,20 +17,20 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import ListaPokaz from '../components/zal/ListaPokaz.astro';
 import Link from '../components/Link.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
-import { t, RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
+import { RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneListyAktualnosci } from '../lib/widoki/listaAktualnosci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { ustawienia, grupy, rodzaje, lead, haslo, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
-const tytul = t(lang, 'aktualnosci');
+const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
 ---
 <Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
   okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-pelna" atrybuty={{ 'data-lista': '', 'data-dalej': en ? '… read more' : '… czytaj dalej' }}>
 
   <ListaPokaz lang={lang} etykieta={filtrEtykieta} opcje={rodzaje.map((r) => ({ wartosc: r, etykieta: RODZAJE_FILTRY[r][lang] }))} szukaj={szukajDlugo}>
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
     <p slot="panel" class="ak-dla" data-dla-info data-pagefind-ignore hidden>
       <span>{en ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
       <button type="button" data-dla-wyczysc>{en ? 'Show all' : 'Pokaż wszystkie'}</button>

@@ -5,7 +5,7 @@ import { t, wybierz, wJezyku } from '../i18n';
 import { u } from '../url';
 import { zaklady as pobierzZaklady } from '../tresci';
 import type { Lang } from '../daty';
-import dzial from '../../data/dzialy/instytut.json';
+import { stronaListy } from '../tekstyStron';
 
 export async function danePracownikow(lang: Lang) {
   const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
@@ -29,7 +29,6 @@ export async function danePracownikow(lang: Lang) {
   // Baner na telefonie: hasło (po angielsku tylko pole _en — bez polskich resztek) i liczby z danych: osoby w spisie ·
   // zakłady naukowe (bez Pracowni Dydaktyki — liczymy wpisy, których nazwa zaczyna się od „Zakład”) · doktoranci
   // (męskoosobowy — przy 2–4 też dopełniacz: „dwóch doktorantów”, „22 doktorantów”).
-  const haslo = ((lang === 'en' ? (dzial as any).pracownicy_haslo_en : (dzial as any).pracownicy_haslo) as string | undefined) || undefined;
   const liczby: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
     { n: osoby.length, pl: ['osoba', 'osoby', 'osób'], en: ['person', 'people'] },
     { n: listaZakladow.filter((z) => /^zakład/i.test(z.data.nazwa.trim())).length, pl: ['zakład', 'zakłady', 'zakładów'], en: ['department', 'departments'] },
@@ -76,9 +75,8 @@ export async function danePracownikow(lang: Lang) {
     osoba2: lang === 'en' ? 'people' : 'osoby',
     osoba5: lang === 'en' ? 'people' : 'osób',
   };
-  const lead = lang === 'en'
-    ? 'Contact details of the staff, PhD students and administration of the Mathematical Institute.'
-    : 'Dane kontaktowe pracowników, doktorantów i administracji Instytutu Matematycznego.';
+  // tytuł, opis, hasło i tekst nad listą (html): Web-Pracownicy → Strony → Pracownicy (src/content/strony/pracownicy.md; zlecenie 30)
+  const { tytul, opis: lead, haslo, html } = await stronaListy('pracownicy', lang, { wst: true });
 
-  return { osoby, grupy, zaklady, haslo, liczby, motywDane, napisy, lead };
+  return { osoby, grupy, zaklady, tytul, haslo, html, liczby, motywDane, napisy, lead };
 }

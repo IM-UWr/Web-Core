@@ -1,8 +1,7 @@
 // Dane listy projektów i grantów (src/views/ListaGrantow.astro): podział na realizowane/zakończone/bez lat, liczby, spis sekcji.
-import dzial from '../../data/dzialy/nauka.json';
 import { today, type Lang } from '../daty';
-import { wybierz } from '../i18n';
 import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, type Grant } from '../tresci';
+import { stronaListy } from '../tekstyStron';
 
 // liczebniki: 1 projekt, 2–4 (22–24…) projekty, 5+ projektów
 export const odm = (n: number, jeden: string, kilka: string, wiele: string) => {
@@ -42,18 +41,14 @@ export async function daneListyGrantow(lang: Lang) {
   ];
   // Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i trzy liczby w banerze;
   // projekty bez podanych lat liczą się tylko do „łącznie” (jak sekcja „Pozostałe”).
-  const haslo = ((dzial as any)[lang === 'en' ? 'granty_haslo_en' : 'granty_haslo'] as string | undefined) || undefined;
   const liczbyTelefon = [
     { n: realizowane.length, pl: ['realizowany projekt', 'realizowane projekty', 'realizowanych projektów'], en: ['ongoing project', 'ongoing projects'] },
     { n: zakonczone.length, pl: ['zakończony', 'zakończone', 'zakończonych'], en: ['completed', 'completed'] },
     { n: wszystkie.length, pl: ['projekt łącznie', 'projekty łącznie', 'projektów łącznie'], en: ['project in total', 'projects in total'] },
   ] as { n: number; pl: [string, string, string]; en: [string, string] }[];
 
-  const naglowek = T('Projekty i granty', 'Research projects and grants');
-  const lead = T(
-    'Projekty badawcze realizowane w Instytucie Matematycznym, finansowane przez Narodowe Centrum Nauki, programy unijne i inne źródła.',
-    'Research projects carried out at the Mathematical Institute, funded by the National Science Centre (NCN), EU programmes and other sources.',
-  );
+  // tytuł, opis, hasło i tekst nad listą (html): Web-Nauka → Strony → Projekty i granty (src/content/strony/nauka/granty.md; zlecenie 30)
+  const { tytul: naglowek, opis: lead, haslo, html } = await stronaListy('nauka/granty', lang, { wst: true });
   const naTejStronie = T('Na tej stronie', 'On this page');
   const sekcje = [
     { id: 'realizowane', tekst: T('Realizowane', 'Ongoing'), ile: realizowane.length, pokaz: true },
@@ -62,11 +57,6 @@ export async function daneListyGrantow(lang: Lang) {
   ].filter((s) => s.pokaz);
 
   // ---------- komputer (kierunek „Założyciele”): paski czasu na wspólnej osi lat ----------
-  // Tekst wprowadzający (te same akapity co TekstWstepny: nauka.json, granty_tekst / granty_tekst_en).
-  const wstep = wybierz(dzial as Record<string, any>, 'granty_tekst', lang)
-    .split(/\n\s*\n/)
-    .map((a) => a.trim())
-    .filter(Boolean);
   // „Dziś” = data budowania: rok + ułamek roku (2.11.2026 → ok. 2026,84).
   const [rD, mD, dD] = today().split('-').map(Number);
   const dzis = rD + (Date.UTC(rD, mD - 1, dD) - Date.UTC(rD, 0, 1)) / (Date.UTC(rD + 1, 0, 1) - Date.UTC(rD, 0, 1));
@@ -104,6 +94,6 @@ export async function daneListyGrantow(lang: Lang) {
 
   return {
     realizowane, zakonczone, bezLat, grupy, kier, zakladProjektu, liczby, haslo, liczbyTelefon, naglowek, lead, naTejStronie, sekcje,
-    wstep, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
+    html, osRealizowanych, osZakonczonych, pasek, dzisNaOsi, spisKomputer,
   };
 }

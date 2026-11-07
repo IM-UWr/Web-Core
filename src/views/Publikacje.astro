@@ -2,9 +2,9 @@
 // Publikacje (/nauka/publikacje), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: wykazy prac według lat
 // (rok → podstrona z listą w HTML, PDF-y) i czasopisma redagowane w Instytucie. Spis „Na tej stronie”: obie sekcje.
 // Treść: src/data/publikacje.json (CMS) i src/data/publikacje/RRRR.json (wykazy). Liczby liczą się z wykazów.
-// Tekst wprowadzający pod banerem (src/data/dzialy/nauka.json, pola publikacje_tekst / _en; puste = brak), krótki tekst
-// o czasopismach na początku ich sekcji (pola czasopisma_tekst / _en; puste = brak; bez czasopism nie ma też tekstu).
-// Baner (bez zmian): hasło (nauka.json: publikacje_haslo / _en) i liczby w jednej liście .pt-liczby — na telefonie
+// Tekst wprowadzający pod banerem (Treść strony Web-Nauka → Strony → Publikacje; zlecenie 30), krótki tekst o czasopismach
+// na początku ich sekcji (w tej samej Treści pod nagłówkiem „Czasopisma redagowane w Instytucie”; bez czasopism nie ma też tekstu).
+// Baner (bez zmian): hasło (pole Hasło strony Publikacje) i liczby w jednej liście .pt-liczby — na telefonie
 // pokazywała się już ta sama lista (zal-telefon.css), więc dawnej listy telefonu (LiczbyBanera, liczbyTelefon) nie ma.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2, czasopisma jako podsekcje h3
 // z parami dl.para, akapit .wst. Własne style (na końcu pliku): siatka lat z cienkimi liniami (bez kart).
@@ -12,7 +12,6 @@
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
-import dzialNauka from '../data/dzialy/nauka.json';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -25,13 +24,8 @@ const en = lang === 'en';
 const T = (pl: string, en_: string) => (en ? en_ : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const nPozycji = (n: number) => (en ? (n === 1 ? 'entry' : 'entries') : odmiana(n, 'pozycja', 'pozycje', 'pozycji'));
-// teksty z CMS (jak dotychczasowy TekstWstepny.astro): akapity oddzielone pustą linią
-const akapity = (pole: string) => ((wybierz(dzialNauka as Record<string, any>, pole, lang) as string) || '')
-  .split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
-
-const { tytul, lead, wszystkie, najnowszy, czasopisma, liczby, haslo, nagCzasopisma, archiwum } = await danePublikacji(lang);
-const wstep = akapity('publikacje_tekst');
-const oCzasopismach = czasopisma.length > 0 ? akapity('czasopisma_tekst') : [];
+// html — tekst nad listą lat, htmlCzasopisma — tekst nad czasopismami (Web-Nauka → Strony → Publikacje; zlecenie 30)
+const { tytul, lead, html, wszystkie, najnowszy, czasopisma, liczby, haslo, nagCzasopisma, htmlCzasopisma, archiwum } = await danePublikacji(lang);
 const tytulWykazow = T('Wykazy prac według lat', 'Lists of publications by year');
 const spis = [
   { id: 'wykazy', etykieta: tytulWykazow, krotka: T('Wykazy prac', 'Lists by year') },
@@ -48,7 +42,7 @@ const spis = [
     )}
   </Fragment>
 
-  {wstep.length > 0 && <section>{wstep.map((a, i) => <p class={i === 0 ? 'wst' : undefined}>{a}</p>)}</section>}
+  {html && <section set:html={html} />}
 
   <section id="wykazy" aria-labelledby="h-wykazy">
     <h2 id="h-wykazy">{tytulWykazow}</h2>
@@ -80,7 +74,7 @@ const spis = [
   {czasopisma.length > 0 && (
     <section id="czasopisma" aria-labelledby="h-czasopisma">
       <h2 id="h-czasopisma">{nagCzasopisma}</h2>
-      {oCzasopismach.map((a) => <p>{a}</p>)}
+      {htmlCzasopisma && <Fragment set:html={htmlCzasopisma} />}
       {czasopisma.map((c) => {
         const opis = wybierz(c as any, 'opis', lang);
         const wydawca = wybierz(c as any, 'wydawca', lang);

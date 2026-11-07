@@ -1,8 +1,8 @@
 ---
 // Struktura i zakłady (/instytut/struktura), kierunek „Założyciele”, szablon podstrony (zal/Podstrona.astro) i wzorzec treści
-// (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). W nagłówku hasło (pole struktura_haslo /
-// struktura_haslo_en w src/data/dzialy/instytut.json) i liczby kadry (liczone z tabeli pracowników).
-// Treść: tekst o organizacji Instytutu (pole struktura_tekst, akapity oddzielone pustą linią; pierwszy akapit .wst) i sekcja
+// (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). W nagłówku hasło (Web-Instytut → Strony →
+// Struktura i zakłady; zlecenie 30) i liczby kadry (liczone z tabeli pracowników).
+// Treść: tekst o organizacji Instytutu (Treść tej strony, Markdown; pierwszy akapit .wst) i sekcja
 // „Zakłady i pracownia” — siatka boksów (ul.boksy, zlecenie 17, punkt 6): etykieta, krótka nazwa (link na cały boks), opis, obszary badań, kierownik i liczba osób;
 // pod listą obszary badań Instytutu. Jedna sekcja z nagłówkiem — bez spisu „Na tej stronie”.
 // Jedna wersja HTML: komputer — trzy albo dwie kolumny; telefon (≤ 1023 px) — jedna kolumna (wzorzec treści).
@@ -16,7 +16,7 @@ import { tytulyWJezyku } from '../lib/osoby';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { lista, osoby, liczby, naglowek, tekst, lead, haslo } = await daneListyZakladow(lang);
+const { lista, osoby, liczby, naglowek, html, lead, haslo } = await daneListyZakladow(lang);
 const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], ['person', 'people'], lang)}`;
 ---
 <Podstrona lang={lang} tytul={naglowek} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
@@ -25,7 +25,7 @@ const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], [
   <Fragment slot="baner"><ul class="pt-liczby">{liczby.map((x) => <li><span class="n">{x.n}</span>{x.l}</li>)}</ul></Fragment>
 
   {/* tekst o organizacji Instytutu, żeby strona nie zaczynała się od razu od listy zakładów */}
-  {tekst.length > 0 && <section>{tekst.map((a, i) => <p class:list={[i === 0 && 'wst']}>{a}</p>)}</section>}
+  {html && <section set:html={html} />}
 
   <section id="z-zaklady" aria-labelledby="z-zaklady-h">
     <h2 id="z-zaklady-h">{T('Zakłady i pracownia', 'Departments and unit')}</h2>

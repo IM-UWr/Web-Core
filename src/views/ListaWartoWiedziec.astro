@@ -1,7 +1,7 @@
 ---
 // Lista „Warto wiedzieć” (/warto-wiedziec, /en/warto-wiedziec): wszystkie opublikowane pozycje kolekcji warto_wiedziec.
 // Szablon podstrony (zal/Podstrona.astro). W stylu listy Aktualności (zlecenie 27, punkt 2): ten sam baner (granat przechodzi w zdjęcie
-// Aktualności, bez liczb; hasło z pola warto_wiedziec_haslo / warto_wiedziec_haslo_en w src/data/dzialy/instytut.json), panel „Pokaż”
+// Aktualności, bez liczb; tytuł, opis, hasło i tekst nad listą — Web-Instytut → Strony → Warto wiedzieć; zlecenie 30), panel „Pokaż”
 // z prawej (zal/ListaPokaz.astro) z filtrem działu (tylko działy, które mają wpisy; w adresie ?dzial=nauka) i polem szukania.
 // Treść: wiersze pozycji (WartoWiedziec.astro, uklad „lista”: rok w kolorze działu pozycji, tytuł, zajawka, miniatura), pod nimi link
 // do „Sukcesów”. Bez spisu „Na tej stronie”. Jedna wersja HTML: komputer i telefon (≤ 1023 px; filtry nad listą). Bez JS: bez filtrów.
@@ -17,11 +17,12 @@ import { daneListyWartoWiedziec } from '../lib/widoki/listaWartoWiedziec';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { ile, dzialy, tytul, lead, haslo } = await daneListyWartoWiedziec(lang);
+const { ile, dzialy, tytul, lead, haslo, html } = await daneListyWartoWiedziec(lang);
 ---
 <Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb klasa="z-wwl" klasaRamy="z-pd-pelna" atrybuty={{ 'data-warto': '' }}>
   <ListaPokaz lang={lang} etykieta={T('Filtruj według działu', 'Filter by section')} opcje={dzialy.map((d) => ({ wartosc: d, etykieta: pole(PATRONI[d], 'nazwa', lang) }))}
     szukaj={T('Szukaj w Warto wiedzieć', 'Search highlights')}>
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
     {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="wwl-pusto">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
     <p class="wwl-pusto" role="status" data-pusto hidden>{T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')}</p>
     <p class="wwl-sukcesy">

@@ -1,9 +1,9 @@
 // Dane wykazu prac z danego roku (src/views/PublikacjeRok.astro): sąsiednie lata, grupy z numeracją, spis treści, liczby i motyw banera.
-import dzial from '../../data/dzialy/nauka.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { lata, odmiana, liczbaWspolautorskich, liczbaZrodel, wspolautorzy } from './publikacje';
 import { pracaEn } from '../en/publikacje';
+import { stronaListy } from '../tekstyStron';
 
 export async function danePublikacjiRoku(rok: number, lang: Lang) {
   const en = lang === 'en';
@@ -22,8 +22,8 @@ export async function danePublikacjiRoku(rok: number, lang: Lang) {
   const lead = en
     ? `List of works published in ${rok} — ${n} ${n === 1 ? 'entry' : 'entries'}.`
     : `Wykaz prac opublikowanych w roku ${rok} — ${n} ${odmiana(n, 'pozycja', 'pozycje', 'pozycji')}.`;
-  // Telefon: hasło z danych działu (po angielsku tylko pole _en — bez polskich resztek) i liczby w banerze.
-  const haslo = ((dzial as any)[en ? 'rocznik_haslo_en' : 'rocznik_haslo'] as string | undefined) || undefined;
+  // Telefon: hasło rocznika (pole „Hasło stron rocznika / obrony” strony Publikacje w Web-Nauka; po angielsku tylko EN) i liczby w banerze.
+  const haslo = (await stronaListy('nauka/publikacje', lang)).hasloPodstron;
   const liczbyTelefon: { n: number; pl: [string, string, string]; en: [string, string] }[] = [
     { n, pl: ['praca w wykazie', 'prace w wykazie', 'prac w wykazie'], en: ['paper in the list', 'papers in the list'] },
     { n: liczbaWspolautorskich(w), pl: ['praca ze współautorami', 'prace ze współautorami', 'prac ze współautorami'], en: ['co-authored paper', 'co-authored papers'] },

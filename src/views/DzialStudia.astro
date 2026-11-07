@@ -1,6 +1,7 @@
 ---
 // Strona działu „Studia” (/studia, /en/studia): baner działu z liczbami, pod nim blok TrescDzialu — podstrony w grupach jak
-// w menu, „O studiach” z „W skrócie” i aktualności dla studentów. Teksty: src/data/dzialy/studia.json; reszta z kolekcji
+// w menu, „O studiach” z „W skrócie” i aktualności dla studentów. Teksty: src/data/studia.md (Web-Studia, „Strona działu
+// Studia”; zlecenie 30); reszta z kolekcji
 // i menu, więc nowy kierunek, specjalność czy link w menu „Studia” sam pojawia się na tej stronie.
 // Jedna wersja HTML: komputer i telefon (≤ 1023 px, jedna kolumna) — src/styles/zal-dzialy.css.
 import Baza from '../layouts/Baza.astro';
@@ -26,7 +27,7 @@ const { liczby, grupy, oStudiach, fakty, aktualnosci, tytul, wstep, haslo } = aw
       </ul>
     )}
   </NaglowekStrony>
-  <TrescDzialu dzial="studia" lang={lang} grupy={grupy} tekst={{ tytul: T('O studiach', 'About our programmes'), akapity: oStudiach, fakty }}>
+  <TrescDzialu dzial="studia" lang={lang} grupy={grupy} tekst={{ tytul: T('O studiach', 'About our programmes'), akapity: [], html: oStudiach, fakty }}>
     <Sekcja id="z-dz-aktualnosci" tytul={T('Aktualności dla studentów', 'News for students')} lang={lang}
       linki={[{ etykieta: T('Wszystkie', 'All'), adres: '/aktualnosci?dla=studenci' }]}
       opis={aktualnosci.length ? undefined : T('Na razie brak aktualności dla studentów.', 'No news for students at the moment.')}>

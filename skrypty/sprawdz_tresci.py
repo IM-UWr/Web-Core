@@ -110,8 +110,11 @@ if not sys.argv[1:]:
         for i, o in enumerate(b.get('opiekunowie') or []):
             if not (isinstance(o, dict) and str(o.get('imie_nazwisko') or '').strip()):
                 wszystkie.append(f'{p}: opiekun {i + 1}: brak imienia i nazwiska')
-    p = 'src/data/popularyzacja.md'
-    if os.path.exists(p):
+    # Strony działów (Popularyzacja — zlecenie 29; Instytut, Nauka, Studia — zlecenie 30): nagłówek pliku z tytułem,
+    # „W skrócie” jako lista wartości z opisem; brak pliku nic nie psuje (tytuł z kodu, bez tekstu).
+    for p in ('src/data/popularyzacja.md', 'src/data/instytut.md', 'src/data/nauka.md', 'src/data/studia.md'):
+        if not os.path.exists(p):
+            continue
         pliki.append(p)
         tekst = open(p, encoding='utf-8').read()
         m = re.match(r'^---\n(.*?)\n---\n', tekst, re.S)
@@ -122,10 +125,14 @@ if not sys.argv[1:]:
             wszystkie.append(f'{p}: błąd YAML: {e}')
         if not isinstance(d, dict) or not d.get('tytul'):
             wszystkie.append(f'{p}: brak nagłówka pliku z polem „tytul”')
-        else:
-            for i, t in enumerate(d.get('tradycja') or []):
-                if not isinstance(t.get('rok'), int) or not t.get('nazwa'):
-                    wszystkie.append(f'{p}: lata tradycji {i + 1}: rok (liczba) i nazwa są wymagane')
+            continue
+        for i, t in enumerate(d.get('tradycja') or []):
+            if not isinstance(t.get('rok'), int) or not t.get('nazwa'):
+                wszystkie.append(f'{p}: lata tradycji {i + 1}: rok (liczba) i nazwa są wymagane')
+        for k in ('o_popularyzacji_fakty', 'o_instytucie_fakty', 'badania_fakty', 'o_studiach_fakty'):
+            for i, f in enumerate(d.get(k) or []):
+                if not (isinstance(f, dict) and str(f.get('wartosc') or '').strip()):
+                    wszystkie.append(f'{p}: „W skrócie” {i + 1}: brak wartości')
     p = 'src/data/przypomnienia.json'
     if os.path.exists(p):
         pliki.append(p)

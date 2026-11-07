@@ -1,10 +1,10 @@
 // Dane planu zajęć (PlanZajec.astro): semestry z sekcjami przedmiotów, aktywny semestr, hasło i nazwy typów zajęć.
 import { wybierzSemestr } from '../../components/wyborSemestru';
 import surowe from '../../data/plan/plan.json';
-import studia from '../../data/dzialy/studia.json';
 import { today, short, type Lang } from '../daty';
 import { odmiana } from '../i18n';
 import { TYPY_EN, salaEn, nazwaPrzedmiotuEn, uwagaEn } from '../en/plan';
+import { stronaListy } from '../tekstyStron';
 
 const MIESIACE = [
   ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'],
@@ -28,9 +28,9 @@ const KROTKO: Record<string, [string, string]> = {
 
 export async function danePlanuZajec(lang: Lang) {
   const en = lang === 'en';
-  // hasło na telefonie (po angielsku tylko plan_haslo_en — bez polskich resztek)
-  const tekstStudiow = studia as { plan_haslo?: string; plan_haslo_en?: string };
-  const haslo = (en ? tekstStudiow.plan_haslo_en : tekstStudiow.plan_haslo) || undefined;
+  // tytuł, opis, hasło na telefonie (po angielsku tylko Hasło EN — bez polskich resztek) i tekst nad planem (html):
+  // Web-Studia → Strony → Plan zajęć (src/content/strony/studia/plan-zajec.md; zlecenie 30, src/lib/tekstyStron.ts)
+  const { tytul, opis: lead, haslo, html } = await stronaListy('studia/plan-zajec', lang, { wst: true });
 
   // po angielsku nazwy typów z src/lib/en/plan.ts (zamiast kalk z USOS), potem z USOS
   const typPelny = (t: string) => (en && TYPY_EN[t]?.pelna) || dane.typy?.[t]?.[lang] || t;
@@ -116,5 +116,5 @@ export async function danePlanuZajec(lang: Lang) {
     .filter((k) => semestry.some((x) => x.sekcje.some((s) => s.id === k.id)))
     .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl, krotka: KROTKIE[k.id]?.[en ? 1 : 0] }));
 
-  return { haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
+  return { tytul, lead, html, haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
 }
