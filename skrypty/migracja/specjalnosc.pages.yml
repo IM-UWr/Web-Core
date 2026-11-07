@@ -1,0 +1,179 @@
+# Szablon formularza specjalności w Pages CMS (zlecenie 29) — jeden dla 5 repozytoriów Web-Spec-* i dla specjalności w Web-Studia.
+# Skrypt skrypty/migracja/formularze_specjalnosci.py wstawia go do .pages.yml (Web-Spec-*: cała sekcja content, Web-Studia: pozycja
+# spec-…) i podstawia: {{pozycja}} (nazwa pozycji), {{etykieta}} (napis w menu CMS), {{id}} (nazwa pliku), {{kierunek}} (pole
+# „Kierunek”: w Web-Spec-* stała lista, w Web-Studia odnośnik do kolekcji kierunków, jak dotąd).
+# Zmiana formularza: popraw ten plik i uruchom skrypt (zastępuje formularze w klonach, reszty .pages.yml nie rusza).
+- name: {{pozycja}}
+  label: '{{etykieta}}'
+  description: 'Strona /studia/<kierunek>/{{id}} i kafelek specjalności na stronie kierunku. „Treść” — nazwa i cały tekst strony (po polsku i po angielsku); „Baner i kafelek” — drobne pola nagłówka i kafelka, zakład, opiekunowie i seminaria.'
+  type: group
+  items:
+  - name: {{pozycja}}-tresc
+    label: Treść
+    description: 'Nazwa i tekst strony specjalności. Sekcje liczone z innych danych (seminaria, opiekunowie, ramka „Wybór specjalności”) strona wstawia sama — opis pola „Treść”.'
+    type: file
+    path: src/content/specjalnosci/{{id}}.md
+    format: yaml-frontmatter
+    fields:
+    - name: nazwa
+      label: Nazwa
+      type: string
+      required: true
+    - name: body
+      label: Treść
+      description: |-
+        Piszesz jak w zwykłym edytorze. Kilka układów strona rozpoznaje sama:
+        • Nagłówek 2 = nowa sekcja (pojawi się w spisie „Na tej stronie”).
+        • Punkt listy zaczynający się pogrubieniem = kafelek (np. „Dlaczego warto”).
+        • Lista numerowana z pogrubionym początkiem = oś kroków. W pogrubieniu tekst przed dwukropkiem to mała etykieta: „Semestr 5: Seminarium dyplomowe”.
+        • W punkcie linia „Termin: …” albo „Formularz: …” = para; sam link w linii = przycisk. Kolejną linię w tym samym punkcie dodasz Shift+Enter (zwykły Enter też zadziała).
+        • Nagłówek 3 zakończony znakiem „?” = rozwijane pytanie.
+        • Lista samych linków = lista plików (PDF / strona); w sekcji „Przydatne strony” — zwykłe linki.
+        • Punkt z rolą kursywą i nazwiskiem pogrubionym = kontakt.
+        • Cytat zaczynający się pogrubionym „Dla kogo” = ramka. Zwykła lista w „Co będziesz umieć” i „Przykładowe tematy prac” = lista z kreskami; w temacie „Tytuł — dopisek” dopisek jest szary.
+        • Pod nagłówkami „Seminaria” i „Opiekun specjalności” (albo „Opiekunowie specjalności”) strona sama wstawi seminaria i opiekunów z formularza „Baner i kafelek”, a ramkę „Wybór specjalności” — na końcu „Jak przebiega specjalność” (albo pod nagłówkiem „Wybór specjalności”). Bez takiego nagłówka wstawi je w zwykłym miejscu.
+        • Stały adres (kotwicę, np. #seminaria) mają sekcje o nagłówkach: O specjalności, Przydatne strony, Dlaczego warto, Jak przebiega specjalność, Wybór specjalności, Czego się uczysz, Co będziesz umieć, Po studiach, Przykładowe tematy prac, Seminaria, Dokumenty, Pytania i odpowiedzi, Opiekun specjalności.
+        • Plik PDF: wgraj w „Media” i wklej link.
+        • Akapit zaczynający się od dwuliterowego skrótu z kropką („Np.”, „Dr.”, „No.”) edytor zapisze jako listę numerowaną „1.” — zacznij akapit inaczej albo pogrub skrót.
+      type: rich-text
+      options:
+        format: markdown
+        path: public/pliki/studia
+    - name: nazwa_en
+      label: Nazwa EN
+      type: string
+    - name: tresc_en
+      label: Treść EN
+      description: 'Cała strona po angielsku, w tym samym układzie co Treść (nagłówki sekcji po angielsku: About, Useful pages, Why choose it, How the specialisation works, What you will learn, Skills, Careers, Sample thesis topics, Seminars, Documents, FAQ, Coordinator; ramka: cytat zaczynający się pogrubionym „Who is it for”). Puste = strona angielska pokaże treść polską.'
+      type: rich-text
+      options:
+        format: markdown
+        path: public/pliki/studia
+  - name: {{pozycja}}-baner
+    label: Baner i kafelek
+    description: 'Nagłówek strony specjalności (skrót, poziom, zdanie pod nazwą, hasło), kafelek na stronie kierunku (kolejność, „Dla kogo”, „Po studiach”), zakład, opiekunowie i seminaria — strona wstawia je w sekcjach „Seminaria” i „Opiekun specjalności”.'
+    type: file
+    path: src/content/specjalnosci-baner/{{id}}.json
+    format: json
+    fields:
+{{kierunek}}
+    - name: kolejnosc
+      label: Kolejność kafelka na stronie kierunku (1 = pierwszy)
+      type: number
+    - name: na_stronie_kierunku
+      label: Pokaż kafelek na stronie kierunku
+      type: boolean
+      default: true
+    - name: bez_podstrony
+      label: Bez własnej podstrony (tylko kafelek, np. specjalność wygaszana)
+      type: boolean
+      default: false
+    - name: kafelek_dla_kogo
+      label: 'Kafelek: „Dla kogo” — jedno zdanie'
+      type: text
+    - name: kafelek_kariera
+      label: 'Kafelek: „Po studiach” — jedno zdanie'
+      type: text
+    - name: skrot
+      label: Skrót (np. AD)
+      type: string
+    - name: poziom
+      label: Poziom (np. studia I i II stopnia)
+      type: string
+    - name: opis
+      label: Jedno zdanie pod nazwą
+      type: text
+    - name: haslo
+      label: Hasło na banerze (jedna linia; liczby w banerze pokażą się tylko razem z hasłem)
+      type: string
+    - name: zaklad
+      label: Zakład
+      type: select
+      options:
+        values:
+        - name: algebra-i-teoria-modeli
+          label: Zakład Algebry i Teorii Modeli
+        - name: analiza-funkcjonalna
+          label: Zakład Analizy Funkcjonalnej
+        - name: analiza-matematyczna
+          label: Zakład Analizy Matematycznej
+        - name: dydaktyka
+          label: Pracownia Dydaktyki i Popularyzacji Matematyki
+        - name: geometria
+          label: Zakład Geometrii
+        - name: rownania-rozniczkowe
+          label: Zakład Równań Różniczkowych
+        - name: statystyka
+          label: Zakład Statystyki
+        - name: teoria-mnogosci-i-topologia
+          label: Zakład Teorii Mnogości i Topologii
+        - name: teoria-prawdopodobienstwa
+          label: Zakład Teorii Prawdopodobieństwa
+      description: (lista z innego repozytorium — nowa pozycja wymaga dopisania w konfiguracji)
+    - name: opiekunowie
+      label: Opiekunowie (imię i nazwisko jak w spisie pracowników, bez tytułów)
+      type: object
+      list: true
+      fields:
+      - name: imie_nazwisko
+        label: Imię i nazwisko
+        type: string
+      - name: rola
+        label: Rola (opcjonalnie)
+        type: string
+      - name: rola_en
+        label: 'EN: rola'
+        type: string
+    - name: seminaria
+      label: Seminaria związane ze specjalnością
+      type: select
+      options:
+        values:
+        - name: analiza-harmoniczna
+          label: Analiza harmoniczna i rozwinięcia ortogonalne
+        - name: dydaktyka
+          label: Seminarium Pracowni Dydaktyki i Popularyzacji Matematyki
+        - name: dyskretna-analiza-harmoniczna
+          label: Dyskretna analiza harmoniczna i niekomutatywna probabilistyka
+        - name: geometria
+          label: Geometria
+        - name: prawdopodobienstwo
+          label: Teoria prawdopodobieństwa i modelowanie stochastyczne
+        - name: rownania-rozniczkowe
+          label: Równania różniczkowe
+        - name: statystyka
+          label: Statystyka
+        - name: teoria-modeli
+          label: Teoria modeli
+        - name: topologia
+          label: Topologia
+        multiple: true
+      description: (lista z innego repozytorium — nowa pozycja wymaga dopisania w konfiguracji)
+    - name: wygaszana
+      label: Wygaszana
+      type: boolean
+    - name: poziom_en
+      label: 'EN: poziom'
+      type: string
+    - name: opis_en
+      label: 'EN: zdanie pod nazwą'
+      type: text
+    - name: haslo_en
+      label: 'EN: hasło na banerze'
+      type: string
+    - name: kafelek_dla_kogo_en
+      label: 'EN: kafelek — dla kogo'
+      type: text
+    - name: kafelek_kariera_en
+      label: 'EN: kafelek — po studiach'
+      type: text
+    - name: do_uzupelnienia
+      label: Do uzupełnienia (techniczne)
+      type: string
+      list: true
+      hidden: true
+    - name: zrodla
+      label: Źródła treści (techniczne)
+      type: string
+      list: true
+      hidden: true

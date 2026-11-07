@@ -9,8 +9,9 @@ WYMAGANE = {
     'zaklady': ['nazwa'], 'kierunki': ['nazwa'], 'specjalnosci': ['nazwa'], 'pracownicy': ['imie_nazwisko'],
     'warto_wiedziec': ['tytul'],
 }
-# Kierunki (zlecenie 28): treść to Markdown (body i tresc_en), bez list obiektów; baner i przypomnienia — JSON, sprawdzane niżej.
-LISTY_OBIEKTOW = {'specjalnosci': ['opiekunowie', 'dlaczego', 'etapy', 'seminaria', 'przedmioty', 'tematy_prac', 'dokumenty', 'linki', 'faq']}
+# Kierunki (zlecenie 28) i specjalności (zlecenie 29): treść to Markdown (body i tresc_en), bez list obiektów; baner, przypomnienia
+# i „Baner i kafelek” specjalności — JSON, sprawdzane niżej (tak jak strona działu Popularyzacja, src/data/popularyzacja.md).
+LISTY_OBIEKTOW = {}
 
 def sprawdz(p):
     bledy = []
@@ -44,20 +45,6 @@ def sprawdz(p):
             for el in v:
                 if not isinstance(el, str):
                     bledy.append(f'{p}: element listy „{k}” nie jest tekstem (np. „: ” w środku — weź tekst w cudzysłów): {el!r}'[:300])
-    # dokumenty: wgrany plik albo link
-    dok = []
-    if kol == 'specjalnosci':
-        dok += dane.get('dokumenty') or []
-    for x in dok:
-        if isinstance(x, dict) and not (x.get('wgraj') or x.get('plik')):
-            bledy.append(f'{p}: dokument „{x.get("nazwa", "?")}” nie ma pliku ani linku')
-    if kol == 'specjalnosci':
-        katalog = p.split('src/content/')[0] + 'src/content/seminaria/'
-        for sid in dane.get('seminaria') or []:
-            # pole „reference” z CMS zapisuje ścieżkę pliku — liczy się sama nazwa pliku
-            sid = re.sub(r'\.(md|ya?ml|json)$', '', str(sid).strip().split('/')[-1])
-            if not os.path.exists(f'{katalog}{sid}.md'):
-                bledy.append(f'{p}: seminarium „{sid}” nie istnieje (brak pliku {katalog}{sid}.md)')
     if kol == 'pracownicy':
         # Numery telefonów podajemy wyłącznie przy administracji (brak pola grupa = nauczyciel).
         grupa = dane.get('grupa') or 'nauczyciel'
@@ -98,6 +85,47 @@ if not sys.argv[1:]:
             wszystkie.append(f'{p}: nie ma kierunku o tej nazwie pliku (src/content/kierunki/{os.path.basename(p)[:-5]}.md)')
         if not isinstance(b.get('liczby', []), list):
             wszystkie.append(f'{p}: pole „liczby” musi być listą')
+    # Specjalności (zlecenie 29): „Baner i kafelek” <id>.json tylko dla istniejącej specjalności, kierunek i seminaria istnieją,
+    # opiekunowie — lista z imieniem i nazwiskiem.
+    for p in sorted(glob.glob('src/content/specjalnosci-baner/*.json')):
+        pliki.append(p)
+        try:
+            b = json.load(open(p, encoding='utf-8'))
+        except ValueError as e:
+            wszystkie.append(f'{p}: błąd JSON: {e}')
+            continue
+        if not os.path.exists(f"src/content/specjalnosci/{os.path.basename(p)[:-5]}.md"):
+            wszystkie.append(f'{p}: nie ma specjalności o tej nazwie pliku (src/content/specjalnosci/{os.path.basename(p)[:-5]}.md)')
+        # pole „reference” z CMS (Web-Studia) zapisuje ścieżkę pliku — liczy się sama nazwa pliku
+        kier = re.sub(r'\.(md|ya?ml|json)$', '', str(b.get('kierunek') or 'matematyka').strip().split('/')[-1])
+        if not os.path.exists(f'src/content/kierunki/{kier}.md'):
+            wszystkie.append(f'{p}: kierunek „{kier}” nie istnieje (brak pliku src/content/kierunki/{kier}.md)')
+        for sid in b.get('seminaria') or []:
+            sid = re.sub(r'\.(md|ya?ml|json)$', '', str(sid).strip().split('/')[-1])
+            if not os.path.exists(f'src/content/seminaria/{sid}.md'):
+                wszystkie.append(f'{p}: seminarium „{sid}” nie istnieje (brak pliku src/content/seminaria/{sid}.md)')
+        for k in ('opiekunowie', 'seminaria', 'zrodla', 'do_uzupelnienia'):
+            if not isinstance(b.get(k, []), list):
+                wszystkie.append(f'{p}: pole „{k}” musi być listą')
+        for i, o in enumerate(b.get('opiekunowie') or []):
+            if not (isinstance(o, dict) and str(o.get('imie_nazwisko') or '').strip()):
+                wszystkie.append(f'{p}: opiekun {i + 1}: brak imienia i nazwiska')
+    p = 'src/data/popularyzacja.md'
+    if os.path.exists(p):
+        pliki.append(p)
+        tekst = open(p, encoding='utf-8').read()
+        m = re.match(r'^---\n(.*?)\n---\n', tekst, re.S)
+        try:
+            d = yaml.safe_load(m.group(1)) if m else None
+        except yaml.YAMLError as e:
+            d = None
+            wszystkie.append(f'{p}: błąd YAML: {e}')
+        if not isinstance(d, dict) or not d.get('tytul'):
+            wszystkie.append(f'{p}: brak nagłówka pliku z polem „tytul”')
+        else:
+            for i, t in enumerate(d.get('tradycja') or []):
+                if not isinstance(t.get('rok'), int) or not t.get('nazwa'):
+                    wszystkie.append(f'{p}: lata tradycji {i + 1}: rok (liczba) i nazwa są wymagane')
     p = 'src/data/przypomnienia.json'
     if os.path.exists(p):
         pliki.append(p)
