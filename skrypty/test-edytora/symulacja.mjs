@@ -5,6 +5,8 @@
 //
 // Uruchomienie (zależności tylko w tym katalogu: npm install):
 //   node symulacja.mjs <katalog z plikami kierunków> <katalog wyjściowy>
+// Zlecenie 30: katalog przeglądany z podkatalogami (kolekcje „Strony”), w katalogu wyjściowym ta sama struktura; oprócz
+// tresc_en zapisywane są też pola dalej / dalej_en (Rok akademicki: „Koniec strony”, rich-text od zlecenia 30).
 // Bez argumentów: tylko próba wzoru $\ell^2$ i kilku zapisów edytora (Enter w punkcie, Shift+Enter).
 import { Window } from 'happy-dom';
 import fs from 'node:fs';
@@ -49,16 +51,20 @@ if (!wej) {
 
 fs.mkdirSync(wyj, { recursive: true });
 let zmian = 0;
-for (const f of fs.readdirSync(wej).filter((f) => f.endsWith('.md'))) {
+const POLA = ['tresc_en', 'dalej', 'dalej_en'];
+for (const f of fs.readdirSync(wej, { recursive: true }).map(String).filter((f) => f.endsWith('.md'))) {
   const tekst = fs.readFileSync(path.join(wej, f), 'utf8').replace(/\r\n/g, '\n');
   const m = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/.exec(tekst);
   const front = YAML.parse(m[1]);
   const body = zapisz(m[2]);
-  if (front.tresc_en) front.tresc_en = zapisz(front.tresc_en);
+  for (const k of POLA) if (front[k]) front[k] = zapisz(front[k]);
   const nowy = `---\n${YAML.stringify(front, { lineWidth: 0 })}---\n${body}\n`;
+  fs.mkdirSync(path.dirname(path.join(wyj, f)), { recursive: true });
   fs.writeFileSync(path.join(wyj, f), nowy);
   // zmiany w Markdownie (linie), osobno PL i EN
-  for (const [jez, a, b] of [['PL', m[2].trim(), body.trim()], ['EN', (YAML.parse(m[1]).tresc_en ?? '').trim(), (front.tresc_en ?? '').trim()]]) {
+  const stary = YAML.parse(m[1]);
+  const pary = [['PL', m[2].trim(), body.trim()], ...POLA.filter((k) => stary[k]).map((k) => [k === 'tresc_en' ? 'EN' : k, String(stary[k]).trim(), front[k].trim()])];
+  for (const [jez, a, b] of pary) {
     const A = a.split('\n'), B = b.split('\n');
     const rozne = B.filter((l) => !A.includes(l));
     zmian += rozne.length;

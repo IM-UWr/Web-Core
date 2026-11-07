@@ -26,7 +26,8 @@ export async function renderMarkdownZNaglowkami(src: string | undefined, lang: L
   let processor = procesory.get(lang);
   if (!processor) {
     processor = await createMarkdownProcessor({
-      remarkPlugins: [remarkMath],
+      // wzory zapisane edytorem (Treść EN, Koniec strony — rich-text od zlecenia 30) — src/plugins/remark-wzory-edytora.mjs
+      remarkPlugins: [remarkMath, remarkWzoryEdytora],
       // linki poza stronę: klasa zew (↗ z CSS) i ukryty dopisek „(inna strona)” / „(external site)” — zlecenie 14, zalecenie 23
       rehypePlugins: [rehypeKatex, [rehypeBloki, { lang }], [rehypeBase, { base: import.meta.env.BASE_URL, lang }], [rehypeZewn, { site: import.meta.env.SITE, base: import.meta.env.BASE_URL, lang }]],
     } as any);

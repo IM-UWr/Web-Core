@@ -2,6 +2,7 @@
 // zapisie dopisuje ukośniki Markdownu — „$\ell^2$” → „$\\ell^2$”, „$a_1$” → „$a\_1$”, „$x^*$” → „$x^\*$” — a KaTeX
 // pokazałby „\\” jako nową linię. Wzór z takim śladem (dwa ukośniki przed literą albo ukośnik przed „_” lub „*”) wraca
 // do postaci sprzed zapisu; wzór wpisany w pliku bez edytora (bez śladu) zostaje bez zmian. Działa po remark-math.
+// Od zlecenia 30 w każdym Markdownie: treść z plików kolekcji (astro.config.mjs) i pola tekstowe (src/lib/markdown.ts).
 // Czego nie da się cofnąć: przy wczytaniu edytor gubi ukośnik w „\{ \}” i zamienia pary „_…_” poza wzorem na kursywę.
 const SLAD = /\\\\[A-Za-z]|\\[_*]/;
 const odwroc = (s) => s.replace(/\\([\\_*])/g, '$1');

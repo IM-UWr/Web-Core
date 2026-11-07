@@ -65,7 +65,10 @@ function linie(li) {
     if (l.length) out.push({ linia: l });
     biez = [];
   };
-  const wiersz = (nodes) => { for (const n of nodes) { if (jestBr(n)) zamknij(); else biez.push(n); } };
+  // „**Tytuł**” i dalszy tekst po zwykłym znaku nowej linii (bez <br>) — też dwie linie: tak edytor zapisuje tytuł i opis
+  // w osobnych akapitach ostatniego punktu listy (zlecenie 30, symulacja zapisu „Jak zacząć” na stronie „Dla uczniów”)
+  const poTytule = (n) => n.type === 'text' && /^[ \t]*\n/.test(n.value) && biez.filter((x) => !pusty(x)).length === 1 && jest(biez.find((x) => !pusty(x)), 'strong');
+  const wiersz = (nodes) => { for (const n of nodes) { if (jestBr(n)) zamknij(); else { if (poTytule(n)) zamknij(); biez.push(n); } } };
   for (const c of li.children ?? []) {
     if (jest(c, 'p')) { zamknij(); wiersz(c.children ?? []); zamknij(); }
     else if (c.type === 'element' && BLOKOWE.has(c.tagName)) { zamknij(); out.push({ blok: c }); }

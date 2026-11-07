@@ -63,6 +63,15 @@ test('oś wpisana samymi Enterami (każda linia jako nowy punkt)', async () => {
   assert.equal(html.match(/<li>/g).length, 2);
 });
 
+test('oś po zapisie w edytorze: ostatni krok „**Tytuł**” i opis w następnej linii (bez pustej linii)', async () => {
+  const md = '1. **Wybierz**\n\n   Opis 1.\n2. **Zapisz się**\n\n   Opis 2.\n\n    [Fundacja](https://fmw.math.uni.wroc.pl/)\n3. **Przyjdź do Instytutu**\n   pl. Grunwaldzki 2/4.';
+  const { html } = await render(md);
+  zawiera(html, '<li><span class="etyk">Krok 3</span><p class="t">Przyjdź do Instytutu</p><p>pl. Grunwaldzki 2/4.</p></li></ol>');
+  assert.equal(html.match(/<li>/g).length, 3);
+  // kafelki: tytuł i opis w następnej linii
+  zawiera((await render('- **Kółka**\n  Co tydzień.\n- **Obozy**\n  Latem.')).html, '<ul class="dwa"><li><b>Kółka</b><span>Co tydzień.</span></li>');
+});
+
 test('oś bez dwukropka: „Krok N” / „Step N”', async () => {
   zawiera((await render('1. **Zapisz się**\n\n   Opis.\n\n2. **Przyjdź**\n\n   Opis 2.')).html, '<span class="etyk">Krok 2</span><p class="t">Przyjdź</p>');
   zawiera((await render('1. **Sign up** — Text.', { lang: 'en' })).html, '<span class="etyk">Step 1</span><p class="t">Sign up</p><p>Text.</p>');

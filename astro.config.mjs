@@ -7,6 +7,7 @@ import rehypeBase from './src/plugins/rehype-base.mjs';
 import rehypeZewn from './src/plugins/rehype-zewn.mjs';
 import rehypeBloki from './src/plugins/rehype-bloki.mjs';
 import rehypeLimity from './src/plugins/rehype-limity.mjs';
+import remarkWzoryEdytora from './src/plugins/remark-wzory-edytora.mjs';
 import panelWariantow from './src/plugins/panel-wariantow.mjs';
 import trescTelefon from './src/plugins/postcss-tresc-telefon.mjs';
 
@@ -26,7 +27,8 @@ export default defineConfig({
   trailingSlash: 'ignore',
   integrations: [react(), ...(PANEL_WARIANTOW ? [panelWariantow()] : [])],
   markdown: {
-    remarkPlugins: [remarkMath],
+    // wzory zapisane edytorem Pages CMS (Treść stron i wpisów, zlecenie 30) — src/plugins/remark-wzory-edytora.mjs
+    remarkPlugins: [remarkMath, remarkWzoryEdytora],
     rehypePlugins: [rehypeKatex, [rehypeBloki, { site, base }], rehypeLimity, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
   },
   build: {
