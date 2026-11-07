@@ -72,17 +72,16 @@
 
 /* ---------- komputer ---------- */
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 20px 28px 14px;
+  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 16px 28px 14px;
     background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
-  /* --marg z górną granicą: krzyżyk stoi w miejscu hamburgera do okna 1920 px; szerzej zostałby poza panelem, a pole szukania bez miejsca */
-  .z-menu.z-menu-pasek { position: fixed; z-index: 40; --marg: min(340px, max(var(--marg-min), calc((100vw - var(--kol)) / 2))); }
-  /* pole szukania w jednym rzędzie z krzyżykiem, bez nachodzenia na niego (także na okładce) */
-  .z-menu-szukaj { margin-right: calc(max(24px, var(--marg, 64px) - 2px) + 24px); }
+  .z-menu.z-menu-pasek { position: fixed; z-index: 40; }
+  /* Krzyżyk w prawym górnym rogu panelu, 24 px od górnej i prawej krawędzi, przy pasku i na okładce (zlecenie 27, punkt 5; wcześniej
+     przy pasku w miejscu hamburgera). Pole szukania w jednym rzędzie z nim: na całą szerokość panelu bez krzyżyka i 12 px odstępu
+     (24 + 40 + 12 − 28 px wcięcia panelu = 48 px z prawej), środek pola na wysokości środka krzyżyka (24 + 40 / 2 = 44 px od góry). */
+  .z-menu-szukaj { margin-right: 48px; }
   .z-menu ul { display: flex; flex-wrap: wrap; gap: 2px 16px; }
   .z-menu ul a { display: inline-block; padding: 3px 0; }
-  .z-menu .z-zamknij { position: absolute; top: 18px; right: 32px; }
-  /* przy pasku krzyżyk w miejscu hamburgera */
-  .z-menu-pasek .z-zamknij { top: calc((var(--gora) - 40px) / 2); right: max(24px, calc(var(--marg) - 2px)); }
+  .z-menu .z-zamknij { position: absolute; top: 24px; right: 24px; }
   .z-menu .z-zamknij button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px;
     color: #fff; background: rgb(255 255 255 / .08); cursor: pointer; }
   .z-menu .z-zamknij button:hover { background: rgb(255 255 255 / .16); }
@@ -101,7 +100,9 @@
     width: min(calc(610px + var(--mw) * 3 / 8), calc(100vw - 64px)); /* 610 → 670 */
     display: flex; flex-direction: column;
   }
-  .z-menu-szukaj { flex: none; margin-bottom: calc(8px + var(--mw) / 15); padding: calc(8px + var(--mw) / 53) 13px; }
+  /* wysokość pola jak dotąd (42 → 50 px z wysokością okna), podana wprost, żeby środek pola stał 44 px od góry panelu, jak środek krzyżyka */
+  .z-menu-szukaj { --szuk-h: calc(42px + var(--mw) / 19); flex: none; height: var(--szuk-h); margin-top: calc(28px - var(--szuk-h) / 2);
+    margin-bottom: calc(8px + var(--mw) / 15); padding: 0 13px; }
   .z-menu-szukaj input { font-size: calc(15px + var(--mw) / 106); }
 
   /* rzędy dzielą między siebie wolną wysokość panelu; rozwinięcie działu samo ściska pozostałe */
