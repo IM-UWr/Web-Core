@@ -242,7 +242,7 @@
   :root[data-theme="dark"] .z-dz .z-dz-rzad a:is(:hover, :active, :focus-visible)::before { background-color: color-mix(in oklab, var(--d-j) 5%, #18243b); }
   .z-dz .z-dz-pas + .z-dz-tresc { padding-top: 22px; }
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
-  .z-dz .z-dz-tresc h2 { margin: 5.6px 0 17.6px; font-size: 28px; }
+  .z-dz .z-dz-tresc h2 { margin: 0 0 12px; font-size: 28px; line-height: 1.6; }
   .z-dz .z-dz-tresc p { font-size: 15.5px; line-height: 1.62; }
   .z-dz .z-dz-skrot dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
   .z-dz .z-dz-skrot dt { font-size: 26px; }
