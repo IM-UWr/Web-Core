@@ -5,6 +5,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeBase from '../plugins/rehype-base.mjs';
 import rehypeZewn from '../plugins/rehype-zewn.mjs';
 import rehypeBloki from '../plugins/rehype-bloki.mjs';
+import rehypeLimity from '../plugins/rehype-limity.mjs';
 
 import type { Lang } from './daty';
 
@@ -31,6 +32,28 @@ export async function renderMarkdownZNaglowkami(src: string | undefined, lang: L
   }
   const result = await processor.render(src, { frontmatter: { bloki } });
   return { html: result.code, naglowki: ((result.metadata as any)?.headings ?? []) as Naglowek[] };
+}
+
+// ---------- Treść kierunku (zlecenie 28): jeden Markdown, sekcje po ## (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs) ----------
+// Ten sam procesor dla treści polskiej (body) i angielskiej (tresc_en), z limitami linii (rehype-limity.mjs: komórki tabel,
+// nazwiska i e-maile w kontaktach), jak treść z pliku. Wynik: HTML sekcji (miejsce na kafelki specjalności: <!--specjalnosci-->)
+// i spis sekcji do „Na tej stronie”.
+export interface SekcjaKierunku { id: string; etykieta: string; krotka?: string }
+const procesoryKierunku = new Map<Lang, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
+
+export async function renderKierunku(src: string | undefined, lang: Lang, opcje: { specjalnosci: boolean; polski?: boolean }): Promise<{ html: string; sekcje: SekcjaKierunku[] }> {
+  let processor = procesoryKierunku.get(lang);
+  if (!processor) {
+    const site = import.meta.env.SITE, base = import.meta.env.BASE_URL;
+    processor = await createMarkdownProcessor({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site, base }], rehypeLimity, [rehypeBase, { base, lang }], [rehypeZewn, { site, base, lang }]],
+    } as any);
+    procesoryKierunku.set(lang, processor);
+  }
+  const kierunek: Record<string, unknown> = { specjalnosci: opcje.specjalnosci, ...(opcje.polski ? { lang: 'pl' } : {}) };
+  const result = await processor.render(src ?? '', { frontmatter: { kierunek } });
+  return { html: result.code, sekcje: (kierunek.sekcje ?? []) as SekcjaKierunku[] };
 }
 
 // ---------- Wzory w tytułach (np. tytuły referatów: „… $\ell^2$ estimates …”) ----------

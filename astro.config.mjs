@@ -27,7 +27,7 @@ export default defineConfig({
   integrations: [react(), ...(PANEL_WARIANTOW ? [panelWariantow()] : [])],
   markdown: {
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex, rehypeBloki, rehypeLimity, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
+    rehypePlugins: [rehypeKatex, [rehypeBloki, { site, base }], rehypeLimity, [rehypeBase, { base }], [rehypeZewn, { site, base }]],
   },
   build: {
     format: 'directory',

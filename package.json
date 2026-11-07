@@ -8,7 +8,8 @@
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist --glob \"**/*.html\"",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test:bloki": "node --test src/plugins/rehype-bloki.test.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^6.0.0",
