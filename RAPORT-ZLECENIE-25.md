@@ -103,7 +103,7 @@ Przed to stan po zleceniu 24 (`dba7d890`), po to `f6bc5a10`. Okna od 800×900 do
 | `studia-szkola-doktorska` | K2 przy 1024 | ok |
 | `studia-pierwszy-rok` | O1 przy 1366 | O1 przy 1366 |
 
-Zostająca pozycja to „Budynek Instytutu” w spisie, który przy 1366×620 jest dłuższy niż okno i się przewija. Narzędzie nie odróżnia przewijania od ucięcia. W zleceniu 27 przenoszę narzędzie do repozytorium i tam sprawdzę, czy może pomijać elementy przewijane.
+Zostająca pozycja to „Budynek Instytutu” w spisie, który przy 1366×620 jest dłuższy niż okno i się przewija. Narzędzie nie odróżnia przewijania od ucięcia. Zlecenie 27 przenosi narzędzie do repozytorium i wtedy można je nauczyć pomijania elementów przewijanych.
 
 ## Porównanie piksel w piksel ze stanem po zleceniu 24
 
