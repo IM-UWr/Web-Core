@@ -1,6 +1,6 @@
 # Raport: zlecenie 29 — specjalności i strona działu Popularyzacja jako Markdown (7.11.2026)
 
-Etapy 1–4 zrobione lokalnie. Kryteria odbioru lokalnego są spełnione, z jednym zastrzeżeniem: zapis w edytorze psuje 4 akapity EN (pytanie 1). **Nic nie jest wysłane na GitHub.** Czekam na „push” (etap 5), potem test w prawdziwym CMS. Polecenie dotyczyło tylko zlecenia 29, więc nie zaczynam 30.
+Etapy 1–4 zrobione, kryteria odbioru lokalnego spełnione (4 akapity EN „No. …” pogrubione po decyzji właściciela). Etap 5: wynik pushu i podglądu jest w sekcji „Push i podgląd”. Test w prawdziwym CMS robi właściciel. Polecenie dotyczyło tylko zlecenia 29, więc nie zaczynam 30.
 
 ## Etapy i commity
 
@@ -18,9 +18,11 @@ Wszystko na gałęzi `wyglad/zlecenie-16`, tylko lokalnie.
 | 3 | Web-Spec-Teoretyczna | `22c7dc7`, `4f89fa8` | jw. |
 | 3 | Web-Studia | `9e28ae7`, `55e1a55` | Matematyka w ekonomii (wygaszana): treść i baner; formularz (i 2 linijki w opisach „Kierunków”, zob. uwaga 3) |
 | 2, 3 | Web-Popularyzacja | `6608b03`, `a4f50c8` | `popularyzacja.md` zamiast `.json`; formularz „Strona działu Popularyzacja” |
-| 4 | Web-Core | ten commit | Raport i zrzuty |
+| 4 | Web-Core | `ec2bc857` | Raport i zrzuty |
+| 4 (decyzja 1) | Web-Spec-Analiza-Danych, Web-Spec-Nauczycielska | `eb14354`, `891742b` | Pogrubione „No.” na początku 4 odpowiedzi EN (zapis w edytorze ich nie psuje) |
+| 4 | Web-Core | ten commit | Raport po decyzji i po „push” |
 
-Nad `origin`: Web-Core 12 commitów (z 28), Web-Studia 5 (z 28), Web-Ustawienia 2 (z 28), Web-Popularyzacja 2, każde Web-Spec-* 2. Po „push” wyślę wszystkie 9 repozytoriów razem i sprawdzę przebieg Web-Podglad.
+Nad `origin`: Web-Core 12 commitów (z 28), Web-Studia 5 (z 28), Web-Ustawienia 2 (z 28), Web-Popularyzacja 2, Web-Spec-Analiza-Danych i Web-Spec-Nauczycielska po 3, pozostałe Web-Spec-* po 2. Po „push” wyślę wszystkie 9 repozytoriów razem i sprawdzę przebieg Web-Podglad.
 
 ## Co widzi edytor
 
@@ -56,7 +58,7 @@ Pominięte (36):
 
 **Popularyzacja:** 42 wartości przeniesione, 0 pominiętych. Treść ma 5 akapitów, „W skrócie” 4 pozycje, tradycja 3 i ukryte linki 3.
 
-Oba skrypty na końcu sprawdzają, że każda stara wartość jest w nowych plikach albo na liście pominiętych. Drugiego uruchomienia na przerobionych plikach odmawiają (sprawdzone). Puściłem je jeszcze raz na kopiach starych plików z historii: dają pliki identyczne z zacommitowanymi. Stare pliki są w historii repozytoriów (np. Web-Spec-Stosowana `07d8459`, Web-Popularyzacja `53f6556`).
+Oba skrypty na końcu sprawdzają, że każda stara wartość jest w nowych plikach albo na liście pominiętych. Drugiego uruchomienia na przerobionych plikach odmawiają (sprawdzone). Puściłem je jeszcze raz na kopiach starych plików z historii: dają pliki identyczne z commitami migracji (późniejsze pogrubienie „No.” to osobny commit, decyzja 1). Stare pliki są w historii repozytoriów (np. Web-Spec-Stosowana `07d8459`, Web-Popularyzacja `53f6556`).
 
 ## Porównanie przed/po
 
@@ -95,7 +97,9 @@ To cecha edytora, nie strony. Wtyczka nie może tego naprawić, bo po zapisie s�
 - Ukośnik (`No\.`) ani encja (`&#32;`) nie pomagają, za to pogrubienie („**No.** …”) wytrzymuje zapis.
 - W całej treści wszystkich 21 repozytoriów takie akapity są tylko te 4.
 
-Do ściągawki i opisów pola „Treść” (specjalności, Popularyzacja i kierunki) dopisałem ostrzeżenie. Treści nie zmieniałem: zob. pytanie 1.
+Do ściągawki i opisów pola „Treść” (specjalności, Popularyzacja i kierunki) dopisałem ostrzeżenie.
+
+**Decyzja 1 (właściciel, 7.11):** pogrubić. Cztery odpowiedzi zaczynają się teraz od „**No.**”. Symulowany zapis tych plików nie zmienia żadnej linii, także drugi zapis z rzędu. W całej treści nie ma już akapitu, który edytor zamieniłby na listę. Na stronie zmieniło się tylko pogrubienie „No.” w tych 4 odpowiedziach EN. Zrzutów nie ma, bo według zlecenia robię je tylko po polsku, a strony PL są bez zmian.
 
 ## Kryteria odbioru
 
@@ -107,7 +111,7 @@ Do ściągawki i opisów pola „Treść” (specjalności, Popularyzacja i kier
 - [x] `sprawdz_tresci.py`: OK (553 pliki). Doszło sprawdzenie banerów specjalności (specjalność, kierunek i seminaria istnieją, opiekunowie mają nazwisko) i `popularyzacja.md`.
 - [x] `astro check`: 6 błędów, te same co przed zleceniem (`process` i `node:*` w `astro.config.mjs` i `src/lib/zdjecia.ts`), żadnych uwag w zmienionych plikach.
 - [x] Testy wtyczki: 23/23 (4 nowe dla specjalności).
-- [~] Symulowany zapis w edytorze: strona bez zmian poza 4 akapitami „No. …” (wyżej, pytanie 1).
+- [x] Symulowany zapis w edytorze nie zmienia strony (po pogrubieniu „No.” w 4 odpowiedziach EN, decyzja 1).
 - [ ] Test w prawdziwym CMS: po „push”.
 
 ## Gałąź domyślna repozytoriów treści
@@ -131,4 +135,4 @@ Do ściągawki i opisów pola „Treść” (specjalności, Popularyzacja i kier
 
 ## Pytania
 
-1. Czy zmienić 4 odpowiedzi EN „No. …” na „**No.** …” (pogrubione), żeby zapis w edytorze ich nie psuł? Dotyczy Analizy danych i Matematyki nauczycielskiej. Bez zmiany pierwszy zapis Treści EN tych specjalności w CMS zrobi z nich listę „1. …”. Zmiana to dwa commity w treści i lekko inny wygląd (pogrubione „No.”).
+1. ~~Czy pogrubić „No.” w 4 odpowiedziach EN?~~ Decyzja: tak, zrobione (`eb14354`, `891742b`).
