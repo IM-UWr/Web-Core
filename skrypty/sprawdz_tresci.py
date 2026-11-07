@@ -32,6 +32,12 @@ def sprawdz(p):
             return [f'{p}: błąd YAML: {e}']
     if not isinstance(dane, dict):
         return [f'{p}: frontmatter nie jest słownikiem']
+    if kol in ('zaklady', 'warto_wiedziec'):
+        # zlecenie 30: pola karty w grupie „Karta” formularza (obiekt karta) — strona czyta je jak pola zwykłe (content.config.ts)
+        karta = dane.pop('karta', None)
+        if karta is not None and not isinstance(karta, dict):
+            return [f'{p}: pole „karta” musi być grupą pól (obiektem)']
+        dane = {**(karta or {}), **dane}
     for k in WYMAGANE.get(kol, []):
         if not dane.get(k):
             bledy.append(f'{p}: brak wymaganego pola „{k}”')

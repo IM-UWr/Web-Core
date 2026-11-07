@@ -15,10 +15,12 @@ export async function daneRokuAkademickiego(lang: Lang) {
   const fm = (Opis.frontmatter ?? {}) as Record<string, string | undefined>;
   const naglowek = (en && fm.tytul_en) || fm.tytul || T('Rok akademicki', 'Academic year');
   const lead = (en && fm.opis_en) || fm.opis || '';
-  const tekstEn = en && fm.tresc_en ? await renderMarkdownZNaglowkami(fm.tresc_en, lang) : undefined;
+  // pole „Bloki” (zlecenie 30): polski tekst czyta je sam z nagłówka pliku (rehype-bloki), Treść EN i Koniec strony — tutaj
+  const bloki = (fm as Record<string, unknown>).bloki === true;
+  const tekstEn = en && fm.tresc_en ? await renderMarkdownZNaglowkami(fm.tresc_en, lang, bloki) : undefined;
   const tylkoPolski = en && !fm.tresc_en;
   const naglowkiTekstu = tekstEn ? tekstEn.naglowki : Opis.getHeadings();
-  const dalej = await renderMarkdownZNaglowkami((en && fm.dalej_en) || fm.dalej || '', lang);
+  const dalej = await renderMarkdownZNaglowkami((en && fm.dalej_en) || fm.dalej || '', lang, bloki);
   const dalejPolski = en && !fm.dalej_en && !!fm.dalej;
 
   const dzis = today();

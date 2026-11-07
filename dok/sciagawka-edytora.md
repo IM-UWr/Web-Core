@@ -1,4 +1,4 @@
-# Ściągawka edytora: kierunki, specjalności, Popularyzacja
+# Ściągawka edytora: kierunki, specjalności, strony działów i strony
 
 Strona kierunku (np. `/studia/matematyka`) to jeden tekst: pole **Treść** w Pages CMS (Web-Studia → Kierunki → Treść), po angielsku pole **Treść EN**. Ten sam tekst jest w opisie pola „Treść” w formularzu (zlecenie 28). Tak samo strona specjalności (Web-Spec-* → „Specjalność: …” → Treść) i tekst „O popularyzacji” (Web-Popularyzacja → Strona działu Popularyzacja) — zlecenie 29; różnice niżej.
 
@@ -26,6 +26,23 @@ Ostatni punkt to cecha edytora Pages CMS (TipTap 3: „Np. ” na początku akap
 Po angielsku nagłówki: About, Useful pages, Why choose it, How the specialisation works, What you will learn, Skills, Careers, Sample thesis topics, Seminars, Documents, FAQ, Coordinator; ramka — cytat z pogrubionym „Who is it for”.
 
 **Popularyzacja** — tekst „O popularyzacji” to jedna sekcja bez kotwic (nagłówki nie są potrzebne); pierwszy akapit strona pokazuje większą czcionką. Działają kafelki i listy plików.
+
+**Strony działów i strony z listą** (zlecenie 30) — strona działu Instytut, Nauka i Studia (Web-Instytut / Web-Nauka / Web-Studia → „Strona działu …”) to jeden tekst jak „O popularyzacji”: bloki działają zawsze, pierwszy akapit jest większy. Tytuł, opis, hasło i tekst nad listą stron Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje, Obrony doktorskie, Aktualności, Pracownicy, Struktura i zakłady, Warto wiedzieć i Plan zajęć to zwykłe strony w kolekcji „Strony” repozytorium, z którego pochodzi lista, pod adresem strony z listą (np. `nauka/konferencje.md` → `/nauka/konferencje`). Brak takiej strony nic nie psuje: lista ma domyślny tytuł i hasło, bez tekstu. Na zwykłych stronach bloki działają, gdy włączone jest pole „Bloki” („Kafelki, oś i kontakty z list”).
+
+Zasada **tekstu nad listą: lista stoi pod całym tekstem, chyba że jest kotwica** — sekcja pod nagłówkiem 2 o nazwie kotwicy idzie na miejsce swojej listy. Kotwice: „Ostatnie sukcesy” („Recent achievements”) na stronie działu Instytut — zdanie nad ostatnimi sukcesami; „Czasopisma redagowane w Instytucie” („Journals edited at the Institute”) na stronie Publikacje — tekst nad listą czasopism (nagłówek sekcji na stronie = nagłówek z tekstu).
+
+Krótka ściągawka w opisie pola „Treść” stron i stron działów:
+
+> Piszesz jak w zwykłym edytorze; akapity oddziela Enter. Nagłówek 2 = nowa sekcja (pojawi się w spisie „Na tej stronie”).
+> Gdy włączone jest pole „Bloki” (niżej), kilka układów strona rozpoznaje sama (strona działu: zawsze):
+> • Punkt listy zaczynający się pogrubieniem = kafelek.
+> • Lista numerowana z pogrubionym początkiem = oś kroków.
+> • Punkt z rolą kursywą i nazwiskiem pogrubionym = kontakt.
+> • Lista samych linków = lista plików (PDF / strona).
+> • Nagłówek 3 zakończony znakiem „?” = rozwijane pytanie.
+> • Tekst nad listą (Seminaria, Konferencje, Aktualności…): lista stoi pod całym tekstem, chyba że jest kotwica — np. na stronie Publikacje tekst pod nagłówkiem 2 „Czasopisma redagowane w Instytucie” stoi nad listą czasopism.
+> • Plik PDF: wgraj w „Media” i wklej link.
+> • Akapit zaczynający się od dwuliterowego skrótu z kropką („Np.”, „Dr.”, „No.”) edytor zapisze jako listę numerowaną „1.” — zacznij akapit inaczej albo pogrub skrót.
 
 ## Przykłady (tak wygląda tekst w Markdownie)
 
@@ -92,5 +109,10 @@ Lista plików (opis po myślniku jest opcjonalny):
 | Treść strony specjalności (PL i EN) | Web-Spec-* → Specjalność: … → Treść (wygaszana Matematyka w ekonomii: Web-Studia) |
 | Kafelek specjalności na stronie kierunku, skrót, poziom, hasło, zakład, opiekunowie, seminaria | Web-Spec-* → Specjalność: … → Baner i kafelek (strona kierunku buduje kafelki sama) |
 | Tekst „O popularyzacji”, tytuł, „W skrócie”, lata tradycji | Web-Popularyzacja → Strona działu Popularyzacja |
+| Tekst „O Instytucie” / „Badania w Instytucie” / „O studiach”, tytuł, wstęp, hasło, „W skrócie” (Instytut: też godziny sekretariatu) | Web-Instytut / Web-Nauka / Web-Studia → Strona działu … |
+| Tytuł, opis, hasło i tekst nad listą: Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje (też hasło rocznika) | Web-Nauka → Strony → `seminaria`, `nauka/konferencje`, `nauka/granty`, `nauka/sukcesy`, `nauka/publikacje` |
+| To samo: Struktura i zakłady, Warto wiedzieć | Web-Instytut → Strony → `instytut/struktura`, `warto-wiedziec` |
+| To samo: Aktualności, Obrony doktorskie (też hasło strony obrony) | Web-Aktualnosci → Strony → `aktualnosci`, `obrony-doktorskie` |
+| To samo: Pracownicy; Plan zajęć | Web-Pracownicy → Strony → `pracownicy`; Web-Studia → Strony → `studia/plan-zajec` |
 
-Nazwy sekcji, które dostają stałe kotwice w adresie (np. `#terminy` w linkach przypomnień), są w `src/plugins/kotwice.mjs` (kotwice kierunku i specjalności osobno, pole `typ`). Inny nagłówek 2 też jest sekcją, z kotwicą z jego tekstu.
+Nazwy sekcji, które dostają stałe kotwice w adresie (np. `#terminy` w linkach przypomnień), są w `src/plugins/kotwice.mjs` (kotwice kierunku i specjalności osobno, pole `typ`; kotwice stron działów i stron z listą — typ `strona` z adresem strony). Inny nagłówek 2 też jest sekcją, z kotwicą z jego tekstu.

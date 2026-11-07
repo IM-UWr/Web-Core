@@ -175,9 +175,17 @@ const obrony = defineCollection({
 
 const rok = z.preprocess(empty, z.coerce.number().int().optional());
 
+// Grupa pól „Karta” w formularzu Pages CMS (zlecenie 30; zakłady, „Warto wiedzieć”): Pages CMS grupuje pola tylko polem typu object,
+// więc w pliku leżą pod kluczem karta. Strona czyta je jak dotąd z wierzchu — przy wczytaniu karta jest spłaszczana.
+const zKarta = <T extends z.ZodRawShape>(pola: T) => z.preprocess((v) => {
+  if (!v || typeof v !== 'object' || !('karta' in v)) return v;
+  const { karta, ...reszta } = v as Record<string, unknown>;
+  return { ...(karta && typeof karta === 'object' ? karta : {}), ...reszta };
+}, z.object(pola));
+
 const zaklady = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/zaklady' }),
-  schema: z.object({
+  schema: zKarta({
     nazwa: z.string(),
     nazwa_en: optStr,
     nazwa_krotka: optStr,
@@ -319,7 +327,7 @@ const granty = defineCollection({
 // Pozycja z treścią (body) dostaje własną podstronę /warto-wiedziec/<plik>; bez treści karta prowadzi do pola „link”.
 const warto_wiedziec = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/warto_wiedziec' }),
-  schema: z.object({
+  schema: zKarta({
     tytul: z.string(),
     tytul_en: optStr,
     // rok jako tekst (np. „2017” albo „2010, 2018”) — liczba z YAML-a też przejdzie
