@@ -34,6 +34,11 @@ test('kafelki jak dawniej: tytuł i opis w osobnych akapitach', async () => {
   zawiera(html, '<li><b>Tytuł</b><span>Opis kafelka.</span></li>');
 });
 
+test('kafelek: linia z dwukropkiem zaraz pod samym tytułem to opis, nie para', async () => {
+  const { html } = await render('- **Materiały do lekcji**\n\n  Archiwa zadań: Matematyka dla Myślących.\n\n  [Strona](https://example.com/)\n- **Drugi** — Opis.');
+  zawiera(html, '<li><b>Materiały do lekcji</b><span>Archiwa zadań: Matematyka dla Myślących.</span><p class="akcja"><a href="https://example.com/">Strona</a></p></li>');
+});
+
 test('pogrubienie bez separatora („**6 przedmiotów**, w tym …”) to zwykła lista', async () => {
   const { html } = await render('- **6 przedmiotów**, w tym 2 informatyczne\n- **12 ECTS**, z matematyki', { kierunek: {} });
   assert.ok(!html.includes('class="dwa"'), html);

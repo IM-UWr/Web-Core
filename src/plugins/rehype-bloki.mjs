@@ -133,8 +133,9 @@ const naDwa = (lista) => {
     const p = pogrubiony(L[0].linia);
     const dzieci = [el('b', null, p.tytul)];
     let dalej = L.slice(1);
+    // opis: reszta linii z tytułem, a przy samym tytule — następna linia (także „Archiwa zadań: …”, jak dotąd; sam link to przycisk)
     if (p.reszta.length) dzieci.push(el('span', null, p.reszta));
-    else if (dalej[0]?.linia && !samLink(dalej[0].linia) && !para(dalej[0].linia)) {
+    else if (dalej[0]?.linia && !samLink(dalej[0].linia)) {
       dzieci.push(el('span', null, dalej[0].linia));
       dalej = dalej.slice(1);
     }
