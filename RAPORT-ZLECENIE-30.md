@@ -43,7 +43,7 @@ Wszystko na gałęzi `wyglad/zlecenie-16`.
 | 3 | Web-Pracownicy | `c4aa5f1` | Strony |
 | 3 | Web-Popularyzacja | `9ad0954` | Strony Popularyzacji; „Bloki” z nową etykietą |
 | 4 | Web-Core | `158128c0` | Symulacja zapisu dla stron i wpisów, poprawki z niej: wzory w każdym Markdownie, ostatni krok osi; test wtyczki |
-| 4 | Web-Core | (raport) | Raport i zrzuty |
+| 4 | Web-Core | `01bb0437` | Raport i zrzuty; uzupełnienie po pushu — następny commit |
 
 ## Co widzi edytor
 
@@ -139,7 +139,23 @@ Zapis zmienił 743 linie Markdownu. Strony zbudowane z zapisanych plików porów
 
 ## Push i podgląd (etap 5)
 
-Po pushu — uzupełnię zaraz po nim.
+- **Pull:** `git pull --rebase` przed pushem w 12 klonach (wszystkie dotknięte przez 28–30) i w Web-Core. Nic nie przyszło z serwera, konfliktów nie było.
+- **Push** 7.11 o 15:53 (słowo właściciela „Po zakończeniu push”): `wyglad/zlecenie-16` w 8 repozytoriach, wszystkie bez wymuszania:
+  - Web-Core `01bb0437`;
+  - Web-Ustawienia `217a9bf`, Web-Instytut `a71e260`, Web-Nauka `5de4170`, Web-Studia `0200b1a`, Web-Aktualnosci `2fdd547`, Web-Pracownicy `c4aa5f1`, Web-Popularyzacja `9ad0954`.
+  - Web-Spec-* nie miały nowych commitów (wypchnięte z 29).
+  - Gałęzi `main` nie ruszałem, więc stara strona się nie przebudowuje.
+- **Web-Podglad:** przebieg uruchomiony ręcznie (run `42383706719`, 14:53–14:59 UTC) zakończył się sukcesem.
+  - Zbudował Web-Core `01bb0437` z 1221 plikami treści, tyle samo co lokalnie.
+  - 12 błędów „patch does not apply” w kroku „TEST telefonu” — tyle samo co w poprzednim przebiegu.
+- **Strony na [podglądzie](https://im-uwr.github.io/Web-Podglad/)** porównałem z lokalnym buildem: 26 adresów (strona główna, strony działów, 11 stron z listą, Rok akademicki, Pierwszy rok, „Dla uczniów”, Procedura dyplomowania, kilka EN).
+  - Tekst jest wszędzie ten sam.
+  - HTML różni się tylko nazwami obrazów (hash z innej maszyny), nazwą arkusza CSS (treść ta sama poza adresem `/Web-Podglad`) i adresem strony w linkach „zgłoś błąd”.
+- **`test-cms`** (do testu niżej) ustawione na nowe `wyglad/zlecenie-16`:
+  - Web-Studia, Web-Ustawienia i Web-Popularyzacja przesunięte do przodu. Były to czubki gałęzi z 29, bez zapisów.
+  - Web-Spec-Stosowana bez zmian.
+  - Web-Aktualnosci: nowa gałąź.
+  - Web-Nauka: stare `test-cms` z zapisem właściciela z 6.11 (`b0a71bd`, „Update src/data/publikacje/2025.json”) zachowane jako `kopia/test-cms-zlecenie-22`, potem `test-cms` ustawione na `5de4170`.
 
 ## Test w CMS (właściciel)
 
