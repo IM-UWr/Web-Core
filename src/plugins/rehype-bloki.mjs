@@ -19,7 +19,7 @@
 // - tylko kierunki: tabela w sekcji blokowej — table.tab; sekcja „Program studiów” — ### jako zakładki; „Specjalności” —
 //   miejsce na kafelki (komentarz <!--specjalnosci-->, wstawia je widok Kierunek.astro).
 // Opcje: lang ('pl' | 'en', domyślnie pl), site i base (linki poza stronę: typ „strona”/„website” na liście plików).
-import { kotwica, kolejnosc, KOTWICE, NAGLOWEK_SPECJALNOSCI } from './kotwice.mjs';
+import { kotwica, kolejnosc, idNaglowka, KOTWICE, NAGLOWEK_SPECJALNOSCI } from './kotwice.mjs';
 import { zewnetrzny } from './rehype-zewn.mjs';
 
 const el = (tagName, klasa, children = [], props = {}) => ({
@@ -484,6 +484,11 @@ export default function rehypeBloki(options = {}) {
         fm[typ].sekcje = sekcjeTresci(tree, ctx, fm[typ], typ);
         return;
       }
+    }
+    // zwykła strona: stałe id nagłówków ## (kotwice typu 'naglowek' w kotwice.mjs, np. „Office hours” → #konsultacje)
+    for (const n of tree.children) {
+      const id = jest(n, 'h2') && !n.properties?.id ? idNaglowka(tekstW(n).replace(/\s+/g, ' ').trim()) : undefined;
+      if (id) n.properties = { ...n.properties, id };
     }
     if (fm.bloki !== true) return;
     const b = bloki(tree);

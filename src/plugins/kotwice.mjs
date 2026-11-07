@@ -63,6 +63,11 @@ export const KOTWICE = [
   // sekcja pod tym nagłówkiem (do następnego ##) idzie na miejsce swojej listy; reszta tekstu stoi nad listą.
   { id: 'sukcesy', typ: 'strona', adres: '/instytut', nazwy: ['Ostatnie sukcesy', 'Recent achievements'] },
   { id: 'czasopisma', typ: 'strona', adres: '/nauka/publikacje', nazwy: ['Czasopisma redagowane w Instytucie', 'Journals edited at the Institute'] },
+
+  // Zwykłe strony (zlecenie 30) — typ 'naglowek': nagłówek ## o tej nazwie na każdej stronie spoza kierunków i specjalności dostaje
+  // to id zamiast id z treści nagłówka, to samo w PL i EN. Zamiast kotwicy w HTML (<a id="…">), którą edytor usuwa przy zapisie.
+  // „Konsultacje”: link w stopce /studia/zajecia#konsultacje (src/data/stopka.json w Web-Ustawienia), także na /en.
+  { id: 'konsultacje', typ: 'naglowek', nazwy: ['Konsultacje', 'Office hours'] },
 ];
 
 export const klucz = (s) => String(s ?? '').replace(/\s+/g, ' ').trim().toLocaleLowerCase('pl');
@@ -75,6 +80,10 @@ const mapa = (typ) => {
   return m;
 };
 const MAPY = { kierunek: mapa('kierunek'), specjalnosc: mapa('specjalnosc') };
+const NAGLOWKI = new Map(KOTWICE.filter((k) => k.typ === 'naglowek').flatMap((k) => k.nazwy.map((n) => [klucz(n), k.id])));
+
+/** Stałe id nagłówka ## zwykłej strony (kotwice typu 'naglowek') albo undefined. */
+export const idNaglowka = (tekst) => NAGLOWKI.get(klucz(tekst));
 
 /** Kotwica dla tekstu nagłówka ## na stronie danego typu albo undefined. */
 export const kotwica = (tekst, typ = 'kierunek') => MAPY[typ]?.get(klucz(tekst));

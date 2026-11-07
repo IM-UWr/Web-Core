@@ -72,6 +72,12 @@ test('oś po zapisie w edytorze: ostatni krok „**Tytuł**” i opis w następn
   zawiera((await render('- **Kółka**\n  Co tydzień.\n- **Obozy**\n  Latem.')).html, '<ul class="dwa"><li><b>Kółka</b><span>Co tydzień.</span></li>');
 });
 
+test('zwykła strona: stałe id nagłówka („Office hours” i „Konsultacje” → #konsultacje), inne nagłówki bez zmian', async () => {
+  zawiera((await render('## Office hours\n\nText.\n\n## Exam session\n\nText.', { lang: 'en', bloki: false })).html,
+    '<h2 id="konsultacje">Office hours</h2>', '<h2 id="exam-session">Exam session</h2>');
+  zawiera((await render('## Konsultacje\n\nTekst.', { bloki: true })).html, '<h2 id="konsultacje">Konsultacje</h2>');
+});
+
 test('oś bez dwukropka: „Krok N” / „Step N”', async () => {
   zawiera((await render('1. **Zapisz się**\n\n   Opis.\n\n2. **Przyjdź**\n\n   Opis 2.')).html, '<span class="etyk">Krok 2</span><p class="t">Przyjdź</p>');
   zawiera((await render('1. **Sign up** — Text.', { lang: 'en' })).html, '<span class="etyk">Step 1</span><p class="t">Sign up</p><p>Text.</p>');
