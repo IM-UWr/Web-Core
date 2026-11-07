@@ -1,6 +1,7 @@
 // Listy adresów do wygenerowania (getStaticPaths) — wspólne dla wersji PL i EN.
 import { getCollection } from 'astro:content';
 import { aktualnosci, obrony, seminaria, konferencje, granty, zaklady, slugOf, opublikowane } from './tresci';
+import { specjalnosci } from './specjalnosci';
 
 export async function sciezkiAktualnosci() {
   const wszystkie = await aktualnosci(true);
@@ -50,7 +51,8 @@ export async function sciezkiKierunkow() {
   return k.map((kierunek) => ({ params: { kierunek: kierunek.id }, props: { kierunek } }));
 }
 
+// specjalność z polami banera (src/lib/specjalnosci.ts): kierunek i „bez podstrony” są w formularzu „Baner i kafelek”
 export async function sciezkiSpecjalnosci() {
-  const s = await getCollection('specjalnosci');
+  const s = await specjalnosci();
   return s.filter((x) => !x.data.bez_podstrony).map((specjalnosc) => ({ params: { kierunek: specjalnosc.data.kierunek, specjalnosc: specjalnosc.id }, props: { specjalnosc } }));
 }

@@ -19,7 +19,7 @@
 // - tylko kierunki: tabela w sekcji blokowej — table.tab; sekcja „Program studiów” — ### jako zakładki; „Specjalności” —
 //   miejsce na kafelki (komentarz <!--specjalnosci-->, wstawia je widok Kierunek.astro).
 // Opcje: lang ('pl' | 'en', domyślnie pl), site i base (linki poza stronę: typ „strona”/„website” na liście plików).
-import { kotwica, NAGLOWEK_SPECJALNOSCI } from './kotwice.mjs';
+import { kotwica, kolejnosc, KOTWICE, NAGLOWEK_SPECJALNOSCI } from './kotwice.mjs';
 import { zewnetrzny } from './rehype-zewn.mjs';
 
 const el = (tagName, klasa, children = [], props = {}) => ({
@@ -273,6 +273,8 @@ function przeksztalc(n, ctx) {
   if (jest(n, 'blockquote')) {
     const b = bloki(n);
     const g = b.length >= 2 ? sam(b[0], 'strong') : undefined;
+    // specjalność: ramka uwagi jak dotąd w szablonie („Dla kogo”): div.uwaga, etykieta i tekst w osobnym div
+    if (g && ctx.klasaRamki) return zBlokiem(el('div', 'uwaga', [el('span', 'etyk', g.children), el('div', ctx.klasaRamki, b.slice(1))]));
     if (g) n.children = [el('span', 'etyk', g.children), ...b.slice(1)];
     return n;
   }
@@ -301,10 +303,39 @@ function pytania(nodes) {
   return out;
 }
 
-// ---------- kierunki: sekcje po ## ----------
+// ---------- lista z kreskami (specjalność: „Co będziesz umieć”, „Przykładowe tematy prac”) ----------
+// Punkt w jednej linii: sam tekst (bez <p>, także z listy „luźnej”, jaką bywa zapis edytora). opisPo: „Tytuł — opis” →
+// tytuł i span.sp-opis „ — opis”; tytuł wyglądający na polski na stronie EN (ctx.polski) w <span lang="pl">.
+function opisPo(linia, ctx) {
+  const k = linia.findIndex((n) => n.type === 'text' && n.value.includes(' — '));
+  let tytul = linia;
+  let opis = [];
+  if (k >= 0) {
+    const t = linia[k].value;
+    const i = t.indexOf(' — ');
+    tytul = przytnij([...linia.slice(0, k), tekst(t.slice(0, i))]);
+    opis = [el('span', 'sp-opis', [tekst(` — ${t.slice(i + 3).replace(/^\s+/, '')}`), ...linia.slice(k + 1)])];
+  }
+  if (ctx.en && !ctx.polskaTresc && ctx.polski?.(tekstW({ children: tytul }))) tytul = [el('span', null, tytul, { lang: 'pl' })];
+  return [...tytul, ...opis];
+}
+
+const naKreski = (lista, ctx) => {
+  lista.properties = { ...lista.properties, className: ['kreski'] };
+  for (const li of pozycje(lista)) {
+    const L = linie(li);
+    if (L.length === 1 && L[0].linia) li.children = ctx.opisPo ? opisPo(L[0].linia, ctx) : L[0].linia;
+  }
+  return zBlokiem(lista);
+};
+
+// ---------- kierunki i specjalności: sekcje po ## ----------
 // układ sekcji: przekształcone bloki; w „prozie” kolejne zwykłe węzły w div.prose
 function uklad(nodes, typ, ctx) {
-  const prz = nodes.map((n) => przeksztalc(n, ctx));
+  const prz = nodes.map((n) => {
+    const p = przeksztalc(n, ctx);
+    return ctx.kreski && jest(p, 'ul') && !jestBlokiem(p) ? naKreski(p, ctx) : p;
+  });
   if (typ !== 'proza') return prz;
   const out = [];
   let prose;
@@ -339,57 +370,117 @@ function zakladki(nodes, ctx, etykietaSekcji) {
 const slug = (s) => s.toLocaleLowerCase('pl').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l')
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-// Treść kierunku: <section id aria-labelledby> dla każdego ##; zwraca listę sekcji do spisu „Na tej stronie”.
-// opcje: specjalnosci (czy kierunek ma kafelki specjalności), lang ('pl', gdy na /en pokazujemy treść polską)
-function sekcjeKierunku(tree, ctx, opcje) {
+// Treść kierunku albo specjalności: <section id aria-labelledby> dla każdego ##; zwraca listę sekcji do spisu „Na tej stronie”.
+// typ: 'kierunek' | 'specjalnosc' (kotwice z kotwice.mjs). opcje: lang ('pl', gdy na /en pokazujemy treść polską) oraz
+//   kierunek: specjalnosci — czy kierunek ma kafelki specjalności (miejsce: komentarz <!--specjalnosci-->);
+//   specjalność: wstawki — { seminaria, opiekun, wybor: czy są dane } (miejsce sekcji liczonej: komentarz <!--wstaw:nazwa-->),
+//     naglowki — { seminaria, opiekun: tekst nagłówka sekcji dopisanej przez stronę; opiekun zastępuje też tekst edytora
+//     (liczba pojedyncza albo mnoga zależy od liczby opiekunów) }, klasaRamki — klasa tekstu w ramce uwagi („Dla kogo”);
+//     dane (wynik) — { etapy: [{ etyk, t }], grupy: [{ nazwa, n }] } z sekcji „Jak przebiega” i „Czego się uczysz”
+//     (liczby banera specjalności).
+const wstaw = (nazwa) => ({ type: 'comment', value: `wstaw:${nazwa}` });
+const ZAMIENIA_NAGLOWEK = new Set(['opiekun']);
+
+function sekcjeTresci(tree, ctx, opcje, typ) {
   const dzieci = bloki(tree);
   const iH2 = dzieci.flatMap((n, i) => (jest(n, 'h2') ? [i] : []));
   const lang = opcje.lang ? { lang: opcje.lang } : {};
+  const c0 = { ...ctx, polskaTresc: !!opcje.lang, ...(typ === 'specjalnosc' ? { klasaRamki: opcje.klasaRamki } : {}) };
   const wynik = [];
-  const sekcje = [];
+  const sek = []; // { node, wpis, k } — sekcja, pozycja spisu, miejsce w kolejności kotwic typu (-1: spoza listy)
   const uzyte = new Set();
+  const porzadek = kolejnosc(typ);
+  const wstawki = opcje.wstawki ?? {};
+  const wstawione = new Set();
+  const dane = { etapy: [], grupy: [] };
   const przed = dzieci.slice(0, iH2[0] ?? dzieci.length);
-  if (przed.length) wynik.push(...uklad(pytania(przed), 'proza', { ...ctx, pliki: maPliki(przed), tab: false }).map((n) => (jest(n, 'div') ? { ...n, properties: { ...n.properties, ...lang } } : n)));
+  if (przed.length) wynik.push(...uklad(pytania(przed), 'proza', { ...c0, pliki: maPliki(przed), tab: false }).map((n) => (jest(n, 'div') ? { ...n, properties: { ...n.properties, ...lang } } : n)));
   let zeSpecjalnosciami = false;
-  const sekcja = (h, srodek, etykietaH, id, krotka) => {
-    h.properties = { id: `${id}-h` };
-    wynik.push(el('section', null, [h, ...srodek], { id, ariaLabelledBy: `${id}-h`, ...lang }));
-    sekcje.push({ id, etykieta: etykietaH, ...(krotka ? { krotka } : {}) });
-  };
-  iH2.forEach((i, k) => {
-    const h = dzieci[i];
-    const tresc = dzieci.slice(i + 1, iH2[k + 1] ?? dzieci.length);
-    const etykietaH = tekstW(h).replace(/\s+/g, ' ').trim();
-    const kt = kotwica(etykietaH);
-    const baza = kt?.id ?? (slug(etykietaH) || 'sekcja');
+  const noweId = (baza) => {
     let id = baza;
     for (let n = 2; uzyte.has(id); n++) id = `${baza}-${n}`;
     uzyte.add(id);
+    return id;
+  };
+  const sekcja = (h, srodek, etykietaH, id, krotka, kId) => {
+    h.properties = { id: `${id}-h` };
+    return { node: el('section', null, [h, ...srodek], { id, ariaLabelledBy: `${id}-h`, ...lang }), wpis: { id, etykieta: etykietaH, ...(krotka ? { krotka } : {}) }, k: porzadek.indexOf(kId) };
+  };
+  // nagłówek wstawki z osią (np. „Wybór specjalności”) — wtedy wstawka idzie pod niego, nie na koniec osi
+  const naglowkiWstawek = new Set(iH2.map((i) => kotwica(tekstW(dzieci[i]).replace(/\s+/g, ' ').trim(), typ)?.wstawka).filter(Boolean));
+  iH2.forEach((i, k) => {
+    const h = dzieci[i];
+    const tresc = dzieci.slice(i + 1, iH2[k + 1] ?? dzieci.length);
+    let etykietaH = tekstW(h).replace(/\s+/g, ' ').trim();
+    const kt = kotwica(etykietaH, typ);
+    if (kt?.wstawka && !wstawki[kt.wstawka] && !tresc.length) return; // sekcja liczona bez danych i bez tekstu: bez nagłówka
     if (kt?.rola === 'specjalnosci') {
       if (!opcje.specjalnosci && !tresc.length) return; // kierunek bez specjalności: bez pustego nagłówka
       zeSpecjalnosciami = true;
     }
-    const c = { ...ctx, pliki: maPliki(tresc), tab: (kt?.uklad ?? 'proza') === 'bloki' };
+    const id = noweId(kt?.id ?? (slug(etykietaH) || 'sekcja'));
+    const c = { ...c0, pliki: kt?.pliki !== false && maPliki(tresc), tab: (kt?.uklad ?? 'proza') === 'bloki', kreski: kt?.lista === 'kreski', opisPo: !!kt?.opisPo };
     const srodek = kt?.rola === 'program' ? zakladki(tresc, c, etykietaH) : uklad(pytania(tresc), kt?.uklad ?? 'proza', c);
     if (kt?.rola === 'specjalnosci' && opcje.specjalnosci) srodek.push({ type: 'comment', value: 'specjalnosci' });
-    sekcja(h, srodek, etykietaH, id, kt?.krotko);
+    if (kt?.wstawka && wstawki[kt.wstawka] && !wstawione.has(kt.wstawka)) { srodek.push(wstaw(kt.wstawka)); wstawione.add(kt.wstawka); }
+    if (kt?.wstawkaNaKoncu && wstawki[kt.wstawkaNaKoncu] && !naglowkiWstawek.has(kt.wstawkaNaKoncu) && !wstawione.has(kt.wstawkaNaKoncu)) {
+      srodek.push(wstaw(kt.wstawkaNaKoncu));
+      wstawione.add(kt.wstawkaNaKoncu);
+    }
+    if (kt?.wstawka && ZAMIENIA_NAGLOWEK.has(kt.wstawka) && opcje.naglowki?.[kt.wstawka]) {
+      etykietaH = opcje.naglowki[kt.wstawka];
+      h.children = [tekst(etykietaH)];
+    }
+    if (typ === 'specjalnosc' && kt?.id === 'przebieg') {
+      for (const ol of srodek.filter((n) => jest(n, 'ol') && n.properties.className?.includes('etapy'))) {
+        for (const li of pozycje(ol)) dane.etapy.push({ etyk: tekstW(li.children[0]).trim(), t: tekstW(li.children[1]).trim() });
+      }
+    }
+    if (typ === 'specjalnosc' && kt?.id === 'przedmioty') {
+      for (const n of srodek) {
+        if (jest(n, 'h3')) dane.grupy.push({ nazwa: tekstW(n).replace(/\s+/g, ' ').trim(), n: 0 });
+        else if (jest(n, 'ul') && dane.grupy.length) dane.grupy[dane.grupy.length - 1].n += pozycje(n).length;
+      }
+    }
+    sek.push(sekcja(h, srodek, etykietaH, id, kt?.krotko, kt?.id));
   });
   if (opcje.specjalnosci && !zeSpecjalnosciami) {
     const etykietaH = NAGLOWEK_SPECJALNOSCI[ctx.en && !opcje.lang ? 'en' : 'pl'];
-    sekcja(el('h2', null, [tekst(etykietaH)]), [{ type: 'comment', value: 'specjalnosci' }], etykietaH, uzyte.has('specjalnosci') ? 'specjalnosci-2' : 'specjalnosci');
+    sek.push(sekcja(el('h2', null, [tekst(etykietaH)]), [{ type: 'comment', value: 'specjalnosci' }], etykietaH, noweId('specjalnosci'), undefined, 'specjalnosci'));
   }
+  // specjalność: sekcje liczone bez nagłówka w treści — w ich dawnym miejscu (kolejność kotwic); ramka wyboru bez osi —
+  // na końcu pierwszej sekcji („O specjalności”), jak dotąd
+  for (const kt of KOTWICE.filter((x) => x.typ === typ && x.wstawka)) {
+    const w = kt.wstawka;
+    if (!wstawki[w] || wstawione.has(w)) continue;
+    wstawione.add(w);
+    if (KOTWICE.some((x) => x.typ === typ && x.wstawkaNaKoncu === w)) {
+      if (sek.length) sek[0].node.children.push(wstaw(w));
+      else wynik.push(wstaw(w));
+      continue;
+    }
+    const etykietaH = opcje.naglowki?.[w] ?? kt.nazwy[0];
+    const nowa = sekcja(el('h2', null, [tekst(etykietaH)]), [wstaw(w)], etykietaH, noweId(kt.id), kt.krotko, kt.id);
+    const gdzie = sek.findIndex((s) => s.k > nowa.k);
+    sek.splice(gdzie < 0 ? sek.length : gdzie, 0, nowa);
+  }
+  wynik.push(...sek.map((s) => s.node));
   tree.children = wynik;
-  return sekcje;
+  if (typ === 'specjalnosc') opcje.dane = dane;
+  return sek.map((s) => s.wpis);
 }
 
 export default function rehypeBloki(options = {}) {
   const en = options.lang === 'en';
-  const ctx = { slowo: en ? 'Step' : 'Krok', en, site: options.site ?? '', base: options.base ?? '/' };
+  // polski — (tekst) => czy wygląda na polski (src/lib/jezykTekstu.ts; tematy prac na stronie EN dostają lang="pl")
+  const ctx = { slowo: en ? 'Step' : 'Krok', en, site: options.site ?? '', base: options.base ?? '/', polski: options.polski };
   return (tree, file) => {
     const fm = file?.data?.astro?.frontmatter ?? {};
-    if (fm.kierunek && typeof fm.kierunek === 'object') {
-      fm.kierunek.sekcje = sekcjeKierunku(tree, ctx, fm.kierunek);
-      return;
+    for (const typ of ['kierunek', 'specjalnosc']) {
+      if (fm[typ] && typeof fm[typ] === 'object') {
+        fm[typ].sekcje = sekcjeTresci(tree, ctx, fm[typ], typ);
+        return;
+      }
     }
     if (fm.bloki !== true) return;
     const b = bloki(tree);

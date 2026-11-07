@@ -197,14 +197,8 @@ const zaklady = defineCollection({
   }),
 });
 
-// Kierunek studiów (np. matematyka): treść w polach, a wygląd w szablonie src/views/Kierunek.astro.
+// lista z pola CMS (puste = brak pozycji)
 const lista = <T extends z.ZodTypeAny>(item: T) => z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(item));
-const link = z.object({ etykieta: z.string(), etykieta_en: optStr, adres: z.string() });
-// Dokument: plik wgrany w CMS (pole „wgraj”) albo link (pole „plik”, np. do BIP). Szablony używają zawsze „plik”.
-const dokument = z
-  .object({ nazwa: z.string(), nazwa_en: optStr, wgraj: optStr, plik: optStr, opis: optStr, opis_en: optStr })
-  .refine((d) => !!(d.wgraj || d.plik), { message: 'Dokument: wgraj plik albo podaj link' })
-  .transform((d) => ({ ...d, plik: (d.wgraj || d.plik) as string }));
 
 // Kierunek (zlecenie 28): jeden Markdown — treść polska w pliku (body), angielska w tresc_en (puste = polska z lang="pl").
 // Sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs), wygląd w src/views/Kierunek.astro.
@@ -238,12 +232,26 @@ const kierunki_baner = defineCollection({
   }),
 });
 
-// Podstrona specjalności (np. /studia/matematyka/analiza-danych).
+// Podstrona specjalności (np. /studia/matematyka/analiza-danych), zlecenie 29: formularz „Treść” — jeden Markdown jak kierunek
+// (body po polsku, tresc_en po angielsku; puste = polska z lang="pl"), sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs,
+// kotwice typu „specjalnosc” w kotwice.mjs), wygląd w src/views/Specjalnosc.astro. Pola banera i kafelka na stronie kierunku —
+// osobny formularz i plik w kolekcji specjalnosci_baner (ten sam id; src/lib/specjalnosci.ts).
 const specjalnosci = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/specjalnosci' }),
   schema: z.object({
     nazwa: z.string(),
     nazwa_en: optStr,
+    tresc_en: optStr,
+    opublikowany: published,
+  }),
+});
+
+// „Baner i kafelek” specjalności (src/content/specjalnosci-baner/<id specjalności>.json; osobny formularz, bo Pages CMS przy zapisie
+// usuwa z pliku pola spoza formularza). Brak pliku: wartości domyślne (kierunek matematyka, kafelek na stronie kierunku, bez
+// banera i opiekunów) — src/lib/specjalnosci.ts. zrodla i do_uzupelnienia — pola ukryte w formularzu (notatki redakcyjne).
+const specjalnosci_baner = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/specjalnosci-baner' }),
+  schema: z.object({
     kierunek: z.preprocess((v) => idWpisu(empty(v)), z.string().default('matematyka')),
     // kafelek na stronie kierunku budowany z tego pliku (jedno miejsce edycji)
     kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
@@ -260,34 +268,12 @@ const specjalnosci = defineCollection({
     opis_en: optStr,
     zaklad: optId,
     opiekunowie: lista(z.object({ imie_nazwisko: z.string(), rola: optStr, rola_en: optStr })),
-    wygaszana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
-    dla_kogo: optStr,
-    dla_kogo_en: optStr,
-    // „Co wyróżnia specjalność” — kafelki jak na stronie kierunku
-    dlaczego: lista(z.object({ tytul: z.string(), tytul_en: optStr, opis: z.string(), opis_en: optStr, ikona: optStr })),
-    // „Jak przebiega specjalność” — oś semestrów/etapów
-    etapy: lista(z.object({ kiedy: z.string(), kiedy_en: optStr, tytul: z.string(), tytul_en: optStr, opis: optStr, opis_en: optStr })),
-    // identyfikatory seminariów (pliki z src/content/seminaria) związanych ze specjalnością
+    // identyfikatory seminariów (pliki z src/content/seminaria) związanych ze specjalnością — sekcja „Seminaria”
     seminaria: idList,
-    przedmioty: lista(z.object({
-      grupa: z.string(),
-      grupa_en: optStr,
-      lista: lista(z.object({ nazwa: z.string(), nazwa_en: optStr, opis: optStr, opis_en: optStr })),
-    })),
-    umiejetnosci: strList,
-    umiejetnosci_en: strList,
-    kariera: optStr,
-    kariera_en: optStr,
-    // tytuł pracy zostaje w języku oryginału (zlecenie 11, zalecenie 12); opis po angielsku opcjonalny (puste = na /en polski)
-    tematy_prac: lista(z.object({ tytul: z.string(), opis: optStr, opis_en: optStr })),
-    dokumenty: lista(dokument),
-    linki: lista(link),
-    faq: lista(z.object({ pytanie: z.string(), pytanie_en: optStr, odpowiedz: z.string(), odpowiedz_en: optStr })),
-    tresc_en: optStr,
+    wygaszana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
     zrodla: strList,
     do_uzupelnienia: strList,
     ...haslo,
-    opublikowany: published,
   }),
 });
 
@@ -355,4 +341,4 @@ const warto_wiedziec = defineCollection({
   }),
 });
 
-export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, warto_wiedziec };
+export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, specjalnosci_baner, warto_wiedziec };

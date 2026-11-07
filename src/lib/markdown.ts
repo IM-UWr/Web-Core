@@ -7,6 +7,7 @@ import rehypeZewn from '../plugins/rehype-zewn.mjs';
 import rehypeBloki from '../plugins/rehype-bloki.mjs';
 import rehypeLimity from '../plugins/rehype-limity.mjs';
 import remarkWzoryEdytora from '../plugins/remark-wzory-edytora.mjs';
+import { wygladaNaPolski } from './jezykTekstu';
 
 import type { Lang } from './daty';
 
@@ -42,20 +43,41 @@ export async function renderMarkdownZNaglowkami(src: string | undefined, lang: L
 export interface SekcjaKierunku { id: string; etykieta: string; krotka?: string }
 const procesoryKierunku = new Map<Lang, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
 
-export async function renderKierunku(src: string | undefined, lang: Lang, opcje: { specjalnosci: boolean; polski?: boolean }): Promise<{ html: string; sekcje: SekcjaKierunku[] }> {
+async function procesorSekcji(lang: Lang) {
   let processor = procesoryKierunku.get(lang);
   if (!processor) {
     const site = import.meta.env.SITE, base = import.meta.env.BASE_URL;
     processor = await createMarkdownProcessor({
       // wzory zapisane edytorem Pages CMS (ukośniki Markdownu we wzorze) — src/plugins/remark-wzory-edytora.mjs
       remarkPlugins: [remarkMath, remarkWzoryEdytora],
-      rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site, base }], rehypeLimity, [rehypeBase, { base, lang }], [rehypeZewn, { site, base, lang }]],
+      // polski: tematy prac na stronie specjalności po angielsku — tytuł po polsku dostaje lang="pl" (jak langTekstu())
+      rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site, base, polski: wygladaNaPolski }], rehypeLimity, [rehypeBase, { base, lang }], [rehypeZewn, { site, base, lang }]],
     } as any);
     procesoryKierunku.set(lang, processor);
   }
+  return processor;
+}
+
+export async function renderKierunku(src: string | undefined, lang: Lang, opcje: { specjalnosci: boolean; polski?: boolean }): Promise<{ html: string; sekcje: SekcjaKierunku[] }> {
+  const processor = await procesorSekcji(lang);
   const kierunek: Record<string, unknown> = { specjalnosci: opcje.specjalnosci, ...(opcje.polski ? { lang: 'pl' } : {}) };
   const result = await processor.render(src ?? '', { frontmatter: { kierunek } });
   return { html: result.code, sekcje: (kierunek.sekcje ?? []) as SekcjaKierunku[] };
+}
+
+// ---------- Treść specjalności (zlecenie 29): jeden Markdown, sekcje po ## jak na kierunku (kotwice typu „specjalnosc”) ----------
+// Sekcje liczone z innych danych (seminaria, opiekunowie, ramka „Wybór specjalności”): w HTML komentarz <!--wstaw:nazwa-->
+// w miejscu sekcji, wstawia je widok Specjalnosc.astro. dane — oś i grupy przedmiotów (liczby banera).
+export type WstawkaSpecjalnosci = 'seminaria' | 'opiekun' | 'wybor';
+export interface DaneSpecjalnosci { etapy: { etyk: string; t: string }[]; grupy: { nazwa: string; n: number }[] }
+
+export async function renderSpecjalnosci(src: string | undefined, lang: Lang, opcje: {
+  wstawki: Partial<Record<WstawkaSpecjalnosci, boolean>>; naglowki: Partial<Record<WstawkaSpecjalnosci, string>>; klasaRamki: string; polski?: boolean;
+}): Promise<{ html: string; sekcje: SekcjaKierunku[]; dane: DaneSpecjalnosci }> {
+  const processor = await procesorSekcji(lang);
+  const specjalnosc: Record<string, unknown> = { wstawki: opcje.wstawki, naglowki: opcje.naglowki, klasaRamki: opcje.klasaRamki, ...(opcje.polski ? { lang: 'pl' } : {}) };
+  const result = await processor.render(src ?? '', { frontmatter: { specjalnosc } });
+  return { html: result.code, sekcje: (specjalnosc.sekcje ?? []) as SekcjaKierunku[], dane: (specjalnosc.dane ?? { etapy: [], grupy: [] }) as DaneSpecjalnosci };
 }
 
 // ---------- Wzory w tytułach (np. tytuły referatów: „… $\ell^2$ estimates …”) ----------

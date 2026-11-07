@@ -1,11 +1,11 @@
 // Dane strony działu „Studia” (DzialStudia.astro): liczby w banerze, kafelki z menu „Studia”, „O studiach” i aktualności.
-import { getCollection } from 'astro:content';
 import tekst from '../../data/dzialy/studia.json';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { menuGlowne } from '../menu';
 import { listaKierunkow, jestSzkolaDoktorska, stopnieKierunku } from '../kierunki';
 import { listaAktualnosci } from '../tresci';
+import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
 
 // polska odmiana: 1 kierunek, 2–4 kierunki, 5+ kierunków
 const odm = (n: number, jeden: string, kilka: string, wiele: string) =>
@@ -22,7 +22,7 @@ export async function daneDzialuStudia(lang: Lang) {
 
   // Pasek liczb (liczone z kolekcji).
   const idKierunkow = new Set(kierunki.map((k) => k.id));
-  const specjalnosci = (await getCollection('specjalnosci')).filter(
+  const specjalnosci = (await wszystkieSpecjalnosci()).filter(
     (s) => s.data.opublikowany !== false && s.data.na_stronie_kierunku && !s.data.wygaszana && idKierunkow.has(s.data.kierunek),
   );
   // stopnie z nadtytułu banera i treści kierunku („I i II stopnia”), szkoła doktorska = III (zlecenie 28: pól etapów już nie ma)

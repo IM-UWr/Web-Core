@@ -1,4 +1,4 @@
-// Testy wtyczki bloków (zlecenie 28):  node --test src/plugins/rehype-bloki.test.mjs  (albo npm run test:bloki)
+// Testy wtyczki bloków (zlecenia 28 i 29):  node --test src/plugins/rehype-bloki.test.mjs  (albo npm run test:bloki)
 // Przypadki z wzoru kierunków (28-zalaczniki\wzor) i zapisy edytora Pages CMS (Enter zamiast Shift+Enter itd.).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -146,4 +146,53 @@ test('wzór po zapisie w edytorze jak przed zapisem; wzór bez śladu edytora be
   assert.equal(await katex(String.raw`$\\ell^2$`), await katex(String.raw`$\ell^2$`));
   assert.equal(await katex(String.raw`$a\_1 + x^\*$`), await katex(String.raw`$a_1 + x^*$`));
   assert.ok((await katex(String.raw`$a \\ b$`)).includes(String.raw`a \\ b`));
+});
+
+// Specjalności (zlecenie 29): tryb sekcji z kotwicami typu „specjalnosc”, wstawki sekcji liczonych z innych danych.
+const procesorySpec = {};
+async function renderSpec(md, opcje = {}, lang = 'pl') {
+  procesorySpec[lang] ??= await createMarkdownProcessor({
+    remarkPlugins: [remarkMath, remarkWzoryEdytora],
+    rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site: 'https://im-uwr.github.io', base: '/Web-Core', polski: (t) => /[ąćęłńóśźż]/i.test(t) }]],
+  });
+  const naglowki = lang === 'en' ? { seminaria: 'Seminars', opiekun: 'Coordinator' } : undefined;
+  const fm = { specjalnosc: { wstawki: { seminaria: true, opiekun: true, wybor: true }, naglowki, klasaRamki: 'sp-dla', ...opcje } };
+  const r = await procesorySpec[lang].render(md, { frontmatter: fm });
+  return { html: r.code.replace(/>\s+</g, '><').replace(/\n/g, ' '), sekcje: fm.specjalnosc.sekcje, dane: fm.specjalnosc.dane };
+}
+
+test('specjalność: kotwice, krótka etykieta spisu, „Przydatne strony” z adresem .php to ul.linki', async () => {
+  const md = '## O specjalności\n\nTekst.\n\n## Przydatne strony\n\n- [Zakład](/instytut/zaklady/statystyka)\n- [Katalog (USOS)](https://usosweb.uwr.edu.pl/kontroler.php?_action=x)\n\n## Jak przebiega specjalność\n\n1. **Semestr 5: Wybór** — Opis.';
+  const { html, sekcje } = await renderSpec(md);
+  zawiera(html, '<section id="o-specjalnosci"', '<section id="linki"', '<ul class="linki"><li><a href="/instytut/zaklady/statystyka">Zakład</a></li>', '<section id="przebieg"');
+  assert.ok(!html.includes('class="pliki"'), html);
+  assert.deepEqual(sekcje.map((s) => s.id), ['o-specjalnosci', 'linki', 'przebieg', 'seminaria', 'opiekun']);
+  assert.equal(sekcje[2].krotka, 'Jak przebiega');
+});
+
+test('specjalność: cytat „Dla kogo” to ramka, listy w „Co będziesz umieć” i tematach to kreski z szarym dopiskiem', async () => {
+  const md = '## O specjalności\n\nTekst.\n\n> **Dla kogo**\n>\n> Dla osób lubiących liczby.\n\n## Co będziesz umieć\n\n- liczyć\n- modelować\n\n## Przykładowe tematy prac\n\n- Równania z dyfuzją — praca magisterska; promotor: X';
+  const { html } = await renderSpec(md);
+  zawiera(html, '<div class="uwaga"><span class="etyk">Dla kogo</span><div class="sp-dla"><p>Dla osób lubiących liczby.</p></div></div>',
+    '<ul class="kreski"><li>liczyć</li><li>modelować</li></ul>', '<li>Równania z dyfuzją<span class="sp-opis"> — praca magisterska; promotor: X</span></li>');
+  const en = (await renderSpec(md.replace('Co będziesz umieć', 'Skills').replace('Przykładowe tematy prac', 'Sample thesis topics'), {}, 'en')).html;
+  zawiera(en, '<li><span lang="pl">Równania z dyfuzją</span><span class="sp-opis">', '<h2 id="seminaria-h">Seminars</h2>');
+});
+
+test('specjalność: wstawki pod nagłówkiem, bez nagłówka w zwykłym miejscu, bez danych bez sekcji; nagłówek opiekuna z danych', async () => {
+  const md = '## O specjalności\n\nTekst.\n\n## Jak przebiega specjalność\n\n1. **Semestr 5: Seminarium** — Opis.\n\n## Seminaria\n\n## Dokumenty\n\n- [Plik](/pliki/a.pdf)\n\n## Opiekun specjalności';
+  const { html, sekcje } = await renderSpec(md, { naglowki: { opiekun: 'Opiekunowie specjalności' } });
+  zawiera(html, '</ol><!--wstaw:wybor-->', '<h2 id="seminaria-h">Seminaria</h2><!--wstaw:seminaria-->', '<h2 id="opiekun-h">Opiekunowie specjalności</h2><!--wstaw:opiekun-->');
+  assert.deepEqual(sekcje.map((s) => s.id), ['o-specjalnosci', 'przebieg', 'seminaria', 'dokumenty', 'opiekun']);
+  const bez = await renderSpec(md.replace('## Seminaria\n\n', ''), { wstawki: { seminaria: true, opiekun: false, wybor: true } });
+  assert.deepEqual(bez.sekcje.map((s) => s.id), ['o-specjalnosci', 'przebieg', 'seminaria', 'dokumenty']);
+  const bezOsi = (await renderSpec('## O specjalności\n\nTekst.', { wstawki: { seminaria: false, opiekun: false, wybor: true } })).html;
+  zawiera(bezOsi, '<p>Tekst.</p></div><!--wstaw:wybor--></section>');
+});
+
+test('specjalność: dane do liczb w banerze (etapy osi i grupy przedmiotów)', async () => {
+  const md = '## Jak przebiega specjalność\n\n1. **Semestr 4: Deklaracja specjalności** — Opis.\n\n## Czego się uczysz\n\n### Przedmioty specjalności (program od 2026/27)\n\n- **Analiza** — Opis.\n- **Algebra** — Opis.';
+  const { dane } = await renderSpec(md);
+  assert.deepEqual(dane.etapy, [{ etyk: 'Semestr 4', t: 'Deklaracja specjalności' }]);
+  assert.deepEqual(dane.grupy, [{ nazwa: 'Przedmioty specjalności (program od 2026/27)', n: 2 }]);
 });

@@ -1,78 +1,40 @@
 ---
-// Podstrona specjalności (/studia/<kierunek>/<specjalność>). Treść: src/content/specjalnosci/<id>.md (edycja w Pages CMS).
-// Wspólny szablon podstrony (zal/Podstrona.astro; zlecenie 12, etap 3) i wzorzec treści (zlecenie 11, zalecenie 14;
-// src/styles/zal-tresc.css, klasa .tresc) — sekcje jak na stronie kierunku (Kierunek.astro), kreski między sekcjami,
-// spis „Na tej stronie” z prawej (na telefonie zwijany nad treścią):
-//   O specjalności (Markdown, „Dla kogo” w ramce uwagi) → strony powiązane (pole `linki`, ul.linki) → Dlaczego warto
-//   (ul.dwa) → Jak przebiega (ol.etapy; pod spodem ramka „Wybór specjalności” z linkiem do terminów na stronie kierunku)
-//   → Czego się uczysz (grupy przedmiotów jako podsekcje, ul.dwa) → Co będziesz umieć (ul.kreski) → Po studiach →
-//   Przykładowe tematy prac (ul.kreski) → Seminaria (ul.linki) → Dokumenty (ul.pliki) → Pytania (.faq) → Opiekun (.kontakty).
-// Baner bez zmian: liczby (LiczbyBanera) i etykiety specjalności. Tytuł karty „Specjalność — Kierunek” jak dotąd.
-// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px, jedna kolumna — zal-tresc.css).
+// Podstrona specjalności (/studia/<kierunek>/<specjalność>), zlecenie 29. Treść: jeden Markdown — src/content/specjalnosci/<id>.md
+// (body po polsku, pole tresc_en po angielsku; edycja w Pages CMS: Nazwa, Treść, Nazwa EN, Treść EN). Sekcje to nagłówki ##
+// (kotwice typu „specjalnosc” i krótka etykieta spisu „Jak przebiega” — src/plugins/kotwice.mjs), bloki wzorca treści z samego
+// tekstu (src/plugins/rehype-bloki.mjs): „**Tytuł** — opis” → ul.dwa, lista numerowana „**Kiedy: Tytuł** — opis” → ol.etapy,
+// ### w „Czego się uczysz” → grupy przedmiotów, zwykła lista w „Co będziesz umieć” i „Przykładowe tematy prac” → ul.kreski
+// („Tytuł — opis”: opis szary), lista linków → ul.linki / ul.pliki, ### z „?” → rozwijane pytania, cytat „> **Dla kogo**” → ramka.
+// Sekcje liczone z innych danych (wstawia je ten widok w miejscu <!--wstaw:…--> z treści): Seminaria (pole „Seminaria”),
+// Opiekun(owie) specjalności (spis pracowników) z zakładem, ramka „Wybór specjalności” (pod osią, a bez osi — w „O specjalności”).
+// Baner i kafelek na stronie kierunku: formularz „Baner i kafelek” (src/content/specjalnosci-baner/<id>.json, src/lib/specjalnosci.ts):
+// liczby (LiczbyBanera) i etykiety specjalności. Tytuł karty „Specjalność — Kierunek” jak dotąd.
+// Wspólny szablon podstrony (zal/Podstrona.astro), wzorzec treści (src/styles/zal-tresc.css, klasa .tresc). Jedna wersja HTML:
+// komputer (≥ 1024 px) i telefon (≤ 1023 px, jedna kolumna — zal-tresc.css).
 import Link from '../components/Link.astro';
 import { zTytulem } from '../lib/osoby';
-import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
-import Ikona from '../components/Ikona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import { u, isExternal } from '../lib/url';
-import { wJezyku, wybierz, langTekstu } from '../lib/i18n';
+import { u } from '../lib/url';
+import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
+import type { Specjalnosc } from '../lib/specjalnosci';
 import { daneSpecjalnosci } from '../lib/widoki/specjalnosc';
 import { mailHtml } from '../lib/limity.mjs';
 
-interface Props { specjalnosc: CollectionEntry<'specjalnosci'>; lang: Lang }
+interface Props { specjalnosc: Specjalnosc; lang: Lang }
 const { specjalnosc, lang } = Astro.props;
 const d = specjalnosc.data;
 const en = lang === 'en';
 const T = (pl: string, plEn: string) => (en ? plEn : pl);
 const w = (o: any, pole: string) => wybierz(o, pole, lang);
-const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a : wJezyku(a, lang)));
-const {
-  Content, htmlEn, kariera, dlaKogo, faq, umiejetnosci, nazwaKierunku, zaklad, opiekunowie, nazwa, sem, haslo, liczbyTel,
-} = await daneSpecjalnosci(specjalnosc, lang);
-
-// typ pozycji na liście plików (wzorzec: „PDF”, „strona ↗”)
-const typPliku = (a: string) => {
-  const roz = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i)?.[1];
-  if (roz) return roz.toUpperCase();
-  return isExternal(a) ? T('strona', 'website') : T('strona', 'page');
-};
-const H = {
-  o: T('O specjalności', 'About'),
-  linki: T('Przydatne strony', 'Useful pages'),
-  dlaczego: T('Dlaczego warto', 'Why choose it'),
-  przebieg: T('Jak przebiega specjalność', 'How the specialisation works'),
-  przedmioty: T('Czego się uczysz', 'What you will learn'),
-  umiejetnosci: T('Co będziesz umieć', 'Skills'),
-  kariera: T('Po studiach', 'Careers'),
-  tematy: T('Przykładowe tematy prac', 'Sample thesis topics'),
-  seminaria: T('Seminaria', 'Seminars'),
-  dokumenty: T('Dokumenty', 'Documents'),
-  faq: T('Pytania i odpowiedzi', 'FAQ'),
-  opiekun: opiekunowie.length > 1 ? T('Opiekunowie specjalności', 'Coordinators') : T('Opiekun specjalności', 'Coordinator'),
-};
-const K: Partial<Record<keyof typeof H, string>> = { przebieg: T('Jak przebiega', 'How it works') };
-const sekcje: [keyof typeof H, string, boolean][] = [
-  ['o', 'o-specjalnosci', true],
-  ['linki', 'linki', d.linki.length > 0],
-  ['dlaczego', 'dlaczego', d.dlaczego.length > 0],
-  ['przebieg', 'przebieg', d.etapy.length > 0],
-  ['przedmioty', 'przedmioty', d.przedmioty.length > 0],
-  ['umiejetnosci', 'umiejetnosci', umiejetnosci.length > 0],
-  ['kariera', 'po-studiach', !!kariera],
-  ['tematy', 'tematy', d.tematy_prac.length > 0],
-  ['seminaria', 'seminaria', sem.length > 0],
-  ['dokumenty', 'dokumenty', d.dokumenty.length > 0],
-  ['faq', 'pytania', faq.length > 0],
-  ['opiekun', 'opiekun', opiekunowie.length > 0],
-];
-const spis = sekcje.filter(([, , jest]) => jest).map(([k, id]) => ({ id, etykieta: H[k], krotka: K[k] }));
+const { czesci, sekcje, nazwaKierunku, zaklad, opiekunowie, nazwa, sem, haslo, liczbyTel } = await daneSpecjalnosci(specjalnosc, lang);
 const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
 ---
 <Podstrona lang={lang} tytul={nazwa} tytulKarty={`${nazwa} — ${nazwaKierunku}`} opis={w(d, 'opis')} opublikowany={d.opublikowany}
   uklad="zwarta portal-baner" lead={d.opis ? w(d, 'opis') : undefined} haslo={haslo}
-  wstecz={{ etykieta: nazwaKierunku, adres: `/studia/${d.kierunek}#specjalnosci` }} dzial="studia" spis={spis} klasa="tresc">
+  wstecz={{ etykieta: nazwaKierunku, adres: `/studia/${d.kierunek}#specjalnosci` }} dzial="studia" spis={sekcje} klasa="tresc"
+  atrybuty={{ 'data-specjalnosc': '' }}>
   {/* Baner: liczby i etykiety specjalności (na każdej szerokości). */}
   <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczbyTel} />
@@ -83,166 +45,56 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
     </div>
   </Fragment>
 
-  <section id="o-specjalnosci" aria-labelledby="o-specjalnosci-h">
-    <h2 id="o-specjalnosci-h">{H.o}</h2>
-    <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
-    {dlaKogo && (
-      <div class="uwaga">
-        <span class="etyk">{T('Dla kogo', 'Who is it for')}</span>
-        <div class="sp-dla" set:html={dlaKogo} />
-      </div>
-    )}
-    {/* ramka „Wybór specjalności” (dotąd w prawym pasku): pod przebiegiem, a bez przebiegu — tutaj */}
-    {d.etapy.length === 0 && (
-    <div class="uwaga sp-wybor">
-      <span class="etyk">{T('Wybór specjalności', 'Choosing a specialisation')}</span>
-      <p>{T('Terminy deklaracji i formularze znajdziesz na stronie kierunku: ', 'Declaration deadlines and forms are listed on the programme page: ')}<a href={doTerminow}>{T('Terminy i formularze', 'Deadlines and forms')}</a>.</p>
-    </div>
-    )}
-  </section>
-
-  {d.linki.length > 0 && (
-    <section id="linki" aria-labelledby="linki-h">
-      <h2 id="linki-h">{H.linki}</h2>
+  {czesci.map((c) => 'html' in c ? <Fragment set:html={c.html} />
+    : c.wstawka === 'seminaria' ? (
       <ul class="linki">
-        {d.linki.map((l) => <li><Link href={href(l.adres)}>{w(l, 'etykieta')}</Link></li>)}
+        {sem.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{wybierz(s.data, 'nazwa', lang)}</a></li>)}
       </ul>
-    </section>
-  )}
-
-  {d.dlaczego.length > 0 && (
-    <section id="dlaczego" aria-labelledby="dlaczego-h">
-      <h2 id="dlaczego-h">{H.dlaczego}</h2>
-      <ul class="dwa">
-        {d.dlaczego.map((x) => <li><b>{w(x, 'tytul')}</b><span>{w(x, 'opis')}</span></li>)}
-      </ul>
-    </section>
-  )}
-
-  {d.etapy.length > 0 && (
-    <section id="przebieg" aria-labelledby="przebieg-h">
-      <h2 id="przebieg-h">{H.przebieg}</h2>
-      <ol class="etapy">
-        {d.etapy.map((e) => (
-          <li>
-            <span class="etyk">{w(e, 'kiedy')}</span>
-            <p class="t">{w(e, 'tytul')}</p>
-            {e.opis && <p>{w(e, 'opis')}</p>}
-          </li>
-        ))}
-      </ol>
+    ) : c.wstawka === 'opiekun' ? (
+      <>
+        <div class="kontakty">
+          {opiekunowie.map((o) => (
+            <div>
+              {o.rola && <span class="etyk">{w(o, 'rola')}</span>}
+              <b data-limit-linii="2">{o.osoba?.data.strona
+                ? <Link href={o.osoba.data.strona}>{zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang)}</Link>
+                : o.osoba ? zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang) : o.imie_nazwisko}</b>
+              {o.osoba && (o.osoba.data.email || o.osoba.data.pokoj || o.osoba.data.telefon) && (
+                <dl class="para">
+                  {o.osoba.data.email && <><dt>e-mail</dt><dd><a href={`mailto:${o.osoba.data.email}`} data-limit-linii="2" set:html={mailHtml(o.osoba.data.email)} /></dd></>}
+                  {o.osoba.data.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{o.osoba.data.pokoj}</dd></>}
+                  {o.osoba.data.telefon && <><dt>{T('tel.', 'phone')}</dt><dd>{o.osoba.data.telefon}</dd></>}
+                </dl>
+              )}
+            </div>
+          ))}
+        </div>
+        {zaklad && (
+          <ul class="linki sp-zaklad">
+            <li><a href={u(wJezyku(`/instytut/zaklady/${zaklad.id}`, lang))}>{wybierz(zaklad.data, 'nazwa', lang)}</a></li>
+          </ul>
+        )}
+      </>
+    ) : (
       <div class="uwaga sp-wybor">
         <span class="etyk">{T('Wybór specjalności', 'Choosing a specialisation')}</span>
         <p>{T('Terminy deklaracji i formularze znajdziesz na stronie kierunku: ', 'Declaration deadlines and forms are listed on the programme page: ')}<a href={doTerminow}>{T('Terminy i formularze', 'Deadlines and forms')}</a>.</p>
       </div>
-    </section>
-  )}
-
-  {d.przedmioty.length > 0 && (
-    <section id="przedmioty" aria-labelledby="przedmioty-h">
-      <h2 id="przedmioty-h">{H.przedmioty}</h2>
-      {d.przedmioty.map((g) => (
-        <>
-          <h3>{w(g, 'grupa')}</h3>
-          <ul class="dwa">
-            {g.lista.map((p) => <li><b>{w(p, 'nazwa')}</b>{p.opis && <span>{w(p, 'opis')}</span>}</li>)}
-          </ul>
-        </>
-      ))}
-    </section>
-  )}
-
-  {umiejetnosci.length > 0 && (
-    <section id="umiejetnosci" aria-labelledby="umiejetnosci-h">
-      <h2 id="umiejetnosci-h">{H.umiejetnosci}</h2>
-      <ul class="kreski">{umiejetnosci.map((x) => <li>{x}</li>)}</ul>
-    </section>
-  )}
-
-  {kariera && (
-    <section id="po-studiach" aria-labelledby="po-studiach-h">
-      <h2 id="po-studiach-h">{H.kariera}</h2>
-      <div class="prose"><Fragment set:html={kariera} /></div>
-    </section>
-  )}
-
-  {d.tematy_prac.length > 0 && (
-    <section id="tematy" aria-labelledby="tematy-h">
-      <h2 id="tematy-h">{H.tematy}</h2>
-      <ul class="kreski">{d.tematy_prac.map((x) => <li>{langTekstu(x.tytul, lang) ? <span lang="pl">{x.tytul}</span> : x.tytul}{x.opis && <span class="sp-opis"> — {wybierz(x, 'opis', lang)}</span>}</li>)}</ul>
-    </section>
-  )}
-
-  {sem.length > 0 && (
-    <section id="seminaria" aria-labelledby="seminaria-h">
-      <h2 id="seminaria-h">{H.seminaria}</h2>
-      <ul class="linki">
-        {sem.map((s) => <li><a href={u(wJezyku(`/seminaria/${s.id}`, lang))}>{wybierz(s.data, 'nazwa', lang)}</a></li>)}
-      </ul>
-    </section>
-  )}
-
-  {d.dokumenty.length > 0 && (
-    <section id="dokumenty" aria-labelledby="dokumenty-h">
-      <h2 id="dokumenty-h">{H.dokumenty}</h2>
-      <ul class="pliki">
-        {d.dokumenty.map((x) => <li><Link href={href(x.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{w(x, 'nazwa')}{x.opis && <small>{w(x, 'opis')}</small>}</span><span class="typ">{typPliku(x.plik)}</span></Link></li>)}
-      </ul>
-    </section>
-  )}
-
-  {faq.length > 0 && (
-    <section id="pytania" aria-labelledby="pytania-h">
-      <h2 id="pytania-h">{H.faq}</h2>
-      <div class="faq">
-        {faq.map((f) => (
-          <details>
-            <summary>{f.q}</summary>
-            <div set:html={f.a} />
-          </details>
-        ))}
-      </div>
-    </section>
-  )}
-
-  {opiekunowie.length > 0 && (
-    <section id="opiekun" aria-labelledby="opiekun-h">
-      <h2 id="opiekun-h">{H.opiekun}</h2>
-      <div class="kontakty">
-        {opiekunowie.map((o) => (
-          <div>
-            {o.rola && <span class="etyk">{w(o, 'rola')}</span>}
-            <b data-limit-linii="2">{o.osoba?.data.strona
-              ? <Link href={o.osoba.data.strona}>{zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang)}</Link>
-              : o.osoba ? zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang) : o.imie_nazwisko}</b>
-            {o.osoba && (o.osoba.data.email || o.osoba.data.pokoj || o.osoba.data.telefon) && (
-              <dl class="para">
-                {o.osoba.data.email && <><dt>e-mail</dt><dd><a href={`mailto:${o.osoba.data.email}`} data-limit-linii="2" set:html={mailHtml(o.osoba.data.email)} /></dd></>}
-                {o.osoba.data.pokoj && <><dt>{T('pokój', 'room')}</dt><dd>{o.osoba.data.pokoj}</dd></>}
-                {o.osoba.data.telefon && <><dt>{T('tel.', 'phone')}</dt><dd>{o.osoba.data.telefon}</dd></>}
-              </dl>
-            )}
-          </div>
-        ))}
-      </div>
-      {zaklad && (
-        <ul class="linki sp-zaklad">
-          <li><a href={u(wJezyku(`/instytut/zaklady/${zaklad.id}`, lang))}>{wybierz(zaklad.data, 'nazwa', lang)}</a></li>
-        </ul>
-      )}
-    </section>
-  )}
+    ))}
 </Podstrona>
 
 <style>
+  /* Treść z Markdownu (set:html) nie ma atrybutu stylów zakresowych — reguły globalne z prefiksem strony specjalności
+     (.tresc[data-specjalnosc]; specyficzność nie niższa niż dawnych reguł zakresowych w tym pliku), jak na stronie kierunku. */
   /* pytania: stary styl .faq z global.css (pogrubienie, wysokość 52 px) nie przecieka do wzorca */
-  .faq summary { min-height: 0; align-items: flex-start; font-weight: 400; }
+  :global(.tresc[data-specjalnosc] .faq summary) { min-height: 0; align-items: flex-start; font-weight: 400; }
   /* „Dla kogo” w ramce uwagi: akapity z Markdown jak tekst ramki */
-  .sp-dla :global(p) { margin: 0 0 10px; }
-  .uwaga + .uwaga { margin-top: 12px; }
-  .etapy + .sp-wybor { margin-top: 8px; }
-  .sp-opis { color: var(--muted); }
+  :global(.tresc[data-specjalnosc] .sp-dla p) { margin: 0 0 10px; }
+  :global(.tresc[data-specjalnosc] .uwaga + .uwaga) { margin-top: 12px; }
+  :global(.tresc[data-specjalnosc] .etapy + .sp-wybor) { margin-top: 8px; }
+  /* przykładowe tematy prac: opis po tytule szary */
+  :global(.tresc[data-specjalnosc] .sp-opis) { color: var(--muted); }
   .sp-zaklad { margin-top: 18px; }
   /* opis dokumentu pod nazwą */
-  .pliki small { display: block; font-size: 13.5px; color: var(--muted); }
+  :global(.tresc[data-specjalnosc] .pliki small) { display: block; font-size: 13.5px; color: var(--muted); }
 </style>

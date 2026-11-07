@@ -1,25 +1,26 @@
 // Dane strony kierunku studiów (Kierunek.astro), zlecenie 28: treść z jednego Markdownu (body / tresc_en; sekcje po ##,
-// bloki z tekstu — src/plugins/rehype-bloki.mjs), baner z kolekcji kierunki_baner i kafelki specjalności z plików specjalności.
-import { getCollection, type CollectionEntry } from 'astro:content';
+// bloki z tekstu — src/plugins/rehype-bloki.mjs), baner z kolekcji kierunki_baner i kafelki specjalności z ich formularzy „Baner i kafelek”.
+import type { CollectionEntry } from 'astro:content';
 import { zTytulem } from '../osoby';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { renderKierunku } from '../markdown';
 import { zaklady, pracownicy } from '../tresci';
 import { banerKierunku, pierwszeZdanie } from '../kierunki';
+import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
 
 export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: Lang) {
   const d = kierunek.data;
   const w = (o: any, pole: string) => wybierz(o, pole, lang);
   const nazwyZakladow = Object.fromEntries((await zaklady()).map((z) => [z.id, z]));
-  // Kafelki specjalności budują się z plików specjalności (src/content/specjalnosci) — jedno miejsce edycji.
+  // Kafelki specjalności budują się z formularza „Baner i kafelek” specjalności (src/lib/specjalnosci.ts) — jedno miejsce edycji.
   const osoby = await pracownicy();
   const zTytulemZeSpisu = (n: string) => {
     const kand = osoby.filter((p) => p.data.imie_nazwisko === n.trim());
     const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
     return zTytulem(o?.data.stopien, n, lang);
   };
-  const specjalnosci = (await getCollection('specjalnosci'))
+  const specjalnosci = (await wszystkieSpecjalnosci())
     .filter((s) => s.data.kierunek === kierunek.id && s.data.opublikowany !== false && s.data.na_stronie_kierunku)
     .sort((a, b) => Number(a.data.wygaszana) - Number(b.data.wygaszana) || a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'))
     .map((s) => ({
