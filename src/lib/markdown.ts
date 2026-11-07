@@ -6,6 +6,7 @@ import rehypeBase from '../plugins/rehype-base.mjs';
 import rehypeZewn from '../plugins/rehype-zewn.mjs';
 import rehypeBloki from '../plugins/rehype-bloki.mjs';
 import rehypeLimity from '../plugins/rehype-limity.mjs';
+import remarkWzoryEdytora from '../plugins/remark-wzory-edytora.mjs';
 
 import type { Lang } from './daty';
 
@@ -46,7 +47,8 @@ export async function renderKierunku(src: string | undefined, lang: Lang, opcje:
   if (!processor) {
     const site = import.meta.env.SITE, base = import.meta.env.BASE_URL;
     processor = await createMarkdownProcessor({
-      remarkPlugins: [remarkMath],
+      // wzory zapisane edytorem Pages CMS (ukośniki Markdownu we wzorze) — src/plugins/remark-wzory-edytora.mjs
+      remarkPlugins: [remarkMath, remarkWzoryEdytora],
       rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site, base }], rehypeLimity, [rehypeBase, { base, lang }], [rehypeZewn, { site, base, lang }]],
     } as any);
     procesoryKierunku.set(lang, processor);

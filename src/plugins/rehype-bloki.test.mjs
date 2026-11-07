@@ -6,11 +6,12 @@ import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeBloki from './rehype-bloki.mjs';
+import remarkWzoryEdytora from './remark-wzory-edytora.mjs';
 
 const procesory = {};
 async function render(md, { lang = 'pl', kierunek, bloki = true } = {}) {
   procesory[lang] ??= await createMarkdownProcessor({
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [remarkMath, remarkWzoryEdytora],
     rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site: 'https://im-uwr.github.io', base: '/Web-Core' }]],
   });
   const fm = kierunek ? { kierunek: { specjalnosci: false, ...kierunek } } : { bloki };
@@ -137,4 +138,12 @@ test('wzór w akapicie i strona z polem bloki: .wst', async () => {
 test('strona bez pola bloki: bez zmian', async () => {
   const { html } = await render('- **A** — b\n- **C** — d', { bloki: false });
   assert.ok(!html.includes('class='), html);
+});
+
+// String.raw: w źródłach testu ukośniki dokładnie jak w pliku Markdown
+test('wzór po zapisie w edytorze jak przed zapisem; wzór bez śladu edytora bez zmian', async () => {
+  const katex = async (md) => (await render(String.raw`## O kierunku` + '\n\n' + md, { kierunek: {} })).html.match(/<span class="katex">[\s\S]*?<\/annotation>/)[0];
+  assert.equal(await katex(String.raw`$\\ell^2$`), await katex(String.raw`$\ell^2$`));
+  assert.equal(await katex(String.raw`$a\_1 + x^\*$`), await katex(String.raw`$a_1 + x^*$`));
+  assert.ok((await katex(String.raw`$a \\ b$`)).includes(String.raw`a \\ b`));
 });
