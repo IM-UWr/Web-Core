@@ -211,7 +211,7 @@ Katalogu `.przekazanie\zdjecia\` nie ma, więc punkt pominięty, a pytanie zapis
    - limit: po skali zostaje co najmniej 1366 px szerokości projektu, bo węższy projekt przy oknie liczonym jeszcze jako szerokie ułożyłby się nieprawdziwie (progi układu liczą się od okna, nie od projektu);
    - stąd plateau między 150% a 250%.
 
-   Powrót do wersji dosłownej to jedna linia w `Okladka.astro`.
+   Powrót do wersji dosłownej to jedna linia w `Okladka.astro`. Właściciel przyjął to odstępstwo (7.11, 10:52, pytanie 1).
 2. **Wykrywanie powiększenia w Firefoksie.** W Firefoksie `outerWidth` rośnie razem ze stroną, więc stosunek `outerWidth / innerWidth` niczego nie mówi. Powiększenie liczę tam jako `devicePixelRatio` względem `devicePixelRatio` przy 100%, zapamiętanym w `localStorage` (`im-dpr-100`) razem z fizyczną szerokością ekranu. Zapis powstaje w każdej przeglądarce, w której stosunek `outerWidth / innerWidth` wynosi około 1, czyli także w Chrome, Edge i Safari przy 100%. O wyniku decyduje jednak tylko tam, gdzie ten stosunek nic nie mówi, czyli w Firefoksie. Ograniczenia:
    - pierwsza wizyta już z powiększeniem przyjmuje je za 100%;
    - zmiana skali systemu przy tym samym ekranie zostawia stary zapis.
@@ -235,7 +235,7 @@ Katalogu `.przekazanie\zdjecia\` nie ma, więc punkt pominięty, a pytanie zapis
    - **(b) limit 1024 px zamiast 1366 px:** 200% daje 1,87 raza, ale progi układu (pasek, Studia, Warto wiedzieć, powiększony wpis) trzeba by przenieść z okna na kontener, czyli osobne zlecenie;
    - **(c) wersja dosłowna:** przy powiększeniu bez skali, ale wtedy 200% przy 4K nie powiększa tekstu.
 
-   Który wariant?
+   **Decyzja właściciela (7.11, 10:52): wariant (a), zostaje jak jest.**
 2. **Polityka prywatności.** Wymienia w `localStorage` tylko motyw i mapę, a teraz dochodzi `im-dpr-100`. Wpis zawiera `devicePixelRatio` i szerokość ekranu w pikselach, bez danych osobowych, i nigdzie nie jest wysyłany. Powstaje w każdej przeglądarce przy wizycie bez powiększenia (odstępstwo 2). Strona jest w repozytorium treści (`src/content/strony/polityka-prywatnosci.md`); nie zmieniałem jej. Czy dopisać zdanie?
 3. **Safari.** Proszę o sprawdzenie na Macu: Cmd + do 200% na pełnym ekranie, tekst listy ma być wyraźnie większy niż przy 100%.
 4. **Panel menu powyżej Full HD** nie rośnie: ma 670 px i tekst 14,5 px, a strona przy 4K 29 px (`z26-panel-3840x2000.jpg`). Zlecenie wymienia tylko drugi ekran, pasek i stopkę. Czy skalować także panel? Ma własny układ zależny od wysokości okna, więc to kilka zmian, nie jedna linia.
