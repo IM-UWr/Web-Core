@@ -1,15 +1,15 @@
 ---
 // Kalendarz (/kalendarz, EN /en/kalendarz): nadchodzące i minione wydarzenia, obrony, konferencje i referaty seminaryjne
 // (subskrypcja kanałów .ics zdjęta ze strony — decyzja właściciela; pliki .ics nadal się generują). Wspólny szablon podstrony
-// (zal/Podstrona.astro; zlecenie 12, etap 3). Strona poza działami: granatowy nagłówek z hasłem i trzema liczbami (obrony,
-// referaty, wydarzenia — LiczbyBanera; zlecenie 01), bez spisu „Na tej stronie” (miesiące to grupy listy).
-// Widok „Nadchodzące” / „Archiwum” (w adresie #archiwum), filtr rodzaju (w adresie także ?rodzaj=…) i szukanie po tekście
-// pozycji działają razem. Pozycje po miesiącach: nagłówek miesiąca Brygadą, wiersze z cienkimi liniami i datą jak na
-// stronach działów (WierszWydarzenia.astro). Jedna wersja HTML: komputer (≥ 1024 px) — przyklejony pasek: widok, rodzaje
-// i pole szukania w jednym wierszu (jak w Planie zajęć); telefon (≤ 1023 px) — widok, rodzaje (lista wyboru) i pole
-// szukania jedno pod drugim, pasek nieprzyklejony. Bez JS: pasek schowany, widać oba widoki jeden pod drugim (z podpisami).
+// (zal/Podstrona.astro; zlecenie 12, etap 3). W stylu listy Aktualności (zlecenie 27, punkt 1): ten sam baner (granat przechodzi
+// w zdjęcie Aktualności, bez liczb, samo hasło), panel „Pokaż” z prawej (zal/ListaPokaz.astro) z rodzajami i polem szukania, data
+// i etykieta wiersza w kolorze działu pozycji (WierszWydarzenia.astro, wariant zwarty), bez spisu „Na tej stronie” (miesiące to grupy listy).
+// Widok „Nadchodzące” / „Archiwum” (w adresie #archiwum): szeroki przełącznik nad listą (dwie równe połówki, wybrana wypełniona),
+// filtr rodzaju (w adresie także ?rodzaj=…) i szukanie po tekście pozycji działają razem. Pozycje po miesiącach: nagłówek miesiąca
+// Brygadą, wiersze z cienkimi liniami. Jedna wersja HTML: komputer (≥ 1024 px) — panel przyklejony z prawej; telefon (≤ 1023 px) —
+// przełącznik, rodzaje (lista wyboru) i pole szukania nad listą. Bez JS: bez przełącznika i filtrów, oba widoki jeden pod drugim (z podpisami).
 import Podstrona from '../components/zal/Podstrona.astro';
-import LiczbyBanera from '../components/LiczbyBanera.astro';
+import ListaPokaz from '../components/zal/ListaPokaz.astro';
 import WierszWydarzenia from '../components/WierszWydarzenia.astro';
 import { t, RODZAJE_FILTRY } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
@@ -18,69 +18,48 @@ import { daneKalendarza } from '../lib/widoki/kalendarz';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { widoki, lead, haslo, liczby, filtrEtykieta, szukajDlugo } = await daneKalendarza(lang);
+const { widoki, lead, haslo, filtrEtykieta, szukajDlugo } = await daneKalendarza(lang);
 const tytul = t(lang, 'kalendarz');
 // rodzaje w kolejności dotychczasowych przycisków na komputerze, nazwy w liczbie mnogiej jak w Aktualnościach (referaty — „Seminaria”)
 const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
 ---
-<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
-  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} klasa="z-kal" atrybuty={{ 'data-kalendarz': '' }}>
-  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
+  wstecz={{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }} klasa="z-kal" klasaRamy="z-pd-pelna" atrybuty={{ 'data-kalendarz': '' }}>
 
-  <div class="kal-narz" data-pagefind-ignore>
-    <div class="kal-widok" role="group" aria-label={T('Widok', 'View')}>
+  <ListaPokaz lang={lang} etykieta={filtrEtykieta} opcje={rodzaje.map((r) => ({ wartosc: r, etykieta: RODZAJE_FILTRY[r][lang] }))} szukaj={szukajDlugo}>
+    <div slot="nad" class="kal-widok" role="group" aria-label={T('Widok', 'View')} data-pagefind-ignore>
       {widoki.map((v, i) => <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-widok-btn={v.id}>{v.etykieta}</button>)}
     </div>
-    <div class="kal-rodzaje" role="group" aria-label={filtrEtykieta}>
-      <button type="button" aria-pressed="true" data-rodzaj="">{t(lang, 'wszystkie')}</button>
-      {rodzaje.map((r) => <button type="button" aria-pressed="false" data-rodzaj={r}>{RODZAJE_FILTRY[r][lang]}</button>)}
-    </div>
-    {/* telefon: rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), zsynchronizowana z przyciskami */}
-    <label class="z-pole-wyboru kal-rodzaj-lista">
-      <span class="sr-only">{filtrEtykieta}</span>
-      <select data-rodzaj-lista autocomplete="off">
-        <option value="">{t(lang, 'wszystkie')}</option>
-        {rodzaje.map((r) => <option value={r}>{RODZAJE_FILTRY[r][lang]}</option>)}
-      </select>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-    </label>
-    <input type="search" class="kal-szukaj" placeholder={szukajDlugo} aria-label={szukajDlugo} autocomplete="off" data-szukaj />
-  </div>
 
-  {widoki.map((v, i) => (
-    <div class="kal-panel" data-widok={v.id} data-aktywny={i === 0 ? '' : undefined} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
-      <p class="kal-podpis">{v.etykieta}</p>
-      {v.grupy.length === 0 && <p class="kal-pusto">{v.pusty}</p>}
-      {v.grupy.map((g) => (
-        <section class="kal-mies" data-grupa>
-          <h2>{g.miesiac}</h2>
-          {g.pozycje.map((w) => <WierszWydarzenia w={w} lang={lang} />)}
-        </section>
-      ))}
-      <p class="kal-pusto" role="status" data-pusty-filtr data-pusty-rodzaj={T('Brak pozycji tego rodzaju.', 'Nothing of this kind here.')} data-pusty-szukaj={T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')} hidden></p>
-    </div>
-  ))}
+    {widoki.map((v, i) => (
+      <div class="kal-panel" data-widok={v.id} data-aktywny={i === 0 ? '' : undefined} data-pagefind-ignore={v.id === 'archiwum' ? '' : undefined}>
+        <p class="kal-podpis">{v.etykieta}</p>
+        {v.grupy.length === 0 && <p class="kal-pusto">{v.pusty}</p>}
+        {v.grupy.map((g) => (
+          <section class="kal-mies" data-grupa>
+            <h2>{g.miesiac}</h2>
+            {g.pozycje.map((w) => <WierszWydarzenia w={w} lang={lang} dzial={w.dzial} zwarty />)}
+          </section>
+        ))}
+        <p class="kal-pusto" role="status" data-pusty-filtr data-pusty-rodzaj={T('Brak pozycji tego rodzaju.', 'Nothing of this kind here.')} data-pusty-szukaj={T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')} hidden></p>
+      </div>
+    ))}
+  </ListaPokaz>
 </Podstrona>
 
 <script>
-  // Widok (Nadchodzące / Archiwum, w adresie #archiwum), filtr rodzaju (?rodzaj=… z adresu) i szukanie po tekście pozycji
+  // Widok (Nadchodzące / Archiwum, w adresie #archiwum), filtr rodzaju z panelu „Pokaż” (?rodzaj=… z adresu) i szukanie po tekście pozycji
   // (etykieta, termin, miejsce, tytuł, prelegent, seminarium — bez daty z lewej) działają razem.
+  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
   const kal = document.querySelector<HTMLElement>('[data-kalendarz]');
   if (kal) {
-    const btnRodzaj = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-rodzaj]'));
-    const rodzajLista = kal.querySelector<HTMLSelectElement>('[data-rodzaj-lista]');
     const btnWidok = Array.from(kal.querySelectorAll<HTMLButtonElement>('button[data-widok-btn]'));
     const widoki = Array.from(kal.querySelectorAll<HTMLElement>('[data-widok]'));
-    const szukaj = kal.querySelector<HTMLInputElement>('[data-szukaj]');
-    const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
-    const znanyRodzaj = (r: string) => btnRodzaj.some((b) => (b.dataset.rodzaj ?? '') === r);
-    let rodzaj = '';
     let widok = location.hash === '#archiwum' ? 'archiwum' : 'nadchodzace';
     const pokaz = () => {
-      const q = norm(szukaj?.value.trim() ?? '');
+      const rodzaj = panel.filtr();
+      const q = panel.szukane();
       btnWidok.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.widokBtn === widok)));
-      btnRodzaj.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.rodzaj ?? '') === rodzaj)));
-      if (rodzajLista) rodzajLista.value = rodzaj;
       widoki.forEach((v) => {
         v.toggleAttribute('data-aktywny', v.dataset.widok === widok);
         v.querySelectorAll<HTMLElement>('[data-ww]').forEach((p) => {
@@ -96,62 +75,46 @@ const rodzaje = ['wydarzenie', 'obrona', 'konferencja', 'referat'];
         }
       });
     };
-    const ustawRodzaj = (r: string) => { rodzaj = znanyRodzaj(r) ? r : ''; pokaz(); };
-    btnRodzaj.forEach((b) => b.addEventListener('click', () => ustawRodzaj(b.dataset.rodzaj ?? '')));
-    rodzajLista?.addEventListener('change', () => ustawRodzaj(rodzajLista.value));
-    szukaj?.addEventListener('input', pokaz);
+    const panel = panelPokaz(kal, pokaz);
     btnWidok.forEach((b) => b.addEventListener('click', () => {
       widok = b.dataset.widokBtn ?? 'nadchodzace';
       history.replaceState(null, '', widok === 'archiwum' ? '#archiwum' : location.pathname + location.search);
       pokaz();
     }));
-    ustawRodzaj(new URLSearchParams(location.search).get('rodzaj') ?? '');
+    panel.ustaw(new URLSearchParams(location.search).get('rodzaj'));
   }
 </script>
 
 <style>
   [hidden] { display: none !important; }
-  /* bez JS: bez paska, oba widoki jeden pod drugim z podpisami; z JS — tylko wybrany widok, bez podpisu */
-  :global(html:not(.js)) .kal-narz { display: none; }
+  /* bez JS: bez przełącznika, oba widoki jeden pod drugim z podpisami; z JS — tylko wybrany widok, bez podpisu */
+  :global(html:not(.js)) .kal-widok { display: none; }
   :global(html.js) .kal-panel:not([data-aktywny]) { display: none; }
   :global(html.js) .kal-podpis { display: none; }
   .kal-podpis { margin: 30px 0 0; font-size: 13px; font-weight: 700; color: var(--d-a); }
 
-  .kal-widok, .kal-rodzaje { display: flex; border: 1px solid var(--line-ui); }
-  .kal-narz button { margin: 0; font: inherit; font-weight: 600; border: 0; border-radius: 0; background: transparent; color: var(--text); cursor: pointer; }
-  .kal-narz button + button { border-left: 1px solid var(--line-ui); }
-  .kal-narz button:hover { color: var(--d-a); }
-  .kal-narz button[aria-pressed='true'] { background: var(--d-a); color: var(--bg); }
-  .kal-narz button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
-  .kal-szukaj { min-width: 0; margin: 0; font: inherit; border: 1px solid var(--line-ui); border-radius: 0; background: var(--bg); color: var(--ink); }
-  .kal-szukaj::placeholder { color: var(--muted); opacity: 1; }
-  .kal-szukaj:focus { outline: 2px solid var(--d-a); outline-offset: -1px; }
+  /* przełącznik Nadchodzące / Archiwum (zlecenie 27, punkt 1): na całą szerokość kolumny listy, dwie równe połówki, wybrana wypełniona
+     (granat na jasnym tle; w ciemnym motywie odwrotnie, bo --ink i --bg zamieniają się w motywie), druga z obrysem */
+  .kal-widok { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kal-widok button { min-height: 44px; margin: 0; padding: 8px 14px; border: 1px solid var(--ink); border-radius: 0; background: transparent;
+    font: inherit; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); cursor: pointer; }
+  .kal-widok button:first-child { border-radius: 5px 0 0 5px; }
+  .kal-widok button:last-child { border-radius: 0 5px 5px 0; }
+  .kal-widok button + button { border-left: 0; }
+  .kal-widok button:hover { background: var(--surface); }
+  .kal-widok button[aria-pressed='true'] { background: var(--ink); color: var(--bg); }
+  .kal-widok button:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--ink); outline-offset: 2px; }
 
-  /* miesiąc: nagłówek Brygadą, wiersze z cienkimi liniami (bez kreski i odstępów sekcji szablonu) */
+  /* miesiąc: nagłówek Brygadą, wiersze z cienkimi liniami (jak w Aktualnościach) */
   .kal-mies { margin: 0; padding: 0; border: 0; }
   .kal-mies h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
     font-size: 23px; line-height: 1.4; color: var(--d-a); }
   .kal-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
 
-  /* ---------- komputer (≥ 1024 px): pasek przyklejony u góry, jak w Planie zajęć ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
-  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-    .kal-rodzaj-lista { display: none; }
-    .kal-narz { position: sticky; top: var(--gora); z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px 0;
-      background: var(--bg); border-bottom: 2px solid var(--rule); }
-    .kal-narz button { font-size: 14px; padding: 7px 12px; }
-    .kal-szukaj { flex: 1; min-width: 200px; font-size: 15px; padding: 8px 12px; }
-  }
-
-  /* ---------- telefon (≤ 1023 px): widok, rodzaje po trzy w rzędzie i pole szukania jedno pod drugim ---------- */
+  /* ---------- telefon (≤ 1023 px): przełącznik nad filtrami ---------- */
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
-    .kal-narz { display: grid; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--rule); }
-    .kal-narz button { min-height: 40px; padding: 6px 4px; font-size: 13.5px; }
-    .kal-widok, .kal-rodzaje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    /* rodzaje jako lista wyboru (zlecenie 11, zalecenie 4: na telefonie lista zamiast paska, w stylu pola) */
-    .kal-rodzaje { display: none; }
-    .kal-rodzaj-lista { display: flex; width: 100%; }
-    .kal-szukaj { width: 100%; padding: 8px 10px; font-size: 16px; }
+    .kal-widok { margin-bottom: 10px; }
     .kal-mies h2 { margin-top: 22px; font-size: 20px; }
   }
 </style>

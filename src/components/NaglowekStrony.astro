@@ -8,7 +8,7 @@
 // Pola lead, nadtytul, nadtytulTelefon, motyw i motywDane zostają w Props dla zgodności widoków; nowy nagłówek ich nie pokazuje
 // (opis strony trafia do meta description). Silnik animacji banerów (src/scripts/baner/) jest odłączony — README tamże.
 import NaglowekZ from './zal/NaglowekZ.astro';
-import { PATRONI, dzialZeSciezki, pole } from '../lib/patroni';
+import { PATRONI, banerAktualnosci, dzialZeSciezki, pole } from '../lib/patroni';
 import { t } from '../lib/i18n';
 import { stripBase } from '../lib/url';
 import type { Lang } from '../lib/daty';
@@ -38,7 +38,8 @@ const dlugi = ozdobny && tytul.trim().length > 20;
 
 const sciezkaZ = stripBase(Astro.url.pathname);
 const bezJezykaZ = sciezkaZ.replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
-const dzialZ = dzialZeSciezki(sciezkaZ);
+// listy w stylu Aktualności (zlecenie 27): nagłówek bez działu, także na Obronach i „Warto wiedzieć”
+const dzialZ = banerAktualnosci(bezJezykaZ) ? undefined : dzialZeSciezki(sciezkaZ);
 const patronZ = dzialZ ? PATRONI[dzialZ] : undefined;
 const stronaDzialuZ = !!patronZ && bezJezykaZ === patronZ.adres;
 const zMenuDzialuZ = !!patronZ && !stronaDzialuZ && cel.adres.replace(/\/$/, '') === patronZ.adres;

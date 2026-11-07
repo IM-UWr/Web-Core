@@ -111,6 +111,11 @@ export function dzialWpisu(p: { rodzaj: string; dla: string[]; zaklad?: string }
   return p.zaklad ? 'nauka' : 'instytut';
 }
 
+// Listy w stylu Aktualności (zlecenie 27, punkty 1–2): baner bez działu (bez sygnetu i ciekawostki), w którym granat przechodzi w zdjęcie
+// Aktualności w naturalnych kolorach — lista i wpisy Aktualności, listy Kalendarza, Obron doktorskich i „Warto wiedzieć”.
+// strona: ścieżka bez /en i bez końcowego „/” (np. '/kalendarz').
+export const banerAktualnosci = (strona: string): boolean => /^\/(aktualnosci(\/|$)|kalendarz$|obrony-doktorskie$|warto-wiedziec$)/.test(strona);
+
 export function dzialZeSciezki(sciezka: string): Dzial | undefined {
   const czlon = sciezka.replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';
   return CZLONY[czlon];

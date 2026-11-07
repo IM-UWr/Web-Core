@@ -8,14 +8,15 @@
 // rodzaj „podstrona” — nagłówek podstrony: głęboki kolor działu na zdjęciu działu (mocniej z lewej, słabiej w prawo),
 //   „← Dział”, sygnet z małym podpisem w lewym marginesie i znak patrona z opisem przy prawej krawędzi. Bez animacji.
 //   Znak i opis (ciekawostka) tylko na podstronach z menu działu; strony głębiej mają sygnet i tytuł. Hasło i liczby — gdy są.
-//   Strony bez działu (Kalendarz, strony ogólne) — granat, bez sygnetu i znaku. Aktualności (lista i wpisy; zlecenie 18, punkt 7): też bez
-//   sygnetu i znaku, ale granat przechodzi w zdjęcie po prawej, w naturalnych kolorach (klasa z-foto-nat).
+//   Strony bez działu (strony ogólne) — granat, bez sygnetu i znaku. Aktualności (lista i wpisy; zlecenie 18, punkt 7) oraz listy Kalendarza,
+//   Obron doktorskich i „Warto wiedzieć” (zlecenie 27; banerAktualnosci() w src/lib/patroni.ts): też bez sygnetu i znaku, ale granat
+//   przechodzi w zdjęcie Aktualności po prawej, w naturalnych kolorach (klasa z-foto-nat).
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { u, stripBase } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
 import { menuGlowne } from '../../lib/menu';
-import { PATRONI, pole, znakDzialu, ramkaZnaku, dzialZeSciezki, type Dzial } from '../../lib/patroni';
+import { PATRONI, pole, znakDzialu, ramkaZnaku, dzialZeSciezki, banerAktualnosci, type Dzial } from '../../lib/patroni';
 import { pulaDzialu, stronyDzialu, ukladStaly, pulaDoSkryptu, tytulCiekawostki, zdanieCiekawostki, type Ciekawostka } from '../../lib/ciekawostki';
 import type { Lang } from '../../lib/daty';
 import { MQ_TELEFON, sizesTelefon } from '../../lib/media';
@@ -57,7 +58,7 @@ if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola
 // Studia (zlecenie 11, zalecenie 17): sala HS od tyłu (3200 px), domyślny filtr bez rozjaśnienia; na komputerze zdjęcie przypięte
 // do szkicu patrona (zalozyciele.css), na telefonie zwykłe object-fit: cover.
 const strona = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
-const fotoNat = !P && /^\/aktualnosci(\/|$)/.test(strona);
+const fotoNat = !P && banerAktualnosci(strona);
 const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?: { pl: string; en: string } }> = {
   instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: '50% 42%' },
   nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: '50% 30%', filtr: 'grayscale(1) contrast(1.15) brightness(1.45)' },

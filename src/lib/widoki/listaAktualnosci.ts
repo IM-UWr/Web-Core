@@ -21,12 +21,10 @@ export async function daneListyAktualnosci(lang: Lang) {
   const haslo = lang === 'en' ? "What's new at the Institute" : 'Co słychać w Instytucie';
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 
-  // Filtr rodzaju: na komputerze przyciski, na telefonie lista rozwijana obok pola szukania (jeden wiersz; decyzja 31.10.2026;
-  // FiltrISzukaj.astro — wspólny z Kalendarzem). Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts), podpowiedź
-  // w polu szukania na telefonie krótsza.
+  // Filtr rodzaju w panelu „Pokaż” (zal/ListaPokaz.astro, wspólny z Kalendarzem, Obronami i „Warto wiedzieć”; zlecenie 27):
+  // na komputerze przyciski, na telefonie lista rozwijana nad polem szukania. Nazwy rodzajów w liczbie mnogiej (RODZAJE_FILTRY w i18n.ts).
   const filtrEtykieta = T('Filtruj według rodzaju', 'Filter by type');
   const szukajDlugo = T('Szukaj w aktualnościach', 'Search news');
-  const szukajKrotko = T('Szukaj', 'Search');
 
-  return { ustawienia, grupy, rodzaje, lead, haslo, filtrEtykieta, szukajDlugo, szukajKrotko };
+  return { ustawienia, grupy, rodzaje, lead, haslo, filtrEtykieta, szukajDlugo };
 }
