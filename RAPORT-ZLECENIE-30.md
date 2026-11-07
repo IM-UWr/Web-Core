@@ -17,7 +17,7 @@
 
 **Czeka na właściciela.**
 - Test w CMS na gałęziach `test-cms`, jedno podejście dla 28, 29 i 30 (sekcja „Test w CMS”).
-- Pytanie o kotwicę `#konsultacje` na stronie EN (sekcja „Pytania”).
+- Pytanie o kotwicę `#konsultacje` na stronie EN — rozstrzygnięte: „Tak, dodaj kotwicę”, zrobione (sekcja „Pytania”).
 
 ## Etapy i commity
 
@@ -43,7 +43,9 @@ Wszystko na gałęzi `wyglad/zlecenie-16`.
 | 3 | Web-Pracownicy | `c4aa5f1` | Strony |
 | 3 | Web-Popularyzacja | `9ad0954` | Strony Popularyzacji; „Bloki” z nową etykietą |
 | 4 | Web-Core | `158128c0` | Symulacja zapisu dla stron i wpisów, poprawki z niej: wzory w każdym Markdownie, ostatni krok osi; test wtyczki |
-| 4 | Web-Core | `01bb0437` | Raport i zrzuty; uzupełnienie po pushu — następny commit |
+| 4 | Web-Core | `01bb0437` | Raport i zrzuty; uzupełnienie po pushu `c0a1e154` |
+| pyt. 1 | Web-Core | `84f3499f` | Stała kotwica `#konsultacje` (kotwice typu `naglowek`), test, ściągawka |
+| pyt. 1 | Web-Studia | `8c7e561` | Bez `<a id="konsultacje">` w Treści EN Zajęć; link w Pierwszym roku EN do `#konsultacje` |
 
 ## Co widzi edytor
 
@@ -120,7 +122,7 @@ Zapis zmienił 743 linie Markdownu. Strony zbudowane z zapisanych plików porów
 **Wynik po poprawkach: tekst bez różnic na wszystkich stronach.** Inny HTML na 14 stronach:
 - link w pogrubieniu zapisany jako pogrubienie w linku — wygląda tak samo (10 stron: 3 aktualności, Sukcesy → Historia, Sprawy studenckie, każda PL i EN);
 - znika `<div lang="en">` wokół angielskiego tekstu w 3 polskich aktualnościach. Czytnik ekranu przeczyta ten tekst polskim głosem. Tak było i przed zleceniem, bo polska Treść aktualności już była w edytorze z przyciskami;
-- strona EN „Zajęcia”: znika kotwica `<a id="konsultacje">` — zob. pytanie 1.
+- strona EN „Zajęcia”: znikała kotwica `<a id="konsultacje">` — po decyzji z pytania 1 kotwica jest w kodzie, a HTML w treści już nie ma.
 
 ## Kryteria odbioru
 
@@ -163,7 +165,7 @@ Jedno podejście dla 28, 29 i 30, na gałęziach `test-cms` ustawionych na nowe 
 
 | Repozytorium | Co zrobić |
 | --- | --- |
-| [Web-Studia](https://app.pagescms.org/IM-UWr/Web-Studia/test-cms) | **28:** Kierunki → Treść, Matematyka: zapisz **bez zmian**, potem dodaj wiersz w tabeli terminów, krok osi (zwykłym Enterem), pytanie (Nagłówek 3 z „?”), PDF z „Media” podlinkowany w „Aktach prawnych”, wzór `$\ell^2$` w akapicie, zmień jedno słowo w Treści EN. Kierunki → Baner: zmień hasło Matematyki. **30:** Strony → Pierwszy rok: otwórz i zapisz **bez zmian** |
+| [Web-Studia](https://app.pagescms.org/IM-UWr/Web-Studia/test-cms) | **28:** Kierunki → Treść, Matematyka: zapisz **bez zmian**, potem dodaj wiersz w tabeli terminów, krok osi (zwykłym Enterem), pytanie (Nagłówek 3 z „?”), PDF z „Media” podlinkowany w „Aktach prawnych”, wzór `$\ell^2$` w akapicie, zmień jedno słowo w Treści EN. Kierunki → Baner: zmień hasło Matematyki. **30:** Strony → Pierwszy rok: otwórz i zapisz **bez zmian**; Strony → Zajęcia i konsultacje: otwórz i zapisz **bez zmian** (link do konsultacji w stopce strony EN ma dalej prowadzić do sekcji „Office hours”) |
 | [Web-Ustawienia](https://app.pagescms.org/IM-UWr/Web-Ustawienia/test-cms) | **28:** przesuń jeden kierunek na liście kierunków |
 | [Web-Spec-Stosowana](https://app.pagescms.org/IM-UWr/Web-Spec-Stosowana/test-cms) | **29:** Specjalność → Treść: zapisz **bez zmian**, potem dodaj temat pracy, krok osi i pytanie |
 | [Web-Popularyzacja](https://app.pagescms.org/IM-UWr/Web-Popularyzacja/test-cms) | **29:** Strona działu Popularyzacja: zapisz **bez zmian**, potem zmień jedną liczbę „W skrócie” |
@@ -189,4 +191,10 @@ Potem ja: porównam `origin/test-cms` z `wyglad/zlecenie-16` w każdym repozytor
    - Edytor z przyciskami usuwa HTML przy zapisie, więc po pierwszym zapisie Treści EN link ze stopki otworzy górę strony.
    - Po polsku działa sam nagłówek „Konsultacje”.
    - Propozycja: stała kotwica dla nagłówka „Office hours” na tej stronie (jak kotwice w `src/plugins/kotwice.mjs`) i usunięcie HTML z treści.
-   - Bez decyzji zostawiam jak jest: strona działa, dopóki nikt nie zapisze Treści EN.
+   - **Decyzja właściciela (7.11): „Tak, dodaj kotwicę”. Zrobione** — Web-Core `84f3499f`, Web-Studia `8c7e561` (wypchnięte, `test-cms` w Web-Studia przesunięte na `8c7e561`):
+     - nowa kotwica typu `naglowek` w `kotwice.mjs`: nagłówek 2 „Konsultacje” / „Office hours” na zwykłej stronie dostaje id `konsultacje`, po polsku i po angielsku; test wtyczki (25/25);
+     - z Treści EN strony Zajęcia zniknął `<a id="konsultacje"></a>`;
+     - link „Office hours” w Pierwszym roku EN prowadzi teraz do `#konsultacje`, bo dawne `#office-hours` już nie istnieje (nagłówek ma jedno id);
+     - build: zmieniły się tylko `/en/studia/zajecia` (id nagłówka, spis „Na tej stronie”, bez pustego akapitu z kotwicą) i `/en/studia/pierwszy-rok` (adres linku). Na stronie Pracownicy (PL i EN) zamieniły się miejscami dwa wpisy tej samej osoby (Elżbieta Kalinowska: zakład i administracja) — nieustalona kolejność przy budowaniu, niezwiązana z kotwicą;
+     - symulowany zapis obu stron w edytorze zostawia nagłówek i link bez zmian;
+     - ściągawka: kotwic w HTML nie wpisywać, stałe kotwice są w `kotwice.mjs`.
