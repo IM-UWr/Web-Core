@@ -29,8 +29,9 @@ interface Props {
   dzial: Dzial;
   lang: Lang;
   grupy: GrupaPod[];
-  // tekst działu: tytuł sekcji, akapity (pierwszy większy) i „W skrócie”; puste akapity = bez sekcji
-  tekst?: { tytul: string; akapity: string[]; fakty?: Fakt[] };
+  // tekst działu: tytuł sekcji, akapity (pierwszy większy) i „W skrócie”; puste akapity = bez sekcji;
+  // html — tekst gotowy z Markdownu zamiast akapitów (Popularyzacja, zlecenie 29; pierwszy akapit z klasą wst)
+  tekst?: { tytul: string; akapity: string[]; html?: string; fakty?: Fakt[] };
 }
 const { dzial, lang, grupy, tekst } = Astro.props;
 const en = lang === 'en';
@@ -96,11 +97,11 @@ const kolumny = (n: number) => (n <= 5 ? Math.max(n, 3) : n === 6 ? 3 : 4);
       )}
     </nav>
   )}
-  {tekst && tekst.akapity.length > 0 && (
+  {tekst && (tekst.akapity.length > 0 || tekst.html) && (
     <section class="z-dz-tresc" aria-labelledby="z-dz-tresc-h">
       <div>
         <h2 id="z-dz-tresc-h">{tekst.tytul}</h2>
-        {tekst.akapity.map((a, i) => <p class:list={[i === 0 && 'wst']}>{a}</p>)}
+        {tekst.html ? <Fragment set:html={tekst.html} /> : tekst.akapity.map((a, i) => <p class:list={[i === 0 && 'wst']}>{a}</p>)}
       </div>
       {fakty.length > 0 && (
         <aside class="z-dz-skrot" aria-labelledby="z-dz-skrot-h">
