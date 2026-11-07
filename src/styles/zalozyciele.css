@@ -90,7 +90,7 @@
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) { .tylko-telefon { display: none !important; } }
 @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .tylko-komputer { display: none !important; } }
 
-/* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); nie zmniejszać na żadnej szerokości */
+/* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); na okładce stopień idzie za skalą okładki (zlecenie 26, punkt 1), na telefonie stały */
 .z-okl-marka > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
 
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
@@ -386,10 +386,12 @@
   }
 
 
-  /* ---------- okładka strony głównej (pierwszy ekran; rozmiary od wysokości okna, jak w prototypie z cqh) ---------- */
-  .z-okladka { --h: max(600px, 100svh); position: relative; height: var(--h); overflow: hidden; background: var(--granat); color: #fff; isolation: isolate; font-family: var(--f-text); }
+  /* ---------- okładka strony głównej (pierwszy ekran, jedna kompozycja skalowana od Full HD, zlecenie 26, punkt 1) ----------
+     --sk: skala s = min(szerokość okna / 1920, wysokość okna / 950), liczona w skrypcie ULOZ (Okladka.astro); bez JS 1, czyli rozmiary od wysokości okna jak dawniej.
+     --hp: wysokość okładki w „pikselach projektu” (co najmniej 950, więc dolne wartości w clamp() działają tylko bez JS). Rozmiar = s × wartość z projektu, drobny tekst z progiem. */
+  .z-okladka { --h: max(600px, 100svh); --sk: var(--z-s, 1); --hp: calc(var(--h) / var(--sk)); --okl-marg: max(24px, calc(48px * var(--sk))); position: relative; height: var(--h); overflow: hidden; background: var(--granat); color: #fff; isolation: isolate; font-family: var(--f-text); }
   .z-okl-foto { position: absolute; top: -13%; left: var(--foto-x, 24%); width: calc(100% - var(--foto-x, 24%)); max-width: none; height: 100%; object-fit: cover; object-position: 2% 50%; z-index: -3;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 140px); mask-image: linear-gradient(90deg, transparent 0, #000 140px); }
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 calc(140px * var(--sk))); mask-image: linear-gradient(90deg, transparent 0, #000 calc(140px * var(--sk))); }
   /* kadr z naturalnych proporcji zdjęcia, rozmiar i położenie liczy skrypt ULOZ w Okladka.astro (zlecenie 18, punkt 13); bez JS reguła wyżej */
   .z-okladka.z-kadr .z-okl-foto { top: var(--foto-top); width: var(--foto-w); height: auto; object-fit: fill; }
   /* ciemne pole pod tytułem z krawędzią na łuku koła (--skos i --skos-maska liczy skrypt ULOZ w Okladka.astro, zlecenie 19, punkt 2; bez JS gradient z lewej) */
@@ -399,7 +401,8 @@
   .z-okladka::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background:
     linear-gradient(180deg, rgb(9 16 34 / .5) 0, rgb(9 16 34 / 0) 16%),
     linear-gradient(0deg, var(--granat) 0, var(--granat) 33%, rgb(13 24 48 / .8) 46%, rgb(13 24 48 / 0) 64%); }
-  .z-narz { position: absolute; z-index: 5; top: 18px; right: 32px; display: flex; gap: 6px; }
+  /* narzędzia na wysokości marki: powyżej Full HD rosną razem z nią (--z-k), poniżej zostają 40 px i tylko ich środek idzie za środkiem logo */
+  .z-narz { --marka-h: max(30px, calc(40px * var(--sk))); position: absolute; z-index: 5; top: calc((18px * var(--sk) + (var(--marka-h) - 40px * var(--z-k, 1)) / 2) / var(--z-k, 1)); right: 32px; display: flex; gap: 6px; zoom: var(--z-k, 1); }
   .z-narz a, .z-narz button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; min-width: 40px; padding: 0 14px; border: 0; border-radius: 6px;
     font: inherit; font-size: 14.5px; font-weight: 600; color: #fff; text-decoration: none; background: rgb(9 16 34 / .42); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer; }
   .z-narz button { padding: 0; width: 40px; }
@@ -407,16 +410,16 @@
   .z-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .z-narz svg:not(.z-flaga) { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
   /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
-  .z-okl-marka { position: absolute; z-index: 5; top: 18px; left: 48px; display: flex; align-items: center; gap: 14px; color: #fff; text-decoration: none; }
-  .z-okl-marka .z-okl-logo { height: 40px; }
-  .z-okl-marka > span:last-child { padding-left: 14px; border-left: 1px solid rgb(255 255 255 / .35); }
+  .z-okl-marka { position: absolute; z-index: 5; top: calc(18px * var(--sk)); left: var(--okl-marg); display: flex; align-items: center; gap: calc(14px * var(--sk)); color: #fff; text-decoration: none; }
+  .z-okl-marka .z-okl-logo { height: max(30px, calc(40px * var(--sk))); }
+  .z-okl-marka > span:last-child { padding-left: calc(14px * var(--sk)); border-left: 1px solid rgb(255 255 255 / .35); font-size: max(12px, calc(14px * var(--sk))); }
   .z-okl-marka:hover > span:last-child { color: #fff; }
   .z-okl-marka:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
   /* tytuł: końce „Instytut” i „Matematyczny” na łuku; top, stopnie i odstęp liczy ULOZ (--tyt-top, --f1, --f2, --w2-odst), bez JS wartości z CSS */
-  .z-okl-tytul { position: absolute; left: 48px; top: var(--tyt-top, clamp(84px, calc(var(--h) * .2), 220px)); }
-  .z-okl-flaga { display: inline-flex; align-items: center; gap: 10px; margin-bottom: clamp(12px, calc(var(--h) * .024), 24px); padding: 6px 14px 6px 12px; border-radius: 6px;
-    background: rgb(9 16 34 / .6); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: 14px; font-weight: 600; color: #fff; text-decoration: none; }
-  .z-okl-flaga::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--studia-j); }
+  .z-okl-tytul { position: absolute; left: var(--okl-marg); top: var(--tyt-top, clamp(84px, calc(var(--h) * .2), 220px)); }
+  .z-okl-flaga { display: inline-flex; align-items: center; gap: calc(10px * var(--sk)); margin-bottom: calc(var(--sk) * clamp(12px, calc(var(--hp) * .024), 24px)); padding: calc(6px * var(--sk)) calc(14px * var(--sk)) calc(6px * var(--sk)) calc(12px * var(--sk)); border-radius: 6px;
+    background: rgb(9 16 34 / .6); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); font-size: max(13px, calc(14px * var(--sk))); font-weight: 600; color: #fff; text-decoration: none; }
+  .z-okl-flaga::before { content: ''; flex: none; width: calc(8px * var(--sk)); height: calc(8px * var(--sk)); border-radius: 50%; background: var(--studia-j); }
   /* flaga stoi nad tytułem i nie przesuwa h1; gdy sięgałaby łuku, łamie się na dwie linie */
   .z-okladka.z-ulozona .z-okl-flaga { position: absolute; left: 0; bottom: 100%; width: max-content; max-width: var(--flaga-max, none); }
   .z-okl-logo { display: block; height: var(--logo-h, clamp(42px, calc(var(--h) * .074), 70px)); aspect-ratio: 500 / 160; background: #fff;
@@ -426,38 +429,38 @@
   .z-okl-tytul h1 > span { display: block; width: fit-content; letter-spacing: -.012em; }
   .z-okl-tytul .w1 { font-size: var(--f1, clamp(56px, calc(var(--h) * .11), 116px)); }
   .z-okl-tytul .w2 { font-size: var(--f2, clamp(40px, calc(var(--h) * .074), 80px)); margin-top: var(--w2-odst, .04em); }
-  /* cztery działy nisko: szkic, nazwa i hasło */
-  .z-okl-dzialy { position: absolute; left: 24px; right: 24px; bottom: clamp(54px, calc(var(--h) * .115), 124px); display: grid; grid-template-columns: repeat(4, 1fr); }
-  .z-okl-dz { position: relative; display: flex; flex-direction: column; padding: clamp(8px, calc(var(--h) * .016), 18px) 24px 4px; color: #fff; text-decoration: none; outline: none; }
+  /* cztery działy nisko: szkic, nazwa i hasło; lewa krawędź nazw na jednej linii z tytułem (dwa razy po połowie marginesu okładki) */
+  .z-okl-dzialy { position: absolute; left: calc(var(--okl-marg) / 2); right: calc(var(--okl-marg) / 2); bottom: calc(var(--sk) * clamp(54px, calc(var(--hp) * .115), 124px)); display: grid; grid-template-columns: repeat(4, 1fr); }
+  .z-okl-dz { position: relative; display: flex; flex-direction: column; padding: calc(var(--sk) * clamp(8px, calc(var(--hp) * .016), 18px)) calc(var(--okl-marg) / 2) calc(4px * var(--sk)); color: #fff; text-decoration: none; outline: none; }
   /* po najechaniu nazwa zostaje biała (globalne a:hover dawało granat na granacie) */
   .z-okl-dz:hover { color: #fff; }
   .z-okl-dz::before { content: ''; position: absolute; inset: 0; background: radial-gradient(52% 50% at 50% 34%, color-mix(in srgb, var(--d-g) 95%, transparent) 0, color-mix(in srgb, var(--d-g) 40%, transparent) 58%, transparent 100%);
     opacity: 0; transition: opacity .6s var(--rytm); pointer-events: none; }
   .z-okl-dz:hover::before, .z-okl-dz:focus-visible::before { opacity: 1; }
   .z-okl-dz > * { position: relative; }
-  .z-okl-szkic { --sz: clamp(84px, min(calc(var(--h) * .18), 20vw), 176px); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto clamp(4px, calc(var(--h) * .01), 10px); }
+  .z-okl-szkic { --sz: calc(var(--sk) * clamp(84px, calc(var(--hp) * .18), 176px)); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto calc(var(--sk) * clamp(4px, calc(var(--hp) * .01), 10px)); }
   .z-okl-szkic .duch path { stroke: rgb(255 255 255 / .2); stroke-width: 1.25; }
   .z-okl-szkic .tusz path { stroke: var(--d-j); stroke-width: 1.25; stroke-dashoffset: 1; opacity: 0; }
   .z-okl-szkic .detale path { stroke: var(--d-j); stroke-width: 1.05; }
   .z-okl-szkic .detale { opacity: 0; }
   .z-okl-dz:is(:hover, :focus-visible) .tusz path { stroke-dashoffset: 0; opacity: 1; }
   .z-okl-dz:is(:hover, :focus-visible) .detale { opacity: 1; }
-  /* suma szerokości czterech nazw to około 16 × czcionka: przy węższym oknie czcionka maleje, żeby „Popularyzacja” nie wychodziła poza okno */
-  .z-okl-nazwa { display: block; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(30px, min(calc(var(--h) * .056), calc((100vw - 260px) / 16)), 54px); line-height: 1.05; letter-spacing: -.01em; }
+  /* suma szerokości czterech nazw to około 16 × czcionka: przy węższym oknie czcionka maleje, żeby „Popularyzacja” nie wychodziła poza okno (działa bez JS; ze skalą szerokość w pikselach projektu jest co najmniej 1920) */
+  .z-okl-nazwa { display: block; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: calc(var(--sk) * clamp(30px, min(calc(var(--hp) * .056), calc((100vw / var(--sk) - 260px) / 16)), 54px)); line-height: 1.05; letter-spacing: -.01em; }
   /* po najechaniu: kreska pod nazwą wysuwa się od lewej i nazwa lekko świeci kolorem działu — kreska (::after) przez
      transform: scaleX, poświata (::before: ten sam tekst, przezroczysty, z cieniem, pod właściwym) przez opacity
      (zlecenie 13, punkt 8: animacje tylko transform i opacity; dawniej background-size i text-shadow) */
-  .z-okl-nazwa span { position: relative; z-index: 0; padding-bottom: 3px; }
-  .z-okl-nazwa span::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--d-j);
+  .z-okl-nazwa span { position: relative; z-index: 0; padding-bottom: calc(3px * var(--sk)); }
+  .z-okl-nazwa span::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: max(1.5px, calc(2px * var(--sk))); background: var(--d-j);
     transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--t-dlugi) var(--rytm); }
   .z-okl-nazwa span::before { content: attr(data-t); position: absolute; z-index: -1; left: 0; top: 0; white-space: nowrap; line-height: normal; color: transparent;
     text-shadow: 0 0 22px color-mix(in srgb, var(--d-j) 55%, transparent); opacity: 0; transition: opacity var(--t-dlugi) var(--rytm); pointer-events: none; }
   .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::after { transform: none; }
   .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::before { opacity: 1; }
   .z-okl-dz:focus-visible .z-okl-nazwa span { outline: 2px solid var(--d-j); outline-offset: 6px; }
-  .z-okl-dz .slot { position: relative; display: block; height: 2.8em; margin-top: 6px; font-size: clamp(13.5px, calc(var(--h) * .021), 16px); line-height: 1.4; }
+  .z-okl-dz .slot { position: relative; display: block; height: 2.8em; margin-top: calc(6px * var(--sk)); font-size: max(13px, calc(var(--sk) * clamp(13.5px, calc(var(--hp) * .021), 16px))); line-height: 1.4; }
   .z-okl-dz .slot > span { position: absolute; inset: 0; transition: opacity var(--t-dlugi) var(--rytm), transform var(--t-dlugi) var(--rytm); }
-  .z-okl-dz .haslo-dz { color: var(--na-ciemnym-2); }
+  .z-okl-dz .haslo-dz { color: var(--na-ciemnym-2); text-wrap: balance; }
   .z-okl-dz .patron { opacity: 0; transform: translateY(4px); color: var(--na-ciemnym-2); }
   .z-okl-dz .patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; color: #fff; }
   .z-okl-dz:is(:hover, :focus-visible) .haslo-dz { opacity: 0; transform: translateY(-4px); }
@@ -467,21 +470,21 @@
   .z-barwa { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: var(--d-j, transparent); mix-blend-mode: soft-light; opacity: 0; transition: opacity .6s var(--rytm); }
   .z-okladka.zabarwione .z-barwa { opacity: .5; }
   /* liczby nad „Szybkim dostępem” (zlecenie 11, zalecenie 15; prototyp v75, wariant „przygaszone”): nie konkurują z działami */
-  .z-okl-liczby { position: absolute; left: 50%; bottom: calc(clamp(10px, calc(var(--h) * .022), 24px) + 36px); transform: translateX(-50%); display: flex; align-items: baseline; white-space: nowrap; }
-  .z-okl-liczby a { position: relative; display: inline-flex; align-items: baseline; gap: 6px; padding: 3px 16px; font-size: 12.5px; color: rgb(255 255 255 / .5); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
-  .z-okl-liczby a + a::before { content: ''; position: absolute; left: 0; top: 7px; bottom: 5px; width: 1px; background: rgb(255 255 255 / .14); }
-  .z-okl-liczby b { font-family: var(--f-text); font-weight: 700; font-size: 14px; color: rgb(255 255 255 / .72); transition: color var(--t-krotki) var(--rytm); }
+  .z-okl-liczby { position: absolute; left: 50%; bottom: calc(var(--sk) * (clamp(10px, calc(var(--hp) * .022), 24px) + 36px)); transform: translateX(-50%); display: flex; align-items: baseline; white-space: nowrap; }
+  .z-okl-liczby a { position: relative; display: inline-flex; align-items: baseline; gap: calc(6px * var(--sk)); padding: calc(3px * var(--sk)) calc(16px * var(--sk)); font-size: max(12.5px, calc(12.5px * var(--sk))); color: rgb(255 255 255 / .5); text-decoration: none; transition: color var(--t-krotki) var(--rytm); }
+  .z-okl-liczby a + a::before { content: ''; position: absolute; left: 0; top: calc(7px * var(--sk)); bottom: calc(5px * var(--sk)); width: 1px; background: rgb(255 255 255 / .14); }
+  .z-okl-liczby b { font-family: var(--f-text); font-weight: 700; font-size: max(14px, calc(14px * var(--sk))); color: rgb(255 255 255 / .72); transition: color var(--t-krotki) var(--rytm); }
   .z-okl-liczby a:hover, .z-okl-liczby a:hover b { color: #fff; }
   .z-okl-liczby a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
   /* opis patrona środkowych działów (3 linie) sięga przy niższych oknach (np. 1366×768, 1280×720) do linii liczb —
      wtedy liczby na chwilę gasną; dział ma pierwszeństwo */
   .z-okl-liczby { transition: opacity var(--t-sredni) var(--rytm); }
   .z-okladka:has(.z-okl-dz:is(:nth-child(2), :nth-child(3)):is(:hover, :focus-visible)) .z-okl-liczby { opacity: 0; }
-  .z-strzalka { position: absolute; left: 50%; bottom: clamp(10px, calc(var(--h) * .022), 24px); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px;
-    padding: 6px 12px; font-size: 14px; color: rgb(255 255 255 / .74); text-decoration: none; white-space: nowrap; }
+  .z-strzalka { position: absolute; left: 50%; bottom: calc(var(--sk) * clamp(10px, calc(var(--hp) * .022), 24px)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: calc(10px * var(--sk));
+    padding: calc(6px * var(--sk)) calc(12px * var(--sk)); font-size: max(13px, calc(14px * var(--sk))); color: rgb(255 255 255 / .74); text-decoration: none; white-space: nowrap; }
   .z-strzalka:hover { color: #fff; }
   .z-strzalka:focus-visible { outline: 2px solid #fff; border-radius: 6px; }
-  .z-strzalka svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob 2.6s ease-in-out infinite; }
+  .z-strzalka svg { width: max(14px, calc(18px * var(--sk))); height: max(14px, calc(18px * var(--sk))); fill: none; stroke: currentColor; stroke-width: 2; animation: z-bob 2.6s ease-in-out infinite; }
   @keyframes z-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
   @media (prefers-reduced-motion: reduce) {
     .z-strzalka svg { animation: none; }

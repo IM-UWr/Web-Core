@@ -70,7 +70,7 @@ const ZERUJ = `(function(){function z(){try{sessionStorage.removeItem('im-wizyta
   `if(document.prerendering)document.addEventListener('prerenderingchange',z,{once:true});else z();` +
   `addEventListener('pageshow',function(e){if(e.persisted)z()})})();`;
 // Stałe łuku okładki (zlecenie 19, punkt 2), osobno dla każdego języka. Żeby zmienić układ, wystarczy zmienić te liczby, wzorów nie trzeba ruszać.
-// ODSTEP: o ile px łuk przechodzi za końcami napisów (wspólne). MAT: stopień mniejszego słowa / stopień większego („Matematyczny” / „Instytut”,
+// ODSTEP: o ile px łuk przechodzi za końcami napisów przy Full HD, skrypt mnoży go przez skalę s (wspólne). MAT: stopień mniejszego słowa / stopień większego („Matematyczny” / „Instytut”,
 // EN „Mathematical” / „Institute”). ODST: odstęp między liniami / stopień większego słowa. K: wygięcie, czyli nachylenie odcinka marka→koniec
 // pierwszej linii = K × nachylenie odcinka między końcami linii (K = 1 daje prostą). GORA: góra tytułu / wysokość okładki.
 const ODSTEP = 58;
@@ -81,6 +81,9 @@ const UKLAD = {
 // Blok tytułu i łuk (komputer), w linii na końcu okładki, zanim strona się narysuje (zlecenie 13, punkt 5), potem przy zmianie rozmiaru i po
 // wczytaniu krojów. Ciemne pole kończy się łukiem koła wygiętym w stronę zdjęcia, jak „(”, 58 px za końcami trzech napisów: nazwy wydziału
 // w marce, „Instytut” i „Matematyczny”. W dół łuk zawsze idzie w prawo: środek koła leży z prawej i nie niżej niż środek marki.
+// Skala okładki (zlecenie 26, punkt 1): okładka jest jedną kompozycją zaprojektowaną na Full HD, s = min(szerokość okna / 1920, wysokość okna / 950).
+// Skrypt liczy s raz i ustawia je na <html> jako --z-s (i --z-k = s, ale nie mniej niż 1); z --z-s CSS buduje rozmiary marki i rzędu działów, tu mnoży przez nie odstępy łuku.
+// Przy s = 1 wszystko jak przed zmianą. Na telefonie skali nie ma. Liczone także przy schowanej okładce (html.bez-okladki), bo --z-k przyda się drugiemu ekranowi.
 // 1. Stopnie i odstęp liczone ze stałych i szerokości słów przy 100 px (0,49 to połowa line-height 0,98, czyli środek linii); po polsku duże jest
 //    pierwsze słowo, po angielsku drugie. 2. Gdy tytuł (+ 24 px) wypada niżej niż szkice działów, top idzie w górę, ale nie wyżej niż dół marki + 40 px
 //    (stopnie zależą od top liniowo, więc wystarczy jedno przeliczenie). 3. Koło przez trzy prawdziwe końce napisów. 4. Ciemne pole (--skos) i maska
@@ -91,8 +94,10 @@ const UKLAD = {
 // okładki); środek budynku na 34,5% wysokości okładki, u góry bez pustego miejsca. Telefon: rozmiar i poziomo w CSS (zal-telefon.css), tu
 // tylko pionowo: środek budynku w połowie między dolną krawędzią paska a górą liter „Instytut”; okładka sięga pod pasek, więc jego wysokość też się liczy (zlecenie 23, punkt 4). Bez JS kadr z CSS.
 const OSTRZEZ = import.meta.env.DEV ? `console.warn('Okładka: łuk poza zakresem, zostaje skos',cx,cy,R);` : '';
-const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)');function uloz(){if(!ok.offsetHeight)return;` +
-  `if(matchMedia('${MQ_TELEFON}').matches){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
+const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)'),rt=document.documentElement;` +
+  `function skala(){var s=Math.min(innerWidth/1920,innerHeight/950);rt.style.setProperty('--z-s',s);rt.style.setProperty('--z-k',Math.max(1,s));return s}` +
+  `function uloz(){var tel=matchMedia('${MQ_TELEFON}').matches,sk=1;if(tel){rt.style.removeProperty('--z-s');rt.style.removeProperty('--z-k')}else sk=skala();if(!ok.offsetHeight)return;var ODSTEP=${ODSTEP}*sk;` +
+  `if(tel){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
   `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
   `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
   // szerokość słowa przy 100 px, ukryta miarka w stylu h1
@@ -103,7 +108,7 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `s=(w_2*U.MAT-w_1)/(.49*(1+U.MAT)+U.ODST);F=(U.K*s*(top-yM)+c)/(w_1-.49*U.K*s);return{f1:F,f2:U.MAT*F,od:U.ODST*F}}` +
   `function dol(t){var m=licz(t);return t+.98*m.f1+m.od+.98*m.f2}` +
   // tytuł nad szkicami działów
-  `var top=U.GORA*H,d=sz?dol(top)+24-(sz.getBoundingClientRect().top-o.top):0;if(d>0)top=Math.max(rm.bottom-o.top+40,top-d/(dol(top)-dol(top-1)));` +
+  `var top=U.GORA*H,d=sz?dol(top)+24*sk-(sz.getBoundingClientRect().top-o.top):0;if(d>0)top=Math.max(rm.bottom-o.top+40*sk,top-d/(dol(top)-dol(top-1)));` +
   `var m=licz(top);tyt.style.setProperty('--f1',m.f1+'px');tyt.style.setProperty('--f2',m.f2+'px');tyt.style.setProperty('--w2-odst',m.od+'px');tyt.style.setProperty('--tyt-top',top+'px');` +
   // koło przez trzy końce napisów
   `function kon(el){var r=el.getBoundingClientRect();return[r.right-o.left+ODSTEP,(r.top+r.bottom)/2-o.top]}` +
@@ -111,10 +116,10 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `cx=(a2*(by-gy)+b2*(gy-ay)+g2*(ay-by))/D,cy=(a2*(gx-bx)+b2*(ax-gx)+g2*(bx-ax))/D,R=Math.hypot(ax-cx,ay-cy),g='rgb(9 16 34',X;` +
   `function luk(y){return cx-Math.sqrt(Math.max(0,R*R-(y-cy)*(y-cy)))}` +
   `if(isFinite(R)&&cx>ax&&cx>bx&&cx>gx&&cy<=yM+1){` +
-  `ok.style.setProperty('--skos','radial-gradient(circle at '+cx.toFixed(1)+'px '+cy.toFixed(1)+'px, '+g+' / 0) '+(R-30).toFixed(1)+'px, '+g+' / .62) '+R.toFixed(1)+'px, '+g+' / .97) '+(R+30).toFixed(1)+'px)');` +
-  `ok.style.setProperty('--skos-maska','linear-gradient(90deg, #000 '+cx.toFixed(1)+'px, transparent '+cx.toFixed(1)+'px)');X=Math.max(0,Math.min(koniec,luk(0))-130);` +
+  `ok.style.setProperty('--skos','radial-gradient(circle at '+cx.toFixed(1)+'px '+cy.toFixed(1)+'px, '+g+' / 0) '+(R-30*sk).toFixed(1)+'px, '+g+' / .62) '+R.toFixed(1)+'px, '+g+' / .97) '+(R+30*sk).toFixed(1)+'px)');` +
+  `ok.style.setProperty('--skos-maska','linear-gradient(90deg, #000 '+cx.toFixed(1)+'px, transparent '+cx.toFixed(1)+'px)');X=Math.max(0,Math.min(koniec,luk(0))-130*sk);` +
   // flaga „wyróżnione” stoi nad tytułem; gdy sięgałaby łuku, łamie się (--flaga-max)
-  `var fl=tyt.querySelector('.z-okl-flaga');if(fl){tyt.style.removeProperty('--flaga-max');ok.classList.add('z-ulozona');for(var j=0;j<2;j++)tyt.style.setProperty('--flaga-max',Math.max(160,luk(fl.getBoundingClientRect().top-o.top)-lewa-24)+'px')}` +
+  `var fl=tyt.querySelector('.z-okl-flaga');if(fl){tyt.style.removeProperty('--flaga-max');ok.classList.add('z-ulozona');for(var j=0;j<2;j++)tyt.style.setProperty('--flaga-max',Math.max(160,luk(fl.getBoundingClientRect().top-o.top)-lewa-24*sk)+'px')}` +
   `}else{${OSTRZEZ}` +
   // dawny skos: prosta o nachyleniu S od końca pierwszej linii
   `var S=.32,od=Math.max(24,m.f1*.34),zanik=Math.max(90,W*.06),x0=bx-ODSTEP-S*by+od*Math.sqrt(1+S*S),nl=Math.hypot(1,S),n=[1/nl,-S/nl],kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
@@ -122,7 +127,8 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},ODSTEP=${ODSTEP
   `var r=f&&(f.getAttribute('width')/f.getAttribute('height')||f.naturalWidth/f.naturalHeight);ok.style.setProperty('--foto-x',X+'px');` +
   `if(r){var Sz=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',Sz+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*Sz/r)+'px');ok.classList.add('z-kadr')}` +
   `ok.classList.add('z-ulozona')}` +
-  `uloz();if(f)f.addEventListener('load',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
+  // resize: skala zależy od okna także wtedy, gdy okładka jest schowana albo się nie zmienia (niskie okno, wysokość okładki co najmniej 600 px)
+  `uloz();if(f)f.addEventListener('load',uloz);addEventListener('resize',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 ---
 {/* Odświeżenie i powrót „wstecz” z Szybkiego dostępu, a także adres #szybki-dostep: okładkę chowamy przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
     Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px zmyliłoby przewinięcie do kotwicy. */}
