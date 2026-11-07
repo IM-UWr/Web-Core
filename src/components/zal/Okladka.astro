@@ -26,9 +26,8 @@ import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-// wyrozniona: wpis z polem „Wyróżnij do…” (dotychczas żółty pasek nad nazwą Instytutu) — plakietka nad logo
-interface Props { lang: Lang; inny: string | null; cel?: string; licznik?: string; wyrozniona?: { tytul: string; adres: string } }
-const { lang, inny, cel = '#szybki-dostep', licznik, wyrozniona } = Astro.props;
+interface Props { lang: Lang; inny: string | null; cel?: string; licznik?: string }
+const { lang, inny, cel = '#szybki-dostep', licznik } = Astro.props;
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
 // pola stron działów (zlecenie 30: src/data/<dział>.md w repozytoriach działów)
@@ -124,8 +123,6 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   `if(isFinite(R)&&cx>ax&&cx>bx&&cx>gx&&cy<=yM+1){` +
   `ok.style.setProperty('--skos','radial-gradient(circle at '+cx.toFixed(1)+'px '+cy.toFixed(1)+'px, '+g+' / 0) '+(R-30*sk).toFixed(1)+'px, '+g+' / .62) '+R.toFixed(1)+'px, '+g+' / .97) '+(R+30*sk).toFixed(1)+'px)');` +
   `ok.style.setProperty('--skos-maska','linear-gradient(90deg, #000 '+cx.toFixed(1)+'px, transparent '+cx.toFixed(1)+'px)');X=Math.max(0,Math.min(koniec,luk(0))-130*sk);` +
-  // flaga „wyróżnione” stoi nad tytułem; gdy sięgałaby łuku, łamie się (--flaga-max)
-  `var fl=tyt.querySelector('.z-okl-flaga');if(fl){tyt.style.removeProperty('--flaga-max');ok.classList.add('z-ulozona');for(var j=0;j<2;j++)tyt.style.setProperty('--flaga-max',Math.max(160,luk(fl.getBoundingClientRect().top-o.top)-lewa-24*sk)+'px')}` +
   `}else{${OSTRZEZ}` +
   // dawny skos: prosta o nachyleniu S od końca pierwszej linii
   `var S=.32,od=Math.max(24,m.f1*.34),zanik=Math.max(90,W*.06),x0=bx-ODSTEP-S*by+od*Math.sqrt(1+S*S),nl=Math.hypot(1,S),n=[1/nl,-S/nl],kat=Math.atan2(n[0],-n[1])*180/Math.PI,dl=W*Math.abs(n[0])+H*Math.abs(n[1]),st=[W/2-n[0]*dl/2,H/2-n[1]*dl/2],t1=(x0-st[0])*n[0]-st[1]*n[1],k=[[0,.97],[.2,.86],[.42,.6],[.64,.32],[.84,.1],[1,0]];` +
@@ -161,7 +158,6 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   </nav>
   <PanelMenu lang={lang} id="z-menu" sciezka="/" />
   <div class="z-okl-tytul">
-    {wyrozniona && <a class="z-okl-flaga" href={href(wyrozniona.adres)}>{wyrozniona.tytul}</a>}
     <h1><span class="w1">{slowo1}</span> <span class="w2">{reszta.join(' ')}</span></h1>
   </div>
   <div class="z-okl-dzialy">

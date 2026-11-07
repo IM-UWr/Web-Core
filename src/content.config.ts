@@ -56,7 +56,6 @@ const aktualnosci = defineCollection({
     wydarzenie_poczatek: optDate,
     wydarzenie_koniec: optDate,
     wydarzenie_miejsce: optStr,
-    wyroznij_do: optDate,
     tytul_en: optStr,
     zajawka_en: optStr,
     tresc_en: optStr,

@@ -356,7 +356,6 @@ export interface PozycjaListy {
   dla: string[];
   href: string;
   wydarzenie?: string;
-  wyroznij_do?: string;
   id: string;
   // pilne = automatyczne ogłoszenie o zamianie dni (src/lib/kolory-dni.ts) — na stronie głównej zawsze na górze
   pilne?: boolean;
@@ -376,7 +375,7 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
     zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zajawkaLang: langPola(a.data, 'zajawka', lang), zdjecie: a.data.zdjecie,
     zdjecie_opis: (lang === 'en' && a.data.zdjecie_opis_en) || a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
     koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
-    wyroznij_do: a.data.wyroznij_do, id: `akt-${slugOf(a.id)}`, zaklad: a.data.zaklad,
+    id: `akt-${slugOf(a.id)}`, zaklad: a.data.zaklad,
   }));
   for (const o of obr) {
     if (o.data.w_aktualnosciach === false) continue;
@@ -395,16 +394,13 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
 
 // Strona główna (decyzja z 30.10.2026): Aktualności to zapowiedzi — chronologicznie według daty publikacji (obrony razem
 // z innymi wpisami), a wpis, którego wydarzenie już się odbyło, znika (liczone przy budowaniu strony, 2× dziennie).
-// Dublowanie z „Najbliższymi wydarzeniami” (kalendarium-przypomnienie) jest dozwolone. Na górze nadal: automatyczne
-// ogłoszenie o zamianie dni, potem wpisy wyróżnione („Wyróżnij na stronie głównej do…”).
+// Dublowanie z „Najbliższymi wydarzeniami” (kalendarium-przypomnienie) jest dozwolone. Na górze nadal automatyczne
+// ogłoszenie o zamianie dni (wyróżniania wpisów nie ma od zlecenia 30).
 export async function aktualnosciNaGlowna(limit = 6, lang: Lang = 'pl'): Promise<PozycjaListy[]> {
   const lista = (await listaAktualnosci(lang)).filter((p) => !odbyloSie(p));
-  const d = today();
-  const wyrozniony = (p: PozycjaListy) => !!p.wyroznij_do && p.wyroznij_do >= d;
   const pilne = lista.filter((p) => p.pilne);
-  const wyroznione = lista.filter((p) => !p.pilne && wyrozniony(p));
-  const reszta = lista.filter((p) => !p.pilne && !wyrozniony(p));
-  return [...pilne, ...wyroznione, ...reszta].slice(0, limit);
+  const reszta = lista.filter((p) => !p.pilne);
+  return [...pilne, ...reszta].slice(0, limit);
 }
 
 // Liczby na okładce strony głównej nad „Szybkim dostępem” (zlecenie 11, zalecenie 15), z tych samych danych co kolumny
@@ -417,9 +413,3 @@ export async function liczbyNaOkladke(lang: Lang = 'pl'): Promise<{ wyd: number;
   return { wyd: wyd.length, sem: sem.length, akt: akt.filter((p) => p.data.slice(0, 10) >= odDnia && p.data.slice(0, 10) <= dzis).length };
 }
 
-// Żółty pasek w banerze: pierwszy wyróżniony wpis (bez wpisów, których wydarzenie już się odbyło).
-export async function wyroznionaAktualnosc(lang: Lang = 'pl'): Promise<PozycjaListy | undefined> {
-  const lista = await listaAktualnosci(lang);
-  const d = today();
-  return lista.find((p) => p.wyroznij_do && p.wyroznij_do >= d && !odbyloSie(p));
-}

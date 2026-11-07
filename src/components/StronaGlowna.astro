@@ -12,17 +12,14 @@ import { rozmiarOkl } from '../lib/zdjecia';
 import { stripBase } from '../lib/url';
 import { t, drugiJezyk } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import { wyroznionaAktualnosc } from '../lib/tresci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const sciezka = stripBase(Astro.url.pathname);
-// wpis z polem „Wyróżnij do…” — plakietka nad logo okładki
-const wyrozniona = await wyroznionaAktualnosc(lang);
 ---
 <Baza tytul={t(lang, 'instytut')} stronaGlowna>
   <ZdjeciePreload slot="head" src={ustawienia.baner.zdjecie} sizes={rozmiarOkl} />
-  <Okladka lang={lang} inny={drugiJezyk(sciezka)} wyrozniona={wyrozniona ? { tytul: wyrozniona.tytul, adres: wyrozniona.href } : undefined} />
+  <Okladka lang={lang} inny={drugiJezyk(sciezka)} />
   {/* drugi ekran razem z paskiem jako jeden obszar: drugi z dwóch stanów strony (okładka albo Szybki dostęp, zlecenie 23, punkt 2;
       src/scripts/zal/przejazd.ts); w tym obszarze przewija się zwyczajnie */}
   <div id="szybki-dostep" class="z-druga-obszar" tabindex="-1">
