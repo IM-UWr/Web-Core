@@ -12,7 +12,8 @@
   .z-pasek.z-pasek-jasny { padding-inline: 40px; }
   body:has(.z-druga) .z-stopka { padding-inline: 48px; }
   .z-druga a:hover .t, .z-druga a.t:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .z-druga h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: 22px; line-height: 1.15; color: var(--ink); }
+  /* od 22 px w dół na wąskich oknach (zlecenie 26, punkt 4.1): „Nadchodzące wydarzenia” nie łamie się wcześniej niż inne nagłówki, kreski stoją na jednej wysokości */
+  .z-druga h2 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(18px, 1.7vw, 22px); line-height: 1.15; color: var(--ink); }
   /* Szybki dostęp: jeden pasek, cztery pozycje rozdzielone kreskami */
   .z-skr { display: grid; grid-template-columns: auto repeat(4, minmax(0, 1fr)); align-items: stretch; border-top: 2px solid var(--rule); border-bottom: 1px solid var(--line); }
   .z-skr h2 { padding: 10px 22px 10px 0; align-self: center; white-space: nowrap; }
@@ -47,10 +48,12 @@
   .z-kolumna[data-slot="2"] .pozycje { flex: 0 1 auto; min-height: 0; overflow: hidden; }
   .z-kolumna .reszta { flex: none; display: block; padding: 9px 0 0; font-size: 13px; font-weight: 700; color: var(--ink); }
   .z-kolumna .reszta:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .z-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--rule); }
+  .z-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--rule); }
   .z-h h2:focus { outline: none; }
   .z-h h2:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .z-h h2 small { margin-left: 8px; font-family: var(--f-text); font-size: 12.5px; font-weight: 600; color: var(--muted); }
+  /* zakres dat seminariów w całości (dawniej „6– / 12 listopada”); przed nim spacja w HTML (miejsce na złamanie, czytnik ekranu), więc margines
+     8 px minus jej szerokość (0,218 em Brygady przy 22 px = 4,796875 px): przy 22 px odstęp jak dotąd */
+  .z-h h2 small { margin-left: 3.203125px; font-family: var(--f-text); font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
   .z-h > a { font-size: 13px; font-weight: 700; color: var(--ink); white-space: nowrap; }
   .z-h > a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .z-w { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; align-items: start; gap: 0 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
@@ -83,7 +86,10 @@
   .z-studia p { margin: 6px 0 12px; color: var(--text); }
   .z-rekr-link { font-size: 14px; font-weight: 700; color: var(--ink) !important; text-decoration: underline !important; text-decoration-color: var(--line) !important; text-decoration-thickness: 2px !important; text-underline-offset: 4px; }
   .z-rekr-link:hover { text-decoration-color: var(--d-a) !important; }
-  .z-kier { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 14px; align-content: start; }
+  /* kierunki nie węższe niż 110 px, liczba kolumn sama z szerokości (zlecenie 26, punkt 4.3; dawniej zawsze pięć, tuż nad progiem 1366 px po ok. 95–100 px
+     i „Szkoła / doktorska”). auto-fit, nie auto-fill: puste tory znikają, więc pięć kierunków wypełnia szerokość jak dotąd (przy 1920 px auto-fill dałby
+     siedem torów i kierunki ściśnięte z lewej). Odstęp między rzędami, gdy się zawiną */
+  .z-kier { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px 14px; align-content: start; }
   .z-kier a { display: flex; flex-direction: column; gap: 2px; padding-top: 2px; }
   .z-kier small { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
   .z-kier b { font-weight: 700; color: var(--ink); line-height: 1.25; }
@@ -155,11 +161,22 @@
   .z-druga .z-w.wyr .min { grid-column: 2; grid-row: 1; width: 100%; height: auto; aspect-ratio: 3 / 2; margin-bottom: 8px; }
   .z-druga .z-w.wyr .tr { grid-column: 2; grid-row: 2; }
 }
-/* Studia: poniżej 1366 px pięć kierunków nie mieści się obok opisu (karta potrzebuje ok. 96 px, przy 1024 px miała 53 px i teksty
-   nachodziły na siebie): opis nad kierunkami. Warto wiedzieć: długie słowa nie mieściły się
-   w czterech kolumnach, więc dwie. Telefon ma własny układ (niżej). */
-@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1365px), (min-width: 1024px) and (pointer: fine) and (max-width: 1365px) {
+/* Szybki dostęp poniżej 1100 px (zlecenie 26, punkt 4.2): napis w osobnym wierszu, jak na telefonie, cztery pozycje pod nim w jednym rzędzie */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1099px), (min-width: 1024px) and (pointer: fine) and (max-width: 1099px) {
+  .z-skr { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .z-skr h2 { grid-column: 1 / -1; padding: 10px 0 6px; }
+  .z-skr a { border-top: 1px solid var(--line); }
+  .z-skr a:first-of-type { border-left: 0; padding-left: 0; }
+}
+/* Studia: opis nad kierunkami, gdy pięć kierunków po co najmniej 110 px (.z-kier) nie mieści się obok opisu (250 px + 36 px), czyli poniżej 1452 px
+   (zlecenie 26, punkt 4.3; dawniej poniżej 1366 px, a tuż nad progiem kierunki miały ok. 98 px). Bez przesunięcia progu przy 1366–1451 px kierunki
+   układały się 4 + 1 (ostatni sam w drugim rzędzie, Studia o 55–92 px wyższe niż dawniej; z opisem nad kierunkami o 43–61 px). Inna liczba kierunków na stronie głównej: próg = 250 + 36 +
+   n × 110 + (n − 1) × 14 px szerokości Studiów (dwie z trzech kolumn siatki). */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1451px), (min-width: 1024px) and (pointer: fine) and (max-width: 1451px) {
   .z-studia { grid-template-columns: minmax(0, 1fr); gap: 12px 0; }
+}
+/* Warto wiedzieć: poniżej 1366 px długie słowa nie mieściły się w czterech kolumnach, więc dwie. Telefon ma własny układ (niżej). */
+@media (min-width: 1024px) and (min-height: 501px) and (max-width: 1365px), (min-width: 1024px) and (pointer: fine) and (max-width: 1365px) {
   .z-warto .rzad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */

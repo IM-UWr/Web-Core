@@ -97,7 +97,9 @@ const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
   if (adres === KOLORY_DNI) return { adres, kd: true, tytul: !dzis.kolor && !dzis.nastepny ? (wybierz(k, 'etykieta', lang) as string) : dzis.tytul, opis: dzis.opis };
   const sem = (plan.semestry as any[]).find((x) => x.od <= today() && today() <= x.do) ?? (plan.semestry as any[])[0];
   const opis = adres === '/studia/plan-zajec' && sem ? ((en && sem.nazwa_en) || sem.nazwa).replace(/^Semestr/, 'semestr').replace(/^Winter/, 'winter').replace(/^Summer/, 'summer')
-    : adres === '/pracownicy' ? T(`${osob} osób, pokoje, e-maile`, `${osob} people, rooms, e-mails`)
+    // „e-maile”: po łączniku U+2060 (łącznik słów, bez szerokości), żeby wyraz się nie łamał (zlecenie 26, punkt 4.2); łącznika niełamiącego
+    // U+2011 Manrope nie ma, przeglądarka wzięłaby go z innego kroju
+    : adres === '/pracownicy' ? T(`${osob} osób, pokoje, e-⁠maile`, `${osob} people, rooms, e-⁠mails`)
     : adres === '/seminaria' ? T(`${seminaria.length} ${seminaria.length === 1 ? 'referat' : 'referatów'} w tym tygodniu`, `${seminaria.length} talks this week`)
     : (wybierz(k, 'opis', lang) as string) || '';
   return { adres, kd: false, tytul: wybierz(k, 'etykieta', lang) as string, opis };
@@ -163,7 +165,7 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOM
       ));
       return (
         <section class="z-kolumna" data-key={key} data-slot={slot} aria-labelledby={`z-h-${key}`}>
-          <div class="z-h"><h2 id={`z-h-${key}`} tabindex="-1">{k.tytul}{'zakres' in k && <small>{k.zakres}</small>}</h2><a href={href(k.adres)}>{k.link}</a></div>
+          <div class="z-h"><h2 id={`z-h-${key}`} tabindex="-1">{k.tytul}{'zakres' in k && <>{' '}<small>{k.zakres}</small></>}</h2><a href={href(k.adres)}>{k.link}</a></div>
           <div class="lista"><div class="lista-in">
             <div class="pozycje">{wiersze}{(k.pozycje.length === 0 || key === 'wyd') && <p class="z-pusto" hidden={k.pozycje.length > 0}>{k.pusto}</p>}</div>
             <a class="reszta" href={href(k.adres)} data-wsz={k.wsz} data-wiecej={T('i jeszcze {n}', '{n} more')}>{k.wsz}</a>

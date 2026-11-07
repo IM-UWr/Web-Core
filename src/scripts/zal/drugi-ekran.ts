@@ -52,6 +52,16 @@ function liczWiecej() {
 // „Pod ekran”: siatka (Szybki dostęp, kolumny, Studia) wypełnia pierwszy ekran, reszta stoi pod nią. Kolejność w HTML (czytnik ekranu) się nie zmienia.
 // Krok zapisany w data-krok na .z-druga, wysokości w --z-druga-h i --z-siatka-h (CSS: zalozyciele-strony.css). Bez kroku układ jak dotąd:
 // tak jest przy 1707×830, 1920×950 i każdym oknie, w którym wszystko się mieści. Tolerancja 1 px na zaokrąglenia.
+// Kreski pod nagłówkami kolumn na jednej wysokości (zlecenie 26, punkt 4.1): gdy w wąskiej kolumnie link (po polsku „Kalendarz →” przy 1024–1072 px)
+// schodzi pod nagłówek, pozostałe nagłówki dostają tę samą wysokość. Przy równych nagłówkach nic się nie zmienia.
+function wyrownajKreski() {
+  const h = Array.from(siatka?.querySelectorAll<HTMLElement>('.z-kolumna > .z-h') ?? []);
+  h.forEach((e) => { e.style.minHeight = ''; });
+  if (TELEFON.matches) return;
+  const wys = h.map((e) => e.getBoundingClientRect().height), max = Math.max(...wys);
+  if (wys.some((x) => x < max - 0.5)) h.forEach((e) => { e.style.minHeight = `${max}px`; });
+}
+
 let skrH = -1;
 function drabinka() {
   if (!siatka || !druga) return;
@@ -66,6 +76,7 @@ function drabinka() {
     liczWiecej();
   };
   ustaw(null);
+  wyrownajKreski();
   skrH = skr?.offsetHeight ?? -1;
   if (TELEFON.matches || k > 1 || !druga.offsetHeight) return;
   const H = document.documentElement.clientHeight;
