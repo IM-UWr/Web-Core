@@ -67,7 +67,8 @@ const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?
     en: 'Lecture room HS: a lecture at the blackboards, students in the benches seen from behind' } },
   popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: '50% 40%' },
   granat: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: '50% 40%' },
-  aktualnosci: { zdjecie: '/pliki/naglowki/aktualnosci-skok.jpg', kadr: '48% 63%', alt: {
+  // kadr: cała skacząca postać pod paskiem menu przy 1024–2560 px (zlecenie 27, punkt 3; szerokość zdjęcia w zalozyciele.css)
+  aktualnosci: { zdjecie: '/pliki/naglowki/aktualnosci-skok.jpg', kadr: '48% 52%', alt: {
     pl: 'Hol Wydziału Matematyki i Informatyki: student w skoku pod tablicą kierunkową',
     en: 'The hall of the Faculty of Mathematics and Computer Science: a student jumping under the direction sign' } },
 };
@@ -85,7 +86,7 @@ const rozmiar = (p: number) => rodzaj === 'dzial'
   ? (dzial === 'studia'
     ? `${sizesTelefon(`max(100vw, ${px(475, p)})`)}, max(1454px, calc((max(64px, (100vw - 1240px) / 2) + 155px) / .4025))`
     : `${sizesTelefon(`max(100vw, ${px(475, p)})`)}, max(64vw, ${px(370, p)})`)
-  : (fotoNat ? `${sizesTelefon(`max(78vw, ${px(365, p)})`)}, min(62vw, 1270px)`
+  : (fotoNat ? `${sizesTelefon(`max(78vw, ${px(365, p)})`)}, min(62vw, 980px)`
     : dzial === 'studia' ? `${sizesTelefon('220vw')}, 122vw` : `${sizesTelefon(`max(100vw, ${px(365, p)})`)}, max(100vw, ${px(300, p)})`);
 
 // Ciekawostka patrona (zalecenie 19): każda podstrona z menu działu dostaje inną ciekawostkę patrona, losowaną raz na wizytę
