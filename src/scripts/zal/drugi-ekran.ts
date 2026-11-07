@@ -86,9 +86,11 @@ function zamien(key: string) {
   dopasujDluga();
   kliknieta.querySelector<HTMLElement>('.z-h h2')?.focus({ preventScroll: true });
   const bezRuchu = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // getBoundingClientRect podaje piksele okna, a przesunięcie pod CSS zoom rośnie k razy (ekrany większe od Full HD, zlecenie 26, punkt 2)
+  const k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z-k')) || 1;
   for (const el of [kliknieta, dluga]) {
     const o = stare.get(el)!, n = el.getBoundingClientRect();
-    const dx = o.left - n.left, dy = o.top - n.top;
+    const dx = (o.left - n.left) / k, dy = (o.top - n.top) / k;
     if (bezRuchu) { el.animate([{ opacity: 0.55 }, { opacity: 1 }], { duration: 150, easing: RYTM }); continue; }
     if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
     if (el === kliknieta) el.style.zIndex = '2';

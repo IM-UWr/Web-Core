@@ -83,7 +83,12 @@ const UKLAD = {
 // w marce, „Instytut” i „Matematyczny”. W dół łuk zawsze idzie w prawo: środek koła leży z prawej i nie niżej niż środek marki.
 // Skala okładki (zlecenie 26, punkt 1): okładka jest jedną kompozycją zaprojektowaną na Full HD, s = min(szerokość okna / 1920, wysokość okna / 950).
 // Skrypt liczy s raz i ustawia je na <html> jako --z-s (i --z-k = s, ale nie mniej niż 1); z --z-s CSS buduje rozmiary marki i rzędu działów, tu mnoży przez nie odstępy łuku.
-// Przy s = 1 wszystko jak przed zmianą. Na telefonie skali nie ma. Liczone także przy schowanej okładce (html.bez-okladki), bo --z-k przyda się drugiemu ekranowi.
+// Przy s = 1 wszystko jak przed zmianą. Na telefonie skali nie ma. Liczone także przy schowanej okładce (html.bez-okladki), bo z --z-k korzysta drugi ekran (zlecenie 26, punkt 2).
+// Ręczne powiększanie (Ctrl +, WCAG 1.4.4; zlecenie 26, punkt 2): skala liczona z samego okna w CSS trzymałaby stały rozmiar na ekranie, więc Ctrl + by nie działał. Dlatego przy powiększeniu z
+// skala powstaje z rozmiaru okna sprzed powiększenia (szerokość × z, wysokość × z) i powiększenie mnoży ją jak na każdej innej stronie. Górny limit: po skali zostaje co najmniej 1366 px szerokości
+// projektu, bo od tej szerokości nie zmieniają się progi układu liczone od okna. Skala systemu nie zmienia z, wygląd zależy wtedy od wielkości monitora.
+// Skąd z: Chrome, Edge i (według dokumentacji, niesprawdzone) Safari z outerWidth / innerWidth, ponad 5% różnicy. W Firefoksie outerWidth rośnie razem ze stroną (sprawdzone, Firefox 159), więc tam
+// z = devicePixelRatio / devicePixelRatio przy 100%, zapamiętany w localStorage razem z fizyczną szerokością ekranu; inny ekran zaczyna zapis od nowa.
 // 1. Stopnie i odstęp liczone ze stałych i szerokości słów przy 100 px (0,49 to połowa line-height 0,98, czyli środek linii); po polsku duże jest
 //    pierwsze słowo, po angielsku drugie. 2. Gdy tytuł (+ 24 px) wypada niżej niż szkice działów, top idzie w górę, ale nie wyżej niż dół marki + 40 px
 //    (stopnie zależą od top liniowo, więc wystarczy jedno przeliczenie). 3. Koło przez trzy prawdziwe końce napisów. 4. Ciemne pole (--skos) i maska
@@ -95,7 +100,9 @@ const UKLAD = {
 // tylko pionowo: środek budynku w połowie między dolną krawędzią paska a górą liter „Instytut”; okładka sięga pod pasek, więc jego wysokość też się liczy (zlecenie 23, punkt 4). Bez JS kadr z CSS.
 const OSTRZEZ = import.meta.env.DEV ? `console.warn('Okładka: łuk poza zakresem, zostaje skos',cx,cy,R);` : '';
 const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === 'en'},f=ok.querySelector('.z-okl-foto:not(.z-lqip)'),rt=document.documentElement;` +
-  `function skala(){var s=Math.min(innerWidth/1920,innerHeight/950);rt.style.setProperty('--z-s',s);rt.style.setProperty('--z-k',Math.max(1,s));return s}` +
+  `function powiekszenie(){var r=outerWidth/innerWidth;if(outerWidth&&(r>1.05||r<.95))return r;var d=devicePixelRatio,e=Math.round(screen.width*d),b;try{b=JSON.parse(localStorage.getItem('im-dpr-100'))}catch(x){}` +
+  `if(!b||b.e!==e){b={e:e,d:d};try{localStorage.setItem('im-dpr-100',JSON.stringify(b))}catch(x){}}r=d/b.d;return r>1.05||r<.95?r:1}` +
+  `function skala(){var W=innerWidth,H=innerHeight,z=powiekszenie(),s=Math.min(W*z/1920,H*z/950);if(z>1)s=Math.min(s,Math.max(1,W/1366));rt.style.setProperty('--z-s',s);rt.style.setProperty('--z-k',Math.max(1,s));return s}` +
   `function uloz(){var tel=matchMedia('${MQ_TELEFON}').matches,sk=1;if(tel){rt.style.removeProperty('--z-s');rt.style.removeProperty('--z-k')}else sk=skala();if(!ok.offsetHeight)return;var ODSTEP=${ODSTEP}*sk;` +
   `if(tel){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
   `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
@@ -128,7 +135,7 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   `if(r){var Sz=Math.max((W-X)/.92,.77*H*r);ok.style.setProperty('--foto-w',Sz+'px');ok.style.setProperty('--foto-top',Math.min(0,.345*H-.47*Sz/r)+'px');ok.classList.add('z-kadr')}` +
   `ok.classList.add('z-ulozona')}` +
   // resize: skala zależy od okna także wtedy, gdy okładka jest schowana albo się nie zmienia (niskie okno, wysokość okładki co najmniej 600 px)
-  `uloz();if(f)f.addEventListener('load',uloz);addEventListener('resize',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
+  `uloz();if(f)f.addEventListener('load',uloz);addEventListener('resize',uloz);addEventListener('pageshow',uloz);document.addEventListener('prerenderingchange',uloz);if(window.ResizeObserver)new ResizeObserver(function(){uloz()}).observe(ok);if(document.fonts)document.fonts.ready.then(uloz)})(document.currentScript.parentElement);`;
 ---
 {/* Odświeżenie i powrót „wstecz” z Szybkiego dostępu, a także adres #szybki-dostep: okładkę chowamy przed pierwszym układem strony, bo przeglądarka odtwarza położenie liczone bez niej (przejazd.ts).
     Wejście na adres z kotwicą: bez animacji wejścia strony (przejscia.css), bo jej przesunięcie o 12 px zmyliłoby przewinięcie do kotwicy. */}

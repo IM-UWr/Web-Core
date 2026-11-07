@@ -5,7 +5,8 @@
 /* reguły na każdej szerokości; telefon (≤ 1023 px) nadpisuje src/styles/zal-telefon.css */
 @media all {
   /* ---------- drugi ekran strony głównej ---------- */
-  .z-druga { --marg: 48px; display: flex; flex-direction: column; min-height: calc(100svh - var(--gora) - 47px); padding: 22px var(--marg); font-size: 14.5px; line-height: 1.4; color: var(--text); }
+  /* 100svh pod CSS zoom też rośnie k razy, dlatego dzielone przez --z-k (zlecenie 26, punkt 2); przy k = 1 wartość jak dawniej */
+  .z-druga { --marg: 48px; display: flex; flex-direction: column; min-height: calc(100svh / var(--z-k, 1) - var(--gora) - 47px); padding: 22px var(--marg); font-size: 14.5px; line-height: 1.4; color: var(--text); }
   .z-druga a { color: inherit; text-decoration: none; }
   /* strona główna: drugi ekran na całą szerokość (jak w prototypie), pasek i stopka z marginesem 40/48 px */
   .z-pasek.z-pasek-jasny { padding-inline: 40px; }
@@ -161,6 +162,8 @@
 }
 /* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  /* Ekrany większe od Full HD (zlecenie 26, punkt 2): drugi ekran, pasek menu i stopka strony głównej rosną tą samą skalą co okładka. --z-k ustawia tylko strona główna (ULOZ w Okladka.astro); przy s ≤ 1 równe 1 */
+  .z-druga, .z-pasek.z-pasek-jasny, body:has(.z-druga) .z-stopka { zoom: var(--z-k, 1); }
   .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
   .z-wiecej .z-ile-t { display: none; }
 
@@ -259,7 +262,9 @@ html.bez-okladki .z-okladka { display: none !important; }
 html.bez-wejscia #tresc > * { animation: none !important; }
 /* przesuwane: okładka oraz pasek i treść Szybkiego dostępu, nie sam obszar — w nim stoi panel menu (position: fixed), który pod
    przesuniętym rodzicem wychodziłby w bok poza stronę, a telefon oddalałby wtedy widok */
-html.z-ciagnie :is(.z-okladka, .z-druga-obszar > :is(.z-pasek, .z-druga)) { transform: translateY(calc(var(--z-ciag, 0px) * -1)); will-change: transform; }
+html.z-ciagnie .z-okladka { transform: translateY(calc(var(--z-ciag, 0px) * -1)); will-change: transform; }
+/* pod CSS zoom (zlecenie 26, punkt 2) przesunięcie też rośnie k razy; dzielone, żeby pasek i treść jechały równo z okładką */
+html.z-ciagnie .z-druga-obszar > :is(.z-pasek, .z-druga) { transform: translateY(calc(var(--z-ciag, 0px) * -1 / var(--z-k, 1))); will-change: transform; }
 html.z-jedzie :is(.z-okladka, .z-druga-obszar > :is(.z-pasek, .z-druga)) { transition: transform var(--z-czas, .4s) cubic-bezier(.22, .8, .2, 1); }
 /* strzałka reaguje na ciągnięcie: jaśnieje, podjeżdża do 10 px, za progiem grot w górę */
 html.z-ciagnie .z-strzalka { color: rgb(255 255 255 / calc(.76 + var(--z-postep, 0) * .24)); transform: translateX(-50%) translateY(calc(var(--z-postep, 0) * -10px)); }
