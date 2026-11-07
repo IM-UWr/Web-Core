@@ -66,7 +66,8 @@ export const KOTWICE = [
 
   // Zwykłe strony (zlecenie 30) — typ 'naglowek': nagłówek ## o tej nazwie na każdej stronie spoza kierunków i specjalności dostaje
   // to id zamiast id z treści nagłówka, to samo w PL i EN. Zamiast kotwicy w HTML (<a id="…">), którą edytor usuwa przy zapisie.
-  // „Konsultacje”: link w stopce /studia/zajecia#konsultacje (src/data/stopka.json w Web-Ustawienia), także na /en.
+  // „Konsultacje”: linki z Pierwszego roku (PL i EN) do /studia/zajecia#konsultacje; ten adres ma też src/data/stopka.json (Web-Ustawienia),
+  // którego kolumn obecna stopka nie pokazuje.
   { id: 'konsultacje', typ: 'naglowek', nazwy: ['Konsultacje', 'Office hours'] },
 ];
 

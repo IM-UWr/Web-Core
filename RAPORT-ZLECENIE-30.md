@@ -165,7 +165,7 @@ Jedno podejście dla 28, 29 i 30, na gałęziach `test-cms` ustawionych na nowe 
 
 | Repozytorium | Co zrobić |
 | --- | --- |
-| [Web-Studia](https://app.pagescms.org/IM-UWr/Web-Studia/test-cms) | **28:** Kierunki → Treść, Matematyka: zapisz **bez zmian**, potem dodaj wiersz w tabeli terminów, krok osi (zwykłym Enterem), pytanie (Nagłówek 3 z „?”), PDF z „Media” podlinkowany w „Aktach prawnych”, wzór `$\ell^2$` w akapicie, zmień jedno słowo w Treści EN. Kierunki → Baner: zmień hasło Matematyki. **30:** Strony → Pierwszy rok: otwórz i zapisz **bez zmian**; Strony → Zajęcia i konsultacje: otwórz i zapisz **bez zmian** (link do konsultacji w stopce strony EN ma dalej prowadzić do sekcji „Office hours”) |
+| [Web-Studia](https://app.pagescms.org/IM-UWr/Web-Studia/test-cms) | **28:** Kierunki → Treść, Matematyka: zapisz **bez zmian**, potem dodaj wiersz w tabeli terminów, krok osi (zwykłym Enterem), pytanie (Nagłówek 3 z „?”), PDF z „Media” podlinkowany w „Aktach prawnych”, wzór `$\ell^2$` w akapicie, zmień jedno słowo w Treści EN. Kierunki → Baner: zmień hasło Matematyki. **30:** Strony → Pierwszy rok: otwórz i zapisz **bez zmian**; Strony → Zajęcia i konsultacje: otwórz i zapisz **bez zmian** (potem sprawdzę, że kotwica `#konsultacje` przy „Office hours” została) |
 | [Web-Ustawienia](https://app.pagescms.org/IM-UWr/Web-Ustawienia/test-cms) | **28:** przesuń jeden kierunek na liście kierunków |
 | [Web-Spec-Stosowana](https://app.pagescms.org/IM-UWr/Web-Spec-Stosowana/test-cms) | **29:** Specjalność → Treść: zapisz **bez zmian**, potem dodaj temat pracy, krok osi i pytanie |
 | [Web-Popularyzacja](https://app.pagescms.org/IM-UWr/Web-Popularyzacja/test-cms) | **29:** Strona działu Popularyzacja: zapisz **bez zmian**, potem zmień jedną liczbę „W skrócie” |
@@ -189,6 +189,7 @@ Potem ja: porównam `origin/test-cms` z `wyglad/zlecenie-16` w każdym repozytor
 1. **Kotwica `#konsultacje` na stronie EN „Classes and office hours”.**
    - Treść EN strony Zajęcia (Web-Studia) ma przed nagłówkiem „Office hours” kotwicę w HTML: `<a id="konsultacje"></a>`. Prowadzi do niej link „Konsultacje” ze stopki w wersji EN.
    - Edytor z przyciskami usuwa HTML przy zapisie, więc po pierwszym zapisie Treści EN link ze stopki otworzy górę strony.
+   - **Poprawka (po decyzji):** obecna stopka nie pokazuje kolumn linków z `stopka.json` (tylko kontakt i strony prawne), więc linku „Office hours” w stopce dziś na stronie nie ma — adres `#konsultacje` jest tylko w danych stopki. Z kotwicy korzystają linki z Pierwszego roku: PL od dawna, EN od tej zmiany (wcześniej `#office-hours`).
    - Po polsku działa sam nagłówek „Konsultacje”.
    - Propozycja: stała kotwica dla nagłówka „Office hours” na tej stronie (jak kotwice w `src/plugins/kotwice.mjs`) i usunięcie HTML z treści.
    - **Decyzja właściciela (7.11): „Tak, dodaj kotwicę”. Zrobione** — Web-Core `84f3499f`, Web-Studia `8c7e561` (wypchnięte, `test-cms` w Web-Studia przesunięte na `8c7e561`):
