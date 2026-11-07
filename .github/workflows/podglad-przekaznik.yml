@@ -1,0 +1,40 @@
+name: Przekaźnik do Web-Podglad
+
+# Stronę buduje IM-UWr/Web-Podglad (workflow podglad.yml) z main tego repozytorium i z main repozytoriów treści;
+# „Budowanie i publikacja strony” (deploy.yml) jest wyłączone. Ten workflow przekazuje do Web-Podglad sygnały,
+# które dotąd uruchamiały deploy.yml:
+#  - „tresc-zmieniona” — zmiana w repozytorium treści IM-UWr/Web-* (ich powiadom.yml, np. zapis w Pages CMS),
+#  - „przebuduj” — nowy plan zajęć z USOS (plan-zajec.yml).
+# Ręczne uruchomienie wysyła „przebuduj”.
+# Klucz: ta sama aplikacja organizacji co w powiadom.yml (zmienna POWIADOM_APP_ID, sekret POWIADOM_KLUCZ). Aplikacja
+# musi mieć dostęp do repozytorium Web-Podglad; uprawnienie Contents: write wystarcza na repository_dispatch.
+on:
+  repository_dispatch:
+    types: [tresc-zmieniona, przebuduj]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  przekaz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Klucz do Web-Podglad
+        id: klucz
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.POWIADOM_APP_ID }}
+          private-key: ${{ secrets.POWIADOM_KLUCZ }}
+          owner: IM-UWr
+          repositories: Web-Podglad
+
+      - name: Sygnał do Web-Podglad
+        env:
+          GH_TOKEN: ${{ steps.klucz.outputs.token }}
+          ZDARZENIE: ${{ github.event.action || 'przebuduj' }}
+          ZRODLO: ${{ github.event.client_payload.repo || github.repository }}
+        run: |
+          gh api repos/IM-UWr/Web-Podglad/dispatches -X POST \
+            -f event_type="$ZDARZENIE" -f "client_payload[repo]=$ZRODLO"
+          echo "::notice title=Przekazano::$ZDARZENIE ($ZRODLO) → IM-UWr/Web-Podglad"
