@@ -1,14 +1,14 @@
 # Jawny Markdown kierunków i specjalności
 
-Nowy format na branchu `markdown-jawne-bloki-2026-11`. Dotyczy całej treści Markdown działu Studia w Web-Studia: kierunków, specjalności, pozostałych podstron oraz tekstów strony działu i Roku akademickiego. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
+Format używany na `main` w Web-Studia i Web-Core. Dotyczy całej treści Markdown działu Studia w Web-Studia: kierunków, specjalności, pozostałych podstron oraz tekstów strony działu i Roku akademickiego. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
 
 ## Jeden formularz, jedna strona
 
-W Pages CMS otwórz **Web-Studia na nowym branchu**, następnie **Kierunki**, **Specjalności** albo **Strony**. Teksty `/studia` i `/studia/rok-akademicki` są odpowiednio w formularzach **Strona działu Studia** i **Rok akademicki**. Najpierw są nazwy PL/EN i treść Markdown PL/EN, poniżej dane; w kierunkach i specjalnościach baner jest na końcu. Polski tekst jest treścią pliku `.md`, angielski polem `tresc_en`. Puste tłumaczenie oznacza pokazanie polskiej treści na stronie angielskiej.
+W Pages CMS otwórz **Web-Studia na branchu main**, następnie **Kierunki**, **Specjalności** albo **Strony**. Teksty `/studia` i `/studia/rok-akademicki` są odpowiednio w formularzach **Strona działu Studia** i **Rok akademicki**. Najpierw są nazwy PL/EN i treść Markdown PL/EN, poniżej dane; w kierunkach i specjalnościach baner jest na końcu. Polski tekst jest treścią pliku `.md`, angielski polem `tresc_en`. Puste tłumaczenie oznacza pokazanie polskiej treści na stronie angielskiej.
 
 W tych wpisach treść, dane i baner znajdują się razem. Nie ma osobnych formularzy „Treść” i „Baner i kafelek”. Nie zmieniaj nazw istniejących plików: to ich identyfikatory używane w adresach i powiązaniach.
 
-Pole `code` wyróżnia składnię. Wygląd strony sprawdzamy w osobnym zbudowanym podglądzie. Komentarze `<!-- ... -->` są instrukcjami redakcyjnymi i nie pojawiają się jako tekst na stronie.
+Pole `code` wyróżnia składnię. Wygląd strony sprawdzamy po jej przebudowaniu. Komentarze `<!-- ... -->` są instrukcjami redakcyjnymi i nie pojawiają się jako tekst na stronie.
 
 Dotyczy to również pól „Koniec strony” PL/EN Roku akademickiego. Dawny przełącznik „Bloki wzorca” w formularzach Studiów zastępują jawne znaczniki. Plan zajęć, kalendarz, terminy semestrów i zamiany dni nadal są generowane z danych; komentarze w plikach wyjaśniają, gdzie trafia część tekstowa. Nie trzeba przepisywać tych danych do Markdownu.
 
@@ -99,11 +99,11 @@ Opiekunów podstrony specjalności wybierasz **poniżej Markdownu w formularzu s
 Lista wyboru w CMS jest lokalnym katalogiem nazwisk, ponieważ powiązania Pages CMS nie obejmują innego repozytorium. Odśwież ją po dodaniu pracownika lub zmianie nazwiska:
 
 ```sh
-python skrypty/pobierz_tresci.py --galaz markdown-jawne-bloki-2026-11 --wymagaj Web-Studia
+python skrypty/pobierz_tresci.py
 node skrypty/synchronizuj-katalog-opiekunow.mjs ../Web-Studia
 ```
 
-Zapisz zmiany katalogu na tym samym branchu Web-Studia. Katalog nie zawiera kontaktów i ma pola tylko do odczytu. Nazwiska wpisane jako zwykły tekst w kafelkach kierunku lub w akapitach pozostają tekstem redakcyjnym — trzeba je aktualizować osobno.
+Zapisz zmiany katalogu w Web-Studia. Katalog nie zawiera kontaktów i ma pola tylko do odczytu. Nazwiska wpisane jako zwykły tekst w kafelkach kierunku lub w akapitach pozostają tekstem redakcyjnym — trzeba je aktualizować osobno.
 
 ## Baner i dane
 
@@ -129,7 +129,7 @@ npm run test:jawne-ui
 
 Lokalnie można podstawić zmienione Web-Studia bez pobierania repozytoriów ponownie: `python skrypty/pobierz_tresci.py --lokalnie .tresci --zrodlo Web-Studia=../Web-Studia`.
 
-Workflow `markdown-jawne-test.yml` w Web-Podglad buduje tylko artefakt i zrzuty testowe; nie publikuje strony. Wymaga nowego brancha Web-Studia, więc nie zastąpi go po cichu treścią z main. Po scaleniu skoordynowanych zmian Web-Core i Web-Studia standardowe budowanie może wrócić do main.
+Workflow `markdown-jawne-test.yml` w Web-Podglad buduje tylko artefakt i zrzuty testowe; nie publikuje strony. Można wskazać main lub wspólny branch Web-Core i Web-Studia. Brak wskazanego brancha Web-Studia przerywa test. Standardowa publikacja korzysta z main.
 
 ## Zakres migracji
 
