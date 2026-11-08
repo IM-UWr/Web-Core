@@ -68,7 +68,7 @@ function linie(li) {
   // „**Tytuł**” i dalszy tekst po zwykłym znaku nowej linii (bez <br>) — też dwie linie: tak edytor zapisuje tytuł i opis
   // w osobnych akapitach ostatniego punktu listy (zlecenie 30, symulacja zapisu „Jak zacząć” na stronie „Dla uczniów”)
   const poTytule = (n) => n.type === 'text' && /^[ \t]*\n/.test(n.value) && biez.filter((x) => !pusty(x)).length === 1 && jest(biez.find((x) => !pusty(x)), 'strong');
-  const wiersz = (nodes) => { for (const n of nodes) { if (jestBr(n)) zamknij(); else { if (poTytule(n)) zamknij(); biez.push(n); } } };
+  const wiersz = (nodes) => { nodes = nodes.flatMap((n) => n.type === 'text' ? n.value.split(/\n(?=[ \t]*(?:[^:\n]{1,20}:\s))/).flatMap((v, i) => i ? [el('br'), tekst(v)] : [tekst(v)]) : [n]); for (const n of nodes) { if (jestBr(n)) zamknij(); else { if (poTytule(n)) zamknij(); biez.push(n); } } };
   for (const c of li.children ?? []) {
     if (jest(c, 'p')) { zamknij(); wiersz(c.children ?? []); zamknij(); }
     else if (c.type === 'element' && BLOKOWE.has(c.tagName)) { zamknij(); out.push({ blok: c }); }
@@ -92,7 +92,8 @@ function pogrubiony(linia) {
 
 // „Klucz: wartość” — para etykieta–wartość; klucz krótki (do 20 znaków), zwykły tekst na początku linii
 function para(linia) {
-  const [a, ...r] = linia;
+  let [a, ...r] = linia;
+  if (jest(a, 'strong') && /^([^:\n]{1,20}):\s*/.test(tekstW(a))) { a = tekst(tekstW(a)); if (r[0]?.type === 'text' && !/\s$/.test(a.value)) a.value += ' '; }
   if (a?.type !== 'text') return undefined;
   const m = /^([^:\n]{1,20}):\s+([\s\S]*)$/.exec(a.value);
   if (!m || !m[1].trim()) return undefined;
@@ -336,7 +337,7 @@ const naKreski = (lista, ctx) => {
 // układ sekcji: przekształcone bloki; w „prozie” kolejne zwykłe węzły w div.prose
 function uklad(nodes, typ, ctx) {
   const prz = nodes.map((n) => {
-    const p = przeksztalc(n, ctx);
+    const p = ctx.jawne ? n : przeksztalc(n, ctx);
     return ctx.kreski && jest(p, 'ul') && !jestBlokiem(p) ? naKreski(p, ctx) : p;
   });
   if (typ !== 'proza') return prz;
@@ -354,20 +355,21 @@ const kopia = (x) => structuredClone(x);
 // „Program studiów”: ### to zakładki (.tresc-taby i panele .kier-prog jak dotąd); akapit w panelu — p.dotyczy.
 // Jedna podsekcja albo brak ### — jeden panel bez zakładek. Bez JS wszystkie panele jeden pod drugim, z podpisami.
 function zakladki(nodes, ctx, etykietaSekcji) {
+  const prefix = ctx.tabPrefix ?? '';
   const iH = nodes.flatMap((n, i) => (jest(n, 'h3') ? [i] : []));
   const wstep = iH.length ? nodes.slice(0, iH[0]) : [];
   const czesci = iH.length ? iH.map((i, k) => ({ h: nodes[i], tresc: nodes.slice(i + 1, iH[k + 1] ?? nodes.length) })) : [{ tresc: nodes }];
   const wiele = czesci.length > 1;
   const panel = (c, i) => zBlokiem(el('div', 'kier-prog', [
     ...(wiele ? [el('p', 'kier-podpis', kopia(c.h.children))] : c.h ? [c.h] : []),
-    ...c.tresc.map((n) => (jest(n, 'p') && !sam(n, 'a') ? el('p', 'dotyczy', n.children) : przeksztalc(n, ctx))),
-  ], { ...(wiele ? { role: 'tabpanel' } : {}), id: `prog-${i}`, ...(wiele ? { ariaLabelledBy: `tab-${i}` } : {}), dataPanel: '' }));
+    ...c.tresc.map((n) => (jest(n, 'p') && !sam(n, 'a') ? el('p', 'dotyczy', n.children) : (ctx.jawne ? n : przeksztalc(n, ctx)))),
+  ], { ...(wiele ? { role: 'tabpanel' } : {}), id: `${prefix}prog-${i}`, ...(wiele ? { ariaLabelledBy: `${prefix}tab-${i}` } : {}), dataPanel: '' }));
   const taby = wiele
     ? [zBlokiem(el('div', 'tresc-taby', czesci.map((c, i) => el('button', null, kopia(c.h.children), {
-      type: 'button', role: 'tab', id: `tab-${i}`, ariaControls: `prog-${i}`, ariaSelected: i === 0 ? 'true' : 'false', tabIndex: i === 0 ? 0 : -1,
+      type: 'button', role: 'tab', id: `${prefix}tab-${i}`, ariaControls: `${prefix}prog-${i}`, ariaSelected: i === 0 ? 'true' : 'false', tabIndex: i === 0 ? 0 : -1,
     })), { role: 'tablist', ariaLabel: etykietaSekcji }))]
     : [];
-  return [...wstep.map((n) => przeksztalc(n, ctx)), ...taby, ...czesci.map(panel)];
+  return [...wstep.map((n) => ctx.jawne ? n : przeksztalc(n, ctx)), ...taby, ...czesci.map(panel)];
 }
 
 const slug = (s) => s.toLocaleLowerCase('pl').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l')
@@ -383,6 +385,122 @@ const slug = (s) => s.toLocaleLowerCase('pl').normalize('NFD').replace(/[̀-ͯ]/
 //     (liczby banera specjalności).
 const wstaw = (nazwa) => ({ type: 'comment', value: `wstaw:${nazwa}` });
 const ZAMIENIA_NAGLOWEK = new Set(['opiekun']);
+
+// Jawne strony nie odgadują bloków ani wstawek z nazw nagłówków.
+function jawnaSekcja(tree, ctx, opcje, typ, file) {
+  const usedIds = new Set(), usedInserts = new Set();
+  let tabGroups = 0;
+  const fail = (message, node) => file.fail(message, node);
+  const listIn = (node, tag) => {
+    const b = bloki(node);
+    if (b.length !== 1 || !jest(b[0], tag)) fail(`Blok ${node.properties.dataBlok} wymaga jednej listy ${tag}.`, node);
+    return b[0];
+  };
+  const transform = (nodes) => nodes.flatMap((n) => {
+    const insert = n.properties?.dataWstawka;
+    if (insert) {
+      if (typ !== 'specjalnosc') fail(`Wstawka ${insert} jest przeznaczona dla specjalności.`, n);
+      if (usedInserts.has(insert)) fail(`Powtórzona wstawka ${insert}.`, n);
+      usedInserts.add(insert);
+      return opcje.wstawki?.[insert] ? [wstaw(insert)] : [];
+    }
+    const kind = n.properties?.dataBlok;
+    if (!kind) return [n];
+    if (kind === 'proza') {
+      const out = []; let prose;
+      for (const child of transform(bloki(n))) {
+        const special = jestBlokiem(child) || child.type === 'comment' || ['dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski'].some((c) => child.properties?.className?.includes(c));
+        if (special) { out.push(child); prose = undefined; }
+        else { if (!prose) { prose = el('div', 'prose'); out.push(prose); } prose.children.push(child); }
+      }
+      return out;
+    }
+    if (kind === 'specjalnosci') {
+      if (typ !== 'kierunek') fail('Kafelki specjalności należą do kierunku.', n);
+      // Pełna zawartość kafelków jest Markdownem kierunku, bez automatycznego dopisywania.
+      const ul = listIn(n, 'ul');
+      if (!pozycje(ul).every((li) => pogrubiony(linie(li)[0]?.linia))) fail('Każdy kafelek zaczyna się od **Tytułu** i opisu po —.', n);
+      const result = naDwa(ul);
+      result.properties.className.push('kier-spec');
+      for (const li of pozycje(result)) for (const dl of li.children.filter((x) => jest(x, 'dl'))) {
+        for (let i = 0; i < dl.children.length; i += 2) if (tekstW(dl.children[i]).trim() === 'Etykieta') {
+          li.children.unshift(el('span', 'etyk', dl.children[i + 1].children)); dl.children.splice(i, 2); break;
+        }
+        if (!dl.children.length) li.children = li.children.filter((x) => x !== dl);
+      }
+
+      return [result];
+    }
+    if (kind === 'kafelki') {
+      const ul = listIn(n, 'ul');
+      if (!pozycje(ul).every((li) => pogrubiony(linie(li)[0]?.linia))) fail('Każdy kafelek wymaga **Tytułu**; opis oddziel przez —.', n);
+      return [naDwa(ul)];
+    }
+    if (kind === 'etapy') {
+      const ol = listIn(n, 'ol');
+      if (!pozycje(ol).every((li) => pogrubiony(linie(li)[0]?.linia))) fail('Każdy krok wymaga **Etykieta: Tytuł**. Sprawdź wcięcia.', n);
+      return [naEtapy(ol, ctx.slowo)];
+    }
+    if (kind === 'kontakty') {
+      const ul = listIn(n, 'ul');
+      if (!pozycje(ul).every((li) => kontakt(linie(li)))) fail('Kontakt wymaga *roli* i **osoby**.', n);
+      return [naKontakty(ul)];
+    }
+    if (kind === 'linki' || kind === 'pliki') {
+      const ul = listIn(n, 'ul');
+      if (!listaLinkow(ul)) fail('Każdy punkt listy odnośników musi zawierać link i ewentualny opis po —.', n);
+      return [kind === 'pliki' ? naPliki(ul, ctx) : naLinki(ul)];
+    }
+    if (kind === 'kreski' || kind === 'tematy') return [naKreski(listIn(n, 'ul'), { ...ctx, opisPo: kind === 'tematy' })];
+    if (kind === 'tabela') {
+      const b = bloki(n);
+      if (b.length !== 1 || !jest(b[0], 'table')) fail('Blok tabela wymaga jednej tabeli Markdown.', n);
+      b[0].properties = { ...b[0].properties, className: ['tab'] };
+      return b;
+    }
+    if (kind === 'pytania') {
+      const b = bloki(n);
+      if (!b.some((x) => jest(x, 'h3'))) fail('Blok pytania wymaga nagłówków ###.', n);
+      // W jawnym bloku nazwa pytania nie musi kończyć się znakiem zapytania.
+      const out = []; let faq;
+      for (let i = 0; i < b.length;) {
+        if (!jest(b[i], 'h3')) { out.push(b[i++]); continue; }
+        let j = i + 1; while (j < b.length && !jestNaglowkiem(b[j])) j++;
+        if (!faq) { faq = el('div', 'faq'); out.push(faq); }
+        faq.children.push(el('details', null, [el('summary', null, b[i].children), el('div', null, transform(b.slice(i + 1, j)))])); i = j;
+      }
+      return out;
+    }
+    if (kind === 'ramka') {
+      const title = n.properties.dataTytul;
+      if (!title) fail('Ramka wymaga etykiety: :::ramka{tytul="Dla kogo"}.', n);
+      return [el('div', 'uwaga', [el('span', 'etyk', [tekst(title)]), el('div', ctx.klasaRamki ?? null, transform(bloki(n)))])];
+    }
+    if (kind === 'zakladki') {
+      const b = transform(bloki(n));
+      // zakladki() zachowuje dotychczasowy HTML; zawartość już przetworzona jawnie.
+      return zakladki(b, { ...ctx, jawne: true, tabPrefix: `blok-${++tabGroups}-` }, ctx.slowo === 'Step' ? 'Tabs' : 'Zakładki');
+    }
+    fail(`Nieobsługiwany blok ${kind}.`, n);
+  });
+  const children = bloki(tree), sections = [], out = [];
+  let current;
+  for (const n of children) {
+    if (jest(n, 'h2')) {
+      const label = tekstW(n).trim();
+      const id = n.properties?.dataSekcjaId || slug(label) || 'sekcja';
+      if (usedIds.has(id)) fail(`Powtórzony identyfikator sekcji ${id}.`, n);
+      usedIds.add(id); n.properties = { id: `${id}-h` };
+      current = el('section', null, [n], { id, ariaLabelledBy: `${id}-h`, ...(opcje.lang ? { lang: opcje.lang } : {}) });
+      out.push(current); sections.push({ id, etykieta: label });
+    } else (current ? current.children : out).push(...transform([n]));
+  }
+  const nonempty = (n) => (n.type !== 'comment' || /^wstaw:/.test(n.value)) && !(n.type === 'raw' && /^<!--/.test(n.value)) && !pusty(n);
+  const visible = out.filter((n) => !jest(n, 'section') || n.children.slice(1).some(nonempty));
+  tree.children = visible;
+  const ids = new Set(visible.filter((n) => jest(n, 'section')).map((n) => n.properties.id));
+  return sections.filter((s) => ids.has(s.id));
+}
 
 function sekcjeTresci(tree, ctx, opcje, typ) {
   const dzieci = bloki(tree);
@@ -481,7 +599,7 @@ export default function rehypeBloki(options = {}) {
     const fm = file?.data?.astro?.frontmatter ?? {};
     for (const typ of ['kierunek', 'specjalnosc']) {
       if (fm[typ] && typeof fm[typ] === 'object') {
-        fm[typ].sekcje = sekcjeTresci(tree, ctx, fm[typ], typ);
+        fm[typ].sekcje = fm[typ].jawne ? jawnaSekcja(tree, { ...ctx, ...(typ === 'specjalnosc' ? { klasaRamki: fm[typ].klasaRamki } : {}) }, fm[typ], typ, file) : sekcjeTresci(tree, ctx, fm[typ], typ);
         return;
       }
     }

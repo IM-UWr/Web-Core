@@ -29,14 +29,15 @@ export async function listaKierunkow(): Promise<Kierunek[]> {
 }
 
 export async function banerKierunku(id: string): Promise<BanerKierunku | undefined> {
-  return (await getCollection('kierunki_baner')).find((b) => b.id === id)?.data;
+  const page = (await getCollection('kierunki')).find((k) => k.id === id);
+  return page?.data.baner ?? (await getCollection('kierunki_baner')).find((b) => b.id === id)?.data;
 }
 
 /** Pierwsze zdanie pierwszego akapitu Markdownu (bez nagłówków, list i tabel), bez znaczników. */
 export function pierwszeZdanie(md?: string): string {
   for (const blok of (md ?? '').split(/\n\s*\n/)) {
     const t = blok.trim();
-    if (!t || /^(#|[-*+]\s|\d+[.)]\s|\||>|```|!\[)/.test(t)) continue;
+    if (!t || /^(<!--|:::|#|[-*+]\s|\d+[.)]\s|\||>|```|!\[)/.test(t)) continue;
     const czysty = t.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`\\]+/g, '').replace(/\s+/g, ' ').trim();
     if (!czysty) continue;
     return (/^.*?[.!?…](?=\s+[A-ZĄĆĘŁŃÓŚŹŻ„"(]|$)/.exec(czysty)?.[0] ?? czysty).trim();

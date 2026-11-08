@@ -28,7 +28,11 @@ export async function daneSpecjalnosci(specjalnosc: Specjalnosc, lang: Lang) {
     const kand = osoby.filter((p) => p.data.imie_nazwisko === n.trim());
     return kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
   };
-  const opiekunowie = d.opiekunowie.map((o) => ({ ...o, osoba: znajdz(o.imie_nazwisko) }));
+  const opiekunowie = d.opiekunowie.map((o) => {
+    const osoba = o.osoba ? osoby.find((p) => p.id === o.osoba) : (o.imie_nazwisko ? znajdz(o.imie_nazwisko) : undefined);
+    if (o.osoba && !osoba) throw new Error(`Specjalność ${specjalnosc.id}: nie istnieje opiekun ${o.osoba}.`);
+    return { ...o, imie_nazwisko: osoba?.data.imie_nazwisko ?? o.imie_nazwisko ?? '', osoba };
+  });
   const nazwa = w(d, 'nazwa');
   const sem = d.seminaria.length ? (await seminaria()).filter((s) => d.seminaria.includes(s.id)).sort((a, b) => d.seminaria.indexOf(a.id) - d.seminaria.indexOf(b.id)) : [];
 
@@ -42,7 +46,7 @@ export async function daneSpecjalnosci(specjalnosc: Specjalnosc, lang: Lang) {
     seminaria: T('Seminaria', 'Seminars'),
     opiekun: opiekunowie.length > 1 ? T('Opiekunowie specjalności', 'Coordinators') : T('Opiekun specjalności', 'Coordinator'),
   };
-  const opcje = { wstawki, naglowki, klasaRamki: KLASA_RAMKI, polski };
+  const opcje = { jawne: d.format_tresci === 'jawne', wstawki, naglowki, klasaRamki: KLASA_RAMKI, polski };
   const { html, sekcje, dane } = await renderSpecjalnosci(zrodlo, lang, opcje);
   const czesci: CzescTresci[] = html.split(/<!--wstaw:(\w+)-->/).map((x, i) => (i % 2 ? { wstawka: x as WstawkaSpecjalnosci } : { html: x }));
 
@@ -61,7 +65,7 @@ export async function daneSpecjalnosci(specjalnosc: Specjalnosc, lang: Lang) {
   const ilePrzedmiotow = danePl.grupy
     .filter((g) => /program od/i.test(g.nazwa) && !/wspóln/i.test(g.nazwa))
     .reduce((s, g) => s + g.n, 0);
-  const liczbyTel = [
+  const liczbyTel = d.baner?.liczby ? d.baner.liczby.map((f) => ({ n: f.n, n_en: f.n_en, pl: f.etykieta, en: f.etykieta_en || f.etykieta })) : [
     { n: stopnie.join(' i '), n_en: stopnie.join(' and '), pl: 'stopień studiów', en: stopnie.length > 1 ? 'study cycles' : 'study cycle' },
     { n: semWyboru ? `${semWyboru}. sem.` : '', n_en: semWyboru ? `sem. ${semWyboru}` : '', pl: 'wybór specjalności', en: 'choice of specialisation' },
     { n: ilePrzedmiotow, pl: ['przedmiot specjalności', 'przedmioty specjalności', 'przedmiotów specjalności'] as [string, string, string], en: ['specialisation course', 'specialisation courses'] as [string, string] },

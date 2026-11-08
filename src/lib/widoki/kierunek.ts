@@ -20,13 +20,13 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
     const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
     return zTytulem(o?.data.stopien, n, lang);
   };
-  const specjalnosci = (await wszystkieSpecjalnosci())
+  const specjalnosci = d.format_tresci === 'jawne' ? [] : (await wszystkieSpecjalnosci())
     .filter((s) => s.data.kierunek === kierunek.id && s.data.opublikowany !== false && s.data.na_stronie_kierunku)
     .sort((a, b) => Number(a.data.wygaszana) - Number(b.data.wygaszana) || a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'))
     .map((s) => ({
       ...s.data,
       strona: s.data.bez_podstrony ? undefined : s.id,
-      opiekunowie: s.data.opiekunowie.map((o) => zTytulemZeSpisu(o.imie_nazwisko)).join(', '),
+      opiekunowie: s.data.opiekunowie.map((o) => zTytulemZeSpisu(o.imie_nazwisko || osoby.find((p) => p.id === o.osoba)?.data.imie_nazwisko || '')).join(', '),
       dla_kogo: s.data.kafelek_dla_kogo,
       dla_kogo_en: s.data.kafelek_dla_kogo_en,
       kariera: s.data.kafelek_kariera,
@@ -36,7 +36,7 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
   // Treść: po angielsku tresc_en; pusta — treść polska (sekcje z lang="pl", linki wewnętrzne z /en).
   const polski = lang === 'en' && !d.tresc_en?.trim();
   const zrodlo = lang === 'en' && !polski ? d.tresc_en : kierunek.body;
-  const { html, sekcje } = await renderKierunku(zrodlo, lang, { specjalnosci: specjalnosci.length > 0, polski });
+  const { html, sekcje } = await renderKierunku(zrodlo, lang, { jawne: d.format_tresci === 'jawne', specjalnosci: specjalnosci.length > 0, polski });
   // miejsce na kafelki specjalności (komentarz z wtyczki na końcu sekcji „Specjalności”)
   const [przed, po = ''] = html.split('<!--specjalnosci-->');
 

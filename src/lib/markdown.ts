@@ -1,3 +1,5 @@
+import remarkDirective from 'remark-directive';
+import remarkJawneBloki from '../plugins/remark-jawne-bloki.mjs';
 // Renderowanie Markdownu z pól tekstowych (np. treść angielska wpisana w formularzu).
 import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
@@ -42,26 +44,27 @@ export async function renderMarkdownZNaglowkami(src: string | undefined, lang: L
 // nazwiska i e-maile w kontaktach), jak treść z pliku. Wynik: HTML sekcji (miejsce na kafelki specjalności: <!--specjalnosci-->)
 // i spis sekcji do „Na tej stronie”.
 export interface SekcjaKierunku { id: string; etykieta: string; krotka?: string }
-const procesoryKierunku = new Map<Lang, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
+const procesoryKierunku = new Map<string, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
 
-async function procesorSekcji(lang: Lang) {
-  let processor = procesoryKierunku.get(lang);
+async function procesorSekcji(lang: Lang, jawne = false) {
+  const key = `${lang}:${jawne}`;
+  let processor = procesoryKierunku.get(key);
   if (!processor) {
     const site = import.meta.env.SITE, base = import.meta.env.BASE_URL;
     processor = await createMarkdownProcessor({
       // wzory zapisane edytorem Pages CMS (ukośniki Markdownu we wzorze) — src/plugins/remark-wzory-edytora.mjs
-      remarkPlugins: [remarkMath, remarkWzoryEdytora],
+      remarkPlugins: [remarkMath, remarkWzoryEdytora, ...(jawne ? [remarkDirective, remarkJawneBloki] : [])],
       // polski: tematy prac na stronie specjalności po angielsku — tytuł po polsku dostaje lang="pl" (jak langTekstu())
       rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, site, base, polski: wygladaNaPolski }], rehypeLimity, [rehypeBase, { base, lang }], [rehypeZewn, { site, base, lang }]],
     } as any);
-    procesoryKierunku.set(lang, processor);
+    procesoryKierunku.set(key, processor);
   }
   return processor;
 }
 
-export async function renderKierunku(src: string | undefined, lang: Lang, opcje: { specjalnosci: boolean; polski?: boolean }): Promise<{ html: string; sekcje: SekcjaKierunku[] }> {
-  const processor = await procesorSekcji(lang);
-  const kierunek: Record<string, unknown> = { specjalnosci: opcje.specjalnosci, ...(opcje.polski ? { lang: 'pl' } : {}) };
+export async function renderKierunku(src: string | undefined, lang: Lang, opcje: { specjalnosci: boolean; polski?: boolean; jawne?: boolean }): Promise<{ html: string; sekcje: SekcjaKierunku[] }> {
+  const processor = await procesorSekcji(lang, opcje.jawne);
+  const kierunek: Record<string, unknown> = { jawne: opcje.jawne, specjalnosci: opcje.specjalnosci, ...(opcje.polski ? { lang: 'pl' } : {}) };
   const result = await processor.render(src ?? '', { frontmatter: { kierunek } });
   return { html: result.code, sekcje: (kierunek.sekcje ?? []) as SekcjaKierunku[] };
 }
@@ -73,10 +76,10 @@ export type WstawkaSpecjalnosci = 'seminaria' | 'opiekun' | 'wybor';
 export interface DaneSpecjalnosci { etapy: { etyk: string; t: string }[]; grupy: { nazwa: string; n: number }[] }
 
 export async function renderSpecjalnosci(src: string | undefined, lang: Lang, opcje: {
-  wstawki: Partial<Record<WstawkaSpecjalnosci, boolean>>; naglowki: Partial<Record<WstawkaSpecjalnosci, string>>; klasaRamki: string; polski?: boolean;
+  jawne?: boolean; wstawki: Partial<Record<WstawkaSpecjalnosci, boolean>>; naglowki: Partial<Record<WstawkaSpecjalnosci, string>>; klasaRamki: string; polski?: boolean;
 }): Promise<{ html: string; sekcje: SekcjaKierunku[]; dane: DaneSpecjalnosci }> {
-  const processor = await procesorSekcji(lang);
-  const specjalnosc: Record<string, unknown> = { wstawki: opcje.wstawki, naglowki: opcje.naglowki, klasaRamki: opcje.klasaRamki, ...(opcje.polski ? { lang: 'pl' } : {}) };
+  const processor = await procesorSekcji(lang, opcje.jawne);
+  const specjalnosc: Record<string, unknown> = { jawne: opcje.jawne, wstawki: opcje.wstawki, naglowki: opcje.naglowki, klasaRamki: opcje.klasaRamki, ...(opcje.polski ? { lang: 'pl' } : {}) };
   const result = await processor.render(src ?? '', { frontmatter: { specjalnosc } });
   return { html: result.code, sekcje: (specjalnosc.sekcje ?? []) as SekcjaKierunku[], dane: (specjalnosc.dane ?? { etapy: [], grupy: [] }) as DaneSpecjalnosci };
 }

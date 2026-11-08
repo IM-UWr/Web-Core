@@ -1,7 +1,6 @@
-// Specjalności (zlecenie 29): treść (kolekcja specjalnosci: nazwa i jeden Markdown PL/EN) i „Baner i kafelek” (kolekcja
-// specjalnosci_baner, ten sam id: kierunek, poziom, zdanie pod nazwą, hasło, skrót, zakład, opiekunowie, seminaria, kafelek
-// na stronie kierunku, kolejność…). Jedno miejsce, z którego czytają strona specjalności, kafelki na stronie kierunku,
-// strona „Studia”, ścieżki stron i mapa strony. Specjalność bez pliku banera dostaje wartości domyślne (jak puste pola).
+// Specjalności: nowy format łączy Markdown, relacje i zagnieżdżony baner w jednym wpisie.
+// Stare pliki specjalnosci_baner są obsługiwane wyłącznie jako format zgodności.
+// Kafelki nowych kierunków należą do Markdownu kierunku.
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type TrescSpecjalnosci = CollectionEntry<'specjalnosci'>;
@@ -16,8 +15,16 @@ const DOMYSLNY: BanerSpecjalnosci = {
 
 /** Wszystkie specjalności (także nieopublikowane) z polami banera. */
 export async function specjalnosci(): Promise<Specjalnosc[]> {
-  const banery = new Map((await getCollection('specjalnosci_baner')).map((b) => [b.id, b.data]));
-  return (await getCollection('specjalnosci')).map((t) => ({ id: t.id, tresc: t, data: { ...DOMYSLNY, ...(banery.get(t.id) ?? {}), ...t.data } }));
+  const items = await getCollection('specjalnosci');
+  const legacy = items.some((t) => t.data.format_tresci !== 'jawne');
+  const banery = new Map((legacy ? await getCollection('specjalnosci_baner') : []).map((b) => [b.id, b.data]));
+  return items.map((t) => ({ id: t.id, tresc: t, data: {
+    ...DOMYSLNY, ...t.data,
+    // W dawnym formacie relacje i baner mieszkały w JSON-ie. Domyślne pola
+    // nowego schematu treści nie mogą ich przesłonić pustymi wartościami.
+    ...(t.data.format_tresci === 'jawne' ? {} : banery.get(t.id)),
+    ...t.data.baner,
+  } }));
 }
 
 export async function specjalnosc(id: string): Promise<Specjalnosc | undefined> {
