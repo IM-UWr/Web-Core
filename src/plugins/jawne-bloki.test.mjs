@@ -53,3 +53,24 @@ test('kilka bloków zakładek ma niezależne identyfikatory paneli',async()=>{
  assert.equal(ids.length,8);assert.equal(new Set(ids).size,8);
  for(const m of html.matchAll(/aria-controls="([^"]+)"/g))assert.ok(ids.includes(m[1]));
 });
+
+test('zwykła strona zachowuje adres nagłówka, Unicode i zwykłe listy wewnątrz prozy',async()=>{
+ const html=await render('## Inna nazwa {#ważne-terminy}\n\n::::proza\n\n- **Tytuł** — opis\n- **Drugi** — opis\n\n::::','strona');
+ assert.match(html,/<h2 id="ważne-terminy">Inna nazwa<\/h2>/);
+ assert.doesNotMatch(html,/class="dwa"|class="prose"|data-sekcja-id|\{#/);
+});
+
+test('na zwykłej stronie układ uruchamia wyłącznie jawny blok',async()=>{
+ const html=await render('## Program studiów\n\n:::kafelki\n\n- **A** — opis\n- **B** — opis\n\n:::','strona');
+ assert.match(html,/class="dwa"/);assert.doesNotMatch(html,/tablist/);
+});
+
+test('komentarz redakcyjny bez treści nie tworzy pustego opisu nad planem',async()=>{
+ const html=await render('<!-- PLAN ZAJĘĆ: instrukcja dla redaktora. -->','strona');
+ assert.equal(html.trim(),'');
+});
+
+test('pusta sekcja zwykłej strony nie trafia do HTML ani spisu',async()=>{
+ const html=await render('## Pusta\n\n<!-- Tylko komentarz. -->\n\n## AA\n\n::::proza\n\nTreść.\n\n::::','strona');
+ assert.doesNotMatch(html,/>Pusta</);assert.match(html,/<h2 id="aa">AA<\/h2>/);
+});

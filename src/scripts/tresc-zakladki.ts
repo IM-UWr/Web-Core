@@ -1,6 +1,8 @@
 // Każdy jawny blok zakładek działa niezależnie. Bez JS wszystkie panele pozostają widoczne.
-for (const group of document.querySelectorAll<HTMLElement>('.tresc[data-kierunek] .tresc-taby[role="tablist"], .tresc[data-specjalnosc] .tresc-taby[role="tablist"]')) {
+for (const group of document.querySelectorAll<HTMLElement>('.tresc .tresc-taby[role="tablist"]')) {
   const tabs = Array.from(group.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+  // Inne przełączniki (np. semestrów kalendarza) mają własną obsługę.
+  if (!tabs[0]?.id.startsWith('blok-') && !group.closest('[data-kierunek], [data-specjalnosc]')) continue;
   const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls') ?? ''));
   const pokaz = (i: number) => {
     tabs.forEach((tab, j) => {

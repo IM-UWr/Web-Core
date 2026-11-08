@@ -36,18 +36,34 @@ for (const file of await fs.readdir(path.join(target, '_cms/pracownicy'))) {
   assert.ok(data.etykieta && !choices.has(data.etykieta), `Niejednoznaczna pozycja listy opiekunów: ${file}`);
   choices.add(data.etykieta);
 }
-for (const name of ['kierunki', 'specjalnosci']) {
+async function markdownFiles(directory) {
+  const result = [];
+  for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await markdownFiles(file));
+    else if (entry.name.endsWith('.md')) result.push(file);
+  }
+  return result;
+}
+function codeFields(collection) {
+  for (const name of ['body', 'tresc_en', 'dalej', 'dalej_en']) {
+    const field = collection.fields.find((f) => f.name === name);
+    if (!field) continue;
+    assert.equal(field.type, 'code', `${collection.name}.${name}: brak kolorowanego edytora`);
+    assert.equal(field.options?.format, 'markdown');
+  }
+}
+for (const name of ['kierunki', 'specjalnosci', 'strony']) {
   const collection = config.content.find((c) => c.name === name);
   assert.ok(collection && collection.type === 'collection', `Brak formularza ${name}`);
   const names = collection.fields.map((f) => f.name);
-  assert.ok(names.indexOf('body') < names.indexOf('baner') && names.at(-1) === 'baner', `${name}: baner powinien być ostatni.`);
-  for (const field of ['body', 'tresc_en']) assert.equal(collection.fields.find((f) => f.name === field)?.type, 'code');
-  for (const file of await fs.readdir(path.join(target, collection.path))) {
-    if (!file.endsWith('.md')) continue;
-    const data = await readMd(path.join(target, collection.path, file));
+  if (name !== 'strony') assert.ok(names.indexOf('body') < names.indexOf('baner') && names.at(-1) === 'baner', `${name}: baner powinien być ostatni.`);
+  codeFields(collection);
+  for (const file of await markdownFiles(path.join(target, collection.path))) {
+    const data = await readMd(file);
     coverage(data, collection.fields, file);
     assert.equal(data.format_tresci, 'jawne', `${file}: brak jawnego formatu`);
-    assert.ok(data.baner, `${file}: brak scalonego banera`);
+    if (name !== 'strony') assert.ok(data.baner, `${file}: brak scalonego banera`);
     for (const coordinator of data.opiekunowie ?? []) {
       const id = path.posix.basename(coordinator.osoba ?? '').replace(/\.ya?ml$/, '');
       assert.ok(id && employees.has(id), `${file}: nieistniejący opiekun ${coordinator.osoba}`);
@@ -59,5 +75,14 @@ for (const name of ['kierunki', 'specjalnosci']) {
     if (name === 'specjalnosci') await fs.access(path.join(target, data.kierunek));
     entries++;
   }
+}
+for (const name of ['strona-dzialu', 'rok-akademicki']) {
+  const collection = config.content.find((c) => c.name === name);
+  assert.ok(collection, `Brak formularza ${name}`);
+  codeFields(collection);
+  const data = await readMd(path.join(target, collection.path));
+  coverage(data, collection.fields, collection.path);
+  assert.equal(data.format_tresci, 'jawne');
+  entries++;
 }
 console.log(`OK: ${entries} wpisów, ${coordinators} powiązań opiekunów; formularze zachowują wszystkie pola.`);

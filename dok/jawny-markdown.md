@@ -1,14 +1,16 @@
 # Jawny Markdown kierunków i specjalności
 
-Nowy format na branchu `markdown-jawne-bloki-2026-11`. Dotyczy kierunków i specjalności z Web-Studia. Dotychczasowy parser innych stron pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
+Nowy format na branchu `markdown-jawne-bloki-2026-11`. Dotyczy całej treści Markdown działu Studia w Web-Studia: kierunków, specjalności, pozostałych podstron oraz tekstów strony działu i Roku akademickiego. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
 
 ## Jeden formularz, jedna strona
 
-W Pages CMS otwórz **Web-Studia na nowym branchu**, następnie **Kierunki** albo **Specjalności**. Kolejność pól: nazwy PL/EN, treść Markdown PL/EN, powiązania i pozostałe dane, na końcu baner. Polski tekst jest treścią pliku `.md`, angielski polem `tresc_en`. Puste tłumaczenie oznacza pokazanie polskiej treści na stronie angielskiej.
+W Pages CMS otwórz **Web-Studia na nowym branchu**, następnie **Kierunki**, **Specjalności** albo **Strony**. Teksty `/studia` i `/studia/rok-akademicki` są odpowiednio w formularzach **Strona działu Studia** i **Rok akademicki**. Najpierw są nazwy PL/EN i treść Markdown PL/EN, poniżej dane; w kierunkach i specjalnościach baner jest na końcu. Polski tekst jest treścią pliku `.md`, angielski polem `tresc_en`. Puste tłumaczenie oznacza pokazanie polskiej treści na stronie angielskiej.
 
 W tych wpisach treść, dane i baner znajdują się razem. Nie ma osobnych formularzy „Treść” i „Baner i kafelek”. Nie zmieniaj nazw istniejących plików: to ich identyfikatory używane w adresach i powiązaniach.
 
 Pole `code` wyróżnia składnię. Wygląd strony sprawdzamy w osobnym zbudowanym podglądzie. Komentarze `<!-- ... -->` są instrukcjami redakcyjnymi i nie pojawiają się jako tekst na stronie.
+
+Dotyczy to również pól „Koniec strony” PL/EN Roku akademickiego. Dawny przełącznik „Bloki wzorca” w formularzach Studiów zastępują jawne znaczniki. Plan zajęć, kalendarz, terminy semestrów i zamiany dni nadal są generowane z danych; komentarze w plikach wyjaśniają, gdzie trafia część tekstowa. Nie trzeba przepisywać tych danych do Markdownu.
 
 ## Sekcje i kolejność
 
@@ -131,6 +133,6 @@ Workflow `markdown-jawne-test.yml` w Web-Podglad buduje tylko artefakt i zrzuty 
 
 ## Zakres migracji
 
-Przeniesiono 4 kierunki i 6 specjalności (5 z własnymi podstronami), obie wersje językowe, dane i banery. Wprowadzono jawne bloki, komentarze redakcyjne i opiekunów po ID, zachowując adresy i układ strony.
+Przeniesiono 4 kierunki i 6 specjalności (5 z własnymi podstronami), obie wersje językowe, dane i banery. Następnie ten sam jawny format zastosowano do pozostałych 15 wpisów w `src/content/strony/studia` (także z podfolderów) oraz `src/data/studia.md` i `src/data/rok-akademicki.md`: łącznie 27 wpisów. Wprowadzono komentarze redakcyjne i opiekunów po ID, zachowując adresy i układ strony. W zwykłych podstronach blok `proza` korzysta z istniejącego kontenera typografii; listy i tabele zachowują zwykły wygląd, dopóki redaktor nie wybierze specjalnego bloku.
 
 Nie obejmuje to pozostałych pomysłów z `cms-reorganizacja-2026-11`: ręcznego głównego menu, nowych statusów publikacji dla wszystkich kolekcji, zewnętrznych stron specjalności ani ogólnego porządkowania innych formularzy. Branch nie zmienia standardowego workflow publikacji.

@@ -29,7 +29,7 @@ export default function remarkJawneBloki() {
       }
       if (node.type === 'heading' && node.depth === 2) {
         const tail = node.children.at(-1);
-        const match = tail?.type === 'text' && /\s+\{#([a-z0-9][a-z0-9-]*)\}\s*$/.exec(tail.value);
+        const match = tail?.type === 'text' && /\s+\{#([\p{L}\p{N}][\p{L}\p{N}\p{M}_-]*)\}\s*$/u.exec(tail.value);
         if (match) {
           tail.value = tail.value.slice(0, match.index);
           node.data = { ...node.data, hProperties: { ...node.data?.hProperties, dataSekcjaId: match[1] } };
@@ -44,6 +44,8 @@ export default function remarkJawneBloki() {
           ...(node.attributes?.tytul ? { dataTytul: node.attributes.tytul } : {}),
         } };
       }
+      // Instrukcje redakcyjne nie są zawartością strony (także przy sprawdzaniu pustego tekstu).
+      if (node.children) node.children = node.children.filter((child) => !(child.type === 'html' && /^\s*<!--[\s\S]*?-->\s*$/.test(child.value)));
       node.children?.forEach(visit);
     };
     visit(tree);

@@ -67,6 +67,7 @@ const aktualnosci = defineCollection({
 const strony = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/strony' }),
   schema: z.object({
+    format_tresci: z.enum(['jawne']).optional(),
     tytul: z.string(),
     opis: optStr,
     tytul_en: optStr,

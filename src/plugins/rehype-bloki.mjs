@@ -407,6 +407,9 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
     const kind = n.properties?.dataBlok;
     if (!kind) return [n];
     if (kind === 'proza') {
+      // Zwykła strona ma już zewnętrzne .prose w swoim szablonie.
+      // Nie dodajemy drugiego kontenera zmieniającego odstępy pierwszych akapitów.
+      if (typ === 'strona') return transform(bloki(n));
       const out = []; let prose;
       for (const child of transform(bloki(n))) {
         const special = jestBlokiem(child) || child.type === 'comment' || ['dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski'].some((c) => child.properties?.className?.includes(c));
@@ -491,15 +494,30 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
       const id = n.properties?.dataSekcjaId || slug(label) || 'sekcja';
       if (usedIds.has(id)) fail(`Powtórzony identyfikator sekcji ${id}.`, n);
       usedIds.add(id); n.properties = { id: `${id}-h` };
+      if (typ === 'strona') {
+        n.properties = { id };
+        out.push(n); sections.push({ id, etykieta: label });
+        continue;
+      }
       current = el('section', null, [n], { id, ariaLabelledBy: `${id}-h`, ...(opcje.lang ? { lang: opcje.lang } : {}) });
       out.push(current); sections.push({ id, etykieta: label });
     } else (current ? current.children : out).push(...transform([n]));
   }
   const nonempty = (n) => (n.type !== 'comment' || /^wstaw:/.test(n.value)) && !(n.type === 'raw' && /^<!--/.test(n.value)) && !pusty(n);
+  if (typ === 'strona') {
+    const flat = out.filter((n, i) => {
+      if (!jest(n, 'h2')) return true;
+      let end = out.findIndex((x, j) => j > i && jest(x, 'h2'));
+      if (end < 0) end = out.length;
+      return out.slice(i + 1, end).some(nonempty);
+    });
+    tree.children = flat;
+    return sections.filter((s) => flat.some((n) => jest(n, 'h2') && n.properties.id === s.id));
+  }
   const visible = out.filter((n) => !jest(n, 'section') || n.children.slice(1).some(nonempty));
   tree.children = visible;
   const ids = new Set(visible.filter((n) => jest(n, 'section')).map((n) => n.properties.id));
-  return sections.filter((s) => ids.has(s.id));
+  return typ === 'strona' ? sections : sections.filter((s) => ids.has(s.id));
 }
 
 function sekcjeTresci(tree, ctx, opcje, typ) {
@@ -597,7 +615,7 @@ export default function rehypeBloki(options = {}) {
   const ctx = { slowo: en ? 'Step' : 'Krok', en, site: options.site ?? '', base: options.base ?? '/', polski: options.polski };
   return (tree, file) => {
     const fm = file?.data?.astro?.frontmatter ?? {};
-    for (const typ of ['kierunek', 'specjalnosc']) {
+    for (const typ of ['kierunek', 'specjalnosc', 'strona']) {
       if (fm[typ] && typeof fm[typ] === 'object') {
         fm[typ].sekcje = fm[typ].jawne ? jawnaSekcja(tree, { ...ctx, ...(typ === 'specjalnosc' ? { klasaRamki: fm[typ].klasaRamki } : {}) }, fm[typ], typ, file) : sekcjeTresci(tree, ctx, fm[typ], typ);
         return;

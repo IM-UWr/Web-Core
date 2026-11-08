@@ -26,7 +26,10 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
     .filter((l) => lang !== 'en' || l.etykieta_en)
     .map((l) => ({ n: l.n, n_en: l.n_en, pl: l.etykieta, en: l.etykieta_en }));
   const { Content, headings } = await render(strona);
-  const en = lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang, d.bloki === true) : undefined;
+  const jawne = d.format_tresci === 'jawne';
+  const en = jawne
+    ? await renderMarkdownZNaglowkami((lang === 'en' && d.tresc_en) || strona.body, lang, false, true)
+    : lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang, d.bloki === true) : undefined;
   const htmlEn = en?.html ?? '';
   const naglowki = en ? en.naglowki : headings;
   const tylkoPolski = lang === 'en' && !d.tresc_en;
