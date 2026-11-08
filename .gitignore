@@ -102,3 +102,4 @@ Thumbs.db
 
 # Lokalne wyniki porównania i testów jawnego Markdownu
 .test-jawne/
+.test-proza/

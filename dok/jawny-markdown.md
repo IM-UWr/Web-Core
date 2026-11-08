@@ -10,6 +10,8 @@ W tych wpisach treść, dane i baner znajdują się razem. Nie ma osobnych formu
 
 Pole `code` wyróżnia składnię. Wygląd strony sprawdzamy po jej przebudowaniu. Komentarze `<!-- ... -->` są instrukcjami redakcyjnymi i nie pojawiają się jako tekst na stronie.
 
+Zwykły tekst jest prozą domyślnie. Akapity, zwykłe listy i tabele nie wymagają otaczania przez `:::proza` ani `::::proza`. Znaczniki są potrzebne do specjalnych układów. Dawne otoczki `proza` nadal są obsługiwane dla zgodności.
+
 Dotyczy to również pól „Koniec strony” PL/EN Roku akademickiego. Dawny przełącznik „Bloki wzorca” w formularzach Studiów zastępują jawne znaczniki. Plan zajęć, kalendarz, terminy semestrów i zamiany dni nadal są generowane z danych; komentarze w plikach wyjaśniają, gdzie trafia część tekstowa. Nie trzeba przepisywać tych danych do Markdownu.
 
 ## Sekcje i kolejność
@@ -28,7 +30,7 @@ Kolejność sekcji i bloków w Markdownie jest kolejnością na stronie. Nazwy �
 
 | Znacznik | Efekt i zawartość |
 |-|-|
-| `:::proza` | Typografia zwykłego tekstu: akapity, nagłówki, zwykłe listy i tabele. Jawne bloki wewnątrz zachowują własny wygląd. |
+| `:::proza` | Opcjonalny zapis zgodności: akapity, zwykłe listy i tabele są prozą również bez tej otoczki. |
 | `:::kafelki` | Lista `- **Tytuł** — opis`, dalsze linie mogą zawierać pary i przyciski. |
 | `:::specjalnosci` | Kafelki specjalności w treści kierunku. Taka sama budowa jak kafelków; opcjonalna para `Etykieta: AD` tworzy mały podpis. |
 | `:::etapy` | Oś: lista `1. **Semestry 1–2: Tytuł** — opis`, dalsze linie w obrębie punktu. |
