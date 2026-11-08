@@ -6,11 +6,18 @@ import YAML from 'yaml';
 const target=path.resolve(process.argv[2]??'../Web-Studia');
 const dir=path.join(target,'_cms/pracownicy');await fs.mkdir(dir,{recursive:true});
 const names=new Set();
+const employees=[];
 for(const file of await fs.readdir('src/content/pracownicy')){
  if(!/\.ya?ml$/.test(file))continue;
  const data=YAML.parse(await fs.readFile(path.join('src/content/pracownicy',file),'utf8'));
  if(data.opublikowany===false)continue;
- names.add(file);await fs.writeFile(path.join(dir,file),YAML.stringify({imie_nazwisko:data.imie_nazwisko,id:file.replace(/\.ya?ml$/,'')}));
+ employees.push({file,data});
+}
+for(const {file,data} of employees){
+ const duplicates=employees.filter(e=>e.data.imie_nazwisko===data.imie_nazwisko).length>1;
+ const group={nauczyciel:'nauczyciel akademicki',administracja:'administracja',doktorant:'doktorant',emeryt:'emeryt'}[data.grupa]??data.grupa;
+ const etykieta=data.imie_nazwisko+(duplicates?` (${group??file.replace(/\.ya?ml$/,'')})`:'');
+ names.add(file);await fs.writeFile(path.join(dir,file),YAML.stringify({imie_nazwisko:data.imie_nazwisko,id:file.replace(/\.ya?ml$/,''),etykieta}));
 }
 for(const file of await fs.readdir(dir))if(/\.ya?ml$/.test(file)&&!names.has(file))await fs.unlink(path.join(dir,file));
 console.log(`Katalog opiekunów: ${names.size} osób. Zmiany katalogu zapisz na tym samym branchu Web-Studia.`);

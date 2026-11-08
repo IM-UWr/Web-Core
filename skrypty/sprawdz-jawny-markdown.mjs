@@ -29,6 +29,13 @@ for (const file of await fs.readdir('src/content/pracownicy')) {
   if (data.opublikowany !== false) employees.set(file.replace(/\.ya?ml$/, ''), data);
 }
 let entries = 0, coordinators = 0;
+const choices = new Set();
+for (const file of await fs.readdir(path.join(target, '_cms/pracownicy'))) {
+  if (!/\.ya?ml$/.test(file)) continue;
+  const data = YAML.parse(await fs.readFile(path.join(target, '_cms/pracownicy', file), 'utf8'));
+  assert.ok(data.etykieta && !choices.has(data.etykieta), `Niejednoznaczna pozycja listy opiekunów: ${file}`);
+  choices.add(data.etykieta);
+}
 for (const name of ['kierunki', 'specjalnosci']) {
   const collection = config.content.find((c) => c.name === name);
   assert.ok(collection && collection.type === 'collection', `Brak formularza ${name}`);
