@@ -32,15 +32,16 @@ const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
 // pola stron działów (zlecenie 30: src/data/<dział>.md w repozytoriach działów)
 const DANE: Record<Dzial, any> = { instytut: polaDzialu('instytut'), nauka: polaDzialu('nauka'), studia: polaDzialu('studia'), popularyzacja: dzPopularyzacja };
-const dzialy = DZIALY.map((dz) => {
+const dzialy = menu.flatMap((m) => {
+  const dz = DZIALY.find((dz) => PATRONI[dz].adres === m.adres);
+  if (!dz) return [];
   const P = PATRONI[dz];
-  const m = menu.find((p) => p.adres === P.adres);
-  return {
+  return [{
     dz, P,
-    nazwa: (m && (wybierz(m, 'etykieta', lang) as string)) || pole(P, 'nazwa', lang),
+    nazwa: wybierz(m, 'etykieta', lang) as string,
     // hasło z danych działu (to samo co w banerze na telefonie), a gdy puste — z prototypu
     haslo: (wybierz(DANE[dz], 'haslo', lang) as string) || pole(P, 'haslo', lang),
-  };
+  }];
 });
 const baner = ustawienia.baner;
 const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');

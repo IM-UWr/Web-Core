@@ -71,13 +71,6 @@ const enAdres = lang === 'en' ? sciezka : inny;
 const ogObraz = absolute(obraz || ustawienia.baner.zdjecie, Astro.site);
 // Wersja testowa na github.io nie powinna trafiać do Google (docelowo strona będzie pod domeną UWr).
 const testowa = (Astro.site?.hostname ?? '').endsWith('github.io');
-// Tło strony i oprawa sekcji (Ustawienia → „Tło strony”, „Sekcje”; style w src/styles/tlo.css).
-// tlo_strony: pole | kratka | penrose | zmierzch | fale | brak (stare true/false z pola-przełącznika = pole / brak).
-const tloUst = (ustawienia as any).tlo_strony;
-const tlo = tloUst === true ? 'pole' : ['pole', 'kratka', 'penrose', 'zmierzch', 'fale'].includes(tloUst) ? tloUst : undefined;
-// sekcje: pasy | linia | karty | brak (bez pola w ustawieniach — pasy).
-const sekcjeUst = (ustawienia as any).sekcje ?? 'pasy';
-const sekcje = ['pasy', 'linia', 'karty'].includes(sekcjeUst) ? sekcjeUst : undefined;
 // dział strony (kolory działu na komputerze); strona główna, Aktualności i strony ogólne — bez działu (granat)
 const dzialStrony = dzialZeSciezki(sciezka);
 ---
@@ -131,7 +124,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
     ] }))} />
     <slot name="head" />
   </head>
-  <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
+  <body data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
     <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
     {/* komputer: pasek menu na banerze (strona główna ma go pod okładką); telefon: nagłówek (Naglowek.astro). Panel menu jest jeden, przy pasku (PanelMenu.astro) */}
     {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} />}

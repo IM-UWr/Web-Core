@@ -14,10 +14,10 @@
 // SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
 import Szkic from './Szkic.astro';
 import Link from '../Link.astro';
-import { menuGlowne, rekrutacja, sciezkaBezJezyka, pasujeDoSciezki } from '../../lib/menu';
+import { menuGlowne, sciezkaBezJezyka, pasujeDoSciezki } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
-import { PATRONI, DZIALY, dzialZeSciezki, pole, skrotNazwy } from '../../lib/patroni';
+import { PATRONI, DZIALY, dzialZeSciezki, skrotNazwy } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
 interface Props { lang: Lang; id: string; sciezka: string; jasny?: boolean; class?: string }
@@ -25,26 +25,20 @@ const { lang, id, sciezka, jasny = false, class: klasa } = Astro.props;
 const en = lang === 'en';
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
-const rek = await rekrutacja(lang);
-const dzialy = DZIALY.map((dz) => {
-  const P = PATRONI[dz];
-  const m = menu.find((p) => p.adres === P.adres);
-  return {
-    dz, P,
-    nazwa: (m && wybierz(m, 'etykieta', lang)) || pole(P, 'nazwa', lang),
-    grupy: (m?.grupy ?? [])
-      .map((g) => ({ nazwa: wybierz(g, 'nazwa', lang) as string, linki: g.linki.filter((l) => l.adres !== rek.adres) }))
-      .filter((g) => g.linki.length > 0),
-  };
-});
-const akt = menu.find((p) => p.adres === '/aktualnosci');
+const pozycje = menu.map((m, i) => ({
+  dz: DZIALY.find((dz) => PATRONI[dz].adres === m.adres),
+  klucz: `pozycja-${i}`, adres: m.adres, nazwa: wybierz(m, 'etykieta', lang),
+  grupy: (m.grupy ?? []).map((g) => ({ nazwa: wybierz(g, 'nazwa', lang), linki: g.linki })),
+}));
 const tu = sciezkaBezJezyka(sciezka);
-const linki = dzialy.flatMap((d) => d.grupy.flatMap((g) => g.linki.map((l) => ({ dz: d.dz, adres: l.adres }))));
+const linki = pozycje.flatMap((d) => d.grupy.flatMap((g) => g.linki.map((l) => ({ dz: d.dz, klucz: d.klucz, adres: l.adres }))));
 const biezacy = linki.filter((l) => pasujeDoSciezki(tu, l.adres)).sort((a, b) => b.adres.length - a.adres.length)[0];
 // dział ze ścieżki (strona działu nie ma swojego linku w grupach), chyba że link tej strony stoi tylko w innym dziale: wtedy dział
 // z linkiem, żeby bieżąca strona była widoczna. Ten sam adres w dwóch działach (Szkoła doktorska: Nauka i Studia): oznaczony w tym ze ścieżki.
 const zeSciezki = dzialZeSciezki(sciezka);
 const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres === biezacy.adres) ? zeSciezki : biezacy.dz;
+const pozycjaBiezaca = pozycje.find((p) => p.dz && p.dz === dzialBiezacy)?.klucz
+  ?? biezacy?.klucz ?? pozycje.find((p) => pasujeDoSciezki(tu, p.adres))?.klucz;
 ---
 <nav class:list={['z-menu', jasny && 'z-menu-jasny', klasa]} id={id} aria-label={en ? 'Main menu' : 'Menu główne'} tabindex="-1" data-z-menu>
   <span class="z-zamknij"><button type="button" data-z-menu-zamknij aria-label={t(lang, 'zamknijMenu')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></span>
@@ -53,18 +47,18 @@ const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres
     <label class="sr-only" for={`${id}-q`}>{t(lang, 'szukaj')}</label>
     <input id={`${id}-q`} type="search" name="q" placeholder={en ? 'Search the website' : 'Szukaj na stronie'} autocomplete="off" />
   </form>
-  {dzialy.map((d) => (
-    <section data-dzial={d.dz} data-biezacy={d.dz === dzialBiezacy ? '' : undefined}>
-      <Szkic dzial={d.dz} rodzaj="sygnet" class="z-menu-sygnet" />
+  {pozycje.map((d) => (
+    <section class:list={[d.grupy.length === 0 && 'duza']} data-dzial={d.dz} data-biezacy={d.klucz === pozycjaBiezaca ? '' : undefined}>
+      {d.dz && <Szkic dzial={d.dz} rodzaj="sygnet" class="z-menu-sygnet" />}
       <h2>
-        <a href={href(d.P.adres)} aria-current={tu === d.P.adres ? 'page' : undefined}>{d.nazwa}</a>
+        <Link href={href(d.adres)} aria-current={(d.grupy.length ? tu === d.adres : pasujeDoSciezki(tu, d.adres)) ? 'page' : undefined}>{d.nazwa}</Link>
         {d.grupy.length > 0 && (
-          <button type="button" class="z-menu-rozwin" aria-expanded="false" aria-controls={`${id}-${d.dz}`} aria-label={`${en ? 'Show pages' : 'Pokaż podstrony'}: ${d.nazwa}`} data-z-menu-rozwin>
+          <button type="button" class="z-menu-rozwin" aria-expanded="false" aria-controls={`${id}-${d.klucz}`} aria-label={`${en ? 'Show pages' : 'Pokaż podstrony'}: ${d.nazwa}`} data-z-menu-rozwin>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
           </button>
         )}
       </h2>
-      <div class="z-menu-grupy" id={`${id}-${d.dz}`}>
+      <div class="z-menu-grupy" id={`${id}-${d.klucz}`}>
         <div class="z-menu-grupy-w">
           {d.grupy.map((g) => (
             <div class="z-menu-grupa">
@@ -72,7 +66,7 @@ const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres
               <ul>{g.linki.map((l) => {
                 const e = wybierz(l, 'etykieta', lang) as string;
                 const sk = skrotNazwy(e);
-                return <li><Link href={href(l.adres)} title={sk ? e : undefined} aria-current={d.dz === dzialBiezacy && l.adres === biezacy?.adres ? 'page' : undefined}>{sk ?? e}</Link></li>;
+                return <li><Link href={href(l.adres)} title={sk ? e : undefined} aria-current={d.klucz === pozycjaBiezaca && l.adres === biezacy?.adres ? 'page' : undefined}>{sk ?? e}</Link></li>;
               })}</ul>
             </div>
           ))}
@@ -80,6 +74,4 @@ const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres
       </div>
     </section>
   ))}
-  <section class="duza"><h2><a href={href('/aktualnosci')} aria-current={pasujeDoSciezki(tu, '/aktualnosci') ? 'page' : undefined}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
-  <section class="duza"><h2><Link href={href(rek.adres)}>{rek.etykieta}</Link></h2></section>
 </nav>

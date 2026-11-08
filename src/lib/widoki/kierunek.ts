@@ -1,5 +1,5 @@
 // Dane strony kierunku studiów (Kierunek.astro), zlecenie 28: treść z jednego Markdownu (body / tresc_en; sekcje po ##,
-// bloki z tekstu — src/plugins/rehype-bloki.mjs), baner z kolekcji kierunki_baner i kafelki specjalności z ich formularzy „Baner i kafelek”.
+// bloki z tekstu — src/plugins/rehype-bloki.mjs), baner z kolekcji kierunki_baner i kafelki specjalności z formularzy specjalności.
 import type { CollectionEntry } from 'astro:content';
 import { zTytulem } from '../osoby';
 import { wybierz } from '../i18n';
@@ -13,7 +13,7 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
   const d = kierunek.data;
   const w = (o: any, pole: string) => wybierz(o, pole, lang);
   const nazwyZakladow = Object.fromEntries((await zaklady()).map((z) => [z.id, z]));
-  // Kafelki specjalności budują się z formularza „Baner i kafelek” specjalności (src/lib/specjalnosci.ts) — jedno miejsce edycji.
+  // Kafelki specjalności budują się z formularza specjalności specjalności (src/lib/specjalnosci.ts) — jedno miejsce edycji.
   const osoby = await pracownicy();
   const zTytulemZeSpisu = (n: string) => {
     const kand = osoby.filter((p) => p.data.imie_nazwisko === n.trim());

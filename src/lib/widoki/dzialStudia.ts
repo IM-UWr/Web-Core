@@ -38,7 +38,7 @@ export async function daneDzialuStudia(lang: Lang) {
   ].filter((x) => x.n > 0);
 
   // Kafelki: grupy i linki z menu „Studia” (kierunki wstawiane automatycznie; nowy link w menu sam pojawi się tutaj).
-  const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Studia' || m.etykieta_en === 'Study');
+  const pozycja = (await menuGlowne()).find((m) => m.adres === '/studia');
   const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
   // „O studiach” — Treść strony działu (zlecenie 30: src/data/studia.md, Web-Studia „Strona działu Studia”, Markdown) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”

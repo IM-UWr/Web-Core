@@ -14,6 +14,8 @@ jakości”) i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
   w repozytorium treści usuwa go też ze strony.
 - Opcja --lokalnie <katalog>: zamiast pobierać z GitHuba, bierze repozytoria z podkatalogów <katalog>/<Repo>/
   (do testów).
+- Opcja --scisle: wymaga wskazanej gałęzi we wszystkich repozytoriach, także lokalnych. Nie wraca do main.
+  Test reorganizacji: --galaz cms-reorganizacja-2026-11 --scisle.
 """
 import concurrent.futures
 import json
@@ -30,6 +32,7 @@ ORG = cfg['organizacja']
 REPOS = cfg['repozytoria']
 lokalnie = sys.argv[sys.argv.index('--lokalnie') + 1] if '--lokalnie' in sys.argv else None
 GALAZ = sys.argv[sys.argv.index('--galaz') + 1] if '--galaz' in sys.argv else 'main'
+SCISLE = '--scisle' in sys.argv
 
 
 def git(*a, cwd=None):
@@ -38,14 +41,24 @@ def git(*a, cwd=None):
 
 def pobierz(repo):
     if lokalnie:
-        return repo, os.path.join(lokalnie, repo), 'lokalnie'
+        kat = os.path.join(lokalnie, repo)
+        if not os.path.isdir(kat):
+            raise SystemExit(f'Brak lokalnego repozytorium: {kat}')
+        if SCISLE and git('branch', '--show-current', cwd=kat) != GALAZ:
+            raise SystemExit(f'{repo}: test wymaga lokalnej gałęzi {GALAZ}')
+        wersja = git('rev-parse', 'HEAD', cwd=kat) if os.path.isdir(os.path.join(kat, '.git')) else 'bez-git'
+        return repo, kat, f'lokalnie:{wersja}'
     cel = os.path.join(CACHE, repo)
     url = f'https://github.com/{ORG}/{repo}.git'
     try:
         if not git('ls-remote', '--heads', url):
+            if SCISLE:
+                raise SystemExit(f'{repo}: puste repozytorium nie może być źródłem ścisłego testu')
             return repo, None, 'puste'
         galaz = GALAZ
         if galaz != 'main' and not git('ls-remote', '--heads', url, galaz):
+            if SCISLE:
+                raise SystemExit(f'{repo}: brak wymaganej gałęzi {galaz}; test nie może użyć main')
             print(f'  {repo}: brak gałęzi {galaz}, biorę main')
             galaz = 'main'
         if os.path.isdir(os.path.join(cel, '.git')):
@@ -54,7 +67,7 @@ def pobierz(repo):
         else:
             shutil.rmtree(cel, ignore_errors=True)
             git('clone', '-q', '--depth', '1', '--branch', galaz, url, cel)
-        return repo, cel, git('rev-parse', '--short', 'HEAD', cwd=cel)
+        return repo, cel, git('rev-parse', 'HEAD', cwd=cel)
     except subprocess.CalledProcessError as e:
         raise SystemExit(f'Nie udało się pobrać {url}:\n{e.stderr}')
 
@@ -98,6 +111,8 @@ for repo, kat, wersja in wyniki:
     print(f'  {repo} ({wersja}): {n} plików')
 
 json.dump(sorted(zrodlo), open(MANIFEST, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+json.dump({'galaz': GALAZ, 'scisle': SCISLE, 'repozytoria': {r: v for r, _, v in wyniki}},
+          open(os.path.join(CACHE, 'zrodla.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 if bledy:
     print('\nTe same pliki w dwóch miejscach (każdy plik może pochodzić tylko z jednego repozytorium):')
     print('\n'.join('  ' + b for b in bledy))

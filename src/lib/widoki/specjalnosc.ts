@@ -1,7 +1,4 @@
-// Dane podstrony specjalności (Specjalnosc.astro), zlecenie 29: treść z jednego Markdownu (body / tresc_en; sekcje po ##, bloki
-// z tekstu — src/plugins/rehype-bloki.mjs, kotwice typu „specjalnosc” w kotwice.mjs), pola banera z formularza „Baner i kafelek”
-// (src/lib/specjalnosci.ts) i sekcje liczone z innych danych: seminaria (pole „Seminaria”), opiekunowie (dane ze spisu
-// pracowników) i ramka „Wybór specjalności” (link do terminów na stronie kierunku). Ich miejsce w HTML treści: <!--wstaw:nazwa-->.
+// Tekst, baner i powiązania specjalności pochodzą z jednego pliku w Web-Studia.
 import { getCollection } from 'astro:content';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';

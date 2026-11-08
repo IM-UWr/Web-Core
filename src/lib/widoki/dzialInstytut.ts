@@ -34,7 +34,7 @@ export async function daneDzialuInstytut(lang: Lang) {
   ].filter((x) => x.n > 0);
 
   // Kafelki: grupy i linki z menu „Instytut” (nowy link w menu sam pojawi się tutaj).
-  const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Instytut' || m.etykieta_en === 'Institute');
+  const pozycja = (await menuGlowne()).find((m) => m.adres === '/instytut');
   const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
   const sukcesy = (await aktualnosci()).filter((a) => a.data.rodzaj === 'sukces').slice(0, 3);
