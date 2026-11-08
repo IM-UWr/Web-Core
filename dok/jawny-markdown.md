@@ -1,14 +1,18 @@
 # Jawny Markdown kierunków i specjalności
 
-Format używany na `main` w Web-Studia i Web-Core. Dotyczy całej treści Markdown działu Studia w Web-Studia: kierunków, specjalności, pozostałych podstron oraz tekstów strony działu i Roku akademickiego. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
+Format używany w Web-Studia i Web-Popularyzacja. Dotyczy kierunków, specjalności, podstron Studiów, tekstów strony działu i Roku akademickiego oraz wszystkich tekstów działu Popularyzacja. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
 
 ## Jeden formularz, jedna strona
 
 W Pages CMS otwórz **Web-Studia na branchu main**, następnie **Kierunki**, **Specjalności** albo **Strony**. Teksty `/studia` i `/studia/rok-akademicki` są odpowiednio w formularzach **Strona działu Studia** i **Rok akademicki**. Najpierw są nazwy PL/EN i treść Markdown PL/EN, poniżej dane; w kierunkach i specjalnościach baner jest na końcu. Polski tekst jest treścią pliku `.md`, angielski polem `tresc_en`. Puste tłumaczenie oznacza pokazanie polskiej treści na stronie angielskiej.
 
+Teksty Popularyzacji są w **Web-Popularyzacja/main**: strona działu i podstrony mają te same jawne znaczniki. Karty działu i „W skrócie” nadal pochodzą z menu i pól formularza.
+
 W tych wpisach treść, dane i baner znajdują się razem. Nie ma osobnych formularzy „Treść” i „Baner i kafelek”. Nie zmieniaj nazw istniejących plików: to ich identyfikatory używane w adresach i powiązaniach.
 
 Pole `code` wyróżnia składnię. Wygląd strony sprawdzamy po jej przebudowaniu. Komentarze `<!-- ... -->` są instrukcjami redakcyjnymi i nie pojawiają się jako tekst na stronie.
+
+Zwykły tekst jest prozą domyślnie. Akapity, zwykłe listy i tabele nie wymagają otaczania przez `:::proza` ani `::::proza`. Znaczniki są potrzebne do specjalnych układów. Dawne otoczki `proza` nadal są obsługiwane dla zgodności.
 
 Dotyczy to również pól „Koniec strony” PL/EN Roku akademickiego. Dawny przełącznik „Bloki wzorca” w formularzach Studiów zastępują jawne znaczniki. Plan zajęć, kalendarz, terminy semestrów i zamiany dni nadal są generowane z danych; komentarze w plikach wyjaśniają, gdzie trafia część tekstowa. Nie trzeba przepisywać tych danych do Markdownu.
 
@@ -28,7 +32,7 @@ Kolejność sekcji i bloków w Markdownie jest kolejnością na stronie. Nazwy �
 
 | Znacznik | Efekt i zawartość |
 |-|-|
-| `:::proza` | Typografia zwykłego tekstu: akapity, nagłówki, zwykłe listy i tabele. Jawne bloki wewnątrz zachowują własny wygląd. |
+| `:::proza` | Opcjonalny zapis zgodności: akapity, zwykłe listy i tabele są prozą również bez tej otoczki. |
 | `:::kafelki` | Lista `- **Tytuł** — opis`, dalsze linie mogą zawierać pary i przyciski. |
 | `:::specjalnosci` | Kafelki specjalności w treści kierunku. Taka sama budowa jak kafelków; opcjonalna para `Etykieta: AD` tworzy mały podpis. |
 | `:::etapy` | Oś: lista `1. **Semestry 1–2: Tytuł** — opis`, dalsze linie w obrębie punktu. |

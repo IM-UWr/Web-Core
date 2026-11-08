@@ -27,12 +27,14 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
     .map((l) => ({ n: l.n, n_en: l.n_en, pl: l.etykieta, en: l.etykieta_en }));
   const { Content, headings } = await render(strona);
   const jawne = d.format_tresci === 'jawne';
+  const tylkoPolski = lang === 'en' && !d.tresc_en;
+  const popularyzacja = strona.id.startsWith('popularyzacja/');
+  const langTekstu = tylkoPolski ? 'pl' : lang;
   const en = jawne
-    ? await renderMarkdownZNaglowkami((lang === 'en' && d.tresc_en) || strona.body, lang, false, true)
+    ? await renderMarkdownZNaglowkami((lang === 'en' && d.tresc_en) || strona.body, langTekstu, false, { wstepPoH2: popularyzacja, limityLinii: popularyzacja && langTekstu === 'pl' })
     : lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang, d.bloki === true) : undefined;
   const htmlEn = en?.html ?? '';
   const naglowki = en ? en.naglowki : headings;
-  const tylkoPolski = lang === 'en' && !d.tresc_en;
 
   // Dział menu, do którego należy strona — do okruszków i bocznej nawigacji.
   const adres = '/' + strona.id;

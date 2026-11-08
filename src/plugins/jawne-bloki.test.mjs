@@ -74,3 +74,9 @@ test('pusta sekcja zwykłej strony nie trafia do HTML ani spisu',async()=>{
  const html=await render('## Pusta\n\n<!-- Tylko komentarz. -->\n\n## AA\n\n::::proza\n\nTreść.\n\n::::','strona');
  assert.doesNotMatch(html,/>Pusta</);assert.match(html,/<h2 id="aa">AA<\/h2>/);
 });
+
+test('jawna podstrona Popularyzacji zachowuje wyróżniony wstęp i wygląd ramki',async()=>{
+ const html=await render('## Dowolna nazwa {#sekcja}\n\nWstęp.\n\n:::ramka{tytul="Uwaga"}\n\nOpis.\n\n:::','strona',{wstepPoH2:true});
+ assert.match(html,/<p class="wst">Wstęp\.<\/p>/);
+ assert.match(html,/<blockquote><span class="etyk">Uwaga<\/span><p>Opis\.<\/p><\/blockquote>/);
+});

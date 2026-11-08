@@ -1,0 +1,48 @@
+name: Domyślna proza — test bez publikacji
+on:
+  workflow_dispatch:
+  push:
+    branches: [markdown-domyslna-proza-2026-11]
+permissions:
+  contents: read
+concurrency:
+  group: proza-domyslna-test
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: python3 skrypty/pobierz_tresci.py
+      - run: npm ci --no-audit --no-fund
+      - name: Migracja wyłącznie lokalnej kopii treści
+        run: |
+          mkdir -p .test-jawne
+          cp .tresci/zrodla.json .test-jawne/zrodla-przed-migracja.json
+          node skrypty/usun-otoczki-proza.mjs .tresci/Web-Studia --zapisz
+          python3 skrypty/pobierz_tresci.py --lokalnie .tresci
+          node skrypty/sprawdz-jawny-markdown.mjs .tresci/Web-Studia
+      - run: npm run test:jawne
+      - run: npm run check
+      - name: Budowanie bez publikacji
+        env:
+          SITE_URL: https://im-uwr.github.io
+          BASE_PATH: /Web-Core
+        run: npm run build
+      - name: Widoki PL/EN komputer/telefon
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:jawne-ui
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proza-domyslna-podglad
+          retention-days: 14
+          include-hidden-files: true
+          path: |
+            dist/
+            .test-jawne/

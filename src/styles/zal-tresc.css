@@ -171,6 +171,17 @@ body .tresc .prose :is(h2 + h3, h2 + p + h3) { margin-top: 10px; }
 body .tresc .prose h4 { margin: 22px 0 4px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
 body .tresc .prose p { margin: 0 0 14px; max-width: 42.7em; font-size: inherit; line-height: inherit; }
 body .tresc .prose > p:first-child { color: var(--ink); }
+/* Proza domyślna w kierunkach i specjalnościach: kontener nie zeruje
+   odstępu podsekcji ani nie wyróżnia akapitu dopisanego po osi/kontaktach.
+   Zwykły początek sekcji zachowuje dotychczasowy kolor pierwszego akapitu. */
+body .tresc .prose[data-proza-domyslna] > p:first-child { color: inherit; }
+body .tresc section > h2 + .prose[data-proza-domyslna] > p:first-child,
+body .tresc > .prose[data-proza-domyslna]:first-child > p:first-child { color: var(--ink); }
+body .tresc .prose[data-proza-domyslna] > h3:first-child { margin-top: 30px; }
+body .tresc section > h2 + .prose[data-proza-domyslna] > h3:first-child { margin-top: 10px; }
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  body .tresc .prose[data-proza-domyslna] > h3:first-child { margin-top: 24px; }
+}
 body .tresc .prose ul { list-style: none; margin: 0 0 16px; padding: 0; max-width: 42.7em; }
 body .tresc .prose ul > li { position: relative; max-width: none; margin: 6px 0; padding-left: 24px; font-size: inherit; line-height: inherit; }
 body .tresc .prose ul > li::before { content: ''; position: absolute; left: 0; top: .84em; width: 12px; height: 2px; background: var(--d-a); }

@@ -396,6 +396,18 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
     if (b.length !== 1 || !jest(b[0], tag)) fail(`Blok ${node.properties.dataBlok} wymaga jednej listy ${tag}.`, node);
     return b[0];
   };
+  // Zwykły Markdown jest prozą domyślnie. Oddzielne znaczniki wymagane są
+  // wyłącznie dla specjalnych układów. Zachowujemy też dawne :::proza.
+  const prose = (nodes, implicit = false) => {
+    const out = []; let group;
+    for (const child of nodes) {
+      const special = jestBlokiem(child) || jest(child, 'section') || jest(child, 'h2') || child.type === 'comment'
+        || ['prose', 'dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski'].some((c) => child.properties?.className?.includes(c));
+      if (special) { out.push(child); group = undefined; }
+      else { if (!group) { group = el('div', 'prose', [], implicit ? { dataProzaDomyslna: '' } : {}); out.push(group); } group.children.push(child); }
+    }
+    return out;
+  };
   const transform = (nodes) => nodes.flatMap((n) => {
     const insert = n.properties?.dataWstawka;
     if (insert) {
@@ -410,13 +422,7 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
       // Zwykła strona ma już zewnętrzne .prose w swoim szablonie.
       // Nie dodajemy drugiego kontenera zmieniającego odstępy pierwszych akapitów.
       if (typ === 'strona') return transform(bloki(n));
-      const out = []; let prose;
-      for (const child of transform(bloki(n))) {
-        const special = jestBlokiem(child) || child.type === 'comment' || ['dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski'].some((c) => child.properties?.className?.includes(c));
-        if (special) { out.push(child); prose = undefined; }
-        else { if (!prose) { prose = el('div', 'prose'); out.push(prose); } prose.children.push(child); }
-      }
-      return out;
+      return prose(transform(bloki(n)));
     }
     if (kind === 'specjalnosci') {
       if (typ !== 'kierunek') fail('Kafelki specjalności należą do kierunku.', n);
@@ -477,7 +483,9 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
     if (kind === 'ramka') {
       const title = n.properties.dataTytul;
       if (!title) fail('Ramka wymaga etykiety: :::ramka{tytul="Dla kogo"}.', n);
-      return [el('div', 'uwaga', [el('span', 'etyk', [tekst(title)]), el('div', ctx.klasaRamki ?? null, transform(bloki(n)))])];
+      const label = el('span', 'etyk', [tekst(title)]), body = transform(bloki(n));
+      if (typ === 'strona') return [el('blockquote', null, [label, ...body])];
+      return [el('div', 'uwaga', [label, el('div', ctx.klasaRamki ?? null, body)])];
     }
     if (kind === 'zakladki') {
       const b = transform(bloki(n));
@@ -511,11 +519,17 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
       if (end < 0) end = out.length;
       return out.slice(i + 1, end).some(nonempty);
     });
+    // Typografia podstron Popularyzacji: pierwszy akapit po pierwszym
+    // nagłówku zachowuje dotychczasowe wyróżnienie niezależnie od jego nazwy.
+    const firstH2 = flat.findIndex((n) => jest(n, 'h2'));
+    const intro = flat[firstH2 + 1];
+    if (opcje.wstepPoH2 && firstH2 >= 0 && jest(intro, 'p')) intro.properties = { ...intro.properties, className: ['wst'] };
     tree.children = flat;
     return sections.filter((s) => flat.some((n) => jest(n, 'h2') && n.properties.id === s.id));
   }
   const visible = out.filter((n) => !jest(n, 'section') || n.children.slice(1).some(nonempty));
-  tree.children = visible;
+  for (const section of visible.filter((n) => jest(n, 'section'))) section.children = [section.children[0], ...prose(section.children.slice(1), true)];
+  tree.children = prose(visible, true);
   const ids = new Set(visible.filter((n) => jest(n, 'section')).map((n) => n.properties.id));
   return typ === 'strona' ? sections : sections.filter((s) => ids.has(s.id));
 }

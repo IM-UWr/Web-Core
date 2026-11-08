@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'parse5';
 const root=process.cwd();
+const baseArg=process.argv.indexOf('--baza');
+const baseline=path.resolve(baseArg<0?'.test-jawne/baseline':process.argv[baseArg+1]);
 function snapshot(html){
  const tree=parse(html);const walk=(n,fn)=>{if(['script','style'].includes(n.tagName))return;fn(n);n.childNodes?.forEach(c=>walk(c,fn));};
  const attr=(n,k)=>n.attrs?.find(a=>a.name===k)?.value;
@@ -15,9 +17,9 @@ function snapshot(html){
 }
 const files=[];
 async function list(dir,prefix=''){for(const d of await fs.readdir(dir,{withFileTypes:true})){const f=path.join(dir,d.name),rel=path.join(prefix,d.name);if(d.isDirectory())await list(f,rel);else if(d.name==='index.html'&&(process.argv.includes('--wszystkie')||/(^|[\\/])studia[\\/](matematyka|isim|siad|szkola-doktorska)([\\/]|$)/.test(rel)))files.push(rel);}}
-await list(path.join(root,'.test-jawne/baseline'));
+await list(baseline);
 const differences=[];
-for(const f of files){const a=snapshot(await fs.readFile(path.join(root,'.test-jawne/baseline',f),'utf8')),b=snapshot(await fs.readFile(path.join(root,'dist',f),'utf8'));if(!a||!b)continue;
+for(const f of files){const a=snapshot(await fs.readFile(path.join(baseline,f),'utf8')),b=snapshot(await fs.readFile(path.join(root,'dist',f),'utf8'));if(!a||!b)continue;
  const diff={file:f};for(const k of ['text','links','ids','classes','headings','banner'])if(JSON.stringify(a[k])!==JSON.stringify(b[k])){
   if(k==='text'){const i=[...a.text].findIndex((c,i)=>c!==b.text[i]);diff.text={at:i,before:a.text.slice(Math.max(0,i-80),i+250),after:b.text.slice(Math.max(0,i-80),i+250)};}
   else diff[k]={before:a[k],after:b[k]};
