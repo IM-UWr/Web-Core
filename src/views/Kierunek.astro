@@ -59,31 +59,7 @@ const { nazwa, przed, po, sekcje, specjalnosci, nazwyZakladow, opis, lead, haslo
 </Podstrona>
 
 <script>
-  // Program studiów: zakładki programów (.tresc-taby, role="tablist"; z ### w sekcji „Program studiów”).
-  // Bez JS: zakładki schowane, wszystkie programy jeden pod drugim (z podpisami).
-  const box = document.querySelector<HTMLElement>('[data-kierunek]');
-  const tabs = Array.from(box?.querySelectorAll<HTMLButtonElement>('.tresc-taby [role="tab"]') ?? []);
-  const panels = Array.from(box?.querySelectorAll<HTMLElement>('[data-panel]') ?? []);
-  const pokaz = (i: number) => {
-    tabs.forEach((t, j) => {
-      t.setAttribute('aria-selected', String(i === j));
-      t.tabIndex = i === j ? 0 : -1;
-    });
-    panels.forEach((p, j) => (p.hidden = i !== j));
-  };
-  if (tabs.length) {
-    pokaz(0);
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => pokaz(i));
-      t.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-          const j = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-          pokaz(j);
-          tabs[j].focus();
-        }
-      });
-    });
-  }
+  import '../scripts/tresc-zakladki';
 </script>
 
 <style>
@@ -105,10 +81,10 @@ const { nazwa, przed, po, sekcje, specjalnosci, nazwyZakladow, opis, lead, haslo
   :global(.tresc[data-kierunek] .faq summary) { min-height: 0; align-items: flex-start; font-weight: 400; }
 
   /* specjalności (ul.dwa): etykieta skrótu, nazwa, opis i pary; nazwa-link jak tytuł, bez podkreślenia */
-  .kier-spec li > b a { color: inherit; text-decoration: none; }
-  .kier-spec li > b a:hover { color: var(--d-a); }
-  .kier-spec li > b a::after { content: ' →'; font-family: var(--f-text); font-size: 15px; color: var(--muted); }
-  .kier-spec dl { margin-top: 8px; }
+  :global(.tresc[data-kierunek] .kier-spec li > b a) { color: inherit; text-decoration: none; }
+  :global(.tresc[data-kierunek] .kier-spec li > b a:hover) { color: var(--d-a); }
+  :global(.tresc[data-kierunek] .kier-spec li > b a::after) { content: ' →'; font-family: var(--f-text); font-size: 15px; color: var(--muted); }
+  :global(.tresc[data-kierunek] .kier-spec dl) { margin-top: 8px; }
 
   @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     /* szerokość rzędu faktów (do ciekawostki z prawej, bez drugiego rzędu) ustawia skrypt w NaglowekZ.astro */

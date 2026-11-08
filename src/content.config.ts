@@ -67,6 +67,7 @@ const aktualnosci = defineCollection({
 const strony = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/strony' }),
   schema: z.object({
+    format_tresci: z.enum(['jawne']).optional(),
     tytul: z.string(),
     opis: optStr,
     tytul_en: optStr,
@@ -210,28 +211,7 @@ const zaklady = defineCollection({
 // lista z pola CMS (puste = brak pozycji)
 const lista = <T extends z.ZodTypeAny>(item: T) => z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(item));
 
-// Kierunek (zlecenie 28): jeden Markdown — treść polska w pliku (body), angielska w tresc_en (puste = polska z lang="pl").
-// Sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs), wygląd w src/views/Kierunek.astro.
-// Baner w kolekcji kierunki_baner (ten sam id), menu i kafelki w Ustawieniach (studia.kierunki), przypomnienia o terminach
-// w src/data/przypomnienia.json (src/lib/kierunki.ts, src/lib/tresci.ts).
-const kierunki = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/kierunki' }),
-  schema: z.object({
-    nazwa: z.string(),
-    nazwa_en: optStr,
-    tresc_en: optStr,
-    opublikowany: published,
-  }),
-});
-
-// Baner kierunku (src/content/kierunki-baner/<id kierunku>.json; osobny formularz, bo Pages CMS przy zapisie usuwa z pliku pola
-// spoza formularza). Brak pliku: baner z samą nazwą (bez zdania, liczb i hasła), opis strony (meta) = pierwsze zdanie treści.
-// kierunek — nazwa pliku kierunku (w formularzu z niej powstaje nazwa nowego pliku banera; strona bierze id z nazwy pliku).
-// liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
-// na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
-const kierunki_baner = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
-  schema: z.object({
+const banerKierunkuSchema = z.object({
     kierunek: optStr,
     podtytul: optStr,
     podtytul_en: optStr,
@@ -239,31 +219,14 @@ const kierunki_baner = defineCollection({
     opis_en: optStr,
     ...haslo,
     liczby: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr, etykieta_krotka: optStr, etykieta_krotka_en: optStr })),
-  }),
 });
-
-// Podstrona specjalności (np. /studia/matematyka/analiza-danych), zlecenie 29: formularz „Treść” — jeden Markdown jak kierunek
-// (body po polsku, tresc_en po angielsku; puste = polska z lang="pl"), sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs,
-// kotwice typu „specjalnosc” w kotwice.mjs), wygląd w src/views/Specjalnosc.astro. Pola banera i kafelka na stronie kierunku —
-// osobny formularz i plik w kolekcji specjalnosci_baner (ten sam id; src/lib/specjalnosci.ts).
-const specjalnosci = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/specjalnosci' }),
-  schema: z.object({
-    nazwa: z.string(),
-    nazwa_en: optStr,
-    tresc_en: optStr,
-    opublikowany: published,
-  }),
+const banerSpecjalnosciSchema = z.object({
+  opis: optStr, opis_en: optStr, ...haslo, skrot: optStr, poziom: optStr, poziom_en: optStr,
+  liczby: liczbyBanera,
 });
-
-// „Baner i kafelek” specjalności (src/content/specjalnosci-baner/<id specjalności>.json; osobny formularz, bo Pages CMS przy zapisie
-// usuwa z pliku pola spoza formularza). Brak pliku: wartości domyślne (kierunek matematyka, kafelek na stronie kierunku, bez
-// banera i opiekunów) — src/lib/specjalnosci.ts. zrodla i do_uzupelnienia — pola ukryte w formularzu (notatki redakcyjne).
-const specjalnosci_baner = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/specjalnosci-baner' }),
-  schema: z.object({
+const polaSpecjalnosci = {
     kierunek: z.preprocess((v) => idWpisu(empty(v)), z.string().default('matematyka')),
-    // kafelek na stronie kierunku budowany z tego pliku (jedno miejsce edycji)
+    // Wyłącznie stary format kafelków; nowy format kierunku ma jawne :::specjalnosci.
     kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
     na_stronie_kierunku: z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean()),
     bez_podstrony: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
@@ -277,14 +240,63 @@ const specjalnosci_baner = defineCollection({
     opis: optStr,
     opis_en: optStr,
     zaklad: optId,
-    opiekunowie: lista(z.object({ imie_nazwisko: z.string(), rola: optStr, rola_en: optStr })),
+    opiekunowie: lista(z.object({ imie_nazwisko: optStr, osoba: optId, rola: optStr, rola_en: optStr })),
     // identyfikatory seminariów (pliki z src/content/seminaria) związanych ze specjalnością — sekcja „Seminaria”
     seminaria: idList,
     wygaszana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
     zrodla: strList,
     do_uzupelnienia: strList,
     ...haslo,
+};
+const jawnyFormat = z.enum(['jawne']).optional();
+const schematSpecjalnosci = z.object({
+  ...polaSpecjalnosci, nazwa: z.string(), nazwa_en: optStr, tresc_en: optStr,
+  format_tresci: jawnyFormat, baner: banerSpecjalnosciSchema.optional(), opublikowany: published,
+});
+
+// Kierunek (zlecenie 28): jeden Markdown — treść polska w pliku (body), angielska w tresc_en (puste = polska z lang="pl").
+// Sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs), wygląd w src/views/Kierunek.astro.
+// Nowy format: format_tresci=jawne, baner w tym wpisie; kierunki_baner pozostaje zgodnością.
+// Menu i kafelki działu Studia: Ustawienia (studia.kierunki), przypomnienia o terminach
+// w src/data/przypomnienia.json (src/lib/kierunki.ts, src/lib/tresci.ts).
+const kierunki = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/kierunki' }),
+  schema: z.object({
+    format_tresci: jawnyFormat,
+    baner: banerKierunkuSchema.optional(),
+    nazwa: z.string(),
+    nazwa_en: optStr,
+    tresc_en: optStr,
+    opublikowany: published,
   }),
+});
+
+// Stary format banera kierunku (zgodność, nowy format ma pole baner w Markdownie).
+// src/content/kierunki-baner/<id kierunku>.json; osobny formularz, bo Pages CMS przy zapisie usuwa z pliku pola
+// spoza formularza). Brak pliku: baner z samą nazwą (bez zdania, liczb i hasła), opis strony (meta) = pierwsze zdanie treści.
+// kierunek — nazwa pliku kierunku (w formularzu z niej powstaje nazwa nowego pliku banera; strona bierze id z nazwy pliku).
+// liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
+// na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
+const kierunki_baner = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
+  schema: banerKierunkuSchema,
+});
+
+// Podstrona specjalności (np. /studia/matematyka/analiza-danych), zlecenie 29: formularz „Treść” — jeden Markdown jak kierunek
+// (body po polsku, tresc_en po angielsku; puste = polska z lang="pl"), sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs,
+// kotwice typu „specjalnosc” w kotwice.mjs), wygląd w src/views/Specjalnosc.astro. Pola banera i kafelka na stronie kierunku —
+// w nowym formacie: pole baner oraz relacje w tym samym wpisie. Specjalnosci_baner pozostaje zgodnością.
+const specjalnosci = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/specjalnosci' }),
+  schema: schematSpecjalnosci,
+});
+
+// „Baner i kafelek” specjalności (src/content/specjalnosci-baner/<id specjalności>.json; osobny formularz, bo Pages CMS przy zapisie
+// usuwa z pliku pola spoza formularza). Brak pliku: wartości domyślne (kierunek matematyka, kafelek na stronie kierunku, bez
+// banera i opiekunów) — src/lib/specjalnosci.ts. zrodla i do_uzupelnienia — pola ukryte w formularzu (notatki redakcyjne).
+const specjalnosci_baner = defineCollection({
+  loader: glob({ pattern: '*.json', base: './src/content/specjalnosci-baner' }),
+  schema: z.object(polaSpecjalnosci),
 });
 
 const konferencje = defineCollection({

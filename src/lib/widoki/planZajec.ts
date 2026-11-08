@@ -30,7 +30,7 @@ export async function danePlanuZajec(lang: Lang) {
   const en = lang === 'en';
   // tytuł, opis, hasło na telefonie (po angielsku tylko Hasło EN — bez polskich resztek) i tekst nad planem (html):
   // Web-Studia → Strony → Plan zajęć (src/content/strony/studia/plan-zajec.md; zlecenie 30, src/lib/tekstyStron.ts)
-  const { tytul, opis: lead, haslo, html } = await stronaListy('studia/plan-zajec', lang, { wst: true });
+  const { tytul, opis: lead, haslo, html, naglowki = [] } = await stronaListy('studia/plan-zajec', lang, { wst: true });
 
   // po angielsku nazwy typów z src/lib/en/plan.ts (zamiast kalk z USOS), potem z USOS
   const typPelny = (t: string) => (en && TYPY_EN[t]?.pelna) || dane.typy?.[t]?.[lang] || t;
@@ -112,9 +112,9 @@ export async function danePlanuZajec(lang: Lang) {
     NP: ['Przyrodnicze (NP)', 'Natural sciences (NP)'],
     inne: ['Pozostałe', 'Other'],
   };
-  const spisKomputer = (dane.kategorie || [])
+  const spisKomputer = [...naglowki.filter((h) => h.depth === 2).map((h) => ({ id: h.slug, etykieta: h.text, krotka: undefined })), ...(dane.kategorie || [])
     .filter((k) => semestry.some((x) => x.sekcje.some((s) => s.id === k.id)))
-    .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl, krotka: KROTKIE[k.id]?.[en ? 1 : 0] }));
+    .map((k) => ({ id: idKategorii(k.id), etykieta: en ? k.en : k.pl, krotka: KROTKIE[k.id]?.[en ? 1 : 0] }))];
 
   return { tytul, lead, html, haslo, typPelny, typKrotki, salaW, grupa, semestry, wiele, aktywny, liczby, idKategorii, spisKomputer };
 }

@@ -99,3 +99,6 @@ Thumbs.db
 /src/data/studia.md
 /src/data/ustawienia.json
 /src/data/wladze.json
+
+# Lokalne wyniki porównania i testów jawnego Markdownu
+.test-jawne/

@@ -14,6 +14,9 @@ jakości”) i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
   w repozytorium treści usuwa go też ze strony.
 - Opcja --lokalnie <katalog>: zamiast pobierać z GitHuba, bierze repozytoria z podkatalogów <katalog>/<Repo>/
   (do testów).
+- --zrodlo Repo=katalog nakłada wskazany lokalny checkout zamiast kopii tego repozytorium.
+- --wymagaj Repo przerywa pobieranie, jeśli Repo nie ma gałęzi podanej przez --galaz (bez powrotu do main).
+- .tresci/zrodla.json zapisuje pełne SHA pobranych repozytoriów; lokalne nakładki są opisane jako lokalne.
 """
 import concurrent.futures
 import json
@@ -30,6 +33,7 @@ ORG = cfg['organizacja']
 REPOS = cfg['repozytoria']
 lokalnie = sys.argv[sys.argv.index('--lokalnie') + 1] if '--lokalnie' in sys.argv else None
 GALAZ = sys.argv[sys.argv.index('--galaz') + 1] if '--galaz' in sys.argv else 'main'
+WYMAGANE = [sys.argv[i + 1] for i, arg in enumerate(sys.argv[:-1]) if arg == '--wymagaj']
 
 
 def git(*a, cwd=None):
@@ -37,6 +41,11 @@ def git(*a, cwd=None):
 
 
 def pobierz(repo):
+    overrides = [sys.argv[i + 1] for i, arg in enumerate(sys.argv[:-1]) if arg == '--zrodlo']
+    for entry in overrides:
+        name, directory = entry.split('=', 1)
+        if name == repo:
+            return repo, os.path.abspath(directory), 'lokalna nakładka robocza'
     if lokalnie:
         return repo, os.path.join(lokalnie, repo), 'lokalnie'
     cel = os.path.join(CACHE, repo)
@@ -46,6 +55,8 @@ def pobierz(repo):
             return repo, None, 'puste'
         galaz = GALAZ
         if galaz != 'main' and not git('ls-remote', '--heads', url, galaz):
+            if repo in WYMAGANE:
+                raise SystemExit(f'{repo}: wymagana gałąź {galaz} nie istnieje; przerywam test.')
             print(f'  {repo}: brak gałęzi {galaz}, biorę main')
             galaz = 'main'
         if os.path.isdir(os.path.join(cel, '.git')):
@@ -54,7 +65,7 @@ def pobierz(repo):
         else:
             shutil.rmtree(cel, ignore_errors=True)
             git('clone', '-q', '--depth', '1', '--branch', galaz, url, cel)
-        return repo, cel, git('rev-parse', '--short', 'HEAD', cwd=cel)
+        return repo, cel, git('rev-parse', 'HEAD', cwd=cel)
     except subprocess.CalledProcessError as e:
         raise SystemExit(f'Nie udało się pobrać {url}:\n{e.stderr}')
 
@@ -71,6 +82,8 @@ if os.path.exists(MANIFEST):
 # 2. pobierz repozytoria (równolegle)
 with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
     wyniki = list(ex.map(pobierz, REPOS))
+
+json.dump({r: wersja for r, _, wersja in wyniki}, open(os.path.join(CACHE, 'zrodla.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 
 # 3. nałóż src/ i public/
 zrodlo = {}

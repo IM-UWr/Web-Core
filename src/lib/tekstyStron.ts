@@ -11,7 +11,7 @@
 // np. „Czasopisma redagowane w Instytucie”): wtedy sekcja pod tym nagłówkiem (do następnego ##) idzie na miejsce swojej listy.
 import { getCollection } from 'astro:content';
 import { KOTWICE, klucz } from '../plugins/kotwice.mjs';
-import { renderMarkdownZNaglowkami } from './markdown';
+import { renderMarkdownZNaglowkami, type Naglowek } from './markdown';
 import { wybierz } from './i18n';
 import type { Lang } from './daty';
 
@@ -98,6 +98,7 @@ export interface Tekst {
   // html — tekst nad listą (pierwszy akapit z klasą wst, gdy opcja wst); sekcje — sekcje pod kotwicami strony (id kotwicy)
   html: string;
   sekcje: Record<string, Sekcja>;
+  naglowki?: Naglowek[];
 }
 
 // Podział Markdownu na tekst główny i sekcje pod kotwicami strony (nagłówki ## spoza bloków kodu).
@@ -128,14 +129,16 @@ function podziel(src: string, adres: string): { glowny: string; kotwiczone: { id
 }
 
 /** Markdown strony → HTML tekstu (z wtyczką bloków, gdy bloki) i sekcji pod kotwicami strony `adres`. */
-export async function renderTekstu(src: string | undefined, adres: string, lang: Lang, opcje: { bloki?: boolean; wst?: boolean } = {}): Promise<Tekst> {
-  const { glowny, kotwiczone } = podziel(src ?? '', adres);
-  const render = async (s: string) => (s ? (await renderMarkdownZNaglowkami(s, lang, opcje.bloki === true)).html : '');
-  let html = await render(glowny);
+export async function renderTekstu(src: string | undefined, adres: string, lang: Lang, opcje: { bloki?: boolean; wst?: boolean; jawne?: boolean } = {}): Promise<Tekst> {
+  // Jawny format nie przypisuje tekstu do miejsc w szablonie na podstawie nazwy nagłówka.
+  const { glowny, kotwiczone } = opcje.jawne ? { glowny: src ?? '', kotwiczone: [] } : podziel(src ?? '', adres);
+  const render = async (s: string) => (s ? (await renderMarkdownZNaglowkami(s, lang, opcje.bloki === true, opcje.jawne)).html : '');
+  const result = await renderMarkdownZNaglowkami(glowny, lang, opcje.bloki === true, opcje.jawne);
+  let html = result.html;
   if (opcje.wst) html = html.replace(/<p>/, '<p class="wst">');
   const sekcje: Record<string, Sekcja> = {};
   for (const s of kotwiczone) if (!sekcje[s.id]) sekcje[s.id] = { naglowek: s.naglowek, html: await render(s.tresc) };
-  return { html, sekcje };
+  return { html, sekcje, ...(opcje.jawne ? { naglowki: result.naglowki } : {}) };
 }
 
 /** Zawartość jednego akapitu (do tekstu w miejscu zwykłego <p>, np. opis sekcji), inaczej undefined. */
@@ -155,7 +158,7 @@ export async function stronaListy(id: StronaZLista, lang: Lang, opcje: { wst?: b
   }
   const d = wpis.data;
   // po angielsku: tytuł, opis i tekst — polskie, gdy pole EN puste; hasła — tylko pole EN (bez polskich resztek), jak dotąd
-  const tekst = await renderTekstu((en && d.tresc_en?.trim()) || wpis.body, `/${id}`, lang, { bloki: d.bloki === true, wst: opcje.wst });
+  const tekst = await renderTekstu((en && d.tresc_en?.trim()) || wpis.body, `/${id}`, lang, { bloki: d.bloki === true, wst: opcje.wst, jawne: d.format_tresci === 'jawne' });
   return {
     jest: true,
     tytul: wybierz(d, 'tytul', lang),
@@ -179,6 +182,6 @@ export async function stronaDzialu(dz: DzialZPlikiem, lang: Lang) {
   const plik = PLIKI_DZIALOW[`../data/${dz}.md`];
   const d = polaDzialu(dz);
   const zrodlo = (lang === 'en' && (d.tresc_en as string | undefined)?.trim()) || plik?.rawContent() || '';
-  const tekst = await renderTekstu(zrodlo, `/${dz}`, lang, { bloki: true, wst: true });
+  const tekst = await renderTekstu(zrodlo, `/${dz}`, lang, { bloki: true, wst: true, jawne: d.format_tresci === 'jawne' });
   return { d, tytul: wybierz(d, 'tytul', lang) || DOMYSLNY_TYTUL[dz][lang], ...tekst };
 }
