@@ -17,26 +17,29 @@ import type { Lang } from './daty';
 const procesory = new Map<string, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
 
 export interface Naglowek { depth: number; slug: string; text: string }
+type TrybJawny = boolean | { wstepPoH2?: boolean; limityLinii?: boolean };
 
 export async function renderMarkdown(src: string | undefined, lang: Lang = 'pl'): Promise<string> {
   return (await renderMarkdownZNaglowkami(src, lang)).html;
 }
 
 // bloki — pole „Bloki wzorca” strony: listy Markdown jako bloki wzorca treści (src/plugins/rehype-bloki.mjs)
-export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl', bloki = false, jawne = false): Promise<{ html: string; naglowki: Naglowek[] }> {
+export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl', bloki = false, jawne: TrybJawny = false): Promise<{ html: string; naglowki: Naglowek[] }> {
   if (!src) return { html: '', naglowki: [] };
-  const key = `${lang}:${jawne}`;
+  const format = typeof jawne === 'object' ? jawne : {};
+  const key = `${lang}:${Boolean(jawne)}:${Boolean(format.limityLinii)}`;
   let processor = procesory.get(key);
   if (!processor) {
+    const site = import.meta.env.SITE, base = import.meta.env.BASE_URL;
     processor = await createMarkdownProcessor({
       // wzory zapisane edytorem (Treść EN, Koniec strony — rich-text od zlecenia 30) — src/plugins/remark-wzory-edytora.mjs
       remarkPlugins: [remarkMath, remarkWzoryEdytora, ...(jawne ? [remarkDirective, remarkJawneBloki] : [])],
       // linki poza stronę: klasa zew (↗ z CSS) i ukryty dopisek „(inna strona)” / „(external site)” — zlecenie 14, zalecenie 23
-      rehypePlugins: [rehypeKatex, [rehypeBloki, { lang }], [rehypeBase, { base: import.meta.env.BASE_URL, lang }], [rehypeZewn, { site: import.meta.env.SITE, base: import.meta.env.BASE_URL, lang }]],
+      rehypePlugins: [rehypeKatex, [rehypeBloki, { lang, ...(format.limityLinii ? { site, base } : {}) }], ...(format.limityLinii ? [rehypeLimity] : []), [rehypeBase, { base, lang }], [rehypeZewn, { site, base, lang }]],
     } as any);
     procesory.set(key, processor);
   }
-  const result = await processor.render(src, { frontmatter: { bloki, ...(jawne ? { strona: { jawne: true } } : {}) } });
+  const result = await processor.render(src, { frontmatter: { bloki, ...(jawne ? { strona: { jawne: true, ...format } } : {}) } });
   return { html: result.code, naglowki: ((result.metadata as any)?.headings ?? []) as Naglowek[] };
 }
 

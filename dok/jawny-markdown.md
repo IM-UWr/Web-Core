@@ -1,10 +1,12 @@
 # Jawny Markdown kierunków i specjalności
 
-Format używany na `main` w Web-Studia i Web-Core. Dotyczy całej treści Markdown działu Studia w Web-Studia: kierunków, specjalności, pozostałych podstron oraz tekstów strony działu i Roku akademickiego. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
+Format używany w Web-Studia i Web-Popularyzacja. Dotyczy kierunków, specjalności, podstron Studiów, tekstów strony działu i Roku akademickiego oraz wszystkich tekstów działu Popularyzacja. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
 
 ## Jeden formularz, jedna strona
 
 W Pages CMS otwórz **Web-Studia na branchu main**, następnie **Kierunki**, **Specjalności** albo **Strony**. Teksty `/studia` i `/studia/rok-akademicki` są odpowiednio w formularzach **Strona działu Studia** i **Rok akademicki**. Najpierw są nazwy PL/EN i treść Markdown PL/EN, poniżej dane; w kierunkach i specjalnościach baner jest na końcu. Polski tekst jest treścią pliku `.md`, angielski polem `tresc_en`. Puste tłumaczenie oznacza pokazanie polskiej treści na stronie angielskiej.
+
+Teksty Popularyzacji są w **Web-Popularyzacja/main**: strona działu i podstrony mają te same jawne znaczniki. Karty działu i „W skrócie” nadal pochodzą z menu i pól formularza.
 
 W tych wpisach treść, dane i baner znajdują się razem. Nie ma osobnych formularzy „Treść” i „Baner i kafelek”. Nie zmieniaj nazw istniejących plików: to ich identyfikatory używane w adresach i powiązaniach.
 

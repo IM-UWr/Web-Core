@@ -17,6 +17,7 @@ type Fakt = { wartosc?: Tekst; wartosc_en?: Tekst; opis?: Tekst; opis_en?: Tekst
 type Tradycja = { rok: number; nazwa: string; nazwa_en?: Tekst };
 type Dane = {
   tytul: string; tytul_en?: Tekst; tresc_en?: Tekst; wstep?: Tekst; wstep_en?: Tekst; haslo?: Tekst; haslo_en?: Tekst;
+  format_tresci?: 'jawne';
   o_popularyzacji_fakty?: Fakt[] | null; tradycja?: Tradycja[] | null;
 };
 
@@ -48,7 +49,8 @@ export async function danePopularyzacji(lang: Lang) {
   // listy plików — ściągawka w opisie pola) i „W skrócie” obok, jak „O studiach”. Pierwszy akapit większy (p.wst, jak pierwszy
   // z dawnych akapitów oddzielonych pustą linią).
   const zrodlo = (en && d.tresc_en?.trim()) || Strona.rawContent();
-  const html = (await renderMarkdownZNaglowkami(zrodlo, lang, true)).html.replace(/<p>/, '<p class="wst">');
+  const jawne = d.format_tresci === 'jawne';
+  const html = (await renderMarkdownZNaglowkami(zrodlo, lang, !jawne, jawne)).html.replace(/<p>/, '<p class="wst">');
   const fakty = (d.o_popularyzacji_fakty ?? [])
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));

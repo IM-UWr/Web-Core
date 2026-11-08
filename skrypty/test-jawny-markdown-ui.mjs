@@ -13,6 +13,7 @@ async function pagesIn(directory, prefix='') {
  return result;
 }
 const pageNames=['','rok-akademicki',...await pagesIn('src/content/strony/studia'),'matematyka','isim','siad','szkola-doktorska','matematyka/analiza-danych','matematyka/matematyka-aktuarialno-finansowa','matematyka/matematyka-nauczycielska','matematyka/matematyka-stosowana','matematyka/matematyka-teoretyczna'];
+const routes=[...pageNames.map(suffix=>({dzial:'studia',suffix})),...['',...await pagesIn('src/content/strony/popularyzacja')].map(suffix=>({dzial:'popularyzacja',suffix}))];
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.avif':'image/avif','.woff2':'font/woff2'};
 function serve(dir,port){const base=path.resolve(dir);const server=createServer(async(req,res)=>{try{let rel=decodeURIComponent(new URL(req.url,'http://localhost').pathname).replace(/^\/Web-Core/,'');let file=path.resolve(base,'.'+rel);if(!file.startsWith(base+path.sep)&&file!==base)throw Error();const stat=await fs.stat(file);if(stat.isDirectory())file=path.join(file,'index.html');res.setHeader('Content-Type',mime[path.extname(file)]??'application/octet-stream');res.end(await fs.readFile(file));}catch{res.statusCode=404;res.end();}});return new Promise(resolve=>server.listen(port,'127.0.0.1',()=>resolve(server)));}
 const server=await serve('dist',4182);
@@ -21,8 +22,10 @@ const report=[];await fs.mkdir('.test-jawne/screenshots',{recursive:true});
 try{
  for(const [width,height]of [[1440,1000],[390,844]])for(const lang of ['pl','en']){
   const ctx=await browser.newContext({viewport:{width,height}});const page=await ctx.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  for(const suffix of pageNames){
-   await page.goto(`http://127.0.0.1:4182/Web-Core/${lang==='en'?'en/':''}studia/${suffix}/`,{waitUntil:'networkidle'});
+  for(const {dzial,suffix} of routes){
+   const route=[lang==='en'?'en':'',dzial,suffix].filter(Boolean).join('/');
+   const response=await page.goto(`http://127.0.0.1:4182/Web-Core/${route}/`,{waitUntil:'networkidle'});
+   assert.equal(response?.status(),200,route+' not available');
    const body=await page.locator('.z-pd-tresc').count()?page.locator('.z-pd-tresc'):page.locator('main').first();assert.ok((await body.innerText()).length>50,suffix+' empty');
    assert.equal(await body.locator('[data-blok],[data-wstawka]').count(),0,'unrendered directive');
    assert.doesNotMatch(await body.innerText(),/::::proza|\{#[\p{L}\p{N}_-]+\}/u,'visible markup');
@@ -44,7 +47,7 @@ try{
     await page.screenshot({path:`.test-jawne/screenshots/${lang}-${width}-${suffix.replaceAll('/','-')}.png`,fullPage:true});
    }
    if(['pierwszy-rok','sprawy-studenckie','rok-akademicki'].includes(suffix)&&lang==='pl')await page.screenshot({path:`.test-jawne/screenshots/${lang}-${width}-${suffix}.png`,fullPage:true});
-   report.push({lang,width,page:suffix,tabs:await tabs.count(),ok:true});
+   report.push({lang,width,page:route,tabs:await tabs.count(),ok:true});
   }
   assert.deepEqual(errors,[]);await ctx.close();
  }

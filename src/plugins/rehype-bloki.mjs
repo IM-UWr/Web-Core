@@ -483,7 +483,9 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
     if (kind === 'ramka') {
       const title = n.properties.dataTytul;
       if (!title) fail('Ramka wymaga etykiety: :::ramka{tytul="Dla kogo"}.', n);
-      return [el('div', 'uwaga', [el('span', 'etyk', [tekst(title)]), el('div', ctx.klasaRamki ?? null, transform(bloki(n)))])];
+      const label = el('span', 'etyk', [tekst(title)]), body = transform(bloki(n));
+      if (typ === 'strona') return [el('blockquote', null, [label, ...body])];
+      return [el('div', 'uwaga', [label, el('div', ctx.klasaRamki ?? null, body)])];
     }
     if (kind === 'zakladki') {
       const b = transform(bloki(n));
@@ -517,6 +519,11 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
       if (end < 0) end = out.length;
       return out.slice(i + 1, end).some(nonempty);
     });
+    // Typografia podstron Popularyzacji: pierwszy akapit po pierwszym
+    // nagłówku zachowuje dotychczasowe wyróżnienie niezależnie od jego nazwy.
+    const firstH2 = flat.findIndex((n) => jest(n, 'h2'));
+    const intro = flat[firstH2 + 1];
+    if (opcje.wstepPoH2 && firstH2 >= 0 && jest(intro, 'p')) intro.properties = { ...intro.properties, className: ['wst'] };
     tree.children = flat;
     return sections.filter((s) => flat.some((n) => jest(n, 'h2') && n.properties.id === s.id));
   }
