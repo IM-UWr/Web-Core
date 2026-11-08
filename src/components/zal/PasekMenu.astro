@@ -12,7 +12,7 @@ import Flaga from './Flaga.astro';
 import { menuGlowne } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
-import { PATRONI, DZIALY, dzialZeSciezki, pole } from '../../lib/patroni';
+import { PATRONI, DZIALY, dzialZeSciezki } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
 interface Props { lang: Lang; sciezka: string; inny: string | null; class?: string }
@@ -20,18 +20,14 @@ const { lang, sciezka, inny, class: klasa } = Astro.props;
 const menu = await menuGlowne();
 const bezJezyka = sciezka.replace(/^\/en(?=\/|$)/, '') || '/';
 const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
-const zMenu = (adres: string) => menu.find((p) => p.adres === adres);
 const biezacy = dzialZeSciezki(sciezka);
 const jasny = !!klasa?.includes('z-pasek-jasny');
 const idPanelu = jasny ? 'z-menu-druga' : 'z-menu-pasek';
 
-const dzialy = DZIALY.map((dz) => {
-  const p = zMenu(PATRONI[dz].adres);
-  return { dz, adres: PATRONI[dz].adres, etykieta: (p && wybierz(p, 'etykieta', lang)) || pole(PATRONI[dz], 'nazwa', lang) };
-});
-const akt = zMenu('/aktualnosci');
-const aktualnosci = { adres: '/aktualnosci', etykieta: (akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci') };
-const naAktualnosciach = bezJezyka === '/aktualnosci' || bezJezyka.startsWith('/aktualnosci/');
+const pozycje = menu.filter((p) => p.w_pasku !== false).map((p) => ({
+  adres: p.adres, etykieta: wybierz(p, 'etykieta', lang),
+  dz: DZIALY.find((dz) => PATRONI[dz].adres === p.adres),
+}));
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
 <header class:list={['z-pasek', klasa]} data-z-pasek>
@@ -42,10 +38,9 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
       <span><b>{t(lang, 'instytut')}</b><small>{t(lang, 'wydzial')}</small></span>
     </a>
     <nav aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
-      {dzialy.map((d) => (
-        <a href={href(d.adres)} data-dzial={d.dz} aria-current={bezJezyka === d.adres ? 'page' : biezacy === d.dz ? 'true' : undefined}>{d.etykieta}</a>
+      {pozycje.map((d) => (
+        <a href={href(d.adres)} data-dzial={d.dz} aria-current={bezJezyka === d.adres ? 'page' : (d.dz ? biezacy === d.dz : bezJezyka.startsWith(d.adres + '/')) ? 'true' : undefined}>{d.etykieta}</a>
       ))}
-      <a href={href(aktualnosci.adres)} aria-current={bezJezyka === '/aktualnosci' ? 'page' : naAktualnosciach ? 'true' : undefined}>{aktualnosci.etykieta}</a>
       <span class="z-pasek-narz">
         <button type="button" data-motyw aria-label={t(lang, 'motyw')}>
           <svg class="z-ks" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>

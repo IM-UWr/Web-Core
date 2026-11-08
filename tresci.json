@@ -1,5 +1,5 @@
 {
-  "_opis": "Repozytoria z treściami strony (organizacja IM-UWr). Przed budowaniem skrypty/pobierz_tresci.py nakłada ich katalogi src/ i public/ na Web-Core. Nowe repozytorium (np. nowe seminarium) dopisz tutaj.",
+  "_opis": "Aktywne źródła treści. Wszystkie specjalności znajdują się w Web-Studia; Web-Spec-* pozostają archiwum i nie są pobierane.",
   "organizacja": "IM-UWr",
   "repozytoria": [
     "Web-Aktualnosci",
@@ -9,11 +9,6 @@
     "Web-Nauka",
     "Web-Popularyzacja",
     "Web-Ustawienia",
-    "Web-Spec-Analiza-Danych",
-    "Web-Spec-Aktuarialno-Finansowa",
-    "Web-Spec-Nauczycielska",
-    "Web-Spec-Stosowana",
-    "Web-Spec-Teoretyczna",
     "Web-Sem-Analiza-Harmoniczna",
     "Web-Sem-Dydaktyka",
     "Web-Sem-Dyskretna-Analiza-Harmoniczna",

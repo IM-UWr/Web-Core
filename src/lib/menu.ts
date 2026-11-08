@@ -1,17 +1,15 @@
-// Menu główne: dane z src/data/nawigacja.json + kierunki studiów wstawiane automatycznie (w grupie z "kierunki": true)
-// z listy w Ustawieniach (studia.kierunki; kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28).
+// Ręczne menu i kafelki: jedyne źródło to src/data/nawigacja.json.
 import nawigacja from '../data/nawigacja.json';
-import { pozycjeKierunkow } from './kierunki';
+import { widoczneMenu, kafelkiMenu, pozycjaRekrutacji } from './nawigacja.mjs';
 import { wybierz } from './i18n';
 import { isExternal } from './url';
 import { semestry } from './kolory-dni';
-import { skrotNazwy } from './patroni';
 import type { Lang } from './daty';
 
 // opis, opis_en: krótki opis pod nazwą w pasie działu na komputerze (zlecenie 20, punkt 2); pusty = bez opisu
-export type Link = { etykieta: string; etykieta_en?: string; opis?: string; opis_en?: string; adres: string };
-export type Grupa = { nazwa: string; nazwa_en?: string; opis?: string; opis_en?: string; kierunki?: boolean; linki: Link[] };
-export type Pozycja = { etykieta: string; etykieta_en?: string; adres?: string; grupy?: Grupa[] };
+export type Link = { etykieta: string; etykieta_en?: string; opis?: string; opis_en?: string; adres: string; w_menu?: boolean; na_stronie_glownej?: boolean; kafelek_nazwa?: string; kafelek_nazwa_en?: string; kafelek_poziom?: string; kafelek_poziom_en?: string; kafelek_opis?: string; kafelek_opis_en?: string };
+export type Grupa = { nazwa: string; nazwa_en?: string; opis?: string; opis_en?: string; w_menu?: boolean; linki: Link[] };
+export type Pozycja = { etykieta: string; etykieta_en?: string; adres: string; w_menu?: boolean; w_pasku?: boolean; rekrutacja?: boolean; grupy?: Grupa[] };
 
 /** Ścieżka strony bez przedrostka języka i końcowego ukośnika (strona główna: „/”). */
 export const sciezkaBezJezyka = (sciezka: string): string => sciezka.replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
@@ -22,43 +20,17 @@ export const pasujeDoSciezki = (sciezka: string, adres: string): boolean => {
   return !isExternal(adres) && !!a && (sciezka === a || sciezka.startsWith(`${a}/`));
 };
 
-export { listaKierunkow } from './kierunki';
-
-let pamiec: Pozycja[] | undefined;
-
+/** Zachowuje dokładnie kolejność redaktora; nie pobiera kolekcji treści. */
 export async function menuGlowne(): Promise<Pozycja[]> {
-  if (pamiec) return pamiec;
-  const kierunki: Link[] = (await pozycjeKierunkow())
-    .filter((p) => p.w_menu !== false)
-    .map((p) => {
-      const pelna = p.kierunek?.data.nazwa;
-      const pelnaEn = p.kierunek?.data.nazwa_en;
-      const e = p.nazwa || pelna || p.adres;
-      const eEn = p.nazwa_en || pelnaEn || e;
-      return {
-        etykieta: e,
-        etykieta_en: eEn,
-        // kierunek ze skrótem w menu i bez własnego opisu (SIAD, ISIM): opisem jest pełna nazwa
-        opis: p.opis_menu || (pelna && (skrotNazwy(e) || e !== pelna) ? pelna : undefined),
-        opis_en: p.opis_menu_en || (pelnaEn && eEn !== pelnaEn ? pelnaEn : undefined),
-        adres: p.adres,
-      };
-    });
-  pamiec = (nawigacja.menu as Pozycja[]).map((m) => ({
-    ...m,
-    grupy: m.grupy?.map((g) => (g.kierunki ? { ...g, linki: [...kierunki, ...g.linki.filter((l) => !kierunki.some((k) => k.adres === l.adres))] } : g)),
-  }));
-  return pamiec;
+  return widoczneMenu(nawigacja.menu) as Pozycja[];
 }
 
-/** Strona rekrutacji: pozycja menu bez grup z „Rekrutacja” / „Admission” w nazwie (dziś https://studia-wmi.uwr.edu.pl/).
- *  Pasek, panel hamburgera i przycisk na stronie działu Studia biorą adres i nazwę stąd. */
-export async function rekrutacja(lang: Lang): Promise<{ adres: string; etykieta: string }> {
-  const rek = (await menuGlowne()).find((p) => !p.grupy && p.adres && /rekrutac|admission/i.test(`${p.etykieta} ${p.etykieta_en ?? ''}`));
-  return {
-    adres: rek?.adres ?? 'https://studia-wmi.uwr.edu.pl/',
-    etykieta: (rek && wybierz(rek, 'etykieta', lang)) || (lang === 'en' ? 'Admission' : 'Rekrutacja'),
-  };
+export const kafelkiStudiow = () => kafelkiMenu(nawigacja.menu);
+
+/** Jeden adres rekrutacji dla menu i przycisków studiów, bez automatycznego linku. */
+export async function rekrutacja(lang: Lang): Promise<{ adres: string; etykieta: string } | undefined> {
+  const rek = pozycjaRekrutacji(nawigacja.menu);
+  return rek ? { adres: rek.adres, etykieta: wybierz(rek, 'etykieta', lang) } : undefined;
 }
 
 /** Rok akademicki najbliższej rekrutacji: następny po ostatnim roku w danych semestrów (src/data/kolory-dni.json),

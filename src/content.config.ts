@@ -24,6 +24,8 @@ const optId = z.preprocess((v) => { const x = empty(v); return x == null ? undef
 const idList = z.preprocess((v) => (v == null || v === '' ? [] : (Array.isArray(v) ? v : [v]).map(idWpisu)), z.array(z.string()));
 const strList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.string()));
 const published = z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean());
+// Przygotowanie przyszłych dwóch wariantów budowania, bez filtrowania treści.
+const statusPublikacji = z.preprocess(empty, z.enum(['oficjalna', 'podglad']).default('oficjalna'));
 
 const plik = z.object({ nazwa: optStr, nazwa_en: optStr, plik: z.string() });
 const plikList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(plik));
@@ -61,6 +63,7 @@ const aktualnosci = defineCollection({
     tresc_en: optStr,
     zaklad: optId,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -83,6 +86,7 @@ const strony = defineCollection({
     haslo_podstron_en: optStr,
     liczby: liczbyBanera,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -101,6 +105,7 @@ const pracownicy = defineCollection({
     pokoj: optStr,
     strona: optStr,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -117,10 +122,10 @@ const seminaria = defineCollection({
     // seminarium zakładu (każdy zakład ma jedno); puste = seminarium niezależne
     zaklad: idList,
     aktywne: published,
-    do_uzupelnienia: strList,
     tresc_en: optStr,
     ...haslo,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -143,6 +148,7 @@ const referaty = defineCollection({
     tresc_en: optStr,
     pliki: plikList,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -170,6 +176,7 @@ const obrony = defineCollection({
     zaklad: optId,
     w_aktualnosciach: published,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -204,6 +211,7 @@ const zaklady = defineCollection({
     tresc_en: optStr,
     ...haslo,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -212,7 +220,7 @@ const lista = <T extends z.ZodTypeAny>(item: T) => z.preprocess((v) => (v == nul
 
 // Kierunek (zlecenie 28): jeden Markdown — treść polska w pliku (body), angielska w tresc_en (puste = polska z lang="pl").
 // Sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs), wygląd w src/views/Kierunek.astro.
-// Baner w kolekcji kierunki_baner (ten sam id), menu i kafelki w Ustawieniach (studia.kierunki), przypomnienia o terminach
+// Baner w kolekcji kierunki_baner (ten sam id), menu i kafelki w nawigacja.json, przypomnienia o terminach
 // w src/data/przypomnienia.json (src/lib/kierunki.ts, src/lib/tresci.ts).
 const kierunki = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/kierunki' }),
@@ -221,31 +229,27 @@ const kierunki = defineCollection({
     nazwa_en: optStr,
     tresc_en: optStr,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
 // Baner kierunku (src/content/kierunki-baner/<id kierunku>.json; osobny formularz, bo Pages CMS przy zapisie usuwa z pliku pola
 // spoza formularza). Brak pliku: baner z samą nazwą (bez zdania, liczb i hasła), opis strony (meta) = pierwsze zdanie treści.
 // kierunek — nazwa pliku kierunku (w formularzu z niej powstaje nazwa nowego pliku banera; strona bierze id z nazwy pliku).
-// liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
-// na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
+// liczby: wartosc_en — wartość po angielsku (puste = jak po polsku).
 const kierunki_baner = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
   schema: z.object({
     kierunek: optStr,
     podtytul: optStr,
-    podtytul_en: optStr,
     opis: optStr,
     opis_en: optStr,
     ...haslo,
-    liczby: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr, etykieta_krotka: optStr, etykieta_krotka_en: optStr })),
+    liczby: lista(z.object({ wartosc: z.string(), wartosc_en: optStr, etykieta: z.string(), etykieta_en: optStr })),
   }),
 });
 
-// Podstrona specjalności (np. /studia/matematyka/analiza-danych), zlecenie 29: formularz „Treść” — jeden Markdown jak kierunek
-// (body po polsku, tresc_en po angielsku; puste = polska z lang="pl"), sekcje po ## i bloki z list (src/plugins/rehype-bloki.mjs,
-// kotwice typu „specjalnosc” w kotwice.mjs), wygląd w src/views/Specjalnosc.astro. Pola banera i kafelka na stronie kierunku —
-// osobny formularz i plik w kolekcji specjalnosci_baner (ten sam id; src/lib/specjalnosci.ts).
+// Jedna specjalność = jeden Markdown w Web-Studia: tekst PL/EN, baner, kafelek i powiązania.
 const specjalnosci = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/specjalnosci' }),
   schema: z.object({
@@ -253,15 +257,10 @@ const specjalnosci = defineCollection({
     nazwa_en: optStr,
     tresc_en: optStr,
     opublikowany: published,
-  }),
-});
-
-// „Baner i kafelek” specjalności (src/content/specjalnosci-baner/<id specjalności>.json; osobny formularz, bo Pages CMS przy zapisie
-// usuwa z pliku pola spoza formularza). Brak pliku: wartości domyślne (kierunek matematyka, kafelek na stronie kierunku, bez
-// banera i opiekunów) — src/lib/specjalnosci.ts. zrodla i do_uzupelnienia — pola ukryte w formularzu (notatki redakcyjne).
-const specjalnosci_baner = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/specjalnosci-baner' }),
-  schema: z.object({
+    status_publikacji: statusPublikacji,
+    // Pola zapisywane przez CMS; na razie nie zmieniają sposobu generowania strony.
+    sposob_prezentacji: z.preprocess(empty, z.enum(['cms', 'zewnetrzna']).default('cms')),
+    adres_zewnetrzny: z.preprocess(empty, z.string().url().optional()),
     kierunek: z.preprocess((v) => idWpisu(empty(v)), z.string().default('matematyka')),
     // kafelek na stronie kierunku budowany z tego pliku (jedno miejsce edycji)
     kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
@@ -281,8 +280,6 @@ const specjalnosci_baner = defineCollection({
     // identyfikatory seminariów (pliki z src/content/seminaria) związanych ze specjalnością — sekcja „Seminaria”
     seminaria: idList,
     wygaszana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
-    zrodla: strList,
-    do_uzupelnienia: strList,
     ...haslo,
   }),
 });
@@ -296,11 +293,10 @@ const konferencje = defineCollection({
     koniec: optDate,
     miejsce: optStr,
     strona: optStr,
-    organizatorzy: optStr,
     zaklad: optId,
-    zdjecie: optStr,
     odwolana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -320,6 +316,7 @@ const granty = defineCollection({
     zaklad: optId,
     strona: optStr,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
@@ -346,9 +343,9 @@ const warto_wiedziec = defineCollection({
     link_etykieta: optStr,
     link_etykieta_en: optStr,
     tresc_en: optStr,
-    zrodla: strList,
     opublikowany: published,
+    status_publikacji: statusPublikacji,
   }),
 });
 
-export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, specjalnosci_baner, warto_wiedziec };
+export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, warto_wiedziec };

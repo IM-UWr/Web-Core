@@ -12,7 +12,6 @@ import { PATRONI, banerAktualnosci, dzialZeSciezki, pole } from '../lib/patroni'
 import { t } from '../lib/i18n';
 import { stripBase } from '../lib/url';
 import type { Lang } from '../lib/daty';
-import ustawienia from '../data/ustawienia.json';
 
 interface Props { tytul: string; tytulLang?: string; lead?: string; haslo?: string; hasloBezLiczb?: boolean; bezPodpisu?: boolean; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown }
 const { tytul, tytulLang, lang, okruszki = [], wstecz, bezPodpisu, hasloBezLiczb } = Astro.props;
@@ -29,11 +28,10 @@ const DZIALY: Record<string, string> = {
 };
 const czlon = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';
 const dzial = DZIALY[czlon] ?? 'inne';
-const ust = ((ustawienia as any).naglowki_podstron ?? {}) as { wariant?: string; zdjecia?: Record<string, { zdjecie?: string }> };
-const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : 'granat';
-const domyslneZdjecia = Object.fromEntries(['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].map((d) => [d, { zdjecie: `/pliki/naglowki/${d}.jpg` }]));
-const zdjecie = (wariant === 'zdjecie' || wariant === 'granat') && !!(ust.zdjecia ?? domyslneZdjecia)[dzial]?.zdjecie;
-const ozdobny = wariant !== 'prosty';
+// Klasy opakowania zachowane dla wspólnych stylów. Obraz i układ wybiera wyłącznie NaglowekZ.
+const wariant = 'granat';
+const zdjecie = ['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].includes(dzial);
+const ozdobny = true;
 const dlugi = ozdobny && tytul.trim().length > 20;
 
 const sciezkaZ = stripBase(Astro.url.pathname);

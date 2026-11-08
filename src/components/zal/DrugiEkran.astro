@@ -24,7 +24,7 @@ import { getCollection } from 'astro:content';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
-import { pozycjeKierunkow } from '../../lib/kierunki';
+import { kafelkiStudiow, rekrutacja } from '../../lib/menu';
 import { tekstDnia } from '../../lib/kolory-dni';
 import { wydarzeniaNaTelefon, aktualnosciNaGlowna, referatyWTygodniu, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU } from '../../lib/tresci';
 import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
@@ -105,14 +105,12 @@ const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
   return { adres, kd: false, tytul: wybierz(k, 'etykieta', lang) as string, opis };
 });
 
-// Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi) z listy w Ustawieniach (studia.kierunki, kolejność listy;
-// kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28), opis i rekrutacja z Ustawień
+// Ręcznie wybrane kafelki i adres rekrutacji z jednego formularza menu.
 const st = ustawienia.studia as any;
-const kierunki = (await pozycjeKierunkow()).filter((p) => p.na_stronie_glownej !== false).map((p) => ({
-  poziom: wybierz(p, 'poziom', lang) || (p.kierunek ? T('Kierunek', 'Programme') : ''),
-  nazwa: wybierz(p, 'nazwa', lang) || (p.kierunek ? wybierz(p.kierunek.data, 'nazwa', lang) : ''),
-  opis: wybierz(p, 'opis', lang),
-  adres: p.adres,
+const rek = await rekrutacja(lang);
+const kierunki = kafelkiStudiow().map((k) => ({
+  poziom: wybierz(k, 'poziom', lang), nazwa: wybierz(k, 'nazwa', lang),
+  opis: wybierz(k, 'opis', lang), adres: k.adres,
 })).map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
 
 // Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł). Jak dotąd na stronie głównej (decyzja 30.10.2026, WartoWiedziec.astro):
@@ -179,9 +177,9 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOM
     <section class="z-studia" data-dzial="studia" aria-labelledby="z-h-studia">
       <div>
         <span class="gdzie">{T('Studia', 'Studies')}</span>
-        <h2 id="z-h-studia"><Link class="h-link" href={st.rekrutacja}>{T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}</Link></h2>
+        <h2 id="z-h-studia">{rek ? <Link class="h-link" href={rek.adres}>{T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}</Link> : T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}</h2>
         <p>{wybierz(st, 'opis', lang)}</p>
-        <Link class="z-rekr-link" href={st.rekrutacja}>{T('Rekrutacja na studia', 'Admission')}{!isExternal(st.rekrutacja) && <span aria-hidden="true"> →</span>}</Link>
+        {rek && <Link class="z-rekr-link" href={rek.adres}>{T('Rekrutacja na studia', 'Admission')}{!isExternal(rek.adres) && <span aria-hidden="true"> →</span>}</Link>}
       </div>
       <nav class="z-kier" aria-label={T('Kierunki', 'Programmes')}>
         {kierunki.map((k) => (

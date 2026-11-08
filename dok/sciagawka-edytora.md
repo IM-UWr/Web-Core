@@ -1,6 +1,6 @@
 # Ściągawka edytora: kierunki, specjalności, strony działów i strony
 
-Strona kierunku (np. `/studia/matematyka`) to jeden tekst: pole **Treść** w Pages CMS (Web-Studia → Kierunki → Treść), po angielsku pole **Treść EN**. Ten sam tekst jest w opisie pola „Treść” w formularzu (zlecenie 28). Tak samo strona specjalności (Web-Spec-* → „Specjalność: …” → Treść) i tekst „O popularyzacji” (Web-Popularyzacja → Strona działu Popularyzacja) — zlecenie 29; różnice niżej.
+Strona kierunku (np. `/studia/matematyka`) to jeden tekst: pole **Treść** w Pages CMS (Web-Studia → Kierunki → Treść), po angielsku pole **Treść EN**. Tak samo strona specjalności (Web-Studia → Specjalności) i tekst „O popularyzacji” (Web-Popularyzacja → Strona działu Popularyzacja) — zlecenie 29; różnice niżej.
 
 > Piszesz jak w zwykłym edytorze. Kilka układów strona rozpoznaje sama:
 > • Nagłówek 2 = nowa sekcja (pojawi się w spisie „Na tej stronie”).
@@ -20,7 +20,7 @@ Ostatni punkt to cecha edytora Pages CMS (TipTap 3: „Np. ” na początku akap
 
 > • Lista samych linków = lista plików (PDF / strona); w sekcji „Przydatne strony” — zwykłe linki.
 > • Cytat zaczynający się pogrubionym „Dla kogo” = ramka. Zwykła lista w „Co będziesz umieć” i „Przykładowe tematy prac” = lista z kreskami; w temacie „Tytuł — dopisek” dopisek jest szary.
-> • Pod nagłówkami „Seminaria” i „Opiekun specjalności” (albo „Opiekunowie specjalności”) strona sama wstawi seminaria i opiekunów z formularza „Baner i kafelek”, a ramkę „Wybór specjalności” — na końcu „Jak przebiega specjalność” (albo pod nagłówkiem „Wybór specjalności”). Bez takiego nagłówka wstawi je w zwykłym miejscu.
+> • Pod nagłówkami „Seminaria” i „Opiekun specjalności” (albo „Opiekunowie specjalności”) strona sama wstawi seminaria i opiekunów z pól tego samego formularza specjalności, a ramkę „Wybór specjalności” — na końcu „Jak przebiega specjalność” (albo pod nagłówkiem „Wybór specjalności”). Bez takiego nagłówka wstawi je w zwykłym miejscu.
 > • Stały adres (kotwicę, np. #seminaria) mają sekcje o nagłówkach: O specjalności, Przydatne strony, Dlaczego warto, Jak przebiega specjalność, Wybór specjalności, Czego się uczysz, Co będziesz umieć, Po studiach, Przykładowe tematy prac, Seminaria, Dokumenty, Pytania i odpowiedzi, Opiekun specjalności.
 
 Po angielsku nagłówki: About, Useful pages, Why choose it, How the specialisation works, What you will learn, Skills, Careers, Sample thesis topics, Seminars, Documents, FAQ, Coordinator; ramka — cytat z pogrubionym „Who is it for”.
@@ -103,11 +103,11 @@ Lista plików (opis po myślniku jest opcjonalny):
 | Co | Gdzie w Pages CMS |
 |---|---|
 | Treść strony kierunku (PL i EN) | Web-Studia → Kierunki → Treść |
-| Nadtytuł, zdanie pod nazwą, hasło, liczby w nagłówku | Web-Studia → Kierunki → Baner (nazwa pliku = nazwa pliku kierunku, np. `matematyka`; bez banera nagłówek ma samą nazwę) |
+| Poziom do statystyk, opis do wyszukiwarek, hasło i liczby kierunku | Web-Studia → Kierunki → Baner (nazwa pliku = nazwa pliku kierunku, np. `matematyka`; bez banera nagłówek ma samą nazwę) |
 | Przypomnienia na stronie głównej (np. deklaracja specjalności) | Web-Studia → Przypomnienia o terminach |
-| Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Ustawienia strony → Sekcja „Studiuj matematykę” → Kierunki w menu… (kierunek spoza listy pojawi się sam na końcu) |
-| Treść strony specjalności (PL i EN) | Web-Spec-* → Specjalność: … → Treść (wygaszana Matematyka w ekonomii: Web-Studia) |
-| Kafelek specjalności na stronie kierunku, skrót, poziom, hasło, zakład, opiekunowie, seminaria | Web-Spec-* → Specjalność: … → Baner i kafelek (strona kierunku buduje kafelki sama) |
+| Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Ustawienia strony → Menu główne (wszystkie wpisy są ręczne) |
+| Treść strony specjalności (PL i EN) | Web-Studia → Specjalności → wybrany wpis |
+| Kafelek specjalności na stronie kierunku, skrót, poziom, hasło, zakład, opiekunowie, seminaria | Web-Studia → Specjalności → ten sam wpis (strona kierunku buduje kafelki sama) |
 | Tekst „O popularyzacji”, tytuł, „W skrócie”, lata tradycji | Web-Popularyzacja → Strona działu Popularyzacja |
 | Tekst „O Instytucie” / „Badania w Instytucie” / „O studiach”, tytuł, wstęp, hasło, „W skrócie” (Instytut: też godziny sekretariatu) | Web-Instytut / Web-Nauka / Web-Studia → Strona działu … |
 | Tytuł, opis, hasło i tekst nad listą: Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje (też hasło rocznika) | Web-Nauka → Strony → `seminaria`, `nauka/konferencje`, `nauka/granty`, `nauka/sukcesy`, `nauka/publikacje` |
@@ -116,3 +116,14 @@ Lista plików (opis po myślniku jest opcjonalny):
 | To samo: Pracownicy; Plan zajęć | Web-Pracownicy → Strony → `pracownicy`; Web-Studia → Strony → `studia/plan-zajec` |
 
 Nazwy sekcji, które dostają stałe kotwice w adresie (np. `#terminy` w linkach przypomnień), są w `src/plugins/kotwice.mjs` (kotwice kierunku i specjalności osobno, pole `typ`; kotwice stron działów i stron z listą — typ `strona` z adresem strony; na zwykłych stronach — typ `naglowek`, np. „Konsultacje” / „Office hours” → `#konsultacje`, linki z Pierwszego roku). Inny nagłówek 2 też jest sekcją, z kotwicą z jego tekstu. Kotwicy w HTML (`<a id="…">`) w treści nie wpisuj — edytor z przyciskami usuwa ją przy zapisie; stała kotwica idzie do `kotwice.mjs`.
+
+
+## Ręczne menu i statusy publikacji
+
+Menu i powiązane kafelki edytuje się razem w Web-Ustawienia → Menu główne. Kolejność pozycji, grup i linków na listach jest kolejnością na stronie. Nic nie jest dopisywane automatycznie po utworzeniu kierunku, specjalności lub podstrony. Przełącznik Pokaż w menu nie usuwa samej strony; kafelek na stronie głównej można włączyć niezależnie. Adres przy pozycji oznaczonej jako rekrutacja zasila także przyciski rekrutacji.
+
+Status publikacji ma dwie wartości: Opublikowana — strona oficjalna i podgląd (`oficjalna`) oraz Tylko podgląd (`podglad`). To przygotowanie przyszłego sposobu publikacji: na razie obie wartości zachowują dotychczasową widoczność. Podgląd i repozytoria są publiczne. Istniejąca opcja `opublikowany` zachowuje osobne dotychczasowe znaczenie i nie służy do wyboru tych statusów.
+
+W specjalności wybór Standardowa strona CMS / Autorska strona zewnętrzna zapisuje odpowiednio `cms` / `zewnetrzna`. Adres autorskiej strony podaje się w tym samym formularzu; przekierowanie nie jest jeszcze włączone.
+
+Na czas testów wybierz w Pages CMS gałąź `cms-reorganizacja-2026-11`. Formularze na `main` zmienią się dopiero po przyszłym wdrożeniu.

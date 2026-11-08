@@ -53,7 +53,7 @@ export async function sciezkiKierunkow() {
   return k.map((kierunek) => ({ params: { kierunek: kierunek.id }, props: { kierunek } }));
 }
 
-// specjalność z polami banera (src/lib/specjalnosci.ts): kierunek i „bez podstrony” są w formularzu „Baner i kafelek”
+// specjalność z polami banera (src/lib/specjalnosci.ts): kierunek i „bez podstrony” są w scalonym formularzu specjalności w Web-Studia
 export async function sciezkiSpecjalnosci() {
   const s = await specjalnosci();
   return s.filter((x) => !x.data.bez_podstrony).map((specjalnosc) => ({ params: { kierunek: specjalnosc.data.kierunek, specjalnosc: specjalnosc.id }, props: { specjalnosc } }));

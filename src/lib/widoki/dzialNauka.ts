@@ -65,7 +65,7 @@ export async function daneDzialuNauka(lang: Lang) {
   ].filter((x) => x.n > 0);
 
   // Kafelki: grupy i linki z menu „Nauka” (nowy link w menu sam pojawi się tutaj).
-  const pozycja = (await menuGlowne()).find((m) => m.etykieta === 'Nauka' || m.etykieta_en === 'Research');
+  const pozycja = (await menuGlowne()).find((m) => m.adres === '/nauka');
   const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
   // Teksty (zlecenie 30): src/data/nauka.md (Web-Nauka, „Strona działu Nauka”) — Treść = „Badania w Instytucie”, reszta w polach.

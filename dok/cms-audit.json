@@ -1,0 +1,2523 @@
+{
+  "branch": "cms-reorganizacja-2026-11",
+  "baseline": {
+    "Web-Spec-Nauczycielska": "34fb046add51da06038f017546605bb7e63b1ecf",
+    "Web-Pracownicy": "b47e10b41234618f3e1c271dbc872d82ad8bd1ba",
+    "Web-Sem-Topologia": "cb46e3a53782c3133820a0a21543b467098bbf51",
+    "Web-Sem-Prawdopodobienstwo": "2f2f78bd36f0f457b19df032f7f9e38907c59c1d",
+    "Web-Popularyzacja": "96715d433b27adb5010175b5994e2b594ac7f796",
+    "Web-Nauka": "01c82977eb4bf5b50e48c161d4f851679cf20f9f",
+    "Web-Spec-Teoretyczna": "1c3a8baae59433ab8e964f044d221909d1212966",
+    "Web-Sem-Analiza-Harmoniczna": "9149783c2a984a4c7d9e42af9f866821f503a6fa",
+    "Web-Core": "6eddb9f12fc7a61d067a3fe086d978ac76df2d02",
+    "Web-Spec-Stosowana": "6b136d7ead239869dc4c52f94723889bab699722",
+    "Web-Instytut": "95b51d13cce29186afd1f6eab850ca5093b7087f",
+    "Web-Sem-Rownania-Rozniczkowe": "538455c17593f20a0fe06a953bae8989b37d2de1",
+    "Web-Ustawienia": "e27d734a1602ad08b175ff58af3780a26bf8c49b",
+    "Web-Sem-Dyskretna-Analiza-Harmoniczna": "0cd2aabc9676c3282cf9a40e34a63f4ba839ed29",
+    "Web-Spec-Aktuarialno-Finansowa": "be3c081a5d4d6bc387f0ea983bfad47bf18cc7a6",
+    "Web-Aktualnosci": "4281983b208869dbcaf3e0c2bbf2e3aaf542e92d",
+    "Web-Sem-Teoria-Modeli": "11127691722931b4c2225dc4040e675720fb9e4d",
+    "Web-Sem-Statystyka": "43bbf3cdedf3904472d8c8b0b92063c612f80341",
+    "Web-Studia": "d77ffe2a44a2301d6082abdfb09de830c382a9d0",
+    "Web-Sem-Dydaktyka": "04b3b05ad60883f5b0921c8c73adb8ba4df6445f",
+    "Web-Podglad": "445f732a27f160566d26dbd24585ab333de32379",
+    "Web-Spec-Analiza-Danych": "dee8db690d0f64428bb8a6c8a00e38cbd30350d6",
+    "Web-Sem-Geometria": "8e83d160d9ea916bd033e34046c4950c0c1e9f15"
+  },
+  "migrated": [
+    {
+      "id": "matematyka-aktuarialno-finansowa",
+      "source": "Web-Spec-Aktuarialno-Finansowa",
+      "path": "src/content/specjalnosci/matematyka-aktuarialno-finansowa.md"
+    },
+    {
+      "id": "analiza-danych",
+      "source": "Web-Spec-Analiza-Danych",
+      "path": "src/content/specjalnosci/analiza-danych.md"
+    },
+    {
+      "id": "matematyka-nauczycielska",
+      "source": "Web-Spec-Nauczycielska",
+      "path": "src/content/specjalnosci/matematyka-nauczycielska.md"
+    },
+    {
+      "id": "matematyka-stosowana",
+      "source": "Web-Spec-Stosowana",
+      "path": "src/content/specjalnosci/matematyka-stosowana.md"
+    },
+    {
+      "id": "matematyka-teoretyczna",
+      "source": "Web-Spec-Teoretyczna",
+      "path": "src/content/specjalnosci/matematyka-teoretyczna.md"
+    },
+    {
+      "id": "matematyka-w-ekonomii",
+      "source": "Web-Studia",
+      "path": "src/content/specjalnosci/matematyka-w-ekonomii.md"
+    }
+  ],
+  "removed": [
+    {
+      "repo": "Web-Sem-Topologia",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Prawdopodobienstwo",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Popularyzacja",
+      "form": "popularyzacja",
+      "path": "linki",
+      "descendants": [
+        "linki.nazwa",
+        "linki.nazwa_en",
+        "linki.adres"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "konferencje",
+      "path": "body",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "konferencje",
+      "path": "organizatorzy",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "konferencje",
+      "path": "zdjecie",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "publikacje",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "publikacje",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "publikacje-wykazy",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Analiza-Harmoniczna",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "warto_wiedziec",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "wladze",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "wladze",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Rownania-Rozniczkowe",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.zdjecie_male",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.zdjecie_telefon",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.podpis",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.podpis_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.podpis_telefon",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.podpis_telefon_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "baner.kadr",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "tlo_strony",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "sekcje",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "naglowki_podstron",
+      "descendants": [
+        "naglowki_podstron.wariant",
+        "naglowki_podstron.zdjecia",
+        "naglowki_podstron.zdjecia.instytut",
+        "naglowki_podstron.zdjecia.instytut.zdjecie",
+        "naglowki_podstron.zdjecia.instytut.kadr",
+        "naglowki_podstron.zdjecia.nauka",
+        "naglowki_podstron.zdjecia.nauka.zdjecie",
+        "naglowki_podstron.zdjecia.nauka.kadr",
+        "naglowki_podstron.zdjecia.studia",
+        "naglowki_podstron.zdjecia.studia.zdjecie",
+        "naglowki_podstron.zdjecia.studia.kadr",
+        "naglowki_podstron.zdjecia.aktualnosci",
+        "naglowki_podstron.zdjecia.aktualnosci.zdjecie",
+        "naglowki_podstron.zdjecia.aktualnosci.kadr",
+        "naglowki_podstron.zdjecia.popularyzacja",
+        "naglowki_podstron.zdjecia.popularyzacja.zdjecie",
+        "naglowki_podstron.zdjecia.popularyzacja.kadr"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "haslo",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "haslo_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "przyciski",
+      "descendants": [
+        "przyciski.etykieta",
+        "przyciski.etykieta_en",
+        "przyciski.adres"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "studia.tytul",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "studia.tytul_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "facebook",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "youtube",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "partnerzy",
+      "descendants": [
+        "partnerzy.nazwa",
+        "partnerzy.logo",
+        "partnerzy.adres"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "skroty",
+      "path": "kafelki.ikona",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Dyskretna-Analiza-Harmoniczna",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Teoria-Modeli",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Statystyka",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "strona-dzialu",
+      "path": "sekretariat_zakres",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "strona-dzialu",
+      "path": "sekretariat_zakres_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "kierunki-baner",
+      "path": "liczby.etykieta_krotka",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "kierunki-baner",
+      "path": "liczby.etykieta_krotka_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "kierunki-baner",
+      "path": "podtytul_en",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Dydaktyka",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Sem-Geometria",
+      "form": "seminarium",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "nawigacja",
+      "path": "menu.grupy.kierunki",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "studia.rekrutacja",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "studia.kierunki",
+      "descendants": [
+        "studia.kierunki.adres",
+        "studia.kierunki.nazwa",
+        "studia.kierunki.poziom",
+        "studia.kierunki.opis",
+        "studia.kierunki.opis_menu",
+        "studia.kierunki.w_menu",
+        "studia.kierunki.na_stronie_glownej",
+        "studia.kierunki.nazwa_en",
+        "studia.kierunki.poziom_en",
+        "studia.kierunki.opis_en",
+        "studia.kierunki.opis_menu_en"
+      ]
+    },
+    {
+      "repo": "Web-Spec-Nauczycielska",
+      "form": "specjalnosc-baner",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Nauczycielska",
+      "form": "specjalnosc-baner",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Teoretyczna",
+      "form": "specjalnosc-baner",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Teoretyczna",
+      "form": "specjalnosc-baner",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Stosowana",
+      "form": "specjalnosc-baner",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Stosowana",
+      "form": "specjalnosc-baner",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Aktuarialno-Finansowa",
+      "form": "specjalnosc-baner",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Aktuarialno-Finansowa",
+      "form": "specjalnosc-baner",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "spec-matematyka-w-ekonomii-baner",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "spec-matematyka-w-ekonomii-baner",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Analiza-Danych",
+      "form": "specjalnosc-baner",
+      "path": "zrodla",
+      "descendants": []
+    },
+    {
+      "repo": "Web-Spec-Analiza-Danych",
+      "form": "specjalnosc-baner",
+      "path": "do_uzupelnienia",
+      "descendants": []
+    }
+  ],
+  "additional_removed": {
+    "navigation": "menu.grupy.kierunki: automatyczne wstawianie zastąpione ręcznymi wpisami",
+    "relocated": [
+      "ustawienia.studia.kierunki → nawigacja.menu[].grupy[].linki[]",
+      "ustawienia.studia.rekrutacja → nawigacja.menu[].rekrutacja"
+    ]
+  },
+  "retained_technical": [
+    "opublikowany: nadal odczytywany w aktywnych filtrach i metadanych; ukryty kontrolny zapis z dotychczasową wartością",
+    "przypomnienia.uid: tożsamość subskrybowanych zdarzeń kalendarza",
+    "kierunki-baner.kierunek: nazwa nowego pliku banera",
+    "nazwa/tytul/rok + filename/view.primary: tworzenie nazw plików i adresów",
+    "karta: istniejąca grupa pól obsługiwana przez zKarta; nie zmieniano struktury dla estetyki"
+  ],
+  "active_forms": [
+    {
+      "repo": "Web-Aktualnosci",
+      "form": "aktualnosci",
+      "path": "src/content/aktualnosci",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "data",
+        "rodzaj",
+        "body",
+        "tresc_en",
+        "dla",
+        "zajawka",
+        "zdjecie",
+        "zdjecie_opis",
+        "zdjecie_opis_en",
+        "wydarzenie_poczatek",
+        "wydarzenie_koniec",
+        "wydarzenie_miejsce",
+        "galeria",
+        "galeria.plik",
+        "galeria.podpis",
+        "album",
+        "zalaczniki",
+        "zalaczniki.nazwa",
+        "zalaczniki.nazwa_en",
+        "zalaczniki.plik",
+        "zaklad",
+        "tytul_en",
+        "zajawka_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/lib/widoki/aktualnosc.ts",
+        "src/views/Aktualnosc.astro",
+        "src/pages/rss.xml.ts",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Aktualnosci",
+      "form": "obrony",
+      "path": "src/content/obrony",
+      "fields": [
+        "kandydat",
+        "status_publikacji",
+        "tytul_rozprawy",
+        "termin",
+        "miejsce",
+        "body",
+        "tresc_en",
+        "zdjecie",
+        "zdjecie_opis",
+        "zdjecie_opis_en",
+        "promotorzy",
+        "data_ogloszenia",
+        "w_aktualnosciach",
+        "zawiadomienie",
+        "rozprawa",
+        "streszczenie_pl",
+        "streszczenie_en",
+        "recenzje",
+        "recenzje.recenzent",
+        "recenzje.plik",
+        "bip",
+        "zaklad",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Obrona.astro",
+        "src/lib/widoki/obrona.ts",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Aktualnosci",
+      "form": "strony",
+      "path": "src/content/strony",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "haslo_podstron",
+        "haslo_podstron_en",
+        "liczby",
+        "liczby.n",
+        "liczby.n_en",
+        "liczby.etykieta",
+        "liczby.etykieta_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Pracownicy",
+      "form": "pracownicy",
+      "path": "src/content/pracownicy",
+      "fields": [
+        "imie_nazwisko",
+        "status_publikacji",
+        "stopien",
+        "grupa",
+        "funkcja",
+        "funkcja_en",
+        "zaklad",
+        "rok_studiow",
+        "email",
+        "telefon",
+        "pokoj",
+        "strona",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/components/TabelaPracownikow.tsx",
+        "src/lib/widoki/wladze.ts",
+        "src/lib/widoki/specjalnosc.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Pracownicy",
+      "form": "strony",
+      "path": "src/content/strony",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "liczby",
+        "liczby.n",
+        "liczby.n_en",
+        "liczby.etykieta",
+        "liczby.etykieta_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "strona-dzialu",
+      "path": "src/data/studia.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "wstep",
+        "wstep_en",
+        "haslo",
+        "haslo_en",
+        "o_studiach_fakty",
+        "o_studiach_fakty.wartosc",
+        "o_studiach_fakty.wartosc_en",
+        "o_studiach_fakty.opis",
+        "o_studiach_fakty.opis_en"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/dzialInstytut.ts",
+        "src/lib/widoki/dzialNauka.ts",
+        "src/lib/widoki/dzialStudia.ts",
+        "src/components/zal/Okladka.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "kierunki",
+      "path": "src/content/kierunki",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "body",
+        "nazwa_en",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/kierunki.ts",
+        "src/lib/widoki/kierunek.ts",
+        "src/views/Kierunek.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "kierunki-baner",
+      "path": "src/content/kierunki-baner",
+      "fields": [
+        "kierunek",
+        "podtytul",
+        "opis",
+        "haslo",
+        "liczby",
+        "liczby.wartosc",
+        "liczby.etykieta",
+        "liczby.wartosc_en",
+        "liczby.etykieta_en",
+        "opis_en",
+        "haslo_en"
+      ],
+      "consumer_files": [
+        "src/lib/kierunki.ts",
+        "src/lib/widoki/kierunek.ts",
+        "src/views/Kierunek.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "specjalnosci",
+      "path": "src/content/specjalnosci",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "kierunek",
+        "sposob_prezentacji",
+        "adres_zewnetrzny",
+        "body",
+        "nazwa_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "skrot",
+        "poziom",
+        "poziom_en",
+        "na_stronie_kierunku",
+        "kolejnosc",
+        "kafelek_dla_kogo",
+        "kafelek_dla_kogo_en",
+        "kafelek_kariera",
+        "kafelek_kariera_en",
+        "zaklad",
+        "opiekunowie",
+        "opiekunowie.imie_nazwisko",
+        "opiekunowie.rola",
+        "opiekunowie.rola_en",
+        "seminaria",
+        "wygaszana",
+        "bez_podstrony",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/specjalnosci.ts",
+        "src/lib/widoki/specjalnosc.ts",
+        "src/views/Specjalnosc.astro",
+        "src/lib/widoki/kierunek.ts",
+        "src/lib/sciezki.ts",
+        "src/pages/sitemap.xml.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "przypomnienia",
+      "path": "src/data/przypomnienia.json",
+      "fields": [
+        "przypomnienia",
+        "przypomnienia.sprawa",
+        "przypomnienia.status_publikacji",
+        "przypomnienia.podpis",
+        "przypomnienia.data",
+        "przypomnienia.co_roku",
+        "przypomnienia.dni_przed",
+        "przypomnienia.adres",
+        "przypomnienia.sprawa_en",
+        "przypomnienia.podpis_en",
+        "przypomnienia.uid"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "strony",
+      "path": "src/content/strony/studia",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "liczby",
+        "liczby.n",
+        "liczby.n_en",
+        "liczby.etykieta",
+        "liczby.etykieta_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "rok-akademicki",
+      "path": "src/data/rok-akademicki.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "dalej",
+        "dalej_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "bloki"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/rokAkademicki.ts",
+        "src/views/RokAkademicki.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Studia",
+      "form": "kolory-dni",
+      "path": "src/data/kolory-dni.json",
+      "fields": [
+        "aktualnosci",
+        "aktualnosci.wlaczone",
+        "aktualnosci.dni_robocze_przed",
+        "aktualnosci.tytul",
+        "aktualnosci.tresc",
+        "aktualnosci.tytul_en",
+        "aktualnosci.tresc_en",
+        "semestry",
+        "semestry.nazwa",
+        "semestry.nazwa_en",
+        "semestry.poczatek",
+        "semestry.koniec",
+        "semestry.terminy",
+        "semestry.terminy.semestr_od",
+        "semestry.terminy.semestr_do",
+        "semestry.terminy.inauguracja",
+        "semestry.terminy.sesja_od",
+        "semestry.terminy.sesja_do",
+        "semestry.terminy.poprawkowa_od",
+        "semestry.terminy.poprawkowa_do",
+        "semestry.terminy.przerwy",
+        "semestry.terminy.przerwy.od",
+        "semestry.terminy.przerwy.do",
+        "semestry.wolne",
+        "semestry.wolne.od",
+        "semestry.wolne.do",
+        "semestry.wolne.opis",
+        "semestry.wolne.opis_en",
+        "semestry.zamiany",
+        "semestry.zamiany.data",
+        "semestry.zamiany.jak_dzien",
+        "semestry.wyjatki",
+        "semestry.wyjatki.data",
+        "semestry.wyjatki.kolor",
+        "semestry.pdf",
+        "semestry.uwagi",
+        "semestry.uwagi_en"
+      ],
+      "consumer_files": [
+        "src/lib/kolory-dni.ts",
+        "src/views/RokAkademicki.astro",
+        "src/lib/widoki/aktualnoscZamianaDni.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "strona-dzialu",
+      "path": "src/data/instytut.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "wstep",
+        "wstep_en",
+        "haslo",
+        "haslo_en",
+        "o_instytucie_fakty",
+        "o_instytucie_fakty.wartosc",
+        "o_instytucie_fakty.wartosc_en",
+        "o_instytucie_fakty.opis",
+        "o_instytucie_fakty.opis_en",
+        "kontakt_godziny",
+        "kontakt_godziny_en"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/dzialInstytut.ts",
+        "src/lib/widoki/dzialNauka.ts",
+        "src/lib/widoki/dzialStudia.ts",
+        "src/components/zal/Okladka.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "zaklady",
+      "path": "src/content/zaklady",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "body",
+        "tresc_en",
+        "karta",
+        "karta.nazwa_krotka",
+        "karta.kierownik",
+        "karta.telefon",
+        "karta.opis",
+        "karta.haslo",
+        "karta.obszary",
+        "karta.strona",
+        "karta.zdjecie",
+        "karta.zdjecie_opis",
+        "karta.zdjecie_opis_en",
+        "karta.nazwa_krotka_en",
+        "karta.opis_en",
+        "karta.haslo_en",
+        "karta.obszary_en",
+        "nazwa_en",
+        "kolejnosc",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/zaklad.ts",
+        "src/views/Zaklad.astro",
+        "src/lib/tresci.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "strony",
+      "path": "src/content/strony",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "liczby",
+        "liczby.n",
+        "liczby.n_en",
+        "liczby.etykieta",
+        "liczby.etykieta_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "warto_wiedziec",
+      "path": "src/content/warto_wiedziec",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tresc_en",
+        "karta",
+        "karta.rok",
+        "karta.zajawka",
+        "karta.zajawka_en",
+        "karta.obraz",
+        "karta.obraz_opis",
+        "karta.obraz_opis_en",
+        "karta.link",
+        "karta.link_etykieta",
+        "karta.link_etykieta_en",
+        "tytul_en",
+        "dzial",
+        "na_glownej",
+        "zawsze",
+        "kolejnosc",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/components/zal/DrugiEkran.astro",
+        "src/views/WartoWiedziecWpis.astro",
+        "src/views/ListaWartoWiedziec.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Instytut",
+      "form": "wladze",
+      "path": "src/data/wladze.json",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "tytul_en",
+        "wstep",
+        "wstep_en",
+        "haslo",
+        "haslo_en",
+        "osoby",
+        "osoby.rola",
+        "osoby.imie_nazwisko",
+        "osoby.zakres",
+        "osoby.dyzur",
+        "osoby.zdjecie",
+        "osoby.rola_en",
+        "osoby.zakres_en",
+        "osoby.dyzur_en",
+        "osoby.stopien",
+        "osoby.email",
+        "osoby.pokoj",
+        "osoby.strona",
+        "wydzial",
+        "wydzial.tytul",
+        "wydzial.tytul_en",
+        "wydzial.opis",
+        "wydzial.opis_en",
+        "wydzial.osoby",
+        "wydzial.osoby.rola",
+        "wydzial.osoby.imie_nazwisko",
+        "wydzial.osoby.email",
+        "wydzial.osoby.dyzur",
+        "wydzial.osoby.zdjecie",
+        "wydzial.osoby.zakres",
+        "wydzial.osoby.pokoj",
+        "wydzial.osoby.rola_en",
+        "wydzial.osoby.dyzur_en",
+        "wydzial.osoby.zakres_en",
+        "wydzial.link",
+        "wydzial.link.etykieta",
+        "wydzial.link.etykieta_en",
+        "wydzial.link.adres",
+        "sekretariat",
+        "sekretariat.nazwa",
+        "sekretariat.opis",
+        "sekretariat.email",
+        "sekretariat.telefony",
+        "sekretariat.adres",
+        "sekretariat.pokoj",
+        "sekretariat.godziny",
+        "sekretariat.osoby",
+        "sekretariat.nazwa_en",
+        "sekretariat.opis_en",
+        "sekretariat.adres_en",
+        "sekretariat.godziny_en",
+        "kadencja",
+        "kadencja_en",
+        "rada",
+        "rada.tytul",
+        "rada.opis",
+        "rada.tytul_en",
+        "rada.opis_en",
+        "linki",
+        "linki.etykieta",
+        "linki.adres",
+        "linki.etykieta_en"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/wladze.ts",
+        "src/components/zal/WladzeZ.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "strona-dzialu",
+      "path": "src/data/nauka.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "wstep",
+        "wstep_en",
+        "haslo",
+        "haslo_en",
+        "badania_fakty",
+        "badania_fakty.wartosc",
+        "badania_fakty.wartosc_en",
+        "badania_fakty.opis",
+        "badania_fakty.opis_en"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/dzialInstytut.ts",
+        "src/lib/widoki/dzialNauka.ts",
+        "src/lib/widoki/dzialStudia.ts",
+        "src/components/zal/Okladka.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "konferencje",
+      "path": "src/content/konferencje",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "poczatek",
+        "koniec",
+        "miejsce",
+        "tytul_en",
+        "strona",
+        "zaklad",
+        "odwolana",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/ListaKonferencji.astro",
+        "src/views/DzialNauka.astro",
+        "src/views/Zaklad.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "granty",
+      "path": "src/content/granty",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "rodzaj",
+        "rok_od",
+        "rok_do",
+        "body",
+        "tytul_en",
+        "kod",
+        "program",
+        "kierownik",
+        "wykonawcy",
+        "kwota",
+        "zaklad",
+        "strona",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/grant.ts",
+        "src/views/Grant.astro",
+        "src/lib/tresci.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "publikacje",
+      "path": "src/data/publikacje.json",
+      "fields": [
+        "lata",
+        "lata.rok",
+        "lata.status_publikacji",
+        "lata.plik",
+        "lata.link",
+        "lata.uwagi",
+        "lata.uwagi_en",
+        "czasopisma",
+        "czasopisma.nazwa",
+        "czasopisma.status_publikacji",
+        "czasopisma.opis",
+        "czasopisma.opis_en",
+        "czasopisma.wydawca",
+        "czasopisma.wydawca_en",
+        "czasopisma.wsparcie",
+        "czasopisma.wsparcie_en",
+        "czasopisma.redakcja",
+        "czasopisma.redakcja_en",
+        "czasopisma.kontakt",
+        "czasopisma.issn",
+        "czasopisma.eissn",
+        "czasopisma.adres",
+        "archiwum",
+        "archiwum_en"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/publikacje.ts",
+        "src/views/Publikacje.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "publikacje-wykazy",
+      "path": "src/data/publikacje",
+      "fields": [
+        "rok",
+        "status_publikacji",
+        "uwagi",
+        "uwagi_en",
+        "pochodzenie",
+        "grupy",
+        "grupy.naglowek",
+        "grupy.naglowek_en",
+        "grupy.rok_wydania",
+        "grupy.prace",
+        "grupy.prace.autorzy",
+        "grupy.prace.tytul",
+        "grupy.prace.zrodlo",
+        "grupy.prace.opis",
+        "grupy.prace.doi",
+        "grupy.prace.if",
+        "grupy.prace.uwagi"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/publikacje.ts",
+        "src/lib/widoki/publikacjeRok.ts",
+        "src/views/PublikacjeRok.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Nauka",
+      "form": "strony",
+      "path": "src/content/strony",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "haslo_podstron",
+        "haslo_podstron_en",
+        "liczby",
+        "liczby.n",
+        "liczby.n_en",
+        "liczby.etykieta",
+        "liczby.etykieta_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Popularyzacja",
+      "form": "popularyzacja",
+      "path": "src/data/popularyzacja.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "wstep",
+        "haslo",
+        "o_popularyzacji_fakty",
+        "o_popularyzacji_fakty.wartosc",
+        "o_popularyzacji_fakty.wartosc_en",
+        "o_popularyzacji_fakty.opis",
+        "o_popularyzacji_fakty.opis_en",
+        "tradycja",
+        "tradycja.rok",
+        "tradycja.nazwa",
+        "tradycja.nazwa_en",
+        "wstep_en",
+        "haslo_en"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/popularyzacja.ts",
+        "src/views/Popularyzacja.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Popularyzacja",
+      "form": "strony",
+      "path": "src/content/strony/popularyzacja",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "ustawienia",
+      "path": "src/data/ustawienia.json",
+      "fields": [
+        "baner",
+        "baner.zdjecie",
+        "baner.opis",
+        "baner.opis_en",
+        "logo",
+        "wydarzenia_dni_robocze",
+        "wydarzenia_dni_telefon",
+        "wstep",
+        "wstep_en",
+        "szukaj_haslo",
+        "szukaj_haslo_en",
+        "studia",
+        "studia.opis",
+        "studia.opis_en",
+        "kontakt",
+        "kontakt.adres",
+        "kontakt.telefon",
+        "kontakt.email",
+        "archiwum",
+        "powiadomienia",
+        "powiadomienia.adres"
+      ],
+      "consumer_files": [
+        "src/layouts/Baza.astro",
+        "src/components/zal/Okladka.astro",
+        "src/components/zal/DrugiEkran.astro",
+        "src/components/zal/StopkaZ.astro",
+        "src/lib/widoki/aktualnosc.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "skroty",
+      "path": "src/data/skroty.json",
+      "fields": [
+        "kafelki",
+        "kafelki.etykieta",
+        "kafelki.etykieta_en",
+        "kafelki.adres"
+      ],
+      "consumer_files": [
+        "src/components/zal/DrugiEkran.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "nawigacja",
+      "path": "src/data/nawigacja.json",
+      "fields": [
+        "menu",
+        "menu.etykieta",
+        "menu.etykieta_en",
+        "menu.w_menu",
+        "menu.w_pasku",
+        "menu.rekrutacja",
+        "menu.adres",
+        "menu.grupy",
+        "menu.grupy.nazwa",
+        "menu.grupy.nazwa_en",
+        "menu.grupy.w_menu",
+        "menu.grupy.opis",
+        "menu.grupy.opis_en",
+        "menu.grupy.linki",
+        "menu.grupy.linki.etykieta",
+        "menu.grupy.linki.etykieta_en",
+        "menu.grupy.linki.w_menu",
+        "menu.grupy.linki.opis",
+        "menu.grupy.linki.opis_en",
+        "menu.grupy.linki.adres",
+        "menu.grupy.linki.na_stronie_glownej",
+        "menu.grupy.linki.kafelek_nazwa",
+        "menu.grupy.linki.kafelek_nazwa_en",
+        "menu.grupy.linki.kafelek_poziom",
+        "menu.grupy.linki.kafelek_poziom_en",
+        "menu.grupy.linki.kafelek_opis",
+        "menu.grupy.linki.kafelek_opis_en"
+      ],
+      "consumer_files": [
+        "src/lib/nawigacja.mjs",
+        "src/lib/menu.ts",
+        "src/components/zal/PanelMenu.astro",
+        "src/components/zal/PasekMenu.astro",
+        "src/components/zal/DrugiEkran.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "deklaracja",
+      "path": "src/content/strony/deklaracja-dostepnosci.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "prywatnosc",
+      "path": "src/content/strony/polityka-prywatnosci.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Ustawienia",
+      "form": "o-stronie",
+      "path": "src/content/strony/o-stronie.md",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "body",
+        "tytul_en",
+        "tresc_en",
+        "opis",
+        "opis_en",
+        "haslo",
+        "haslo_en",
+        "pasek_boczny",
+        "bloki",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tekstyStron.ts",
+        "src/lib/widoki/strona.ts",
+        "src/views/Strona.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Analiza-Harmoniczna",
+      "form": "seminarium",
+      "path": "src/content/seminaria/analiza-harmoniczna.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Analiza-Harmoniczna",
+      "form": "referaty",
+      "path": "src/content/referaty/analiza-harmoniczna",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Dydaktyka",
+      "form": "seminarium",
+      "path": "src/content/seminaria/dydaktyka.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Dydaktyka",
+      "form": "referaty",
+      "path": "src/content/referaty/dydaktyka",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Dyskretna-Analiza-Harmoniczna",
+      "form": "seminarium",
+      "path": "src/content/seminaria/dyskretna-analiza-harmoniczna.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Dyskretna-Analiza-Harmoniczna",
+      "form": "referaty",
+      "path": "src/content/referaty/dyskretna-analiza-harmoniczna",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Geometria",
+      "form": "seminarium",
+      "path": "src/content/seminaria/geometria.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Geometria",
+      "form": "referaty",
+      "path": "src/content/referaty/geometria",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Prawdopodobienstwo",
+      "form": "seminarium",
+      "path": "src/content/seminaria/prawdopodobienstwo.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Prawdopodobienstwo",
+      "form": "referaty",
+      "path": "src/content/referaty/prawdopodobienstwo",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Rownania-Rozniczkowe",
+      "form": "seminarium",
+      "path": "src/content/seminaria/rownania-rozniczkowe.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Rownania-Rozniczkowe",
+      "form": "referaty",
+      "path": "src/content/referaty/rownania-rozniczkowe",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Statystyka",
+      "form": "seminarium",
+      "path": "src/content/seminaria/statystyka.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Statystyka",
+      "form": "referaty",
+      "path": "src/content/referaty/statystyka",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Teoria-Modeli",
+      "form": "seminarium",
+      "path": "src/content/seminaria/teoria-modeli.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Teoria-Modeli",
+      "form": "referaty",
+      "path": "src/content/referaty/teoria-modeli",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Topologia",
+      "form": "seminarium",
+      "path": "src/content/seminaria/topologia.md",
+      "fields": [
+        "nazwa",
+        "status_publikacji",
+        "nazwa_en",
+        "haslo",
+        "haslo_en",
+        "prowadzacy",
+        "kontakt",
+        "archiwum",
+        "zaklad",
+        "aktywne",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/widoki/seminarium.ts",
+        "src/lib/widoki/listaSeminariow.ts",
+        "src/views/Seminarium.astro"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    },
+    {
+      "repo": "Web-Sem-Topologia",
+      "form": "referaty",
+      "path": "src/content/referaty/topologia",
+      "fields": [
+        "tytul",
+        "status_publikacji",
+        "jezyk",
+        "prelegent",
+        "afiliacja",
+        "afiliacja_en",
+        "termin",
+        "sala",
+        "sala_en",
+        "pliki",
+        "pliki.nazwa",
+        "pliki.plik",
+        "body",
+        "tresc_en",
+        "opublikowany"
+      ],
+      "consumer_files": [
+        "src/lib/tresci.ts",
+        "src/views/Seminarium.astro",
+        "src/lib/kalendarz.ts"
+      ],
+      "exceptions": [
+        "status_publikacji",
+        "sposob_prezentacji",
+        "adres_zewnetrzny"
+      ],
+      "technical": [
+        "opublikowany",
+        "uid",
+        "kierunek",
+        "filename",
+        "view.primary"
+      ]
+    }
+  ]
+}

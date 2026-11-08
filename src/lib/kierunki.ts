@@ -1,31 +1,14 @@
-// Kierunki studiów (zlecenie 28): treść (kolekcja kierunki: nazwa i jeden Markdown PL/EN), baner (kolekcja kierunki_baner,
-// ten sam id) i jedna lista menu „Studia” i kafelków strony głównej w Ustawieniach (studia.kierunki; kolejność = kolejność
-// na liście). Kierunek spoza listy pojawia się sam na końcu menu i kafelków: pełna nazwa, poziom „Kierunek” / „Programme”
-// i zdanie z banera (bez banera — pierwsze zdanie treści). Pozycja listy bez pliku kierunku (np. studia podyplomowe) to zwykły
-// link albo kafelek.
+// Dane kierunków i statystyki są niezależne od ręcznego menu oraz kafelków.
 import { getCollection, type CollectionEntry } from 'astro:content';
-import ustawienia from '../data/ustawienia.json';
 
 export type Kierunek = CollectionEntry<'kierunki'>;
 export type BanerKierunku = CollectionEntry<'kierunki_baner'>['data'];
-// opis — zdanie w kafelku na stronie głównej; opis_menu — opis pod nazwą w menu (puste: pełna nazwa, gdy w menu jest skrót)
-export type PozycjaKierunku = {
-  adres: string; nazwa?: string; nazwa_en?: string; poziom?: string; poziom_en?: string; opis?: string; opis_en?: string;
-  opis_menu?: string; opis_menu_en?: string; w_menu?: boolean; na_stronie_glownej?: boolean; kierunek?: Kierunek;
-};
-
 export const adresKierunku = (id: string) => `/studia/${id}`;
-const bezKonca = (a: string) => a.replace(/#.*$/, '').replace(/\/+$/, '');
-const pozycjeUstawien = (): PozycjaKierunku[] =>
-  (((ustawienia as any).studia?.kierunki ?? []) as PozycjaKierunku[]).filter((p) => p && typeof p.adres === 'string' && p.adres.trim());
 
-/** Opublikowane kierunki w kolejności listy w Ustawieniach; spoza listy na końcu, alfabetycznie. */
+/** Rzeczywiste opublikowane kierunki do statystyk, niezależnie od pozycji menu. */
 export async function listaKierunkow(): Promise<Kierunek[]> {
-  const kolej = pozycjeUstawien().map((p) => bezKonca(p.adres));
-  const miejsce = (k: Kierunek) => { const i = kolej.indexOf(adresKierunku(k.id)); return i < 0 ? Infinity : i; };
-  return (await getCollection('kierunki'))
-    .filter((k) => k.data.opublikowany !== false)
-    .sort((a, b) => miejsce(a) - miejsce(b) || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
+  return (await getCollection('kierunki')).filter((k) => k.data.opublikowany !== false)
+    .sort((a, b) => a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
 }
 
 export async function banerKierunku(id: string): Promise<BanerKierunku | undefined> {
@@ -42,20 +25,6 @@ export function pierwszeZdanie(md?: string): string {
     return (/^.*?[.!?…](?=\s+[A-ZĄĆĘŁŃÓŚŹŻ„"(]|$)/.exec(czysty)?.[0] ?? czysty).trim();
   }
   return '';
-}
-
-/** Pozycje menu „Studia” i kafelków: lista z Ustawień (z plikiem kierunku, jeśli adres to /studia/<id>), potem kierunki spoza listy. */
-export async function pozycjeKierunkow(): Promise<PozycjaKierunku[]> {
-  const kierunki = await listaKierunkow();
-  const lista = pozycjeUstawien().map((p) => ({ ...p, kierunek: kierunki.find((k) => adresKierunku(k.id) === bezKonca(p.adres)) }));
-  const spoza = await Promise.all(kierunki.filter((k) => !lista.some((p) => p.kierunek === k)).map(async (k) => {
-    const b = await banerKierunku(k.id);
-    return {
-      adres: adresKierunku(k.id), nazwa: k.data.nazwa, nazwa_en: k.data.nazwa_en, poziom: 'Kierunek', poziom_en: 'Programme',
-      opis: b?.opis || pierwszeZdanie(k.body), opis_en: b?.opis_en || pierwszeZdanie(k.data.tresc_en) || undefined, kierunek: k,
-    };
-  }));
-  return [...lista, ...spoza];
 }
 
 // Szkoła doktorska (kierunek „szkola-doktorska”): III stopień, nie liczy się do kierunków studiów na stronie „Studia”.

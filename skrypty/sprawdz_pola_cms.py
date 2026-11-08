@@ -18,8 +18,8 @@ import sys
 import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# „opublikowany”: świadomie bez pola (wszystko jest opublikowane, a brak wartości to true); „body”: treść pliku Markdown
-POLA_POMIJANE = {'opublikowany', 'body'}
+# „body”: treść pliku Markdown; konferencje zachowują archiwalny tekst bez formularza, bo nie mają podstron.
+POLA_POMIJANE = {'body'}
 # Pliki świadomie bez formularza. stopka.json: nowy wygląd go nie czyta (zlecenie 22).
 PLIKI_BEZ_FORMULARZA = {('Web-Ustawienia', 'src/data/stopka.json')}
 ROZSZERZENIA = ('.md', '.json', '.yml', '.yaml')
