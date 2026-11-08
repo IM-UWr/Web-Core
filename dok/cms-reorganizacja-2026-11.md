@@ -1,38 +1,38 @@
 # Reorganizacja Pages CMS i integracja strony — 8 listopada 2026
 
-Wykonano zmiany w lokalnych klonach 23 repozytoriów na branchach `cms-reorganizacja-2026-11`. Wszystkie lokalne i zdalne `main` pozostają bez zmian. Build z połączonymi zmienionymi danymi działa. Zapis na GitHub jest zablokowany: próby utworzenia brancha w Web-Studia i Web-Core zwróciły `403 Resource not accessible by integration`; odczyt metadanych wskazuje `push: false`. Nie utworzono zdalnych branchy ani draft PR-ów. Nie opublikowano podglądu i nie wykonano merge.
+Zmiany zapisano na GitHubie w 23 repozytoriach na branchach `cms-reorganizacja-2026-11`; w każdym otwarto draft pull request z konta Avean. Końcowy odczyt GitHuba potwierdził niezmienione SHA wszystkich 23 branchy `main`, prawidłowe branche zmian oraz otwarte, niescalone draft PR-y. Nie nadpisano obecnej strony i nie wykonano merge. Wcześniejsza blokada zapisu została rozwiązana przez podłączenie właściwego konta GitHub.
 
 Pakiet zawiera komplet zmian w postaci osobnych commitów/patchy, ich bazowe SHA, szczegółowy audyt oraz opisy przygotowanych draft PR-ów. Nie jest to zestaw samych rekomendacji: kod i dane zostały zmienione, a build uruchomiony.
 
 ## A. Repozytoria i pliki
 
-We wszystkich poniższych repozytoriach istnieje lokalny branch `cms-reorganizacja-2026-11`. Linki prowadzą do istniejących repozytoriów; linków do nieutworzonych branchy i PR-ów nie podano.
+We wszystkich poniższych repozytoriach utworzono zdalny branch `cms-reorganizacja-2026-11` i draft PR. W tabeli są bezpośrednie linki do repozytorium, brancha i PR-u.
 
-| Repozytorium | Zakres |
-|---|---|
-| [Web-Aktualnosci](https://github.com/IM-UWr/Web-Aktualnosci) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Core](https://github.com/IM-UWr/Web-Core) | Odczyt danych, ręczne menu, schematy i testy |
-| [Web-Instytut](https://github.com/IM-UWr/Web-Instytut) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Nauka](https://github.com/IM-UWr/Web-Nauka) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Podglad](https://github.com/IM-UWr/Web-Podglad) | Izolowany workflow testowy |
-| [Web-Popularyzacja](https://github.com/IM-UWr/Web-Popularyzacja) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Pracownicy](https://github.com/IM-UWr/Web-Pracownicy) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Analiza-Harmoniczna](https://github.com/IM-UWr/Web-Sem-Analiza-Harmoniczna) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Dydaktyka](https://github.com/IM-UWr/Web-Sem-Dydaktyka) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Dyskretna-Analiza-Harmoniczna](https://github.com/IM-UWr/Web-Sem-Dyskretna-Analiza-Harmoniczna) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Geometria](https://github.com/IM-UWr/Web-Sem-Geometria) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Prawdopodobienstwo](https://github.com/IM-UWr/Web-Sem-Prawdopodobienstwo) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Rownania-Rozniczkowe](https://github.com/IM-UWr/Web-Sem-Rownania-Rozniczkowe) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Statystyka](https://github.com/IM-UWr/Web-Sem-Statystyka) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Teoria-Modeli](https://github.com/IM-UWr/Web-Sem-Teoria-Modeli) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Sem-Topologia](https://github.com/IM-UWr/Web-Sem-Topologia) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Spec-Aktuarialno-Finansowa](https://github.com/IM-UWr/Web-Spec-Aktuarialno-Finansowa) | Archiwum: wyłączenie formularza, zachowanie danych |
-| [Web-Spec-Analiza-Danych](https://github.com/IM-UWr/Web-Spec-Analiza-Danych) | Archiwum: wyłączenie formularza, zachowanie danych |
-| [Web-Spec-Nauczycielska](https://github.com/IM-UWr/Web-Spec-Nauczycielska) | Archiwum: wyłączenie formularza, zachowanie danych |
-| [Web-Spec-Stosowana](https://github.com/IM-UWr/Web-Spec-Stosowana) | Archiwum: wyłączenie formularza, zachowanie danych |
-| [Web-Spec-Teoretyczna](https://github.com/IM-UWr/Web-Spec-Teoretyczna) | Archiwum: wyłączenie formularza, zachowanie danych |
-| [Web-Studia](https://github.com/IM-UWr/Web-Studia) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
-| [Web-Ustawienia](https://github.com/IM-UWr/Web-Ustawienia) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| Repozytorium | Branch | Draft PR | Zakres |
+|---|---|---|---|
+| [Web-Aktualnosci](https://github.com/IM-UWr/Web-Aktualnosci) | [branch](https://github.com/IM-UWr/Web-Aktualnosci/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Aktualnosci/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Core](https://github.com/IM-UWr/Web-Core) | [branch](https://github.com/IM-UWr/Web-Core/tree/cms-reorganizacja-2026-11) | [#2](https://github.com/IM-UWr/Web-Core/pull/2) | Odczyt danych, ręczne menu, schematy i testy |
+| [Web-Instytut](https://github.com/IM-UWr/Web-Instytut) | [branch](https://github.com/IM-UWr/Web-Instytut/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Instytut/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Nauka](https://github.com/IM-UWr/Web-Nauka) | [branch](https://github.com/IM-UWr/Web-Nauka/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Nauka/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Podglad](https://github.com/IM-UWr/Web-Podglad) | [branch](https://github.com/IM-UWr/Web-Podglad/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Podglad/pull/1) | Izolowany workflow testowy |
+| [Web-Popularyzacja](https://github.com/IM-UWr/Web-Popularyzacja) | [branch](https://github.com/IM-UWr/Web-Popularyzacja/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Popularyzacja/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Pracownicy](https://github.com/IM-UWr/Web-Pracownicy) | [branch](https://github.com/IM-UWr/Web-Pracownicy/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Pracownicy/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Analiza-Harmoniczna](https://github.com/IM-UWr/Web-Sem-Analiza-Harmoniczna) | [branch](https://github.com/IM-UWr/Web-Sem-Analiza-Harmoniczna/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Analiza-Harmoniczna/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Dydaktyka](https://github.com/IM-UWr/Web-Sem-Dydaktyka) | [branch](https://github.com/IM-UWr/Web-Sem-Dydaktyka/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Dydaktyka/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Dyskretna-Analiza-Harmoniczna](https://github.com/IM-UWr/Web-Sem-Dyskretna-Analiza-Harmoniczna) | [branch](https://github.com/IM-UWr/Web-Sem-Dyskretna-Analiza-Harmoniczna/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Dyskretna-Analiza-Harmoniczna/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Geometria](https://github.com/IM-UWr/Web-Sem-Geometria) | [branch](https://github.com/IM-UWr/Web-Sem-Geometria/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Geometria/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Prawdopodobienstwo](https://github.com/IM-UWr/Web-Sem-Prawdopodobienstwo) | [branch](https://github.com/IM-UWr/Web-Sem-Prawdopodobienstwo/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Prawdopodobienstwo/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Rownania-Rozniczkowe](https://github.com/IM-UWr/Web-Sem-Rownania-Rozniczkowe) | [branch](https://github.com/IM-UWr/Web-Sem-Rownania-Rozniczkowe/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Rownania-Rozniczkowe/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Statystyka](https://github.com/IM-UWr/Web-Sem-Statystyka) | [branch](https://github.com/IM-UWr/Web-Sem-Statystyka/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Statystyka/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Teoria-Modeli](https://github.com/IM-UWr/Web-Sem-Teoria-Modeli) | [branch](https://github.com/IM-UWr/Web-Sem-Teoria-Modeli/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Teoria-Modeli/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Sem-Topologia](https://github.com/IM-UWr/Web-Sem-Topologia) | [branch](https://github.com/IM-UWr/Web-Sem-Topologia/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Sem-Topologia/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Spec-Aktuarialno-Finansowa](https://github.com/IM-UWr/Web-Spec-Aktuarialno-Finansowa) | [branch](https://github.com/IM-UWr/Web-Spec-Aktuarialno-Finansowa/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Spec-Aktuarialno-Finansowa/pull/1) | Archiwum: wyłączenie formularza, zachowanie danych |
+| [Web-Spec-Analiza-Danych](https://github.com/IM-UWr/Web-Spec-Analiza-Danych) | [branch](https://github.com/IM-UWr/Web-Spec-Analiza-Danych/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Spec-Analiza-Danych/pull/1) | Archiwum: wyłączenie formularza, zachowanie danych |
+| [Web-Spec-Nauczycielska](https://github.com/IM-UWr/Web-Spec-Nauczycielska) | [branch](https://github.com/IM-UWr/Web-Spec-Nauczycielska/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Spec-Nauczycielska/pull/1) | Archiwum: wyłączenie formularza, zachowanie danych |
+| [Web-Spec-Stosowana](https://github.com/IM-UWr/Web-Spec-Stosowana) | [branch](https://github.com/IM-UWr/Web-Spec-Stosowana/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Spec-Stosowana/pull/1) | Archiwum: wyłączenie formularza, zachowanie danych |
+| [Web-Spec-Teoretyczna](https://github.com/IM-UWr/Web-Spec-Teoretyczna) | [branch](https://github.com/IM-UWr/Web-Spec-Teoretyczna/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Spec-Teoretyczna/pull/1) | Archiwum: wyłączenie formularza, zachowanie danych |
+| [Web-Studia](https://github.com/IM-UWr/Web-Studia) | [branch](https://github.com/IM-UWr/Web-Studia/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Studia/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
+| [Web-Ustawienia](https://github.com/IM-UWr/Web-Ustawienia) | [branch](https://github.com/IM-UWr/Web-Ustawienia/tree/cms-reorganizacja-2026-11) | [#1](https://github.com/IM-UWr/Web-Ustawienia/pull/1) | Formularze CMS, opisy i statusy; dane zgodne z formularzami |
 
 Najważniejsze pliki:
 
@@ -145,17 +145,17 @@ Nie pomylono statusu z `opublikowany`. Nie wdrożono filtrowania dwóch wersji, 
 | Kafelek i menu PL/EN | Zgodne teksty i adresy z generowaną wcześniej wersją |
 | Niezależność statystyk | Dodatkowy kierunek dał 4 zamiast 3; nadal 5 specjalności, menu i kafelki bez automatycznego wpisu |
 | Przełączniki bez zmiany działania | Testowa specjalność z `podglad`, `zewnetrzna` i adresem zewnętrznym nadal ma dotychczasową stronę CMS, bez przekierowania |
-| Testy przeglądarkowe w tym środowisku | Niewykonane: lokalny Chromium i serwer podglądu napotkały ograniczenia systemowe; pobranie headless-shell nie powiodło się; chmurowa przeglądarka odrzuciła lokalny protokół plików |
+| Testy przeglądarkowe | OK na GitHub Actions: komputer PL, komputer EN, telefon PL i telefon EN. Sprawdzono otwieranie i zamykanie menu, grupy kierunków, kolejność i adresy menu, kafelki oraz wejścia na kierunki i specjalności; bez błędów JavaScript. Lokalne uruchomienie było zablokowane ograniczeniami środowiska. |
 | Formularze w zalogowanej aplikacji Pages CMS | Nie testowano interakcyjnie. Wykonano walidację aktualnym schematem i kontrolę zapisywanych danych |
-| Zdalny test branchy / GitHub Actions | Nie uruchomiono — brak prawa zapisu blokuje utworzenie branchy i workflow na GitHub |
+| Zdalny test branchy / GitHub Actions | OK — [przebieg 42516815539](https://github.com/IM-UWr/Web-Podglad/actions/runs/42516815539) zakończony sukcesem. Pobieranie wyłącznie branchy reorganizacji, kontrola treści i CMS, 28 testów jednostkowych, Astro + Pagefind: 749 stron, cztery warianty testu przeglądarkowego. |
 
 Test danych tymczasowych odbył się wyłącznie na ignorowanej nakładce testowej. Te pliki i zmienione wartości usunięto po teście; nie należą do commitów.
 
 ## G. Podgląd i warunki wdrożenia
 
-Nowy workflow w Web-Podglad działa na branchu reorganizacji. Pobiera Web-Core i wszystkie 16 aktywnych źródeł z branchy o tej samej nazwie. Flaga `--scisle` celowo nie pozwala zamienić brakującego brancha na `main`. Zapisuje pełne SHA pobranych źródeł. Przygotowano również test Playwright menu na komputerze i telefonie, PL/EN, zrzuty kontrolne i przejście przez kierunki oraz specjalności. Nie twierdzimy, że ten test przeglądarkowy już przeszedł.
+Nowy workflow w Web-Podglad działa na branchu reorganizacji. Pobiera Web-Core i wszystkie 16 aktywnych źródeł z branchy o tej samej nazwie. Flaga `--scisle` celowo nie pozwala zamienić brakującego brancha na `main`. Zapisuje pełne SHA pobranych źródeł. Test Playwright menu na komputerze i telefonie, PL/EN, przeszedł na GitHub Actions. Obejmuje także kafelki i przejście przez kierunki oraz specjalności; zapisano cztery zrzuty kontrolne.
 
-Wynik workflow jest artefaktem `cms-reorganizacja-strona-testowa`; nie ma kroku deploy, uprawnień Pages, zapisu na `zbudowana` ani dostępu do domeny produkcyjnej. Nie istnieje nowy publiczny adres podglądu. Po uzyskaniu prawa zapisu należy wypchnąć komplet branchy, utworzyć draft PR-y i uruchomić ten workflow. Lokalne polecenie odtwarzające zestaw danych:
+Wynik workflow jest artefaktem `cms-reorganizacja-strona-testowa`; nie ma kroku deploy, uprawnień Pages, zapisu na `zbudowana` ani dostępu do domeny produkcyjnej. Nie istnieje nowy publiczny adres podglądu. Gotowa strona testowa (około 187 MB) jest dostępna jako [artefakt strony](https://github.com/IM-UWr/Web-Podglad/actions/runs/42516815539/artifacts/13631303160), a [zrzuty menu](https://github.com/IM-UWr/Web-Podglad/actions/runs/42516815539/artifacts/13632050907) jako osobny artefakt. Pobranie artefaktów wymaga zalogowania do GitHuba; stronę należy uruchomić na serwerze statycznym z bazową ścieżką `/Web-Podglad/`. Artefakt strony jest przechowywany do 22 listopada 2026; workflow można uruchomić ponownie na tym branchu. Komplet branchy i 23 draft PR-y są już na GitHubie; workflow uruchomił się automatycznie po zapisaniu brancha Web-Podglad. Lokalne polecenie odtwarzające zestaw danych:
 
 ```sh
 python3 skrypty/pobierz_tresci.py --lokalnie .. --galaz cms-reorganizacja-2026-11 --scisle
@@ -165,3 +165,15 @@ SITE_URL=https://im-uwr.github.io BASE_PATH=/Web-Podglad npm run build
 Przed przyszłym wdrożeniem potrzebna jest skoordynowana zmiana Web-Studia, Web-Ustawienia i Web-Core oraz pozostałych konfiguracji. Nie należy uruchamiać publikacji na mieszance starego Core i nowej migracji: stary Core nadal pobierałby Web-Spec-* i zgłaszał powielone ścieżki. Należy wstrzymać publikację na czas skoordynowanego wdrożenia, wykonać test pełnego zestawu i dopiero potem wznowić obecny workflow. W tym zadaniu niczego nie scalano ani nie wyłączano w działającej publikacji.
 
 Formularze reorganizacji pokażą się w Pages CMS po wybraniu brancha `cms-reorganizacja-2026-11`; samo ich istnienie na tym branchu nie zmienia formularzy `main`.
+
+
+## Kontrola końcowa pakietu
+
+Końcowe porównanie potwierdziło zachowanie wszystkich 856 adresów HTML/XML/ICS. Na 749 stronach HTML nie zmienił się tekst głównej treści, kolejność i adresy odnośników głównej treści, etykiety i adresy menu, tytuły, opisy do wyszukiwarek oraz canonical/hreflang. Porównanie wartości źródłowych potwierdziło zachowanie merytorycznych danych 590 plików; osobno sprawdzono ręczną migrację menu.
+
+Wszystkie 23 patche przeszły kontrolę zgodności z końcowymi drzewami plików. Repozytoria są na czystych lokalnych branchach reorganizacji; każdy lokalny main nadal wskazuje bazowe SHA. Końcowy build po odświeżeniu pamięci treści nie zgłosił ostrzeżeń o duplikatach.
+
+
+## Aktualizacja po podłączeniu konta Avean
+
+23 branche i 23 draft PR-y są zapisane na GitHubie. Dane źródeł testu zawiera artefakt `.tresci/zrodla.json`, a SHA Web-Core plik `.tresci/web-core-sha.txt`. Po udanym teście zmieniono wyłącznie ten raport, uzupełniając linki i wyniki; kod, konfiguracje CMS i treści poddane testom pozostają te same. W aplikacji Pages CMS nie przeprowadzono interakcyjnego zapisu formularza; ich zgodność zweryfikowano oficjalnym schematem i kontrolą danych. Przed wdrożeniem pozostaje skoordynowane scalenie zestawu oraz test redakcyjny formularzy na wybranym branchu; w tym zleceniu PR-y pozostają draftami.
