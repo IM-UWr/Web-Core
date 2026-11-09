@@ -137,3 +137,8 @@ w `.pages.yml`, dodaj plik treści i dopisz nazwę repozytorium w `tresci.json` 
 ## Domena UWr
 
 Po przydzieleniu domeny: Settings → Pages → Custom domain. Adres i ścieżkę bazową workflow pobiera automatycznie z ustawień Pages, więc w kodzie nic nie trzeba zmieniać.
+
+## Archiwum silnika banerów
+
+Stary, nieaktywny silnik animacji został wycofany z `main` 9.11.2026.
+[Archiwum, SHA i instrukcja odtworzenia](dok/archiwum-silnika-banerow.md).
