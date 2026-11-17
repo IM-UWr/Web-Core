@@ -1,6 +1,7 @@
 # Wersja angielska — postęp (zlecenie 11, zalecenie 12)
 
-Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`). Audyt: `dok/en/RAPORT-EN.md` na gałęzi `kopia/2026-11-01-estetyka-prototypy`
+Gałąź `wyglad/en` (z `wyglad/porzadki`, `f315100`; od 18.11.2026 znaczniki `archiwum/wyglad/en` i `archiwum/wyglad/porzadki`).
+Audyt: `dok/en/RAPORT-EN.md` w znaczniku `archiwum/kopia/2026-11-01-estetyka-prototypy` (dawniej gałąź)
 (numery K…, C…, D… poniżej to pozycje z tego raportu). Wyglądu nie zmieniam — tylko teksty.
 
 ## Krok 1: problemy w kodzie (sekcja K) — zrobione (5.11, ok. 02:20)

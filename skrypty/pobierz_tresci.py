@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Pobiera repozytoria treści organizacji (lista w tresci.json) i nakłada ich katalogi src/ i public/ na Web-Core.
 
-Uruchamiane przed każdym budowaniem (workflow „Budowanie i publikacja strony”, „Sprawdzenie gałęzi”, „Kontrola
-jakości”) i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
+Uruchamiane przed każdym budowaniem (workflow „Budowanie i publikacja strony”, budowa Podglądu w Web-Podglad)
+i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
 
 - Repozytoria są publiczne — pobieranie bez klucza (git clone --depth 1), kopie w .tresci/ (pomijane przez git).
 - Pobierana jest gałąź main, także gdy gałąź domyślna repozytorium jest inna. Opcja --galaz <nazwa>: pobiera wskazaną

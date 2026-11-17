@@ -5,7 +5,8 @@ typy, pomocniki, motywy matematyczne, niepodpięty arkusz `baner.css` i jego REA
 
 ## Zachowana wersja
 
-- Gałąź archiwalna: [`archiwum/2026-11-09-silnik-banerow`](https://github.com/IM-UWr/Web-Core/tree/archiwum/2026-11-09-silnik-banerow).
+- Znacznik archiwalny: [`archiwum/2026-11-09-silnik-banerow`](https://github.com/IM-UWr/Web-Core/tree/archiwum/2026-11-09-silnik-banerow)
+  (do 18.11.2026 gałąź o tej nazwie; zlecenie 38 zamieniło ją na znacznik wskazujący ten sam commit).
 - Pełny SHA sprzed usunięcia: [`ec63774647a165693e356f0555a87cb7a3b40c2f`](https://github.com/IM-UWr/Web-Core/commit/ec63774647a165693e356f0555a87cb7a3b40c2f).
 - [Kod i pierwotna instrukcja ponownego podłączenia](https://github.com/IM-UWr/Web-Core/tree/ec63774647a165693e356f0555a87cb7a3b40c2f/src/scripts/baner).
 
@@ -34,7 +35,7 @@ Historyczne komentarze wskazujące `src/scripts/baner/` odnoszą się do powyżs
 Na osobnej gałęzi roboczej można przywrócić sam katalog:
 
 ```sh
-git fetch origin archiwum/2026-11-09-silnik-banerow
+git fetch origin tag archiwum/2026-11-09-silnik-banerow
 git restore --source=ec63774647a165693e356f0555a87cb7a3b40c2f -- src/scripts/baner
 ```
 
