@@ -103,3 +103,8 @@ Thumbs.db
 # Lokalne wyniki porównania i testów jawnego Markdownu
 .test-jawne/
 .test-proza/
+
+# Raporty zleceń i zrzuty są tylko lokalne (zlecenie 38; dawne są w znaczniku archiwum/pierwsza-wersja)
+/raport-zrzuty/
+/RAPORT-*.md
+/PYTANIA.md

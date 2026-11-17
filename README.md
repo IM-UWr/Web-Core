@@ -138,7 +138,16 @@ w `.pages.yml`, dodaj plik treści i dopisz nazwę repozytorium w `tresci.json` 
 
 Po przydzieleniu domeny: Settings → Pages → Custom domain. Adres i ścieżkę bazową workflow pobiera automatycznie z ustawień Pages, więc w kodzie nic nie trzeba zmieniać.
 
-## Archiwum silnika banerów
+## Archiwa
+
+- **Pierwsza wersja strony** (sprzed „Założycieli”, z wariantami Obecna, Zwarta, Portal i Redakcyjna) oraz wszystkie
+  raporty zleceń (`RAPORT-*.md`, `PYTANIA.md`) i zrzuty (`raport-zrzuty/`) do 18.11.2026: znacznik
+  `archiwum/pierwsza-wersja`. Od zlecenia 38 raporty i zrzuty są tylko lokalne (`.gitignore`). Odwołania do
+  `RAPORT-…md` w komentarzach kodu dotyczą tamtej wersji.
+- **Stare gałęzie** wszystkich repozytoriów IM-UWr: znaczniki `archiwum/<nazwa gałęzi>` (zlecenie 38;
+  skrypt `skrypty/porzadki/galezie.py`). W repozytoriach zostaje tylko `main` (w Web-Podglad także `zbudowana`).
+
+### Archiwum silnika banerów
 
 Stary, nieaktywny silnik animacji został wycofany z `main` 9.11.2026.
 [Archiwum, SHA i instrukcja odtworzenia](dok/archiwum-silnika-banerow.md).

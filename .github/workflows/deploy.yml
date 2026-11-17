@@ -68,54 +68,6 @@ jobs:
           if [ -n "$warn" ]; then echo "::warning title=Ostrzeżenia budowania::${warn}"; fi
           echo "::notice title=Wynik budowania::$(find dist -name '*.html' | wc -l) stron HTML, $(du -sh dist | cut -f1)"
 
-      # Warianty wyglądu na komputer do porównania: każda gałąź wariant-<nazwa> jest budowana (równolegle) z tymi samymi
-      # treściami pod <adres strony>/warianty/<nazwa>/. Zdjęcia i dokumenty biorą z głównej strony (/pliki/), więc
-      # paczka prawie nie rośnie. Przełącznik w lewym dolnym rogu dodawany jest tu, przy publikacji, nie w kodzie
-      # strony; na telefonie (≤ 760 px) jest ukryty, a na podstronach z wyglad-podstron.json („zrobione”) go nie ma.
-      # Po wyborze wyglądu wystarczy usunąć gałęzie wariant-* (krok się pomija). Błąd budowania wariantu nie
-      # zatrzymuje publikacji głównej strony.
-      - name: Warianty wyglądu (gałęzie wariant-*)
-        continue-on-error: true
-        env:
-          BASE0: ${{ steps.pages.outputs.base_path }}
-          SITE0: ${{ steps.pages.outputs.origin }}
-        run: |
-          WARIANTY=$(git ls-remote --heads origin 'wariant-*' | sed 's#.*refs/heads/wariant-##' | sort)
-          if [ -z "$WARIANTY" ]; then echo "Brak gałęzi wariant-*"; exit 0; fi
-          # Pobranie gałęzi jedno po drugim (równoległe „git fetch” w jednym repozytorium wchodzą sobie w drogę),
-          # budowanie już równolegle.
-          git fetch -q --depth 1 origin $(for n in $WARIANTY; do echo "+refs/heads/wariant-$n:refs/remotes/origin/wariant-$n"; done) || true
-          for n in $WARIANTY; do git worktree add -q --detach "$RUNNER_TEMP/wariant-$n" "origin/wariant-$n" || true; done
-          zbuduj() {
-            n="$1"; d="$RUNNER_TEMP/wariant-$n"; cd "$d" || return 1
-            echo "pobieranie treści" > etap.log
-            python3 skrypty/pobierz_tresci.py --lokalnie "$GITHUB_WORKSPACE/.tresci" > tresci.log 2>&1 || return 1
-            echo "instalacja zależności" > etap.log
-            if cmp -s package.json "$GITHUB_WORKSPACE/package.json"; then cp -al "$GITHUB_WORKSPACE/node_modules" node_modules || return 1
-            else npm install --no-audit --no-fund --prefer-offline > install.log 2>&1 || return 1; fi
-            echo "budowanie" > etap.log
-            SITE_URL="$SITE0" BASE_PATH="$BASE0/warianty/$n" npm run build > build.log 2>&1 || return 1
-            echo "zdjęcia i dokumenty z głównej strony" > etap.log
-            rm -rf dist/pliki
-            find dist -name '*.html' -print0 | xargs -0 perl -pi -e "s#\Q$BASE0/warianty/$n/pliki/\E#$BASE0/pliki/#g"
-          }
-          for n in $WARIANTY; do ( if zbuduj "$n" > /dev/null 2>&1; then echo 0; else echo 1; fi > "$RUNNER_TEMP/wynik-$n" ) & done
-          wait
-          ok=""
-          for n in $WARIANTY; do
-            d="$RUNNER_TEMP/wariant-$n"
-            if [ "$(cat "$RUNNER_TEMP/wynik-$n")" = 0 ]; then
-              mkdir -p "dist/warianty/$n" && cp -r "$d/dist/." "dist/warianty/$n/"
-              ok="$ok $n"
-              echo "::notice title=Wariant $n::$(find "$d/dist" -name '*.html' | wc -l) stron HTML, $(du -sh "$d/dist" | cut -f1)"
-            else
-              echo "::warning title=Wariant $n się nie zbudował::etap: $(cat "$d/etap.log" 2>/dev/null || echo 'pobranie gałęzi') — $(cat "$d"/tresci.log "$d"/install.log "$d"/build.log 2>/dev/null | tail -n 20 | tr '\n' ' ' | tail -c 1500 | iconv -f utf-8 -t utf-8 -c)"
-            fi
-          done
-          [ -z "$ok" ] && exit 0
-          # Przełącznik w rogu stron i podstrony z wybranym wyglądem (wyglad-podstron.json): skrypty/warianty.py
-          python3 skrypty/warianty.py dist "$BASE0" $ok
-
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

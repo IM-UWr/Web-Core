@@ -8,7 +8,6 @@ import rehypeZewn from './src/plugins/rehype-zewn.mjs';
 import rehypeBloki from './src/plugins/rehype-bloki.mjs';
 import rehypeLimity from './src/plugins/rehype-limity.mjs';
 import remarkWzoryEdytora from './src/plugins/remark-wzory-edytora.mjs';
-import panelWariantow from './src/plugins/panel-wariantow.mjs';
 import trescTelefon from './src/plugins/postcss-tresc-telefon.mjs';
 
 // Adres strony. Na GitHub Pages (strona projektu) adres ma postać
@@ -18,14 +17,11 @@ import trescTelefon from './src/plugins/postcss-tresc-telefon.mjs';
 const site = process.env.SITE_URL || 'https://im-uwr.github.io';
 const base = process.env.BASE_PATH !== undefined ? process.env.BASE_PATH || '/' : '/Web-Core';
 
-// Panel wariantów skali (tylko `astro dev`) ukryty 6.11.2026 na prośbę właściciela. Żeby wrócił: true.
-const PANEL_WARIANTOW = false;
-
 export default defineConfig({
   site,
   base,
   trailingSlash: 'ignore',
-  integrations: [react(), ...(PANEL_WARIANTOW ? [panelWariantow()] : [])],
+  integrations: [react()],
   markdown: {
     // wzory zapisane edytorem Pages CMS (Treść stron i wpisów, zlecenie 30) — src/plugins/remark-wzory-edytora.mjs
     remarkPlugins: [remarkMath, remarkWzoryEdytora],
