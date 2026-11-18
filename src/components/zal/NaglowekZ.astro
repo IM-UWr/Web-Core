@@ -8,9 +8,10 @@
 // rodzaj „podstrona” — nagłówek podstrony: głęboki kolor działu na zdjęciu działu (mocniej z lewej, słabiej w prawo),
 //   „← Dział”, sygnet z małym podpisem w lewym marginesie i znak patrona z opisem przy prawej krawędzi. Bez animacji.
 //   Znak i opis (ciekawostka) tylko na podstronach z menu działu; strony głębiej mają sygnet i tytuł. Hasło i liczby — gdy są.
-//   Strony bez działu (strony ogólne) — granat, bez sygnetu i znaku. Aktualności (lista i wpisy; zlecenie 18, punkt 7) oraz listy Kalendarza,
+//   Strony bez działu (strony ogólne) — granat, bez sygnetu i znaku. Lista Aktualności (zlecenie 18, punkt 7) oraz listy Kalendarza,
 //   Obron doktorskich i „Warto wiedzieć” (zlecenie 27; banerAktualnosci() w src/lib/patroni.ts): też bez sygnetu i znaku, ale granat
-//   przechodzi w zdjęcie Aktualności po prawej, w naturalnych kolorach (klasa z-foto-nat).
+//   przechodzi w zdjęcie Aktualności po prawej, w naturalnych kolorach (klasa z-foto-nat). Wpis w Aktualnościach (zlecenie 37): podstrona
+//   działu wpisu (dzialWpisu, prop dzial z NaglowekStrony) — sygnet, kolor i zdjęcie działu; bez znaku, bo wpisu nie ma w menu działu.
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { u, stripBase } from '../../lib/url';

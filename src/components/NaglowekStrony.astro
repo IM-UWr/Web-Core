@@ -7,15 +7,16 @@
 // haslo: krótkie hasło działu (pola `haslo` / `haslo_en` w danych) — pokazywane razem z liczbami, a z hasloBezLiczb także bez nich.
 // Pola lead, nadtytul, nadtytulTelefon, motyw i motywDane zostają w Props dla zgodności widoków; nowy nagłówek ich nie pokazuje
 // (opis strony trafia do meta description). Stary silnik animacji: archiwum opisane w dok/archiwum-silnika-banerow.md.
+// dzial: dział banera spoza adresu (wpis w Aktualnościach, zlecenie 37: dzialWpisu) — pierwszeństwo przed banerAktualnosci() i działem z adresu.
 import NaglowekZ from './zal/NaglowekZ.astro';
-import { PATRONI, banerAktualnosci, dzialZeSciezki, pole } from '../lib/patroni';
+import { PATRONI, banerAktualnosci, dzialZeSciezki, pole, type Dzial } from '../lib/patroni';
 import { t } from '../lib/i18n';
 import { stripBase } from '../lib/url';
 import type { Lang } from '../lib/daty';
 import ustawienia from '../data/ustawienia.json';
 
-interface Props { tytul: string; tytulLang?: string; lead?: string; haslo?: string; hasloBezLiczb?: boolean; bezPodpisu?: boolean; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown }
-const { tytul, tytulLang, lang, okruszki = [], wstecz, bezPodpisu, hasloBezLiczb } = Astro.props;
+interface Props { tytul: string; tytulLang?: string; lead?: string; haslo?: string; hasloBezLiczb?: boolean; bezPodpisu?: boolean; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown; dzial?: Dzial }
+const { tytul, tytulLang, lang, okruszki = [], wstecz, bezPodpisu, hasloBezLiczb, dzial: dzialBanera } = Astro.props;
 const haslo = Astro.props.haslo?.trim() || undefined;
 const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
 const cel: { etykieta: string; adres: string; telefon?: string } = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
@@ -28,7 +29,7 @@ const DZIALY: Record<string, string> = {
   studia: 'studia', aktualnosci: 'aktualnosci', popularyzacja: 'popularyzacja',
 };
 const czlon = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';
-const dzial = DZIALY[czlon] ?? 'inne';
+const dzial = dzialBanera ?? DZIALY[czlon] ?? 'inne';
 const ust = ((ustawienia as any).naglowki_podstron ?? {}) as { wariant?: string; zdjecia?: Record<string, { zdjecie?: string }> };
 const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : 'granat';
 const domyslneZdjecia = Object.fromEntries(['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].map((d) => [d, { zdjecie: `/pliki/naglowki/${d}.jpg` }]));
@@ -38,8 +39,8 @@ const dlugi = ozdobny && tytul.trim().length > 20;
 
 const sciezkaZ = stripBase(Astro.url.pathname);
 const bezJezykaZ = sciezkaZ.replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
-// listy w stylu Aktualności (zlecenie 27): nagłówek bez działu, także na Obronach i „Warto wiedzieć”
-const dzialZ = banerAktualnosci(bezJezykaZ) ? undefined : dzialZeSciezki(sciezkaZ);
+// listy w stylu Aktualności (zlecenie 27): nagłówek bez działu, także na Obronach i „Warto wiedzieć”; wpis w Aktualnościach — dział wpisu (zlecenie 37)
+const dzialZ = dzialBanera ?? (banerAktualnosci(bezJezykaZ) ? undefined : dzialZeSciezki(sciezkaZ));
 const patronZ = dzialZ ? PATRONI[dzialZ] : undefined;
 const stronaDzialuZ = !!patronZ && bezJezykaZ === patronZ.adres;
 const zMenuDzialuZ = !!patronZ && !stronaDzialuZ && cel.adres.replace(/\/$/, '') === patronZ.adres;

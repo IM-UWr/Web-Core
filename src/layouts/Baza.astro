@@ -30,7 +30,7 @@ import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
 // Podgląd (PODGLAD=1): plakietka stanu budowy i wiersz szkicu (zlecenie 33, część B); w innych budowach nic, bajt w bajt
 // (dlatego w tym samym wierszu co StopkaZ — osobny wiersz dokładał odstęp przed </body>).
 import StanBudowy from '../components/zal/StanBudowy.astro';
-import { dzialZeSciezki } from '../lib/patroni';
+import { dzialZeSciezki, type Dzial } from '../lib/patroni';
 import Naglowek from '../components/Naglowek.astro';
 import { TYLKO_OPUBLIKOWANE } from '../lib/tresci';
 import Fonty from '../components/Fonty.astro';
@@ -57,9 +57,13 @@ interface Props {
   // zwarta — treść pod banerem jak w wariancie Zwarta (src/styles/uklad-zwarta.css); zwarta-baner — baner jak w Zwarta;
   // portal-baner — baner jak w Portal (src/styles/uklad-portal.css). Np. uklad="zwarta portal-baner". Bez propu — jak dotąd.
   uklad?: string;
+  // Dział strony spoza adresu (zlecenie 37: wpis w Aktualnościach, dzialWpisu): ma pierwszeństwo przed działem z adresu w pasku menu
+  // i w hamburgerze (podświetlony dział zamiast Aktualności). <body data-dzial> i „Następna strona w dziale” zostają z adresu:
+  // [data-dzial] przestawia --accent całej treści (zalozyciele.css, zal-telefon.css), a wpis ma mieć kolory treści jak dotąd.
+  dzial?: Dzial;
 }
 
-const { tytul, opis, obraz, opublikowany = true, pozaIndeksem = false, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true, uklad } = Astro.props;
+const { tytul, opis, obraz, opublikowany = true, pozaIndeksem = false, alternatywa, typ = 'website', stronaGlowna = false, szukaj = true, uklad, dzial } = Astro.props;
 // do indeksu (canonical, hreflang, Pagefind) — strony nie oznaczone jako poza indeksem; szkic tylko na Podglądzie (zlecenie 33: Podgląd
 // pokazuje wszystko, a przy fladze TYLKO_OPUBLIKOWANE stron-szkiców w ogóle nie ma)
 const wIndeksie = (opublikowany || !TYLKO_OPUBLIKOWANE) && !pozaIndeksem;
@@ -139,7 +143,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
   <body data-tlo={tlo} data-sekcje={sekcje} data-uklad={uklad?.trim() || undefined} data-dzial={dzialStrony}>
     <a class="skip" href="#tresc">{lang === 'en' ? 'Skip to content' : 'Przejdź do treści'}</a>
     {/* komputer: pasek menu na banerze (strona główna ma go pod okładką); telefon: nagłówek (Naglowek.astro). Panel menu jest jeden, przy pasku (PanelMenu.astro) */}
-    {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} />}
+    {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} dzial={dzial} />}
     <Naglowek lang={lang} sciezka={sciezka} inny={inny} idPanelu={stronaGlowna ? 'z-menu-druga' : 'z-menu-pasek'} naOkladce={stronaGlowna} />
     {!opublikowany && (
       <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>

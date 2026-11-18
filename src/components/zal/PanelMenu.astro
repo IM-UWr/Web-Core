@@ -11,17 +11,18 @@
 // Bieżąca strona (zlecenie 18, punkt 6): aria-current="page" na najdłuższym pasującym adresie, także dla podstron głębszych niż
 // pozycja menu; na komputerze panel otwiera się z rozwiniętym działem tej strony (section[data-biezacy]), poza działami wszystkie zwinięte.
 // Na telefonie zawsze złożony i bez koloru bieżącej strony (prośba właściciela, 6.11); aria-current zostaje dla czytników ekranu.
+// Wpis w Aktualnościach (zlecenie 37): dział wpisu przychodzi w dzial (PasekMenu ← Baza) i jest bieżącym działem zamiast Aktualności.
 // SIAD jako skrót z pełną nazwą w podpowiedzi (skrotNazwy).
 import Szkic from './Szkic.astro';
 import Link from '../Link.astro';
 import { menuGlowne, rekrutacja, sciezkaBezJezyka, pasujeDoSciezki } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
-import { PATRONI, DZIALY, dzialZeSciezki, pole, skrotNazwy } from '../../lib/patroni';
+import { PATRONI, DZIALY, dzialZeSciezki, pole, skrotNazwy, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-interface Props { lang: Lang; id: string; sciezka: string; jasny?: boolean; class?: string }
-const { lang, id, sciezka, jasny = false, class: klasa } = Astro.props;
+interface Props { lang: Lang; id: string; sciezka: string; jasny?: boolean; class?: string; dzial?: Dzial }
+const { lang, id, sciezka, jasny = false, class: klasa, dzial } = Astro.props;
 const en = lang === 'en';
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
@@ -44,7 +45,7 @@ const biezacy = linki.filter((l) => pasujeDoSciezki(tu, l.adres)).sort((a, b) =>
 // dział ze ścieżki (strona działu nie ma swojego linku w grupach), chyba że link tej strony stoi tylko w innym dziale: wtedy dział
 // z linkiem, żeby bieżąca strona była widoczna. Ten sam adres w dwóch działach (Szkoła doktorska: Nauka i Studia): oznaczony w tym ze ścieżki.
 const zeSciezki = dzialZeSciezki(sciezka);
-const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres === biezacy.adres) ? zeSciezki : biezacy.dz;
+const dzialBiezacy = dzial ?? (!biezacy || linki.some((l) => l.dz === zeSciezki && l.adres === biezacy.adres) ? zeSciezki : biezacy.dz);
 ---
 <nav class:list={['z-menu', jasny && 'z-menu-jasny', klasa]} id={id} aria-label={en ? 'Main menu' : 'Menu główne'} tabindex="-1" data-z-menu>
   <span class="z-zamknij"><button type="button" data-z-menu-zamknij aria-label={t(lang, 'zamknijMenu')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></span>
@@ -80,6 +81,6 @@ const dzialBiezacy = !biezacy || linki.some((l) => l.dz === zeSciezki && l.adres
       </div>
     </section>
   ))}
-  <section class="duza"><h2><a href={href('/aktualnosci')} aria-current={pasujeDoSciezki(tu, '/aktualnosci') ? 'page' : undefined}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
+  <section class="duza"><h2><a href={href('/aktualnosci')} aria-current={!dzial && pasujeDoSciezki(tu, '/aktualnosci') ? 'page' : undefined}>{(akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci')}</a></h2></section>
   <section class="duza"><h2><Link href={href(rek.adres)}>{rek.etykieta}</Link></h2></section>
 </nav>

@@ -42,6 +42,7 @@ const en = lang === 'en';
 const tytulInny = (w?: Aktualnosc) => (w ? (lang === 'en' && w.data.tytul_en) || w.data.tytul : '');
 const { tytul, zajawka, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze, dzialWiersza } = await daneAktualnosci(wpis, lang);
 // Wpis o wydarzeniu w kolorze swojego wiersza na liście (zlecenie 21, punkt 6): etykieta, data i linki w tekście; reszta jak dotąd (zalozyciele.css, .akt-wydarzenie).
+// Baner i menu (zlecenie 37): każdy wpis ma baner podstrony swojego działu (dzialWpisu) i ten dział podświetlony w menu; kolory treści jak wyżej.
 const oWydarzeniu = d.rodzaj === 'wydarzenie';
 const href = (a: string) => (isExternal(a) ? a : u(a));
 // typ pliku z prawej w liście plików (wzorzec: „PDF”, „strona ↗”)
@@ -57,7 +58,7 @@ const szerPliku = (await zdjecie(d.zdjecie))?.width;
 const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}` : '';
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta"
-  wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} dzial={oWydarzeniu ? dzialWpisu(d) : undefined}
+  wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} dzial={oWydarzeniu ? dzialWpisu(d) : undefined} dzialBanera={dzialWpisu(d)}
   klasa={['tresc', zKarta && 'akt-z-karta', oWydarzeniu && 'akt-wydarzenie'].filter(Boolean).join(' ')} klasaRamy={zKarta ? 'z-pd-pelna' : undefined}>
   <section class="akt-wpis">
     <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}</p>

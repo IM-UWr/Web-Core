@@ -10,7 +10,9 @@
 // widok telefonu dla samej treści (data-tresc="telefon", reguły robi src/plugins/postcss-tresc-telefon.mjs). Pozycje z limitem linii mają data-limit-linii="N" (src/lib/limity.mjs).
 // Sloty: domyślny — treść; „baner” — to, co ma stać w nagłówku pod tytułem (liczby .pt-liczby, plakietki, linki).
 // Właściwości: jak Baza (tytul, opis, obraz, uklad…) i NaglowekStrony (lead, haslo, okruszki, wstecz) oraz
-// dzial (kolory działu treści), spis ({ id, etykieta, krotka? }), klasa i atrybuty elementu treści.
+// dzial (kolory działu treści; wpis o wydarzeniu, zlecenie 21, punkt 6), dzialBanera (baner podstrony działu i bieżący dział w menu dla strony
+// spoza adresu działu: wpis w Aktualnościach, zlecenie 37 — do NaglowekStrony i Baza; kolory treści bez zmian), spis ({ id, etykieta, krotka? }),
+// klasa i atrybuty elementu treści.
 import Baza from '../../layouts/Baza.astro';
 import NaglowekStrony from '../NaglowekStrony.astro';
 import SpisStrony from './SpisStrony.astro';
@@ -40,14 +42,16 @@ interface Props {
   okruszki?: { etykieta: string; adres?: string }[];
   wstecz?: { etykieta: string; adres: string; telefon?: string };
   dzial?: Dzial;
+  // dział banera i menu (zlecenie 37), niezależny od kolorów treści (dzial)
+  dzialBanera?: Dzial;
   spis?: { id: string; etykieta: string; krotka?: string }[];
   klasa?: string;
   // dodatkowa klasa ramy .z-pd (np. z-wladze)
   klasaRamy?: string;
   atrybuty?: Record<string, string>;
 }
-const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, hasloBezLiczb, bezPodpisu, okruszki, wstecz, dzial, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
-const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lang, okruszki, wstecz };
+const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, hasloBezLiczb, bezPodpisu, okruszki, wstecz, dzial, dzialBanera, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
+const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lang, okruszki, wstecz, dzial: dzialBanera };
 
 // Zasada treści (zlecenie 25, punkt 1). Pozycja jest zła, gdy ma więcej linii niż limit (różne górne krawędzie prostokątów tekstu, tolerancja pół wysokości linii, tekst tylko
 // dla czytnika pominięty) albo gdy słowo wystaje z kolumny. Chwile: przed pierwszym narysowaniem, po wczytaniu krojów, przy zmianie szerokości okna (od stanu pełnego, w rAF, bez mrugania).
@@ -65,7 +69,7 @@ const ZASADA = `(function(pd){var tel=matchMedia('${MQ_TELEFON}'),tr=pd.querySel
   `uloz(true);addEventListener('resize',function(){if(innerWidth===sz)return;sz=innerWidth;cancelAnimationFrame(cz);cz=requestAnimationFrame(function(){uloz(true)})});` +
   `if(document.fonts)document.fonts.ready.then(function(){uloz(true)});document.addEventListener('z-spis',function(){uloz(false)})})(document.currentScript.parentElement);`;
 ---
-<Baza tytul={tytulKarty ?? tytul} opis={opis} obraz={obraz} opublikowany={opublikowany} alternatywa={alternatywa} typ={typ} uklad={uklad}>
+<Baza tytul={tytulKarty ?? tytul} opis={opis} obraz={obraz} opublikowany={opublikowany} alternatywa={alternatywa} typ={typ} uklad={uklad} dzial={dzialBanera}>
   {Astro.slots.has('baner')
     ? <NaglowekStrony {...naglowek}><slot name="baner" /></NaglowekStrony>
     : <NaglowekStrony {...naglowek} />}

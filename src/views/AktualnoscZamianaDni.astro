@@ -9,6 +9,8 @@
 // i semestr) między cienkimi liniami, tekst, przycisk-link do kalendarza, sekcja „Zobacz też” (ul.linki).
 // Szablon Podstrona.astro nie przekazuje do Baza.astro `szukaj` ani slotu „head” (noindex poza oknem), dlatego rama jest
 // tu złożona z tych samych elementów ręcznie. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
+// Baner i menu (zlecenie 37): jak każdy wpis — podstrona działu wpisu (dzialWpisu z tymi samymi polami co wiersz listy w kolory-dni.ts:
+// ogłoszenie dla studentów i pracowników, czyli Studia) i ten dział podświetlony w menu; treść bez kolorów działu.
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import { u } from '../lib/url';
@@ -16,16 +18,18 @@ import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
 import { short, longWithDay, type Lang } from '../lib/daty';
 import { nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
 import { daneAktualnosciZamianyDni } from '../lib/widoki/aktualnoscZamianaDni';
+import { dzialWpisu } from '../lib/patroni';
 
 interface Props { data: string; lang: Lang }
 const { data, lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const { a, d, html, minela, dla, kalendarz } = await daneAktualnosciZamianyDni(data, lang);
 const wielka = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const dzialBanera = dzialWpisu({ rodzaj: 'ogloszenie', dla });
 ---
-<Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie} uklad="zwarta">
+<Baza tytul={a.tytul} opis={a.zajawka} typ="article" szukaj={a.wOknie} uklad="zwarta" dzial={dzialBanera}>
   {!a.wOknie && <meta slot="head" name="robots" content="noindex" />}
-  <NaglowekStrony tytul={a.tytul} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} />
+  <NaglowekStrony tytul={a.tytul} lang={lang} wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} dzial={dzialBanera} />
   <div class="z-pd">
     <div class="z-pd-tresc tresc">
       <section class="zd">

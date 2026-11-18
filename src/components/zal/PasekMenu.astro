@@ -7,21 +7,22 @@
 // Strona główna: zwykły jasny pasek na górze drugiego ekranu (klasa z-pasek-jasny).
 // Na telefonie (≤ 1023 px) sam pasek jest schowany (zal-telefon.css), tam jest nagłówek Naglowek.astro; panel zostaje i otwiera go
 // hamburger z nagłówka (id panelu: Baza.astro).
+// Bieżący dział: z adresu, a gdy Baza poda dzial (wpis w Aktualnościach, zlecenie 37) — ten dział zamiast Aktualności.
 import PanelMenu from './PanelMenu.astro';
 import Flaga from './Flaga.astro';
 import { menuGlowne } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
 import { t, wJezyku, wybierz, UWR_ADRES } from '../../lib/i18n';
-import { PATRONI, DZIALY, dzialZeSciezki, pole } from '../../lib/patroni';
+import { PATRONI, DZIALY, dzialZeSciezki, pole, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
-interface Props { lang: Lang; sciezka: string; inny: string | null; class?: string }
-const { lang, sciezka, inny, class: klasa } = Astro.props;
+interface Props { lang: Lang; sciezka: string; inny: string | null; class?: string; dzial?: Dzial }
+const { lang, sciezka, inny, class: klasa, dzial } = Astro.props;
 const menu = await menuGlowne();
 const bezJezyka = sciezka.replace(/^\/en(?=\/|$)/, '') || '/';
 const href = (adres: string) => (isExternal(adres) ? adres : u(wJezyku(adres, lang)));
 const zMenu = (adres: string) => menu.find((p) => p.adres === adres);
-const biezacy = dzialZeSciezki(sciezka);
+const biezacy = dzial ?? dzialZeSciezki(sciezka);
 const jasny = !!klasa?.includes('z-pasek-jasny');
 const idPanelu = jasny ? 'z-menu-druga' : 'z-menu-pasek';
 
@@ -31,7 +32,7 @@ const dzialy = DZIALY.map((dz) => {
 });
 const akt = zMenu('/aktualnosci');
 const aktualnosci = { adres: '/aktualnosci', etykieta: (akt && wybierz(akt, 'etykieta', lang)) || t(lang, 'aktualnosci') };
-const naAktualnosciach = bezJezyka === '/aktualnosci' || bezJezyka.startsWith('/aktualnosci/');
+const naAktualnosciach = !dzial && (bezJezyka === '/aktualnosci' || bezJezyka.startsWith('/aktualnosci/'));
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
 <header class:list={['z-pasek', klasa]} data-z-pasek>
@@ -68,5 +69,5 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
     </nav>
   </div>
 </header>
-<PanelMenu lang={lang} id={idPanelu} sciezka={sciezka} jasny={jasny} class="z-menu-pasek" />
+<PanelMenu lang={lang} id={idPanelu} sciezka={sciezka} jasny={jasny} class="z-menu-pasek" dzial={dzial} />
 <script>import '../../scripts/zal/menu'; import '../../scripts/zal/pasek';</script>
