@@ -114,7 +114,7 @@ Lista plików (opis po myślniku jest opcjonalny):
 | Treść strony kierunku (PL i EN) | Web-Studia → Kierunki → Treść |
 | Nadtytuł, zdanie pod nazwą, hasło, liczby w nagłówku | Web-Studia → Kierunki → Baner (nazwa pliku = nazwa pliku kierunku, np. `matematyka`; bez banera nagłówek ma samą nazwę) |
 | Przypomnienia na stronie głównej (np. deklaracja specjalności) | Web-Studia → Przypomnienia o terminach |
-| Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Ustawienia strony → Sekcja „Studiuj matematykę” → Kierunki w menu… (kierunek spoza listy pojawi się sam na końcu) |
+| Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Ustawienia strony → Sekcja „Studiuj matematykę” → Kierunki w menu… Nowy kierunek pojawi się w menu i kafelkach dopiero po dopisaniu go tutaj (robi to administrator). Każda pozycja ma wszystko wpisane: nazwa i opis w menu, nazwa, napis nad nią i zdanie na kafelku (puste pole zostaje puste na stronie). Studia podyplomowe to też kierunek (`/studia/podyplomowe`). |
 | Treść strony specjalności (PL i EN) | Web-Spec-* → Specjalność: … → Treść (wygaszana Matematyka w ekonomii: Web-Studia) |
 | Kafelek specjalności na stronie kierunku, skrót, poziom, hasło, zakład, opiekunowie, seminaria | Web-Spec-* → Specjalność: … → Baner i kafelek (strona kierunku buduje kafelki sama) |
 | Tekst „O popularyzacji”, tytuł, „W skrócie”, lata tradycji | Web-Popularyzacja → Strona działu Popularyzacja |

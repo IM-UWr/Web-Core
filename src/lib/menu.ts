@@ -1,11 +1,10 @@
-// Menu główne: dane z src/data/nawigacja.json + kierunki studiów wstawiane automatycznie (w grupie z "kierunki": true)
-// z listy w Ustawieniach (studia.kierunki; kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28).
+// Menu główne: dane z src/data/nawigacja.json + kierunki studiów z listy w Ustawieniach (studia.kierunki), wstawiane na początek
+// grupy z "kierunki": true. Tylko pozycje z listy, z nazwą i opisem wpisanymi na liście (zlecenie 39, src/lib/kierunki.ts).
 import nawigacja from '../data/nawigacja.json';
 import { pozycjeKierunkow } from './kierunki';
 import { wybierz } from './i18n';
 import { isExternal } from './url';
 import { semestry } from './kolory-dni';
-import { skrotNazwy } from './patroni';
 import type { Lang } from './daty';
 
 // opis, opis_en: krótki opis pod nazwą w pasie działu na komputerze (zlecenie 20, punkt 2); pusty = bez opisu
@@ -30,20 +29,13 @@ export async function menuGlowne(): Promise<Pozycja[]> {
   if (pamiec) return pamiec;
   const kierunki: Link[] = (await pozycjeKierunkow())
     .filter((p) => p.w_menu !== false)
-    .map((p) => {
-      const pelna = p.kierunek?.data.nazwa;
-      const pelnaEn = p.kierunek?.data.nazwa_en;
-      const e = p.nazwa || pelna || p.adres;
-      const eEn = p.nazwa_en || pelnaEn || e;
-      return {
-        etykieta: e,
-        etykieta_en: eEn,
-        // kierunek ze skrótem w menu i bez własnego opisu (SIAD, ISIM): opisem jest pełna nazwa
-        opis: p.opis_menu || (pelna && (skrotNazwy(e) || e !== pelna) ? pelna : undefined),
-        opis_en: p.opis_menu_en || (pelnaEn && eEn !== pelnaEn ? pelnaEn : undefined),
-        adres: p.adres,
-      };
-    });
+    .map((p) => ({
+      etykieta: p.nazwa_menu ?? '',
+      etykieta_en: p.nazwa_menu_en || p.nazwa_menu,
+      opis: p.opis_menu || undefined,
+      opis_en: p.opis_menu_en || undefined,
+      adres: p.adres,
+    }));
   pamiec = (nawigacja.menu as Pozycja[]).map((m) => ({
     ...m,
     grupy: m.grupy?.map((g) => (g.kierunki ? { ...g, linki: [...kierunki, ...g.linki.filter((l) => !kierunki.some((k) => k.adres === l.adres))] } : g)),

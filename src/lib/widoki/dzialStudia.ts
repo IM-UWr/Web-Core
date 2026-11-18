@@ -2,7 +2,7 @@
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { menuGlowne } from '../menu';
-import { listaKierunkow, jestSzkolaDoktorska, stopnieKierunku } from '../kierunki';
+import { listaKierunkow, jestSzkolaDoktorska, jestPodyplomowe, stopnieKierunku } from '../kierunki';
 import { listaAktualnosci } from '../tresci';
 import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
 import { stronaDzialu } from '../tekstyStron';
@@ -27,7 +27,7 @@ export async function daneDzialuStudia(lang: Lang) {
   );
   // stopnie z nadtytułu banera i treści kierunku („I i II stopnia”), szkoła doktorska = III (zlecenie 28: pól etapów już nie ma)
   const wszystkieStopnie = [...new Set((await Promise.all(kierunki.map(stopnieKierunku))).flat())].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
-  const nKierunkow = kierunki.filter((k) => !jestSzkolaDoktorska(k)).length;
+  const nKierunkow = kierunki.filter((k) => !jestSzkolaDoktorska(k) && !jestPodyplomowe(k)).length;
   // Liczby w banerze: kierunki, specjalności, stopnie studiów. Bez liczby nauczycieli akademickich — jest na stronie
   // „Instytut” (decyzja 31.10.2026: bez powtórzeń między działami). Krótkie etykiety, bez „do wyboru” i „(I, II, III)”
   // (decyzja 31.10.2026: na telefonie każda w jednej linijce; po angielsku „programmes” zamiast „degree programmes”).

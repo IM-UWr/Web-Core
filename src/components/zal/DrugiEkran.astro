@@ -106,11 +106,11 @@ const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
 });
 
 // Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi) z listy w Ustawieniach (studia.kierunki, kolejność listy;
-// kierunek spoza listy na końcu — src/lib/kierunki.ts, zlecenie 28), opis i rekrutacja z Ustawień
+// tylko pozycje z listy, z tym, co na niej wpisano — src/lib/kierunki.ts, zlecenie 39), opis i rekrutacja z Ustawień
 const st = ustawienia.studia as any;
 const kierunki = (await pozycjeKierunkow()).filter((p) => p.na_stronie_glownej !== false).map((p) => ({
-  poziom: wybierz(p, 'poziom', lang) || (p.kierunek ? T('Kierunek', 'Programme') : ''),
-  nazwa: wybierz(p, 'nazwa', lang) || (p.kierunek ? wybierz(p.kierunek.data, 'nazwa', lang) : ''),
+  poziom: wybierz(p, 'poziom', lang) || '',
+  nazwa: wybierz(p, 'nazwa', lang) || '',
   opis: wybierz(p, 'opis', lang),
   adres: p.adres,
 })).map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
