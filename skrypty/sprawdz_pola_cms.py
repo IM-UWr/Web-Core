@@ -18,6 +18,23 @@ import sys
 import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+class Wczytywacz(yaml.SafeLoader):
+    """YAML jak w Pages CMS i Astro (YAML 1.2): „13:00” to tekst, a nie liczba sześćdziesiątkowa 780 (YAML 1.1, PyYAML).
+    Pages CMS zapisuje godziny bez cudzysłowu (termin wydarzenia w aktualnościach, zlecenie 31)."""
+
+
+def _bez_szescdziesiatkowych(typ):
+    def konstruktor(loader, node):
+        if ':' in str(node.value):
+            return loader.construct_scalar(node)
+        return getattr(yaml.SafeLoader, f'construct_yaml_{typ}')(loader, node)
+    return konstruktor
+
+
+Wczytywacz.add_constructor('tag:yaml.org,2002:int', _bez_szescdziesiatkowych('int'))
+Wczytywacz.add_constructor('tag:yaml.org,2002:float', _bez_szescdziesiatkowych('float'))
 # „opublikowany”: świadomie bez pola (wszystko jest opublikowane, a brak wartości to true); „body”: treść pliku Markdown
 POLA_POMIJANE = {'opublikowany', 'body'}
 # Pliki świadomie bez formularza. stopka.json: nowy wygląd go nie czyta (zlecenie 22).
@@ -72,11 +89,11 @@ def wczytaj(sciezka):
     if sciezka.endswith('.json'):
         return json.loads(tekst)
     if sciezka.endswith(('.yml', '.yaml')):
-        return yaml.safe_load(tekst)
+        return yaml.load(tekst, Loader=Wczytywacz)
     m = re.match(r'^---\r?\n(.*?)\r?\n---\r?\n?(.*)$', tekst, re.S)
     if not m:
         return {'body': tekst}
-    dane = yaml.safe_load(m.group(1)) or {}
+    dane = yaml.load(m.group(1), Loader=Wczytywacz) or {}
     dane['body'] = m.group(2)
     return dane
 
@@ -114,6 +131,11 @@ def wartosci(pole, wartosc, gdzie, zglos):
             zglos(f'{gdzie}: zła data {x!r}')
         elif typ in ('string', 'text', 'rich-text', 'image', 'file', 'code') and not isinstance(x, str):
             zglos(f'{gdzie}: oczekiwany tekst, jest {type(x).__name__} {str(x)[:30]!r}')
+        elif typ in ('string', 'text') and pole.get('pattern'):
+            # wzorzec pola (np. godzina terminu, zlecenie 31): formularz nie zapisze wpisu z wartością spoza wzorca
+            wzor = pole['pattern'] if isinstance(pole['pattern'], str) else pole['pattern'].get('regex', '')
+            if not re.search(wzor, x):
+                zglos(f'{gdzie}: wartość {x!r} nie pasuje do wzorca pola ({wzor})')
 
 
 def main():
