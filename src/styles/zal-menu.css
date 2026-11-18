@@ -132,7 +132,7 @@
      jest ucięte. Zwinięte grupy zostają w układzie (0fr), więc szerokość listy nie zmienia się przy rozwijaniu działów.
      Pierwszy stan po otwarciu bez animacji (.bez-animacji, menu.ts): skrypt od razu mierzy bieżący link. */
   .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: grid; grid-template-rows: 0fr; visibility: hidden; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s linear .32s; }
-  .z-menu.zwijane section[data-dzial].rozwiniety .z-menu-grupy { display: grid; grid-template-rows: 1fr; visibility: visible; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s; }
+  .z-menu.zwijane section[data-dzial].rozwiniety .z-menu-grupy { display: grid; grid-template-rows: 1fr; visibility: inherit; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s; }
   .z-menu.zwijane.bez-animacji section[data-dzial] .z-menu-grupy { transition: none !important; }
   /* position: bez niego dopiski .sr-only linków poza stronę (absolutne) wystają ze zwiniętej grupy i lista zyskuje pasek przewijania */
   .z-menu.zwijane .z-menu-grupy-w { position: relative; min-height: 0; overflow: hidden; }
