@@ -63,13 +63,7 @@
   --accent-ink: #101828;
   --tint: #1c2740;
   --tint-ink: #f6c47a;
-  --minione-tlo: #232a38;
-  --minione-tekst: #8e99ad;
-  --photo: #1a2440;
-  --footer-bg: #060b16;
-  --footer-text: #ecf0f7;
-  --footer-muted: #a6b2c5;
-  --footer-line: #1e2a42;
+  /* --photo, --minione-*, --footer-*: w zalozyciele.css (zlecenie 34) */
   --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
 }
@@ -155,7 +149,7 @@ body > main { flex: 1 0 auto; }
 .js .hdr-foto { margin-bottom: calc(-1 * var(--hdr-h)); transition: background-color var(--t-sredni) var(--rytm), border-color var(--t-sredni) var(--rytm), box-shadow var(--t-sredni) var(--rytm); }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) { background: transparent; border-bottom-color: transparent; }
 .js .hdr.hdr-stopka:not(.menu-otwarte) { background: var(--footer-bg); border-bottom-color: transparent; box-shadow: none; }
-.js .hdr.hdr-stopka:not(.menu-otwarte) .burger { background: rgb(255 255 255 / .14); }
+.js .hdr.hdr-stopka:not(.menu-otwarte) .burger { background: var(--burger-tlo, rgb(255 255 255 / .14)); }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .brand-name, .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .nav > a, .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .nav-pill, .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .icon-btn:not(.burger), .js .hdr.hdr-stopka:not(.menu-otwarte) .brand-name, .js .hdr.hdr-stopka:not(.menu-otwarte) .nav > a, .js .hdr.hdr-stopka:not(.menu-otwarte) .nav-pill, .js .hdr.hdr-stopka:not(.menu-otwarte) .icon-btn:not(.burger) { color: #fff; }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .brand-sub, .js .hdr.hdr-stopka:not(.menu-otwarte) .brand-sub { color: rgb(255 255 255 / .82); }
 .js .hdr-foto:not(.przewiniety):not(.menu-otwarte) .brand-logo, .js .hdr.hdr-stopka:not(.menu-otwarte) .brand-logo { background: #fff; }

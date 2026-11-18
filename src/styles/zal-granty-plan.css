@@ -49,6 +49,8 @@
   .z-pl .pl-sem button + button, .z-pl .pl-dni button + button { border-left: 1px solid var(--line-ui); }
   .z-pl .pl-sem button:hover, .z-pl .pl-dni button:hover { color: var(--d-a); }
   .z-pl .pl-sem button[aria-pressed="true"], .z-pl .pl-dni button[aria-pressed="true"] { background: var(--d-a); color: var(--bg); }
+  /* ciemny (zlecenie 34): wybrany semestr i dzień z lekkim odcieniem działu i kreską pod spodem zamiast jaskrawego wypełnienia */
+  :root[data-theme="dark"] .z-pl :is(.pl-sem, .pl-dni) button[aria-pressed="true"] { background: color-mix(in oklab, var(--d-a) 16%, transparent); color: var(--ink); box-shadow: inset 0 -2px 0 var(--d-a); }
   .z-pl .pl-sem button:focus-visible, .z-pl .pl-dni button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; border-radius: 0; }
   .z-pl .pl-szukaj { flex: 1; min-width: 220px; margin: 0; font: inherit; font-size: 15px; padding: 8px 12px; border: 1px solid var(--line-ui); border-radius: 0;
     background: var(--bg); color: var(--ink); }
@@ -95,6 +97,7 @@
     font: inherit; font-size: 13.5px; font-weight: 600; color: var(--text); cursor: pointer; }
   .z-pl .pl-sem button + button, .z-pl .pl-dni button + button { border-left: 1px solid var(--line-ui); }
   .z-pl .pl-sem button[aria-pressed="true"], .z-pl .pl-dni button[aria-pressed="true"] { background: var(--d-a); color: var(--bg); }
+  :root[data-theme="dark"] .z-pl :is(.pl-sem, .pl-dni) button[aria-pressed="true"] { background: color-mix(in oklab, var(--d-a) 16%, transparent); color: var(--ink); box-shadow: inset 0 -2px 0 var(--d-a); }
   .z-pl .pl-sem button:focus-visible, .z-pl .pl-dni button:focus-visible { position: relative; outline: 2px solid var(--d-a); outline-offset: 2px; }
   /* pasek w dwóch rzędach: semestry po równo, pod nimi dni; wyszukiwarka tylko na komputerze (zlecenie 18, punkt 19) */
   .z-pl .pl-szukaj { display: none; }

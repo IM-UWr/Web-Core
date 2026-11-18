@@ -19,7 +19,7 @@
     --znacznik: var(--granat); --znacznik-ink: #fff;
     --font: var(--f-text);
   }
-  /* ciemny motyw „Nocny granat”: tokeny wspólne z komputerem (zalozyciele.css, poza @media) */
+  /* ciemny motyw „Granat z krawędzią” (zlecenie 34): tokeny wspólne z komputerem (zalozyciele.css, poza @media) */
   [data-dzial] { --accent: var(--d-a); }
   body { font-family: var(--f-text); }
   main :is(h1, h2, h3) { font-family: var(--f-display); font-weight: 500; letter-spacing: -.005em; }
@@ -49,12 +49,12 @@
   .hdr .brand-sub { color: var(--na-ciemnym-2) !important; }
   .hdr .brand-logo { background: #fff !important; transition: background-color var(--t-sredni) var(--rytm); }
   .hdr .icon-btn { color: #fff !important; background: transparent; }
-  .hdr .icon-btn.burger { background: rgb(255 255 255 / .14) !important; color: #fff !important; }
+  .hdr .icon-btn.burger { background: var(--burger-tlo, rgb(255 255 255 / .14)) !important; color: #fff !important; }
   .hdr.jasny .brand-name { color: var(--ink) !important; }
   .hdr.jasny .brand-sub { color: var(--muted) !important; }
   .hdr.jasny .brand-logo { background: var(--uwr) !important; }
   .hdr.jasny .icon-btn { color: color-mix(in srgb, var(--ink) 76%, transparent) !important; }
-  .hdr.jasny .icon-btn.burger { background: var(--surface) !important; color: var(--ink) !important; }
+  .hdr.jasny .icon-btn.burger { background: var(--burger-tlo, var(--surface)) !important; color: var(--ink) !important; }
   @media (prefers-reduced-motion: reduce) { .hdr, .hdr .brand-name, .hdr .brand-sub, .hdr .brand-logo, .hdr .icon-btn { transition: none; } }
   /* strona główna: Wydział albo Instytut w tym samym miejscu, widoczny jeden; ukryty bez fokusu i poza czytnikami (zlecenie 18, punkt 12) */
   .brand-okladka { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; }

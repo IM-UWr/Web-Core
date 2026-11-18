@@ -155,8 +155,7 @@
      Granatowy baner (.ph-granat, oba motywy): aktywny filtr biały z granatowym tekstem.
      Bursztyn zostaje: hasło, rysunek w banerze, miesiąc na kafelku, kreski sekcji, linki w treści, przyciski .btn-primary. */
   :root { --znacznik: #1b2d52; --znacznik-ink: #ffffff; }
-  :root[data-theme='dark'] { --znacznik: #2b4170; --znacznik-ink: #f1f4fa; --znacznik-tekst: #a9c0e8; --znacznik-miesiac: #f2a33a; }
-  :root[data-theme='dark'] { --tint-ink: #d3dcea; }
+  :root[data-theme='dark'] { --znacznik: var(--pow-2); --znacznik-ink: var(--ink); --znacznik-tekst: var(--text); --znacznik-miesiac: #f2a33a; }
   .ph-granat { --znacznik: #ffffff; --znacznik-ink: #1b2d52; }
 
   /* B1. Etykiety w wierszach list (.news-meta .badge: Aktualności, Kalendarz, wpis, konferencje, projekty…) — jedna

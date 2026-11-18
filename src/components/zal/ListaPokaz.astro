@@ -50,7 +50,7 @@ const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
   /* kolory poza działami (jak w Aktualnościach, wartości jak w :root w zalozyciele.css): panel, nagłówki grup i linki pod listą także na Obronach
      i „Warto wiedzieć”, gdzie <body> ma data-dzial działu, w którego menu stoją; kolor działu mają tylko wiersze z własnym data-dzial */
   .lp-uklad { --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de; --accent: var(--d-a); }
-  :global(:root[data-theme='dark']) .lp-uklad { --d-a: #e4eaf5; --d-t: #222e46; }
+  :global(:root[data-theme='dark']) .lp-uklad { --d-a: var(--ink); --d-t: var(--surface); }
   /* bez JS: bez filtrów (cała lista widoczna) */
   :global(html:not(.js)) .lp-narz { display: none; }
 

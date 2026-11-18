@@ -37,36 +37,53 @@
    = --line; propozycja ≥ 3:1 także w jasnym czeka na decyzję — RAPORT-ZLECENIE-11.md). */
 :root { --line-ui: var(--line); --rule: var(--ink); --panel: rgb(9 16 34); }
 
-/* ---------- ciemny motyw „Nocny granat” (zlecenie 11, zalecenie 10; wariant A z dok/ciemny/RAPORT-CIEMNY.md) ----------
-   Głęboki granat zamiast czerni: banery, stopka i okładka w granacie marki są o ton ciemniejsze od treści (jak w jasnym),
-   powierzchnie pół tonu jaśniejsze, panel menu jeszcze jaśniejszy. Jedna definicja dla komputera i telefonu.
+/* ---------- ciemny motyw „Granat z krawędzią” (zlecenie 34; pierwsza wersja: zlecenie 11) ----------
+   Granat o pół tonu ciemniejszy i mniej fioletowy niż dawniej; banery, stopka i okładka w granacie marki zostają osobną płytą
+   i kończą się kreską w kolorze działu (niżej). Powierzchnie o ton jaśniejsze (--surface), najechanie jeszcze o ton (--pow-2).
+   Jedna definicja dla komputera i telefonu; tryb jasny bez zmian.
    Tylko forma [data-theme="dark"]: skrypt w <head> zawsze ustawia data-theme (domyślnie jasny, także przy ciemnym
    systemie — decyzja z Baza.astro), więc forma z prefers-color-scheme nie miałaby kiedy zadziałać. */
 :root[data-theme="dark"] {
-  --bg: #18243b; --surface: #222e46; --line: #3a465c;
-  --ink: #e4eaf5; --text: #ced5e3; --muted: #a5afc1;
-  --line-ui: #727c8f; --rule: #7d8697; --panel: #24324f;
-  --tint: #222e46; --tint-ink: #e4eaf5;
-  --primary: #ced5e3; --accent: var(--d-a); --accent-ink: #18243b;
-  --uwr: #e4eaf5;
+  --bg: #172032; --surface: #202a3c; --pow-2: #2a3447; --line: #323b4b;
+  --ink: #ecf0f7; --text: #d1d6df; --muted: #a5abb7;
+  --line-ui: #727986; --rule: #585f6c; --panel: #1d2b44;
+  --tint: var(--surface); --tint-ink: var(--ink);
+  --primary: var(--text); --accent: var(--d-a); --accent-ink: var(--bg);
+  --uwr: var(--ink);
   /* kolory poza działami: wybrany przycisk i akcenty w kolorze tekstu (jasnym) */
-  --d-a: #e4eaf5; --d-t: #222e46;
+  --d-a: var(--ink); --d-t: var(--surface);
+  /* zdjęcia, minione terminy i stopka (dawniej w global.css; jedna definicja tutaj) */
+  --photo: var(--surface); --minione-tlo: var(--surface); --minione-tekst: var(--muted);
+  --footer-bg: #0d1830; --footer-text: var(--ink); --footer-muted: var(--muted); --footer-line: var(--line);
+  /* hamburger w nagłówku telefonu bez kółka (zal-telefon.css, global.css) */
+  --burger-tlo: transparent;
 }
-/* kolor działu: jasny kolor działu z 22% koloru nagłówków (pastel, nie neon, ≥ 4,5:1 na tle, powierzchni i --d-t);
-   tło działu: 11% koloru działu w powierzchni (zamiast przyciemnionego głębokiego, który dawał brudny brąz) */
+/* kolor działu: jasny kolor działu z 20% koloru nagłówków (pastel, nie neon, ≥ 4,5:1 na tle i powierzchni); tło działu to
+   powierzchnia, a kafelki grup na telefonie mają 14% koloru działu w powierzchni (--d-kafel, zal-dzialy.css) */
 :root[data-theme="dark"] [data-dzial]:is([data-dzial="instytut"], [data-dzial="nauka"], [data-dzial="studia"], [data-dzial="popularyzacja"]) {
-  --d-a: color-mix(in oklab, var(--d-j) 78%, #e4eaf5); --d-t: color-mix(in oklab, var(--d-j) 11%, #222e46);
+  --d-a: color-mix(in oklab, var(--d-j) 80%, var(--ink)); --d-t: var(--surface);
+  --d-kafel: color-mix(in oklab, var(--d-j) 14%, var(--surface));
 }
 /* wpis o wydarzeniu (zlecenie 21, punkt 6): .z-pd ma data-dzial, ale kolor działu mają tylko etykieta, data i linki w tekście.
    Reszta treści zostaje w kolorach poza działami (wartości jak w :root wyżej), wiersze „Najbliższych wydarzeń” mają własne data-dzial. */
 .akt-wydarzenie { --d-wpisu: var(--d-a); }
 .akt-wydarzenie > * { --d-j: #c9d0de; --d-g: var(--granat-2); --d-a: #131c31; --d-t: #eef0f4; --d-jm: #c9d0de; --accent: var(--d-a); }
-:root[data-theme="dark"] .akt-wydarzenie > * { --d-a: #e4eaf5; --d-t: #222e46; }
+:root[data-theme="dark"] .akt-wydarzenie > * { --d-a: var(--ink); --d-t: var(--surface); }
 .akt-wydarzenie :is(.akt-meta, .akt-wyd-data, .prose a) { --d-a: var(--d-wpisu); --accent: var(--d-wpisu); }
 /* zdjęcia w dwóch kolorach: światła w kolorze działu przygaszonym granatem (cienie bez zmian — bez szwu z granatem z lewej) */
 :root[data-theme="dark"] .z-nagl .z-foto { background: color-mix(in oklab, var(--d-j) 55%, var(--granat)); }
 /* nagłówek podstrony: głęboki kolor działu z domieszką granatu zamiast jaskrawej cegły / ochry (gradienty te same) */
 :root[data-theme="dark"] .z-nagl.z-nagl-pod { --g-pod: color-mix(in oklab, var(--d-g) 72%, var(--granat)); }
+/* krawędź banera (zlecenie 34, komputer i telefon): zamiast szarej kreski pod banerem kreska 2 px w kolorze działu;
+   banery bez działu i granatowe (Aktualności, wpisy, listy w ich stylu) — cienka jasna linia 1 px */
+:root[data-theme="dark"] .z-nagl { box-shadow: none; }
+:root[data-theme="dark"] .z-nagl::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: 2px; pointer-events: none;
+  background: color-mix(in srgb, var(--d-j) 80%, transparent); }
+:root[data-theme="dark"] :is(.z-nagl.z-granat, .z-nagl:not([data-dzial]))::after { height: 1px; background: rgb(201 208 222 / .38); }
+/* przyciski ☀, EN, ☰ (pasek menu, okładka, nagłówek telefonu): najechanie lekkim odcieniem koloru tekstu; hamburger telefonu
+   dostaje go przez --burger-tlo, bo jego tło ustawiają reguły z !important (zal-telefon.css) */
+:root[data-theme="dark"] :is(.z-pasek-narz, .z-narz, .hdr-tools) > :is(a, button):hover { background: color-mix(in srgb, currentColor 12%, transparent); border-radius: 4px; }
+:root[data-theme="dark"] .hdr-tools > .burger:hover { --burger-tlo: color-mix(in srgb, currentColor 12%, transparent); border-radius: 4px; }
 /* baner Aktualności (zlecenie 18, punkt 7; układ niżej, telefon w zal-telefon.css): zdjęcie w naturalnych kolorach, bez mnożenia
    z kolorem i bez filtrów, w obu motywach */
 /* overflow: rozmyta mała wersja zdjęcia nie wychodzi na granat przy lewej krawędzi */
@@ -414,6 +431,9 @@
   .z-narz :is(a, button):hover { background: rgb(9 16 34 / .7); }
   .z-narz :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .z-narz svg:not(.z-flaga) { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
+  /* ciemny (zlecenie 34): przyciski bez kafelków i rozmycia, czytelne dzięki cieniowi pod treścią; odstępy i kolejność jak w jasnym */
+  :root[data-theme="dark"] .z-narz :is(a, button) { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; text-shadow: 0 1px 8px rgb(9 16 34 / .8); }
+  :root[data-theme="dark"] .z-narz svg:not(.z-flaga) { filter: drop-shadow(0 1px 4px rgb(9 16 34 / .8)); }
   /* okładka: logo UWr i wydział w górnej linii, na wysokości narzędzi z prawej (zlecenie 11, zalecenie 7) */
   /* dwa linki obok siebie (zlecenie 32, punkt 8): orzeł do UWr, nazwa do Wydziału; każdy podświetla się osobno */
   .z-okl-marka { position: absolute; z-index: 5; top: calc(18px * var(--sk)); left: var(--okl-marg); display: flex; align-items: center; gap: calc(14px * var(--sk)); color: #fff; }

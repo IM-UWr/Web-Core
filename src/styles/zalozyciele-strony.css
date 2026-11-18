@@ -21,6 +21,10 @@
   .z-skr a b { font-weight: 700; color: var(--ink); font-size: 15px; }
   .z-skr a small { font-size: 12.5px; color: var(--muted); }
   .z-skr a:hover { background: var(--surface); }
+  /* ciemny (zlecenie 34): jedna płyta na powierzchni z cienkimi kreskami zamiast grubej kreski 2 px */
+  :root[data-theme="dark"] .z-skr { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); }
+  :root[data-theme="dark"] .z-skr h2 { padding-left: 18px; }
+  :root[data-theme="dark"] .z-skr a:hover { background: var(--pow-2); }
   .z-skr-kd { --kd-n: #0e9cbc; --kd-p: #e0841b; }
   .z-kd-kropka { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: var(--muted); font-size: 0; vertical-align: 0; }
   .z-skr-kd[data-kolor="niebieski"] .z-kd-kropka, .z-skr-kd[data-kolor="brak"][data-nastepny="niebieski"] .z-kd-kropka { background: var(--kd-n); }

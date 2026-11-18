@@ -87,7 +87,7 @@ body[data-tlo='fale']::before { background: url('../assets/tlo/fale.webp') cente
 /* Kafelki wypełnione kolorem --surface zlewały się z jasnym tłem — na wzorze dostają pełne tło karty, cienką ramkę
    i lekki cień. :where(body…) = specyficzność jak samej klasy, więc :hover i własne kolory (np. kafelek kolorów dni) wygrywają. */
 body[data-tlo] { --kafel: #ffffff; --kafel-ramka: rgb(17 26 46 / .10); --kafel-cien: 0 1px 2px rgb(11 27 58 / .05), 0 6px 18px rgb(11 27 58 / .07); }
-:root[data-theme='dark'] body[data-tlo] { --kafel: #17223b; --kafel-ramka: rgb(255 255 255 / .09); --kafel-cien: 0 1px 2px rgb(0 0 0 / .35), 0 8px 22px rgb(0 0 0 / .3); }
+:root[data-theme='dark'] body[data-tlo] { --kafel: var(--surface); --kafel-ramka: var(--line); --kafel-cien: 0 1px 2px rgb(0 0 0 / .35), 0 8px 22px rgb(0 0 0 / .3); }
 :where(body[data-tlo]) :is(.tile, .stat, .side-box, .event-box, .why, .person, .toc-top, .dz-card, .dz-event, .cz) {
   background: var(--kafel); border: 1px solid var(--kafel-ramka); box-shadow: var(--kafel-cien); }
 
