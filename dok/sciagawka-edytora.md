@@ -1,102 +1,123 @@
-# Ściągawka edytora: kierunki, specjalności, strony działów, strony i aktualności
+# Ściągawka edytora: Strony, strony działów, kierunki, wpisy i aktualności
 
-Strona kierunku (np. `/studia/matematyka`) to jeden tekst: pole **Treść** w Pages CMS (Web-Studia → Kierunki → Treść), po angielsku pole **Treść EN**. Ten sam tekst jest w opisie pola „Treść” w formularzu (zlecenie 28). Tak samo strona specjalności (Web-Spec-* → „Specjalność: …” → Treść) i tekst „O popularyzacji” (Web-Popularyzacja → Strona działu Popularyzacja) — zlecenie 29; różnice niżej.
+W Pages CMS są dwa rodzaje tekstu (zlecenie 40):
 
-> Piszesz jak w zwykłym edytorze. Kilka układów strona rozpoznaje sama:
-> • Nagłówek 2 = nowa sekcja (pojawi się w spisie „Na tej stronie”).
-> • Punkt listy zaczynający się pogrubieniem = kafelek (np. „Dlaczego warto”).
-> • Lista numerowana z pogrubionym początkiem = oś kroków. W pogrubieniu tekst przed dwukropkiem to mała etykieta: „Semestry 1–2: Podstawy”.
-> • W punkcie linia „Termin: …” albo „Formularz: …” = para; sam link w linii = przycisk. Kolejną linię w tym samym punkcie dodasz Shift+Enter (zwykły Enter też zadziała).
-> • Nagłówek 3 zakończony znakiem „?” = rozwijane pytanie.
-> • Lista samych linków = lista plików (PDF / strona).
-> • Punkt z rolą kursywą i nazwiskiem pogrubionym = kontakt.
-> • Pod nagłówkiem „Specjalności” strona sama wstawi kafelki specjalności; pod „Program studiów” nagłówki 3 stają się zakładkami.
-> • Plik PDF: wgraj w „Media” i wklej link.
-> • Akapit zaczynający się od dwuliterowego skrótu z kropką („Np.”, „Dr.”, „No.”) edytor zapisze jako listę numerowaną „1.” — zacznij akapit inaczej albo pogrub skrót.
+- **Jawny Markdown** — kierunki i specjalności (Web-Studia) oraz Strony i strona działu w Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja, Web-Pracownicy i strony ze stopki (Web-Ustawienia: deklaracja dostępności, polityka prywatności, „O stronie”). Zwykły tekst, listy i tabele piszesz bez znaczników, specjalny układ (kafelki, oś kroków, pytania, pliki, kontakty) zamykasz w bloku `:::nazwa` … `:::`. Pełny opis: `dok/jawny-markdown.md`. Plik ma `format_tresci: jawne` (ukryte pole formularza; nowa Strona dostaje je sama).
+- **Zwykły Markdown** — wpisy: aktualności, obrony, zakłady, „Warto wiedzieć”, konferencje, projekty i granty, opisy seminariów i referaty. Bez bloków `:::`; wzory w LaTeX-u (`$\ell^2$`).
 
-Ostatni punkt to cecha edytora Pages CMS (TipTap 3: „Np. ” na początku akapitu bierze za punkt listy „a.”, „b.”), a nie strony; po zapisie słowa nie da się odtworzyć. W środku akapitu i w nowej linii po Shift+Enter skróty są bezpieczne.
+Strony Web-Aktualnosci (`aktualnosci`, `obrony-doktorskie` i inne) są jeszcze w dawnym formacie, w którym strona sama rozpoznaje układy (etap 3 zlecenia 40; opis dawnego formatu: `zasady-parsera.md`).
 
-**Specjalność** — w opisie pola „Treść” zamiast punktu o „Specjalnościach” i „Programie studiów”:
+**Formularze:** tytuł, tytuł EN (i „Opublikowane”) → Treść, Treść EN → reszta pól; pola EN tuż pod polskimi, z etykietą „… EN”. Puste pole EN = strona angielska pokaże tekst polski. Pole Treść to edytor Markdownu (pole `code`): wygląd sprawdzasz na Podglądzie po przebudowaniu (ok. 10 minut).
 
-> • Lista samych linków = lista plików (PDF / strona); w sekcji „Przydatne strony” — zwykłe linki.
-> • Cytat zaczynający się pogrubionym „Dla kogo” = ramka. Zwykła lista w „Co będziesz umieć” i „Przykładowe tematy prac” = lista z kreskami; w temacie „Tytuł — dopisek” dopisek jest szary.
-> • Pod nagłówkami „Seminaria” i „Opiekun specjalności” (albo „Opiekunowie specjalności”) strona sama wstawi seminaria i opiekunów z formularza „Baner i kafelek”, a ramkę „Wybór specjalności” — na końcu „Jak przebiega specjalność” (albo pod nagłówkiem „Wybór specjalności”). Bez takiego nagłówka wstawi je w zwykłym miejscu.
-> • Stały adres (kotwicę, np. #seminaria) mają sekcje o nagłówkach: O specjalności, Przydatne strony, Dlaczego warto, Jak przebiega specjalność, Wybór specjalności, Czego się uczysz, Co będziesz umieć, Po studiach, Przykładowe tematy prac, Seminaria, Dokumenty, Pytania i odpowiedzi, Opiekun specjalności.
+## Ściągawka w opisie pola „Treść”
 
-Po angielsku nagłówki: About, Useful pages, Why choose it, How the specialisation works, What you will learn, Skills, Careers, Sample thesis topics, Seminars, Documents, FAQ, Coordinator; ramka — cytat z pogrubionym „Who is it for”.
+Strony i strony działów (jawny Markdown):
 
-**Popularyzacja** — tekst „O popularyzacji” to jedna sekcja bez kotwic (nagłówki nie są potrzebne); pierwszy akapit strona pokazuje większą czcionką. Działają kafelki i listy plików.
+> Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i wklej link. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
 
-**Strony działów i strony z listą** (zlecenie 30) — strona działu Instytut, Nauka i Studia (Web-Instytut / Web-Nauka / Web-Studia → „Strona działu …”) to jeden tekst jak „O popularyzacji”: bloki działają zawsze, pierwszy akapit jest większy. Tytuł, opis, hasło i tekst nad listą stron Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje, Obrony doktorskie, Aktualności, Pracownicy, Struktura i zakłady, Warto wiedzieć i Plan zajęć to zwykłe strony w kolekcji „Strony” repozytorium, z którego pochodzi lista, pod adresem strony z listą (np. `nauka/konferencje.md` → `/nauka/konferencje`). Brak takiej strony nic nie psuje: lista ma domyślny tytuł i hasło, bez tekstu. Na zwykłych stronach bloki działają, gdy włączone jest pole „Bloki” („Kafelki, oś i kontakty z list”).
+Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
 
-Zasada **tekstu nad listą: lista stoi pod całym tekstem, chyba że jest kotwica** — sekcja pod nagłówkiem 2 o nazwie kotwicy idzie na miejsce swojej listy. Kotwice: „Ostatnie sukcesy” („Recent achievements”) na stronie działu Instytut — zdanie nad ostatnimi sukcesami; „Czasopisma redagowane w Instytucie” („Journals edited at the Institute”) na stronie Publikacje — tekst nad listą czasopism (nagłówek sekcji na stronie = nagłówek z tekstu).
+Wpisy (zwykły Markdown):
 
-Krótka ściągawka w opisie pola „Treść” stron i stron działów:
+> Zwykły Markdown: akapity oddziela pusta linia; \*\*pogrubienie\*\*, \*kursywa\*, [tekst linku](https://…); lista: „- ” na początku linii; ## = nagłówek sekcji. Plik PDF: wgraj w „Media” i wklej link. Komentarze <!-- … --> to podpowiedzi; na stronie ich nie widać.
 
-> Piszesz jak w zwykłym edytorze; akapity oddziela Enter. Nagłówek 2 = nowa sekcja (pojawi się w spisie „Na tej stronie”).
-> Gdy włączone jest pole „Bloki” (niżej), kilka układów strona rozpoznaje sama (strona działu: zawsze):
-> • Punkt listy zaczynający się pogrubieniem = kafelek.
-> • Lista numerowana z pogrubionym początkiem = oś kroków.
-> • Punkt z rolą kursywą i nazwiskiem pogrubionym = kontakt.
-> • Lista samych linków = lista plików (PDF / strona).
-> • Nagłówek 3 zakończony znakiem „?” = rozwijane pytanie.
-> • Tekst nad listą (Seminaria, Konferencje, Aktualności…): lista stoi pod całym tekstem, chyba że jest kotwica — np. na stronie Publikacje tekst pod nagłówkiem 2 „Czasopisma redagowane w Instytucie” stoi nad listą czasopism.
-> • Plik PDF: wgraj w „Media” i wklej link.
-> • Akapit zaczynający się od dwuliterowego skrótu z kropką („Np.”, „Dr.”, „No.”) edytor zapisze jako listę numerowaną „1.” — zacznij akapit inaczej albo pogrub skrót.
+## Przykłady (jawny Markdown)
 
-## Przykłady (tak wygląda tekst w Markdownie)
+Każdy znacznik bloku w osobnej linii, z pustą linią przed i po. Blok w bloku: na zewnątrz cztery dwukropki (`::::zakladki` … `::::`).
 
-Kolejne linie jednego punktu kończą się dwiema spacjami: tak edytor zapisuje Shift+Enter (w edytorze ich nie widać). Linia bez nich w pliku Markdown sklei się z poprzednią.
+Sekcja ze stałym adresem (zmieniasz nazwę, `{#…}` zostawiasz):
+
+```markdown
+## Dlaczego warto {#dlaczego-warto}
+
+Zwykły akapit, bez znaczników.
+```
 
 Kafelki:
 
 ```markdown
-## Dlaczego warto
+:::kafelki
 
 - **Kategoria A+** — Najwyższa ocena naukowa dyscypliny w Polsce.
 - **Pomoc na starcie** — Kurs wyrównawczy i tutornia.
+
+:::
 ```
 
-Oś kroków z parą i przyciskiem (kolejne linie punktu: Shift+Enter):
+Oś kroków z parą i przyciskiem (dalsze linie punktu wcięte trzema spacjami):
 
 ```markdown
-1. **Semestry 3–4: Wybór specjalności** — Pod koniec 4. semestru wybierasz specjalność.  
-   Termin: do 30 czerwca  
+:::etapy
+
+1. **Semestry 3–4: Wybór specjalności** — Pod koniec 4. semestru wybierasz specjalność.
+   Termin: do 30 czerwca
    [Formularz C2](https://forms.cloud.microsoft/e/SWEQQ1YF5L)
+
+:::
 ```
 
-Pytanie:
+Pytania (każdy `###` to jedno rozwijane pytanie):
 
 ```markdown
+:::pytania
+
 ### Kiedy wybieram specjalność?
 
 Pod koniec 4. semestru (formularz C2, do 30 czerwca).
+
+:::
 ```
 
 Kontakt:
 
 ```markdown
-- *Sekretariat dydaktyczny*  
-  **Justyna Jędrzejewska-Idczak**  
-  e-mail: [Justyna.Jedrzejewska-Idczak@uwr.edu.pl](mailto:Justyna.Jedrzejewska-Idczak@uwr.edu.pl)  
-  tel.: 71 375 7436  
+:::kontakty
+
+- *Sekretariat dydaktyczny* **Justyna Jędrzejewska-Idczak**
+  e-mail: [Justyna.Jedrzejewska-Idczak@uwr.edu.pl](mailto:Justyna.Jedrzejewska-Idczak@uwr.edu.pl)
   pokój: 315
+
+:::
 ```
 
-Ramka „Dla kogo” (specjalność):
+Lista plików (opis po myślniku opcjonalny; `:::linki` = lista zwykłych linków):
 
 ```markdown
-> **Dla kogo**
->
-> Dla osób, które lubią równania różniczkowe i chcą łączyć matematykę z programowaniem.
-```
+:::pliki
 
-Lista plików (opis po myślniku jest opcjonalny):
-
-```markdown
 - [Regulamin studiów](/pliki/studia/regulamin.pdf)
 - [Harmonogram wygaszania](/pliki/studia/zmiany2026.pdf) — Część przedmiotów jest wygaszana.
+
+:::
 ```
+
+Ramka z tytułem:
+
+```markdown
+:::ramka{tytul="Dla kogo"}
+
+Dla osób, które lubią równania różniczkowe i chcą łączyć matematykę z programowaniem.
+
+:::
+```
+
+Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::specjalnosci`, wstawki `::opiekun`, `::seminaria`, `::wybor`) opisuje `dok/jawny-markdown.md`.
+
+## Strony z listą, sekcje przenoszone, karty
+
+- **Tekst nad listą:** tytuł, opis, hasło i tekst stron Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje, Obrony doktorskie, Aktualności, Pracownicy, Struktura i zakłady, Warto wiedzieć i Plan zajęć to zwykłe Strony w repozytorium, z którego pochodzi lista, pod adresem strony z listą (np. `nauka/konferencje.md` → `/nauka/konferencje`). Tekst stoi nad listą. Brak takiej Strony nic nie psuje: lista ma domyślny tytuł i hasło, bez tekstu.
+- **Sekcja przenoszona** (decyduje jawne id, nie nazwa nagłówka):
+  - `## Ostatnie sukcesy {#sukcesy}` (EN: `## Recent achievements {#sukcesy}`) na końcu strony działu Instytut — zdanie nad ostatnimi sukcesami;
+  - `## Czasopisma redagowane w Instytucie {#czasopisma}` (EN: `## Journals edited at the Institute {#czasopisma}`) na Stronie Publikacje — tekst nad listą czasopism; bez tego nagłówka czasopisma są bez tekstu.
+- **Karty „Dla kogo” (Popularyzacja):** każda Strona z katalogu `popularyzacja/` ma kartę na stronie działu; tytuł karty = pole „Hasło” (puste = tytuł strony), zdanie = pole „Opis”.
+
+## Szablony nowych wpisów i pola, których strona nie pokazuje
+
+- **Szablon Treści:** nowy zakład, pozycja „Warto wiedzieć”, konferencja, projekt i referat startują z komentarzem w Treści, np. `<!-- TEKST: … -->` albo `<!-- STRESZCZENIE: … -->`. Treść z samym komentarzem liczy się jak pusta: wpis nie dostaje pustej podstrony ani pustego streszczenia. Konferencja i projekt z opisem mają własną stronę; konferencja bez opisu prowadzi od razu na swoją stronę internetową.
+- **Opis strony dla Google** (dawniej „Wstęp pod tytułem”, strony działów) i **Krótki opis** Stron trafiają tylko do Google i do podglądu linku; nowy nagłówek ich nie pokazuje. Wyjątek: w Popularyzacji opis Strony to zdanie na karcie „Dla kogo”.
+- **Hasło Strony** pokazuje się na banerze tylko razem z liczbami (hasło bez liczb i liczby bez hasła się nie wyświetlają). Listy Aktualności, Kalendarza, Obron, Ofert i „Warto wiedzieć” pokazują hasło także bez liczb.
+- **Nadtytuł kierunku** (Kierunki → Baner) na stronie się nie wyświetla; strona liczy z niego stopnie studiów na stronie „Studia”.
+- **Pola ukryte** (np. „Do uzupełnienia”, „Format treści”, dawne „Bloki wzorca”, hasło stron ze stopki): formularz ich nie pokazuje, wartości zostają w plikach.
 
 ## Aktualności: termin wydarzenia, zdjęcia i załączniki (zlecenie 31)
 
@@ -111,7 +132,7 @@ Lista plików (opis po myślniku jest opcjonalny):
 
 > **Nowa strona jest od razu opublikowana. Żeby przygotować ją po cichu, odznacz »Opublikowane«: wtedy widać ją tylko na Podglądzie, z żółtym paskiem i etykietą »szkic«.**
 
-- Przełącznik stoi zaraz pod tytułem w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady i „Warto wiedzieć” (Web-Instytut).
+- Przełącznik stoi pod tytułem i tytułem EN w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady i „Warto wiedzieć” (Web-Instytut).
 - Na Podglądzie szkic widać zawsze. Pod paskiem menu jest żółty pasek, a plakietka stanu budowy (w rogu ekranu) ma żółty wiersz „Szkic: tej strony nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →” z linkiem do formularza tej strony. Przy każdym linku do szkicu (menu, listy, kafelki, tekst) stoi mała etykieta „szkic”.
 - Na przyszłej stronie publicznej szkicu nie ma: znika strona, link w menu, kafelek, pozycja w liczbach, mapie strony i wyszukiwarce. Link do szkicu w tekście innej strony zostaje samym tekstem.
 - Szkic strony działu: strona działu zostaje (prowadzi do niej menu), ale bez tekstu z formularza. Plakietka ma wtedy wiersz „Szkic: tekstu tej strony nie będzie na stronie publicznej (strona zostanie, bez tekstu)” z linkiem do formularza.
@@ -122,18 +143,23 @@ Lista plików (opis po myślniku jest opcjonalny):
 
 | Co | Gdzie w Pages CMS |
 |---|---|
-| Treść strony kierunku (PL i EN) | Web-Studia → Kierunki → Treść |
-| Nadtytuł, zdanie pod nazwą, hasło, liczby w nagłówku | Web-Studia → Kierunki → Baner (nazwa pliku = nazwa pliku kierunku, np. `matematyka`; bez banera nagłówek ma samą nazwę) |
+| Treść strony kierunku (PL i EN) | Web-Studia → Kierunki → Treść Markdown, Treść Markdown EN |
+| Zdanie pod nazwą, hasło, liczby w nagłówku kierunku | Web-Studia → Kierunki → Baner (nazwa pliku = nazwa pliku kierunku, np. `matematyka`; bez banera nagłówek ma samą nazwę; nadtytuł się nie wyświetla) |
 | Przypomnienia na stronie głównej (np. deklaracja specjalności) | Web-Studia → Przypomnienia o terminach |
-| Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Ustawienia strony → Sekcja „Studiuj matematykę” → Kierunki w menu… Nowy kierunek pojawi się w menu i kafelkach dopiero po dopisaniu go tutaj (robi to administrator). Każda pozycja ma wszystko wpisane: nazwa i opis w menu, nazwa, napis nad nią i zdanie na kafelku (puste pole zostaje puste na stronie). Studia podyplomowe to też kierunek (`/studia/podyplomowe`). |
-| Treść strony specjalności (PL i EN) | Web-Spec-* → Specjalność: … → Treść (wygaszana Matematyka w ekonomii: Web-Studia) |
-| Kafelek specjalności na stronie kierunku, skrót, poziom, hasło, zakład, opiekunowie, seminaria | Web-Spec-* → Specjalność: … → Baner i kafelek (strona kierunku buduje kafelki sama) |
+| Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Strona główna i kontakt → „Kierunki w menu „Studia” i kafelki na stronie głównej”. Nowy kierunek pojawi się w menu i kafelkach dopiero po dopisaniu go tutaj (robi to administrator). Każda pozycja ma wszystko wpisane: nazwa i opis w menu, nazwa, napis nad nią i zdanie na kafelku (puste pole zostaje puste na stronie). Studia podyplomowe to też kierunek (`/studia/podyplomowe`). |
+| Treść strony specjalności (PL i EN), opiekunowie, zakład, seminaria, baner | Web-Studia → Specjalności (repozytoria Web-Spec-* nie są już czytane) |
+| Kafelki specjalności na stronie kierunku | Web-Studia → Kierunki → Treść Markdown, blok `:::specjalnosci` (nowa specjalność nie dopisuje kafelka sama) |
 | Tekst „O popularyzacji”, tytuł, „W skrócie”, lata tradycji | Web-Popularyzacja → Strona działu Popularyzacja |
-| Tekst „O Instytucie” / „Badania w Instytucie” / „O studiach”, tytuł, wstęp, hasło, „W skrócie” (Instytut: też godziny sekretariatu) | Web-Instytut / Web-Nauka / Web-Studia → Strona działu … |
+| Karty „Dla kogo” na stronie Popularyzacji | Web-Popularyzacja → Strony (tytuł karty = Hasło, zdanie = Opis) |
+| Tekst „O Instytucie” / „Badania w Instytucie” / „O studiach”, tytuł, hasło, „W skrócie” (Instytut: też godziny sekretariatu), opis strony dla Google | Web-Instytut / Web-Nauka / Web-Studia → Strona działu … |
 | Tytuł, opis, hasło i tekst nad listą: Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje (też hasło rocznika) | Web-Nauka → Strony → `seminaria`, `nauka/konferencje`, `nauka/granty`, `nauka/sukcesy`, `nauka/publikacje` |
 | To samo: Struktura i zakłady, Warto wiedzieć | Web-Instytut → Strony → `instytut/struktura`, `warto-wiedziec` |
 | To samo: Aktualności, Obrony doktorskie (też hasło strony obrony) | Web-Aktualnosci → Strony → `aktualnosci`, `obrony-doktorskie` |
 | To samo: Pracownicy; Plan zajęć | Web-Pracownicy → Strony → `pracownicy`; Web-Studia → Strony → `studia/plan-zajec` |
 | Termin wydarzenia (Kalendarz, nadchodzące wydarzenia, .ics) | Web-Aktualnosci → Aktualności → Termin wydarzenia (pod „Rodzaj”; zwykła informacja: tylko „Data”) |
+| Deklaracja dostępności, Polityka prywatności, O stronie (linki w stopce) | Web-Ustawienia → formularze o tych nazwach (jawny Markdown; tylko administrator) |
+| Zdjęcia i kadry nagłówków działów, ikony Facebooka i YouTube w stopce | Web-Ustawienia → Strona główna i kontakt → Nagłówki działów; Facebook; YouTube (tylko administrator) |
 
-Nazwy sekcji, które dostają stałe kotwice w adresie (np. `#terminy` w linkach przypomnień), są w `src/plugins/kotwice.mjs` (kotwice kierunku i specjalności osobno, pole `typ`; kotwice stron działów i stron z listą — typ `strona` z adresem strony; na zwykłych stronach — typ `naglowek`, np. „Konsultacje” / „Office hours” → `#konsultacje`, linki z Pierwszego roku). Inny nagłówek 2 też jest sekcją, z kotwicą z jego tekstu. Kotwicy w HTML (`<a id="…">`) w treści nie wpisuj — edytor z przyciskami usuwa ją przy zapisie; stała kotwica idzie do `kotwice.mjs`.
+**Stały adres sekcji w jawnym Markdownie** to `{#id}` przy nagłówku `##` (np. `## Terminy {#terminy}`); przy migracji każdy nagłówek dostał id z dawnym adresem, więc linki działają jak przedtem. Zmieniając nazwę nagłówka, id zostaw; bez `{#…}` adres powstaje z tekstu nagłówka. Kotwicy w HTML (`<a id="…">`) w treści nie wpisuj.
+
+Dawny format (Strony Web-Aktualnosci): stałe kotwice nazw sekcji (np. `#terminy`) są w `src/plugins/kotwice.mjs` (typ `strona` — strony działów i strony z listą, typ `naglowek` — zwykłe strony); inny nagłówek 2 dostaje kotwicę z tekstu. Kotwica w HTML nie przetrwa zapisu, stała kotwica idzie do `kotwice.mjs`.

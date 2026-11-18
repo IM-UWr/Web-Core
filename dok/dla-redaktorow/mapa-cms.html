@@ -3,7 +3,8 @@
   Źródło PDF „Mapa CMS” dla redaktorów (Web-Podglad/dla-redaktorow/Mapa-CMS-IM-UWr.pdf). Pierwsza wersja (7.11.2026) powstała
   w rozmowie claude.ai i nie miała źródła w repozytoriach; to jest jej odtworzenie z poprawkami po zleceniach 28–39 (18.11.2026).
   PDF: node skrypty/pdf-dla-redaktorow.mjs (Edge z systemu, A4, dwie strony).
-  Do przepisania w zleceniu 40 (jawny Markdown we wszystkich działach): tabela „Układy…” na stronie 2.
+  Zlecenie 40 (18.11.2026): strona 2 przepisana na jawny Markdown (tabela bloków zamiast „Układów, które strona rozpoznaje sama”);
+  formularze: pola EN pod polskimi, Treść na górze. Strony Aktualności zostają w dawnym formacie do etapu 3 zlecenia 40.
 -->
 <html lang="pl">
 <head>
@@ -90,7 +91,7 @@
   <div class="info">
     <div><b>1. Logowanie</b>Link z zaproszenia e-mailem otwiera Pages CMS. Konto GitHub nie jest potrzebne. Widzisz tylko swoje repozytoria.</div>
     <div><b>2. Zapis = publikacja</b>Po kliknięciu „Save” zmiana pojawia się na stronie po ok. 10 minutach. Odśwież stronę: Ctrl+F5.</div>
-    <div><b>3. Pisanie</b>Pole „Treść” działa jak edytor tekstu. Ściągawka (kafelki, oś, pytania, pliki) jest w opisie pola.</div>
+    <div><b>3. Pisanie</b>Pole „Treść” to tekst w Markdownie, na górze formularza; pola EN są tuż pod polskimi. Ściągawka jest w opisie pola, przykłady na stronie 2.</div>
     <div><b>4. Bez obaw</b>Każdy zapis da się cofnąć. Nie zmieniaj gałęzi (branch). W razie kłopotu napisz do administratora strony.</div>
   </div>
 
@@ -153,7 +154,7 @@
   <div class="dzial ustawienia">
     <header><h2>Ustawienia strony: tylko administrator</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Ustawienia">CMS ↗</a></header>
     <ul class="kol">
-      <li><b>Strona główna i kontakt</b>, w tym lista kierunków w menu „Studia” i kafelki kierunków</li>
+      <li><b>Strona główna i kontakt</b>: kierunki w menu „Studia” i kafelki, zdjęcia nagłówków działów, Facebook i YouTube</li>
       <li><b>Menu główne</b>: menu u góry, hamburger, kafelki działów</li>
       <li><b>Kafelki „Na skróty”</b></li>
       <li><b>Deklaracja dostępności</b>, <b>Polityka prywatności</b>, <b>O stronie</b></li>
@@ -186,44 +187,49 @@
   <div class="naglowek">
     <div>
       <h1>Instrukcja dla redaktorów: najważniejsze</h1>
-      <div class="pod">Jak pisać, żeby strona sama zrobiła kafelki, oś kroków, pytania i tabele · pliki · nowy kierunek</div>
+      <div class="pod">Jawny Markdown: sekcje, kafelki, oś kroków, pytania, pliki · dodawanie plików · nowy kierunek</div>
     </div>
     <div class="prawa">Jawne bloki na żywo:<br><a href="https://im-uwr.github.io/Web-Podglad/studia/matematyka/">strona kierunku Matematyka</a></div>
   </div>
 
   <div class="uklady-glowa">
-    <h2>Układy, które strona rozpoznaje sama</h2>
-    <p>Strony działów Instytut i Nauka oraz zwykłe strony z zaznaczonym polem „Bloki”. Piszesz zwykłym edytorem; środkowa kolumna to ten sam tekst w widoku Source.</p>
+    <h2>Jawny Markdown: bloki, które wpisujesz</h2>
+    <p>Zwykły tekst, listy i tabele piszesz bez znaczników. Specjalny układ zamykasz w bloku: <code>:::nazwa</code> … <code>:::</code>, każdy znacznik w osobnej linii, z pustą linią przed i po.</p>
   </div>
   <table>
-    <thead><tr><th>Co wpisujesz w edytorze</th><th>Przykład (widok Source)</th><th>Co robi strona</th></tr></thead>
+    <thead><tr><th>Co chcesz mieć na stronie</th><th>Zapis w polu „Treść”</th><th>Uwagi</th></tr></thead>
     <tbody>
-      <tr><td><b>Nagłówek 2</b> (Heading 2)</td><td><pre>## Dlaczego warto</pre></td><td>nowa sekcja; pojawia się w spisie „Na tej stronie”</td></tr>
-      <tr><td><b>Nagłówek 3 zakończony „?”</b>, pod nim odpowiedź (dowolnie długa)</td><td><pre>### Kiedy wybieram specjalność?
-Pod koniec 4. semestru…</pre></td><td><b>rozwijane pytanie (FAQ)</b>; odpowiedź kończy się na następnym nagłówku</td></tr>
-      <tr><td><b>Lista punktowana</b>, każdy punkt zaczyna się <b>pogrubieniem</b></td><td><pre>- **Kategoria A+**: najwyższa ocena…
-- **Pomoc na starcie**: kurs wyrównawczy</pre></td><td><b>kafelki</b> (tytuł + opis)</td></tr>
-      <tr><td><b>Lista numerowana</b>, punkty zaczynają się <b>pogrubieniem</b>; tekst przed dwukropkiem to mała etykieta</td><td><pre>1. **Semestry 1–2: Podstawy**: analiza…
-2. **Semestry 3–4: Wybór**: specjalność…</pre></td><td><b>oś kroków („drabinka”)</b> z etykietą „Semestry 1–2”</td></tr>
-      <tr><td>W punkcie osi lub kafelka: kolejna linia <b>Shift+Enter</b> z „Termin: …” albo z samym linkiem</td><td><pre>Termin: do 30 czerwca
-[Formularz C2](/pliki/studia/c2.pdf)</pre></td><td>para „Termin / wartość”; sam link w linii = <b>przycisk</b></td></tr>
-      <tr><td><b>Tabela</b> (przycisk tabeli w edytorze)</td><td><pre>| Sprawa | Termin |
-|---|---|
-| Wybór specjalności | 30.06 |</pre></td><td><b>tabela</b>; na telefonie każdy wiersz jako osobny blok</td></tr>
-      <tr><td><b>Lista samych linków</b> (opcjonalnie „ — opis”)</td><td><pre>- [Regulamin praktyk](/pliki/studia/regulamin.pdf)</pre></td><td><b>lista plików</b> z ikoną i typem (PDF, DOCX); bez plików: lista linków</td></tr>
-      <tr><td>Punkt: <i>rola kursywą</i>, potem <b>osoba pogrubiona</b>, dalej linie „e-mail: …”, „pokój: …”</td><td><pre>- *Sekretariat* **Anna Nowak**
-e-mail: a.nowak@…</pre></td><td><b>karta kontaktu</b></td></tr>
-      <tr><td><b>Cytat</b> zaczynający się pogrubieniem</td><td><pre>&gt; **Uwaga:** zapisy trwają do…</pre></td><td><b>ramka z uwagą</b></td></tr>
-      <tr><td><b>Studia i Popularyzacja</b> (kierunki, specjalności, strony): <b>jawne bloki</b> zamiast rozpoznawania</td><td><pre>:::kafelki
+      <tr><td><b>Sekcja</b> w spisie „Na tej stronie”</td><td><pre>## Dlaczego warto {#dlaczego-warto}</pre></td><td><code>{#…}</code> to stały adres sekcji: zmieniasz nazwę, <b>id zostaw</b></td></tr>
+      <tr><td><b>Kafelki</b> (tytuł + opis)</td><td><pre>:::kafelki
 - **Kategoria A+** — najwyższa ocena…
-:::</pre></td><td>kafelki, oś (<code>:::etapy</code>), zakładki, ramki itd.; ściągawka w opisie pola „Treść Markdown”</td></tr>
+:::</pre></td><td>każdy punkt zaczyna się pogrubionym tytułem</td></tr>
+      <tr><td><b>Oś kroków</b> z terminem i przyciskiem</td><td><pre>:::etapy
+1. **Semestry 3–4: Wybór** — specjalność…
+   Termin: do 30 czerwca
+   [Formularz C2](/pliki/studia/c2.pdf)
+:::</pre></td><td>dalsze linie punktu wcięte 3 spacjami; „Termin: …” = para, sam link w linii = <b>przycisk</b></td></tr>
+      <tr><td><b>Rozwijane pytania (FAQ)</b></td><td><pre>:::pytania
+### Kiedy wybieram specjalność?
+Pod koniec 4. semestru…
+:::</pre></td><td>każdy nagłówek <code>###</code> to jedno pytanie</td></tr>
+      <tr><td><b>Lista plików</b> z ikoną i typem (PDF, DOCX)</td><td><pre>:::pliki
+- [Regulamin praktyk](/pliki/studia/regulamin.pdf)
+:::</pre></td><td>opis po „ — ” opcjonalny; <code>:::linki</code> = lista zwykłych linków</td></tr>
+      <tr><td><b>Karty kontaktu</b></td><td><pre>:::kontakty
+- *Sekretariat* **Anna Nowak**
+  e-mail: a.nowak@…
+:::</pre></td><td>rola kursywą, osoba pogrubiona, dalej „e-mail:”, „pokój:”</td></tr>
+      <tr><td><b>Ramka</b> z tytułem</td><td><pre>:::ramka{tytul="Uwaga"}
+Zapisy trwają do…
+:::</pre></td><td>też <code>:::zakladki</code>, <code>:::tabela</code>, <code>:::kreski</code>; blok w bloku: na zewnątrz <code>::::</code></td></tr>
+      <tr><td><b>Podpowiedź</b> dla redaktora</td><td><pre>&lt;!-- KAFELKI: punkt = kafelek --&gt;</pre></td><td>na stronie jej nie widać; Treść z samym komentarzem = pusta</td></tr>
     </tbody>
   </table>
 
   <div class="trzy">
-    <div><b>Gdzie to działa</b>Rozpoznawanie: strony działów Instytut i Nauka, zwykłe strony z zaznaczonym polem „Bloki”. Studia i Popularyzacja: jawne bloki <code>:::…</code>. Seminaria i referaty: zwykły Markdown, wzory w LaTeX-u (<code>$\ell^2$</code>).</div>
-    <div><b>Pułapki</b>Kolejna linia w tym samym punkcie: <b>Shift+Enter</b> (w osi kroków zwykły Enter też zadziała). Akapit zaczęty od „Np.”, „Dr.” edytor zamieni w listę numerowaną: zacznij inaczej albo pogrub skrót. Nagłówek w środku odpowiedzi FAQ kończy pytanie: zamiast niego użyj pogrubienia.</div>
-    <div><b>Wersja angielska</b>Pola <b>„Treść EN”</b>, „Nazwa EN” i inne z „EN” w tych samych formularzach. Puste pole EN: strona angielska pokaże tekst polski. Nagłówki sekcji po angielsku, np. „Why choose it”, „FAQ”.</div>
+    <div><b>Gdzie to działa</b>Jawny Markdown: Strony i strony działów Instytutu, Nauki, Studiów, Popularyzacji i Pracowników, kierunki, specjalności, strony ze stopki. Strony Aktualności: jeszcze dawny format. Wpisy (aktualności, zakłady, konferencje, granty, referaty): zwykły Markdown, wzory w LaTeX-u (<code>$\ell^2$</code>).</div>
+    <div><b>Pułapki</b>Każdy blok zamknij osobną linią <code>:::</code> (tyle dwukropków, ile przy otwarciu). Nie usuwaj <code>{#…}</code> przy nagłówkach: linki do sekcji przestałyby działać. Wygląd sprawdzaj na Podglądzie po przebudowaniu (ok. 10 min).</div>
+    <div><b>Wersja angielska</b>Pola <b>„… EN”</b> tuż pod polskimi, w tych samych formularzach. Puste pole EN: strona angielska pokaże tekst polski. W Treści EN te same bloki; <code>{#…}</code> przy nagłówkach EN też zostaw.</div>
   </div>
 
   <div class="dwie">
@@ -232,8 +238,8 @@ e-mail: a.nowak@…</pre></td><td><b>karta kontaktu</b></td></tr>
       <ol>
         <li>W CMS swojego repozytorium kliknij w menu po lewej <b>Media</b>, wejdź do właściwego folderu (np. <b>studia</b>) i kliknij <b>Upload</b>. CMS sam poprawi nazwę pliku (bez spacji i polskich znaków); zapamiętaj ją.</li>
         <li>Adres pliku na stronie to <code>/pliki/</code> + folder + nazwa, np. <code>/pliki/studia/regulamin-praktyk-2026.pdf</code>.</li>
-        <li>W polu „Treść” wpisz opis (np. „Karta zaliczenia praktyki (PDF)”), zaznacz go, kliknij przycisk <b>linku</b> i wklej adres.</li>
-        <li><b>Save.</b> Kilka takich linków w liście da listę plików z ikonami.</li>
+        <li>W polu „Treść” wpisz link: <code>[Karta zaliczenia praktyki (PDF)](/pliki/studia/karta.pdf)</code>.</li>
+        <li><b>Save.</b> Kilka takich linków (po jednym w punkcie listy) w bloku <code>:::pliki</code> da listę plików z ikonami.</li>
         <li>Nowsza wersja pliku: wgraj nowy plik, zmień link, stary usuń w Media.</li>
       </ol>
     </div>
@@ -241,10 +247,10 @@ e-mail: a.nowak@…</pre></td><td><b>karta kontaktu</b></td></tr>
       <h2>Jak dodać nowy kierunek</h2>
       <ol>
         <li><b>Web-Studia → Kierunki → nowy wpis.</b> Wpisz Nazwę i Treść Markdown (sekcje <code>##</code>, bloki jak w ściągawce w opisie pola), potem Nazwę EN i Treść Markdown EN. Save. Nazwa pliku powstaje z Nazwy, np. „Matematyka finansowa” → <code>matematyka-finansowa</code>; adres strony: <code>/studia/matematyka-finansowa</code>.</li>
-        <li><b>Baner</b> (w tym samym formularzu, opcjonalnie): nadtytuł, zdanie pod nazwą, hasło i liczby (liczby pokażą się tylko razem z hasłem). Bez banera strona pokaże samą nazwę.</li>
+        <li><b>Baner</b> (w tym samym formularzu, opcjonalnie): zdanie pod nazwą, hasło i liczby (hasło i liczby pokazują się tylko razem). Bez banera strona pokaże samą nazwę.</li>
         <li>Po ok. 10 minutach strona kierunku działa pod adresem <code>/studia/&lt;nazwa-pliku&gt;</code>. W menu „Studia” i w kafelkach pojawi się dopiero po dopisaniu na listę w Ustawieniach (krok 4).</li>
         <li><b>Menu i kafelki (administrator):</b> Web-Ustawienia → Strona główna i kontakt → „Kierunki w menu „Studia” i kafelki na stronie głównej” → nowa pozycja: adres <code>/studia/&lt;nazwa-pliku&gt;</code>, nazwa i opis w menu, nazwa, napis i zdanie na kafelku (PL i EN), miejsce na liście. Strona pokazuje pola tak, jak są wpisane: puste pole zostaje puste.</li>
-        <li>Terminy kierunku: <b>Kierunki → Przypomnienia o terminach</b>, z linkiem do strony kierunku. Specjalności przypisane do nowego kierunku: poproś administratora (lista kierunków w formularzu specjalności jest stała).</li>
+        <li>Terminy kierunku: <b>Web-Studia → Przypomnienia o terminach</b>, z linkiem do strony kierunku. Specjalności przypisane do nowego kierunku: poproś administratora (lista kierunków w formularzu specjalności jest stała).</li>
       </ol>
     </div>
   </div>

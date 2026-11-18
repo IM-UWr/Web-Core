@@ -1,6 +1,6 @@
-# Jawny Markdown kierunków i specjalności
+# Jawny Markdown: kierunki, specjalności, Strony i strony działów
 
-Format używany w Web-Studia i Web-Popularyzacja. Dotyczy kierunków, specjalności, podstron Studiów, tekstów strony działu i Roku akademickiego oraz wszystkich tekstów działu Popularyzacja. Dotychczasowy parser innych działów pozostaje dostępny. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
+Format używany w Web-Studia i Web-Popularyzacja: kierunki, specjalności, podstrony Studiów, teksty strony działu i Roku akademickiego oraz wszystkie teksty działu Popularyzacja. Od zlecenia 40 także Strony i strona działu w Web-Instytut i Web-Nauka, strona Pracownicy (Web-Pracownicy) i strony ze stopki (Web-Ustawienia) — szczegóły w „Pozostałe działy (zlecenie 40)”. Plik jest w jawnym formacie, gdy ma `format_tresci: jawne`; bez tego pola działa dotychczasowy parser (dziś Strony Web-Aktualnosci). Wpisy (aktualności, zakłady, granty, konferencje, referaty…) są zwykłym Markdownem. Dokument `zasady-parsera.md` opisuje wcześniejszy format, a poniższa instrukcja opisuje nowy.
 
 ## Jeden formularz, jedna strona
 
@@ -143,9 +143,16 @@ Nie obejmuje to pozostałych pomysłów z `cms-reorganizacja-2026-11`: ręcznego
 
 ## Pozostałe działy (zlecenie 40)
 
-Zlecenie 40 przenosi do jawnego formatu Strony i stronę działu kolejnych repozytoriów, po jednym (kolejność: Instytut, Nauka, Aktualności, Pracownicy, seminaria, Ustawienia). Wpisy (aktualności, zakłady, „Warto wiedzieć”, granty…) zostają zwykłym Markdownem; pole Treść ma przy nich ściągawkę.
+Zlecenie 40 przenosi do jawnego formatu Strony i stronę działu kolejnych repozytoriów, po jednym (kolejność: Instytut, Nauka, Aktualności, Pracownicy, seminaria, Ustawienia; na koniec porządek pól w Studiach i Popularyzacji). Wpisy (aktualności, zakłady, „Warto wiedzieć”, granty…) zostają zwykłym Markdownem; pole Treść ma przy nich ściągawkę. W każdym repozytorium tekst i wygląd stron bez zmian (porównanie HTML całej strony przed/po: 0 różnic, poza zatwierdzonymi).
 
-- **Web-Instytut** (etap 1): 12 Stron i `src/data/instytut.md`. Przy każdym `##` jest `{#id}` z dawnym adresem sekcji (np. `{#sieć-eduroam}`), na początku Treści i Treści EN komentarz `<!-- UKŁAD JAWNY: … -->`. Wygląd bez zmian (porównanie HTML całej strony: 0 różnic).
+- **Web-Instytut** (etap 1): 12 Stron i `src/data/instytut.md`. Przy każdym `##` jest `{#id}` z dawnym adresem sekcji (np. `{#sieć-eduroam}`), na początku Treści i Treści EN komentarz `<!-- UKŁAD JAWNY: … -->`.
+- **Web-Nauka** (etap 2): 6 Stron i `src/data/nauka.md`, 10 nagłówków z `{#id}`. Na stronie Publikacje tekst pod `## Czasopisma redagowane w Instytucie {#czasopisma}` (EN: `## Journals edited at the Institute {#czasopisma}`) stoi nad listą czasopism. Konferencja z opisem (Treść nie tylko z komentarzem) ma własną stronę `/nauka/konferencje/<plik>`, jak projekt.
+- **Web-Aktualnosci** (etap 3): jeszcze nie przeniesione — Strony `aktualnosci`, `obrony-doktorskie` i pozostałe są w dawnym formacie.
+- **Web-Pracownicy** (etap 4): strona `pracownicy`; tekst stoi nad listą osób, pusta Treść (albo sam komentarz) = sama lista.
+- **Seminaria** (etap 5, 9 repozytoriów `Web-Sem-*`): bez Stron; opis seminarium i streszczenia referatów to zwykły Markdown. Nowy referat startuje z szablonem streszczenia (komentarz), który liczy się jak pusta Treść.
+- **Web-Ustawienia** (etap 6): Deklaracja dostępności, Polityka prywatności i O stronie (`src/content/strony/`), 18 nagłówków z `{#id}`.
+- **Web-Studia, Web-Popularyzacja** (etap 7): format bez zmian (był jawny), tylko porządek pól w formularzach.
+- **Formularze we wszystkich repozytoriach:** tytuł, tytuł EN → Treść, Treść EN → reszta; pola EN tuż pod polskimi, etykiety „… EN”; ukryte pole `format_tresci` (`default: jawne`), więc nowa Strona od razu jest w jawnym formacie; dawne „Bloki wzorca” ukryte (w jawnym formacie strona ich nie czyta). Pola, których strona nie pokazuje, są ukryte albo opisane (np. „Opis strony dla Google” zamiast „Wstęp pod tytułem”: nowy nagłówek działu go nie pokazuje).
 - **Sekcja przenoszona** (kotwica typu „strona” w `src/plugins/kotwice.mjs`): w jawnym formacie decyduje tylko jawne id, nie nazwa nagłówka. Na `/instytut` tekst pod `## Ostatnie sukcesy {#sukcesy}` (EN: `## Recent achievements {#sukcesy}`) stoi nad listą ostatnich sukcesów; bez `{#sukcesy}` zostaje na końcu „O Instytucie”.
 - **Limity linii** (`rehype-limity.mjs`: krótkie komórki tabel, kontakty) w jawnych Stronach działają dla tekstu polskiego jak w dawnym formacie; Strony Studiów zostają bez nich, jak od początku jawnego formatu.
 - **Szablony Treści** nowych wpisów (pole `default`, np. `<!-- TEKST: … -->` w zakładach i „Warto wiedzieć”): sama Treść z komentarzem liczy się jak pusta (`maTresc()` w `src/lib/tresci.ts`), więc wpis nie dostaje pustej podstrony ani pustego streszczenia.
