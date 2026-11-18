@@ -2,7 +2,7 @@
 import { render } from 'astro:content';
 import { RODZAJE_GRANTOW } from '../i18n';
 import { today, type Lang } from '../daty';
-import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, type Grant } from '../tresci';
+import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, maTresc, type Grant } from '../tresci';
 
 // Pole „program” nie ma wersji angielskiej: po angielsku znane polskie nazwy tłumaczymy, resztę zostawiamy (nazwy konkursów,
 // np. OPUS, są takie same w obu językach). Używane w plakietce, karcie danych, haśle, opisie strony i na liście projektów.
@@ -18,7 +18,7 @@ export async function daneGrantu(grant: Grant, lang: Lang) {
   const tytul = (lang === 'en' && d.tytul_en) || d.tytul;
   // tytuł w drugim języku (pod nagłówkiem), jeśli jest
   const tytulDrugi = lang === 'en' ? (d.tytul_en ? { tekst: d.tytul, lang: 'pl' } : undefined) : d.tytul_en ? { tekst: d.tytul_en, lang: 'en' } : undefined;
-  const maOpis = !!grant.body?.trim();
+  const maOpis = maTresc(grant.body);
   const { Content } = await render(grant);
   const okres = lataGrantu(grant);
   const trwa = d.rok_do !== undefined && d.rok_do >= Number(today().slice(0, 4));

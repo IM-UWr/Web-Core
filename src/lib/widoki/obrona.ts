@@ -4,7 +4,7 @@ import { t, wybierz } from '../i18n';
 import { renderMarkdown } from '../markdown';
 import { tytulyEn, tytulyWJezyku } from '../osoby';
 import { long, longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
-import { miejsce, slugOf, trwaLubBedzie, type Obrona, type Wydarzenie } from '../tresci';
+import { miejsce, slugOf, trwaLubBedzie, maTresc, type Obrona, type Wydarzenie } from '../tresci';
 import { stronaListy } from '../tekstyStron';
 
 export async function daneObrony(obrona: Obrona, lang: Lang) {
@@ -43,7 +43,7 @@ export async function daneObrony(obrona: Obrona, lang: Lang) {
   // dok/en/RAPORT-EN.md, K4; zlecenie 16, decyzja właściciela 5.11). undefined = treść wpisu (<Content />).
   const html = lang === 'en'
     ? d.tresc_en?.trim() ? await renderMarkdown(d.tresc_en, lang) : zaproszenieEn(obrona, przyszla)
-    : obrona.body?.trim() ? undefined : zaproszeniePl(obrona, przyszla);
+    : maTresc(obrona.body) ? undefined : zaproszeniePl(obrona, przyszla);
 
   return { Content, html, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby };
 }

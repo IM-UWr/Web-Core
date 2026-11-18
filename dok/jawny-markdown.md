@@ -140,3 +140,21 @@ Workflow `markdown-jawne-test.yml` w Web-Podglad buduje tylko artefakt i zrzuty 
 Przeniesiono 4 kierunki i 6 specjalności (5 z własnymi podstronami), obie wersje językowe, dane i banery. Następnie ten sam jawny format zastosowano do pozostałych 15 wpisów w `src/content/strony/studia` (także z podfolderów) oraz `src/data/studia.md` i `src/data/rok-akademicki.md`: łącznie 27 wpisów. Wprowadzono komentarze redakcyjne i opiekunów po ID, zachowując adresy i układ strony. W zwykłych podstronach blok `proza` korzysta z istniejącego kontenera typografii; listy i tabele zachowują zwykły wygląd, dopóki redaktor nie wybierze specjalnego bloku.
 
 Nie obejmuje to pozostałych pomysłów z `cms-reorganizacja-2026-11`: ręcznego głównego menu, nowych statusów publikacji dla wszystkich kolekcji, zewnętrznych stron specjalności ani ogólnego porządkowania innych formularzy. Branch nie zmienia standardowego workflow publikacji.
+
+## Pozostałe działy (zlecenie 40)
+
+Zlecenie 40 przenosi do jawnego formatu Strony i stronę działu kolejnych repozytoriów, po jednym (kolejność: Instytut, Nauka, Aktualności, Pracownicy, seminaria, Ustawienia). Wpisy (aktualności, zakłady, „Warto wiedzieć”, granty…) zostają zwykłym Markdownem; pole Treść ma przy nich ściągawkę.
+
+- **Web-Instytut** (etap 1): 12 Stron i `src/data/instytut.md`. Przy każdym `##` jest `{#id}` z dawnym adresem sekcji (np. `{#sieć-eduroam}`), na początku Treści i Treści EN komentarz `<!-- UKŁAD JAWNY: … -->`. Wygląd bez zmian (porównanie HTML całej strony: 0 różnic).
+- **Sekcja przenoszona** (kotwica typu „strona” w `src/plugins/kotwice.mjs`): w jawnym formacie decyduje tylko jawne id, nie nazwa nagłówka. Na `/instytut` tekst pod `## Ostatnie sukcesy {#sukcesy}` (EN: `## Recent achievements {#sukcesy}`) stoi nad listą ostatnich sukcesów; bez `{#sukcesy}` zostaje na końcu „O Instytucie”.
+- **Limity linii** (`rehype-limity.mjs`: krótkie komórki tabel, kontakty) w jawnych Stronach działają dla tekstu polskiego jak w dawnym formacie; Strony Studiów zostają bez nich, jak od początku jawnego formatu.
+- **Szablony Treści** nowych wpisów (pole `default`, np. `<!-- TEKST: … -->` w zakładach i „Warto wiedzieć”): sama Treść z komentarzem liczy się jak pusta (`maTresc()` w `src/lib/tresci.ts`), więc wpis nie dostaje pustej podstrony ani pustego streszczenia.
+
+Narzędzia (z katalogu Web-Core):
+
+```sh
+node skrypty/jawny-markdown-repo.mjs ../Web-Instytut            # raport: co dostanie {#id} i komentarz
+node skrypty/jawny-markdown-repo.mjs ../Web-Instytut --zapisz   # migracja (bez zmian tekstu; skrypt sam to sprawdza)
+node skrypty/migracja/formularze_40.mjs ../Web-Instytut         # formularze: kolejność, opisy, ukryte pola, szablony
+node skrypty/sprawdz-jawny-markdown.mjs ../Web-Instytut         # formularze i pliki: format, pola, {#id} przy ##
+```

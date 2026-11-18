@@ -17,7 +17,7 @@ import TytulReferatu from '../components/TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
-import { slugOf, sala, salaReferatu, afiliacjaReferatu, type Seminarium } from '../lib/tresci';
+import { slugOf, sala, salaReferatu, afiliacjaReferatu, maTresc, type Seminarium } from '../lib/tresci';
 import { daneSeminarium } from '../lib/widoki/seminarium';
 import { mailHtml } from '../lib/limity.mjs';
 
@@ -31,7 +31,7 @@ const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy,
 const dzienTygodnia = (termin: string) => longWithDay(termin, lang).split(', ')[0];
 const kiedyGdzie = (termin: string, s: string | undefined, zDniem: boolean) =>
   [zDniem ? dzienTygodnia(termin) : '', time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
-const maOpis = !!htmlEn || !!seminarium.body?.trim();
+const maOpis = !!htmlEn || maTresc(seminarium.body);
 const tytulPow = T('Powiadomienia e-mail', 'Email notifications');
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
@@ -107,7 +107,7 @@ const spis = [
           <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), true)}</p>
           <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
           <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
-          {(en || r.body?.trim()) && <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>}
+          {(en || maTresc(r.body)) && <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>}
           {r.data.pliki.length > 0 && (
             <ul class="pliki">{r.data.pliki.map((p) => <li><Link href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></Link></li>)}</ul>
           )}
@@ -127,7 +127,7 @@ const spis = [
             {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
             <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
             <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
-            {(en || r.body?.trim()) && (
+            {(en || maTresc(r.body)) && (
               <details>
                 <summary>{t(lang, 'streszczenie')}</summary>
                 <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>

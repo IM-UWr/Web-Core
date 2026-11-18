@@ -30,8 +30,11 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
   const tylkoPolski = lang === 'en' && !d.tresc_en;
   const popularyzacja = strona.id.startsWith('popularyzacja/');
   const langTekstu = tylkoPolski ? 'pl' : lang;
+  // Limity linii (src/plugins/rehype-limity.mjs: krótkie komórki tabel, kontakty) jak w dawnej treści z pliku: tylko tekst polski.
+  // Strony Studiów są w jawnym formacie bez nich od jego wprowadzenia — tak zostaje (zlecenie 40: wygląd bez zmian).
+  const limityLinii = langTekstu === 'pl' && !strona.id.startsWith('studia/');
   const en = jawne
-    ? await renderMarkdownZNaglowkami((lang === 'en' && d.tresc_en) || strona.body, langTekstu, false, { wstepPoH2: popularyzacja, limityLinii: popularyzacja && langTekstu === 'pl' })
+    ? await renderMarkdownZNaglowkami((lang === 'en' && d.tresc_en) || strona.body, langTekstu, false, { wstepPoH2: popularyzacja, limityLinii })
     : lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang, d.bloki === true) : undefined;
   const htmlEn = en?.html ?? '';
   const naglowki = en ? en.naglowki : headings;

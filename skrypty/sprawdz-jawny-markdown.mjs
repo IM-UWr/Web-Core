@@ -1,5 +1,8 @@
 // Sprawdza formularz i powiązania, zanim Pages CMS zapisze dane według nowego układu.
-// Uruchom po pobraniu treści: node skrypty/sprawdz-jawny-markdown.mjs [ścieżka Web-Studia]
+// Uruchom po pobraniu treści: node skrypty/sprawdz-jawny-markdown.mjs [ścieżka repozytorium treści, domyślnie ../Web-Studia]
+// Każde repozytorium (zlecenie 40): Strony i strona działu — Treść i Treść EN jako kolorowany edytor Markdown, ukryte pole
+// format_tresci (domyślnie jawne), każdy plik w jawnym formacie, każde pole pliku w formularzu (zapis w CMS niczego nie wytnie).
+// Web-Studia dodatkowo: kierunki, specjalności, rok akademicki, scalony baner i powiązania opiekunów ze spisem pracowników.
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -22,15 +25,16 @@ function coverage(data, fields, label) {
     }
   }
 }
+const studia = config.content.some((c) => c.name === 'kierunki');
 const employees = new Map();
-for (const file of await fs.readdir('src/content/pracownicy')) {
+if (studia) for (const file of await fs.readdir('src/content/pracownicy')) {
   if (!/\.ya?ml$/.test(file)) continue;
   const data = YAML.parse(await fs.readFile(path.join('src/content/pracownicy', file), 'utf8'));
   if (data.opublikowany !== false) employees.set(file.replace(/\.ya?ml$/, ''), data);
 }
 let entries = 0, coordinators = 0;
 const choices = new Set();
-for (const file of await fs.readdir(path.join(target, '_cms/pracownicy'))) {
+if (studia) for (const file of await fs.readdir(path.join(target, '_cms/pracownicy'))) {
   if (!/\.ya?ml$/.test(file)) continue;
   const data = YAML.parse(await fs.readFile(path.join(target, '_cms/pracownicy', file), 'utf8'));
   assert.ok(data.etykieta && !choices.has(data.etykieta), `Niejednoznaczna pozycja listy opiekunów: ${file}`);
@@ -53,9 +57,18 @@ function codeFields(collection) {
     assert.equal(field.options?.format, 'markdown');
   }
 }
-for (const name of ['kierunki', 'specjalnosci', 'strony']) {
+function hiddenFormat(collection) {
+  const field = collection.fields.find((f) => f.name === 'format_tresci');
+  assert.ok(field && field.hidden === true && field.default === 'jawne', `${collection.name}: brak ukrytego pola format_tresci (default: jawne)`);
+}
+let headings = 0, withoutId = 0;
+function countHeadings(text) {
+  for (const line of String(text ?? '').split(/\r?\n/)) if (/^##\s/.test(line)) { headings++; if (!/\{#[^}]+\}\s*$/.test(line)) withoutId++; }
+}
+for (const name of studia ? ['kierunki', 'specjalnosci', 'strony'] : ['strony']) {
   const collection = config.content.find((c) => c.name === name);
   assert.ok(collection && collection.type === 'collection', `Brak formularza ${name}`);
+  hiddenFormat(collection);
   const names = collection.fields.map((f) => f.name);
   if (name !== 'strony') assert.ok(names.indexOf('body') < names.indexOf('baner') && names.at(-1) === 'baner', `${name}: baner powinien być ostatni.`);
   codeFields(collection);
@@ -63,6 +76,7 @@ for (const name of ['kierunki', 'specjalnosci', 'strony']) {
     const data = await readMd(file);
     coverage(data, collection.fields, file);
     assert.equal(data.format_tresci, 'jawne', `${file}: brak jawnego formatu`);
+    countHeadings((await fs.readFile(file, 'utf8')).replace(/^---[\s\S]*?\n---/, '')); countHeadings(data.tresc_en);
     if (name !== 'strony') assert.ok(data.baner, `${file}: brak scalonego banera`);
     for (const coordinator of data.opiekunowie ?? []) {
       const id = path.posix.basename(coordinator.osoba ?? '').replace(/\.ya?ml$/, '');
@@ -76,13 +90,16 @@ for (const name of ['kierunki', 'specjalnosci', 'strony']) {
     entries++;
   }
 }
-for (const name of ['strona-dzialu', 'rok-akademicki']) {
+for (const name of studia ? ['strona-dzialu', 'rok-akademicki'] : ['strona-dzialu', 'popularyzacja']) {
   const collection = config.content.find((c) => c.name === name);
+  if (!studia && !collection) continue;
   assert.ok(collection, `Brak formularza ${name}`);
   codeFields(collection);
+  hiddenFormat(collection);
   const data = await readMd(path.join(target, collection.path));
   coverage(data, collection.fields, collection.path);
-  assert.equal(data.format_tresci, 'jawne');
+  assert.equal(data.format_tresci, 'jawne', `${collection.path}: brak jawnego formatu`);
+  countHeadings((await fs.readFile(path.join(target, collection.path), 'utf8')).replace(/^---[\s\S]*?\n---/, '')); countHeadings(data.tresc_en);
   entries++;
 }
-console.log(`OK: ${entries} wpisów, ${coordinators} powiązań opiekunów; formularze zachowują wszystkie pola.`);
+console.log(`OK (${path.basename(target)}): ${entries} wpisów, ${coordinators} powiązań opiekunów; formularze zachowują wszystkie pola. Nagłówki ##: ${headings}, bez {#id}: ${withoutId}.`);

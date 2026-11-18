@@ -16,7 +16,7 @@ import { u, isExternal } from '../lib/url';
 import ZdjecieZ from './ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
 import { wJezyku, wybierz } from '../lib/i18n';
-import { slugOf, widoczny } from '../lib/tresci';
+import { slugOf, widoczny, maTresc } from '../lib/tresci';
 import type { Lang } from '../lib/daty';
 
 interface Props {
@@ -35,7 +35,7 @@ const pozycje = (await getCollection('warto_wiedziec'))
   .filter((w) => slugOf(w.id) !== pomin)
   .map((w) => {
     const d = w.data;
-    const maStrone = !!w.body?.trim();
+    const maStrone = maTresc(w.body);
     const cel = maStrone ? `/warto-wiedziec/${slugOf(w.id)}` : d.link;
     const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
     return {

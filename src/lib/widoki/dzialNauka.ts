@@ -2,7 +2,7 @@
 import { wybierz } from '../i18n';
 import { today, addDays, type Lang } from '../daty';
 import { menuGlowne } from '../menu';
-import { konferencje, granty, obrony, trwaLubBedzie, type Grant, type Konferencja, type Obrona } from '../tresci';
+import { konferencje, granty, obrony, trwaLubBedzie, maTresc, type Grant, type Konferencja, type Obrona } from '../tresci';
 import { stronaDzialu } from '../tekstyStron';
 
 // Konferencja trwająca albo nadchodząca (używane też w szablonie — wygląd daty).
@@ -27,7 +27,7 @@ export async function daneDzialuNauka(lang: Lang) {
 
   // Projekty realizowane — tak samo jak na /nauka/granty: rok zakończenia ≥ bieżący rok.
   const realizowane = listaGrantow.filter((g) => (g.data.rok_do ?? 0) >= rok);
-  const maOpis = (g: Grant) => !!g.body?.trim();
+  const maOpis = (g: Grant) => maTresc(g.body);
   // Przykłady: najpierw projekty z opisem, potem najnowsze (każdy ma własną podstronę).
   const przyklady = [...realizowane.filter(maOpis), ...realizowane.filter((g) => !maOpis(g))].slice(0, 4);
 

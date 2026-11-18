@@ -2,13 +2,13 @@
 // Automat co kilka minut pobiera ten plik i wysyła wiadomość do zapisanych na listę danego seminarium,
 // gdy pojawi się nowy (opublikowany, przyszły) referat. Adres: /seminaria/powiadomienia.json
 import type { APIRoute } from 'astro';
-import { referaty, seminaria, seminariumReferatu, slugOf, sala, salaReferatu, afiliacjaReferatu } from '../../lib/tresci';
+import { referaty, seminaria, seminariumReferatu, slugOf, sala, salaReferatu, afiliacjaReferatu, bezKomentarzy } from '../../lib/tresci';
 import { absolute } from '../../lib/url';
 import { addDays, today } from '../../lib/daty';
 
-// Streszczenie jako zwykły tekst (wzory $...$ zostają bez zmian).
+// Streszczenie jako zwykły tekst (wzory $...$ zostają bez zmian); bez komentarzy HTML (podpowiedzi z szablonu wpisu, zlecenie 40).
 const tekst = (md: string | undefined, max = 900) => {
-  const t = (md ?? '')
+  const t = bezKomentarzy(md)
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')

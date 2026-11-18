@@ -9,6 +9,8 @@
 //   Brak pliku nic nie psuje: lista z domyślnym tytułem, opisem i hasłem jak przed zleceniem 30 (DOMYSLNE niżej), bez tekstu.
 // Lista stoi pod całym tekstem, chyba że tekst ma kotwicę strony (nagłówek ## z listy typu 'strona' w src/plugins/kotwice.mjs,
 // np. „Czasopisma redagowane w Instytucie”): wtedy sekcja pod tym nagłówkiem (do następnego ##) idzie na miejsce swojej listy.
+// Jawny Markdown (format_tresci: jawne, zlecenie 40): o przeniesieniu decyduje tylko jawne id, np. „## Ostatnie sukcesy {#sukcesy}”,
+// nie nazwa nagłówka.
 import { getCollection } from 'astro:content';
 import { KOTWICE, klucz } from '../plugins/kotwice.mjs';
 import { renderMarkdownZNaglowkami, type Naglowek } from './markdown';
@@ -102,8 +104,9 @@ export interface Tekst {
   naglowki?: Naglowek[];
 }
 
-// Podział Markdownu na tekst główny i sekcje pod kotwicami strony (nagłówki ## spoza bloków kodu).
-function podziel(src: string, adres: string): { glowny: string; kotwiczone: { id: string; naglowek: string; tresc: string }[] } {
+// Podział Markdownu na tekst główny i sekcje pod kotwicami strony (nagłówki ## spoza bloków kodu). Jawny format: nagłówek z {#id}
+// kotwicy tej strony (to samo id i wzór co w src/plugins/remark-jawne-bloki.mjs).
+function podziel(src: string, adres: string, jawne = false): { glowny: string; kotwiczone: { id: string; naglowek: string; tresc: string }[] } {
   const kotwice = (KOTWICE as { id: string; typ?: string; adres?: string; nazwy: string[] }[]).filter((k) => k.typ === 'strona' && k.adres === adres);
   const linie = src.replace(/\r\n/g, '\n').split('\n');
   const glowny: string[] = [];
@@ -112,10 +115,10 @@ function podziel(src: string, adres: string): { glowny: string; kotwiczone: { id
   let wKodzie = false;
   for (const l of linie) {
     if (/^\s*(```|~~~)/.test(l)) wKodzie = !wKodzie;
-    const m = !wKodzie && /^##\s+(.+?)\s*#*\s*$/.exec(l);
+    const m = !wKodzie && (jawne ? /^##\s+(.+?)\s+\{#([\p{L}\p{N}][\p{L}\p{N}\p{M}_-]*)\}\s*$/u : /^##\s+(.+?)\s*#*\s*$/).exec(l);
     if (m) {
       const naglowek = m[1].replace(/\\(.)/g, '$1').replace(/[*_]/g, '').trim();
-      const k = kotwice.find((x) => x.nazwy.some((n) => klucz(n) === klucz(naglowek)));
+      const k = jawne ? kotwice.find((x) => x.id === m[2]) : kotwice.find((x) => x.nazwy.some((n) => klucz(n) === klucz(naglowek)));
       if (k) {
         const s = { id: k.id, naglowek, linie: [] as string[] };
         kotwiczone.push(s);
@@ -131,8 +134,8 @@ function podziel(src: string, adres: string): { glowny: string; kotwiczone: { id
 
 /** Markdown strony → HTML tekstu (z wtyczką bloków, gdy bloki) i sekcji pod kotwicami strony `adres`. */
 export async function renderTekstu(src: string | undefined, adres: string, lang: Lang, opcje: { bloki?: boolean; wst?: boolean; jawne?: boolean } = {}): Promise<Tekst> {
-  // Jawny format nie przypisuje tekstu do miejsc w szablonie na podstawie nazwy nagłówka.
-  const { glowny, kotwiczone } = opcje.jawne ? { glowny: src ?? '', kotwiczone: [] } : podziel(src ?? '', adres);
+  // Jawny format nie przypisuje tekstu do miejsc w szablonie na podstawie nazwy nagłówka — tylko po jawnym {#id} kotwicy strony.
+  const { glowny, kotwiczone } = podziel(src ?? '', adres, opcje.jawne === true);
   const render = async (s: string) => (s ? (await renderMarkdownZNaglowkami(s, lang, opcje.bloki === true, opcje.jawne)).html : '');
   const result = await renderMarkdownZNaglowkami(glowny, lang, opcje.bloki === true, opcje.jawne);
   let html = result.html;

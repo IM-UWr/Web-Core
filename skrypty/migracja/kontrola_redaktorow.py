@@ -16,7 +16,10 @@ Uruchomienie (najpierw git fetch w repozytorium):
   python skrypty/migracja/kontrola_redaktorow.py po <repozytorium> --przed REF [--po REF] [--dopisane POLE=WARTOŚĆ]
 Domyślnie: --wynik HEAD, --baza = wspólny przodek wyniku i origin/main (baza z etapu 0), --po HEAD.
 --dopisane (zlecenie 33: opublikowany=true): pole najwyższego poziomu z tą wartością = pole bez wartości (migracja dopisała
-jawną wartość domyślną). Każda inna wartość, np. „opublikowany: false” redaktora, jest porównywana jak zwykle.
+jawną wartość domyślną). Każda inna wartość, np. „opublikowany: false” redaktora, jest porównywana jak zwykle. Opcję można
+podać kilka razy (zlecenie 40: --dopisane format_tresci=jawne).
+--jawne (zlecenie 40, migracja do jawnego Markdownu): Treść i Treść EN porównywane jako tekst po migracji — bez komentarzy
+<!-- … --> i bez {#id} na końcu nagłówków, z białymi znakami zwiniętymi do spacji. Każde słowo redaktora musi być w wyniku.
 """
 import re
 import subprocess
@@ -30,6 +33,14 @@ from termin import DECYZJE, POLA, PRZEMIANOWANIA, WYJATKI, Wczytywacz, pola_wyda
 
 DANE = re.compile(r'\.(md|json|ya?ml)$')
 DOPISANE: list[tuple[str, object]] = []  # --dopisane: (pole, wartość), np. ('opublikowany', True)
+JAWNE = False  # --jawne: Treść i Treść EN jako tekst po migracji do jawnego Markdownu
+
+
+def tekst_jawny(t):
+    """Tekst Markdownu bez dopisków migracji do jawnego formatu (komentarze, {#id} przy nagłówkach), białe znaki zwinięte."""
+    t = re.sub(r'<!--.*?-->', ' ', str(t), flags=re.S)
+    t = re.sub(r'(?m)^(#{2,6}\s.*?)\s+\{#[^}\s]+\}\s*$', r'\1', t)
+    return re.sub(r'\s+', ' ', t).strip()
 
 
 def git(repo, *arg, ok=False):
@@ -77,6 +88,10 @@ def porownawczo(sciezka, dane):
     for k, v in DOPISANE:
         if k in d and d[k] == v:
             del d[k]
+    if JAWNE and sciezka.endswith('.md'):
+        for k in ('body', 'tresc_en'):
+            if isinstance(d.get(k), str):
+                d[k] = tekst_jawny(d[k])
     if '/aktualnosci/' in f'/{sciezka}' and isinstance(d.get('termin'), list):
         t = [x for x in d.pop('termin') if isinstance(x, dict) and x.get('dzien')]
         if t:
@@ -258,9 +273,12 @@ def main():
         raise SystemExit(__doc__)
     opcja = lambda n, d=None: arg[arg.index(n) + 1] if n in arg else d  # noqa: E731
     repo = Path(arg[1]).resolve()
-    if opcja('--dopisane'):
-        k, v = opcja('--dopisane').split('=', 1)
-        DOPISANE.append((k, yaml.safe_load(v)))
+    for i, a in enumerate(arg[:-1]):
+        if a == '--dopisane':
+            k, v = arg[i + 1].split('=', 1)
+            DOPISANE.append((k, yaml.safe_load(v)))
+    global JAWNE
+    JAWNE = '--jawne' in arg
     if arg[0] == 'przed':
         sys.exit(przed_pushem(repo, opcja('--wynik', 'HEAD'), opcja('--baza')))
     if not opcja('--przed'):

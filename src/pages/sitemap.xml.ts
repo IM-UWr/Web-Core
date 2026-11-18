@@ -1,7 +1,7 @@
 // Mapa strony dla wyszukiwarek (widoczne treści — przy fladze TYLKO_OPUBLIKOWANE tylko opublikowane, zlecenie 33; obie wersje językowe).
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
-import { aktualnosci, obrony, seminaria, granty, slugOf, widoczny } from '../lib/tresci';
+import { aktualnosci, obrony, seminaria, granty, slugOf, widoczny, maTresc } from '../lib/tresci';
 import { absolute } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { wykazy } from '../lib/widoki/publikacje';
@@ -24,7 +24,7 @@ export async function GET(context: APIContext) {
   sciezki.push('/nauka/publikacje', ...Object.keys(wykazy).map((r) => `/nauka/publikacje/${r}`));
   for (const s of await specjalnosci()) if (widoczny(s) && !s.data.bez_podstrony) sciezki.push(`/studia/${s.data.kierunek}/${s.id}`);
   sciezki.push('/warto-wiedziec');
-  for (const w of await getCollection('warto_wiedziec')) if (widoczny(w) && w.body?.trim()) sciezki.push(`/warto-wiedziec/${slugOf(w.id)}`);
+  for (const w of await getCollection('warto_wiedziec')) if (widoczny(w) && maTresc(w.body)) sciezki.push(`/warto-wiedziec/${slugOf(w.id)}`);
   sciezki.push('/studia/plan-zajec');
   const url = (p: string) => absolute(p, context.site);
   // podstrony szkiców (src/lib/szkice.ts) — przy fladze ich nie ma

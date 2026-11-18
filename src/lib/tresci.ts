@@ -22,6 +22,13 @@ export const jestSzkicem = (e: { data: { opublikowany?: boolean } }) => e.data.o
 /** Jedna funkcja widoczności dla list, stron i odnośników: na Podglądzie zawsze true, przy fladze tylko opublikowane. */
 export const widoczny = <T extends { data: { opublikowany?: boolean } }>(e: T) => !TYLKO_OPUBLIKOWANE || !jestSzkicem(e);
 
+// Treść wpisu bez komentarzy HTML (zlecenie 40): szablon nowego wpisu w Pages CMS (`default` pola Treść) to sam komentarz
+// z podpowiedzią, a CMS wstawia go też przy otwarciu wpisu z pustą Treścią. Treść z samymi komentarzami = wpis bez opisu
+// (grant bez własnej strony, obrona z zaproszeniem, „Warto wiedzieć” bez podstrony, referat bez streszczenia).
+export const bezKomentarzy = (t?: string | null) => (t ?? '').replace(/<!--[\s\S]*?-->/g, '');
+/** Czy Treść wpisu ma tekst (poza komentarzami HTML i białymi znakami). */
+export const maTresc = (t?: string | null) => bezKomentarzy(t).trim() !== '';
+
 // Identyfikator wpisu bez rozszerzenia i podfolderów daty.
 export const slugOf = (id: string) => id.split('/').pop()!.replace(/\.(md|ya?ml)$/, '');
 

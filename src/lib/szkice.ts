@@ -6,7 +6,7 @@
 // (src/middleware.ts: na Podglądzie etykieta „szkic”, przy fladze sam tekst) i plakietka stanu budowy na Podglądzie (wiersz szkicu, B4).
 // Strona działu-szkic zostaje i przy fladze (bez tekstu z pliku, bo prowadzi do niej menu): tylko etykieta na Podglądzie.
 import { getCollection } from 'astro:content';
-import { slugOf, jestSzkicem, TYLKO_OPUBLIKOWANE } from './tresci';
+import { slugOf, jestSzkicem, maTresc, TYLKO_OPUBLIKOWANE } from './tresci';
 import { jestTekstemListy, szkicDzialu } from './tekstyStron';
 import { specjalnosci } from './specjalnosci';
 import { stripBase } from './url';
@@ -81,7 +81,7 @@ export function szkice(): Promise<Szkice> {
     for (const e of await getCollection('obrony')) if (jestSzkicem(e)) dodaj('obrony', e, `/obrony-doktorskie/${slugOf(e.id)}`);
     for (const e of await getCollection('seminaria')) if (jestSzkicem(e)) dodaj('seminaria', e, `/seminaria/${e.id}`);
     for (const e of await getCollection('granty')) if (jestSzkicem(e)) dodaj('granty', e, `/nauka/granty/${slugOf(e.id)}`);
-    for (const e of await getCollection('warto_wiedziec')) if (jestSzkicem(e) && e.body?.trim()) dodaj('warto_wiedziec', e, `/warto-wiedziec/${slugOf(e.id)}`);
+    for (const e of await getCollection('warto_wiedziec')) if (jestSzkicem(e) && maTresc(e.body)) dodaj('warto_wiedziec', e, `/warto-wiedziec/${slugOf(e.id)}`);
     const d = new Map<string, WpisSzkicu>();
     const dzial = (nazwa: string, fm?: Record<string, any>) => {
       if (szkicDzialu(fm)) d.set(`/${nazwa}`, { kolekcja: nazwa === 'popularyzacja' ? 'popularyzacja' : 'strona-dzialu', plik: `src/data/${nazwa}.md`, adres: `/${nazwa}` });

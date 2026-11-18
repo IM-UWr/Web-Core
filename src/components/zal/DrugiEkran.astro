@@ -30,7 +30,7 @@ import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { pozycjeKierunkow } from '../../lib/kierunki';
 import { tekstDnia } from '../../lib/kolory-dni';
-import { wydarzeniaNaTelefon, wydarzeniaMinione, aktualnosciNaGlowna, referatyWTygodniu, referatyMinione, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU, widoczny, type Wydarzenie, type ReferatWLiscie } from '../../lib/tresci';
+import { wydarzeniaNaTelefon, wydarzeniaMinione, aktualnosciNaGlowna, referatyWTygodniu, referatyMinione, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU, widoczny, maTresc, type Wydarzenie, type ReferatWLiscie } from '../../lib/tresci';
 import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
 
 interface Props { lang: Lang }
@@ -135,7 +135,7 @@ const warto = (await getCollection('warto_wiedziec'))
   .filter((w) => widoczny(w) && w.data.na_glownej)
   .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
   .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze))
-  .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: w.body?.trim() ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
+  .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: maTresc(w.body) ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
 // (tylko na komputerze — na telefonie ten blok jest schowany i losuje własna lista w StronaGlowna.astro)
 const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOMPUTER}').matches)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
   `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
