@@ -159,7 +159,7 @@ const aktualnosci = defineCollection({
   schema: z.object({
     tytul: z.string(),
     data: date,
-    rodzaj: z.preprocess(empty, z.enum(['ogloszenie', 'wydarzenie', 'sukces', 'kariera']).default('ogloszenie')),
+    rodzaj: z.preprocess(empty, z.enum(['ogloszenie', 'wydarzenie', 'seminarium-wydzialowe', 'sukces', 'kariera']).default('ogloszenie')),
     dla: z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.enum(['studenci', 'doktoranci', 'pracownicy', 'kandydaci']))),
     zajawka: optStr,
     zdjecie: optStr,

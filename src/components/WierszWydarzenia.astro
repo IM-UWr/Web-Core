@@ -2,8 +2,8 @@
 // Wiersz wydarzenia (Kalendarz, „Najbliższe wydarzenia” pod aktualnością) w języku podstron „Założycieli”: data jak na
 // stronach działów (zal/dzial/Wiersz.astro — dzień dużą Brygadą, pod nim „mie rrrr”; minione — szarym), obok mała etykieta
 // „Rodzaj · dzień i godzina · miejsce”, tytuł Brygadą (referat — wzory przez KaTeX, strona zewnętrzna — z ikoną), podtytuł
-// i opis referatu. Cały wiersz klikalny (link w tytule); konferencja bez strony — wiersz bez linku. Wiersze rozdzielone
-// cienką linią. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px, węższa kolumna daty).
+// i opis referatu (przy seminarium wydziałowym zajawka wpisu, czyli tytuł wykładu; zlecenie 49). Cały wiersz klikalny (link
+// w tytule); konferencja bez strony — wiersz bez linku. Wiersze rozdzielone cienką linią. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px, węższa kolumna daty).
 // data-ww i data-rodzaj — filtr i szukanie w Kalendarzu i na liście Obron (szukanie w .ww-tresc, bez daty).
 // zwarty — listy w stylu Aktualności (Kalendarz, Obrony; zlecenie 27): na komputerze ten sam wzór wiersza co WierszAktualnosci.astro
 //   (węższa kolumna daty, mniejsze pismo), a data także minionych pozycji w kolorze działu. bezRodzaju — etykieta bez rodzaju (lista Obron).
@@ -13,7 +13,7 @@ import TytulReferatu from './TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, RODZAJE } from '../lib/i18n';
 import { dayNum, monthShort, dayShort, parse, range, time, hasTime, type Lang } from '../lib/daty';
-import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
+import { trwaLubBedzie, rodzajWiersza, type Wydarzenie } from '../lib/tresci';
 import type { Dzial } from '../lib/patroni';
 
 // dzial — własny kolor wiersza pod wpisem o wydarzeniu (zlecenie 21, punkt 6); bez niego kolor otoczenia
@@ -24,7 +24,9 @@ const zewn = !!w.href && isExternal(w.href);
 const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
 const minione = !trwaLubBedzie(w);
 const kiedy = hasTime(w.poczatek) ? `${dayShort(w.poczatek, lang)} ${time(w.poczatek)}` : range(w.poczatek, w.koniec, lang);
-const etykieta = [bezRodzaju ? '' : RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce].filter(Boolean).join(' · ');
+const etykieta = [bezRodzaju ? '' : RODZAJE[rodzajWiersza(w)]?.[lang], kiedy, w.miejsce].filter(Boolean).join(' · ');
+// pod tytułem: opis referatu (nazwa seminarium) albo zajawka seminarium wydziałowego (tytuł wykładu; tytuł wpisu to prelegent)
+const zOpisem = w.rodzaj === 'referat' || w.rodzajWpisu === 'seminarium-wydzialowe';
 ---
 <article class:list={['ww', adres && 'ww-klik', minione && 'ww-minione', zwarty && 'ww-zwarty']} data-ww data-rodzaj={w.rodzaj} data-dzial={dzial}>
   <time class="ww-data" datetime={w.poczatek.slice(0, 10)}>{dayNum(w.poczatek)}<small>{monthShort(w.poczatek, lang)} {parse(w.poczatek).y}</small></time>
@@ -36,7 +38,7 @@ const etykieta = [bezRodzaju ? '' : RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce]
         : w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}
     </H>
     {w.podtytul && <p lang={w.rodzaj === 'obrona' ? 'en' : undefined}>{w.podtytul}</p>}
-    {w.rodzaj === 'referat' && w.opis && <p class="ww-opis">{w.opis}</p>}
+    {zOpisem && w.opis && <p class="ww-opis" lang={w.opisLang}>{w.opis}</p>}
     <slot />
   </div>
 </article>

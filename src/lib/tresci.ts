@@ -205,6 +205,11 @@ export const poPolskuNaEn = (jezyk: string | undefined, lang: Lang) => lang === 
 
 export interface Wydarzenie {
   rodzaj: 'wydarzenie' | 'obrona' | 'referat' | 'konferencja' | 'termin';
+  // pozycja z aktualności: rodzaj wpisu (zlecenie 49) — „seminarium-wydzialowe” zmienia etykietę wiersza i pokazuje zajawkę (opis),
+  // a rodzaj pozycji zostaje „wydarzenie” (filtr Kalendarza, liczby, wydarzenia.ics)
+  rodzajWpisu?: string;
+  // język opisu, gdy na /en opis to polska zajawka (pozycje z aktualności; zlecenie 49)
+  opisLang?: string;
   tytul: string;
   // referat: język (pole jezyk w CMS)
   jezyk?: string;
@@ -235,9 +240,10 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
   for (const a of akt) {
     if (!a.data.wydarzenie_poczatek) continue;
     out.push({
-      rodzaj: 'wydarzenie', tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), poczatek: a.data.wydarzenie_poczatek,
+      rodzaj: 'wydarzenie', rodzajWpisu: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), poczatek: a.data.wydarzenie_poczatek,
       koniec: a.data.wydarzenie_koniec, koniecIcs: a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120),
       miejsce: miejsce(a.data.wydarzenie_miejsce, lang), href: `/aktualnosci/${slugOf(a.id)}`, uid: `akt-${slugOf(a.id)}`, opis: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka,
+      opisLang: langPola(a.data, 'zajawka', lang),
     });
   }
   for (const o of obr) {
@@ -424,6 +430,12 @@ export interface PozycjaListy {
 // Oferty pracy, staży i stypendiów (rodzaj „Kariera”, zlecenie 44) mają własną podstronę /aktualnosci/kariera: nie ma ich na liście
 // Aktualności, na stronie głównej (kolumna Aktualności i liczba na okładce) ani w RSS. Strona Studiów pokazuje tylko aktualne.
 export const jestOferta = (p: { rodzaj: string }) => p.rodzaj === 'kariera';
+// Rodzaje wpisów, które zachowują się jak „Wydarzenie” (zlecenie 49): „Seminarium wydziałowe” to wydarzenie z własną plakietką —
+// wpis o wydarzeniu (kolory działu na stronie wpisu i w „Najbliższych wydarzeniach”), z terminem w Kalendarzu jako „wydarzenie”.
+export const jakWydarzenie = (rodzaj: string) => rodzaj === 'wydarzenie' || rodzaj === 'seminarium-wydzialowe';
+// Rodzaj do podpisu wiersza wydarzenia (Kalendarz, „Najbliższe wydarzenia”, strona główna): seminarium wydziałowe ma własny podpis,
+// pozostałe pozycje — swój rodzaj.
+export const rodzajWiersza = (w: { rodzaj: string; rodzajWpisu?: string }) => (w.rodzajWpisu === 'seminarium-wydzialowe' ? w.rodzajWpisu : w.rodzaj);
 // Aktualna = bez terminu zgłoszeń albo termin dziś lub później (cały dzień terminu oferta jest jeszcze aktualna). Liczone przy budowie;
 // Podgląd przebudowuje się codziennie, więc oferta sama przechodzi do „Zakończonych”.
 export const ofertaAktualna = (p: { zgloszenia?: string }) => !p.zgloszenia || p.zgloszenia >= today();

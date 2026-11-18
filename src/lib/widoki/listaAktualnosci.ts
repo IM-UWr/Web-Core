@@ -17,7 +17,7 @@ export async function daneListyAktualnosci(lang: Lang) {
     else grupy.push({ miesiac: m, pozycje: [p] });
   }
   // bez „Kariera”: oferty mają własną stronę (zlecenie 44), a w ich miejscu w panelu jest ramka z linkiem i liczbą aktualnych ofert
-  const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
+  const rodzaje = ['ogloszenie', 'wydarzenie', 'seminarium-wydzialowe', 'sukces', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
   const ofertyAktualne = (await listaOfert(lang)).filter(ofertaAktualna).length;
   // Tytuł, opis, hasło (na telefonie zamiast opisu — NaglowekStrony.astro; decyzja 31.10.2026) i tekst nad listą:
   // Web-Aktualnosci → Strony → Aktualności (src/content/strony/aktualnosci.md; zlecenie 30, src/lib/tekstyStron.ts).

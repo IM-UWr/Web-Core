@@ -412,8 +412,9 @@ function aktualnosci({ pola, pole, kolejnosc, ustaw, formatTresci, etykietyEn, f
   const ma = (seq, nazwa) => seq.items.some((i) => i.get('name') === nazwa);
 
   // Aktualności (decyzja 18.11, pytanie 3): tytuł, tytuł EN → data, rodzaj, terminy → Treść, Treść EN → zajawka, zajawka EN → reszta.
-  // Opis z raportu 40-0 uzupełniony o oferty: od zlecenia 44 „Kariera” ma własną stronę (i stronę Studiów), nie listę Aktualności.
-  ustaw(formularz('aktualnosci'), 'description', 'Ogłoszenia, wydarzenia, sukcesy i oferty pracy, staży i stypendiów. Ogłoszenia, wydarzenia i sukcesy widać w Aktualnościach i na stronie głównej; wydarzenie z terminem trafia też do kalendarza. Oferty (rodzaj „Kariera”) są na stronie Kariera i na stronie Studiów.');
+  // Opis z raportu 40-0 uzupełniony o oferty: od zlecenia 44 „Kariera” ma własną stronę (i stronę Studiów), nie listę Aktualności;
+  // od zlecenia 49 także o seminaria wydziałowe (rodzaj „Seminarium wydziałowe”, opcja dopisana w .pages.yml).
+  ustaw(formularz('aktualnosci'), 'description', 'Ogłoszenia, wydarzenia, seminaria wydziałowe, sukcesy i oferty pracy, staży i stypendiów. Ogłoszenia, wydarzenia, seminaria wydziałowe i sukcesy widać w Aktualnościach i na stronie głównej; wpis z terminem trafia też do kalendarza. Oferty (rodzaj „Kariera”) są na stronie Kariera i na stronie Studiów.');
   const a = pola('aktualnosci');
   etykietyEn(a);
   // zlecenie 48: „Opublikowane” pod parą tytuł / tytuł EN, jak w zleceniu 33

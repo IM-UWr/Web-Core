@@ -107,6 +107,9 @@ def sprawdz(p):
             ostrzezenia.append(f'{p}: stary zapis terminu (wydarzenie_*) — przenieś do pola „termin” (skrypty/migracja/termin.py)')
         if rodzaj == 'wydarzenie' and not termin and not stary:
             ostrzezenia.append(f'{p}: rodzaj „wydarzenie” bez terminu — wpis nie trafi do Kalendarza (dodaj „Termin wydarzenia” albo zmień rodzaj)')
+        # zlecenie 49: „Seminarium wydziałowe” działa jak „Wydarzenie”
+        if rodzaj == 'seminarium-wydzialowe' and not termin and not stary:
+            ostrzezenia.append(f'{p}: rodzaj „Seminarium wydziałowe” bez terminu — wpis nie trafi do Kalendarza (dodaj „Termin wydarzenia”)')
         if rodzaj in ('sukces', 'kariera') and (termin or stary):
             ostrzezenia.append(f'{p}: termin wydarzenia przy rodzaju „{rodzaj}” — to zwykle pomyłka (dzień informacji wpisuje się w „Data”)')
         if len(termin) > 1:
