@@ -1,7 +1,7 @@
-// Mapa strony dla wyszukiwarek (tylko opublikowane treści, obie wersje językowe).
+// Mapa strony dla wyszukiwarek (widoczne treści — przy fladze TYLKO_OPUBLIKOWANE tylko opublikowane, zlecenie 33; obie wersje językowe).
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
-import { aktualnosci, obrony, seminaria, granty, slugOf } from '../lib/tresci';
+import { aktualnosci, obrony, seminaria, granty, slugOf, widoczny } from '../lib/tresci';
 import { absolute } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { wykazy } from '../lib/widoki/publikacje';
@@ -16,14 +16,14 @@ export async function GET(context: APIContext) {
   // konferencje nie mają własnych podstron (lista /nauka/konferencje prowadzi na zewnętrzne strony konferencji)
   for (const g of await granty()) sciezki.push(`/nauka/granty/${slugOf(g.id)}`);
   // teksty stron z listą (zlecenie 30) nie mają własnych stron — ich adresy są wyżej
-  for (const s of await getCollection('strony')) if (s.data.opublikowany !== false && !jestTekstemListy(s.id)) sciezki.push(`/${s.id}`);
-  for (const k of await getCollection('kierunki')) if (k.data.opublikowany !== false) sciezki.push(`/studia/${k.id}`);
-  for (const z of await getCollection('zaklady')) if (z.data.opublikowany !== false) sciezki.push(`/instytut/zaklady/${z.id}`);
+  for (const s of await getCollection('strony')) if (widoczny(s) && !jestTekstemListy(s.id)) sciezki.push(`/${s.id}`);
+  for (const k of await getCollection('kierunki')) if (widoczny(k)) sciezki.push(`/studia/${k.id}`);
+  for (const z of await getCollection('zaklady')) if (widoczny(z)) sciezki.push(`/instytut/zaklady/${z.id}`);
   sciezki.push('/instytut/struktura', '/instytut/wladze');
   sciezki.push('/nauka/publikacje', ...Object.keys(wykazy).map((r) => `/nauka/publikacje/${r}`));
-  for (const s of await specjalnosci()) if (s.data.opublikowany !== false && !s.data.bez_podstrony) sciezki.push(`/studia/${s.data.kierunek}/${s.id}`);
+  for (const s of await specjalnosci()) if (widoczny(s) && !s.data.bez_podstrony) sciezki.push(`/studia/${s.data.kierunek}/${s.id}`);
   sciezki.push('/warto-wiedziec');
-  for (const w of await getCollection('warto_wiedziec')) if (w.data.opublikowany !== false && w.body?.trim()) sciezki.push(`/warto-wiedziec/${slugOf(w.id)}`);
+  for (const w of await getCollection('warto_wiedziec')) if (widoczny(w) && w.body?.trim()) sciezki.push(`/warto-wiedziec/${slugOf(w.id)}`);
   sciezki.push('/studia/plan-zajec');
   const url = (p: string) => absolute(p, context.site);
   const wpisy = sciezki

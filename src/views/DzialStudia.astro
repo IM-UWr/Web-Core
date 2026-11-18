@@ -17,9 +17,9 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
 const T = (pl: string, angielski: string) => (en ? angielski : pl);
-const { liczby, grupy, oStudiach, fakty, aktualnosci, tytul, wstep, haslo } = await daneDzialuStudia(lang);
+const { liczby, grupy, oStudiach, fakty, aktualnosci, tytul, wstep, haslo, szkic } = await daneDzialuStudia(lang);
 ---
-<Baza tytul={tytul} opis={wstep} uklad="zwarta portal-baner">
+<Baza tytul={tytul} opis={wstep} opublikowany={!szkic} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={wstep} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">

@@ -5,6 +5,8 @@
 // formularzu) nie jest wyświetlane: grupy linków nad tekstem biorą się z menu działu.
 import { getCollection } from 'astro:content';
 import { wybierz } from '../i18n';
+import { widoczny, TYLKO_OPUBLIKOWANE } from '../tresci';
+import { polaPlikuDzialu, szkicDzialu } from '../tekstyStron';
 import type { Lang } from '../daty';
 import * as Strona from '../../data/popularyzacja.md';
 import { renderMarkdownZNaglowkami } from '../markdown';
@@ -28,7 +30,7 @@ export async function danePopularyzacji(lang: Lang) {
   const en = lang === 'en';
   const T = (pl: string, angielski: string) => (en ? angielski : pl);
   const w = (o: any, pole: string) => wybierz(o, pole, lang) as string;
-  const d = (Strona.frontmatter ?? {}) as Dane;
+  const d = polaPlikuDzialu(Strona.frontmatter) as Dane;
 
   const tytul = w(d, 'tytul') || T('Popularyzacja', 'Outreach');
   const lead = w(d, 'wstep');
@@ -48,7 +50,7 @@ export async function danePopularyzacji(lang: Lang) {
   // „O popularyzacji”: Markdown z pola Treść (po angielsku Treść EN; pusta — polska, jak dotąd) przez wtyczkę bloków (kafelki,
   // listy plików — ściągawka w opisie pola) i „W skrócie” obok, jak „O studiach”. Pierwszy akapit większy (p.wst, jak pierwszy
   // z dawnych akapitów oddzielonych pustą linią).
-  const zrodlo = (en && d.tresc_en?.trim()) || Strona.rawContent();
+  const zrodlo = TYLKO_OPUBLIKOWANE && Strona.frontmatter?.opublikowany === false ? '' : (en && d.tresc_en?.trim()) || Strona.rawContent();
   const jawne = d.format_tresci === 'jawne';
   const html = (await renderMarkdownZNaglowkami(zrodlo, lang, !jawne, jawne)).html.replace(/<p>/, '<p class="wst">');
   const fakty = (d.o_popularyzacji_fakty ?? [])
@@ -60,7 +62,7 @@ export async function danePopularyzacji(lang: Lang) {
   const wMenu = grupy.flatMap((g) => g.linki).map((l) => l.adres);
   const pozycjaWMenu = (adres: string) => { const i = wMenu.indexOf(adres); return i < 0 ? wMenu.length : i; };
   const karty = (await getCollection('strony'))
-    .filter((s) => s.id.startsWith('popularyzacja/') && s.data.opublikowany !== false)
+    .filter((s) => s.id.startsWith('popularyzacja/') && widoczny(s))
     .map((s) => ({
       adres: `/${s.id}`,
       nazwa: w(s.data, 'tytul'),
@@ -69,5 +71,5 @@ export async function danePopularyzacji(lang: Lang) {
     }))
     .sort((a, b) => pozycjaWMenu(a.adres) - pozycjaWMenu(b.adres) || a.adres.localeCompare(b.adres));
 
-  return { tytul, lead, haslo, liczby, grupy, html, fakty, karty };
+  return { tytul, lead, haslo, liczby, grupy, html, fakty, karty, szkic: szkicDzialu(Strona.frontmatter) };
 }

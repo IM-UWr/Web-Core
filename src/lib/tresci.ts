@@ -14,53 +14,59 @@ export type Grant = CollectionEntry<'granty'>;
 export type Zaklad = CollectionEntry<'zaklady'>;
 export type Pracownik = CollectionEntry<'pracownicy'>;
 
-export const opublikowane = <T extends { data: { opublikowany?: boolean } }>(e: T) => e.data.opublikowany !== false;
+// Szkice (zlecenie 33): wpis z „opublikowany: false”. Podgląd (domyślnie) pokazuje wszystko: szkic ma żółty pasek na swojej stronie
+// i etykietę „szkic” przy każdym linku do niego (src/middleware.ts). Budowa strony publicznej z TYLKO_OPUBLIKOWANE=1 pomija szkice
+// wszędzie: strony, listy, menu, kafelki, liczby w banerach, mapa strony, wyszukiwarka i .ics. Flagi dziś nigdzie nie ustawiamy.
+export const TYLKO_OPUBLIKOWANE = process.env.TYLKO_OPUBLIKOWANE === '1';
+export const jestSzkicem = (e: { data: { opublikowany?: boolean } }) => e.data.opublikowany === false;
+/** Jedna funkcja widoczności dla list, stron i odnośników: na Podglądzie zawsze true, przy fladze tylko opublikowane. */
+export const widoczny = <T extends { data: { opublikowany?: boolean } }>(e: T) => !TYLKO_OPUBLIKOWANE || !jestSzkicem(e);
 
 // Identyfikator wpisu bez rozszerzenia i podfolderów daty.
 export const slugOf = (id: string) => id.split('/').pop()!.replace(/\.(md|ya?ml)$/, '');
 
-export async function aktualnosci(wszystkie = false): Promise<Aktualnosc[]> {
+export async function aktualnosci(): Promise<Aktualnosc[]> {
   const items = await getCollection('aktualnosci');
   return items
-    .filter((e) => wszystkie || opublikowane(e))
+    .filter(widoczny)
     .sort((a, b) => (a.data.data < b.data.data ? 1 : a.data.data > b.data.data ? -1 : 0) || a.id.localeCompare(b.id));
 }
 
-export async function obrony(wszystkie = false): Promise<Obrona[]> {
+export async function obrony(): Promise<Obrona[]> {
   const items = await getCollection('obrony');
   return items
-    .filter((e) => wszystkie || opublikowane(e))
+    .filter(widoczny)
     .sort((a, b) => (a.data.termin < b.data.termin ? 1 : -1));
 }
 
-export async function seminaria(wszystkie = false): Promise<Seminarium[]> {
+export async function seminaria(): Promise<Seminarium[]> {
   const items = await getCollection('seminaria');
   return items
-    .filter((e) => wszystkie || opublikowane(e))
+    .filter(widoczny)
     .sort((a, b) => a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
 }
 
-export async function konferencje(wszystkie = false): Promise<Konferencja[]> {
+export async function konferencje(): Promise<Konferencja[]> {
   const items = await getCollection('konferencje');
   return items
-    .filter((e) => wszystkie || opublikowane(e))
+    .filter(widoczny)
     .sort((a, b) => (a.data.poczatek < b.data.poczatek ? 1 : a.data.poczatek > b.data.poczatek ? -1 : 0));
 }
 
-export async function granty(wszystkie = false): Promise<Grant[]> {
+export async function granty(): Promise<Grant[]> {
   const items = await getCollection('granty');
   return items
-    .filter((e) => wszystkie || opublikowane(e))
+    .filter(widoczny)
     .sort((a, b) => (b.data.rok_od ?? 0) - (a.data.rok_od ?? 0) || (b.data.rok_do ?? 0) - (a.data.rok_do ?? 0) || a.data.tytul.localeCompare(b.data.tytul, 'pl'));
 }
 
-export async function zaklady(wszystkie = false): Promise<Zaklad[]> {
+export async function zaklady(): Promise<Zaklad[]> {
   const items = await getCollection('zaklady');
-  return items.filter((e) => wszystkie || opublikowane(e)).sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
+  return items.filter(widoczny).sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
 }
 
 export async function pracownicy(): Promise<Pracownik[]> {
-  return (await getCollection('pracownicy')).filter(opublikowane);
+  return (await getCollection('pracownicy')).filter(widoczny);
 }
 
 // Pierwsza osoba z zapisu typu „prof. dr hab. P. Borodulin-Nadzieja”, „dr Ś. R. Gal” albo „prof. Piotr Biler, prof. Grzegorz Karch”:
@@ -135,10 +141,10 @@ export function rangaStopnia(stopien?: string): number {
 // Seminarium referatu: pole „Seminarium” z CMS, a gdy puste — folder, w którym leży plik.
 export const seminariumReferatu = (r: Referat) => r.data.seminarium || r.id.split('/')[0];
 
-export async function referaty(wszystkie = false): Promise<Referat[]> {
+export async function referaty(): Promise<Referat[]> {
   const items = await getCollection('referaty');
   return items
-    .filter((e) => wszystkie || opublikowane(e))
+    .filter(widoczny)
     .sort((a, b) => (a.data.termin < b.data.termin ? -1 : 1));
 }
 

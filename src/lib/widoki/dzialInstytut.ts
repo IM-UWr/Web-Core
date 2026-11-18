@@ -13,7 +13,7 @@ import { stronaDzialu } from '../tekstyStron';
 type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
 
 export async function daneDzialuInstytut(lang: Lang) {
-  const { d: dzial, tytul, html: oInstytucie, sekcje } = await stronaDzialu('instytut', lang);
+  const { d: dzial, tytul, html: oInstytucie, sekcje, szkic } = await stronaDzialu('instytut', lang);
 
   // Odmiana po liczebniku: 1 / 2–4 (bez 12–14) / 5+ ; po angielsku: 1 / reszta.
   const odm = (n: number, pl: [string, string, string], en: [string, string]) => {
@@ -55,5 +55,5 @@ export async function daneDzialuInstytut(lang: Lang) {
   // zdanie nad sukcesami: sekcja „Ostatnie sukcesy” z treści (HTML)
   const sukcesyOpis = sekcje.sukcesy?.html ?? '';
 
-  return { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed };
+  return { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed, szkic };
 }

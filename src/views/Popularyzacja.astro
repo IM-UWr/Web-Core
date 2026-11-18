@@ -15,9 +15,9 @@ import { danePopularyzacji } from '../lib/widoki/popularyzacja';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { tytul, lead, haslo, liczby, grupy, html, fakty, karty } = await danePopularyzacji(lang);
+const { tytul, lead, haslo, liczby, grupy, html, fakty, karty, szkic } = await danePopularyzacji(lang);
 ---
-<Baza tytul={tytul} opis={lead || undefined} uklad="zwarta portal-baner">
+<Baza tytul={tytul} opis={lead || undefined} opublikowany={!szkic} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={tytul} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: tytul }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">

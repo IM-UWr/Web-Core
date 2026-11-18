@@ -22,9 +22,9 @@ const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const lata = (g: Grant) => (g.data.rok_od && g.data.rok_do && g.data.rok_od !== g.data.rok_do ? `${g.data.rok_od}–${g.data.rok_do}` : String(g.data.rok_od ?? g.data.rok_do ?? ''));
 const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
 
-const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty } = await daneDzialuNauka(lang);
+const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty, szkic } = await daneDzialuNauka(lang);
 ---
-<Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
+<Baza tytul={naglowek} opis={lead || undefined} opublikowany={!szkic} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {/* liczby w banerze: konferencje w ostatnim roku (gdy są), inaczej liczby działu z danych */}
     {(liczbyKomputer.length > 0 ? liczbyKomputer : liczby).length > 0 && (

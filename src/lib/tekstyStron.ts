@@ -14,6 +14,7 @@ import { KOTWICE, klucz } from '../plugins/kotwice.mjs';
 import { renderMarkdownZNaglowkami, type Naglowek } from './markdown';
 import { wybierz } from './i18n';
 import type { Lang } from './daty';
+import { widoczny, TYLKO_OPUBLIKOWANE } from './tresci';
 
 type Para = { pl: string; en: string };
 type Domyslne = { tytul: Para; opis: Para; haslo?: Para; haslo_podstron?: Para };
@@ -152,7 +153,7 @@ export interface StronaListy extends Tekst {
 export async function stronaListy(id: StronaZLista, lang: Lang, opcje: { wst?: boolean } = {}): Promise<StronaListy> {
   const en = lang === 'en';
   const dom = STRONY_Z_LISTA[id];
-  const wpis = (await getCollection('strony')).find((s) => s.id === id && s.data.opublikowany !== false);
+  const wpis = (await getCollection('strony')).find((s) => s.id === id && widoczny(s));
   if (!wpis) {
     return { jest: false, tytul: dom.tytul[lang], opis: dom.opis[lang], haslo: dom.haslo?.[lang], hasloPodstron: dom.haslo_podstron?.[lang], html: '', sekcje: {} };
   }
@@ -174,14 +175,22 @@ export type DzialZPlikiem = 'instytut' | 'nauka' | 'studia';
 const PLIKI_DZIALOW = import.meta.glob<{ frontmatter: Record<string, any>; rawContent: () => string }>('../data/{instytut,nauka,studia}.md', { eager: true });
 const DOMYSLNY_TYTUL: Record<DzialZPlikiem, Para> = { instytut: p('Instytut', 'Institute'), nauka: p('Nauka', 'Research'), studia: p('Studia', 'Study') };
 
+// Strona działu jako szkic (zlecenie 33, pole „Opublikowane”; także src/data/popularyzacja.md): na Podglądzie żółty pasek. Przy fladze
+// TYLKO_OPUBLIKOWANE strona działu zostaje (prowadzi do niej menu główne), ale bez pól i tekstu z pliku — jak przed jego wypełnieniem.
+const plikUkryty = (fm?: Record<string, any>) => TYLKO_OPUBLIKOWANE && fm?.opublikowany === false;
+/** Pola pliku strony działu; pusty obiekt, gdy pliku nie ma albo gdy przy fladze jest szkicem. */
+export const polaPlikuDzialu = (fm?: Record<string, any>): Record<string, any> => (plikUkryty(fm) ? {} : fm ?? {});
+/** Czy strona działu ma żółty pasek szkicu (tylko Podgląd, bez flagi). */
+export const szkicDzialu = (fm?: Record<string, any>) => fm?.opublikowany === false && !TYLKO_OPUBLIKOWANE;
+
 /** Pola z nagłówka pliku strony działu (pusty obiekt, gdy pliku nie ma). */
-export const polaDzialu = (dz: DzialZPlikiem): Record<string, any> => PLIKI_DZIALOW[`../data/${dz}.md`]?.frontmatter ?? {};
+export const polaDzialu = (dz: DzialZPlikiem): Record<string, any> => polaPlikuDzialu(PLIKI_DZIALOW[`../data/${dz}.md`]?.frontmatter);
 
 /** Tytuł, pola i tekst strony działu (pierwszy akapit z klasą wst, jak dawne akapity tekstu działu). */
 export async function stronaDzialu(dz: DzialZPlikiem, lang: Lang) {
   const plik = PLIKI_DZIALOW[`../data/${dz}.md`];
   const d = polaDzialu(dz);
-  const zrodlo = (lang === 'en' && (d.tresc_en as string | undefined)?.trim()) || plik?.rawContent() || '';
+  const zrodlo = plikUkryty(plik?.frontmatter) ? '' : (lang === 'en' && (d.tresc_en as string | undefined)?.trim()) || plik?.rawContent() || '';
   const tekst = await renderTekstu(zrodlo, `/${dz}`, lang, { bloki: true, wst: true, jawne: d.format_tresci === 'jawne' });
-  return { d, tytul: wybierz(d, 'tytul', lang) || DOMYSLNY_TYTUL[dz][lang], ...tekst };
+  return { d, tytul: wybierz(d, 'tytul', lang) || DOMYSLNY_TYTUL[dz][lang], szkic: szkicDzialu(plik?.frontmatter), ...tekst };
 }

@@ -5,7 +5,7 @@ import { zTytulem } from '../osoby';
 import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { renderKierunku } from '../markdown';
-import { zaklady, pracownicy } from '../tresci';
+import { zaklady, pracownicy, widoczny } from '../tresci';
 import { banerKierunku, pierwszeZdanie } from '../kierunki';
 import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
 
@@ -21,7 +21,7 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
     return zTytulem(o?.data.stopien, n, lang);
   };
   const specjalnosci = d.format_tresci === 'jawne' ? [] : (await wszystkieSpecjalnosci())
-    .filter((s) => s.data.kierunek === kierunek.id && s.data.opublikowany !== false && s.data.na_stronie_kierunku)
+    .filter((s) => s.data.kierunek === kierunek.id && widoczny(s) && s.data.na_stronie_kierunku)
     .sort((a, b) => Number(a.data.wygaszana) - Number(b.data.wygaszana) || a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'))
     .map((s) => ({
       ...s.data,

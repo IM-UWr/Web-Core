@@ -21,7 +21,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
-const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed } = await daneDzialuInstytut(lang);
+const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukcesyOpis, k, godziny, mapa, mapaEmbed, szkic } = await daneDzialuInstytut(lang);
 // zdjęcie sukcesu (object-fit: cover): na komputerze karta 3 : 2 w jednej z trzech kolumn po ok. 390 px; zdjęcie szersze niż 3 : 2
 // wypełnia pole wysokością, więc potrzebna szerokość rośnie o p / 1,5 (zlecenie 13, punkt 6). Na telefonie miniatura 54 × 54 px
 // jak w wierszu Aktualności: szerokość 54 px razy proporcje (zlecenie 21, punkt 4). Małe szerokości w srcset są dla telefonu,
@@ -29,7 +29,7 @@ const { naglowek, lead, haslo, liczby, grupy, oInstytucie, fakty, sukcesy, sukce
 const kartaSukcesu = (p: number) => `${sizesTelefon(`${Math.ceil(54 * Math.max(1, p))}px`)}, ${Math.ceil(390 * Math.max(1, p / 1.5))}px`;
 const SZEROKOSCI_SUKCESU = [54, 72, 81, 108, 120, 144, 162, 216, 240, 360, 400, 640, 960, 1280, 1600, 1920, 2560, 3200];
 ---
-<Baza tytul={naglowek} opis={lead || undefined} uklad="zwarta portal-baner">
+<Baza tytul={naglowek} opis={lead || undefined} opublikowany={!szkic} uklad="zwarta portal-baner">
   <NaglowekStrony tytul={naglowek} lead={lead || undefined} haslo={haslo || undefined} lang={lang} okruszki={[{ etykieta: naglowek }]}>
     {liczby.length > 0 && (
       <ul class="pt-liczby">

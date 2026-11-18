@@ -3,14 +3,14 @@ import { getCollection } from 'astro:content';
 import type { Osoba } from '../../components/TabelaPracownikow.tsx';
 import { t, wybierz, wJezyku } from '../i18n';
 import { u } from '../url';
-import { zaklady as pobierzZaklady } from '../tresci';
+import { zaklady as pobierzZaklady, widoczny } from '../tresci';
 import type { Lang } from '../daty';
 import { stronaListy } from '../tekstyStron';
 
 export async function danePracownikow(lang: Lang) {
   const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
   const osoby: Osoba[] = (await getCollection('pracownicy'))
-    .filter((p) => p.data.opublikowany !== false)
+    .filter(widoczny)
     // funkcja (np. „Sekretariat”) po angielsku z pola funkcja_en, a gdy puste — po polsku
     .map((p) => {
       const funkcja = wybierz(p.data, 'funkcja', lang);

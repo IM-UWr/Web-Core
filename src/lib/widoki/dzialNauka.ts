@@ -69,7 +69,7 @@ export async function daneDzialuNauka(lang: Lang) {
   const grupy = (pozycja?.grupy ?? []).filter((g) => g.linki.length > 0);
 
   // Teksty (zlecenie 30): src/data/nauka.md (Web-Nauka, „Strona działu Nauka”) — Treść = „Badania w Instytucie”, reszta w polach.
-  const { d: dzial, tytul: naglowek, html: badania } = await stronaDzialu('nauka', lang);
+  const { d: dzial, tytul: naglowek, html: badania, szkic } = await stronaDzialu('nauka', lang);
   const lead = wybierz(dzial, 'wstep', lang);
   // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
   const haslo = wybierz(dzial, 'haslo', lang);
@@ -80,5 +80,5 @@ export async function daneDzialuNauka(lang: Lang) {
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((lang === 'en' && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
 
-  return { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty };
+  return { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomputer, grupy, naglowek, lead, haslo, badania, fakty, szkic };
 }

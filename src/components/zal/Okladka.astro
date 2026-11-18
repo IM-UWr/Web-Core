@@ -18,7 +18,7 @@ import ustawienia from '../../data/ustawienia.json';
 import { frontmatter as dzPopularyzacja } from '../../data/popularyzacja.md';
 import { menuGlowne } from '../../lib/menu';
 import { liczbyNaOkladke } from '../../lib/tresci';
-import { polaDzialu } from '../../lib/tekstyStron';
+import { polaDzialu, polaPlikuDzialu } from '../../lib/tekstyStron';
 import { rozmiarOkl } from '../../lib/zdjecia';
 import { MQ_TELEFON } from '../../lib/media';
 import { u, isExternal } from '../../lib/url';
@@ -31,7 +31,7 @@ const { lang, inny, cel = '#szybki-dostep', licznik } = Astro.props;
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 const menu = await menuGlowne();
 // pola stron działów (zlecenie 30: src/data/<dział>.md w repozytoriach działów)
-const DANE: Record<Dzial, any> = { instytut: polaDzialu('instytut'), nauka: polaDzialu('nauka'), studia: polaDzialu('studia'), popularyzacja: dzPopularyzacja };
+const DANE: Record<Dzial, any> = { instytut: polaDzialu('instytut'), nauka: polaDzialu('nauka'), studia: polaDzialu('studia'), popularyzacja: polaPlikuDzialu(dzPopularyzacja) };
 const dzialy = DZIALY.map((dz) => {
   const P = PATRONI[dz];
   const m = menu.find((p) => p.adres === P.adres);

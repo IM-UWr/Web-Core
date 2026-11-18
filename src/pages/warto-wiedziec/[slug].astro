@@ -1,10 +1,10 @@
 ---
-// Podstrona pozycji „Warto wiedzieć” — tylko dla pozycji z treścią.
+// Podstrona pozycji „Warto wiedzieć” — tylko dla pozycji z treścią (i widocznych: zlecenie 33, flaga TYLKO_OPUBLIKOWANE).
 import { getCollection } from 'astro:content';
 import WartoWiedziecWpis from '../../views/WartoWiedziecWpis.astro';
-import { slugOf } from '../../lib/tresci';
+import { slugOf, widoczny } from '../../lib/tresci';
 export async function getStaticPaths() {
-  const wpisy = (await getCollection('warto_wiedziec')).filter((w) => w.body?.trim());
+  const wpisy = (await getCollection('warto_wiedziec')).filter((w) => widoczny(w) && w.body?.trim());
   return wpisy.map((wpis) => ({ params: { slug: slugOf(wpis.id) }, props: { wpis } }));
 }
 const { wpis } = Astro.props;

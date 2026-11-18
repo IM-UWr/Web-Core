@@ -3,7 +3,7 @@ import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { menuGlowne } from '../menu';
 import { listaKierunkow, jestSzkolaDoktorska, jestPodyplomowe, stopnieKierunku } from '../kierunki';
-import { listaAktualnosci } from '../tresci';
+import { listaAktualnosci, widoczny } from '../tresci';
 import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
 import { stronaDzialu } from '../tekstyStron';
 
@@ -23,7 +23,7 @@ export async function daneDzialuStudia(lang: Lang) {
   // Pasek liczb (liczone z kolekcji).
   const idKierunkow = new Set(kierunki.map((k) => k.id));
   const specjalnosci = (await wszystkieSpecjalnosci()).filter(
-    (s) => s.data.opublikowany !== false && s.data.na_stronie_kierunku && !s.data.wygaszana && idKierunkow.has(s.data.kierunek),
+    (s) => widoczny(s) && s.data.na_stronie_kierunku && !s.data.wygaszana && idKierunkow.has(s.data.kierunek),
   );
   // stopnie z nadtytułu banera i treści kierunku („I i II stopnia”), szkoła doktorska = III (zlecenie 28: pól etapów już nie ma)
   const wszystkieStopnie = [...new Set((await Promise.all(kierunki.map(stopnieKierunku))).flat())].filter((s) => ['I', 'II', 'III'].includes(s)).sort((a, b) => a.length - b.length);
@@ -43,7 +43,7 @@ export async function daneDzialuStudia(lang: Lang) {
 
   // „O studiach” — Treść strony działu (zlecenie 30: src/data/studia.md, Web-Studia „Strona działu Studia”, Markdown) i ramka „W skrócie” obok, po prawej (komputer; jak „O Instytucie”
   // na stronie „Instytut”): lista {wartosc, opis, opis_en}, fakty jeden pod drugim; pozycje bez wartości pomijamy.
-  const { d: tekst, tytul, html: oStudiach } = await stronaDzialu('studia', lang);
+  const { d: tekst, tytul, html: oStudiach, szkic } = await stronaDzialu('studia', lang);
   const fakty = (((tekst as any).o_studiach_fakty ?? []) as Fakt[])
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
@@ -59,5 +59,5 @@ export async function daneDzialuStudia(lang: Lang) {
   // Hasło na telefonie zamiast opisu (NaglowekStrony.astro; decyzja 31.10.2026). Opis zostaje na komputerze i w <meta description>.
   const haslo = w(tekst, 'haslo');
 
-  return { liczby, grupy, oStudiach, fakty, aktualnosci, aktualnosciTel, tytul, wstep, haslo };
+  return { liczby, grupy, oStudiach, fakty, aktualnosci, aktualnosciTel, tytul, wstep, haslo, szkic };
 }

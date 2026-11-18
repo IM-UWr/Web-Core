@@ -16,7 +16,7 @@ import { u, isExternal } from '../lib/url';
 import ZdjecieZ from './ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
 import { wJezyku, wybierz } from '../lib/i18n';
-import { slugOf } from '../lib/tresci';
+import { slugOf, widoczny } from '../lib/tresci';
 import type { Lang } from '../lib/daty';
 
 interface Props {
@@ -30,7 +30,7 @@ const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 
 const pozycje = (await getCollection('warto_wiedziec'))
-  .filter((w) => w.data.opublikowany !== false)
+  .filter(widoczny)
   .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
   .filter((w) => slugOf(w.id) !== pomin)
   .map((w) => {

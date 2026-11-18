@@ -5,6 +5,8 @@
 // „Studia”; budowa wypisuje wtedy ostrzeżenie. Pozycja listy bez pliku kierunku to zwykły link albo kafelek.
 import { getCollection, type CollectionEntry } from 'astro:content';
 import ustawienia from '../data/ustawienia.json';
+import { widoczny, TYLKO_OPUBLIKOWANE } from './tresci';
+import { adresySzkicow } from './szkice';
 
 export type Kierunek = CollectionEntry<'kierunki'>;
 export type BanerKierunku = CollectionEntry<'kierunki_baner'>['data'];
@@ -21,13 +23,18 @@ const bezKonca = (a: string) => a.replace(/#.*$/, '').replace(/\/+$/, '');
 const pozycjeUstawien = (): PozycjaKierunku[] =>
   (((ustawienia as any).studia?.kierunki ?? []) as PozycjaKierunku[]).filter((p) => p && typeof p.adres === 'string' && p.adres.trim());
 
-/** Opublikowane kierunki z pliku kierunku. */
-const opublikowane = async (): Promise<Kierunek[]> => (await getCollection('kierunki')).filter((k) => k.data.opublikowany !== false);
+/** Widoczne kierunki z pliku kierunku (zlecenie 33: na Podglądzie także szkice, przy fladze TYLKO_OPUBLIKOWANE tylko opublikowane). */
+const widoczne = async (): Promise<Kierunek[]> => (await getCollection('kierunki')).filter(widoczny);
+/** Pozycje listy bez tych, które przy fladze prowadzą do strony-szkicu (tej strony wtedy nie ma). */
+const pozycjeBezSzkicow = async (): Promise<PozycjaKierunku[]> => {
+  const szkice = TYLKO_OPUBLIKOWANE ? await adresySzkicow() : undefined;
+  return pozycjeUstawien().filter((p) => !szkice?.has(bezKonca(p.adres)));
+};
 
-/** Opublikowane kierunki z listy w Ustawieniach, w jej kolejności (liczby na stronie „Studia”; kierunek spoza listy się nie liczy). */
+/** Widoczne kierunki z listy w Ustawieniach, w jej kolejności (liczby na stronie „Studia”; kierunek spoza listy się nie liczy). */
 export async function listaKierunkow(): Promise<Kierunek[]> {
-  const kierunki = await opublikowane();
-  return pozycjeUstawien().map((p) => kierunki.find((k) => adresKierunku(k.id) === bezKonca(p.adres))).filter((k): k is Kierunek => !!k);
+  const kierunki = await widoczne();
+  return (await pozycjeBezSzkicow()).map((p) => kierunki.find((k) => adresKierunku(k.id) === bezKonca(p.adres))).filter((k): k is Kierunek => !!k);
 }
 
 export async function banerKierunku(id: string): Promise<BanerKierunku | undefined> {
@@ -50,8 +57,8 @@ export function pierwszeZdanie(md?: string): string {
 let ostrzezone = false;
 /** Pozycje menu „Studia” i kafelków: tylko lista z Ustawień, w jej kolejności (z plikiem kierunku, jeśli adres to /studia/<id>). */
 export async function pozycjeKierunkow(): Promise<PozycjaKierunku[]> {
-  const kierunki = await opublikowane();
-  const lista = pozycjeUstawien().map((p) => ({ ...p, kierunek: kierunki.find((k) => adresKierunku(k.id) === bezKonca(p.adres)) }));
+  const kierunki = await widoczne();
+  const lista = (await pozycjeBezSzkicow()).map((p) => ({ ...p, kierunek: kierunki.find((k) => adresKierunku(k.id) === bezKonca(p.adres)) }));
   if (!ostrzezone) {
     ostrzezone = true;
     for (const k of kierunki.filter((k) => !lista.some((p) => p.kierunek === k))) {
