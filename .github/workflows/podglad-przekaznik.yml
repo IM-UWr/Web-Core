@@ -10,7 +10,18 @@ name: Przekaźnik do Web-Podglad
 # Seria sygnałów nie tworzy kolejki budów: w Web-Podglad nowe uruchomienie przerywa budowę w toku.
 # Klucz: ta sama aplikacja organizacji co w powiadom.yml (zmienna POWIADOM_APP_ID, sekret POWIADOM_KLUCZ — oba na poziomie
 # organizacji, dostępne także przy zdarzeniu push). Aplikacja musi mieć dostęp do repozytorium Web-Podglad; uprawnienie
-# Contents: write wystarcza na repository_dispatch.
+# Contents: write wystarcza na repository_dispatch, a Actions: Read and write jest potrzebne do włączania podglad.yml (niżej).
+#
+# Harmonogramy (zlecenie 43, etap 2). GitHub wyłącza workflowy z harmonogramem (on: schedule) w repozytorium publicznym
+# po 60 dniach bez aktywności (stan „disabled_inactivity”), a wyłączony workflow nie uruchamia się od żadnego zdarzenia.
+# Tego przekaźnika (uruchamianego zdarzeniami) GitHub nie wyłącza, więc przy każdym przebiegu, przed sygnałem, sprawdza
+# plan-zajec.yml (to repozytorium, GITHUB_TOKEN z actions: write) i podglad.yml (Web-Podglad, klucz aplikacji):
+#  - wyłączony przez GitHub włącza z powrotem (PUT …/enable) i zostawia ostrzeżenie w logu;
+#  - na włączonym też wywołuje „enable” (bez skutków; GitHub nie dokumentuje, czy to zeruje licznik 60 dni);
+#  - wyłączonego ręcznie nie włącza (to czyjaś decyzja), tylko ostrzega.
+# Ten krok nigdy nie zatrzymuje przekaźnika: przy braku uprawnienia aplikacji albo błędzie API zostawia ostrzeżenie,
+# a sygnał do Web-Podglad idzie dalej. Ostatni zapas z czerwonym przebiegiem: zadanie „podtrzymanie” w plan-zajec.yml
+# i podtrzymanie.yml w Web-Podglad (co tydzień). Opis i ustawienie aplikacji: README, „Harmonogramy GitHub”.
 on:
   repository_dispatch:
     types: [tresc-zmieniona, przebuduj]
@@ -32,6 +43,8 @@ jobs:
   przekaz:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      actions: write  # włączanie plan-zajec.yml w tym repozytorium (krok „Harmonogramy”)
     steps:
       - name: Klucz do Web-Podglad
         id: klucz
@@ -41,6 +54,59 @@ jobs:
           private-key: ${{ secrets.POWIADOM_KLUCZ }}
           owner: IM-UWr
           repositories: Web-Podglad
+
+      # Przed sygnałem: wyłączony podglad.yml nie zbudowałby strony po tym sygnale. Opis na górze pliku.
+      - name: Harmonogramy (plan-zajec.yml, podglad.yml Web-Podglad)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          TOKEN_TU: ${{ github.token }}
+          TOKEN_PODGLAD: ${{ steps.klucz.outputs.token }}
+        run: |
+          # repozytorium, plik, token, skutek wyłączenia; zawsze kończy się powodzeniem (najwyżej ostrzeżenie)
+          wlacz() {
+            local repo=$1 plik=$2 token=$3 skutek=$4 adres="repos/$1/actions/workflows/$2" stan odp info kod
+            local wlaczenie="https://github.com/$1/actions/workflows/$2 → „Enable workflow”"
+            if [ -z "$token" ]; then
+              echo "::warning title=Harmonogram $repo/$plik::Brak klucza (krok „Klucz do Web-Podglad” nieudany) — stan nie sprawdzony."
+              return 0
+            fi
+            if ! stan=$(GH_TOKEN=$token gh api "$adres" --jq .state 2>&1); then
+              echo "::warning title=Harmonogram $repo/$plik::Nie udało się odczytać stanu: $stan"
+              return 0
+            fi
+            if [ "$stan" = disabled_manually ]; then
+              echo "::warning title=Harmonogram $repo/$plik wyłączony ręcznie::Przekaźnik nie włącza workflowów wyłączonych ręcznie. Skutek: $skutek. Jeśli to pomyłka: $wlaczenie."
+              return 0
+            fi
+            if odp=$(GH_TOKEN=$token gh api -X PUT -i "$adres/enable" 2>&1); then
+              info=$(printf '%s\n' "$odp" | head -n 1 | tr -d '\r')
+              if [ "$stan" = active ]; then
+                echo "$repo/$plik: active; PUT enable → $info"
+              else
+                echo "::warning title=Harmonogram $repo/$plik włączony ponownie::Miał stan „$stan” (GitHub wyłącza harmonogramy po 60 dniach bez aktywności w repozytorium); przekaźnik włączył go z powrotem (PUT enable → $info)."
+              fi
+              return 0
+            fi
+            kod=$(printf '%s\n' "$odp" | head -n 1 | sed -n 's#^HTTP/[0-9.]* \([0-9]*\).*#\1#p')
+            info=$(printf '%s\n' "$odp" | grep -o 'gh: .*' | head -n 1)
+            [ -n "$info" ] || info=$(printf '%s\n' "$odp" | head -n 1 | tr -d '\r')
+            if [ "$kod" = 403 ] && [ "$repo" != "$GITHUB_REPOSITORY" ]; then
+              info="$info — aplikacja „IM-UWr strona powiadomienia” nie ma uprawnienia Actions: Read and write (README Web-Core, „Harmonogramy GitHub”)"
+            elif [ "$kod" = 403 ]; then
+              info="$info — GITHUB_TOKEN bez actions: write (permissions zadania „przekaz”)"
+            fi
+            if [ "$stan" = active ]; then
+              echo "::warning title=Harmonogram $repo/$plik — nie można włączać::Teraz jest włączony (active), ale przekaźnik nie mógłby go włączyć po wyłączeniu przez GitHub: $info"
+            else
+              echo "::warning title=Harmonogram $repo/$plik WYŁĄCZONY::Stan „$stan”, przekaźnik nie mógł go włączyć: $info. Skutek: $skutek. Włączenie: $wlaczenie."
+            fi
+            return 0
+          }
+          wlacz "$GITHUB_REPOSITORY" plan-zajec.yml "$TOKEN_TU" \
+            'plan zajęć nie pobiera się z USOS i 1 sierpnia nie przejdzie na nowy rok akademicki'
+          wlacz IM-UWr/Web-Podglad podglad.yml "$TOKEN_PODGLAD" \
+            'Podgląd nie przebudowuje się ani co godzinę, ani po zapisach w CMS (sygnał z przekaźnika nic nie uruchamia)'
 
       - name: Sygnał do Web-Podglad
         env:

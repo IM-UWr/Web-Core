@@ -5,12 +5,26 @@ name: Plan zajęć z USOS
 #  - main (harmonogram / ręczne uruchomienie): po commicie zleca przebudowę strony (repository_dispatch
 #    „przebuduj” — commit zrobiony tokenem GITHUB_TOKEN sam nie uruchamia innych workflowów);
 #  - gałąź robocza, na której zmieniono skrypt: próbne pobranie zapisane na tej gałęzi.
+#
+# Podtrzymanie harmonogramu (zlecenie 43, etap 2). GitHub wyłącza workflowy z harmonogramem w repozytorium publicznym
+# po 60 dniach bez aktywności (stan „disabled_inactivity”), a wyłączony workflow nie uruchamia się od żadnego zdarzenia.
+# Bez podtrzymania plan przestałby się pobierać i 1 sierpnia nie przeszedłby na nowy rok akademicki. Zabezpieczenia:
+#  1. podglad-przekaznik.yml przy każdym przebiegu (zapis w CMS, push na main) włącza z powrotem ten plik
+#     i podglad.yml w Web-Podglad, jeśli GitHub je wyłączył (ostrzeżenie w logu przekaźnika);
+#  2. ostatni zapas — zadanie „podtrzymanie” niżej, co tydzień (poniedziałek 04:13 UTC) i przy ręcznym uruchomieniu:
+#     „enable” przez API dla tego pliku (GitHub nie dokumentuje, czy to zeruje licznik 60 dni) i kontrola podglad.yml
+#     i podtrzymanie.yml w Web-Podglad: stan inny niż „active” kończy przebieg błędem z opisem, co zrobić.
+#     Web-Podglad (podtrzymanie.yml) sprawdza tak samo ten plik. Powiadomienie o nieudanym przebiegu z harmonogramu
+#     GitHub wysyła osobie, która ostatnio zmieniła w tym pliku linie „cron”.
+# deploy.yml jest wyłączony celowo i nie jest podtrzymywany.
 on:
   schedule:
     # 3 razy dziennie (czas UTC; w Polsce +1/+2 h), przed porannym i popołudniowym budowaniem strony
     - cron: '47 1 * * *'
     - cron: '37 9 * * *'
     - cron: '47 15 * * *'
+    # podtrzymanie harmonogramu, poniedziałek 04:13 UTC (zadanie „podtrzymanie”; ten sam napis w warunkach zadań niżej)
+    - cron: '13 4 * * 1'
   workflow_dispatch:
   push:
     branches-ignore: [main]
@@ -27,6 +41,7 @@ concurrency:
 
 jobs:
   plan:
+    if: github.event.schedule != '13 4 * * 1'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -57,3 +72,51 @@ jobs:
               || echo "::warning title=Plan zajęć::Nie udało się zlecić przebudowy — strona odświeży się przy najbliższym planowym budowaniu."
           fi
           echo "::notice title=Plan zajęć::Zapisano nowy plan na gałęzi $GALAZ."
+
+  # Ostatni zapas podtrzymania harmonogramów (opis na górze pliku). Błąd = czerwony przebieg, bez continue-on-error.
+  podtrzymanie:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '13 4 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Podtrzymanie tego harmonogramu (enable przez API)
+        run: |
+          adres="repos/$GITHUB_REPOSITORY/actions/workflows/plan-zajec.yml/enable"
+          if ! odp=$(gh api -X PUT -i "$adres" 2>&1); then
+            printf '%s\n' "$odp"
+            echo "::error title=Podtrzymanie plan-zajec.yml nieudane::PUT $adres nie powiódł się ($(printf '%s\n' "$odp" | grep -o 'gh: .*' | head -n 1)). Harmonogram teraz działa (ten przebieg z niego ruszył), ale cotygodniowe podtrzymanie nie. Zostaje podtrzymanie przez przekaźnik przy zapisach w CMS i kontrola z Web-Podglad."
+            exit 1
+          fi
+          echo "PUT $adres → $(printf '%s\n' "$odp" | head -n 1 | tr -d '\r')"
+          echo "::notice title=Podtrzymanie::plan-zajec.yml: enable OK. Następne: $(date -u -d 'next monday 04:13' '+%Y-%m-%d %H:%M UTC')."
+
+      - name: Kontrola harmonogramów Web-Podglad
+        if: ${{ !cancelled() }}
+        run: |
+          blad=0
+          # repozytorium, plik, skutek wyłączenia
+          sprawdz() {
+            local repo=$1 plik=$2 skutek=$3 stan powod
+            if ! stan=$(gh api "repos/$repo/actions/workflows/$plik" --jq .state 2>&1); then
+              echo "::error title=Kontrola $repo/$plik nieudana::Nie udało się odczytać stanu: $stan"
+              blad=1; return
+            fi
+            echo "$repo/$plik: $stan"
+            [ "$stan" = active ] && return
+            case "$stan" in
+              disabled_inactivity) powod='GitHub wyłączył go po 60 dniach bez aktywności w repozytorium. Przekaźnik Web-Core włącza go sam przy zapisie w CMS, jeśli aplikacja „IM-UWr strona powiadomienia” ma uprawnienie Actions: Read and write (README Web-Core, „Harmonogramy GitHub”) — nie było zapisu albo brak uprawnienia.' ;;
+              disabled_manually) powod='Ktoś wyłączył go ręcznie. Jeśli celowo, usuń go z listy w zadaniu „podtrzymanie” w plan-zajec.yml (Web-Core), żeby ten błąd nie wracał co tydzień.' ;;
+              *) powod='Nieoczekiwany stan (plik usunięty albo przemianowany?).' ;;
+            esac
+            echo "::error title=Harmonogram wyłączony: $repo/$plik::Stan „$stan”. $powod Skutek: $skutek. Co zrobić: https://github.com/$repo/actions/workflows/$plik → „Enable workflow”."
+            blad=1
+          }
+          sprawdz IM-UWr/Web-Podglad podglad.yml \
+            'Podgląd nie przebudowuje się ani co godzinę, ani po zapisach w CMS'
+          sprawdz IM-UWr/Web-Podglad podtrzymanie.yml \
+            'Web-Podglad nie podtrzymuje podglad.yml i nie sprawdza plan-zajec.yml w Web-Core'
+          exit $blad

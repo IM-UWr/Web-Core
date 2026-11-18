@@ -127,12 +127,46 @@ Strona `/studia/rok-akademicki` (scalona z dawnym kalendarzem zajęć; stary adr
 
 Każde repozytorium treści ma workflow `.github/workflows/powiadom.yml`: po każdej zmianie wysyła do Web-Core zdarzenie
 `repository_dispatch` typu `tresc-zmieniona`, które uruchamia budowanie i publikację. Klucz to aplikacja GitHub organizacji
-„powiadomienia” (zainstalowana tylko na Web-Core, uprawnienie Contents: read & write) — zmienna `POWIADOM_APP_ID`
-i sekret `POWIADOM_KLUCZ` ustawione raz dla organizacji (dla repozytoriów publicznych).
+„IM-UWr strona powiadomienia” (zainstalowana na Web-Core i Web-Podglad, uprawnienie Contents: read & write; do włączania
+harmonogramów także Actions: read & write, patrz niżej) — zmienna `POWIADOM_APP_ID` i sekret `POWIADOM_KLUCZ` ustawione
+raz dla organizacji (dla repozytoriów publicznych).
 
 **Nowe repozytorium treści** (np. nowe seminarium): utwórz je w IM-UWr jako publiczne, skopiuj `.pages.yml`,
 `README.md` i `.github/workflows/powiadom.yml` z repozytorium tego samego rodzaju (np. innego seminarium), zmień ścieżki
 w `.pages.yml`, dodaj plik treści i dopisz nazwę repozytorium w `tresci.json` w Web-Core.
+
+## Harmonogramy GitHub (podtrzymanie)
+
+GitHub wyłącza workflowy z harmonogramem w repozytorium publicznym po 60 dniach bez aktywności, a wyłączony workflow nie
+uruchamia się od żadnego zdarzenia. Harmonogramy mają dwa: `plan-zajec.yml` (Web-Core) i `podglad.yml` (Web-Podglad);
+`deploy.yml` jest wyłączony celowo. Zabezpieczenia (zlecenie 43):
+
+1. **Przekaźnik** (`podglad-przekaznik.yml`, uruchamiany zapisem w CMS i pushem na main — takich GitHub nie wyłącza)
+   przy każdym przebiegu sprawdza oba i włącza z powrotem wyłączony przez GitHub (ostrzeżenie w logu przekaźnika).
+   Wyłączonego ręcznie nie włącza. Ten krok nigdy nie zatrzymuje przekaźnika.
+2. **Ostatni zapas, co tydzień w poniedziałek:** zadanie „podtrzymanie” w `plan-zajec.yml` (04:13 UTC) i
+   `podtrzymanie.yml` w Web-Podglad (04:43 UTC). Każde wywołuje „enable” dla swoich harmonogramów i sprawdza
+   harmonogramy drugiego repozytorium; stan inny niż „active” daje czerwony przebieg z opisem, co zrobić.
+
+**Jednorazowe ustawienie (właściciel organizacji):** żeby przekaźnik mógł włączać `podglad.yml` w Web-Podglad,
+aplikacja „IM-UWr strona powiadomienia” potrzebuje uprawnienia Actions: Read and write. Do tego czasu przekaźnik
+przy każdym przebiegu zostawia ostrzeżenie „Harmonogram IM-UWr/Web-Podglad/podglad.yml — nie można włączać”.
+
+1. Otwórz https://github.com/organizations/IM-UWr/settings/apps/im-uwr-strona-powiadomienia/permissions
+   (albo: IM-UWr → Settings → Developer settings, na dole lewego menu → GitHub Apps → „IM-UWr strona powiadomienia”
+   → Edit → zakładka „Permissions & events”).
+2. „Repository permissions” → „Actions” → **Read and write** → na dole strony **Save changes**.
+3. Otwórz https://github.com/organizations/IM-UWr/settings/installations/176681935 (IM-UWr → Settings → GitHub Apps
+   → „IM-UWr strona powiadomienia” → Configure). Na górze pojawi się prośba o nowe uprawnienia: **Review request** →
+   **Accept new permissions** (jeśli jej nie ma, uprawnienie już obowiązuje). Na tej samej stronie, w „Repository
+   access”, musi być zaznaczone Web-Podglad.
+4. Sprawdzenie: Actions w Web-Core → „Przekaźnik do Web-Podglad” → Run workflow (zleca też zwykłą przebudowę
+   Podglądu). W kroku „Harmonogramy” nie ma ostrzeżenia, jest wiersz
+   `IM-UWr/Web-Podglad/podglad.yml: active; PUT enable → HTTP/2.0 204 No Content`.
+
+Uprawnienie dotyczy wszystkich repozytoriów, na których aplikacja jest zainstalowana. Pozwala m.in. włączać i wyłączać
+workflowy oraz uruchamiać, anulować, ponawiać i usuwać przebiegi; nie pozwala zmieniać plików workflowów. Klucz aplikacji jest sekretem organizacji
+dostępnym w publicznych repozytoriach IM-UWr; dziś daje już zapis treści (Contents), więc ryzyko rośnie niewiele.
 
 ## Domena UWr
 
