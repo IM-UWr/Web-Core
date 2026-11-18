@@ -201,7 +201,29 @@ function nauka({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentar
   ustaw(pole(g, 'body'), 'default', '<!-- OPIS PROJEKTU: Cel i wyniki projektu. Pusta Treść = strona projektu pokaże same dane. -->');
 }
 
-const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka };
+// ---------- Web-Pracownicy (etap 4) ----------
+function pracownicy({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz }) {
+  komentarz('Zlecenie 40: tekst strony Pracownicy w jawnym Markdownie (ukryte format_tresci), ściągawka przy Treści, opis formularza Pracownicy.');
+
+  // Pracownicy: kolejność bez zmian (formularz nie ma Treści), opis „co to i gdzie widać” (raport 40-0, sekcja 3)
+  ustaw(formularz('pracownicy'), 'description', 'Spis osób: pracownicy, doktoranci, administracja. Widać go w Pracownikach, na stronach zakładów i przy władzach.');
+
+  // Strony (tylko tekst strony z listą: pracownicy.md)
+  const sf = formularz('strony');
+  const JAK_W_STUDIACH = ' Treść w jawnym Markdownie, jak w Studiach.';
+  if (!sf.get('description').endsWith(JAK_W_STUDIACH)) ustaw(sf, 'description', sf.get('description') + JAK_W_STUDIACH);
+  const s = pola('strony');
+  formatTresci(s);
+  kolejnosc(s, ['tytul', 'tytul_en', 'opublikowany', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'liczby', 'pasek_boczny', 'bloki']);
+  ustaw(pole(s, 'body'), 'description', `${JAWNY} Strona Pracownicy: tekst stoi nad listą osób; pusta Treść (albo sam komentarz) = sama lista.`);
+  ustaw(pole(s, 'tresc_en'), 'description', `${JAWNY} Puste = strona angielska pokaże treść polską.`);
+  ustaw(pole(s, 'opis'), 'label', 'Krótki opis (Google i podgląd linku)');
+  ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla (baner pokazuje tytuł i hasło). Np. „Dane kontaktowe pracowników, doktorantów i administracji…”. Puste = opis domyślny.');
+  // „Bloki wzorca”: w jawnym formacie strona ich nie czyta (układ wskazują bloki :::) — ukryte, wartości zostają w plikach.
+  ustaw(pole(s, 'bloki'), 'hidden', true);
+}
+
+const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy };
 
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
   const repo = path.resolve(process.argv[2] ?? '');
