@@ -110,7 +110,7 @@
 @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) { .tylko-komputer { display: none !important; } }
 
 /* Nazwa Wydziału: jeden krój na okładce komputera i w pasku telefonu (zlecenie 18, punkt 12); na okładce stopień idzie za skalą okładki (zlecenie 26, punkt 1), na telefonie stały */
-.z-okl-wydzial > span:last-child, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
+.z-okl-wydzial > span.z-okl-wydzial-nazwa, .z-wydzial-nazwa { font-family: var(--f-text); font-size: 14px; font-weight: 500; line-height: 1.25; color: rgb(255 255 255 / .85); }
 
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   /* ---------- podstawy: ciepłe tło w jasnym motywie, ciemny granat w ciemnym ---------- */
@@ -441,8 +441,8 @@
   .z-okl-marka { position: absolute; z-index: 5; top: calc(18px * var(--sk)); left: var(--okl-marg); display: flex; align-items: center; gap: calc(14px * var(--sk)); color: #fff; }
   .z-okl-marka a { display: flex; align-items: center; color: inherit; text-decoration: none; }
   .z-okl-marka .z-okl-logo { height: max(30px, calc(40px * var(--sk))); transition: opacity var(--t-krotki) var(--rytm); }
-  .z-okl-wydzial > span:last-child { padding-left: calc(14px * var(--sk)); border-left: 1px solid rgb(255 255 255 / .35); font-size: max(12px, calc(14px * var(--sk))); }
-  .z-okl-wydzial:hover > span:last-child { color: #fff; }
+  .z-okl-wydzial > span.z-okl-wydzial-nazwa { padding-left: calc(14px * var(--sk)); border-left: 1px solid rgb(255 255 255 / .35); font-size: max(12px, calc(14px * var(--sk))); }
+  .z-okl-wydzial:hover > span.z-okl-wydzial-nazwa { color: #fff; }
   .z-okl-uwr:hover .z-okl-logo { opacity: .75; }
   @media (prefers-reduced-motion: reduce) { .z-okl-marka .z-okl-logo { transition: none; } }
   .z-okl-marka a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }

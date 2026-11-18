@@ -105,7 +105,7 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   `function skala(){var W=innerWidth,H=innerHeight,z=powiekszenie(),s=Math.min(W*z/1920,H*z/950);if(z>1)s=Math.min(s,Math.max(1,W/1366));rt.style.setProperty('--z-s',s);rt.style.setProperty('--z-k',Math.max(1,s));return s}` +
   `function uloz(){var tel=matchMedia('${MQ_TELEFON}').matches,sk=1;if(tel){rt.style.removeProperty('--z-s');rt.style.removeProperty('--z-k')}else sk=skala();if(!ok.offsetHeight)return;var ODSTEP=${ODSTEP}*sk;` +
   `if(tel){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
-  `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector('.z-okl-wydzial > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
+  `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector('.z-okl-wydzial-nazwa'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
   `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
   // szerokość słowa przy 100 px, ukryta miarka w stylu h1
   `function szer(el){var m=document.createElement('span');m.textContent=el.textContent;m.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;letter-spacing:-.012em';h1.appendChild(m);var v=m.getBoundingClientRect().width/100;h1.removeChild(m);return v}` +
@@ -145,14 +145,14 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   <span class="z-barwa" aria-hidden="true"></span>
   <div class="z-skos" aria-hidden="true"></div>
   {/* dwa osobne linki (zlecenie 32, punkt 8): orzeł do UWr, nazwa do Wydziału; jak logo bez widocznej ↗ (wyjątek z zalecenia 23),
-      dopisek „(inna strona)” tylko dla czytników ekranu */}
+      dopisek „(inna strona)” tylko dla czytników ekranu, po nazwie (zlecenie 43, etap 3) */}
   <div class="z-okl-marka">
     <a class="z-okl-uwr" href={uwrAdres} aria-label={`${t(lang, 'uwrStronaGlowna')} ${obcaStrona}`}>
       <span class="z-okl-logo" aria-hidden="true" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
     </a>
     <a class="z-okl-wydzial" href={wmiAdres}>
-      {isExternal(wmiAdres) && <span class="sr-only">{obcaStrona} </span>}
-      <span>{wydz1}{wydz2 && <><br />{wydz2}</>}</span>
+      <span class="z-okl-wydzial-nazwa">{wydz1}{wydz2 && <><br />{wydz2}</>}</span>
+      {isExternal(wmiAdres) && <span class="sr-only">{` ${obcaStrona}`}</span>}
     </a>
   </div>
   <nav class="z-narz" aria-label={lang === 'en' ? 'Tools' : 'Narzędzia'}>
