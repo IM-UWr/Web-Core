@@ -41,12 +41,19 @@ POMIN: list[str] = []  # --pomin: pola z decyzji właściciela (ścieżki z krop
 
 
 def bez_sciezki(d, sciezka):
-    """Usuwa pole o ścieżce z kropkami (np. baner.kadr) z dict d (w miejscu); brak pola = bez zmian."""
-    *rodzice, ostatni = sciezka.split('.')
-    for r in rodzice:
-        d = d.get(r) if isinstance(d, dict) else None
-    if isinstance(d, dict):
-        d.pop(ostatni, None)
+    """Usuwa pole o ścieżce z kropkami (np. baner.kadr) z d (w miejscu); lista po drodze = każda pozycja
+    (np. baner.liczby.etykieta_krotka); brak pola = bez zmian."""
+    if isinstance(d, list):
+        for x in d:
+            bez_sciezki(x, sciezka)
+        return
+    if not isinstance(d, dict):
+        return
+    pierwszy, _, reszta = sciezka.partition('.')
+    if reszta:
+        bez_sciezki(d.get(pierwszy), reszta)
+    else:
+        d.pop(pierwszy, None)
 
 
 def tekst_jawny(t):

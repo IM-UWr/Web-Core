@@ -99,10 +99,15 @@ export async function formularze(repo, opis) {
     },
     /** Zmiana pliku danych JSON repozytorium (zapis jak w źródle: 2 spacje, ten sam koniec pliku). fn zmienia obiekt w miejscu. */
     daneJson(rel, fn) { dane.push({ rel, fn }); },
+    /** Zmiana nagłówka YAML plików .md katalogu (tekstowo: fn(nagłówek) → nagłówek; Treść i reszta pliku bez zmian). */
+    naglowkiMd(katalog, fn) { dane.push({ katalog, fn }); },
   };
   const komentarze = [];
   opis(api);
-  let wynik = wcieciaKotwic(doc.toString({ indentSeq: false, lineWidth: 0, flowCollectionPadding: false }), zrodlo);
+  // styl list jak w źródle: Web-Studia ma listy wcięte („content:” i niżej „  - name:”), pozostałe repozytoria — bez wcięcia
+  const indentSeq = /^content:\r?\n +- /m.test(zrodlo);
+  let wynik = doc.toString({ indentSeq, lineWidth: 0, flowCollectionPadding: false });
+  if (!indentSeq) wynik = wcieciaKotwic(wynik, zrodlo);
   const linie = wynik.split('\n');
   const nowe = komentarze.filter((k) => !linie.includes(k));
   if (nowe.length) {
@@ -112,7 +117,17 @@ export async function formularze(repo, opis) {
   }
   await fs.writeFile(plik, wynik);
   let zmiana = wynik !== zrodlo;
-  for (const { rel, fn } of dane) {
+  for (const { katalog, fn } of dane.filter((x) => x.katalog)) {
+    for (const nazwa of (await fs.readdir(path.join(repo, katalog))).filter((n) => n.endsWith('.md')).sort()) {
+      const p = path.join(repo, katalog, nazwa);
+      const tekst = await fs.readFile(p, 'utf8');
+      const m = /^(---\r?\n)([\s\S]*?)(\r?\n---(?:\r?\n|$))/.exec(tekst);
+      if (!m) continue;
+      const nowy = m[1] + fn(m[2]) + m[3] + tekst.slice(m[0].length);
+      if (nowy !== tekst) { await fs.writeFile(p, nowy); zmiana = true; console.log(`Zapisano ${katalog}/${nazwa}`); }
+    }
+  }
+  for (const { rel, fn } of dane.filter((x) => x.rel)) {
     const p = path.join(repo, rel);
     const tekst = await fs.readFile(p, 'utf8');
     const obiekt = JSON.parse(tekst);
@@ -372,7 +387,62 @@ function ustawieniaStrony({ pola, pole, kolejnosc, ustaw, usun, odkryj, etykiety
   }
 }
 
-const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony };
+// ---------- Web-Studia i Web-Popularyzacja (etap 7: format już jawny, porządek pól) ----------
+const OPIS_GOOGLE = 'Trafia do Google i do podglądu linku; na samej stronie się nie wyświetla. Puste = ogólny opis serwisu.';
+
+function studia({ pola, pole, kolejnosc, ustaw, usun, etykietyEn, naglowkiMd, komentarz }) {
+  komentarz('Zlecenie 40: pola EN pod polskimi, etykiety „… EN”, usunięty krótszy podpis liczb kierunku (etykieta_krotka), opisy pól, które strona pokazuje inaczej, niż mówiła etykieta.');
+
+  // Strona działu: wstęp trafia tylko do Google (nowy nagłówek go nie pokazuje)
+  const sd = pola('strona-dzialu');
+  etykietyEn(sd);
+  ustaw(pole(sd, 'wstep'), 'label', 'Opis strony dla Google (1–2 zdania)');
+  ustaw(pole(sd, 'wstep'), 'description', `${OPIS_GOOGLE.replace('. Puste', '. Np. „Matematyka, sztuczna inteligencja w analizie danych…”. Puste')}`);
+  ustaw(pole(sd, 'wstep_en'), 'label', 'Opis strony dla Google EN');
+
+  // Kierunki: baner — pola EN pod polskimi; liczby bez krótszego podpisu (decyzja 18.11, lista 1a: strona go nie czyta)
+  const k = pola('kierunki');
+  etykietyEn(k);
+  const b = pole(k, 'baner').get('fields');
+  kolejnosc(b, ['podtytul', 'podtytul_en', 'opis', 'opis_en', 'haslo', 'haslo_en', 'liczby']);
+  ustaw(pole(b, 'podtytul'), 'description', 'Na stronie się nie wyświetla: strona liczy z niego (i z Treści) stopnie studiów na stronie „Studia”, np. „Studia I i II stopnia”.');
+  ustaw(pole(b, 'podtytul_en'), 'description', 'Na stronie się nie wyświetla.');
+  const l = pole(b, 'liczby').get('fields');
+  usun(l, 'etykieta_krotka');
+  usun(l, 'etykieta_krotka_en');
+  kolejnosc(l, ['wartosc', 'wartosc_en', 'etykieta', 'etykieta_en', 'pozycja']);
+  naglowkiMd('src/content/kierunki', (fm) => fm.split('\n').filter((l) => !/^[ \t]+etykieta_krotka(?:_en)?:/.test(l)).join('\n'));
+
+  // Specjalności, Strony, Rok akademicki, Przypomnienia, Kalendarz zajęć: etykiety „… EN”, pola EN pod polskimi
+  etykietyEn(pola('specjalnosci'));
+  const s = pola('strony');
+  etykietyEn(s);
+  ustaw(pole(s, 'opis'), 'label', 'Krótki opis (Google i podgląd linku)');
+  ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla (baner pokazuje tytuł i hasło). Puste = ogólny opis serwisu.');
+  ustaw(pole(s, 'opis_en'), 'label', 'Krótki opis EN');
+  etykietyEn(pola('rok-akademicki'));
+  const p = pole(pola('przypomnienia'), 'przypomnienia').get('fields');
+  etykietyEn(p);
+  kolejnosc(p, ['sprawa', 'sprawa_en', 'podpis', 'podpis_en', 'data', 'co_roku', 'dni_przed', 'adres', 'uid']);
+  const kd = pola('kolory-dni');
+  etykietyEn(kd);
+  kolejnosc(pole(kd, 'aktualnosci').get('fields'), ['wlaczone', 'dni_robocze_przed', 'tytul', 'tytul_en', 'tresc', 'tresc_en']);
+}
+
+function popularyzacja({ pola, pole, kolejnosc, ustaw, etykietyEn, komentarz }) {
+  komentarz('Zlecenie 40: tytuł EN pod tytułem i Treść na górze, pola EN pod polskimi, etykiety „… EN”, opis wstępu (tylko Google).');
+  const sd = pola('popularyzacja');
+  etykietyEn(sd);
+  kolejnosc(sd, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'wstep', 'wstep_en', 'haslo', 'haslo_en', 'o_popularyzacji_fakty', 'tradycja', 'linki']);
+  ustaw(pole(sd, 'wstep'), 'label', 'Opis strony dla Google (1–2 zdania)');
+  ustaw(pole(sd, 'wstep'), 'description', OPIS_GOOGLE.replace('. Puste', '. Np. „Kółka, obozy i konkursy dla uczniów…”. Puste'));
+  ustaw(pole(sd, 'wstep_en'), 'label', 'Opis strony dla Google EN');
+  const s = pola('strony');
+  etykietyEn(s);
+  kolejnosc(s, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'pasek_boczny']);
+}
+
+const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony, 'Web-Studia': studia, 'Web-Popularyzacja': popularyzacja };
 for (const r of ['Analiza-Harmoniczna', 'Dydaktyka', 'Dyskretna-Analiza-Harmoniczna', 'Geometria', 'Prawdopodobienstwo', 'Rownania-Rozniczkowe', 'Statystyka', 'Teoria-Modeli', 'Topologia']) OPISY[`Web-Sem-${r}`] = seminaria;
 
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
