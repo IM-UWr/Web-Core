@@ -18,7 +18,9 @@ const pozycja = (await menuGlowne()).find((m) => m.adres === PATRONI[dzial].adre
 const linki = (pozycja?.grupy ?? []).flatMap((g) => g.linki).filter((l) => !isExternal(l.adres));
 const tu = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
 const k = linki.findIndex((l) => l.adres.replace(/\/$/, '') === tu);
-const nast = k >= 0 ? linki[k + 1] : undefined;
+// „Warto wiedzieć” (zlecenie 47, punkt 4): lista bez „Następnej strony w dziale” (zostaje „Zgłoś błąd”)
+const BEZ_NASTEPNEJ = new Set(['/instytut/warto-wiedziec']);
+const nast = k >= 0 && !BEZ_NASTEPNEJ.has(tu) ? linki[k + 1] : undefined;
 const wMenu = k >= 0 || tu.startsWith('/popularyzacja/');
 const adresStrony = absolute(stripBase(Astro.url.pathname), Astro.site);
 const mail = `mailto:${ustawienia.kontakt.email}?subject=${encodeURIComponent(`${lang === 'en' ? 'Error on page' : 'Błąd na stronie'}: ${tytul}`)}&body=${encodeURIComponent(adresStrony)}`;

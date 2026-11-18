@@ -86,6 +86,13 @@ export async function formularze(repo, opis) {
     },
     /** Pokazuje pole w CMS (usuwa hidden). */
     odkryj(wezelPola) { wezelPola.delete('hidden'); },
+    /** Zamienia formularz najwyższego poziomu na nowy (to samo miejsce w menu CMS), np. kolekcję na grupę (zlecenie 47). */
+    zamienFormularz(nazwa, obiekt) {
+      const lista = doc.get('content');
+      const i = lista.items.findIndex((x) => x.get('name') === nazwa);
+      if (i < 0) throw Error(`Brak formularza ${nazwa}`);
+      lista.items[i] = doc.createNode(obiekt, { aliasDuplicateObjects: false });
+    },
     /** Etykiety „EN: coś” → „Coś EN” we wszystkich polach listy, także zagnieżdżonych (raport 40-0, sekcja 3). */
     etykietyEn(seq) {
       for (const p of seq.items) {
@@ -140,8 +147,141 @@ export async function formularze(repo, opis) {
   return zmiana;
 }
 
+// ---------- Web-Instytut: „Warto wiedzieć” (zlecenie 47) ----------
+const KOMENTARZ_47 = 'Zlecenie 47: „Warto wiedzieć” jako grupa trzech kolekcji (Sylwetki, Nagrody i wyróżnienia, Historie) w podkatalogach src/content/warto_wiedziec/; formularze według wzoru Studiów, „Dodano” z default "".';
+const OPUBLIKOWANE = 'Opublikowane — widoczne na stronie publicznej (na Podglądzie widać zawsze)';
+const KOM = {
+  uklad: '<!-- UKŁAD JAWNY: ## rozpoczyna sekcję w spisie. Nazwę można zmieniać; {#id} zachowuje adres. Bloki :::nazwa … ::: sterują wyglądem; komentarze są tylko instrukcjami dla redaktora. -->',
+  tekst: '<!-- TEKST: Zwykły Markdown. Specjalny układ wymaga jawnego znacznika bloku. -->',
+  tba: '<!-- TBA: Pusta Treść = sylwetka „TBA” (imię, lata i znaczek TBA). Tekst pisz według innych sylwetek: :::w-skrocie, sekcje ## z {#id}, „## Źródła {#zrodla}”. -->',
+};
+const SZKIELET_SYLWETKI = [
+  '<!-- SZKIELET SYLWETKI: skopiuj poniższe linie nad ten komentarz (bez znaczników komentarza) i wypełnij; komentarz TBA wyżej usuń.',
+  ':::w-skrocie',
+  '',
+  '- **1950** — doktorat na Uniwersytecie Wrocławskim',
+  '',
+  ':::',
+  '',
+  'Wstęp: dwa, trzy zdania o osobie.',
+  '',
+  '## Droga naukowa {#droga}',
+  '',
+  'Tekst sekcji.',
+  '',
+  '## Źródła {#zrodla}',
+  '',
+  '- [Tytuł źródła](https://…) — co z niego wzięto',
+  '-->',
+].join('\n');
+const SZKIELET_LAUREATOW = [
+  '<!-- LAUREACI: gdy nagrodę dostał ktoś z Instytutu, skopiuj poniższe linie nad ten komentarz (bez znaczników komentarza). Każdy punkt: **rok** imię i nazwisko — [aktualność](/aktualnosci/…); nazwisko jako link do sylwetki dostaje portret; nowych dopisuj na górze.',
+  '## Laureaci z Instytutu {#laureaci}',
+  '',
+  ':::laureaci',
+  '',
+  '- **2026** Imię Nazwisko — [aktualność](/aktualnosci/…)',
+  '',
+  ':::',
+  '-->',
+].join('\n');
+const opublikowane = (opis) => ({ name: 'opublikowany', label: OPUBLIKOWANE, description: opis, type: 'boolean', default: true });
+const tresc = (opis, szablon) => ({ name: 'body', label: 'Treść', description: `${JAWNY} ${opis}`, type: 'code', options: { format: 'markdown' }, default: szablon });
+const trescEn = (opis) => ({ name: 'tresc_en', label: 'Treść EN', description: `${JAWNY} ${opis}`, type: 'code', options: { format: 'markdown' } });
+const FORMAT_TRESCI_47 = { ...FORMAT_TRESCI };
+const OBRAZ = { name: 'obraz', label: 'Zdjęcie', description: 'Tylko z prawem do publikacji. Puste = bez zdjęcia.', type: 'image', options: { path: 'public/pliki/warto-wiedziec' } };
+const POLA_OBRAZU_LINKU = [
+  OBRAZ,
+  { name: 'obraz_opis', label: 'Opis zdjęcia', description: 'Np. „Medal Uniwersytetu Wrocławskiego”. Pokazuje się pod zdjęciem. Puste = bez opisu.', type: 'string', default: '' },
+  { name: 'obraz_opis_en', label: 'Opis zdjęcia EN', description: 'Puste = opis polski.', type: 'string', default: '' },
+  { name: 'link', label: 'Link', description: 'Artykuł, nagranie, strona nagrody: /… albo https://…. Przycisk pod Treścią; przy pustej Treści karta prowadzi prosto do linku. Puste = bez przycisku.', type: 'string', default: '' },
+  { name: 'link_etykieta', label: 'Napis na przycisku linku', description: 'Np. „Artykuł w Annals of Mathematics”. Puste = „Więcej”.', type: 'string', default: '' },
+  { name: 'link_etykieta_en', label: 'Napis na przycisku EN', description: 'Puste = napis polski.', type: 'string', default: '' },
+];
+const zajawka = (gdzie) => [
+  { name: 'zajawka', label: 'Zajawka (1–2 zdania)', description: `${gdzie} Puste = bez zajawki.`, type: 'text', default: '' },
+  { name: 'zajawka_en', label: 'Zajawka EN', description: 'Puste = zajawka polska.', type: 'text', default: '' },
+];
+const STRONA_GLOWNA = [
+  { name: 'dodano', label: 'Dodano', description: 'Dzień dodania wpisu: przez 30 dni znaczek „Nowe”. Ustaw tylko przy nowym wpisie albo przy publikacji szkicu, nie przy poprawkach. Puste = bez „Nowe”.', type: 'date', default: '', options: { format: 'yyyy-MM-dd' } },
+  { name: 'na_glownej', label: 'Pokaż na stronie głównej', description: 'Wpis losuje się w rzędzie „Warto wiedzieć” na stronie głównej. Wyłączone = tylko na stronie Warto wiedzieć.', type: 'boolean', default: true },
+  { name: 'ulubione', label: 'Ulubione', description: 'Na stronie głównej losuje się 3× częściej. Wyłączone = zwykła szansa.', type: 'boolean', default: false },
+  { name: 'zawsze', label: 'Zawsze pokazuj na stronie głównej (nie losuj; zwykle zostaw puste)', description: 'Wpis zajmuje na stałe jedno z miejsc w rzędzie „Warto wiedzieć”. Wyłączone = losuje się jak inne.', type: 'boolean', default: false },
+];
+const ZRODLA = { name: 'zrodla', label: 'Źródła (dla redakcji, niewyświetlane)', description: 'Skąd są fakty: link albo opis, jeden na pozycję. Na stronie się nie pokazuje. Puste = brak.', type: 'string', list: true };
+const MMDD = { regex: '^(|(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]))$', message: 'Wpisz datę w formacie MM-DD, np. 01-14' };
+const kolekcja = (name, label, katalog, description, view, fields) => ({
+  name, label, type: 'collection', path: `src/content/warto_wiedziec/${katalog}`, format: 'yaml-frontmatter', filename: '{primary}.md',
+  description, view, fields,
+});
+export const WARTO_WIEDZIEC_47 = {
+  name: 'warto_wiedziec',
+  label: 'Warto wiedzieć',
+  type: 'group',
+  items: [
+    kolekcja('ww_sylwetki', 'Sylwetki', 'sylwetki',
+      'Ludzie Instytutu: siatka portretów na stronie Warto wiedzieć (/instytut/warto-wiedziec) i strona każdej osoby. Pusta Treść = sylwetka „TBA”. Sylwetka osoby żyjącej: odznacz „Opublikowane”, dopóki osoba nie zaakceptuje tekstu. Nazwa pliku (adres) powstaje z imienia i nazwiska.',
+      { fields: ['tytul', 'lata', 'opublikowany', 'dodano'], primary: 'tytul', sort: 'tytul' },
+      [
+        { name: 'tytul', label: 'Imię i nazwisko', description: 'Np. „Hugo Steinhaus”. Przy zakładaniu sylwetki powstaje z tego nazwa pliku i adres strony (późniejsza zmiana adresu nie zmienia).', type: 'string', required: true },
+        opublikowane('Odznacz, żeby przygotować sylwetkę bez pokazywania jej na stronie publicznej (szkic). Sylwetka osoby żyjącej: szkic, dopóki osoba nie zaakceptuje tekstu.'),
+        tresc('Sylwetka: :::w-skrocie (liczby obok portretu), wstęp, sekcje ## z {#id}, „## Do pobrania {#do-pobrania}” z :::pliki, na końcu „## Źródła {#zrodla}” (na stronie zwinięte). Link do innej sylwetki, nagrody albo historii (/instytut/warto-wiedziec/…) łączy wpisy. Pusta Treść (albo same komentarze) = sylwetka „TBA”.', `${KOM.uklad}\n\n${KOM.tba}\n\n${SZKIELET_SYLWETKI}`),
+        trescEn('Sylwetka po angielsku, w tym samym układzie. Puste = strona angielska pokaże ramkę „Translation in preparation” z linkiem do wersji polskiej.'),
+        FORMAT_TRESCI_47,
+        { name: 'lata', label: 'Lata', description: 'Np. 1887–1972 albo 1956 (= ur. 1956). Inny tekst pokaże się tak, jak wpisany. Puste = bez lat.', type: 'string', default: '' },
+        { name: 'podpis', label: 'Podpis (jedno zdanie)', description: 'Np. „Współtwórca wrocławskiej szkoły matematycznej”. Pod nazwiskiem w banerze i na karcie w siatce sylwetek. Puste = bez podpisu.', type: 'string', default: '' },
+        { name: 'podpis_en', label: 'Podpis EN', description: 'Puste = podpis polski.', type: 'string', default: '' },
+        { name: 'rocznica_urodzin', label: 'Rocznica urodzin', description: 'MM-DD, np. 01-14. Przez 7 dni przed i po tej dacie sylwetka ma pierwszeństwo na stronie głównej. Puste = bez rocznicy.', type: 'string', default: '', pattern: MMDD },
+        { name: 'karta', label: 'Karta', description: 'Zajawka i portret.', type: 'object', fields: [
+          ...zajawka('Pokazuje się w rzędzie „Warto wiedzieć” na stronie głównej i w opisie strony dla Google.'),
+          { ...OBRAZ, description: 'Portret, tylko z prawem do publikacji. Puste = sylwetka zastępcza.' },
+          { name: 'obraz_zrodlo', label: 'Źródło zdjęcia', description: 'Autor, licencja, link, np. „Fot. Jan Kowalski, CC BY-SA 4.0”. Pokazuje się drobno pod portretem. Puste = bez podpisu.', type: 'string', default: '' },
+        ] },
+        ...STRONA_GLOWNA,
+      ]),
+    kolekcja('ww_nagrody', 'Nagrody i wyróżnienia', 'nagrody',
+      'Nagrody i wyróżnienia Instytutu i jego ludzi, w kolejności z pola „Kolejność” (10, 20, 30…). Laureatów dopisuj w Treści w bloku :::laureaci; licznik na liście liczy się sam.',
+      { fields: ['tytul', 'kolejnosc', 'opublikowany', 'na_glownej'], primary: 'tytul', sort: 'kolejnosc' },
+      [
+        { name: 'tytul', label: 'Tytuł', description: 'Np. „Medal Uniwersytetu Wrocławskiego”. Przy zakładaniu wpisu powstaje z tego nazwa pliku i adres strony.', type: 'string', required: true },
+        { name: 'tytul_en', label: 'Tytuł EN', description: 'Puste = tytuł polski.', type: 'string', default: '' },
+        opublikowane('Odznacz, żeby przygotować wpis bez pokazywania go na stronie publicznej (szkic).'),
+        tresc('Opis nagrody; laureaci z Instytutu w sekcji „## Laureaci z Instytutu {#laureaci}” w bloku :::laureaci (licznik na liście liczy się sam), dokumenty w :::pliki. Pusta Treść (albo same komentarze) = wpis bez własnej strony; karta prowadzi do linku.', `${KOM.uklad}\n\n${KOM.tekst}\n\n${SZKIELET_LAUREATOW}`),
+        trescEn('Opis po angielsku, w tym samym układzie. Puste = strona angielska pokaże ramkę „Translation in preparation” z linkiem do wersji polskiej.'),
+        FORMAT_TRESCI_47,
+        { name: 'kolejnosc', label: 'Kolejność', description: 'Mniejsza = wyżej; zostaw odstępy 10, 20, 30, żeby wstawiać pomiędzy. Puste = na końcu (100).', type: 'number', default: 100 },
+        { name: 'karta', label: 'Karta', description: 'Zajawka, zdjęcie z opisem i link z napisem na przycisku (i EN).', type: 'object', fields: [
+          ...zajawka('Pokazuje się na liście nagród, na stronie wpisu (wstęp) i w rzędzie „Warto wiedzieć” na stronie głównej.'),
+          ...POLA_OBRAZU_LINKU,
+        ] },
+        ...STRONA_GLOWNA,
+        ZRODLA,
+      ]),
+    kolekcja('ww_historie', 'Historie', 'historie',
+      'Wydarzenia i odkrycia na osi czasu na stronie Warto wiedzieć. Rok jest wymagany: stawia punkt na osi. Zajawka pokazuje się w panelu osi, więc najlepiej 1–2 zdania.',
+      { fields: ['tytul', 'karta.rok', 'opublikowany', 'na_glownej'], primary: 'tytul', sort: 'karta.rok' },
+      [
+        { name: 'tytul', label: 'Tytuł', description: 'Np. „Pierwsze wykłady matematyki we Wrocławiu”. Przy zakładaniu wpisu powstaje z tego nazwa pliku i adres strony.', type: 'string', required: true },
+        { name: 'tytul_en', label: 'Tytuł EN', description: 'Puste = tytuł polski.', type: 'string', default: '' },
+        opublikowane('Odznacz, żeby przygotować wpis bez pokazywania go na stronie publicznej (szkic).'),
+        tresc('Historia: zwykły tekst, sekcje ## z {#id}. Pusta Treść (albo same komentarze) = wpis bez własnej strony; panel osi prowadzi do linku.', `${KOM.uklad}\n\n${KOM.tekst}`),
+        trescEn('Tekst po angielsku, w tym samym układzie. Puste = strona angielska pokaże ramkę „Translation in preparation” z linkiem do wersji polskiej.'),
+        FORMAT_TRESCI_47,
+        // required: Pages CMS nie sprawdza pól całkiem pustej grupy, która nie jest wymagana — bez tego historia bez roku przeszłaby zapis
+        { name: 'karta', label: 'Karta', description: 'Rok (punkt na osi), zajawka, zdjęcie z opisem i link z napisem na przycisku (i EN).', type: 'object', required: true, fields: [
+          { name: 'rok', label: 'Rok', description: 'Rok wydarzenia, np. 1946. Wymagany: stawia punkt na osi czasu.', type: 'string', required: true, pattern: { regex: '^\\d{4}$', message: 'Wpisz rok, np. 1946' } },
+          ...zajawka('Pokazuje się w panelu osi czasu, na stronie wpisu (wstęp) i na stronie głównej; najlepiej 1–2 zdania.'),
+          ...POLA_OBRAZU_LINKU,
+        ] },
+        { name: 'rocznica', label: 'Rocznica', description: 'MM-DD, np. 11-15. Przez 7 dni przed i po tej dacie historia ma pierwszeństwo na stronie głównej, a oś czasu startuje od niej. Puste = bez rocznicy.', type: 'string', default: '', pattern: MMDD },
+        ...STRONA_GLOWNA,
+        ZRODLA,
+      ]),
+  ],
+};
+
 // ---------- Web-Instytut (etap 1) ----------
-function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz }) {
+function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz, zamienFormularz }) {
   komentarz('Zlecenie 40: Strony i strona działu w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, pola EN pod polskimi, szablony Treści zakładu i „Warto wiedzieć”, ukryte notatki i hasło władz.');
 
   // Strona działu
@@ -179,13 +319,17 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
   // „Bloki wzorca”: w jawnym formacie strona ich nie czyta (układ wskazują bloki :::) — ukryte, wartości zostają w plikach.
   ustaw(pole(s, 'bloki'), 'hidden', true);
 
-  // „Warto wiedzieć”
-  const wf = formularz('warto_wiedziec');
-  ustaw(wf, 'description', 'Wyjątkowe, trwałe osiągnięcia Instytutu (np. Annals of Mathematics, wykład T. Tao): lista „Warto wiedzieć”, karty na stronie głównej i w dziale z pola „Gdzie pokazać”; pozycja z opisem ma własną podstronę. Bieżące nagrody i granty → Aktualności, rodzaj „sukces”.');
-  const w = pola('warto_wiedziec');
-  kolejnosc(w, ['tytul', 'tytul_en', 'opublikowany', 'body', 'tresc_en', 'karta', 'dzial', 'na_glownej', 'zawsze', 'kolejnosc', 'zrodla']);
-  ustaw(pole(w, 'body'), 'description', `${WPIS} Pusta Treść (albo sam komentarz) = karta bez własnej podstrony, prowadzi do linku.`);
-  ustaw(pole(w, 'body'), 'default', '<!-- TEKST: Pusta Treść = sama zajawka bez własnej strony. -->');
+  // „Warto wiedzieć” — od zlecenia 47 grupa trzech kolekcji (sylwetki, nagrody, historie); dawny formularz zlecenia 40 zastępuje
+  // WARTO_WIEDZIEC_47. Gdy grupa już jest (drugie uruchomienie albo zmiana właściciela w CMS) — bez zmian.
+  if (formularz('warto_wiedziec').get('type') !== 'group') {
+    komentarz(KOMENTARZ_47);
+    zamienFormularz('warto_wiedziec', WARTO_WIEDZIEC_47);
+  }
+  // Historie: grupa „Karta” wymagana (rok obowiązkowy także wtedy, gdy redaktor nie otworzy karty) — też dla grupy już przeniesionej
+  ustaw(pole(pola('ww_historie'), 'karta'), 'required', true);
+  if (sf.get('description').includes(' warto-wiedziec.md (Warto wiedzieć)')) {
+    ustaw(sf, 'description', sf.get('description').replace(' warto-wiedziec.md (Warto wiedzieć)', ' instytut/warto-wiedziec.md (Warto wiedzieć)'));
+  }
 
   // Władze (decyzje 18.11: notatki i hasło bez liczb ukryte; wartości zostają w pliku)
   const wl = pola('wladze');

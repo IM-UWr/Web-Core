@@ -9,10 +9,12 @@
 // Drugi katalog (opcjonalnie): te same scenariusze na starej konfiguracji — dla porównania (jak było przed zleceniem 31).
 // Zlecenie 33: scenariusz 8 — przełącznik „Opublikowane” (stara strona bez pola, nowa strona, odznaczenie) w 12 formularzach.
 // Zlecenie 44: scenariusz 9 — grupa „Termin zgłoszeń” w aktualnościach (oferty „Kariera”).
+// Zlecenie 47: scenariusz 10 — „Warto wiedzieć”: nowa sylwetka z szablonu (nazwa pliku, TBA, „Dodano”), rok historii, dopisanie laureata.
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { z } from 'zod/v3';
+import { liczLaureatow } from '../../src/lib/ww.mjs';
 
 // ---------- pola (fields/core) ----------
 const fmt = (d, wzor) => {
@@ -318,6 +320,40 @@ function scenariusze(kat, nazwaKonf, nowa) {
     console.log('9e. Drugi termin zgłoszeń (przycisk znika przy 1 pozycji; gdyby jednak)');
     w = zapisz(form, oferta({ zgloszenia: [{ ...pustyZgl(), do_dnia: '2026-12-15' }, { ...pustyZgl(), do_dnia: '2026-12-16' }] }));
     sprawdz(w.bledy.length > 0, `zablokowany: ${w.bledy.join('; ')}`);
+  }
+
+  // Zlecenie 47: „Warto wiedzieć” — grupa trzech kolekcji w Web-Instytut (Sylwetki, Nagrody i wyróżnienia, Historie)
+  const konfI = konfiguracja(kat, 'Web-Instytut');
+  const wws = JSON.stringify(konfI.content).includes('"ww_sylwetki"') ? formularz(konfI, 'ww_sylwetki') : undefined;
+  if (wws) {
+    console.log('10a. Nowa sylwetka z szablonu (Imię i nazwisko „Władysław Żółkiewski Test”)');
+    const s = Object.assign(otworz(wws, null), { tytul: 'Władysław Żółkiewski Test' });
+    const nazwaS = generateFilename(wws.filename, wws, s);
+    w = zapisz(wws, s);
+    console.log('   ' + pokaz(w));
+    sprawdz(nazwaS === 'wladyslaw-zolkiewski-test.md', `nazwa pliku z imienia i nazwiska (polskie litery): ${nazwaS}`);
+    const tresc = String(w.dane?.body ?? '');
+    sprawdz(!w.bledy.length && tresc.includes('<!--') && !tresc.replace(/<!--[\s\S]*?-->/g, '').trim(), 'Treść z szablonu: same komentarze (= TBA na Podglądzie)');
+    sprawdz(!w.bledy.length && !w.dane.dodano && w.dane.opublikowany === true && w.dane.format_tresci === 'jawne', '„Dodano” puste, „Opublikowane” zaznaczone, format_tresci: jawne');
+    console.log('10b. Nowa historia bez roku i z rokiem „19xx” (rok wymagany, 4 cyfry)');
+    const fh = formularz(konfI, 'ww_historie');
+    w = zapisz(fh, Object.assign(otworz(fh, null), { tytul: 'Historia testowa' }));
+    sprawdz(w.bledy.some((b) => b.startsWith('karta.rok')), `bez roku zablokowany: ${w.bledy.join('; ')}`);
+    w = zapisz(fh, Object.assign(otworz(fh, null), { tytul: 'Historia testowa', karta: { ...otworz(fh, null).karta, rok: '19xx' } }));
+    sprawdz(w.bledy.includes('karta.rok: Wpisz rok, np. 1946'), `rok „19xx” zablokowany: ${w.bledy.join('; ')}`);
+    console.log('10c. Dopisanie laureata do Medalu Uniwersytetu (blok :::laureaci w Treści)');
+    const fn = formularz(konfI, 'ww_nagrody');
+    const plikM = path.posix.join(fn.path, 'medal-uniwersytetu.md');
+    const tekstM = fs.readFileSync(path.join(kat, 'Web-Instytut', plikM), 'utf8');
+    const stanM = otworz(fn, tekstM, plikM);
+    const przed = liczLaureatow(stanM.body);
+    stanM.body = stanM.body.replace(/(:::laureaci\r?\n[\s\S]*?)(\r?\n\r?\n:::)/, '$1\n- **2027** Jan Testowy — [aktualność](/aktualnosci/test)$2');
+    w = zapisz(fn, stanM, plikM);
+    const bez = zapisz(fn, otworz(fn, tekstM, plikM), plikM);
+    const { body: _b1, ...r1 } = w.dane ?? {};
+    const { body: _b2, ...r2 } = bez.dane ?? {};
+    sprawdz(!w.bledy.length && liczLaureatow(w.dane.body) === przed + 1 && JSON.stringify(r1) === JSON.stringify(r2),
+      `licznik ${przed} → ${liczLaureatow(w.dane?.body ?? '')}, poza Treścią bez zmian`);
   }
 
   // Zlecenie 33: przełącznik „Opublikowane” (default: true) w Stronach, stronach działów, kierunkach i specjalnościach.

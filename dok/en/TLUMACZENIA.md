@@ -11,7 +11,7 @@ przed nałożeniem).
 
 | Pole | PL | EN |
 |---|---|---|
-| Marczewski — notka (baner Instytutu) | Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1957–1962. Zabiegał o budowę gmachu Instytutu. | A co-founder of Wrocław mathematics and Rector of the University in 1957–1962. He campaigned for the construction of the Institute building. |
+| Marczewski — notka (baner Instytutu) | Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1953–1957. Zabiegał o budowę gmachu Instytutu. | A co-founder of Wrocław mathematics and Rector of the University in 1953–1957. He campaigned for the construction of the Institute building. |
 | Marczewski — fakt (okładka) | Pierwszy dyrektor Instytutu. | The Institute’s first director. |
 | Ślebodziński — notka (baner Nauki) | Geometra różniczkowy. W 1931 roku wprowadził pochodną Liego, dziś jedno z podstawowych narzędzi geometrii. | A differential geometer. In 1931 he introduced the Lie derivative, now one of the basic tools of geometry. |
 | Ślebodziński — fakt | Wprowadził pochodną Liego. | Introduced the Lie derivative. |
@@ -21,6 +21,8 @@ przed nałożeniem).
 | Steinhaus — fakt | „Między duchem a materią pośredniczy matematyka”. | “Mathematics mediates between mind and matter.” |
 
 Uwaga: „autor twierdzenia Knastera–Tarskiego” przetłumaczone jako „co-author” (twierdzenie ma dwóch autorów).
+
+Zlecenie 47 (poprawka): rektorat Marczewskiego trwał w latach **1953–1957** (wcześniej było 1957–1962).
 
 ### Inne napisy w kodzie
 
@@ -32,6 +34,28 @@ Uwaga: „autor twierdzenia Knastera–Tarskiego” przetłumaczone jako „co-a
 | drugi ekran głównej — sala (`DrugiEkran.astro`) | s. HS | room HS | K10 |
 | drugi ekran — „więcej” (`DrugiEkran.astro`, `drugi-ekran.ts`) | i jeszcze 4 · Wszystkie aktualności → | 4 more · All news → | K11 |
 | kanał RSS (`src/pages/en/rss.xml.ts`) | Instytut Matematyczny UWr — aktualności | Mathematical Institute, University of Wrocław — news | L |
+
+### „Warto wiedzieć” (zlecenie 47; `src/views/ListaWartoWiedziec.astro`, `SylwetkaWW.astro`, `WartoWiedziecWpis.astro`, `src/components/ww/`, `src/lib/ww.mjs`, `src/lib/tekstyStron.ts`)
+
+| Gdzie | PL | EN |
+|---|---|---|
+| W skrócie (sylwetka) | W skrócie | At a glance |
+| Do pobrania (sekcja w Treści) | Do pobrania | Downloads |
+| Źródła (nagłówek z liczbą) | Źródła · „22 źródła · rozwiń” / „zwiń” | Sources · “22 sources · show” / “hide” |
+| sylwetka — inne | Inne sylwetki · Wszystkie sylwetki → | Other profiles · All profiles → |
+| sylwetka — powiązania | W „Warto wiedzieć” (nazwa z tytułu strony listy) | In Highlights (name from the list page’s `tytul_en`) |
+| nagroda / historia — ludzie | Ludzie w tej historii · Sylwetki laureatów | People in this story · Recipients’ profiles |
+| nagroda / historia — pozostałe | Zobacz też w „Historie” / „Nagrody i wyróżnienia” | See also in “Stories” / “Awards and distinctions” |
+| nazwy grup | Sylwetki · Nagrody i wyróżnienia · Historie | Profiles · Awards and distinctions · Stories |
+| znaczki | Nowe · Nowa sylwetka · TBA · PL | New · New profile · TBA · PL |
+| lata | ur. 1956 · Fot. | b. 1956 · Photo: |
+| baner listy | 81 lat od pierwszego wykładu · 17 sylwetek · 4 rektorów UWr | 81 years since the first lecture · 17 profiles · 4 University rectors |
+| nagroda na liście | 10 laureatów z Instytutu | 10 recipients from the Institute |
+| oś czasu | Czytaj → · Poprzednie / Następne wydarzenie · „Wydarzenia i odkrycia od 1945 roku. Najedź na punkt na osi albo go wybierz.” | Read → · Previous / Next event · “Events and discoveries since 1945. Hover over a point on the timeline or select it.” |
+| strona główna (napis) | 140. urodziny · 14 stycznia · 81 lat temu · 15 listopada | 140th birthday · 14 January · 81 years ago · 15 November |
+| TBA | TBA · Sylwetka w przygotowaniu. | TBA · Profile in preparation. |
+| pusta Treść EN | — | Translation in preparation. This page is currently available in Polish only. · Read in Polish → |
+| lista — tytuł, opis (domyślne, Strona `instytut/warto-wiedziec` bez EN) | Warto wiedzieć · Ludzie i historie, z których wyrosła wrocławska matematyka… | Highlights · The people and stories behind Wrocław mathematics: founders and professors, important discoveries and distinctions we are proud of. Current achievements are in the News. |
 
 ## 2. Plan zajęć — dane z USOS (`src/lib/en/plan.ts`; K9, K12, D1)
 
@@ -334,7 +358,7 @@ tekstach EN na stronie).
 | Web-Studia | `kierunki/matematyka.md` | `etapy[1].formularz_en` | Formularz C2 | Form C2 |
 | Web-Studia | `kierunki/matematyka.md` | `etapy[3].formularz_en` | Formularz C3 | Form C3 |
 | Web-Studia | `kierunki/matematyka.md` | `etapy[4].formularz_en` | Formularz E | Form E |
-| Web-Instytut | `warto_wiedziec/wyklad-terencea-tao.md` | `tresc_en` i treść PL | link `(/nauka/konferencje/2017-analysis-and-applications-in-honor-of-professor-elias-m-stein)` — martwy (konferencje nie mają podstron) | `(/nauka/konferencje#rok-2017)` — lista konferencji, rok 2017 (na `/en` link dostaje `/en` automatycznie) |
+| Web-Instytut | `warto_wiedziec/historie/wyklad-terencea-tao.md` (do zlecenia 47: `warto_wiedziec/wyklad-terencea-tao.md`) | `tresc_en` i treść PL | link `(/nauka/konferencje/2017-analysis-and-applications-in-honor-of-professor-elias-m-stein)` — martwy (konferencje nie mają podstron) | `(/nauka/konferencje#rok-2017)` — lista konferencji, rok 2017 (na `/en` link dostaje `/en` automatycznie) |
 
 ## 5. Do decyzji (propozycje — nie wdrożone; sekcja „Do decyzji” audytu i sprawy z tej pracy)
 

@@ -1,0 +1,40 @@
+---
+// Siatka kart sylwetek „Warto wiedzieć” (zlecenie 47; wygląd .ww2-siatka z prototypu): portret albo placeholder, imię i nazwisko
+// (w <b> — za nim middleware dopisuje na Podglądzie etykietę „szkic”), lata (złoty drobny tekst, reguły pola „Lata”), podpis.
+// Znaczki: „Nowe” (30 dni od „Dodano”, sprawdza przeglądarka — NOWE_JS; TBA nigdy), „TBA” (pusta Treść), na /en „PL” (Treść tylko po polsku).
+// mala — „Inne sylwetki” na stronie sylwetki: bez podpisu i znaczka „Nowe”; losuj — ile kart pokazać (pozostałe hidden; skrypt INNE_JS
+// losuje przy każdym wejściu, bez JS widać karty wybrane przy budowie: pokaz).
+import Link from '../Link.astro';
+import { u, isExternal } from '../../lib/url';
+import { wJezyku, wybierz, langPola } from '../../lib/i18n';
+import { parsujLata } from '../../lib/ww.mjs';
+import { adresWW, portretHtml, bezTlumaczenia, type WW } from '../../lib/wartoWiedziec';
+import { NOWE_JS, INNE_JS } from '../../lib/wwSkrypty';
+import type { Lang } from '../../lib/daty';
+
+interface Props { wpisy: WW[]; lang: Lang; mala?: boolean; losuj?: number; pokaz?: Set<string> }
+const { wpisy, lang, mala = false, losuj, pokaz } = Astro.props;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const nowe = !mala && wpisy.some((w) => w.dodano && !w.tba);
+---
+<ul class:list={['ww2-siatka', mala && 'ww2-siatka-mala', losuj && 'ww2-inne']} data-ww2-losuj={losuj}>
+  {wpisy.map((w) => {
+    const lata = parsujLata(w.lata, lang).tekst;
+    const podpis = mala ? '' : wybierz(w, 'podpis', lang);
+    return (
+      <li hidden={!!pokaz && !pokaz.has(w.slug)}>
+        <Link href={href(adresWW(w))}>
+          <Fragment set:html={portretHtml(w)} />
+          <b lang={langPola(w, 'tytul', lang)}>{w.tytul}</b>
+          {lata && <small>{lata}</small>}
+          {podpis && <span class="ww2-pd" lang={langPola(w, 'podpis', lang)}>{podpis}</span>}
+          {!mala && w.dodano && !w.tba && <i class="ww2-znaczek ww2-nowe-k" data-dodano={w.dodano} hidden>{T('Nowe', 'New')}</i>}
+          {w.tba ? <i class="ww2-znaczek ww2-tba-k">TBA</i> : bezTlumaczenia(w, lang) && <i class="ww2-znaczek ww2-pl-k" title="Only in Polish">PL</i>}
+        </Link>
+      </li>
+    );
+  })}
+</ul>
+{nowe && <script is:inline set:html={NOWE_JS} />}
+{losuj && <script is:inline set:html={INNE_JS} />}

@@ -1,62 +1,61 @@
 ---
-// Lista „Warto wiedzieć” (/warto-wiedziec, /en/warto-wiedziec): wszystkie opublikowane pozycje kolekcji warto_wiedziec.
-// Szablon podstrony (zal/Podstrona.astro). W stylu listy Aktualności (zlecenie 27, punkt 2): ten sam baner (granat przechodzi w zdjęcie
-// Aktualności, bez liczb; tytuł, opis, hasło i tekst nad listą — Web-Instytut → Strony → Warto wiedzieć; zlecenie 30), panel „Pokaż”
-// z prawej (zal/ListaPokaz.astro) z filtrem działu (tylko działy, które mają wpisy; w adresie ?dzial=nauka) i polem szukania.
-// Treść: wiersze pozycji (WartoWiedziec.astro, uklad „lista”: rok w kolorze działu pozycji, tytuł, zajawka, miniatura), pod nimi link
-// do „Sukcesów”. Bez spisu „Na tej stronie”. Jedna wersja HTML: komputer i telefon (≤ 1023 px; filtry nad listą). Bez JS: bez filtrów.
+// Lista „Warto wiedzieć” (/instytut/warto-wiedziec, /en/instytut/warto-wiedziec; zlecenie 47, punkt 4; wygląd: prototyp v4.15,
+// C-prototyp/strona/index.html). Szablon podstrony (zal/Podstrona.astro) pod Instytutem: „← Instytut” nad tytułem, baner jak strony
+// działów (hasło z pola i trzy liczby: lata od pierwszego wykładu, sylwetki, 4 rektorów UWr), spis „Na tej stronie” z trzema grupami.
+// Treść: wstęp z pola Opis (p.wst, słowo „Aktualnościach” to link do /aktualnosci), potem:
+// - Sylwetki: zdanie pod nagłówkiem i siatka kart (ww/SiatkaSylwetek.astro), kolejność wg roku urodzenia z pola „Lata”;
+// - Nagrody i wyróżnienia: wiersze bez roku (WartoWiedziec.astro) z licznikiem laureatów, kolejność z pola „Kolejność”;
+// - Historie: pozioma oś czasu (ww/OsHistorii.astro).
+// Bez przełącznika widoków, wyszukiwarki i „Następnej strony w dziale”. Grupa bez widocznych wpisów — bez sekcji (i bez pozycji w spisie).
 import Podstrona from '../components/zal/Podstrona.astro';
-import ListaPokaz from '../components/zal/ListaPokaz.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
+import SiatkaSylwetek from '../components/ww/SiatkaSylwetek.astro';
+import OsHistorii from '../components/ww/OsHistorii.astro';
 import { u } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
-import { PATRONI, pole } from '../lib/patroni';
+import { nazwaGrupy } from '../lib/wartoWiedziec';
 import type { Lang } from '../lib/daty';
 import { daneListyWartoWiedziec } from '../lib/widoki/listaWartoWiedziec';
+import '../styles/warto-wiedziec.css';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { ile, dzialy, tytul, lead, haslo, html } = await daneListyWartoWiedziec(lang);
+const { tytul, opis, opisPl, haslo, liczby, sylwetki, nagrody, historie } = await daneListyWartoWiedziec(lang);
+
+// wstęp: zwykły tekst z pola Opis; pierwsze „Aktualnościach” („News” w Opisie EN) prowadzi do listy Aktualności
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const wstep = opis ? esc(opis).replace(/Aktualnościach|Aktualności|the News|News/, (m) => `<a href="${u(wJezyku('/aktualnosci', lang))}">${m}</a>`) : '';
+const sekcje = [
+  { id: 'sylwetki', ile: sylwetki.length },
+  { id: 'nagrody', ile: nagrody.length },
+  { id: 'historie', ile: historie.filter((w) => w.rok !== undefined).length },
+].filter((s) => s.ile > 0).map((s) => ({ id: s.id, etykieta: nazwaGrupy(s.id as 'sylwetki', lang) }));
+const od = historie.find((w) => w.rok !== undefined)?.rok;
 ---
-<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb klasa="z-wwl" klasaRamy="z-pd-pelna" atrybuty={{ 'data-warto': '' }}>
-  <ListaPokaz lang={lang} etykieta={T('Filtruj według działu', 'Filter by section')} opcje={dzialy.map((d) => ({ wartosc: d, etykieta: pole(PATRONI[d], 'nazwa', lang) }))}
-    szukaj={T('Szukaj w Warto wiedzieć', 'Search highlights')}>
-    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
-    {ile > 0 ? <WartoWiedziec lang={lang} uklad="lista" /> : <p class="wwl-pusto">{T('Na razie brak pozycji.', 'Nothing here yet.')}</p>}
-    <p class="wwl-pusto" role="status" data-pusto hidden>{T('Brak pozycji spełniających wybrane kryteria.', 'No items match the selected filters.')}</p>
-    <p class="wwl-sukcesy">
-      <a href={u(wJezyku('/nauka/sukcesy', lang))}>{T('Bieżące nagrody, granty i stypendia — Sukcesy', 'Recent prizes, grants and scholarships — Achievements')}</a> →
-    </p>
-  </ListaPokaz>
+<Podstrona lang={lang} tytul={tytul} opis={opis} uklad="zwarta portal-baner" haslo={haslo} wstecz={{ etykieta: T('Instytut', 'Institute'), adres: '/instytut' }}
+  dzial="instytut" spis={sekcje} klasa="tresc z-ww2">
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
+  {wstep && <p class="wst ww2-wst" lang={opisPl ? 'pl' : undefined} set:html={wstep} />}
+  {sylwetki.length > 0 && (
+    <section id="sylwetki" aria-labelledby="sylwetki-h">
+      <h2 id="sylwetki-h">{nazwaGrupy('sylwetki', lang)}</h2>
+      <p class="ww2-sek-opis">{T('Ludzie, którzy zbudowali Instytut i jego pozycję. Każda sylwetka łączy się z historiami i wyróżnieniami z tej strony.', 'The people who built the Institute and its standing. Each profile links to the stories and distinctions on this page.')}</p>
+      <SiatkaSylwetek wpisy={sylwetki} lang={lang} />
+    </section>
+  )}
+  {nagrody.length > 0 && (
+    <section id="nagrody" aria-labelledby="nagrody-h">
+      <h2 id="nagrody-h">{nazwaGrupy('nagrody', lang)}</h2>
+      <WartoWiedziec lang={lang} wpisy={nagrody} />
+    </section>
+  )}
+  {od !== undefined && (
+    <section id="historie" aria-labelledby="historie-h">
+      <h2 id="historie-h">{nazwaGrupy('historie', lang)}</h2>
+      <p class="ww2-sek-opis">{T(`Wydarzenia i odkrycia od ${od} roku. Najedź na punkt na osi albo go wybierz.`, `Events and discoveries since ${od}. Hover over a point on the timeline or select it.`)}</p>
+      <OsHistorii wpisy={historie} lang={lang} />
+    </section>
+  )}
 </Podstrona>
-
-<script>
-  // Filtr działu z panelu „Pokaż” (?dzial=… z adresu) i szukanie po tekście pozycji (rok, tytuł, zajawka, etykieta linku).
-  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
-  const lista = document.querySelector<HTMLElement>('[data-warto]');
-  if (lista) {
-    const pozycje = Array.from(lista.querySelectorAll<HTMLElement>('[data-ww-poz]'));
-    const tekst = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
-    const pusto = lista.querySelector<HTMLElement>('[data-pusto]');
-    const pokaz = () => {
-      const dzial = panel.filtr();
-      const q = panel.szukane();
-      let ile = 0;
-      for (const p of pozycje) {
-        p.hidden = (!!dzial && p.dataset.dzial !== dzial) || (!!q && !(tekst.get(p) ?? '').includes(q));
-        if (!p.hidden) ile++;
-      }
-      if (pusto) pusto.hidden = pozycje.length === 0 || ile > 0;
-    };
-    const panel = panelPokaz(lista, pokaz);
-    panel.ustaw(new URLSearchParams(location.search).get('dzial'));
-  }
-</script>
-
-<style>
-  [hidden] { display: none !important; }
-  .wwl-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
-  .wwl-sukcesy { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
-  .wwl-sukcesy a { color: var(--d-a); }
-</style>

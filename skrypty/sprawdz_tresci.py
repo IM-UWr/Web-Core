@@ -142,17 +142,55 @@ def sprawdz(p):
         if grupa != 'administracja' and str(dane.get('telefon') or '').strip():
             bledy.append(f'{p}: pole „telefon” jest dozwolone tylko dla grupy „administracja” (tu: „{grupa}”) — usuń numer')
     if kol == 'warto_wiedziec':
-        # „Warto wiedzieć”: dział z listy, pola tak/nie jako wartości logiczne, obraz musi istnieć w public/
-        dz = dane.get('dzial')
-        if dz not in (None, '', 'nauka', 'studia', 'instytut'):
-            bledy.append(f'{p}: pole „dzial” musi być jednym z: nauka, studia, instytut (tu: „{dz}”)')
-        for k in ('na_glownej', 'opublikowany'):
+        # „Warto wiedzieć”: pola tak/nie jako wartości logiczne, obraz musi istnieć w public/; zlecenie 47: trzy grupy w podkatalogach
+        # (sylwetki/, nagrody/, historie/) i te same ostrzeżenia co przy budowie (src/lib/wartoWiedziec.ts, naWW)
+        for k in ('na_glownej', 'opublikowany', 'ulubione', 'zawsze'):
             if dane.get(k) not in (None, '', True, False):
                 bledy.append(f'{p}: pole „{k}” musi mieć wartość true albo false')
         obraz = str(dane.get('obraz') or '')
         if obraz.startswith('/pliki/') and not os.path.exists(p.split('src/content/')[0] + 'public' + obraz):
             bledy.append(f'{p}: brak pliku obrazu public{obraz}')
+        sprawdz_ww(p, dane)
     return bledy
+
+
+WW_GRUPY = {'sylwetki': 'Sylwetki', 'nagrody': 'Nagrody i wyróżnienia', 'historie': 'Historie'}
+ww_nazwy = {}  # nazwa pliku → [(grupa, plik)]: adres /instytut/warto-wiedziec/<plik> jest wspólny dla trzech grup
+
+
+def sprawdz_ww(p, dane):
+    reszta = p.split('src/content/warto_wiedziec/')[1]
+    grupa = reszta.split('/')[0] if '/' in reszta else 'historie'
+    if '/' not in reszta:
+        ostrzezenia.append(f'{p}: plik w starym układzie (wprost w warto_wiedziec/) — strona traktuje go jak historię; przenieś do sylwetki/, nagrody/ albo historie/')
+    if grupa not in WW_GRUPY or not p.endswith('.md'):
+        return
+    ww_nazwy.setdefault(os.path.basename(p)[:-3], []).append((grupa, p))
+    dodano = str(dane.get('dodano') or '').strip()
+    if dodano and not re.fullmatch(r'\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])', dodano):
+        ostrzezenia.append(f'{p}: „Dodano” „{dodano}” to nie data RRRR-MM-DD — strona pominie pole (bez „Nowe”)')
+    rocznica = str(dane.get('rocznica_urodzin' if grupa == 'sylwetki' else 'rocznica') or '').strip()
+    if rocznica and not re.fullmatch(r'(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])', rocznica):
+        ostrzezenia.append(f'{p}: rocznica „{rocznica}” to nie data MM-DD — strona pominie pole')
+    if grupa == 'historie':
+        rok = str(dane.get('rok') or '').strip()
+        if not re.fullmatch(r'\d{4}', rok):
+            ostrzezenia.append(f'{p}: {f"rok „{rok}” to nie rok (4 cyfry)" if rok else "brak roku"} — historia nie stanie na osi czasu')
+    if grupa == 'sylwetki':
+        # pole „Lata” (wzór: parsujLata w src/lib/ww.mjs): rok, „ur. rok” albo dwa lata z kreską; inny tekst — ostrzeżenie
+        lata = str(dane.get('lata') or '').strip()
+        if lata and not re.fullmatch(r'(?i)(?:(?:ur|b)\.?\s*)?\d{4}(?:\s*[-–—]\s*\d{4})?', lata):
+            ostrzezenia.append(f'{p}: Lata: nie data („{lata}”) — strona pokaże tak, jak wpisane')
+
+
+def sprawdz_ww_nazwy():
+    """Ta sama nazwa pliku w dwóch grupach: wspólny adres — strona zostawia pierwszy (sylwetki, nagrody, historie), drugi pomija."""
+    for nazwa, lista in sorted(ww_nazwy.items()):
+        if len(lista) > 1:
+            lista = sorted(lista, key=lambda x: list(WW_GRUPY).index(x[0]))
+            for grupa, p in lista[1:]:
+                ostrzezenia.append(f'{p}: nazwa pliku „{nazwa}” jest już w grupie {WW_GRUPY[lista[0][0]]} ({lista[0][1]}) — adres jest wspólny, '
+                                   'strona pominie ten wpis; zmień nazwę pliku')
 
 pliki = []
 for a in sys.argv[1:] or ['src/content']:
@@ -161,6 +199,7 @@ for a in sys.argv[1:] or ['src/content']:
     else:
         pliki.append(a.replace(os.sep, '/'))
 wszystkie = [b for p in pliki for b in sprawdz(p)]
+sprawdz_ww_nazwy()
 
 
 def sprawdz_grafiki(md_pliki):

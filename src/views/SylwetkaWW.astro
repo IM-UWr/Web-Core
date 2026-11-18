@@ -1,0 +1,76 @@
+---
+// Strona sylwetki „Warto wiedzieć” (/instytut/warto-wiedziec/<plik>; zlecenie 47, punkt 5; wygląd: prototyp v4.15 — w-hugo-steinhaus.html,
+// w-marek-bozejko.html, w-krzysztof-tabisz.html). Szablon podstrony: imię i nazwisko jako tytuł, podpis w miejscu hasła, „← Warto wiedzieć”.
+// Głowa (.ww2-prof): portret albo placeholder (napis „Zdjęcie” tylko na Podglądzie), pod nim lata (pole „Lata”) i źródło zdjęcia
+// (tylko przy zdjęciu); obok liczby z bloku :::w-skrocie. Dalej w kolejności:
+//   wstęp (tekst przed pierwszym ##) → sekcje Treści (także „Do pobrania” z :::pliki) → „W »Warto wiedzieć«” (nagrody i historie, które
+//   linkują do osoby; bez nich sekcji nie ma) → „Źródła” (sekcja {#zrodla}, zawsze na końcu, zwinięta) → „Inne sylwetki” (4 losowe).
+// TBA (pusta Treść): imię, lata, placeholder i ramka. /en bez Treści EN: ramka „Translation in preparation” z linkiem do strony polskiej.
+// Spis „Na tej stronie” zawiera wszystkie sekcje.
+import Podstrona from '../components/zal/Podstrona.astro';
+import WartoWiedziec from '../components/WartoWiedziec.astro';
+import SiatkaSylwetek from '../components/ww/SiatkaSylwetek.astro';
+import RamkiWW from '../components/ww/RamkiWW.astro';
+import { u } from '../lib/url';
+import { wJezyku } from '../lib/i18n';
+import { zrodlaLicz } from '../lib/ww.mjs';
+import { ADRES_WW, portretHtml, type WW } from '../lib/wartoWiedziec';
+import { zrodlaJs } from '../lib/wwSkrypty';
+import { daneWpisuWW, sekcjeSylwetki } from '../lib/widoki/wartoWiedziecWpis';
+import type { Lang } from '../lib/daty';
+import '../styles/warto-wiedziec.css';
+
+interface Props { wpis: WW; lang: Lang }
+const { wpis: w, lang } = Astro.props;
+const { T, tytul, tytulLang, zajawka, podpis, lata, tresc, bezTlumaczenia, tytulListy, wstecz, wszystkie } = await daneWpisuWW(w, lang);
+const { powiazane, inne, inneStart } = await sekcjeSylwetki(w, wszystkie);
+const sekcje = (tresc?.sekcje ?? []).map((s, i) => ({ ...s, id: s.id || `sekcja-${i + 1}` }));
+const wWW = lang === 'en' ? `In ${tytulListy}` : `W „${tytulListy}”`;
+const spis = [
+  ...sekcje.map((s) => ({ id: s.id, etykieta: s.etykieta })),
+  ...(powiazane.length ? [{ id: 'w-warto-wiedziec', etykieta: wWW }] : []),
+  ...(tresc?.zrodla ? [{ id: 'zrodla', etykieta: tresc.zrodla.etykieta || T('Źródła', 'Sources') }] : []),
+  ...(inne.length ? [{ id: 'inne-sylwetki', etykieta: T('Inne sylwetki', 'Other profiles') }] : []),
+];
+---
+<Podstrona lang={lang} tytul={tytul} tytulLang={tytulLang} opis={zajawka || podpis || undefined} obraz={w.obraz || undefined} opublikowany={w.data.opublikowany}
+  typ="article" uklad="zwarta portal-baner" haslo={podpis || undefined} hasloBezLiczb wstecz={wstecz} dzial="instytut" spis={spis} klasa="tresc z-ww2 z-ww2-os">
+  <div class="ww2-prof">
+    <div class="ww2-prof-l">
+      <Fragment set:html={portretHtml(w, 'ww2-duzy')} />
+      {lata && <p class="ww2-prof-lata">{lata}</p>}
+      {w.obraz && w.obraz_zrodlo && <p class="ww2-prof-zrodlo">{T('Fot.', 'Photo:')} {w.obraz_zrodlo}</p>}
+    </div>
+    <div class="ww2-prof-tr">{tresc?.skrot && <Fragment set:html={tresc.skrot} />}</div>
+  </div>
+  <RamkiWW lang={lang} bledy={tresc?.bledy} tba={w.tba} tlumaczenie={bezTlumaczenia ? `${ADRES_WW}/${w.slug}` : undefined} />
+  {tresc?.wstep && <div class="ww2-wstep ww2-tresc"><div class="prose" set:html={tresc.wstep} /></div>}
+  {sekcje.map((s) => (
+    <section id={s.id} aria-labelledby={`${s.id}-h`}>
+      <h2 id={`${s.id}-h`} set:html={s.naglowek} />
+      <div class="ww2-tresc"><div class="prose" set:html={s.html} /></div>
+    </section>
+  ))}
+  {powiazane.length > 0 && (
+    <section id="w-warto-wiedziec" aria-labelledby="w-warto-wiedziec-h">
+      <h2 id="w-warto-wiedziec-h">{wWW}</h2>
+      <WartoWiedziec lang={lang} wpisy={powiazane} zGrupa />
+    </section>
+  )}
+  {tresc?.zrodla && (
+    <section id="zrodla" aria-labelledby="zrodla-h" class="ww2-zrodla-sek">
+      <details class="ww2-zrodla-d">
+        <summary><h2 id="zrodla-h" set:html={tresc.zrodla.naglowek} /><span class="ww2-zrodla-n">{tresc.zrodla.n > 0 && <>{zrodlaLicz(tresc.zrodla.n, lang)} · </>}<span data-ww2-zrodla-stan>{T('rozwiń', 'show')}</span></span></summary>
+        <div class="ww2-zrodla ww2-tresc"><div class="prose" set:html={tresc.zrodla.html} /></div>
+      </details>
+      <script is:inline set:html={zrodlaJs(lang)} />
+    </section>
+  )}
+  {inne.length > 0 && (
+    <section id="inne-sylwetki" aria-labelledby="inne-sylwetki-h" data-pagefind-ignore>
+      <h2 id="inne-sylwetki-h">{T('Inne sylwetki', 'Other profiles')}</h2>
+      <SiatkaSylwetek wpisy={inne} lang={lang} mala losuj={4} pokaz={inneStart} />
+      <p class="ww2-inne-wszystkie"><a href={u(wJezyku(`${ADRES_WW}#sylwetki`, lang))}>{T('Wszystkie sylwetki', 'All profiles')} <span aria-hidden="true">→</span></a></p>
+    </section>
+  )}
+</Podstrona>

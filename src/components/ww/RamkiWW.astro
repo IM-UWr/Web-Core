@@ -1,0 +1,34 @@
+---
+// Ramki stron wpisów „Warto wiedzieć” (zlecenie 47): złe linie bloków :::w-skrocie / :::laureaci (tylko Podgląd, jak ramka :::grafik
+// w zleceniu 45), TBA (sylwetka z pustą Treścią; na Podglądzie zdanie dla redaktora) i „Translation in preparation” (/en, Treść tylko PL).
+import { u } from '../../lib/url';
+import { TYLKO_OPUBLIKOWANE } from '../../lib/tresci';
+import { WZOR_W_SKROCIE, WZOR_LAUREATA } from '../../lib/ww.mjs';
+import type { BladLiniiWW } from '../../lib/wartoWiedziec';
+import type { Lang } from '../../lib/daty';
+
+interface Props { lang: Lang; bledy?: BladLiniiWW[]; tba?: boolean; tlumaczenie?: string }
+const { lang, bledy = [], tba = false, tlumaczenie } = Astro.props;
+const en = lang === 'en';
+const WZORY: Record<string, string> = { 'w-skrocie': WZOR_W_SKROCIE, laureaci: WZOR_LAUREATA };
+---
+{bledy.length > 0 && (
+  <div class="ww2-bledy" role="alert" lang="pl" data-pagefind-ignore>
+    <b>Podgląd: tych linii bloku strona nie rozumie i je pomija</b>
+    <ul>{bledy.map((b) => <li>:::{b.blok}, linia {b.nr}{en ? ' Treści EN' : ' Treści'}: <code>{b.tekst}</code> — wzór: <code>{WZORY[b.blok]}</code></li>)}</ul>
+    <small>Na stronie publicznej ta ramka się nie pokazuje.</small>
+  </div>
+)}
+{tba && (
+  <div class="ww2-tba">
+    <p class="ww2-tba-h">TBA</p>
+    <p>{en ? 'Profile in preparation.' : 'Sylwetka w przygotowaniu.'}</p>
+    {!TYLKO_OPUBLIKOWANE && <p class="ww2-tba-podglad" lang="pl" data-pagefind-ignore>Podgląd: wpisz tekst w CMS (Warto wiedzieć → Sylwetki) i zapisz.</p>}
+  </div>
+)}
+{tlumaczenie && (
+  <div class="ww2-tba ww2-tlum" lang="en">
+    <p><b>Translation in preparation.</b> This page is currently available in Polish only.</p>
+    <p><a href={u(tlumaczenie)} hreflang="pl">Read in Polish <span aria-hidden="true">→</span></a></p>
+  </div>
+)}

@@ -60,8 +60,9 @@ export const MOTYWY_STRON: Record<string, string> = {
   'instytut/kontakt': 'mapa',
   'instytut/infrastruktura-informatyczna': 'motyl',
   'instytut/infrastruktura-informatyczna/*': 'motyl', // podstrony (regulamin sieci itd.) — decyzja użytkownika 01.11.2026
-  'warto-wiedziec': 'trzy-odleglosci/warto',
-  'warto-wiedziec/*': 'trzy-odleglosci/warto',
+  // „Warto wiedzieć” pod Instytutem (zlecenie 47): lista i strony wpisów
+  'instytut/warto-wiedziec': 'trzy-odleglosci/warto',
+  'instytut/warto-wiedziec/*': 'trzy-odleglosci/warto',
   szukaj: 'banach/kratka',
   'deklaracja-dostepnosci': 'kratka',
   'polityka-prywatnosci': 'kratka',

@@ -1,0 +1,10 @@
+---
+// Strona wpisu „Warto wiedzieć” (zlecenie 47): sylwetka (SylwetkaWW.astro) albo nagroda / historia z Treścią (WartoWiedziecWpis.astro).
+// Adres płaski — nazwa pliku jest unikalna we wszystkich trzech grupach (src/lib/wartoWiedziec.ts); szkice tylko na Podglądzie.
+import SylwetkaWW from '../../../views/SylwetkaWW.astro';
+import WartoWiedziecWpis from '../../../views/WartoWiedziecWpis.astro';
+import { sciezkiWW } from '../../../lib/wartoWiedziec';
+export const getStaticPaths = sciezkiWW;
+const { wpis } = Astro.props;
+---
+{wpis.grupa === 'sylwetki' ? <SylwetkaWW wpis={wpis} lang="pl" /> : <WartoWiedziecWpis wpis={wpis} lang="pl" />}

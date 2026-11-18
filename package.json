@@ -10,7 +10,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "test:bloki": "node --test src/plugins/rehype-bloki.test.mjs",
-    "test:jawne": "node --test src/plugins/rehype-bloki.test.mjs src/plugins/jawne-bloki.test.mjs src/plugins/proza-domyslna.test.mjs src/plugins/grafik.test.mjs",
+    "test:jawne": "node --test src/plugins/rehype-bloki.test.mjs src/plugins/jawne-bloki.test.mjs src/plugins/proza-domyslna.test.mjs src/plugins/grafik.test.mjs src/plugins/ww.test.mjs",
     "test:jawne-ui": "node skrypty/test-jawny-markdown-ui.mjs"
   },
   "dependencies": {

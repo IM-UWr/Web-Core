@@ -46,6 +46,8 @@ Kolejność sekcji i bloków w Markdownie jest kolejnością na stronie. Nazwy �
 | `:::zakladki` | Nagłówki `###` rozpoczynają zakładki. Jedna podsekcja to jeden panel bez przycisków; bez JavaScriptu wszystkie panele są widoczne. |
 | `:::pary` | Lista `- **Etykieta:** treść`: etykieta w kolumnie obok treści, kreski między parami; na telefonie etykieta nad treścią. Dalsze linie punktu należą do tej samej treści. |
 | `:::grafik` | Tylko zwykłe Strony: grafik dyżurów (Tutornia). Linie `Sala:`, `Od:`, `Do:`, potem jeden dyżur na linię `- pon. 12:15–14:00 **Imię Nazwisko** — przedmioty`. Strona rysuje plan tygodnia, ramkę „Teraz” nad treścią i liczby banera. Jeden blok na stronę; pusty blok w Treści EN bierze grafik z wersji polskiej. Szczegóły: „Grafik dyżurów i pary”. |
+| `:::w-skrocie` | Tylko sylwetka „Warto wiedzieć”: liczby obok portretu, `- **1973** — doktorat w IM PAN` (podpis: Markdown w jednej linii, także link). Punkt z latami życia strona pomija (lata są w polu „Lata”). Szczegóły: „Warto wiedzieć (zlecenie 47)”. |
+| `:::laureaci` | Tylko nagroda „Warto wiedzieć”: `- **2026** Imię Nazwisko — [aktualność](/aktualnosci/…)` (część po ` — ` opcjonalna). Link do sylwetki daje mini portret i powiązanie; licznik „N laureatów z Instytutu” liczy się sam. |
 | `::opiekun` | Tylko specjalność: wstawia opiekunów wybranych w formularzu, ich aktualne kontakty i przypisany zakład. |
 | `::seminaria` | Tylko specjalność: wstawia odnośniki do seminariów wybranych w formularzu. |
 | `::wybor` | Tylko specjalność: wstawia ramkę z odnośnikiem do terminów i formularzy na stronie kierunku. |
@@ -215,3 +217,14 @@ node skrypty/jawny-markdown-repo.mjs ../Web-Instytut --zapisz   # migracja (bez 
 node skrypty/migracja/formularze_40.mjs ../Web-Instytut         # formularze: kolejność, opisy, ukryte pola, szablony
 node skrypty/sprawdz-jawny-markdown.mjs ../Web-Instytut         # formularze i pliki: format, pola, {#id} przy ##
 ```
+
+## Warto wiedzieć (zlecenie 47)
+
+Od zlecenia 47 „Warto wiedzieć” to trzy kolekcje w jawnym Markdownie w Web-Instytut (`src/content/warto_wiedziec/{sylwetki,nagrody,historie}/`, w CMS grupa „Warto wiedzieć” z formularzami `ww_sylwetki`, `ww_nagrody`, `ww_historie`; ukryte `format_tresci: jawne`). Strony: `/instytut/warto-wiedziec` (lista: siatka sylwetek, nagrody, oś czasu historii) i `/instytut/warto-wiedziec/<plik>` (adres płaski, wspólny dla trzech grup); stare `/warto-wiedziec/…` przekierowują. Tekst nad listą: Strona `instytut/warto-wiedziec`.
+
+- **Sylwetka:** na początku Treści `:::w-skrocie` (liczby obok portretu), potem wstęp (tekst przed pierwszym `##`), sekcje `##` z `{#id}`, „Do pobrania” (`## Do pobrania {#do-pobrania}` z `:::pliki`), na końcu `## Źródła {#zrodla}` (na stronie zwinięte, liczba w nagłówku). Strona dokłada „W »Warto wiedzieć«” (nagrody i historie, które linkują do tej osoby) i „Inne sylwetki”.
+- **Nagroda:** opis, `## Laureaci z Instytutu {#laureaci}` z `:::laureaci`, ewentualnie `:::pliki`. **Historia:** zwykły tekst z sekcjami `##`.
+- **Bloki tylko tu:** `:::w-skrocie` i `:::laureaci` działają wyłącznie w „Warto wiedzieć” (gdzie indziej to nieznany znacznik). Zła linia bloku nie zatrzymuje budowy (inaczej niż w pozostałych blokach): strona ją pomija, log budowy ma ostrzeżenie `[warto-wiedziec] … linia N bloku :::… pominięta`, a na Podglądzie nad treścią stoi czerwona ramka z numerem linii i wzorem. Parser: `src/plugins/remark-jawne-bloki.mjs` (linie: `src/lib/ww.mjs`), HTML: `src/plugins/rehype-bloki.mjs` (`naWSkrocie`, `naLaureatow`).
+- **Powiązania z linków:** link `[…](/instytut/warto-wiedziec/<plik>)` (także z `/en`, kotwicą albo pełnym adresem) w Treści nagrody albo historii łączy wpis z sylwetką (`linkiDoWW` w `src/lib/ww.mjs`). Pola „Osoby” nie ma.
+- **Pusta Treść** (albo same komentarze): sylwetka = TBA (strona z ramką), nagroda i historia = bez własnej strony (karta prowadzi do linku). Pusta Treść EN przy polskiej: ramka „Translation in preparation”.
+- **Kontrola:** `npm run test:jawne` (testy `src/plugins/ww.test.mjs`), `node skrypty/sprawdz-jawny-markdown.mjs ../Web-Instytut` (formularze, format i złe linie bloków), `python skrypty/sprawdz_tresci.py` (Lata, Dodano, rocznice, rok historii, duplikat nazwy pliku w trzech grupach, stary układ).

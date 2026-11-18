@@ -1,0 +1,192 @@
+/* „Warto wiedzieć” (zlecenie 47): lista /instytut/warto-wiedziec, strony sylwetek, nagród i historii, rząd na stronie głównej.
+   Wygląd z prototypu v4.15 (.przekazanie/prototypy/47-warto-wiedziec/C-prototyp/zrodla/ww2.css), bez reguł samego prototypu
+   (pasek prototypu, przełącznik widoków, wyszukiwarka, ramki „Prototyp:”, szkice i monogramy patronów — dziś wszędzie placeholder).
+   Importują: ListaWartoWiedziec.astro, SylwetkaWW.astro, WartoWiedziecWpis.astro, zal/DrugiEkran.astro. */
+
+/* ---------- portret: zdjęcie (duotone granat → złoto, po najechaniu kolor) albo placeholder ---------- */
+.ww2-portret { --ww2-ciemny: #16203a; --ww2-jasny: #e3c27f; position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; isolation: isolate; background: var(--ww2-ciemny); }
+.ww2-portret.ww2-foto { background: var(--ww2-jasny); }
+.ww2-portret.ww2-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.12) brightness(1.04); mix-blend-mode: multiply; transition: filter .35s; }
+.ww2-portret.ww2-foto::after { content: ""; position: absolute; inset: 0; background: var(--ww2-ciemny); mix-blend-mode: lighten; transition: opacity .35s; pointer-events: none; }
+a:hover .ww2-portret.ww2-foto img, .ww2-portret.ww2-foto.ww2-duzy:hover img { filter: none; mix-blend-mode: normal; }
+a:hover .ww2-portret.ww2-foto::after, .ww2-portret.ww2-foto.ww2-duzy:hover::after { opacity: 0; }
+.ww2-portret.ww2-ph { display: grid; place-items: center; align-content: center; gap: 6px; background: #1b2540; background-image: repeating-linear-gradient(135deg, rgba(227,194,127,.05) 0 10px, transparent 10px 20px); }
+.ww2-portret.ww2-ph::before { content: ""; position: absolute; inset: 7%; border: 1px dashed rgba(227,194,127,.35); }
+.ww2-portret.ww2-ph svg { width: 46%; height: auto; fill: none; stroke: rgba(227,194,127,.6); stroke-width: 2.2; }
+/* napis „Zdjęcie” (tylko na Podglądzie) — na dużych placeholderach: siatka sylwetek i portret na stronie osoby */
+.ww2-portret.ww2-ph small { display: none; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: rgba(227,194,127,.75); }
+.ww2-siatka:not(.ww2-siatka-mala) .ww2-portret.ww2-ph small, .ww2-portret.ww2-ph.ww2-duzy small { display: block; }
+.ww2-portret.ww2-mini { width: 30px; flex: 0 0 30px; border-radius: 50%; aspect-ratio: 1; }
+.ww2-portret.ww2-ph.ww2-mini::before { display: none; }
+.ww2-portret.ww2-ph.ww2-mini svg { width: 62%; stroke-width: 3.5; }
+@media (prefers-reduced-motion: reduce) { .ww2-portret img, .ww2-portret::after { transition: none; } }
+
+/* ---------- lista: wstęp, sekcje ---------- */
+body .tresc.z-ww2 > section { padding: 0 0 44px; margin: 0 0 40px; border-bottom: 1px solid var(--line); }
+body .tresc.z-ww2 > section:last-of-type { padding-bottom: 0; margin-bottom: 0; border-bottom: 0; }
+body .tresc.z-ww2 p.ww2-wst { margin: 0 0 30px; max-width: 46em; }
+body .tresc .ww2-sek-opis { margin: -4px 0 18px; max-width: 46em; color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+/* siatka sylwetek: portret, imię i nazwisko, lata (złote), podpis; znaczki Nowe / TBA / PL */
+body .tresc .ww2-siatka { list-style: none; margin: 0; padding: 0; max-width: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 26px 18px; }
+body .tresc .ww2-siatka > li { margin: 0; padding: 0; max-width: none; }
+body .tresc .ww2-siatka > li[hidden] { display: none; }
+body .tresc .ww2-siatka a { position: relative; display: flex; flex-direction: column; gap: 3px; color: inherit; text-decoration: none; }
+body .tresc .ww2-siatka a .ww2-portret { margin-bottom: 9px; }
+body .tresc .ww2-siatka b { font-family: var(--f-display); font-weight: 500; font-size: 19px; line-height: 1.25; color: var(--ink); }
+body .tresc .ww2-siatka small { font-size: 12.5px; font-weight: 600; line-height: 1.4; color: var(--d-a); letter-spacing: .01em; font-variant-numeric: lining-nums; }
+body .tresc .ww2-siatka .ww2-pd { font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+body .tresc .ww2-siatka a:hover b { color: var(--d-a); }
+/* etykieta „szkic” (Podgląd, src/middleware.ts) za imieniem: na szerokość napisu, nie całej karty */
+body .tresc .ww2-siatka a > .szkic-etykieta { align-self: flex-start; margin: 1px 0 1px; }
+body .tresc .ww2-siatka a:focus-visible { outline: 3px solid var(--d-a); outline-offset: 4px; }
+.ww2-znaczek { position: absolute; top: 8px; padding: 2px 7px; font-style: normal; font-size: 11px; font-weight: 700; line-height: 1.5; letter-spacing: .06em; text-transform: uppercase; }
+.ww2-nowe-k { left: 8px; color: #16203a; background: #e3c27f; }
+.ww2-nowe-k[hidden] { display: none; }
+.ww2-tba-k, .ww2-pl-k { right: 8px; color: #fff; background: #16203a; border: 1px solid rgba(255,255,255,.35); letter-spacing: .08em; }
+body .tresc .ww2-siatka-mala { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 18px 14px; }
+body .tresc .ww2-siatka-mala b { font-size: 15.5px; }
+.ww2-siatka-mala .ww2-znaczek { top: 4px; font-size: 10px; padding: 1px 5px; }
+.ww2-siatka-mala .ww2-tba-k { right: 4px; }
+/* „Inne sylwetki”: 4 losowe */
+body .tresc .ww2-siatka.ww2-inne { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 680px; }
+body .tresc p.ww2-inne-wszystkie { margin: 18px 0 0; font-size: 15px; }
+body .tresc p.ww2-inne-wszystkie a { font-weight: 600; }
+
+/* ---------- oś czasu historii ---------- */
+.ww2-ol { margin: 6px 0 10px; }
+.ww2-ol-tor { position: relative; height: 74px; }
+.ww2-ol-linia { position: absolute; left: 0; right: 0; top: 30px; height: 2px; background: color-mix(in srgb, var(--d-a) 55%, transparent); }
+.ww2-ol-dek { position: absolute; top: 46px; transform: translateX(-50%); font-size: 12px; line-height: 1.4; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ww2-ol-dek::before { content: ""; position: absolute; left: 50%; top: -14px; width: 1px; height: 8px; background: color-mix(in srgb, var(--d-a) 55%, transparent); }
+body .tresc a.ww2-ol-pkt { position: absolute; top: 31px; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; border-radius: 50%; text-decoration: none; }
+.ww2-ol-pkt::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--d-a); transition: transform .15s, background .15s; }
+.ww2-ol-pkt:hover::before, .ww2-ol-pkt:focus-visible::before { transform: scale(1.25); }
+.ww2-ol-pkt:focus-visible { outline: 2px solid var(--d-a); outline-offset: 1px; }
+.ww2-ol-pkt.on::before { background: var(--d-a); transform: scale(1.35); }
+.ww2-ol-r { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); font-size: 12px; font-weight: 700; line-height: 1.4; color: var(--d-a); opacity: 0; transition: opacity .15s; white-space: nowrap; }
+.ww2-ol-pkt.on .ww2-ol-r, .ww2-ol-pkt:hover .ww2-ol-r { opacity: 1; }
+.ww2-ol-panel { border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent); padding-top: 14px; }
+.ww2-ol-karty { display: grid; gap: 18px; }
+.ww2-ol-karta { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 18px; align-items: start; }
+body .tresc .ww2-ol p.ww2-ol-rok { margin: 0; font-family: var(--f-display); font-size: 40px; line-height: 1; color: var(--d-a); font-variant-numeric: lining-nums; }
+body .tresc .ww2-ol-karta h3 { margin: 2px 0 6px; font-family: var(--f-display); font-size: 21px; font-weight: 500; line-height: 1.25; color: var(--ink); }
+body .tresc .ww2-ol-karta h3 a { color: inherit; text-decoration: none; }
+body .tresc .ww2-ol-karta h3 a:hover { color: var(--d-a); }
+body .tresc .ww2-ol-karta p { margin: 0 0 8px; font-size: 15.5px; line-height: 1.55; max-width: 62ch; }
+body .tresc a.ww2-ol-czytaj { font-weight: 600; font-size: 14.5px; }
+.ww2-ol-nav { display: none; }
+/* z JS: jedna karta naraz, wszystkie w jednej komórce siatki — stała wysokość panelu, nic nie skacze */
+.ww2-ol.js .ww2-ol-karta { grid-area: 1 / 1; visibility: hidden; opacity: 0; transition: opacity .18s; }
+.ww2-ol.js .ww2-ol-karta.on { visibility: visible; opacity: 1; }
+.ww2-ol.js .ww2-ol-nav { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.ww2-ol-nav button { width: 34px; height: 34px; padding: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); background: none; color: inherit; font-size: 20px; line-height: 1; cursor: pointer; }
+.ww2-ol-nav button:hover { border-color: var(--d-a); color: var(--d-a); }
+.ww2-ol-nav button:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+/* bez JS: oś bez panelu, wydarzenia jako lista pod osią */
+.ww2-ol:not(.js) .ww2-ol-panel { padding-top: 18px; }
+@media (prefers-reduced-motion: reduce) { .ww2-ol-pkt::before, .ww2-ol-r, .ww2-ol.js .ww2-ol-karta { transition: none; } }
+
+/* ---------- strona sylwetki: głowa (portret, lata, liczby „W skrócie”) ---------- */
+.ww2-prof { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 28px; align-items: start; margin: 0 0 30px; }
+.ww2-prof-l { position: sticky; top: calc(var(--gora, 70px) + 20px); }
+body .tresc .ww2-prof p.ww2-prof-lata { margin: 8px 0 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--d-a); letter-spacing: .01em; font-variant-numeric: lining-nums; }
+body .tresc .ww2-prof p.ww2-prof-zrodlo { margin: 4px 0 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+body .tresc dl.ww2-skrot { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px 18px; max-width: none; margin: 0; padding: 12px 0 0; border-top: 2px solid var(--ink); }
+body .tresc dl.ww2-skrot > div { margin: 0; }
+body .tresc dl.ww2-skrot dt { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; color: var(--d-a); font-variant-numeric: lining-nums; }
+body .tresc dl.ww2-skrot dd { margin: 2px 0 0; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+body .tresc dl.ww2-skrot dd a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+body .tresc dl.ww2-skrot dd a:hover { color: var(--d-a); }
+body .tresc .ww2-wstep { margin: 0 0 40px; }
+body .tresc .ww2-wstep .prose > p:first-child { font-size: 18px; line-height: 1.6; color: var(--ink); }
+/* TBA i „Translation in preparation” */
+.ww2-tba { margin: 1.5rem 0 2rem; padding: 1.25rem 1.5rem; border: 1px dashed color-mix(in srgb, currentColor 35%, transparent); border-radius: 4px; max-width: 46em; }
+body .tresc .ww2-tba p { margin: 0 0 .5rem; }
+body .tresc .ww2-tba p:last-child { margin-bottom: 0; }
+body .tresc .ww2-tba p.ww2-tba-h { font-family: var(--f-display); font-size: 2.25rem; line-height: 1.1; font-weight: 600; letter-spacing: .06em; color: #b8913f; margin-bottom: .75rem; }
+body .tresc .ww2-tba p.ww2-tba-podglad { font-size: .875rem; opacity: .8; margin-top: .75rem; }
+/* złe linie bloków :::w-skrocie i :::laureaci — tylko na Podglądzie (jak ramka :::grafik, zlecenie 45) */
+body .tresc .ww2-bledy { margin: 0 0 28px; padding: 12px 16px; max-width: 46em; border: 2px solid #c62828; border-radius: 4px; background: color-mix(in oklab, #c62828 6%, var(--bg)); font-size: 14px; line-height: 1.5; color: var(--text); }
+body .tresc .ww2-bledy ul { list-style: none; margin: 6px 0; padding: 0; max-width: none; }
+body .tresc .ww2-bledy li { margin: 0; padding: 0; }
+body .tresc .ww2-bledy code { font-size: 13px; }
+
+/* sekcje Treści wpisu: :::pliki w .prose bez kresek i podkreśleń (wzór: lista dokumentów w Studiach) */
+body .tresc .ww2-tresc .prose ul.pliki { max-width: 46em; margin: 4px 0 16px; padding: 0; }
+body .tresc .ww2-tresc .prose ul.pliki > li { margin: 0; padding-left: 0; }
+body .tresc .ww2-tresc .prose ul.pliki > li::before { content: none; }
+body .tresc .ww2-tresc .prose ul.pliki a { text-decoration: none; }
+body .tresc .ww2-tresc .prose ul.pliki a > span:not(.typ) { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--d-a) 60%, transparent); }
+body .tresc .ww2-tresc .prose ul.pliki a:hover > span:not(.typ) { color: var(--d-a); }
+body .tresc .ww2-tresc .prose ul.pliki small { display: block; margin-top: 2px; font-size: 13.5px; line-height: 1.45; color: var(--muted); text-decoration: none; }
+
+/* lista laureatów (:::laureaci): rok, osoba (z mini portretem, gdy link do sylwetki), „aktualność →” */
+body .tresc .prose ul.ww2-l { list-style: none; max-width: 46em; margin: 0 0 16px; padding: 0; border-top: 1px solid var(--line); }
+body .tresc .prose ul.ww2-l > li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; align-items: baseline; margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+body .tresc .prose ul.ww2-l > li::before { content: none; }
+.ww2-l-rok { font-family: var(--f-display); font-size: 21px; line-height: 1.1; color: var(--d-a); font-variant-numeric: lining-nums; }
+.ww2-l-kto { font-family: var(--f-display); font-size: 19px; line-height: 1.3; color: var(--ink); }
+body .tresc .prose ul.ww2-l > li > a { font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.ww2-l-po { font-size: 13.5px; color: var(--muted); }
+body .tresc .prose a.ww2-l-os { display: inline-flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; }
+body .tresc .prose a.ww2-l-os:hover { color: var(--d-a); text-decoration: underline; }
+
+/* „Ludzie w tej historii” / „Sylwetki laureatów” */
+body .tresc ul.ww2-ludzie { list-style: none; margin: 0; padding: 0; max-width: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+body .tresc ul.ww2-ludzie > li { margin: 0; padding: 0; }
+body .tresc ul.ww2-ludzie a { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; padding: 10px; border: 1px solid var(--line); color: inherit; text-decoration: none; }
+body .tresc ul.ww2-ludzie a:hover { border-color: var(--d-a); }
+body .tresc ul.ww2-ludzie b { display: block; font-family: var(--f-display); font-weight: 500; font-size: 18px; line-height: 1.25; color: var(--ink); }
+body .tresc ul.ww2-ludzie small { display: block; font-size: 12.5px; font-weight: 600; color: var(--d-a); }
+body .tresc ul.ww2-ludzie i { display: block; margin-top: 4px; font-style: normal; font-size: 13px; font-weight: 600; }
+.ww2-ludzie .ww2-portret.ww2-ph small { display: none; }
+
+/* „Źródła”: zwinięte, w nagłówku liczba („22 źródła · rozwiń”) */
+.ww2-zrodla-d > summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.ww2-zrodla-d > summary::-webkit-details-marker { display: none; }
+body .tresc .ww2-zrodla-d > summary h2 { margin: 0; }
+.ww2-zrodla-d > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-3px); margin-left: 2px; opacity: .6; order: 3; }
+.ww2-zrodla-d[open] > summary::after { transform: rotate(-135deg) translateY(-1px); }
+.ww2-zrodla-n { font-size: 14px; color: var(--muted); order: 2; }
+.ww2-zrodla-d[open] > summary { margin-bottom: 16px; }
+.ww2-zrodla-d > summary:hover .ww2-zrodla-n { color: var(--d-a); }
+.ww2-zrodla-d > summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 4px; }
+body .tresc .ww2-zrodla .prose { font-size: 14px; line-height: 1.6; }
+body .tresc .ww2-zrodla .prose li { margin: 4px 0; }
+
+/* telefon i wąskie okna (wartości z prototypu: 1023, 700, 640, 560 px) */
+@media (max-width: 1023px) {
+  .ww2-prof { grid-template-columns: 136px minmax(0, 1fr); gap: 18px; }
+  .ww2-prof-l { position: static; }
+  body .tresc dl.ww2-skrot { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+  body .tresc dl.ww2-skrot dt { font-size: 21px; }
+  body .tresc .ww2-siatka { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+  body .tresc .ww2-siatka-mala { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 700px) and (max-width: 1023px) { body .tresc dl.ww2-skrot { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  body .tresc .ww2-siatka.ww2-inne { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ww2-ol-dek-n { display: none; }
+  .ww2-ol-karta { grid-template-columns: 1fr; gap: 4px; }
+  body .tresc .ww2-ol p.ww2-ol-rok { font-size: 30px; }
+  body .tresc .prose ul.ww2-l > li { grid-template-columns: 52px minmax(0, 1fr); }
+  body .tresc .prose ul.ww2-l > li > :nth-child(n+3) { grid-column: 2; }
+}
+@media (max-width: 560px) {
+  .ww2-prof { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; }
+  body .tresc dl.ww2-skrot { gap: 8px 12px; padding-top: 10px; }
+  body .tresc dl.ww2-skrot dt { font-size: 18px; }
+  body .tresc dl.ww2-skrot dd { font-size: 12px; }
+  body .tresc .ww2-prof p.ww2-prof-lata { font-size: 12.5px; margin-top: 6px; }
+  .ww2-portret.ww2-ph.ww2-duzy small { display: none; }
+}
+
+/* ---------- strona główna: rząd „Warto wiedzieć” (twarz zamiast roku przy sylwetce, napis nad tytułem) ---------- */
+.z-warto .rzad .ww2-twarz { flex: 0 0 34px; width: 34px; }
+.z-warto .rzad .ww2-twarz .ww2-portret { width: 34px; border-radius: 50%; aspect-ratio: 1; }
+.z-warto .rzad .ww2-twarz .ww2-ph::before, .z-warto .rzad .ww2-twarz .ww2-ph small { display: none; }
+.z-warto .rzad .ww2-twarz .ww2-ph svg { width: 62%; stroke-width: 3.5; }
+.z-warto .rzad .t .ww2-ozn { display: block; margin: 0 0 2px; font-style: normal; font-size: 11.5px; font-weight: 700; line-height: 1.4; letter-spacing: .06em; text-transform: uppercase; color: var(--d-a); }
+/* etykieta „szkic” (Podgląd) w rzędzie strony głównej: przy tytule, nie na całą wysokość wiersza */
+.z-warto .rzad > a > .szkic-etykieta { align-self: flex-start; margin-top: 2px; }

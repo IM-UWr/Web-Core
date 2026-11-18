@@ -17,7 +17,8 @@ import type { Lang } from './daty';
 const procesory = new Map<string, Awaited<ReturnType<typeof createMarkdownProcessor>>>();
 
 export interface Naglowek { depth: number; slug: string; text: string }
-type TrybJawny = boolean | { wstepPoH2?: boolean; limityLinii?: boolean };
+// ww — „Warto wiedzieć” (zlecenie 47): bloki :::w-skrocie i :::laureaci; wejście { lata, portrety }, wyjście bledy (złe linie)
+type TrybJawny = boolean | { wstepPoH2?: boolean; limityLinii?: boolean; ww?: Record<string, unknown> };
 
 export async function renderMarkdown(src: string | undefined, lang: Lang = 'pl'): Promise<string> {
   return (await renderMarkdownZNaglowkami(src, lang)).html;

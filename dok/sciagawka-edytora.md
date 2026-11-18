@@ -2,8 +2,8 @@
 
 W Pages CMS są dwa rodzaje tekstu (zlecenie 40):
 
-- **Jawny Markdown** — kierunki i specjalności (Web-Studia) oraz Strony i strona działu w Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja, Web-Aktualnosci, Web-Pracownicy i strony ze stopki (Web-Ustawienia: deklaracja dostępności, polityka prywatności, „O stronie”). Zwykły tekst, listy i tabele piszesz bez znaczników, specjalny układ (kafelki, oś kroków, pytania, pliki, kontakty) zamykasz w bloku `:::nazwa` … `:::`. Pełny opis: `dok/jawny-markdown.md`. Plik ma `format_tresci: jawne` (ukryte pole formularza; nowa Strona dostaje je sama).
-- **Zwykły Markdown** — wpisy: aktualności, obrony, zakłady, „Warto wiedzieć”, konferencje, projekty i granty, opisy seminariów i referaty. Bez bloków `:::`; wzory w LaTeX-u (`$\ell^2$`).
+- **Jawny Markdown** — kierunki i specjalności (Web-Studia) oraz Strony i strona działu w Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja, Web-Aktualnosci, Web-Pracownicy, strony ze stopki (Web-Ustawienia: deklaracja dostępności, polityka prywatności, „O stronie”) i od zlecenia 47 „Warto wiedzieć” (Web-Instytut: sylwetki, nagrody, historie). Zwykły tekst, listy i tabele piszesz bez znaczników, specjalny układ (kafelki, oś kroków, pytania, pliki, kontakty) zamykasz w bloku `:::nazwa` … `:::`. Pełny opis: `dok/jawny-markdown.md`. Plik ma `format_tresci: jawne` (ukryte pole formularza; nowa Strona dostaje je sama).
+- **Zwykły Markdown** — wpisy: aktualności, obrony, zakłady, konferencje, projekty i granty, opisy seminariów i referaty. Bez bloków `:::`; wzory w LaTeX-u (`$\ell^2$`).
 
 **Formularze:** tytuł, tytuł EN (i „Opublikowane”) → Treść, Treść EN → reszta pól; pola EN tuż pod polskimi, z etykietą „… EN”. Puste pole EN = strona angielska pokaże tekst polski. Pole Treść to edytor Markdownu (pole `code`): wygląd sprawdzasz na Podglądzie po przebudowaniu (ok. 10 minut).
 
@@ -157,12 +157,32 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 
 > **Nowa strona jest od razu opublikowana. Żeby przygotować ją po cichu, odznacz »Opublikowane«: wtedy widać ją tylko na Podglądzie, z żółtym paskiem i etykietą »szkic«.**
 
-- Przełącznik stoi pod tytułem i tytułem EN w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady i „Warto wiedzieć” (Web-Instytut).
+- Przełącznik stoi pod tytułem i tytułem EN w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady i trzy formularze grupy „Warto wiedzieć”: Sylwetki, Nagrody i wyróżnienia, Historie (Web-Instytut).
 - Na Podglądzie szkic widać zawsze. Pod paskiem menu jest żółty pasek, a plakietka stanu budowy (w rogu ekranu) ma żółty wiersz „Szkic: tej strony nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →” z linkiem do formularza tej strony. Przy każdym linku do szkicu (menu, listy, kafelki, tekst) stoi mała etykieta „szkic”.
 - Na przyszłej stronie publicznej szkicu nie ma: znika strona, link w menu, kafelek, pozycja w liczbach, mapie strony i wyszukiwarce. Link do szkicu w tekście innej strony zostaje samym tekstem.
 - Szkic strony działu: strona działu zostaje (prowadzi do niej menu), ale bez tekstu z formularza. Plakietka ma wtedy wiersz „Szkic: tekstu tej strony nie będzie na stronie publicznej (strona zostanie, bez tekstu)” z linkiem do formularza.
 - Dymek „Nowa wersja strony gotowa — Odśwież” pojawia się tylko wtedy, gdy nowa budowa zmieniła otwartą stronę.
 - Bez przełącznika: aktualności, obrony, konferencje, granty, seminaria, referaty i pracownicy.
+
+## „Warto wiedzieć”: sylwetki, nagrody i historie (zlecenie 47)
+
+> **Nowa pozycja: Web-Instytut → Warto wiedzieć → Sylwetki / Nagrody i wyróżnienia / Historie → „Add an entry”. Tytuł (imię i nazwisko) wpisz przed pierwszym zapisem: z niego powstaje nazwa pliku i adres `/instytut/warto-wiedziec/<plik>`.**
+
+- **Trzy grupy, jeden adres.** Strona `/instytut/warto-wiedziec` pokazuje siatkę sylwetek, listę nagród i oś czasu historii. Adres każdego wpisu jest płaski (`/instytut/warto-wiedziec/hugo-steinhaus`), więc nazwa pliku nie może się powtórzyć w dwóch grupach: drugi wpis o tej samej nazwie strona pominie (ostrzeżenie w logu budowy i w `sprawdz_tresci.py`).
+- **Sylwetka:** Imię i nazwisko, „Lata”, podpis (jedno zdanie), rocznica urodzin (MM-DD), portret ze źródłem zdjęcia w „Karcie”. Każda sylwetka ma stronę. Kolejność w siatce: rok urodzenia z pola „Lata”.
+- **Nagroda:** tytuł, „Kolejność” (10, 20, 30…; mniejsza = wyżej), w „Karcie” zajawka, zdjęcie z opisem i link z napisem na przycisku. Własną stronę ma tylko nagroda z Treścią; bez Treści karta prowadzi do linku.
+- **Historia:** tytuł, w „Karcie” **Rok** (wymagany: stawia punkt na osi czasu), zajawka (1–2 zdania: pokazuje się w panelu osi), rocznica (MM-DD: przez 7 dni przed i po niej historia ma pierwszeństwo na stronie głównej, a oś startuje od niej). Bez Treści punkt osi prowadzi do linku z karty.
+- **TBA:** sylwetka z pustą Treścią (albo z samymi komentarzami `<!-- … -->`) ma stronę z imieniem, latami, portretem zastępczym i ramką „TBA: sylwetka w przygotowaniu”; na Podglądzie dodatkowo zdanie „wpisz tekst w CMS (Warto wiedzieć → Sylwetki) i zapisz”. Na liście ma znaczek „TBA”, nie liczy się w banerze i nie losuje się na stronie głównej ani w „Innych sylwetkach”.
+- **„Lata”:** `1887–1972` (dwie daty, dowolna kreska i spacje) albo `1956` (= „ur. 1956”, po angielsku „b. 1956”). Inny tekst (np. `xxxx`, `ok. 1900`) pokaże się tak, jak wpisany, z ostrzeżeniem „Lata: nie data”. Puste = bez lat. Lata stoją raz, pod portretem; punkt „W skrócie” z latami życia strona pomija.
+- **„Dodano” i „Nowe”:** dzień dodania wpisu (RRRR-MM-DD). Przez 30 dni wpis ma znaczek „Nowe” (na liście; sylwetka na stronie głównej: „Nowa sylwetka”), potem znaczek znika sam. Ustaw tylko przy nowym wpisie albo przy publikacji szkicu, nie przy poprawkach. Puste = bez „Nowe”.
+- **Szkic osoby żyjącej:** sylwetka osoby żyjącej jest szkicem (odznaczone „Opublikowane”), dopóki osoba nie zaakceptuje tekstu: widać ją tylko na Podglądzie, z etykietą „szkic”; na stronie publicznej nie ma jej w siatce, liczbach, „Innych sylwetkach”, na stronie głównej, w mapie strony i w wyszukiwarce, a linki do niej (laureaci, teksty innych sylwetek) zostają samym tekstem. **Opublikowanie szkicu po akceptacji: włącz »Opublikowane« i ustaw »Dodano« na ten dzień.**
+- **`:::w-skrocie`** (sylwetka, na początku Treści): liczby obok portretu, jedna na linię: `- **1973** — doktorat w IM PAN`. Podpis może mieć link: `- **72** — [publikacje naukowe](https://…)`. Zła linia (np. bez pogrubienia) nie zatrzymuje strony: strona ją pomija, a na Podglądzie nad treścią stoi czerwona ramka z numerem linii i wzorem.
+- **`:::laureaci`** (nagroda, w sekcji `## Laureaci z Instytutu {#laureaci}`): jedna osoba na linię, `- **2026** Imię Nazwisko — [aktualność](/aktualnosci/…)` (część po ` — ` jest opcjonalna). Link do sylwetki (`[Imię Nazwisko](/instytut/warto-wiedziec/imie-nazwisko)`, także z „prof.” przed linkiem) daje mini portret, kartę w „Sylwetkach laureatów” i wpis w „W »Warto wiedzieć«” na stronie osoby. Licznik „N laureatów z Instytutu” na liście liczy się sam. Nagroda z laureatami nie losuje się na stronie głównej.
+- **„Do pobrania”** (np. noty biograficzne): sekcja `## Do pobrania {#do-pobrania}` z blokiem `:::pliki` (jak na Stronach: `- [Nota biograficzna](/pliki/….pdf) — opis`).
+- **„Źródła”**: sekcja `## Źródła {#zrodla}` na końcu Treści; na stronie jest zwinięta, z liczbą („22 źródła · rozwiń”).
+- **Powiązania biorą się z linków:** link w Treści nagrody albo historii do sylwetki (`/instytut/warto-wiedziec/<plik>`) dodaje kartę osoby w „Ludzie w tej historii” (przy nagrodzie z laureatami: „Sylwetki laureatów”) i ten wpis w „W »Warto wiedzieć«” na stronie osoby. Samo pogrubione nazwisko powiązania nie daje. Pola „Osoby” nie ma.
+- **Strona główna:** rząd „Warto wiedzieć” losuje wpisy z włączonym „Pokaż na stronie głównej”: najpierw rocznice (±7 dni: „140. urodziny · 14 stycznia”, „81 lat temu · 15 listopada”), potem „Zawsze pokazuj”, potem najnowsza „Nowa sylwetka”, resztę losowo („Ulubione” 3× częściej). Bez nagród z laureatami, TBA i (na stronie angielskiej) wpisów bez Treści EN.
+- **Wersja angielska:** pusta Treść EN przy wypełnionej polskiej = strona angielska z ramką „Translation in preparation” i linkiem „Read in Polish →”, na liście EN znaczek „PL”. Puste tytuł, zajawka albo podpis EN = tekst polski.
 
 ## Gdzie co jest
 
@@ -178,7 +198,9 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 | Karty „Dla kogo” na stronie Popularyzacji | Web-Popularyzacja → Strony (tytuł karty = Hasło, zdanie = Opis) |
 | Tekst „O Instytucie” / „Badania w Instytucie” / „O studiach”, tytuł, hasło, „W skrócie” (Instytut: też godziny sekretariatu), opis strony dla Google | Web-Instytut / Web-Nauka / Web-Studia → Strona działu … |
 | Tytuł, opis, hasło i tekst nad listą: Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje (też hasło rocznika) | Web-Nauka → Strony → `seminaria`, `nauka/konferencje`, `nauka/granty`, `nauka/sukcesy`, `nauka/publikacje` |
-| To samo: Struktura i zakłady, Warto wiedzieć | Web-Instytut → Strony → `instytut/struktura`, `warto-wiedziec` |
+| To samo: Struktura i zakłady, Warto wiedzieć | Web-Instytut → Strony → `instytut/struktura`, `instytut/warto-wiedziec` |
+| Sylwetki, nagrody i wyróżnienia, historie (`/instytut/warto-wiedziec`) | Web-Instytut → Warto wiedzieć → Sylwetki / Nagrody i wyróżnienia / Historie (opis niżej: „Warto wiedzieć”) |
+| Laureaci nagrody (licznik na liście, portrety) | Web-Instytut → Warto wiedzieć → Nagrody i wyróżnienia → Treść, blok `:::laureaci` |
 | To samo: Aktualności, Kariera (oferty), Obrony doktorskie (też hasło strony obrony) | Web-Aktualnosci → Strony → `aktualnosci`, `kariera`, `obrony-doktorskie` |
 | To samo: Pracownicy; Plan zajęć | Web-Pracownicy → Strony → `pracownicy`; Web-Studia → Strony → `studia/plan-zajec` |
 | Termin wydarzenia (Kalendarz, nadchodzące wydarzenia, .ics) | Web-Aktualnosci → Aktualności → Termin wydarzenia (pod „Rodzaj”; zwykła informacja: tylko „Data”) |

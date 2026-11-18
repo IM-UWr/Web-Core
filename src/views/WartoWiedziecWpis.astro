@@ -1,83 +1,89 @@
 ---
-// Podstrona pozycji „Warto wiedzieć” (powstaje tylko, gdy pozycja ma treść). Kierunek „Założyciele”, szablon podstrony
-// (zal/Podstrona.astro) i wzorzec treści (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14).
-// W nagłówku tytuł i „← Warto wiedzieć”. Treść: etykieta „rok · dział” (link do działu), zajawka jako pierwszy akapit (.wst),
-// zdjęcie z podpisem, treść z Markdown (podzielona na sekcje po nagłówkach ##, żeby działały kreski i spis „Na tej stronie”),
-// przycisk-link (pole „link”) i „Zobacz też” — pozostałe pozycje jako lista linków (WartoWiedziec.astro, uklad „linki”;
-// powtórzenie, poza indeksem wyszukiwarki). Jedna wersja HTML: komputer i telefon (≤ 1023 px).
+// Strona nagrody albo historii „Warto wiedzieć” (/instytut/warto-wiedziec/<plik>; zlecenie 47, punkt 6; wygląd: prototyp v4.15 —
+// w-medal-uniwersytetu.html, w-pierwsze-wyklady.html). Powstaje tylko, gdy wpis ma Treść (wpis bez Treści prowadzi do karta.link).
+// Szablon podstrony (zal/Podstrona.astro) i wzorzec treści (.tresc — src/styles/zal-tresc.css): tytuł, „← Warto wiedzieć”, hasło jak linia meta.
+// Treść: linia meta („1945 · Historie”, „Nagrody i wyróżnienia” — link do sekcji listy), zajawka jako wstęp (.wst), zdjęcie z opisem,
+// Treść z jawnego Markdownu (sekcje po ##, także :::laureaci i :::pliki) i przycisk linku z karty; dalej „Ludzie w tej historii”
+// (przy nagrodzie z laureatami „Sylwetki laureatów”: sylwetki, do których Treść linkuje) i „Zobacz też w »…«” (pozostałe wpisy grupy,
+// lista linków; poza indeksem wyszukiwarki). /en bez Treści EN: ramka „Translation in preparation” z linkiem do strony polskiej.
 import Link from '../components/Link.astro';
-import type { CollectionEntry } from 'astro:content';
 import Podstrona from '../components/zal/Podstrona.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
+import RamkiWW from '../components/ww/RamkiWW.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, langPola } from '../lib/i18n';
-import { slugOf } from '../lib/tresci';
-import { renderMarkdown } from '../lib/markdown';
+import { wJezyku } from '../lib/i18n';
+import { parsujLata } from '../lib/ww.mjs';
+import { ADRES_WW, portretHtml, type WW } from '../lib/wartoWiedziec';
+import { daneWpisuWW, sekcjeWpisu } from '../lib/widoki/wartoWiedziecWpis';
 import type { Lang } from '../lib/daty';
-import { daneWpisuWartoWiedziec } from '../lib/widoki/wartoWiedziecWpis';
+import '../styles/warto-wiedziec.css';
 
-interface Props { wpis: CollectionEntry<'warto_wiedziec'>; lang: Lang }
-const { wpis, lang } = Astro.props;
-const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+interface Props { wpis: WW; lang: Lang }
+const { wpis: w, lang } = Astro.props;
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
-const { d, tytul, zajawka, htmlEn, tylkoPolski, dzial, haslo, zewnetrzny, etykietaLinku, opisObrazu, wszystkie } = await daneWpisuWartoWiedziec(wpis, lang);
-
-// Treść jako HTML (ten sam renderer co treść kolekcji: remark-math, rehype-katex, rehype-base — astro.config.mjs) i podział
-// na sekcje po <h2>: pierwsza część (przed pierwszym nagłówkiem) idzie do sekcji z zajawką i zdjęciem.
-const html = htmlEn || (await renderMarkdown(wpis.body ?? '', lang));
-const [poczatek, ...dalsze] = html.split(/(?=<h2[\s>])/);
-const sekcje = dalsze.map((h) => {
-  const m = h.match(/^<h2[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/);
-  return { html: h, id: m?.[1], etykieta: (m?.[2] ?? '').replace(/<[^>]+>/g, '').trim() };
-});
+const { T, tytul, tytulLang, zajawka, zajawkaLang, tresc, bezTlumaczenia, wstecz, nazwaGrupy, wszystkie } = await daneWpisuWW(w, lang);
+const { ludzie, ludzieTytul, pozostale, przycisk, opisObrazu } = await sekcjeWpisu(w, wszystkie, lang);
+const rok = w.grupa === 'historie' && w.rok !== undefined ? String(w.rok) : '';
+const haslo = [rok, nazwaGrupy].filter(Boolean).join(' · ');
+const sekcje = (tresc?.sekcje ?? []).map((s, i) => ({ ...s, id: s.id || `sekcja-${i + 1}` }));
+const zobacz = lang === 'en' ? `See also in “${nazwaGrupy}”` : `Zobacz też w „${nazwaGrupy}”`;
 const spis = [
-  ...sekcje.filter((s) => s.id).map((s) => ({ id: s.id!, etykieta: s.etykieta })),
-  { id: 'zobacz-tez', etykieta: T('Zobacz też', 'See also') },
+  ...sekcje.map((s) => ({ id: s.id, etykieta: s.etykieta })),
+  ...(tresc?.zrodla ? [{ id: 'zrodla', etykieta: tresc.zrodla.etykieta }] : []),
+  ...(ludzie.length ? [{ id: 'ludzie', etykieta: ludzieTytul }] : []),
+  ...(pozostale.length ? [{ id: 'zobacz-tez', etykieta: lang === 'en' ? 'See also' : 'Zobacz też' }] : []),
 ];
-const jezykTresci = tylkoPolski ? 'pl' : undefined;
-const przycisk = d.link ? { adres: href(d.link), etykieta: etykietaLinku, zew: zewnetrzny } : undefined;
+const wszystkieSekcje = [...sekcje, ...(tresc?.zrodla ? [{ ...tresc.zrodla, id: 'zrodla' }] : [])];
+// przycisk linku z karty: pod Treścią (w ostatniej sekcji albo w pierwszej, gdy Treść nie ma sekcji)
+const ostatnia = wszystkieSekcje.length - 1;
 ---
-<Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={zajawka || undefined} obraz={d.obraz} opublikowany={d.opublikowany} typ="article"
-  lead={zajawka || undefined} haslo={haslo} wstecz={{ etykieta: wszystkie, adres: '/warto-wiedziec' }} dzial="instytut"
-  spis={sekcje.length ? spis : []} klasa="tresc">
+<Podstrona lang={lang} tytul={tytul} tytulLang={tytulLang} opis={zajawka || undefined} obraz={w.obraz || undefined} opublikowany={w.data.opublikowany} typ="article"
+  uklad="zwarta portal-baner" haslo={haslo} hasloBezLiczb wstecz={wstecz} dzial="instytut" spis={spis.length > 1 ? spis : []} klasa="tresc z-ww2">
   <section>
-    <p class="etyk ww-meta">{d.rok && <>{d.rok} · </>}<a href={href(dzial.adres)}>{dzial[lang]}</a></p>
-    {zajawka && <p class="wst">{zajawka}</p>}
-    {d.obraz && (
+    <p class="etyk ww-meta">{rok && <>{rok} · </>}<a href={href(`${ADRES_WW}#${w.grupa}`)}>{nazwaGrupy}</a></p>
+    {zajawka && <p class="wst" lang={zajawkaLang}>{zajawka}</p>}
+    {w.obraz && (
       <figure class="ww-foto">
-        <ZdjecieZ src={d.obraz} alt={opisObrazu} sizes="(min-width: 820px) 760px, calc(100vw - 32px)" loading="eager" />
+        <ZdjecieZ src={w.obraz} alt={opisObrazu} sizes="(min-width: 820px) 760px, calc(100vw - 32px)" loading="eager" />
         {opisObrazu && <figcaption>{opisObrazu}</figcaption>}
       </figure>
     )}
-    {tylkoPolski && <div class="uwaga"><p lang="en">{t('en', 'wersjaPolska')}</p></div>}
-    {poczatek && <div class="ww-tresc" lang={jezykTresci} set:html={poczatek} />}
-    {przycisk && sekcje.length === 0 && <p class="akcja glowny"><Link class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}{!przycisk.zew && <span aria-hidden="true"> →</span>}</Link></p>}
+    <RamkiWW lang={lang} bledy={tresc?.bledy} tlumaczenie={bezTlumaczenia ? `${ADRES_WW}/${w.slug}` : undefined} />
+    {tresc?.wstep && <div class="ww2-tresc"><div class="prose" set:html={tresc.wstep} /></div>}
+    {przycisk && ostatnia < 0 && <p class="akcja glowny"><Link class="przycisk glowny" href={href(przycisk.adres)} lang={lang}>{przycisk.etykieta}{!przycisk.zew && <span aria-hidden="true"> →</span>}</Link></p>}
   </section>
-  {sekcje.map((s, i) => (
-    <section>
-      <div class="ww-tresc" lang={jezykTresci} set:html={s.html} />
-      {przycisk && i === sekcje.length - 1 && <p class="akcja glowny"><Link class="przycisk glowny" href={przycisk.adres}>{przycisk.etykieta}{!przycisk.zew && <span aria-hidden="true"> →</span>}</Link></p>}
+  {wszystkieSekcje.map((s, i) => (
+    <section id={s.id} aria-labelledby={`${s.id}-h`}>
+      <h2 id={`${s.id}-h`} set:html={s.naglowek} />
+      <div class:list={['ww2-tresc', s.id === 'zrodla' && 'ww2-zrodla']}><div class="prose" set:html={s.html} /></div>
+      {przycisk && i === ostatnia && <p class="akcja glowny"><Link class="przycisk glowny" href={href(przycisk.adres)} lang={lang}>{przycisk.etykieta}{!przycisk.zew && <span aria-hidden="true"> →</span>}</Link></p>}
     </section>
   ))}
-  <section id="zobacz-tez" aria-labelledby="zobacz-tez-h" data-pagefind-ignore>
-    <h2 id="zobacz-tez-h">{T('Zobacz też', 'See also')}</h2>
-    <WartoWiedziec lang={lang} uklad="linki" pomin={slugOf(wpis.id)} />
-  </section>
+  {ludzie.length > 0 && (
+    <section id="ludzie" aria-labelledby="ludzie-h">
+      <h2 id="ludzie-h">{ludzieTytul}</h2>
+      <ul class="ww2-ludzie">
+        {ludzie.map((o) => (
+          <li><a href={href(`${ADRES_WW}/${o.slug}`)}><Fragment set:html={portretHtml(o)} /><span><b>{o.tytul}</b>{o.lata && <small>{parsujLata(o.lata, lang).tekst}</small>}<i>{T('Sylwetka', 'Profile')} <span aria-hidden="true">→</span></i></span></a></li>
+        ))}
+      </ul>
+    </section>
+  )}
+  {pozostale.length > 0 && (
+    <section id="zobacz-tez" aria-labelledby="zobacz-tez-h" data-pagefind-ignore>
+      <h2 id="zobacz-tez-h">{zobacz}</h2>
+      <WartoWiedziec lang={lang} wpisy={pozostale} uklad="linki" />
+    </section>
+  )}
 </Podstrona>
 
 <style>
   .ww-meta a { color: inherit; text-decoration: none; }
   .ww-meta a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  /* zdjęcie pozycji: bez zaokrągleń i cieni, podpis przygaszony */
+  /* zdjęcie wpisu: bez zaokrągleń i cieni, podpis przygaszony */
   .ww-foto { margin: 6px 0 22px; }
   .ww-foto :global(img) { display: block; width: 100%; max-width: var(--szer-akapitu); height: auto; }
   .ww-foto figcaption { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
-  /* treść z Markdown: listy jak lista z kreskami wzorca (ul.kreski), tabele jak tabela wzorca */
-  .ww-tresc :global(ul) { list-style: none; max-width: 42.7em; margin: 0 0 16px; padding: 0; }
-  .ww-tresc :global(ul > li) { position: relative; margin: 6px 0; padding-left: 24px; }
-  .ww-tresc :global(ul > li)::before { content: ''; position: absolute; left: 0; top: .84em; width: 12px; height: 2px; background: var(--d-a); }
-  .ww-tresc :global(ol) { max-width: 42.7em; margin: 0 0 16px; padding-left: 24px; }
-  .ww-tresc :global(img) { max-width: 100%; height: auto; }
   .akcja { margin: 22px 0 0; }
 </style>

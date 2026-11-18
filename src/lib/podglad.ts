@@ -26,7 +26,8 @@ function repozytoriumPliku(plik: string): string | undefined {
 // Formularze z przełącznikiem „Opublikowane” (zlecenie 33, A2.3; zakłady i „Warto wiedzieć” — decyzja właściciela 18.11):
 // nazwa formularza w .pages.yml = nazwa kolekcji. Strony działów (strona-dzialu, popularyzacja) to formularze jednego pliku
 // (adres …/main/file/<nazwa>); ich strona zostaje i przy fladze, a wiersz szkicu mówi tylko o tekście z pliku.
-const KOLEKCJE = new Set(['strony', 'kierunki', 'specjalnosci', 'zaklady', 'warto_wiedziec']);
+// „Warto wiedzieć” od zlecenia 47: trzy formularze w grupie „Warto wiedzieć” (ww_sylwetki, ww_nagrody, ww_historie).
+const KOLEKCJE = new Set(['strony', 'kierunki', 'specjalnosci', 'zaklady', 'ww_sylwetki', 'ww_nagrody', 'ww_historie']);
 const PLIKI = new Set(['strona-dzialu', 'popularyzacja']);
 
 /** Adres formularza wpisu w Pages CMS albo undefined, gdy nie da się go ustalić (brak pochodzenia albo formularz bez przełącznika). */

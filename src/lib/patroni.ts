@@ -34,8 +34,8 @@ export const PATRONI: Record<Dzial, Patron> = {
   instytut: {
     dzial: 'instytut', nazwa: 'Instytut', nazwa_en: 'Institute', adres: '/instytut',
     patron: 'Edward Marczewski', lata: '1907–1976', podpis: 'E. Marczewski', sala: 'EM',
-    notka: 'Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1957–1962. Zabiegał o budowę gmachu Instytutu.',
-    notka_en: 'A co-founder of Wrocław mathematics and Rector of the University in 1957–1962. He campaigned for the construction of the Institute building.',
+    notka: 'Współtwórca wrocławskiej matematyki, rektor Uniwersytetu w latach 1953–1957. Zabiegał o budowę gmachu Instytutu.',
+    notka_en: 'A co-founder of Wrocław mathematics and Rector of the University in 1953–1957. He campaigned for the construction of the Institute building.',
     fakt: 'Pierwszy dyrektor Instytutu.', fakt_en: 'The Institute’s first director.',
     haslo: 'Wrocławska szkoła matematyczna', haslo_en: 'The Wrocław school of mathematics',
     znakNazwa: 'Twierdzenie Szpilrajna, 1930', znakNazwa_en: 'Szpilrajn’s theorem, 1930',
@@ -95,7 +95,7 @@ export const pole = (p: Patron, k: 'nazwa' | 'notka' | 'fakt' | 'haslo' | 'znakN
 
 // Dział strony po pierwszym członie adresu (bez /en). Aktualności, kalendarz i strony ogólne nie mają działu (granat).
 const CZLONY: Record<string, Dzial> = {
-  instytut: 'instytut', pracownicy: 'instytut', 'warto-wiedziec': 'instytut',
+  instytut: 'instytut', pracownicy: 'instytut',
   nauka: 'nauka', seminaria: 'nauka', 'obrony-doktorskie': 'nauka',
   studia: 'studia', popularyzacja: 'popularyzacja',
 };
@@ -112,10 +112,11 @@ export function dzialWpisu(p: { rodzaj: string; dla: string[]; zaklad?: string }
 }
 
 // Listy w stylu Aktualności (zlecenie 27, punkty 1–2): baner bez działu (bez sygnetu i ciekawostki), w którym granat przechodzi w zdjęcie
-// Aktualności w naturalnych kolorach — lista Aktualności, listy Kalendarza, Obron doktorskich i „Warto wiedzieć”. Wpisy Aktualności pasują
+// Aktualności w naturalnych kolorach — lista Aktualności, listy Kalendarza i Obron doktorskich („Warto wiedzieć” od zlecenia 47 jest pod
+// Instytutem, /instytut/warto-wiedziec, z banerem działu: hasło i liczby jak strony działów). Wpisy Aktualności pasują
 // do wzorca, ale od zlecenia 37 mają baner podstrony swojego działu: dzialWpisu przekazany jako dzialBanera (Aktualnosc.astro → Podstrona →
 // NaglowekStrony) ma pierwszeństwo przed tą funkcją. strona: ścieżka bez /en i bez końcowego „/” (np. '/kalendarz').
-export const banerAktualnosci = (strona: string): boolean => /^\/(aktualnosci(\/|$)|kalendarz$|warto-wiedziec$)/.test(strona);
+export const banerAktualnosci = (strona: string): boolean => /^\/(aktualnosci(\/|$)|kalendarz$)/.test(strona);
 
 export function dzialZeSciezki(sciezka: string): Dzial | undefined {
   const czlon = sciezka.replace(/^\/en(?=\/|$)/, '').split('/').filter(Boolean)[0] ?? '';

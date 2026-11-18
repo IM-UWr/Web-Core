@@ -107,4 +107,34 @@ for (const name of studia ? ['strona-dzialu', 'rok-akademicki'] : ['strona-dzial
   countHeadings((await fs.readFile(path.join(target, collection.path), 'utf8')).replace(/^---[\s\S]*?\n---/, '')); countHeadings(data.tresc_en);
   entries++;
 }
-console.log(`OK (${path.basename(target)}): ${entries} wpisów, ${coordinators} powiązań opiekunów; formularze zachowują wszystkie pola. Nagłówki ##: ${headings}, bez {#id}: ${withoutId}.`);
+// Web-Instytut (zlecenie 47): grupa „Warto wiedzieć” — trzy kolekcje (Sylwetki, Nagrody i wyróżnienia, Historie); każde pole pliku
+// w formularzu, format jawny; linie bloków :::w-skrocie i :::laureaci tym samym parserem co strona (src/lib/ww.mjs) — zła linia
+// to ostrzeżenie (strona się zbuduje, linię pominie; na Podglądzie ramka nad treścią).
+const ww = config.content.find((c) => c.name === 'warto_wiedziec');
+let wwEntries = 0;
+const wwWarnings = [];
+if (ww) {
+  assert.equal(ww.type, 'group', 'warto_wiedziec: oczekiwana grupa trzech kolekcji (zlecenie 47)');
+  const { linieBlokow, liniaWSkrocie, liniaLaureata } = await import(new URL('../src/lib/ww.mjs', import.meta.url).href);
+  for (const name of ['ww_sylwetki', 'ww_nagrody', 'ww_historie']) {
+    const collection = ww.items.find((c) => c.name === name);
+    assert.ok(collection && collection.type === 'collection', `Brak formularza ${name} w grupie warto_wiedziec`);
+    hiddenFormat(collection);
+    codeFields(collection);
+    for (const file of await markdownFiles(path.join(target, collection.path))) {
+      const data = await readMd(file);
+      coverage(data, collection.fields, file);
+      assert.equal(data.format_tresci, 'jawne', `${file}: brak jawnego formatu`);
+      const body = (await fs.readFile(file, 'utf8')).replace(/^---[\s\S]*?\n---/, '');
+      countHeadings(body); countHeadings(data.tresc_en);
+      for (const [pole, md] of [['Treść', body], ['Treść EN', data.tresc_en ?? '']]) {
+        for (const [blok, linia] of [['w-skrocie', liniaWSkrocie], ['laureaci', liniaLaureata]]) {
+          for (const l of linieBlokow(md, blok).flat()) if (l.trim() && !linia(l)) wwWarnings.push(`${path.relative(target, file)}: ${pole}, blok :::${blok}, linia „${l}” — strona ją pominie`);
+        }
+      }
+      wwEntries++;
+    }
+  }
+}
+for (const w of wwWarnings) console.warn(`UWAGA ${w}`);
+console.log(`OK (${path.basename(target)}): ${entries} wpisów${ww ? `, ${wwEntries} wpisów „Warto wiedzieć” (złych linii bloków: ${wwWarnings.length})` : ''}, ${coordinators} powiązań opiekunów; formularze zachowują wszystkie pola. Nagłówki ##: ${headings}, bez {#id}: ${withoutId}.`);

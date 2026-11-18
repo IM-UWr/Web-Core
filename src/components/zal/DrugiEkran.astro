@@ -18,22 +18,25 @@
 // Telefon (≤ 1023 px): kolumny jedna pod drugą, po 3 pozycje, pierwsza aktualność bez wyróżnienia (zlecenie 18, punkt 11), „Zobacz więcej” rozwija listę w miejscu (zalozyciele-strony.css).
 import Link from '../Link.astro';
 import '../../styles/zalozyciele-strony.css';
+import '../../styles/warto-wiedziec.css';
+import { naGlownejWW, portretHtml, ADRES_WW } from '../../lib/wartoWiedziec';
+import { glownaJs } from '../../lib/wwSkrypty';
+import { dzisWarszawa } from '../../lib/ww.mjs';
 import Szkic from './Szkic.astro';
 import KafelekGrafiku from '../grafik/Kafelek.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { rozmiarPola } from '../../lib/zdjecia';
-import { MQ_KOMPUTER, sizesTelefon } from '../../lib/media';
+import { sizesTelefon } from '../../lib/media';
 import ustawienia from '../../data/ustawienia.json';
 import skroty from '../../data/skroty.json';
 import plan from '../../data/plan/plan.json';
-import { getCollection } from 'astro:content';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { pozycjeKierunkow } from '../../lib/kierunki';
 import { tekstDnia } from '../../lib/kolory-dni';
 import { grafikDlaAdresu } from '../../lib/grafikStrony';
-import { wydarzeniaNaTelefon, wydarzeniaMinione, aktualnosciNaGlowna, referatyWTygodniu, referatyMinione, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU, widoczny, maTresc, type Wydarzenie, type ReferatWLiscie } from '../../lib/tresci';
+import { wydarzeniaNaTelefon, wydarzeniaMinione, aktualnosciNaGlowna, referatyWTygodniu, referatyMinione, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU, type Wydarzenie, type ReferatWLiscie } from '../../lib/tresci';
 import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
 
 interface Props { lang: Lang }
@@ -133,20 +136,14 @@ const kierunki = (await pozycjeKierunkow()).filter((p) => p.na_stronie_glownej !
   adres: p.adres,
 })).map((k) => ({ ...k, skrot: skrotNazwy(k.nazwa as string), pelna: k.nazwa }));
 
-// Warto wiedzieć: cztery pozycje w rzędzie (rok i tytuł). Jak dotąd na stronie głównej (decyzja 30.10.2026, WartoWiedziec.astro):
-// w HTML wszystkie pozycje „na głównej”, widoczne pierwsze cztery („Zawsze pokazuj” najpierw, dalej wg kolejności — to widzą
-// przeglądarki bez JS), a skrypt w linii zaraz pod listą losuje pozostałe miejsca przed narysowaniem strony.
+// Warto wiedzieć (zlecenie 47, punkt 7; wzór GLOWNA_JS w prototypie): na komputerze 4 pozycje w rzędzie, na telefonie 3 (ta sama lista
+// i ta sama funkcja wyboru — src/lib/ww.mjs). Pula i wybór przy budowie: src/lib/wartoWiedziec.ts (naGlownejWW). Z lewej sylwetka — mała
+// twarz (portret albo placeholder), historia — rok, nagroda — nic; nad tytułem napis („140. urodziny · 14 stycznia”, „81 lat temu ·
+// 15 listopada”, „Nowa sylwetka”). Skrypt w linii zaraz pod listą wybiera od nowa przed narysowaniem strony (rocznica ±7 dni, „Zawsze
+// pokazuj”, najnowszy z „Dodano” w 30 dniach, losowanie z wagami — ulubione ×3); bez JS widać wybór z dnia budowy.
 const WARTO_ILE = 4;
-const warto = (await getCollection('warto_wiedziec'))
-  .filter((w) => widoczny(w) && w.data.na_glownej)
-  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
-  .sort((a, b) => Number(b.data.zawsze) - Number(a.data.zawsze))
-  .map((w) => ({ rok: w.data.rok ?? '', zawsze: w.data.zawsze, tytul: wybierz(w.data, 'tytul', lang) as string, adres: maTresc(w.body) ? `/warto-wiedziec/${slugOf(w.id)}` : (w.data.link || '/warto-wiedziec') }));
-// (tylko na komputerze — na telefonie ten blok jest schowany i losuje własna lista w StronaGlowna.astro)
-const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOMPUTER}').matches)return;var n=+box.dataset.losuj,el=[].slice.call(box.children),` +
-  `st=el.filter(function(e){return e.hasAttribute('data-zawsze')}),r=el.filter(function(e){return !e.hasAttribute('data-zawsze')});` +
-  `for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=r[i];r[i]=r[j];r[j]=t}` +
-  `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
+const warto = await naGlownejWW(lang, WARTO_ILE, dzisWarszawa());
+const LOSUJ = glownaJs(lang);
 ---
 <section class="z-druga" aria-label={T('Szybki dostęp', 'Quick access')}>
   <nav class="z-skr" style={`--skr-n:${skr.length}`} data-ile={skr.length} data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
@@ -215,8 +212,13 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOM
     </section>
     {warto.length > 0 && (
       <section class="z-warto" data-dzial="instytut" aria-labelledby="z-h-warto">
-        <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Did you know')}</h2><a href={href('/warto-wiedziec')}>{T('Wszystkie →', 'All →')}</a></div>
-        <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((w, i) => <Link href={href(w.adres)} data-zawsze={w.zawsze ? '' : undefined} hidden={i >= WARTO_ILE}><span>{w.rok}</span><b class="t">{w.tytul}</b></Link>)}</div>
+        <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Did you know')}</h2><a href={href(ADRES_WW)}>{T('Wszystkie →', 'All →')}</a></div>
+        <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((p) => (
+          <Link href={href(p.adres)} {...p.dane} hidden={!p.widoczna}>
+            {p.w.grupa === 'sylwetki' ? <span class="ww2-twarz" set:html={portretHtml(p.w)} /> : p.w.grupa === 'historie' && <span>{p.w.rok}</span>}
+            <b class="t">{p.napis && <i class="ww2-ozn">{p.napis}</i>}<span class="ww2-t" lang={p.tytulLang}>{p.tytul}</span></b>
+          </Link>
+        ))}</div>
         <script is:inline set:html={LOSUJ} />
       </section>
     )}

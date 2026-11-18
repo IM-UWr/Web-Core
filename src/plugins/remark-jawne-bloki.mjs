@@ -1,5 +1,29 @@
 // Jawna składnia układu; remark-directive odpowiada za standardową gramatykę.
-const BLOKI = new Set(['proza', 'kafelki', 'etapy', 'kontakty', 'linki', 'pliki', 'pytania', 'ramka', 'zakladki', 'tabela', 'kreski', 'tematy', 'specjalnosci', 'pary', 'grafik']);
+import { liniaWSkrocie, liniaLaureata, POWODY_WW } from '../lib/ww.mjs';
+
+const BLOKI = new Set(['proza', 'kafelki', 'etapy', 'kontakty', 'linki', 'pliki', 'pytania', 'ramka', 'zakladki', 'tabela', 'kreski', 'tematy', 'specjalnosci', 'pary', 'grafik', 'w-skrocie', 'laureaci']);
+// Bloki „Warto wiedzieć” (zlecenie 47): zła linia nie zatrzymuje budowy (bloki zmieniają redaktorzy, „strona bezobsługowa”) —
+// punkt, który nie pasuje do wzoru (linia w tekście źródłowym), wypada z bloku, a błąd (numer linii Treści, linia, powód) idzie
+// w data-bledy do rehype-bloki.mjs (ramka na Podglądzie i ostrzeżenie w logu: src/lib/wartoWiedziec.ts).
+const LINIE_WW = { 'w-skrocie': liniaWSkrocie, laureaci: liniaLaureata };
+function sprawdzLinieWW(node, zrodlo) {
+  const linie = zrodlo.split(/\r?\n/);
+  const bledy = [];
+  const zla = (n) => {
+    for (let l = n.position.start.line; l <= n.position.end.line; l++) if ((linie[l - 1] ?? '').trim()) bledy.push({ nr: l, tekst: linie[l - 1].trim(), powod: POWODY_WW[node.name] });
+  };
+  node.children = node.children.filter((c) => {
+    if (c.type === 'html' && /^\s*<!--[\s\S]*?-->\s*$/.test(c.value)) return true;
+    if (c.type !== 'list' || c.ordered) { zla(c); return false; }
+    c.children = c.children.filter((li) => {
+      if (LINIE_WW[node.name](linie[li.position.start.line - 1])) return true;
+      zla(li);
+      return false;
+    });
+    return c.children.length > 0;
+  });
+  return bledy;
+}
 const WSTAWKI = new Set(['opiekun', 'seminaria', 'wybor']);
 
 export default function remarkJawneBloki() {
@@ -52,6 +76,10 @@ export default function remarkJawneBloki() {
           node.data.hProperties.dataLinia = node.position.start.line;
           node.children = [];
           return;
+        }
+        if (block && LINIE_WW[node.name]) {
+          const bledy = sprawdzLinieWW(node, String(file.value));
+          if (bledy.length) node.data.hProperties.dataBledy = JSON.stringify(bledy);
         }
       }
       // Instrukcje redakcyjne nie są zawartością strony (także przy sprawdzaniu pustego tekstu).

@@ -455,32 +455,56 @@ const granty = defineCollection({
   }),
 });
 
-// „Warto wiedzieć”: krótka lista trwałych, wyjątkowych osiągnięć Instytutu (pasek na stronie głównej + sekcje na /nauka i /studia).
-// Pozycja z treścią (body) dostaje własną podstronę /warto-wiedziec/<plik>; bez treści karta prowadzi do pola „link”.
-const warto_wiedziec = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/warto_wiedziec' }),
-  schema: zKarta({
-    tytul: z.string(),
-    tytul_en: optStr,
-    // rok jako tekst (np. „2017” albo „2010, 2018”) — liczba z YAML-a też przejdzie
-    rok: z.preprocess((v) => (v == null || v === '' ? undefined : String(v)), z.string().optional()),
-    zajawka: optStr,
-    zajawka_en: optStr,
-    dzial: z.preprocess(empty, z.enum(['nauka', 'studia', 'instytut']).default('instytut')),
-    na_glownej: published,
-    // „Zawsze pokazuj na stronie głównej” — pozycja nie bierze udziału w losowaniu (patrz WartoWiedziec.astro)
-    zawsze: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
-    kolejnosc: z.preprocess(empty, z.coerce.number().default(100)),
-    obraz: optStr,
-    obraz_opis: optStr,
-    obraz_opis_en: optStr,
-    link: optStr,
-    link_etykieta: optStr,
-    link_etykieta_en: optStr,
-    tresc_en: optStr,
-    zrodla: strList,
-    opublikowany: published,
+// „Warto wiedzieć” (zlecenie 47): trzy kolekcje w podkatalogach Web-Instytut src/content/warto_wiedziec/ — sylwetki, nagrody
+// i wyróżnienia, historie (grupa wpisu wynika z podkatalogu). Adres płaski: /instytut/warto-wiedziec/<plik> (duplikaty nazw:
+// src/lib/wartoWiedziec.ts). Pola wspólne przez zWW (jak zKarta: grupa „Karta” formularza spłaszczona). Wartości, które mogą być złe
+// po zapisie redaktora (Dodano, rocznice, rok historii), schemat tylko przepuszcza jako tekst — sprawdza je src/lib/wartoWiedziec.ts:
+// zła wartość = ostrzeżenie w logu i pole puste (albo historia pominięta na osi), nie błąd budowy.
+// Stary układ (plik leżący wprost w warto_wiedziec/, przed pushem Web-Instytut) — historia, z ostrzeżeniem w logu.
+const tekst = z.preprocess((v) => (v == null || v === '' ? undefined : String(v)), z.string().optional());
+const nie = z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean());
+const zWW = <T extends z.ZodRawShape>(pola: T) => zKarta({
+  tytul: z.string(),
+  opublikowany: published,
+  zajawka: optStr,
+  zajawka_en: optStr,
+  obraz: optStr,
+  // „Pokaż na stronie głównej” (domyślnie tak), „Ulubione” (×3 w losowaniu), „Zawsze pokazuj”
+  na_glownej: published,
+  ulubione: nie,
+  zawsze: nie,
+  // „Dodano” („RRRR-MM-DD” albo puste; data z YAML-a też) — znaczek „Nowe” przez 30 dni
+  dodano: z.preprocess(toDateString, z.string().optional()),
+  format_tresci: optStr,
+  tresc_en: optStr,
+  ...pola,
+});
+const ww_sylwetki = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/warto_wiedziec/sylwetki' }),
+  schema: zWW({
+    lata: tekst,
+    podpis: optStr,
+    podpis_en: optStr,
+    rocznica_urodzin: tekst,
+    obraz_zrodlo: optStr,
   }),
 });
+const obrazILink = {
+  tytul_en: optStr,
+  obraz_opis: optStr,
+  obraz_opis_en: optStr,
+  link: optStr,
+  link_etykieta: optStr,
+  link_etykieta_en: optStr,
+  zrodla: strList,
+};
+const ww_nagrody = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/warto_wiedziec/nagrody' }),
+  schema: zWW({ ...obrazILink, kolejnosc: z.preprocess(empty, z.coerce.number().default(100)) }),
+});
+const ww_historie = defineCollection({
+  loader: glob({ pattern: ['historie/*.md', '*.md'], base: './src/content/warto_wiedziec' }),
+  schema: zWW({ ...obrazILink, rok: tekst, rocznica: tekst }),
+});
 
-export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, specjalnosci_baner, warto_wiedziec };
+export const collections = { aktualnosci, strony, pracownicy, seminaria, referaty, obrony, konferencje, granty, zaklady, kierunki, kierunki_baner, specjalnosci, specjalnosci_baner, ww_sylwetki, ww_nagrody, ww_historie };

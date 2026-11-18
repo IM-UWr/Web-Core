@@ -22,6 +22,7 @@
 import { kotwica, kolejnosc, idNaglowka, KOTWICE, NAGLOWEK_SPECJALNOSCI } from './kotwice.mjs';
 import { zewnetrzny } from './rehype-zewn.mjs';
 import { parsujGrafik, POWODY } from '../lib/grafik.mjs';
+import { pomijanyPunkt } from '../lib/ww.mjs';
 
 const el = (tagName, klasa, children = [], props = {}) => ({
   type: 'element', tagName, properties: { ...(klasa ? { className: [klasa] } : {}), ...props }, children,
@@ -407,6 +408,58 @@ const slug = (s) => s.toLocaleLowerCase('pl').normalize('NFD').replace(/[̀-ͯ]/
 //     dane (wynik) — { etapy: [{ etyk, t }], grupy: [{ nazwa, n }] } z sekcji „Jak przebiega” i „Czego się uczysz”
 //     (liczby banera specjalności).
 const wstaw = (nazwa) => ({ type: 'comment', value: `wstaw:${nazwa}` });
+
+// ---------- bloki „Warto wiedzieć” (zlecenie 47) ----------
+// Punkty są już sprawdzone w remark-jawne-bloki.mjs (złe linie wypadły z bloku). Opcje strony: ww = { lata — liczba z pola „Lata”
+// (punkt „W skrócie” z tą wartością albo podpisem „lata życia”/„rok urodzenia” strona pomija), portrety — { plik sylwetki: HTML
+// małego portretu } tylko dla sylwetek widocznych (widoczny(): przy fladze TYLKO_OPUBLIKOWANE szkice bez portretu; sam link do szkicu
+// zamienia w tekst src/middleware.ts), bledy (wynik) — złe linie bloków do ramki na Podglądzie }.
+// :::w-skrocie — `- **wartość** — podpis` → dl.ww2-skrot (wartość dt, podpis dd; podpis to Markdown w jednej linii, z linkami).
+function naWSkrocie(lis, ww) {
+  const dl = el('dl', 'ww2-skrot');
+  for (const li of lis) {
+    const l = linie(li)[0]?.linia ?? [];
+    if (!jest(l[0], 'strong')) continue;
+    let reszta = przytnij(l.slice(1));
+    if (reszta[0]?.type === 'text') reszta = przytnij([tekst(reszta[0].value.replace(/^\s*[—–-]\s*/, '')), ...reszta.slice(1)]);
+    if (pomijanyPunkt(tekstW(l[0]).trim(), reszta.map(tekstW).join(''), ww.lata)) continue;
+    dl.children.push(el('div', null, [el('dt', null, l[0].children), el('dd', null, reszta)]));
+  }
+  return dl.children.length ? [zBlokiem(dl)] : [];
+}
+// :::laureaci — `- **rok** kto — [aktualność](/aktualnosci/…)` → ul.ww2-l (rok, osoba, „aktualność →” z tekstem dla czytnika).
+// „kto” jako sam link do sylwetki (/instytut/warto-wiedziec/<plik>) dostaje mini portret; część po „ — ” opcjonalna.
+function naLaureatow(lis, ww) {
+  const ul = el('ul', 'ww2-l');
+  for (const li of lis) {
+    const l = linie(li)[0]?.linia ?? [];
+    if (!jest(l[0], 'strong')) continue;
+    const reszta = przytnij(l.slice(1));
+    let kto = reszta, po = [];
+    for (let i = 0; i < reszta.length; i++) {
+      const m = reszta[i].type === 'text' && /\s[—–-]\s/.exec(reszta[i].value);
+      if (!m) continue;
+      kto = przytnij([...reszta.slice(0, i), tekst(reszta[i].value.slice(0, m.index))]);
+      po = przytnij([tekst(reszta[i].value.slice(m.index + m[0].length)), ...reszta.slice(i + 1)]);
+      break;
+    }
+    const ktoTekst = kto.map(tekstW).join('').replace(/\s+/g, ' ').trim();
+    // „kto” z jednym linkiem do sylwetki (obok najwyżej zwykły tekst, np. „prof. [Marek Bożejko](…)”): cały napis staje się linkiem
+    // z mini portretem, jak w prototypie; link do szkicu przy fladze — bez portretu (portrety mają tylko sylwetki widoczne)
+    const linki = kto.filter((x) => jest(x, 'a'));
+    const link = linki.length === 1 && kto.every((x) => x === linki[0] || x.type === 'text') ? linki[0] : undefined;
+    const plik = link && /^(?:\/en)?\/instytut\/warto-wiedziec\/([a-z0-9-]+)\/?$/.exec(String(link.properties?.href ?? ''))?.[1];
+    const portret = plik && ww.portrety?.[plik];
+    if (link && portret) {
+      const caly = el('a', 'ww2-l-os', [{ type: 'raw', value: portret }, ...kto.flatMap((x) => (x === link ? link.children : [x]))], { href: link.properties.href });
+      kto = [caly];
+    }
+    const poLink = po.length === 1 && jest(po[0], 'a') ? po[0] : undefined;
+    if (poLink) poLink.children = [...poLink.children, el('span', 'sr-only', [tekst(`: ${ktoTekst}`)]), el('span', null, [tekst(' →')], { ariaHidden: 'true' })];
+    ul.children.push(el('li', null, [el('span', 'ww2-l-rok', l[0].children), el('span', 'ww2-l-kto', kto), ...(po.length ? [poLink ?? el('span', 'ww2-l-po', po)] : [])]));
+  }
+  return ul.children.length ? [zBlokiem(ul)] : [];
+}
 const ZAMIENIA_NAGLOWEK = new Set(['opiekun']);
 
 // Jawne strony nie odgadują bloków ani wstawek z nazw nagłówków.
@@ -425,7 +478,7 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
     const out = []; let group;
     for (const child of nodes) {
       const special = jestBlokiem(child) || jest(child, 'section') || jest(child, 'h2') || child.type === 'comment'
-        || ['prose', 'dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski', 'pary'].some((c) => child.properties?.className?.includes(c));
+        || ['prose', 'dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski', 'pary', 'ww2-skrot', 'ww2-l'].some((c) => child.properties?.className?.includes(c));
       if (special) { out.push(child); group = undefined; }
       else { if (!group) { group = el('div', 'prose', [], implicit ? { dataProzaDomyslna: '' } : {}); out.push(group); } group.children.push(child); }
     }
@@ -502,6 +555,12 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
       }
       opcje.grafik = parsujGrafik(JSON.parse(n.properties.dataZrodlo ?? '[]'));
       return [wstaw('grafik')];
+    }
+    if (kind === 'w-skrocie' || kind === 'laureaci') {
+      const ww = (opcje.ww ??= {});
+      (ww.bledy ??= []).push(...JSON.parse(n.properties.dataBledy ?? '[]').map((b) => ({ ...b, blok: kind })));
+      const lis = bloki(n).filter((x) => jest(x, 'ul')).flatMap(pozycje);
+      return kind === 'w-skrocie' ? naWSkrocie(lis, ww) : naLaureatow(lis, ww);
     }
     if (kind === 'tabela') {
       const b = bloki(n);

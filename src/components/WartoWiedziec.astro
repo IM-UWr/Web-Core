@@ -1,75 +1,71 @@
 ---
-// „Warto wiedzieć” — pozycje z kolekcji src/content/warto_wiedziec (jedno miejsce edycji w CMS) we wzorcu treści podstron
-// (klasa .tresc na elemencie treści — src/styles/zal-tresc.css; zlecenie 11, zalecenie 14). Używają go tylko strony
-// „Warto wiedzieć”: lista (ListaWartoWiedziec.astro) i pozycja (WartoWiedziecWpis.astro, „Zobacz też”).
-// uklad: 'lista' = wiersze w stylu listy Aktualności (zlecenie 27, punkt 2; wzór: WierszAktualnosci.astro): rok dużą Brygadą
-//                  w kolorze działu pozycji (pole „dział”), tytuł Brygadą (link do podstrony pozycji albo zewnętrzny z ↗; cały wiersz
-//                  klikalny), zajawka, przy pozycji bez podstrony etykieta linku; z prawej miniatura zdjęcia (jeśli jest; na telefonie
-//                  pod rokiem). data-ww-poz i data-dzial — filtr i szukanie na liście (ListaWartoWiedziec.astro);
-//        'linki' = lista linków do stron powiązanych (ul.linki wzorca: dwie kolumny, Brygada, → albo ↗).
-// pomin: identyfikator pozycji do pominięcia (bieżąca podstrona). Kolejność: pole „kolejność”, potem rok (od najnowszego)
-// i tytuł. Gdy nie ma żadnej pozycji do pokazania, komponent nic nie renderuje.
+// „Warto wiedzieć” — wiersze wpisów (nagrody, historie) we wzorcu treści podstron (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11,
+// zalecenie 14). Od zlecenia 47 dostaje gotową listę wpisów (src/lib/wartoWiedziec.ts) — widoki: lista /instytut/warto-wiedziec
+// („Nagrody i wyróżnienia”), strona sylwetki („W »Warto wiedzieć«”), strona nagrody i historii („Zobacz też w »…«”).
+// uklad: 'lista' = wiersze w stylu listy Aktualności (wzór: WierszAktualnosci.astro): rok dużą Brygadą (tylko historie; nagrody są bez
+//                  roku — klasa ww2-bez-roku), tytuł Brygadą (link do strony wpisu albo zewnętrzny z ↗; cały wiersz klikalny), zajawka,
+//                  oznaczenia (grupa — zGrupa; „N laureatów z Instytutu”, gdy wpis ma blok :::laureaci), przy wpisie bez strony etykieta
+//                  linku; z prawej miniatura zdjęcia (jeśli jest; na telefonie pod rokiem);
+//        'linki' = lista linków (ul.linki wzorca: dwie kolumny, Brygada, → albo ↗).
+// Wpis bez Treści nie ma własnej strony: prowadzi do karta.link, a bez linku jest samym tytułem. Pusta lista — nic.
 // Jedna wersja HTML: komputer i telefon (≤ 1023 px — węższa kolumna roku, miniatura pod rokiem).
 import Link from './Link.astro';
-import { getCollection } from 'astro:content';
 import { u, isExternal } from '../lib/url';
 import ZdjecieZ from './ZdjecieZ.astro';
 import { rozmiarPola } from '../lib/zdjecia';
-import { wJezyku, wybierz } from '../lib/i18n';
-import { slugOf, widoczny, maTresc } from '../lib/tresci';
+import { wJezyku, wybierz, langPola } from '../lib/i18n';
+import { laureaciLicz } from '../lib/ww.mjs';
+import { ADRES_WW, nazwaGrupy, type WW } from '../lib/wartoWiedziec';
 import type { Lang } from '../lib/daty';
 
 interface Props {
   lang: Lang;
+  wpisy: WW[];
   uklad?: 'lista' | 'linki';
-  // identyfikator pozycji do pominięcia (np. bieżąca podstrona)
-  pomin?: string;
+  // nazwa grupy w oznaczeniach (lista mieszana: „W »Warto wiedzieć«” na stronie sylwetki)
+  zGrupa?: boolean;
 }
-const { lang, uklad = 'lista', pomin } = Astro.props;
+const { lang, wpisy, uklad = 'lista', zGrupa = false } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
 
-const pozycje = (await getCollection('warto_wiedziec'))
-  .filter(widoczny)
-  .sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || (b.data.rok ?? '').localeCompare(a.data.rok ?? '') || a.data.tytul.localeCompare(b.data.tytul, 'pl'))
-  .filter((w) => slugOf(w.id) !== pomin)
-  .map((w) => {
-    const d = w.data;
-    const maStrone = maTresc(w.body);
-    const cel = maStrone ? `/warto-wiedziec/${slugOf(w.id)}` : d.link;
-    const zewnetrzny = !maStrone && !!d.link && isExternal(d.link);
-    return {
-      dzial: d.dzial,
-      tytul: wybierz(d, 'tytul', lang),
-      zajawka: wybierz(d, 'zajawka', lang),
-      rok: d.rok,
-      obraz: d.obraz,
-      cel,
-      zewnetrzny,
-      // etykieta linku tylko przy pozycji bez własnej podstrony (np. „Strona czasopisma”); z podstroną wystarcza tytuł
-      etykieta: !maStrone && d.link ? wybierz(d, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More')) : '',
-    };
-  });
-const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
+const pozycje = wpisy.map((w) => {
+  const cel = w.stronaWlasna ? `${ADRES_WW}/${w.slug}` : w.link || undefined;
+  const zewnetrzny = !w.stronaWlasna && !!w.link && isExternal(w.link);
+  return {
+    w,
+    tytul: wybierz(w, 'tytul', lang),
+    tytulLang: langPola(w, 'tytul', lang),
+    zajawka: wybierz(w, 'zajawka', lang),
+    zajawkaLang: langPola(w, 'zajawka', lang),
+    rok: w.grupa === 'historie' ? w.rok : undefined,
+    cel,
+    zewnetrzny,
+    // etykieta linku tylko przy wpisie bez własnej strony (np. „Strona czasopisma”); ze stroną wystarcza tytuł
+    etykieta: !w.stronaWlasna && w.link ? wybierz(w, 'link_etykieta', lang) || (zewnetrzny ? T('Strona zewnętrzna', 'External website') : T('Więcej', 'More')) : '',
+    oznaczenia: [zGrupa ? nazwaGrupy(w.grupa, lang) : '', w.laureaci > 0 ? laureaciLicz(w.laureaci, lang) : ''].filter(Boolean),
+  };
+});
 ---
 {pozycje.length > 0 && uklad === 'linki' && (
   <ul class="linki">
     {pozycje.map((k) => (
-      <li>{k.cel ? <Link href={href(k.cel)}>{k.tytul}</Link> : <span class="ww-bez">{k.tytul}</span>}</li>
+      <li>{k.cel ? <Link href={href(k.cel)} lang={lang}><span lang={k.tytulLang}>{k.tytul}</span></Link> : <span class="ww-bez" lang={k.tytulLang}>{k.tytul}</span>}</li>
     ))}
   </ul>
 )}
 {pozycje.length > 0 && uklad === 'lista' && (
   <ul class="ww-lista">
     {pozycje.map((k) => (
-      <li class:list={['ww-w', k.obraz && 'ww-z-min', k.cel && 'ww-klik']} data-ww-poz data-dzial={k.dzial}>
-        <span class="ww-rok">{k.rok}</span>
+      <li class:list={['ww-w', k.w.obraz && 'ww-z-min', k.cel && 'ww-klik', k.rok === undefined && 'ww2-bez-roku']} data-ww-poz>
+        {k.rok !== undefined && <span class="ww-rok">{k.rok}</span>}
         <div class="ww-tr">
-          <p class="t">{k.cel ? <Link href={href(k.cel)}>{k.tytul}</Link> : k.tytul}</p>
-          {k.zajawka && <p class="x">{k.zajawka}</p>}
+          <p class="t" lang={k.tytulLang}>{k.cel ? <Link href={href(k.cel)} lang={lang}>{k.tytul}</Link> : k.tytul}</p>
+          {k.zajawka && <p class="x" lang={k.zajawkaLang}>{k.zajawka}</p>}
+          {k.oznaczenia.length > 0 && <p class="ww2-oz">{k.oznaczenia.map((o, i) => <span class:list={[zGrupa && i === 0 && 'ww2-gr']}>{o}</span>)}</p>}
           {k.etykieta && <p class:list={['ww-dalej', k.zewnetrzny && 'zew']} aria-hidden="true">{k.etykieta}</p>}
         </div>
-        {k.obraz && <span class="ww-min" aria-hidden="true"><ZdjecieZ src={k.obraz} sizes={rozmiarPola(['telefon', 54, 54], [null, 72, 48])} /></span>}
+        {k.w.obraz && <span class="ww-min" aria-hidden="true"><ZdjecieZ src={k.w.obraz} sizes={rozmiarPola(['telefon', 54, 54], [null, 72, 48])} /></span>}
       </li>
     ))}
   </ul>
@@ -84,6 +80,9 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
   .ww-w[hidden] { display: none; }
   .ww-w:first-child { border-top: 1px solid var(--line); }
   .ww-w.ww-z-min { grid-template-columns: 76px minmax(0, 1fr) auto; }
+  /* nagrody (i wpisy bez roku): bez kolumny roku */
+  .ww-w.ww2-bez-roku { grid-template-columns: minmax(0, 1fr); }
+  .ww-w.ww2-bez-roku.ww-z-min { grid-template-columns: minmax(0, 1fr) auto; }
   .ww-rok { font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.05; color: var(--d-a); font-variant-numeric: lining-nums; }
   .ww-tr .t { margin: 2px 0 4px; max-width: none; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .ww-tr .t :global(a) { color: inherit; text-decoration: none; }
@@ -93,6 +92,9 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
   .ww-klik:has(.t a:focus-visible) { outline: 3px solid var(--d-a); outline-offset: 4px; }
   .ww-klik:hover .t :global(a) { color: var(--d-a); }
   .ww-tr .x { margin: 0; max-width: 42.7em; font-size: 15.5px; line-height: 1.55; color: var(--text); }
+  /* oznaczenia pod zajawką: grupa (w kolorze działu), „N laureatów z Instytutu” */
+  .ww2-oz { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 0; max-width: none; font-size: 12.5px; font-weight: 600; line-height: 1.4; letter-spacing: .01em; color: var(--muted); }
+  .ww2-oz .ww2-gr { color: var(--d-a); }
   .ww-dalej { margin: 6px 0 0; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--d-a); }
   .ww-dalej::after { content: '\00a0→'; }
   .ww-dalej.zew::after { content: '\00a0↗'; }
@@ -104,19 +106,24 @@ const zewTekst = ` ${T('(strona zewnętrzna)', '(external site)')}`;
     .ww-w, .ww-w.ww-z-min { gap: 12px; padding: 14px 0; }
     .ww-w { grid-template-columns: 58px minmax(0, 1fr); }
     .ww-w.ww-z-min { grid-template-columns: 58px minmax(0, 1fr) auto; }
+    .ww-w.ww2-bez-roku { grid-template-columns: minmax(0, 1fr); }
+    .ww-w.ww2-bez-roku.ww-z-min { grid-template-columns: minmax(0, 1fr) auto; }
     /* rok (4 cyfry) w kolumnie daty 58 px: mniejszy niż dzień w Aktualnościach (26 px) */
     .ww-rok { font-size: 22px; line-height: 1.15; }
     .ww-tr .t { margin: 1px 0 3px; font-size: 18.5px; line-height: 1.28; }
     .ww-tr .x { font-size: 14.5px; line-height: 1.5; }
     .ww-min { width: 72px; }
   }
-  /* telefon: miniatura pod rokiem (kolumna roku), żeby tekst miał całą szerokość */
+  /* telefon: miniatura pod rokiem (kolumna roku), żeby tekst miał całą szerokość; bez roku — miniatura z prawej */
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .ww-bez { font-size: 19px; }
     .ww-w, .ww-w.ww-z-min { grid-template-columns: 54px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 0 12px; padding: 13px 0; }
     .ww-rok { grid-column: 1; grid-row: 1; font-size: 22px; line-height: 1.2; }
     .ww-tr { grid-column: 2; grid-row: 1 / 3; }
     .ww-min { grid-column: 1; grid-row: 2; align-self: start; width: 54px; aspect-ratio: 1; margin-top: 10px; }
+    .ww-w.ww2-bez-roku, .ww-w.ww2-bez-roku.ww-z-min { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto; }
+    .ww-w.ww2-bez-roku .ww-tr { grid-column: 1; grid-row: 1; }
+    .ww-w.ww2-bez-roku .ww-min { grid-column: 2; grid-row: 1; margin-top: 2px; }
     .ww-tr .t { font-size: 18.5px; }
     .ww-tr .x { font-size: 15px; }
   }

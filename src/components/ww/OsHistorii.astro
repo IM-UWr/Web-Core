@@ -1,0 +1,60 @@
+---
+// Historie „Warto wiedzieć” na poziomej osi czasu (zlecenie 47, punkt 4; prototyp: os_historii i OS_JS w build.py, style .ww2-ol*).
+// Linia z podziałką co 10 lat, punkt w miejscu roku (karta.rok; historia bez roku jest pominięta z ostrzeżeniem — wartoWiedziec.ts).
+// Pod osią panel z jednym wydarzeniem: duży rok, tytuł, zajawka, „Czytaj →” (strona wpisu albo link z karty, gdy Treść pusta),
+// strzałki ‹ › i licznik „3 / 9”. Wszystkie karty w jednej komórce siatki, więc panel ma stałą wysokość.
+// Skrypt (OS_JS, src/lib/wwSkrypty.ts): rozsuwa punkty za blisko siebie (30 px, na wąskim torze 24 px), mysz — najechanie pokazuje,
+// kliknięcie otwiera; dotyk — pierwsze stuknięcie pokazuje, drugie otwiera; klawiatura — Tab po punktach, ← → między nimi.
+// Start: wydarzenie z rocznicą w ±7 dni (Europe/Warsaw), bez takiego najstarsze. Bez JS: punkty w miejscu roku, karty jako lista.
+import Link from '../Link.astro';
+import { u, isExternal } from '../../lib/url';
+import { wJezyku, wybierz, langPola } from '../../lib/i18n';
+import { adresWW, type WW } from '../../lib/wartoWiedziec';
+import { OS_JS } from '../../lib/wwSkrypty';
+import type { Lang } from '../../lib/daty';
+
+interface Props { wpisy: WW[]; lang: Lang }
+const { lang } = Astro.props;
+const wpisy = Astro.props.wpisy.filter((w) => w.rok !== undefined);
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const href = (a: string) => (isExternal(a) ? a : u(wJezyku(a, lang)));
+const od = Math.floor(wpisy[0]?.rok! / 10) * 10;
+const doRoku = (Math.floor(wpisy.at(-1)?.rok! / 10) + 1) * 10;
+// miejsce na torze bez JS (i podziałki): margines max(15 px, 3%) z obu stron, jak w skrypcie
+const miejsce = (r: number) => `left:calc(max(15px, 3%) + (100% - 2 * max(15px, 3%)) * ${((r - od) / (doRoku - od)).toFixed(4)})`;
+const dekady = Array.from({ length: (doRoku - od) / 10 + 1 }, (_, i) => od + i * 10);
+const karty = wpisy.map((w) => ({ w, adres: adresWW(w), czytaj: w.stronaWlasna || !!w.link, tytul: wybierz(w, 'tytul', lang), zajawka: wybierz(w, 'zajawka', lang) }));
+---
+{wpisy.length > 0 && (
+  <div class="ww2-ol" data-od={od} data-do={doRoku}>
+    <div class="ww2-ol-tor">
+      <div class="ww2-ol-linia" aria-hidden="true"></div>
+      <div aria-hidden="true">{dekady.map((d) => <span class:list={['ww2-ol-dek', (d / 10) % 2 === 1 && 'ww2-ol-dek-n']} style={miejsce(d)}>{d}</span>)}</div>
+      {karty.map(({ w, adres, tytul }) => (
+        <a class="ww2-ol-pkt" href={href(adres)} style={miejsce(w.rok!)} data-rok={w.rok} data-rocznica={w.rocznica} aria-label={`${w.rok}: ${tytul}`}>
+          <span class="ww2-ol-r" aria-hidden="true">{w.rok}</span>
+        </a>
+      ))}
+    </div>
+    <div class="ww2-ol-panel">
+      <div class="ww2-ol-karty" aria-live="polite">
+        {karty.map(({ w, adres, czytaj, tytul, zajawka }) => (
+          <article class="ww2-ol-karta">
+            <p class="ww2-ol-rok">{w.rok}</p>
+            <div>
+              <h3 lang={langPola(w, 'tytul', lang)}>{czytaj ? <Link href={href(adres)}>{tytul}</Link> : tytul}</h3>
+              {zajawka && <p lang={langPola(w, 'zajawka', lang)}>{zajawka}</p>}
+              {czytaj && <Link class="ww2-ol-czytaj" href={href(adres)}>{T('Czytaj', 'Read')}{!isExternal(adres) && <span aria-hidden="true"> →</span>}<span class="sr-only">: {tytul}</span></Link>}
+            </div>
+          </article>
+        ))}
+      </div>
+      <div class="ww2-ol-nav">
+        <button type="button" data-ww2-ol-kier="-1" aria-label={T('Poprzednie wydarzenie', 'Previous event')}>‹</button>
+        <span data-ww2-ol-licz>1 / {wpisy.length}</span>
+        <button type="button" data-ww2-ol-kier="1" aria-label={T('Następne wydarzenie', 'Next event')}>›</button>
+      </div>
+    </div>
+  </div>
+  <script is:inline set:html={OS_JS} />
+)}

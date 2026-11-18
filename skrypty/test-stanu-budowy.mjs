@@ -1,7 +1,7 @@
 // Zlecenie 33, część B: test plakietki stanu budowy w przeglądarce (Playwright + Edge z systemu) i zrzuty do raportu.
 // Strona: lokalna budowa Podglądu (PODGLAD=1 bez PODGLAD_RUN_ID, więc działa tryb testowy ?stan=…) z wpisami testowymi-szkicami:
 // kierunki/isim, strony/instytut/kontakt, strony/instytut/infrastruktura-informatyczna (podstrony = szkice pośrednio),
-// specjalnosci/matematyka-stosowana, data/nauka (strona działu), zaklady/geometria, warto_wiedziec/wyklad-terencea-tao (decyzja 18.11).
+// specjalnosci/matematyka-stosowana, data/nauka (strona działu), zaklady/geometria, warto_wiedziec/historie/wyklad-terencea-tao (decyzja 18.11; od zlecenia 47 w historie/).
 //
 // Uruchomienie:  node skrypty/test-stanu-budowy.mjs <adres strony, np. http://localhost:4321/Web-Core> <katalog zrzutów>
 import fs from 'node:fs';
@@ -171,7 +171,7 @@ console.log('3. Strona tylko na Podglądzie (B4)');
     ['/studia/matematyka/matematyka-stosowana/', 'https://app.pagescms.org/im-uwr/web-studia/main/collection/specjalnosci/edit/src%2Fcontent%2Fspecjalnosci%2Fmatematyka-stosowana.md', false],
     ['/en/instytut/kontakt/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/strony/edit/src%2Fcontent%2Fstrony%2Finstytut%2Fkontakt.md', false],
     ['/instytut/zaklady/geometria/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/zaklady/edit/src%2Fcontent%2Fzaklady%2Fgeometria.md', false],
-    ['/warto-wiedziec/wyklad-terencea-tao/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/warto_wiedziec/edit/src%2Fcontent%2Fwarto_wiedziec%2Fwyklad-terencea-tao.md', false],
+    ['/instytut/warto-wiedziec/wyklad-terencea-tao/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/ww_historie/edit/src%2Fcontent%2Fwarto_wiedziec%2Fhistorie%2Fwyklad-terencea-tao.md', false],
   ];
   for (const [adres, cms, posr] of przypadki) {
     await idz(p, adres, 'ok');

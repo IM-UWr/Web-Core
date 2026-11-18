@@ -1,12 +1,9 @@
 ---
-// Podstrona pozycji „Warto wiedzieć” — tylko dla pozycji z treścią (i widocznych: zlecenie 33, flaga TYLKO_OPUBLIKOWANE).
-import { getCollection } from 'astro:content';
-import WartoWiedziecWpis from '../../views/WartoWiedziecWpis.astro';
-import { slugOf, widoczny, maTresc } from '../../lib/tresci';
-export async function getStaticPaths() {
-  const wpisy = (await getCollection('warto_wiedziec')).filter((w) => widoczny(w) && maTresc(w.body));
-  return wpisy.map((wpis) => ({ params: { slug: slugOf(wpis.id) }, props: { wpis } }));
-}
-const { wpis } = Astro.props;
+// Dawne adresy wpisów „Warto wiedzieć” (/warto-wiedziec/<plik>) — przekierowania na /instytut/warto-wiedziec/<plik> (zlecenie 47,
+// src/lib/wartoWiedziec.ts: przekierowaniaWW). Bez mapy strony.
+import Przekierowanie from '../../views/Przekierowanie.astro';
+import { przekierowaniaWW } from '../../lib/wartoWiedziec';
+export const getStaticPaths = przekierowaniaWW;
+const { cel, tytul } = Astro.props;
 ---
-<WartoWiedziecWpis wpis={wpis} lang="pl" />
+<Przekierowanie cel={cel} tytul={tytul} lang="pl" />

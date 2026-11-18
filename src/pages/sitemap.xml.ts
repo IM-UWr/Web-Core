@@ -8,6 +8,7 @@ import { wykazy } from '../lib/widoki/publikacje';
 import { specjalnosci } from '../lib/specjalnosci';
 import { jestTekstemListy } from '../lib/tekstyStron';
 import { powstaje } from '../lib/szkice';
+import { ADRES_WW, widoczneWW } from '../lib/wartoWiedziec';
 
 export async function GET(context: APIContext) {
   const sciezki: string[] = ['/', '/instytut', '/nauka', '/studia', '/popularyzacja', '/aktualnosci', '/aktualnosci/kariera', '/kalendarz', '/seminaria', '/pracownicy', '/obrony-doktorskie', '/nauka/konferencje', '/nauka/granty', '/nauka/sukcesy', '/studia/rok-akademicki'];
@@ -24,8 +25,9 @@ export async function GET(context: APIContext) {
   sciezki.push('/instytut/struktura', '/instytut/wladze');
   sciezki.push('/nauka/publikacje', ...Object.keys(wykazy).map((r) => `/nauka/publikacje/${r}`));
   for (const s of await specjalnosci()) if (widoczny(s) && !s.data.bez_podstrony) sciezki.push(`/studia/${s.data.kierunek}/${s.id}`);
-  sciezki.push('/warto-wiedziec');
-  for (const w of await getCollection('warto_wiedziec')) if (widoczny(w) && maTresc(w.body)) sciezki.push(`/warto-wiedziec/${slugOf(w.id)}`);
+  // „Warto wiedzieć” (zlecenie 47): lista i strony wpisów pod Instytutem; przekierowania ze starych /warto-wiedziec/… nie trafiają do mapy
+  sciezki.push(ADRES_WW);
+  for (const w of await widoczneWW()) if (w.stronaWlasna) sciezki.push(`${ADRES_WW}/${w.slug}`);
   sciezki.push('/studia/plan-zajec');
   const url = (p: string) => absolute(p, context.site);
   // podstrony szkiców (src/lib/szkice.ts) — przy fladze ich nie ma

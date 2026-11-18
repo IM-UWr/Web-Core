@@ -48,10 +48,14 @@ export const STRONY_Z_LISTA: Record<string, Domyslne> = {
     opis: p('Dane kontaktowe pracowników, doktorantów i administracji Instytutu Matematycznego.', 'Contact details of the staff, PhD students and administration of the Mathematical Institute.'),
     haslo: p('Kontakt do każdego z nas', 'How to reach each of us'),
   },
-  'warto-wiedziec': {
+  // „Warto wiedzieć” pod Instytutem (zlecenie 47): plik src/content/strony/instytut/warto-wiedziec.md; opis = wstęp nad listą (p.wst)
+  'instytut/warto-wiedziec': {
     tytul: p('Warto wiedzieć', 'Highlights'),
-    opis: p('Wyjątkowe wydarzenia i osiągnięcia, którymi Instytut Matematyczny chwali się od lat.', 'Exceptional events and achievements the Mathematical Institute has been proud of for years.'),
-    haslo: p('Czym chwalimy się od lat', 'What we have long been proud of'),
+    opis: p(
+      'Ludzie i historie, z których wyrosła wrocławska matematyka: założyciele i profesorowie, ważne odkrycia i wyróżnienia, z których jesteśmy dumni. Bieżące sukcesy znajdziesz w Aktualnościach.',
+      'The people and stories behind Wrocław mathematics: founders and professors, important discoveries and distinctions we are proud of. Current achievements are in the News.',
+    ),
+    haslo: p('Ludzie i historie wrocławskiej matematyki', 'People and stories of Wrocław mathematics'),
   },
   'instytut/struktura': {
     tytul: p('Struktura i zakłady', 'Structure and departments'),
@@ -100,8 +104,12 @@ export const STRONY_Z_LISTA: Record<string, Domyslne> = {
   },
 };
 export type StronaZLista = keyof typeof STRONY_Z_LISTA;
+// Dawne położenie tekstu strony z listą (zlecenie 47: strony/warto-wiedziec.md → strony/instytut/warto-wiedziec.md). Do pushu Web-Instytut
+// Podgląd ma jeszcze stary plik: nie robi z niego zwykłej strony (adres /warto-wiedziec to przekierowanie), a lista ma do tego czasu
+// tytuł, wstęp i hasło z wartości domyślnych wyżej.
+const DAWNE_TEKSTY: Partial<Record<StronaZLista, string>> = { 'instytut/warto-wiedziec': 'warto-wiedziec' };
 /** Wpis kolekcji „strony”, który jest tekstem strony z listą (bez własnej podstrony). */
-export const jestTekstemListy = (id: string) => Object.hasOwn(STRONY_Z_LISTA, id);
+export const jestTekstemListy = (id: string) => Object.hasOwn(STRONY_Z_LISTA, id) || Object.values(DAWNE_TEKSTY).includes(id);
 
 export interface Sekcja { naglowek: string; html: string }
 export interface Tekst {
@@ -157,6 +165,8 @@ export const jedenAkapit = (html: string) => /^\s*<p>([\s\S]*?)<\/p>\s*$/.exec(h
 
 export interface StronaListy extends Tekst {
   jest: boolean; tytul: string; opis?: string; haslo?: string; hasloPodstron?: string;
+  /** na /en opis to tekst polski (Opis EN pusty) — atrybut lang="pl" tam, gdzie strona pokazuje opis w treści */
+  opisPl?: boolean;
 }
 
 /** Tytuł, opis, hasło i tekst strony z listą (adres bez / na początku, np. 'nauka/konferencje'). */
@@ -174,6 +184,7 @@ export async function stronaListy(id: StronaZLista, lang: Lang, opcje: { wst?: b
     jest: true,
     tytul: wybierz(d, 'tytul', lang),
     opis: wybierz(d, 'opis', lang) || undefined,
+    opisPl: en && !d.opis_en?.trim() && !!d.opis?.trim(),
     haslo: (en ? d.haslo_en : d.haslo) || undefined,
     hasloPodstron: (en ? d.haslo_podstron_en : d.haslo_podstron) || undefined,
     ...tekst,
