@@ -1,5 +1,6 @@
 // Panel menu z hamburgera (src/components/zal/PanelMenu.astro): ten sam na komputerze i telefonie (zlecenie 18, punkt 6).
-// Przycisk [data-z-menu-otworz] z aria-controls otwiera swój panel; krzyżyk, Esc i klik obok zamykają, fokus wraca na przycisk.
+// Przycisk [data-z-menu-otworz] z aria-controls otwiera swój panel; krzyżyk, ponowny klik przycisku, Esc i klik obok zamykają,
+// fokus wraca na przycisk. Na komputerze panel to zwarta lista pod przyciskiem (zlecenie 32): położenie liczy ustawPolozenie().
 // Fokus przenosimy z preventScroll: zwykłe focus() na wysuwającym się panelu przesuwało całą okładkę w bok (prototyp).
 // Skrypt wczytywany z okładki, paska i nagłówka telefonu: moduł wykonuje się raz, więc obsługa podpina się tylko raz.
 import { MQ_KOMPUTER, MQ_TELEFON } from '../../lib/media';
@@ -63,11 +64,27 @@ function stanPoczatkowy(panel: HTMLElement) {
   if (link && link.bottom > dol) panel.scrollTop = Math.ceil(link.bottom - dol + 24);
 }
 
+// Komputer (zlecenie 32): lista tuż pod przyciskiem, który ją otworzył — góra 8 px pod nim, prawa krawędź równo z nim, co najmniej 16 px
+// od krawędzi okna; wysokość najwyżej do 16 px nad dołem okna (dalej przewijanie w liście). Przy pasku lista jest stała (fixed),
+// na okładce w obrębie okładki (absolute), więc --menu-x i --menu-y liczymy od jej bloku zawierającego.
+function ustawPolozenie(panel: HTMLElement, przycisk: HTMLButtonElement) {
+  if (przycisk.hasAttribute('data-burger') || !window.matchMedia(MQ_KOMPUTER).matches) return;
+  const b = przycisk.getBoundingClientRect();
+  const szer = document.documentElement.clientWidth;
+  const rodzic = getComputedStyle(panel).position === 'fixed' ? null : (panel.offsetParent as HTMLElement | null)?.getBoundingClientRect();
+  const gora = b.bottom + 8;
+  const prawa = Math.max(16, szer - b.right);
+  panel.style.setProperty('--menu-y', `${gora - (rodzic ? rodzic.top : 0)}px`);
+  panel.style.setProperty('--menu-x', `${prawa - (rodzic ? szer - rodzic.right : 0)}px`);
+  panel.style.setProperty('--menu-max-h', `${Math.max(200, Math.floor(window.innerHeight - gora - 16))}px`);
+}
+
 function otworz(przycisk: HTMLButtonElement) {
   const panel = document.getElementById(przycisk.getAttribute('aria-controls') || '');
   if (!panel) return;
   zamknij(false);
   ustawTelefon(przycisk, true);
+  ustawPolozenie(panel, przycisk);
   stanPoczatkowy(panel);
   panel.classList.add('otwarte');
   przycisk.setAttribute('aria-expanded', 'true');
@@ -80,6 +97,18 @@ function otworz(przycisk: HTMLButtonElement) {
 przyciski.forEach((b) => b.addEventListener('click', () => (otwarty?.przycisk === b ? zamknij() : otworz(b))));
 document.querySelectorAll<HTMLButtonElement>('[data-z-menu-zamknij]').forEach((b) => b.addEventListener('click', () => zamknij()));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && otwarty) zamknij(); });
+// Komputer: Tab za ostatnią pozycją listy (fokus przechodzi poza listę i jej przycisk) zamyka listę, fokus idzie dalej po stronie.
+// Shift+Tab z pierwszej pozycji wraca na hamburger i lista zostaje. relatedTarget null (klik w puste miejsce, wyjście z okna) nie zamyka.
+panele.forEach((panel) => panel.addEventListener('focusout', (e) => {
+  if (otwarty?.panel !== panel || !window.matchMedia(MQ_KOMPUTER).matches) return;
+  const cel = (e as FocusEvent).relatedTarget as Node | null;
+  if (cel && !panel.contains(cel) && cel !== otwarty.przycisk) zamknij(false);
+}));
+// zmiana rozmiaru okna albo przewinięcie (pasek może zmienić wysokość): lista zostaje pod swoim przyciskiem
+let ramka = 0;
+const popraw = () => { cancelAnimationFrame(ramka); ramka = requestAnimationFrame(() => { if (otwarty) ustawPolozenie(otwarty.panel, otwarty.przycisk); }); };
+window.addEventListener('resize', popraw);
+window.addEventListener('scroll', popraw, { passive: true });
 document.addEventListener('click', (e) => {
   if (!otwarty) return;
   const cel = e.target as Element;

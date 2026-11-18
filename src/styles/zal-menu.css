@@ -1,10 +1,11 @@
 /* ==========================================================================
    Panel menu z hamburgera (src/components/zal/PanelMenu.astro): jeden na komputerze i telefonie (zlecenie 18, punkt 6).
-   Z prawej strony, na granacie (na komputerze w ciemnym motywie --panel). Otwieranie i zamykanie: src/scripts/zal/menu.ts.
-   - Komputer (≥ 1024 px): na okładce w obrębie okładki, przy pasku stały na całą wysokość okna; przy jasnym pasku jasny
-     (.z-menu-jasny, ustawia src/scripts/zal/pasek.ts), własny krzyżyk. Pismo, sygnet i szerokość rosną z wysokością okna, rzędy
-     dzielą między siebie jego wolną wysokość (zlecenie 20, punkt 1), a każdy dział mieści się bez przewijania także przy
-     oknie 1366×640 (linki w grupie obok siebie, z zawijaniem). Kolor działu: sygnet, kreska pod nazwą i bieżąca strona.
+   Na granacie (na komputerze w ciemnym motywie --panel). Otwieranie, zamykanie i położenie: src/scripts/zal/menu.ts.
+   - Komputer (≥ 1024 px; zlecenie 32): zwarta lista tuż pod hamburgerem, który ją otworzył (8 px pod przyciskiem, prawa krawędź
+     równo z nim; --menu-x, --menu-y i --menu-max-h liczy menu.ts), na okładce w obrębie okładki, przy pasku stała. Wielkość według
+     treści: sekcje jedna pod drugą, stałe wielkości pisma i sygnetów (bez skalowania z wysokością okna), szerokość do 560 px
+     (linki w grupie obok siebie, z zawijaniem), na niskim oknie przewijanie wewnątrz listy. Przy jasnym pasku jasna
+     (.z-menu-jasny, ustawia src/scripts/zal/pasek.ts), własny mały krzyżyk. Kolor działu: sygnet, kreska pod nazwą i bieżąca strona.
    - Telefon (≤ 1023 px): pod nagłówkiem, w kolorze nagłówka (granat, przy jasnym nagłówku jasny na pełnym tle: .z-menu-jasny, ustawia
      src/scripts/zal/pasek.ts; zlecenie 21, punkt 2), strona przyciemniona (.z-menu-tlo) i nieprzewijalna, krzyżykiem staje się hamburger
      w nagłówku (Naglowek.astro), więc własny krzyżyk panelu jest schowany.
@@ -70,78 +71,64 @@
 .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: none; }
 .z-menu.zwijane section[data-dzial] .z-menu-grupy { padding-top: 4px; }
 
-/* ---------- komputer ---------- */
+/* ---------- komputer: zwarta lista pod hamburgerem (zlecenie 32) ---------- */
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-  .z-menu { position: absolute; top: 0; right: 0; bottom: 0; z-index: 6; padding: 16px 28px 14px;
-    background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: -18px 0 40px rgb(0 0 0 / .3); }
+  /* stałe wielkości (dawniej rosły z wysokością okna przez --mw): pismo działu, linku, nazwy grupy, sygnet i odstęp za sygnetem.
+     O stopień mniejsze od dawnej pełnej skali (30 / 17,5 / 14,5 / 54 / 17 px): przy 1536×864 rozwinięta lista sięgała prawie dołu okna. */
+  .z-menu { --m-h2: 26px; --m-l: 16px; --m-g: 13.5px; --m-s: 46px; --m-k: 16px;
+    position: absolute; top: var(--menu-y, 64px); right: var(--menu-x, 32px); z-index: 6;
+    width: max-content; max-width: min(560px, calc(100vw - var(--menu-x, 32px) - 16px)); max-height: var(--menu-max-h, calc(100vh - 96px));
+    padding: 14px 22px 6px; border: 1px solid rgb(255 255 255 / .1); border-radius: 8px;
+    background: color-mix(in srgb, var(--panel) 96%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    box-shadow: 0 16px 44px rgb(0 0 0 / .34);
+    /* pojawienie się: przezroczystość i 8 px w dół, bez przyciemniania strony */
+    opacity: 0; transform: translateY(-8px);
+    transition: opacity .18s var(--rytm), transform .18s var(--rytm), visibility 0s linear .18s, background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
+  .z-menu.otwarte { opacity: 1; transform: none;
+    transition: opacity .18s var(--rytm), transform .18s var(--rytm), visibility 0s, background-color var(--t-sredni) var(--rytm), color var(--t-sredni) var(--rytm); }
   .z-menu.z-menu-pasek { position: fixed; z-index: 40; }
-  /* Krzyżyk w prawym górnym rogu panelu, 24 px od górnej i prawej krawędzi, przy pasku i na okładce (zlecenie 27, punkt 5; wcześniej
-     przy pasku w miejscu hamburgera). Pole szukania w jednym rzędzie z nim: na całą szerokość panelu bez krzyżyka i 12 px odstępu
-     (24 + 40 + 12 − 28 px wcięcia panelu = 48 px z prawej), środek pola na wysokości środka krzyżyka (24 + 40 / 2 = 44 px od góry). */
-  .z-menu-szukaj { margin-right: 48px; }
-  .z-menu ul { display: flex; flex-wrap: wrap; gap: 2px 16px; }
-  .z-menu ul a { display: inline-block; padding: 3px 0; }
-  .z-menu .z-zamknij { position: absolute; top: 24px; right: 24px; }
-  .z-menu .z-zamknij button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px;
+
+  /* pole szukania i mały krzyżyk w jednym rzędzie, krzyżyk w prawym górnym rogu listy, środkiem na wysokości środka pola */
+  .z-menu-szukaj { --szuk-h: 44px; height: var(--szuk-h); margin: 0 44px 10px 0; padding: 0 12px; }
+  .z-menu-szukaj input { font-size: 15.5px; }
+  .z-menu .z-zamknij { position: absolute; top: calc(14px + (44px - 34px) / 2); right: 22px; }
+  .z-menu .z-zamknij button { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 6px;
     color: #fff; background: rgb(255 255 255 / .08); cursor: pointer; }
   .z-menu .z-zamknij button:hover { background: rgb(255 255 255 / .16); }
   .z-menu .z-zamknij button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-  .z-menu .z-zamknij svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; }
-}
+  .z-menu .z-zamknij svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
-  /* wielkości rosną z wysokością okna: przy 640 px jak dotąd, pełne przy 800 px i wyżej */
-  .z-menu {
-    --mw: clamp(0px, calc(100vh - 640px), 160px);
-    --m-h2: calc(23px + var(--mw) / 23);    /* nazwa działu: 23 → 30 */
-    --m-l: calc(14.5px + var(--mw) / 53);   /* link: 14,5 → 17,5 */
-    --m-g: calc(12.5px + var(--mw) / 80);   /* nazwa grupy: 12,5 → 14,5 */
-    --m-s: calc(40px + var(--mw) / 11.5);   /* sygnet: 40 → 54 */
-    width: min(calc(610px + var(--mw) * 3 / 8), calc(100vw - 64px)); /* 610 → 670 */
-    display: flex; flex-direction: column;
-  }
-  /* wysokość pola jak dotąd (42 → 50 px z wysokością okna), podana wprost, żeby środek pola stał 44 px od góry panelu, jak środek krzyżyka */
-  .z-menu-szukaj { --szuk-h: calc(42px + var(--mw) / 19); flex: none; height: var(--szuk-h); margin-top: calc(28px - var(--szuk-h) / 2);
-    margin-bottom: calc(8px + var(--mw) / 15); padding: 0 13px; }
-  .z-menu-szukaj input { font-size: calc(15px + var(--mw) / 106); }
-
-  /* rzędy dzielą między siebie wolną wysokość panelu; rozwinięcie działu samo ściska pozostałe */
-  .z-menu section { flex: 1 0 auto; }
-  /* transition: bez niej przy zwijaniu rząd skacze od razu do niższej granicy, a grupy na chwilę wystają na następny rząd */
-  .z-menu.zwijane section { max-height: calc(var(--m-s) * 1.2 + 90px); transition: max-height .32s var(--rytm); }
-  .z-menu.zwijane section.rozwiniety { max-height: calc(var(--m-s) * 1.2 + 360px); }
-  .z-menu section[data-dzial] { grid-template-columns: var(--m-s) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: calc(14px + var(--mw) / 53); align-content: center; }
-  .z-menu section.duza { flex-grow: .72; display: flex; flex-direction: column; justify-content: center; padding-left: calc(var(--m-s) + 14px + var(--mw) / 53); }
-  .z-menu.zwijane section.duza { max-height: calc(var(--m-h2) + 76px); }
-  .z-menu .z-menu-sygnet { grid-row: 1; width: var(--m-s); height: calc(var(--m-s) * 1.2); }
+  /* działy jeden pod drugim, bez rozciągania: wysokość listy to wysokość treści */
+  .z-menu section { padding: 6px 0; }
+  .z-menu section[data-dzial] { grid-template-columns: var(--m-s) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: var(--m-k); align-items: center; }
+  .z-menu .z-menu-sygnet { grid-row: 1; width: var(--m-s); height: calc(var(--m-s) * 1.2); margin-top: 0; }
   /* rozwinięty: sygnet nie rozpycha rzędu, grupy stoją tuż pod nazwą działu */
-  .z-menu section.rozwiniety .z-menu-sygnet { grid-row: 1 / span 2; margin-bottom: calc(var(--m-s) * -1.2); }
+  .z-menu section.rozwiniety .z-menu-sygnet { grid-row: 1 / span 2; align-self: start; margin-bottom: calc(var(--m-s) * -1.2); }
   .z-menu h2 { font-size: var(--m-h2); }
-  .z-menu h2 a::after { width: calc(28px + var(--mw) / 32); margin-top: calc(4px + var(--mw) / 53); }
+  .z-menu h2 a::after { width: 30px; margin-top: 6px; }
+  .z-menu-rozwin { width: 32px; height: 32px; }
+  .z-menu-rozwin svg { width: 19px; height: 19px; }
+  .z-menu section.duza { padding: 8px 0 8px calc(var(--m-s) + var(--m-k)); }
+  .z-menu section[data-dzial] + section.duza { margin-top: 0; }
+  .z-menu section.duza:last-child { border-bottom: 0; }
   .z-menu section.duza h2 { font-size: calc(var(--m-h2) + 1px); }
   .z-menu section.duza h2 a.zew::after { font-size: .72em; }
-  .z-menu-rozwin { width: calc(30px + var(--mw) / 30); height: calc(30px + var(--mw) / 30); }
-  .z-menu-rozwin svg { width: calc(18px + var(--mw) / 53); height: calc(18px + var(--mw) / 53); }
 
   .z-menu .z-menu-grupa h3 { font-size: var(--m-g); }
-  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: calc(5px + var(--mw) / 21); }
-  .z-menu ul { font-size: var(--m-l); gap: 2px calc(16px + var(--mw) / 53); }
+  .z-menu .z-menu-grupa + .z-menu-grupa { margin-top: 8px; }
+  .z-menu ul { display: flex; flex-wrap: wrap; gap: 0 16px; font-size: var(--m-l); }
+  .z-menu ul a { display: inline-block; padding: 2px 0; }
 
-  /* rozwijanie płynne: wysokość grup przechodzi przez 0fr → 1fr. Warunek .zwijane: bez JS grupy widoczne, nic nie jest ucięte.
-     Pierwszy stan po otwarciu panelu bez animacji (.bez-animacji, menu.ts): skrypt od razu mierzy bieżący link. */
+  /* rozwijanie płynne: wysokość grup przechodzi przez 0fr → 1fr, a z nią wysokość listy. Warunek .zwijane: bez JS grupy widoczne, nic nie
+     jest ucięte. Zwinięte grupy zostają w układzie (0fr), więc szerokość listy nie zmienia się przy rozwijaniu działów.
+     Pierwszy stan po otwarciu bez animacji (.bez-animacji, menu.ts): skrypt od razu mierzy bieżący link. */
   .z-menu.zwijane section[data-dzial]:not(.rozwiniety) .z-menu-grupy { display: grid; grid-template-rows: 0fr; visibility: hidden; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s linear .32s; }
   .z-menu.zwijane section[data-dzial].rozwiniety .z-menu-grupy { display: grid; grid-template-rows: 1fr; visibility: visible; padding-top: 0; transition: grid-template-rows .32s var(--rytm), visibility 0s; }
-  .z-menu.zwijane.bez-animacji :is(section, section[data-dzial] .z-menu-grupy) { transition: none !important; }
-  /* position: bez niego dopiski .sr-only linków poza stronę (absolutne) wystają ze zwiniętej grupy i panel zyskuje pasek przewijania */
+  .z-menu.zwijane.bez-animacji section[data-dzial] .z-menu-grupy { transition: none !important; }
+  /* position: bez niego dopiski .sr-only linków poza stronę (absolutne) wystają ze zwiniętej grupy i lista zyskuje pasek przewijania */
   .z-menu.zwijane .z-menu-grupy-w { position: relative; min-height: 0; overflow: hidden; }
-  .z-menu.zwijane .z-menu-grupy-w::before { content: ''; display: block; height: calc(4px + var(--mw) / 26); }
-}
-
-/* okna do 800 px wysokości: ciaśniejsze rzędy, bo w wąskim panelu rozwinięte Studia mają więcej rzędów linków niż wyższe okna */
-@media (min-width: 1024px) and (min-height: 501px) and (max-height: 800px), (min-width: 1024px) and (pointer: fine) and (max-height: 800px) {
-  .z-menu { padding-bottom: 10px; }
-  .z-menu section { padding-block: 6px; }
-  .z-menu section.duza { padding-block: 8px; }
+  .z-menu.zwijane .z-menu-grupy-w::before { content: ''; display: block; height: 4px; }
+  .z-menu.zwijane section.rozwiniety .z-menu-grupy-w { padding-bottom: 4px; }
 }
 
 /* ---------- telefon: wysuwa się pod nagłówkiem (--menu-top: dół nagłówka, ustawiany skryptem przy otwarciu) ---------- */
@@ -181,6 +168,8 @@
 .z-menu-jasny ul a:hover { color: var(--ink); }
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   .z-menu-jasny ul a[aria-current='page'], .z-menu-jasny section[data-dzial] h2 a[aria-current='page'] { color: var(--d-a); }
+  /* lista na komputerze: cień dookoła i cienka ramka zamiast cienia w lewo (zlecenie 32) */
+  .z-menu.z-menu-jasny { border: 1px solid var(--line); box-shadow: 0 16px 44px rgb(13 24 48 / .16); }
 }
 .z-menu-jasny section { border-bottom-color: var(--line); }
 .z-menu-jasny .z-menu-sygnet path { stroke: var(--d-a); }

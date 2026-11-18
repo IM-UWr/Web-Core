@@ -9,7 +9,7 @@ import Ikona from './Ikona.astro';
 import Flaga from './zal/Flaga.astro';
 import ustawienia from '../data/ustawienia.json';
 import { u } from '../lib/url';
-import { t, wJezyku, wydzialLinie, WMI_ADRES } from '../lib/i18n';
+import { t, wJezyku, wydzialLinie, WMI_ADRES, UWR_ADRES } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 
 interface Props { lang: Lang; sciezka: string; inny: string | null; idPanelu: string; naOkladce?: boolean }
@@ -17,7 +17,7 @@ const { lang, inny, idPanelu, naOkladce = false } = Astro.props;
 const [wydz1, wydz2] = wydzialLinie(lang);
 const logo = (ustawienia as any).logo as string | undefined;
 // logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
-const uwrAdres = lang === 'en' ? 'https://uwr.edu.pl/en/' : 'https://uwr.edu.pl/';
+const uwrAdres = UWR_ADRES[lang];
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
 ---
 <header class="hdr">

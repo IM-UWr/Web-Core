@@ -232,6 +232,8 @@ export type Klucz = keyof typeof T.pl;
 
 // Wydział: nazwa w dwóch liniach („Wydział Matematyki / i Informatyki”) i adres strony; okładka komputera i pasek telefonu (zlecenie 18, punkt 12)
 export const WMI_ADRES = 'https://wmi.uwr.edu.pl/';
+// Uczelnia: orzeł UWr prowadzi na stronę UWr — nagłówek telefonu, okładka i pasek menu (zlecenie 32, punkt 8)
+export const UWR_ADRES: Record<Lang, string> = { pl: 'https://uwr.edu.pl/', en: 'https://uwr.edu.pl/en/' };
 export function wydzialLinie(lang: Lang): [string, string] {
   const wydzial = t(lang, 'wydzial');
   const podzial = wydzial.search(/ (i|and) /);

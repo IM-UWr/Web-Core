@@ -22,7 +22,7 @@ import { polaDzialu } from '../../lib/tekstyStron';
 import { rozmiarOkl } from '../../lib/zdjecia';
 import { MQ_TELEFON } from '../../lib/media';
 import { u, isExternal } from '../../lib/url';
-import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES } from '../../lib/i18n';
+import { t, wJezyku, wybierz, wydzialLinie, WMI_ADRES, UWR_ADRES } from '../../lib/i18n';
 import { PATRONI, DZIALY, pole, type Dzial } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
@@ -44,9 +44,11 @@ const dzialy = DZIALY.map((dz) => {
 });
 const baner = ustawienia.baner;
 const [slowo1, ...reszta] = t(lang, 'instytut').split(' ');
-// górna linia: logo UWr i nazwa wydziału w dwóch liniach („Wydział Matematyki / i Informatyki”), link do strony wydziału
+// górna linia: logo UWr (link do UWr) i nazwa wydziału w dwóch liniach („Wydział Matematyki / i Informatyki”, link do strony wydziału)
 const [wydz1, wydz2] = wydzialLinie(lang);
 const wmiAdres = WMI_ADRES;
+const uwrAdres = UWR_ADRES[lang];
+const obcaStrona = lang === 'en' ? '(external site)' : '(inna strona)';
 const doJezyka = lang === 'pl' ? 'en' : 'pl';
 // liczby nad „Szybkim dostępem” (zalecenie 15): pozycja z zerem znika; odmiana jak w prototypie (1 / 2–4 / 5+, bez 12–14)
 const odm = (n: number, f: [string, string, string]) => (n === 1 ? f[0] : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? f[1] : f[2]);
@@ -103,7 +105,7 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   `function skala(){var W=innerWidth,H=innerHeight,z=powiekszenie(),s=Math.min(W*z/1920,H*z/950);if(z>1)s=Math.min(s,Math.max(1,W/1366));rt.style.setProperty('--z-s',s);rt.style.setProperty('--z-k',Math.max(1,s));return s}` +
   `function uloz(){var tel=matchMedia('${MQ_TELEFON}').matches,sk=1;if(tel){rt.style.removeProperty('--z-s');rt.style.removeProperty('--z-k')}else sk=skala();if(!ok.offsetHeight)return;var ODSTEP=${ODSTEP}*sk;` +
   `if(tel){var l=ok.querySelector('.w1'),pas=document.querySelector('.hdr');if(f&&l)ok.style.setProperty('--foto-top',Math.min(0,((pas?pas.offsetHeight:0)+l.getBoundingClientRect().top-ok.getBoundingClientRect().top+.14*parseFloat(getComputedStyle(l).fontSize))/2-.47*f.offsetHeight)+'px');return}` +
-  `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector(':scope > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
+  `var tyt=ok.querySelector('.z-okl-tytul'),h1=ok.querySelector('h1'),w1=ok.querySelector('.w1'),w2=ok.querySelector('.w2'),mk=ok.querySelector('.z-okl-marka'),nz=mk&&mk.querySelector('.z-okl-wydzial > span:last-child'),sz=ok.querySelector('.z-okl-szkic');if(!tyt||!h1||!w1||!w2||!nz)return;` +
   `var H=ok.clientHeight,W=ok.clientWidth,o=ok.getBoundingClientRect(),rm=mk.getBoundingClientRect(),koniec=nz.getBoundingClientRect().right-o.left,u=koniec+ODSTEP,yM=(rm.top+rm.bottom)/2-o.top,lewa=tyt.getBoundingClientRect().left-o.left;` +
   // szerokość słowa przy 100 px, ukryta miarka w stylu h1
   `function szer(el){var m=document.createElement('span');m.textContent=el.textContent;m.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-size:100px;letter-spacing:-.012em';h1.appendChild(m);var v=m.getBoundingClientRect().width/100;h1.removeChild(m);return v}` +
@@ -142,12 +144,17 @@ const ULOZ = `(function(ok){var U=${JSON.stringify(UKLAD[lang])},EN=${lang === '
   {/* zalecenie 1: po najechaniu na dział zdjęcie lekko barwi się na jasny kolor działu (okladka.ts) */}
   <span class="z-barwa" aria-hidden="true"></span>
   <div class="z-skos" aria-hidden="true"></div>
-  <a class="z-okl-marka" href={wmiAdres}>
-    {/* znak wydziału jak logo: bez widocznej ↗ (wyjątek z zalecenia 23), dopisek tylko dla czytników ekranu */}
-    {isExternal(wmiAdres) && <span class="sr-only">{lang === 'en' ? '(external site) ' : '(inna strona) '}</span>}
-    <span class="z-okl-logo" role="img" aria-label={lang === 'en' ? 'University of Wrocław' : 'Uniwersytet Wrocławski'} style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
-    <span>{wydz1}{wydz2 && <><br />{wydz2}</>}</span>
-  </a>
+  {/* dwa osobne linki (zlecenie 32, punkt 8): orzeł do UWr, nazwa do Wydziału; jak logo bez widocznej ↗ (wyjątek z zalecenia 23),
+      dopisek „(inna strona)” tylko dla czytników ekranu */}
+  <div class="z-okl-marka">
+    <a class="z-okl-uwr" href={uwrAdres} aria-label={`${t(lang, 'uwrStronaGlowna')} ${obcaStrona}`}>
+      <span class="z-okl-logo" aria-hidden="true" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
+    </a>
+    <a class="z-okl-wydzial" href={wmiAdres}>
+      {isExternal(wmiAdres) && <span class="sr-only">{obcaStrona} </span>}
+      <span>{wydz1}{wydz2 && <><br />{wydz2}</>}</span>
+    </a>
+  </div>
   <nav class="z-narz" aria-label={lang === 'en' ? 'Tools' : 'Narzędzia'}>
     <button type="button" data-motyw aria-label={t(lang, 'motyw')}>
       <svg class="z-ks" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>

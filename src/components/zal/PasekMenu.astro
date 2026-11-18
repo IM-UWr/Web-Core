@@ -11,7 +11,7 @@ import PanelMenu from './PanelMenu.astro';
 import Flaga from './Flaga.astro';
 import { menuGlowne } from '../../lib/menu';
 import { u, isExternal } from '../../lib/url';
-import { t, wJezyku, wybierz } from '../../lib/i18n';
+import { t, wJezyku, wybierz, UWR_ADRES } from '../../lib/i18n';
 import { PATRONI, DZIALY, dzialZeSciezki, pole } from '../../lib/patroni';
 import type { Lang } from '../../lib/daty';
 
@@ -37,10 +37,15 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
 <header class:list={['z-pasek', klasa]} data-z-pasek>
   {!jasny && <span class="z-pasek-tlo" aria-hidden="true"></span>}
   <div class="z-pasek-in">
-    <a class="z-marka" href={u(wJezyku('/', lang))}>
-      <span class="z-logo" aria-hidden="true" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
-      <span><b>{t(lang, 'instytut')}</b><small>{t(lang, 'wydzial')}</small></span>
-    </a>
+    {/* dwa linki (zlecenie 32, punkt 8): orzeł do UWr (dopisek „(inna strona)” tylko dla czytników), napis na stronę główną Instytutu */}
+    <div class="z-marka">
+      <a class="z-marka-uwr" href={UWR_ADRES[lang]} aria-label={`${t(lang, 'uwrStronaGlowna')} ${lang === 'en' ? '(external site)' : '(inna strona)'}`}>
+        <span class="z-logo" aria-hidden="true" style={`--logo:url(${u('/pliki/uwr-logo.png')})`}></span>
+      </a>
+      <a class="z-marka-im" href={u(wJezyku('/', lang))}>
+        <span><b>{t(lang, 'instytut')}</b><small>{t(lang, 'wydzial')}</small></span>
+      </a>
+    </div>
     <nav aria-label={lang === 'en' ? 'Main menu' : 'Menu główne'}>
       {dzialy.map((d) => (
         <a href={href(d.adres)} data-dzial={d.dz} aria-current={bezJezyka === d.adres ? 'page' : biezacy === d.dz ? 'true' : undefined}>{d.etykieta}</a>
