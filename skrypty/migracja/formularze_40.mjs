@@ -435,15 +435,17 @@ function studia({ pola, pole, kolejnosc, ustaw, usun, etykietyEn, naglowkiMd, ko
 
 function popularyzacja({ pola, pole, kolejnosc, ustaw, etykietyEn, komentarz }) {
   komentarz('Zlecenie 40: tytuł EN pod tytułem i Treść na górze, pola EN pod polskimi, etykiety „… EN”, opis wstępu (tylko Google).');
+  // przełącznik „Opublikowane” (zlecenie 33) pod tytułem i tytułem EN, jak w Instytucie i Nauce — gdy formularz go ma
+  const zOpublikowanym = (seq, [a, b, ...reszta]) => (seq.items.some((i) => i.get('name') === 'opublikowany') ? [a, b, 'opublikowany', ...reszta] : [a, b, ...reszta]);
   const sd = pola('popularyzacja');
   etykietyEn(sd);
-  kolejnosc(sd, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'wstep', 'wstep_en', 'haslo', 'haslo_en', 'o_popularyzacji_fakty', 'tradycja', 'linki']);
+  kolejnosc(sd, zOpublikowanym(sd, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'wstep', 'wstep_en', 'haslo', 'haslo_en', 'o_popularyzacji_fakty', 'tradycja', 'linki']));
   ustaw(pole(sd, 'wstep'), 'label', 'Opis strony dla Google (1–2 zdania)');
   ustaw(pole(sd, 'wstep'), 'description', OPIS_GOOGLE.replace('. Puste', '. Np. „Kółka, obozy i konkursy dla uczniów…”. Puste'));
   ustaw(pole(sd, 'wstep_en'), 'label', 'Opis strony dla Google EN');
   const s = pola('strony');
   etykietyEn(s);
-  kolejnosc(s, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'pasek_boczny']);
+  kolejnosc(s, zOpublikowanym(s, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'pasek_boczny']));
   // opis i hasło: nowy baner strony ich nie pokazuje (Strony nie mają liczb), widać je na kartach „Dla kogo” strony działu
   ustaw(pole(s, 'opis'), 'label', 'Opis (zdanie na karcie „Dla kogo”)');
   ustaw(pole(s, 'opis'), 'description', 'Zdanie na karcie tej strony na stronie Popularyzacji; trafia też do Google i do podglądu linku. Na samej stronie się nie wyświetla.');
