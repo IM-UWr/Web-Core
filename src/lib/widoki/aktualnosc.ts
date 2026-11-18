@@ -18,6 +18,12 @@ export async function daneAktualnosci(wpis: Aktualnosc, lang: Lang) {
   const { Content } = await render(wpis);
   const htmlEn = lang === 'en' && d.tresc_en ? await renderMarkdown(d.tresc_en, lang) : '';
   const tylkoPolski = lang === 'en' && !d.tresc_en;
+  // Zlecenie 46 (decyzja 18.11.2026): zajawka nie stoi nad treścią wpisu, bo redaktorzy wpisują w nią pierwsze zdanie treści.
+  // Zostaje w <meta name="description">, na listach, na stronie głównej i w Kalendarzu. Siatka bezpieczeństwa: gdy wpis nie ma
+  // w tym języku żadnego tekstu (treść pusta albo same komentarze <!-- … -->; strona EN bez Treści EN pokazuje treść polską),
+  // zajawka pokazuje się jak dotąd, żeby strona wpisu nie została bez tekstu.
+  const pusty = (s?: string) => !s || s.replace(/<!--[\s\S]*?-->/g, '').trim() === '';
+  const zajawkaNaStronie = (lang === 'en' && d.tresc_en ? pusty(d.tresc_en) : pusty(wpis.body)) ? zajawka : '';
 
   const wydarzenie: Wydarzenie | undefined = d.wydarzenie_poczatek
     ? {
@@ -35,5 +41,5 @@ export async function daneAktualnosci(wpis: Aktualnosc, lang: Lang) {
   const wpisy = d.rodzaj === 'wydarzenie' && najblizsze.length > 0 ? new Map((await aktualnosci()).map((a) => [`/aktualnosci/${slugOf(a.id)}`, a.data])) : undefined;
   const dzialWiersza = (w: Wydarzenie) => (wpisy ? dzialWydarzenia(w, w.href ? wpisy.get(w.href) : undefined) : undefined);
 
-  return { tytul, zajawka, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze, dzialWiersza };
+  return { tytul, zajawka, zajawkaNaStronie, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze, dzialWiersza };
 }

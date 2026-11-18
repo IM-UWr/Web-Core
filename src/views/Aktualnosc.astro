@@ -3,7 +3,7 @@
 // (zal/Podstrona.astro; zlecenie 12, etap 3). Strona poza działami: granatowy nagłówek podstrony z tytułem wpisu
 // i „← Wszystkie aktualności” (dotąd pasek z linkiem powrotu bez banera), bez spisu „Na tej stronie”.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): pierwsza sekcja to wpis — etykieta
-// „Rodzaj · Opublikowano … · dla: …”, zajawka jako pierwszy akapit (p.wst), karta ze zdjęciem i blokiem wydarzenia (data jak
+// „Rodzaj · Opublikowano … · dla: …”, karta ze zdjęciem i blokiem wydarzenia (data jak
 // na stronach działów, pary „Kiedy / Gdzie”, stan: trwa / odbyło się), tekst (.prose), pełny album (przycisk-link); dalej sekcje
 // „Galeria” (Galeria.tsx — podgląd na pełnym ekranie), „Załączniki” (ul.pliki) i „Najbliższe wydarzenia” (WierszWydarzenia.astro;
 // tylko gdy są blisko), kreski między sekcjami; na końcu „Nowszy / Starszy wpis”.
@@ -17,6 +17,9 @@
 // - telefon (≤ 1023 px): karta ma display: contents, czyli jedna kolumna: blok wydarzenia między liniami, pod nim zdjęcie;
 //   „Nowszy / Starszy wpis” jeden pod drugim.
 // Wpis bez zdjęcia: karta z samym blokiem wydarzenia. Bez zdjęcia i bez wydarzenia: bez karty, prawa kolumna pusta.
+// Zajawka (zlecenie 46, decyzja 18.11.2026): nie jest pokazywana na stronie wpisu — redaktorzy wpisują w nią pierwsze zdanie
+// treści, więc stało dwa razy. Zostaje w opisie strony (<meta name="description">, podglądy linków), na listach, na stronie
+// głównej i w Kalendarzu. Wyjątek: wpis bez tekstu w tym języku — wtedy zajawka jak dotąd jako pierwszy akapit (p.wst).
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
@@ -42,7 +45,7 @@ const { wpis, lang, nowszy, starszy } = Astro.props;
 const d = wpis.data;
 const en = lang === 'en';
 const tytulInny = (w?: Aktualnosc) => (w ? (lang === 'en' && w.data.tytul_en) || w.data.tytul : '');
-const { tytul, zajawka, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze, dzialWiersza } = await daneAktualnosci(wpis, lang);
+const { tytul, zajawka, zajawkaNaStronie, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze, dzialWiersza } = await daneAktualnosci(wpis, lang);
 // Wpis o wydarzeniu w kolorze swojego wiersza na liście (zlecenie 21, punkt 6): etykieta, data i linki w tekście; reszta jak dotąd (zalozyciele.css, .akt-wydarzenie).
 // Baner i menu (zlecenie 37): każdy wpis ma baner podstrony swojego działu (dzialWpisu) i ten dział podświetlony w menu; kolory treści jak wyżej.
 const oWydarzeniu = d.rodzaj === 'wydarzenie';
@@ -68,7 +71,7 @@ const zgloszenia = !d.zgloszenia_do ? '' : ofertaAktualna({ zgloszenia: d.zglosz
   klasa={['tresc', zKarta && 'akt-z-karta', oWydarzeniu && 'akt-wydarzenie'].filter(Boolean).join(' ')} klasaRamy={zKarta ? 'z-pd-pelna' : undefined}>
   <section class="akt-wpis">
     <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}{zgloszenia && <> · <span>{zgloszenia}</span></>}</p>
-    {zajawka && <p class="wst" lang={langPola(d, 'zajawka', lang)}>{zajawka}</p>}
+    {zajawkaNaStronie && <p class="wst" lang={langPola(d, 'zajawka', lang)}>{zajawkaNaStronie}</p>}
 
     {zKarta && <div class="akt-karta">
     {wydarzenie && (
