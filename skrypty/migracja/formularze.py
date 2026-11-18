@@ -273,8 +273,9 @@ def etap3(T):
 
     # Wpisy: pola podstawowe, Treść, Treść EN, reszta
     a = wpis(repo('Web-Aktualnosci'), 'aktualnosci')
-    uloz(a, ['tytul', 'data', 'rodzaj', 'body', 'tresc_en', 'dla', 'zajawka', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en',
-             'wydarzenie_poczatek', 'wydarzenie_koniec', 'wydarzenie_miejsce', 'galeria', 'album', 'zalaczniki', 'zaklad', 'tytul_en', 'zajawka_en'])
+    # od zlecenia 31: grupa „termin” zaraz pod „Rodzaj” zamiast pól wydarzenie_* (formularze_31.py, dane: termin.py)
+    uloz(a, ['tytul', 'data', 'rodzaj', 'termin', 'body', 'tresc_en', 'dla', 'zajawka', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en',
+             'galeria', 'album', 'zalaczniki', 'zaklad', 'tytul_en', 'zajawka_en'])
     bogaty_en(a, opis='Treść po angielsku, w tym samym układzie co Treść. Puste = wersja angielska pokaże treść po polsku.')
     o = wpis(repo('Web-Aktualnosci'), 'obrony')
     uloz(o, ['kandydat', 'tytul_rozprawy', 'termin', 'miejsce', 'body', 'tresc_en', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en', 'promotorzy',
