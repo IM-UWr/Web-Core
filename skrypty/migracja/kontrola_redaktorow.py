@@ -4,7 +4,8 @@
   przed  Każdy zapis na origin/main od bazy (redaktorzy, właściciel, inna sesja: wszystko, czego nie wypchnął Code w tym
          zleceniu) i każdy plik, który zmienił: wersja z origin/main porównana pole po polu z wersją wypychaną (--wynik).
          Każda wartość musi być w wyniku bez zmian albo przeniesiona zgodnie z migracją (wydarzenie_* → termin, puste
-         pozycje list „- {}” usunięte, „pozycja: false” dopisane). Inaczej STOP (kod wyjścia 1).
+         pozycje list „- {}” usunięte, „pozycja: false” dopisane, decyzje właściciela z termin.py: WYJATKI, DECYZJE).
+         Inaczej STOP (kod wyjścia 1).
          Najpierw: czy wynik powstał na najświeższym origin/main (inaczej: migracja jeszcze raz na świeżym main).
   po     Całe repozytorium przed pushem (--przed, HEAD origin/main sprzed pusha) i po nim (--po, domyślnie HEAD):
          lista zmienionych pól z liczbą plików; zmiana spoza migracji = kod wyjścia 1.
@@ -22,7 +23,7 @@ from pathlib import Path
 
 import yaml
 
-from termin import POLA, WYJATKI, Wczytywacz, pola_wydarzenia, tekst
+from termin import DECYZJE, POLA, WYJATKI, Wczytywacz, pola_wydarzenia, tekst
 
 DANE = re.compile(r'\.(md|json|ya?ml)$')
 
@@ -110,6 +111,14 @@ def wyjatek(sciezka, przed, po):
     return porownawczo(sciezka, bez(przed)) == porownawczo(sciezka, bez(po))
 
 
+def po_decyzji(sciezka, dane):
+    """Wersja redaktora z naniesioną decyzją właściciela (termin.py, DECYZJE) — tylko gdy pole ma wartość sprzed decyzji."""
+    d = DECYZJE.get(Path(sciezka).name)
+    if d and isinstance(dane, dict) and dane.get(d[0]) == d[1]:
+        return {**dane, d[0]: d[2]}
+    return dane
+
+
 def skrot(v):
     s = repr(v)
     return s if len(s) <= 90 else s[:87] + '…'
@@ -155,9 +164,11 @@ def przed_pushem(repo, wynik, baza):
                       + ('' if zgodne else ' — STOP'))
                 stop += not zgodne
                 continue
+            decyzja = po_decyzji(sciezka, red) is not red
+            red = po_decyzji(sciezka, red)
             r = roznice(porownawczo(sciezka, red), porownawczo(sciezka, wyn))
             if not r:
-                print(f'    {stan} {sciezka}: OK')
+                print(f'    {stan} {sciezka}: OK' + (' — z decyzją właściciela (DECYZJE)' if decyzja else ''))
             elif wyjatek(sciezka, red, wyn):
                 print(f'    {stan} {sciezka}: OK — wyjątek z decyzji właściciela (wpis z 16.11)')
             else:
@@ -193,6 +204,7 @@ def po_pushu(repo, przed, po):
         for k in sorted(set(da) | set(db)):
             if da.get(k) != db.get(k):
                 pola[k].add(sciezka)
+        da = po_decyzji(sciezka, da)
         if roznice(porownawczo(sciezka, da), porownawczo(sciezka, db)) and not wyjatek(sciezka, da, db):
             zle += 1
             print(f'  {sciezka}: zmiana spoza migracji')
@@ -202,9 +214,9 @@ def po_pushu(repo, przed, po):
     print(f'  Plików danych: {len(wszystkie)}, zmienionych: {zmienione}. Zmienione pola (liczba plików):')
     for k, s in sorted(pola.items()):
         print(f'    {k}: {len(s)}')
-    wyj = [s for s in {s for p in pola.values() for s in p} if Path(s).name in WYJATKI]
+    wyj = [s for s in {s for p in pola.values() for s in p} if Path(s).name in WYJATKI or Path(s).name in DECYZJE]
     if wyj:
-        print(f'  W tym wyjątki z decyzji właściciela: {", ".join(sorted(Path(s).name for s in wyj))}')
+        print(f'  W tym wyjątki i decyzje właściciela: {", ".join(sorted(Path(s).name for s in wyj))}')
     print(f'  Wynik: {"NIEDOZWOLONE ZMIANY: " + str(zle) if zle else "OK, tylko zmiany z migracji"}')
     return 1 if zle else 0
 

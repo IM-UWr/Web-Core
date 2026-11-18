@@ -10,8 +10,9 @@ Przy okazji usuwa z list (galeria, zalaczniki) całkiem puste pozycje „- {}”
 Plik zmieniany jest tylko w tych liniach; styl wartości (cudzysłowy) jak w danym pliku. Skrypt jest powtarzalny: uruchomiony
 na świeżym main migruje to, co zostało; plik, który ma już `termin` i jednocześnie wydarzenie_*, zatrzymuje skrypt.
 
-Uruchomienie:  python skrypty/migracja/termin.py <katalog Web-Aktualnosci> [--sprawdz]
+Uruchomienie:  python skrypty/migracja/termin.py <katalog Web-Aktualnosci> [--sprawdz] [--decyzje]
   --sprawdz  nic nie zapisuje, tylko wypisuje plan.
+  --decyzje  zamiast migracji: decyzje właściciela o innych polach (DECYZJE), osobny commit po migracji.
 """
 import json
 import re
@@ -36,6 +37,14 @@ WYJATKI = {
                           'wydarzenie_miejsce': 'Aula Leopoldina'}, None),
 }
 KOLEJNOSC = ('dzien', 'godzina', 'dzien_konca', 'godzina_konca', 'miejsce')
+
+# Decyzje właściciela o innych polach tych wpisów: (pole, wartość przed decyzją, nowa wartość). Stosowane osobnym
+# uruchomieniem z --decyzje (osobny commit), tylko gdy pole ma wciąż wartość sprzed decyzji; inna wartość = stop.
+DECYZJE = {
+    # „Medale…”: bez terminu nie są wydarzeniem → rodzaj „sukces” (właściciel 18.11, pytanie 2 raportu zlecenia 31;
+    # „wydarzenie” ustawił redaktor 17.11 o 22:27)
+    '2026-11-16--2.md': ('rodzaj', 'wydarzenie', 'sukces'),
+}
 
 
 def tekst(v):
@@ -195,12 +204,35 @@ Wczytywacz.add_constructor('tag:yaml.org,2002:int', _bez_szescdziesiatkowych('in
 Wczytywacz.add_constructor('tag:yaml.org,2002:float', _bez_szescdziesiatkowych('float'))
 
 
+def decyzje(kat, sprawdz):
+    """Decyzje właściciela (DECYZJE): jedna linia pola w frontmatterze."""
+    for nazwa, (pole, stara, nowa) in DECYZJE.items():
+        p = kat / nazwa
+        if not p.exists():
+            raise SystemExit(f'{nazwa}: brak pliku — sprawdź ręcznie (redaktor mógł go usunąć lub przemianować)')
+        calosc = p.read_text(encoding='utf-8')
+        m = re.match(r'^---\n(.*?\n)---\n', calosc, re.S)
+        w = re.search(rf'^{pole}: *(.*?) *$', m.group(1), re.M) if m else None
+        obecna = (w.group(1).strip('"\'') if w else None)
+        if obecna == nowa:
+            print(f'{nazwa}: {pole} już „{nowa}”')
+            continue
+        if obecna != stara:
+            raise SystemExit(f'{nazwa}: {pole} = {obecna!r}, a nie {stara!r} — redaktor coś zmienił, decyzja właściciela potrzebna')
+        if not sprawdz:
+            fm = m.group(1)[:w.start()] + f'{pole}: {nowa}' + m.group(1)[w.end():]
+            p.write_text(calosc[:m.start(1)] + fm + calosc[m.end(1):], encoding='utf-8', newline='\n')
+        print(f'{nazwa}: {pole} „{stara}” → „{nowa}”')
+
+
 def main():
     if len(sys.argv) < 2:
         raise SystemExit(__doc__)
     kat = Path(sys.argv[1]) / 'src' / 'content' / 'aktualnosci'
     sprawdz = '--sprawdz' in sys.argv
     sys.stdout.reconfigure(encoding='utf-8')
+    if '--decyzje' in sys.argv:
+        return decyzje(kat, sprawdz)
     n = 0
     for p in sorted(kat.glob('*.md')):
         w = migruj(p, sprawdz)
