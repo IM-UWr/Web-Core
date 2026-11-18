@@ -9,6 +9,7 @@ import rehypeBloki from './src/plugins/rehype-bloki.mjs';
 import rehypeLimity from './src/plugins/rehype-limity.mjs';
 import remarkWzoryEdytora from './src/plugins/remark-wzory-edytora.mjs';
 import trescTelefon from './src/plugins/postcss-tresc-telefon.mjs';
+import skrotyPodgladu from './src/integracje/skrotyPodgladu.mjs';
 
 // Adres strony. Na GitHub Pages (strona projektu) adres ma postać
 // https://<konto>.github.io/<repozytorium>/ — stąd BASE_PATH.
@@ -21,7 +22,8 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'ignore',
-  integrations: [react()],
+  // skrotyPodgladu: tylko budowa Podglądu (PODGLAD=1) — skróty stron dla dymka „Nowa wersja gotowa” (zlecenie 33)
+  integrations: [react(), skrotyPodgladu()],
   markdown: {
     // wzory zapisane edytorem Pages CMS (Treść stron i wpisów, zlecenie 30) — src/plugins/remark-wzory-edytora.mjs
     remarkPlugins: [remarkMath, remarkWzoryEdytora],

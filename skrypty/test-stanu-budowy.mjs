@@ -1,7 +1,7 @@
 // Zlecenie 33, część B: test plakietki stanu budowy w przeglądarce (Playwright + Edge z systemu) i zrzuty do raportu.
 // Strona: lokalna budowa Podglądu (PODGLAD=1 bez PODGLAD_RUN_ID, więc działa tryb testowy ?stan=…) z wpisami testowymi-szkicami:
 // kierunki/isim, strony/instytut/kontakt, strony/instytut/infrastruktura-informatyczna (podstrony = szkice pośrednio),
-// specjalnosci/matematyka-stosowana, data/nauka (strona działu).
+// specjalnosci/matematyka-stosowana, data/nauka (strona działu), zaklady/geometria, warto_wiedziec/wyklad-terencea-tao (decyzja 18.11).
 //
 // Uruchomienie:  node skrypty/test-stanu-budowy.mjs <adres strony, np. http://localhost:4321/Web-Core> <katalog zrzutów>
 import fs from 'node:fs';
@@ -32,7 +32,12 @@ async function strona(ekran, motyw = 'light') {
   p.on('pageerror', (e) => bledyKonsoli.push(`${ekran}/${motyw}: ${e.message}`));
   return p;
 }
-const idz = async (p, adres, stan) => { await p.goto(`${baza}${adres}${stan ? `?stan=${stan}` : ''}`); await p.waitForFunction(() => /sb-(ok|buduje|blad|niedostepny)/.test(document.getElementById('stan-budowy')?.className || '')); };
+const idz = async (p, adres, stan) => {
+  await p.goto(`${baza}${adres}${stan ? `?stan=${stan}` : ''}`);
+  await p.waitForFunction(() => /sb-(ok|buduje|blad|niedostepny)/.test(document.getElementById('stan-budowy')?.className || ''));
+  // „nowa”: dymek po porównaniu skrótu strony z /podglad/skroty.json (zapytanie do strony)
+  if (stan === 'nowa') await p.waitForSelector('.sb-dymek:not([hidden])', { timeout: 5000 }).catch(() => {});
+};
 const rog = (p) => p.$eval('#stan-budowy', (e) => e.dataset.rog);
 const zapamietany = (p) => p.evaluate(() => JSON.parse(localStorage.getItem('im-plakietka-rog')));
 const zrzut = (p, nazwa) => p.screenshot({ path: path.join(katalog, `z33-${nazwa}.png`) });
@@ -95,7 +100,6 @@ console.log('2. Przeciąganie do rogów (B3)');
   const p = await strona('komputer');
   await idz(p, OPUBLIKOWANA, 'ok');
   sprawdz((await rog(p)) === 'ld', 'domyślnie lewy dolny róg');
-  const W = 1440, H = 900;
   for (const [x, y, cel] of [[1300, 820, 'pd'], [1300, 150, 'pg'], [120, 160, 'lg'], [140, 800, 'ld'], [680, 300, 'lg'], [760, 300, 'pg']]) {
     await przeciagnij(p, x, y);
     sprawdz((await rog(p)) === cel && (await zapamietany(p)) === cel, `przeciągnięcie do (${x}, ${y}) → róg ${cel}, zapamiętany`);
@@ -166,6 +170,8 @@ console.log('3. Strona tylko na Podglądzie (B4)');
     ['/studia/isim/', 'https://app.pagescms.org/im-uwr/web-studia/main/collection/kierunki/edit/src%2Fcontent%2Fkierunki%2Fisim.md', false],
     ['/studia/matematyka/matematyka-stosowana/', 'https://app.pagescms.org/im-uwr/web-studia/main/collection/specjalnosci/edit/src%2Fcontent%2Fspecjalnosci%2Fmatematyka-stosowana.md', false],
     ['/en/instytut/kontakt/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/strony/edit/src%2Fcontent%2Fstrony%2Finstytut%2Fkontakt.md', false],
+    ['/instytut/zaklady/geometria/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/zaklady/edit/src%2Fcontent%2Fzaklady%2Fgeometria.md', false],
+    ['/warto-wiedziec/wyklad-terencea-tao/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/warto_wiedziec/edit/src%2Fcontent%2Fwarto_wiedziec%2Fwyklad-terencea-tao.md', false],
   ];
   for (const [adres, cms, posr] of przypadki) {
     await idz(p, adres, 'ok');
@@ -176,11 +182,55 @@ console.log('3. Strona tylko na Podglądzie (B4)');
     if (adres === POSREDNIO) await zrzut(p, 'komputer-szkic-posrednio');
     if (adres === SZKIC) await zrzut(p, 'komputer-szkic');
   }
-  for (const adres of [OPUBLIKOWANA, '/nauka/', '/']) {
+  // strona działu-szkic (decyzja 18.11): wiersz o tekście z pliku, link do formularza pliku „Strona działu”
+  for (const [adres, wzor] of [['/nauka/', /^Szkic: tekstu tej strony nie będzie na stronie publicznej \(strona zostanie, bez tekstu\)/], ['/en/nauka/', /^Draft: the text of this page won’t be on the public site/]]) {
     await idz(p, adres, 'ok');
-    sprawdz(!(await p.$('.sb-szkic')), `${adres}: bez wiersza szkicu${adres === '/nauka/' ? ' (strona działu-szkic zostaje w budowie publicznej)' : ''}`);
+    const w = await p.$eval('.sb-szkic', (e) => ({ tekst: e.innerText, href: e.querySelector('a')?.href })).catch(() => ({}));
+    sprawdz(w.href === 'https://app.pagescms.org/im-uwr/web-nauka/main/file/strona-dzialu' && wzor.test(w.tekst || ''), `${adres}: wiersz szkicu strony działu z linkiem do formularza pliku`);
+  }
+  for (const adres of [OPUBLIKOWANA, '/']) {
+    await idz(p, adres, 'ok');
+    sprawdz(!(await p.$('.sb-szkic')), `${adres}: bez wiersza szkicu`);
   }
   await zrzut(p, 'komputer-opublikowana');
+  await p.context().close();
+}
+
+// ---------- 4. żółty pasek szkicu pod paskiem menu (decyzja 18.11) ----------
+console.log('4. Żółty pasek szkicu');
+for (const ekran of ['komputer', 'telefon']) {
+  const p = await strona(ekran);
+  for (const y of [0, 600]) {
+    await idz(p, SZKIC, 'ok');
+    await p.evaluate((v) => scrollTo(0, v), y);
+    await p.waitForTimeout(300);
+    const w = await p.evaluate(() => {
+      const pasek = document.querySelector('.szkic-pasek');
+      const b = pasek.getBoundingClientRect();
+      // co leży nad paskiem: element w środku paska i tuż nad nim (menu)
+      const nad = document.elementFromPoint(innerWidth / 2, b.top + b.height / 2);
+      const wyzej = document.elementFromPoint(innerWidth / 2, Math.max(0, b.top - 2));
+      return { gora: b.top, wys: b.height, widoczny: !!nad?.closest('.szkic-pasek'), wyzej: wyzej ? (wyzej.closest('header, nav, [class*="pasek"], [class*="naglowek"]')?.className || wyzej.tagName) : '' };
+    });
+    sprawdz(w.widoczny && w.gora > 0 && w.wys < 80, `${ekran}, przewinięcie ${y} px: pasek widoczny, od ${Math.round(w.gora)} px (nad nim: ${String(w.wyzej).slice(0, 40)})`);
+    if (y === 0) await zrzut(p, `${ekran}-pasek-szkicu`);
+  }
+  await p.context().close();
+}
+
+// ---------- 5. dymek tylko przy zmianie tej strony (decyzja 18.11) ----------
+console.log('5. Dymek „Nowa wersja gotowa” a skrót strony');
+{
+  const p = await strona('komputer');
+  await idz(p, OPUBLIKOWANA, 'ok');
+  const d = await p.$eval('#stan-budowy', (e) => ({ skrot: e.dataset.skrot, plik: e.dataset.plik }));
+  const json = await p.evaluate(async (u) => (await fetch(u)).json(), `${baza}/podglad/skroty.json`);
+  sprawdz(/^[\w-]{16}$/.test(d.skrot || '') && d.plik === 'instytut/struktura/index.html' && json.strony[d.plik] === d.skrot, `skrót strony w plakietce = skrót w skroty.json (${d.plik} ${d.skrot})`);
+  await idz(p, OPUBLIKOWANA, 'nowa');
+  sprawdz(await p.isVisible('.sb-dymek'), 'nowa budowa zmieniła stronę: dymek widoczny');
+  await idz(p, OPUBLIKOWANA, 'nowa&skrot=bez-zmian');
+  await p.waitForTimeout(1500);
+  sprawdz(!(await p.isVisible('.sb-dymek')) && /^Aktualna/.test(await p.innerText('.sb-tekst')), 'nowa budowa bez zmian tej strony: bez dymka, „Aktualna”');
   await p.context().close();
 }
 

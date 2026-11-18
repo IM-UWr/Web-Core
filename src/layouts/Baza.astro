@@ -146,7 +146,7 @@ const dzialStrony = dzialZeSciezki(sciezka);
     {!stronaGlowna && <PasekMenu lang={lang} sciezka={sciezka} inny={inny} dzial={dzial} />}
     <Naglowek lang={lang} sciezka={sciezka} inny={inny} idPanelu={stronaGlowna ? 'z-menu-druga' : 'z-menu-pasek'} naOkladce={stronaGlowna} />
     {!opublikowany && (
-      <div class="notice notice-warn" role="status" style="border-radius:0;text-align:center">{t(lang, 'podglad')}</div>
+      <div class="notice notice-warn szkic-pasek" role="status">{t(lang, 'podglad')}</div>
     )}
     <main id="tresc" {...(wIndeksie && szukaj ? { 'data-pagefind-body': '' } : {})}>
       <slot />

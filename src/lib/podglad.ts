@@ -23,14 +23,17 @@ function repozytoriumPliku(plik: string): string | undefined {
   return pochodzenie![plik.replaceAll('\\', '/')];
 }
 
-// Formularze z przełącznikiem „Opublikowane” (zlecenie 33, A2.3): nazwa formularza w .pages.yml = nazwa kolekcji.
-// Strony działów (strona-dzialu, popularyzacja) też go mają, ale ich strona zostaje i przy fladze (bez wiersza szkicu).
-const Z_PRZELACZNIKIEM = new Set(['strony', 'kierunki', 'specjalnosci']);
+// Formularze z przełącznikiem „Opublikowane” (zlecenie 33, A2.3; zakłady i „Warto wiedzieć” — decyzja właściciela 18.11):
+// nazwa formularza w .pages.yml = nazwa kolekcji. Strony działów (strona-dzialu, popularyzacja) to formularze jednego pliku
+// (adres …/main/file/<nazwa>); ich strona zostaje i przy fladze, a wiersz szkicu mówi tylko o tekście z pliku.
+const KOLEKCJE = new Set(['strony', 'kierunki', 'specjalnosci', 'zaklady', 'warto_wiedziec']);
+const PLIKI = new Set(['strona-dzialu', 'popularyzacja']);
 
 /** Adres formularza wpisu w Pages CMS albo undefined, gdy nie da się go ustalić (brak pochodzenia albo formularz bez przełącznika). */
 export function formularzWCms(kolekcja: string, plik?: string): string | undefined {
-  if (!plik || !Z_PRZELACZNIKIEM.has(kolekcja)) return undefined;
+  if (!plik || !(KOLEKCJE.has(kolekcja) || PLIKI.has(kolekcja))) return undefined;
   const repo = repozytoriumPliku(plik);
   if (!repo) return undefined;
-  return `https://app.pagescms.org/${tresci.organizacja.toLowerCase()}/${repo.toLowerCase()}/main/collection/${kolekcja}/edit/${encodeURIComponent(plik)}`;
+  const r = `https://app.pagescms.org/${tresci.organizacja.toLowerCase()}/${repo.toLowerCase()}/main`;
+  return PLIKI.has(kolekcja) ? `${r}/file/${kolekcja}` : `${r}/collection/${kolekcja}/edit/${encodeURIComponent(plik)}`;
 }

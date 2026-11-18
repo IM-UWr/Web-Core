@@ -318,6 +318,17 @@ details[open] > summary .chev { transform: rotate(180deg); }
 .side-box .event { padding: 12px; border-radius: 14px; }
 .notice { padding: 14px 18px; border-radius: var(--radius); background: var(--tint); color: var(--tint-ink); font-weight: 600; }
 .notice-warn { background: var(--accent); color: var(--accent-ink); }
+/* Strona-szkic (Baza.astro; decyzja właściciela 18.11 do zlecenia 33): żółty pasek przypięty pod paskiem menu, jak czerwony
+   pasek błędu budowy (src/lib/stanBudowy/styl.css), żeby nie zasłaniał go pasek menu (komputer) ani baner (telefon).
+   Telefon: jedna linia i treść niżej o wysokość paska (inaczej zasłaniałby link „← dział” w banerze); komputer: pasek leży na
+   pustej górze banera, pod paskiem menu, bez przesuwania treści. */
+.szkic-pasek { position: fixed; z-index: 26; top: var(--hdr-h); left: 0; right: 0; padding: 6px 16px; border-radius: 0; text-align: center; font-size: 13px; line-height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 12px rgb(0 0 0 / .18); }
+.szkic-pasek ~ main { margin-top: 31px; }
+@media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+  .szkic-pasek { top: var(--gora, 66px); font-size: 14px; white-space: normal; }
+  .szkic-pasek ~ main { margin-top: 0; }
+}
+@media print { .szkic-pasek { position: static; box-shadow: none; } }
 
 /* treść artykułów i stron */
 .prose { max-width: var(--szer-akapitu); font-size: 18px; line-height: 1.7; }

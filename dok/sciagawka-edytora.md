@@ -111,11 +111,12 @@ Lista plików (opis po myślniku jest opcjonalny):
 
 > **Nowa strona jest od razu opublikowana. Żeby przygotować ją po cichu, odznacz »Opublikowane«: wtedy widać ją tylko na Podglądzie, z żółtym paskiem i etykietą »szkic«.**
 
-- Przełącznik stoi zaraz pod tytułem w formularzach: Kierunki, Specjalności, Strony i Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja).
-- Na Podglądzie szkic widać zawsze. Na górze strony jest żółty pasek, a plakietka stanu budowy (w rogu ekranu) ma żółty wiersz „Szkic: tej strony nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →” z linkiem do formularza tej strony. Przy każdym linku do szkicu (menu, listy, kafelki, tekst) stoi mała etykieta „szkic”.
+- Przełącznik stoi zaraz pod tytułem w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady i „Warto wiedzieć” (Web-Instytut).
+- Na Podglądzie szkic widać zawsze. Pod paskiem menu jest żółty pasek, a plakietka stanu budowy (w rogu ekranu) ma żółty wiersz „Szkic: tej strony nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →” z linkiem do formularza tej strony. Przy każdym linku do szkicu (menu, listy, kafelki, tekst) stoi mała etykieta „szkic”.
 - Na przyszłej stronie publicznej szkicu nie ma: znika strona, link w menu, kafelek, pozycja w liczbach, mapie strony i wyszukiwarce. Link do szkicu w tekście innej strony zostaje samym tekstem.
-- Szkic strony działu: strona działu zostaje (prowadzi do niej menu), ale bez tekstu z formularza.
-- Bez przełącznika: aktualności, seminaria, referaty, pracownicy, zakłady i „Warto wiedzieć”.
+- Szkic strony działu: strona działu zostaje (prowadzi do niej menu), ale bez tekstu z formularza. Plakietka ma wtedy wiersz „Szkic: tekstu tej strony nie będzie na stronie publicznej (strona zostanie, bez tekstu)” z linkiem do formularza.
+- Dymek „Nowa wersja strony gotowa — Odśwież” pojawia się tylko wtedy, gdy nowa budowa zmieniła otwartą stronę.
+- Bez przełącznika: aktualności, obrony, konferencje, granty, seminaria, referaty i pracownicy.
 
 ## Gdzie co jest
 

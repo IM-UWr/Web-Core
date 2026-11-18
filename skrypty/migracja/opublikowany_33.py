@@ -1,7 +1,8 @@
 """Zlecenie 33: przełącznik „Opublikowane” w formularzach Pages CMS i jawne `opublikowany` we wpisach.
 
 Formularze (A2.3): „Strony” we wszystkich repozytoriach, które je mają, „Strona działu …” (Web-Instytut, Web-Nauka,
-Web-Studia, Web-Popularyzacja) oraz kierunki i specjalności (Web-Studia). Pole `opublikowany` (boolean, `default: true`)
+Web-Studia, Web-Popularyzacja), kierunki i specjalności (Web-Studia) oraz — decyzja właściciela 18.11 — zakłady
+i „Warto wiedzieć” (Web-Instytut). Pole `opublikowany` (boolean, `default: true`)
 stoi zaraz pod tytułem, a gdy tuż pod tytułem jest tytuł EN — pod tą parą (para PL/EN się nie rozdziela). Dotychczasowe
 pole (Web-Studia: „Uwzględniaj w zestawieniach”) jest zastępowane i przenoszone na to miejsce.
 
@@ -24,7 +25,7 @@ import yaml
 
 CELE = {
     'Web-Aktualnosci': ['strony'],
-    'Web-Instytut': ['strona-dzialu', 'strony'],
+    'Web-Instytut': ['strona-dzialu', 'zaklady', 'strony', 'warto_wiedziec'],
     'Web-Nauka': ['strona-dzialu', 'strony'],
     'Web-Popularyzacja': ['popularyzacja', 'strony'],
     'Web-Pracownicy': ['strony'],

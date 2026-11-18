@@ -5,7 +5,11 @@
 // - przy wejściu na stronę pytanie tylko, gdy wynik jest starszy niż 30 s; potem co 120 s, w trakcie budowy co 20 s; karta w tle nie pyta;
 // - ETag obsługuje przeglądarka (cache: 'no-cache' → zapytanie warunkowe bez własnych nagłówków, więc bez zapytania wstępnego CORS);
 // - 403/429 albo wyczerpany limit: „Stan budowy chwilowo niedostępny”, kolejne pytanie po 10 min.
-// Tryb testowy (tylko localhost, budowa lokalna): ?stan=ok | w-toku | kolejka | nowa | blad | limit — odpowiedzi z pliku.
+// Dymek „Nowa wersja gotowa” (decyzja właściciela 18.11) tylko wtedy, gdy nowa budowa zmieniła tę stronę: skrót strony (data-skrot,
+// src/integracje/skrotyPodgladu.mjs) porównany ze skrótem z /podglad/skroty.json nowej wersji (zapytanie do strony, nie do API, raz
+// na nową budowę; gdy nowa wersja jeszcze się publikuje, ponowienie co 20 s). Bez skrótów (starsza budowa) dymek jak dotąd.
+// Tryb testowy (tylko localhost, budowa lokalna): ?stan=ok | w-toku | kolejka | nowa | blad | limit — odpowiedzi z pliku;
+// przy „nowa” ta strona liczy się jako zmieniona, chyba że ?skrot=bez-zmian (wtedy porównanie z lokalnym skroty.json).
 (function () {
   'use strict';
   var el = document.getElementById('stan-budowy');
@@ -16,6 +20,7 @@
   var REPO = D.repo || 'IM-UWr/Web-Podglad';
   var MOJ = D.run ? Number(D.run) : 0;
   var START = D.start ? Date.parse(D.start) : 0;
+  var PLIK = D.plik || '';
   var API = 'https://api.github.com/repos/' + REPO;
   var LISTA = API + '/actions/workflows/podglad.yml/runs?per_page=10';
   var AKCJE = 'https://github.com/' + REPO + '/actions/workflows/podglad.yml';
@@ -24,6 +29,7 @@
   var SWIEZE = 30e3, ZWYKLE = 120e3, W_BUDOWIE = 20e3, PRZERWA = 600e3;
   var szukaj = new URLSearchParams(location.search);
   var TEST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) && !MOJ ? szukaj.get('stan') : null;
+  var SKROT = TEST && szukaj.get('skrot') !== 'bez-zmian' ? 'zmieniona' : D.skrot || '';
   var BEZ_RUCHU = window.matchMedia('(prefers-reduced-motion: reduce)');
   var KOMPUTER = window.matchMedia('(min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine)');
 
@@ -209,6 +215,29 @@
       .catch(function () { var c = czytaj(K_STAN) || {}; c.bledy = { id: run.id, lista: [] }; zapisz(K_STAN, c); return c; });
   }
 
+  // ---------- czy nowa budowa zmieniła tę stronę: true / false / null (jeszcze nie wiadomo) ----------
+  var zmiany = {};
+  function zmieniona(run) {
+    if (!SKROT || !PLIK) return true;
+    var z = zmiany[run.id];
+    if (z === true || z === false) return z;
+    if (z === undefined) sprawdzSkrot(run, 0);
+    return null;
+  }
+  function sprawdzSkrot(run, proba) {
+    zmiany[run.id] = 'czeka';
+    var adres = document.querySelector('link[href*="stan-budowy.css"]').href.replace(/stan-budowy\.css.*$/, 'skroty.json?r=' + run.id);
+    fetch(adres, { cache: 'no-store' }).then(function (o) { if (!o.ok) throw 0; return o.json(); }).then(function (j) {
+      // skróty z tej albo nowszej budowy; starsze = nowa wersja jeszcze się publikuje
+      if (!TEST && !(Number(j.run) >= run.id)) {
+        if (proba < 6) { setTimeout(function () { sprawdzSkrot(run, proba + 1); }, 20e3); return; }
+        throw 0;
+      }
+      zmiany[run.id] = !j.strony || j.strony[PLIK] !== SKROT;
+      rysuj();
+    }).catch(function () { zmiany[run.id] = true; rysuj(); });
+  }
+
   // ---------- tryb testowy: przebiegi z pliku, czasy względem teraz ----------
   function testowe(plik) {
     var s = plik[TEST] || plik.ok;
@@ -263,7 +292,7 @@
       powiedz(tekst.textContent);
     }
     // dymek „nowa wersja”
-    if (s.nowa && !s.aktywna) {
+    if (s.nowa && !s.aktywna && zmieniona(s.nowa)) {
       if (dymek.hidden) {
         dymek.textContent = '';
         dymek.appendChild(E('span', null, T.nowa + ' — '));
