@@ -4,7 +4,8 @@
   przed  Każdy zapis na origin/main od bazy (redaktorzy, właściciel, inna sesja: wszystko, czego nie wypchnął Code w tym
          zleceniu) i każdy plik, który zmienił: wersja z origin/main porównana pole po polu z wersją wypychaną (--wynik).
          Każda wartość musi być w wyniku bez zmian albo przeniesiona zgodnie z migracją (wydarzenie_* → termin, puste
-         pozycje list „- {}” usunięte, „pozycja: false” dopisane, decyzje właściciela z termin.py: WYJATKI, DECYZJE).
+         pozycje list „- {}” usunięte, „pozycja: false” dopisane, decyzje właściciela z termin.py: WYJATKI, DECYZJE,
+         PRZEMIANOWANIA).
          Inaczej STOP (kod wyjścia 1).
          Najpierw: czy wynik powstał na najświeższym origin/main (inaczej: migracja jeszcze raz na świeżym main).
   po     Całe repozytorium przed pushem (--przed, HEAD origin/main sprzed pusha) i po nim (--po, domyślnie HEAD):
@@ -23,7 +24,7 @@ from pathlib import Path
 
 import yaml
 
-from termin import DECYZJE, POLA, WYJATKI, Wczytywacz, pola_wydarzenia, tekst
+from termin import DECYZJE, POLA, PRZEMIANOWANIA, WYJATKI, Wczytywacz, pola_wydarzenia, tekst
 
 DANE = re.compile(r'\.(md|json|ya?ml)$')
 
@@ -119,6 +120,12 @@ def po_decyzji(sciezka, dane):
     return dane
 
 
+def nowa_sciezka(sciezka):
+    """Ścieżka pliku po przemianowaniu z decyzji właściciela (termin.py, PRZEMIANOWANIA) albo ta sama."""
+    nowa = PRZEMIANOWANIA.get(Path(sciezka).name)
+    return str(Path(sciezka).with_name(nowa).as_posix()) if nowa else sciezka
+
+
 def skrot(v):
     s = repr(v)
     return s if len(s) <= 90 else s[:87] + '…'
@@ -158,6 +165,11 @@ def przed_pushem(repo, wynik, baza):
                 continue
             # wersja redaktora = najnowsza na origin/main (kolejne zapisy mogły ją jeszcze zmienić)
             red, wyn = wczytaj(repo, gora, sciezka), wczytaj(repo, wynik_h, sciezka)
+            nowa = nowa_sciezka(sciezka)
+            if wyn is None and nowa != sciezka:
+                wyn = wczytaj(repo, wynik_h, nowa)
+                if wyn is not None:
+                    print(f'    (w wyniku przemianowany na {Path(nowa).name}, decyzja właściciela)')
             if red is None or wyn is None:
                 zgodne = red is None and wyn is None
                 print(f'    {stan} {sciezka}: {"OK (usunięty)" if zgodne else "w wyniku " + ("brak pliku" if wyn is None else "plik jest, a redaktor go usunął")}'
@@ -186,6 +198,14 @@ def po_pushu(repo, przed, po):
     pola = defaultdict(set)
     zle = 0
     pliki = git(repo, 'diff', '--no-renames', '--name-status', a, b).splitlines()
+    # przemianowania z decyzji właściciela: usunięty stary plik + dodany nowy = jeden zmieniony plik
+    dodane = {l.split('\t', 1)[1] for l in pliki if l.startswith('A\t')}
+    pary = {}
+    for l in pliki:
+        st, sc = l.split('\t', 1)
+        if st == 'D' and nowa_sciezka(sc) != sc and nowa_sciezka(sc) in dodane:
+            pary[sc] = nowa_sciezka(sc)
+    pliki = [l for l in pliki if l.split('\t', 1)[1] not in pary.values()]
     wszystkie = [p for p in git(repo, 'ls-tree', '-r', '--name-only', b).splitlines() if DANE.search(p) and p != '.pages.yml']
     for linia in pliki:
         stan, sciezka = linia.split('\t', 1)
@@ -196,7 +216,10 @@ def po_pushu(repo, przed, po):
             print(f'  {stan} {sciezka}: plik spoza danych — sprawdź')
             zle += 1
             continue
-        da, db = wczytaj(repo, a, sciezka), wczytaj(repo, b, sciezka)
+        da, db = wczytaj(repo, a, sciezka), wczytaj(repo, b, pary.get(sciezka, sciezka))
+        if sciezka in pary:
+            pola['(nazwa pliku)'].add(sciezka)
+            print(f'  {Path(sciezka).name} → {Path(pary[sciezka]).name}: przemianowany (decyzja właściciela)')
         if da is None or db is None:
             print(f'  {stan} {sciezka}: plik {"dodany" if da is None else "usunięty"} — niedozwolone')
             zle += 1
@@ -214,7 +237,8 @@ def po_pushu(repo, przed, po):
     print(f'  Plików danych: {len(wszystkie)}, zmienionych: {zmienione}. Zmienione pola (liczba plików):')
     for k, s in sorted(pola.items()):
         print(f'    {k}: {len(s)}')
-    wyj = [s for s in {s for p in pola.values() for s in p} if Path(s).name in WYJATKI or Path(s).name in DECYZJE]
+    wyj = [s for s in {s for p in pola.values() for s in p} if Path(s).name in WYJATKI or Path(s).name in DECYZJE
+           or Path(s).name in PRZEMIANOWANIA]
     if wyj:
         print(f'  W tym wyjątki i decyzje właściciela: {", ".join(sorted(Path(s).name for s in wyj))}')
     print(f'  Wynik: {"NIEDOZWOLONE ZMIANY: " + str(zle) if zle else "OK, tylko zmiany z migracji"}')

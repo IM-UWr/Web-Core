@@ -10,9 +10,10 @@ Przy okazji usuwa z list (galeria, zalaczniki) całkiem puste pozycje „- {}”
 Plik zmieniany jest tylko w tych liniach; styl wartości (cudzysłowy) jak w danym pliku. Skrypt jest powtarzalny: uruchomiony
 na świeżym main migruje to, co zostało; plik, który ma już `termin` i jednocześnie wydarzenie_*, zatrzymuje skrypt.
 
-Uruchomienie:  python skrypty/migracja/termin.py <katalog Web-Aktualnosci> [--sprawdz] [--decyzje]
+Uruchomienie:  python skrypty/migracja/termin.py <katalog Web-Aktualnosci> [--sprawdz] [--decyzje | --przemianuj]
   --sprawdz  nic nie zapisuje, tylko wypisuje plan.
   --decyzje  zamiast migracji: decyzje właściciela o innych polach (DECYZJE), osobny commit po migracji.
+  --przemianuj  zamiast migracji: nowe nazwy trzech plików z 16.11 (PRZEMIANOWANIA), osobny commit po --decyzje.
 """
 import json
 import re
@@ -44,6 +45,14 @@ DECYZJE = {
     # „Medale…”: bez terminu nie są wydarzeniem → rodzaj „sukces” (właściciel 18.11, pytanie 2 raportu zlecenia 31;
     # „wydarzenie” ustawił redaktor 17.11 o 22:27)
     '2026-11-16--2.md': ('rodzaj', 'wydarzenie', 'sukces'),
+}
+
+# Przemianowanie trzech plików z 16.11 (nazwy z CMS bez tytułu) na nazwy jak reszta wpisów: data wpisu + opis z tytułu
+# (właściciel 18.11, pytanie 3 raportu zlecenia 31). Osobne uruchomienie z --przemianuj, osobny commit, po --decyzje.
+PRZEMIANOWANIA = {
+    '2026-11-16-.md': '2026-11-10-seminarium-wydzialowe-problem-milenijny.md',
+    '2026-11-16--1.md': '2026-11-11-stypendium-im-steinhausa-dla-dominika-gdesza.md',
+    '2026-11-16--2.md': '2026-11-13-medale-uniwersytetu-dla-profesorow-bozejki-i-rolskiego.md',
 }
 
 
@@ -208,6 +217,8 @@ def decyzje(kat, sprawdz):
     """Decyzje właściciela (DECYZJE): jedna linia pola w frontmatterze."""
     for nazwa, (pole, stara, nowa) in DECYZJE.items():
         p = kat / nazwa
+        if not p.exists() and (kat / PRZEMIANOWANIA.get(nazwa, nazwa)).exists():
+            p = kat / PRZEMIANOWANIA[nazwa]  # już przemianowany (--przemianuj)
         if not p.exists():
             raise SystemExit(f'{nazwa}: brak pliku — sprawdź ręcznie (redaktor mógł go usunąć lub przemianować)')
         calosc = p.read_text(encoding='utf-8')
@@ -225,6 +236,20 @@ def decyzje(kat, sprawdz):
         print(f'{nazwa}: {pole} „{stara}” → „{nowa}”')
 
 
+def przemianuj(kat, sprawdz):
+    """Przemianowanie plików (PRZEMIANOWANIA); treść bez zmian."""
+    for stara, nowa in PRZEMIANOWANIA.items():
+        s, n = kat / stara, kat / nowa
+        if n.exists() and not s.exists():
+            print(f'{stara}: już {nowa}')
+            continue
+        if not s.exists() or n.exists():
+            raise SystemExit(f'{stara} → {nowa}: {"brak starego pliku" if not s.exists() else "nowa nazwa już zajęta"} — sprawdź ręcznie')
+        if not sprawdz:
+            s.rename(n)
+        print(f'{stara} → {nowa}')
+
+
 def main():
     if len(sys.argv) < 2:
         raise SystemExit(__doc__)
@@ -233,6 +258,8 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     if '--decyzje' in sys.argv:
         return decyzje(kat, sprawdz)
+    if '--przemianuj' in sys.argv:
+        return przemianuj(kat, sprawdz)
     n = 0
     for p in sorted(kat.glob('*.md')):
         w = migruj(p, sprawdz)
