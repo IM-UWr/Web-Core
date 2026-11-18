@@ -1,10 +1,12 @@
-// Adresy stron-szkiców (zlecenie 33): wpisy z „opublikowany: false”, które mają własną stronę, i strony działów-szkice.
-// Na Podglądzie src/middleware.ts dopisuje „szkic” / „draft” przy każdym linku do nich (menu, listy, kafelki, treść).
-// Przy fladze TYLKO_OPUBLIKOWANE stron-szkiców nie ma: menu (menu.ts) i lista kierunków (kierunki.ts) pomijają linki do nich,
-// a pozostałe linki (np. w treści) middleware zamienia na sam tekst. Strona działu zostaje i przy fladze (bez tekstu z pliku),
-// więc jej adres jest w zbiorze tylko na Podglądzie.
+// Strony-szkice (zlecenie 33): wpisy z „opublikowany: false”, które mają własną stronę, ich podstrony i strony działów-szkice.
+// Jedno miejsce, które mówi, czego nie będzie w budowie publicznej (TYLKO_OPUBLIKOWANE=1):
+// - strona, której wpis ma wyłączone „Opublikowane” (jestSzkicem, ta sama reguła co widoczny() w tresci.ts);
+// - pośrednio: podstrona takiej strony (adres pod jej adresem), np. specjalność kierunku-szkicu albo strona w folderze strony-szkicu.
+// Z tego korzystają: getStaticPaths (sciezki.ts), mapa strony, menu (menu.ts), kafelki kierunków (kierunki.ts), linki w treści
+// (src/middleware.ts: na Podglądzie etykieta „szkic”, przy fladze sam tekst) i plakietka stanu budowy na Podglądzie (wiersz szkicu, B4).
+// Strona działu-szkic zostaje i przy fladze (bez tekstu z pliku, bo prowadzi do niej menu): tylko etykieta na Podglądzie.
 import { getCollection } from 'astro:content';
-import { slugOf, jestSzkicem } from './tresci';
+import { slugOf, jestSzkicem, TYLKO_OPUBLIKOWANE } from './tresci';
 import { jestTekstemListy, szkicDzialu } from './tekstyStron';
 import { specjalnosci } from './specjalnosci';
 import { stripBase } from './url';
@@ -30,24 +32,68 @@ export function adresDoPorownania(href: string): string {
   return a.replace(/^\/en(?=\/|$)/, '').replace(/\/+$/, '') || '/';
 }
 
-let pamiec: Promise<Set<string>> | undefined;
+/** Wpis z wyłączonym „Opublikowane”: kolekcja, plik (ścieżka w repozytorium treści, np. src/content/strony/x.md) i adres jego strony. */
+export interface WpisSzkicu {
+  kolekcja: string;
+  plik?: string;
+  adres: string;
+}
 
-/** Zbiór adresów (w postaci adresDoPorownania) stron-szkiców. */
-export function adresySzkicow(): Promise<Set<string>> {
+export class Szkice {
+  constructor(
+    /** strony-szkice (adres → wpis); ich podstrony też są szkicami */
+    readonly strony: Map<string, WpisSzkicu>,
+    /** strony działów-szkice: tylko na Podglądzie, przy fladze zostają */
+    readonly dzialy: Map<string, WpisSzkicu>,
+  ) {}
+
+  get size() {
+    return this.strony.size + this.dzialy.size;
+  }
+
+  /** Wpis, przez który strony o tym adresie nie będzie w budowie publicznej: ona sama albo strona nadrzędna; undefined = będzie. */
+  powod(adres: string): WpisSzkicu | undefined {
+    for (let a = adres; a.length > 1; a = a.slice(0, a.lastIndexOf('/')) || '/') {
+      const w = this.strony.get(a);
+      if (w) return w;
+    }
+    return undefined;
+  }
+
+  /** Czy link pod ten adres prowadzi do szkicu (etykieta na Podglądzie, sam tekst przy fladze). */
+  has(adres: string): boolean {
+    return !!this.powod(adres) || this.dzialy.has(adres);
+  }
+}
+
+let pamiec: Promise<Szkice> | undefined;
+
+/** Strony-szkice z bieżących danych (adresy w postaci adresDoPorownania). */
+export function szkice(): Promise<Szkice> {
   pamiec ??= (async () => {
-    const s = new Set<string>();
-    for (const e of await getCollection('strony')) if (jestSzkicem(e) && !jestTekstemListy(e.id)) s.add(`/${e.id}`);
-    for (const e of await getCollection('kierunki')) if (jestSzkicem(e)) s.add(`/studia/${e.id}`);
-    for (const e of await specjalnosci()) if (jestSzkicem(e) && !e.data.bez_podstrony) s.add(`/studia/${e.data.kierunek}/${e.id}`);
-    for (const e of await getCollection('zaklady')) if (jestSzkicem(e)) s.add(`/instytut/zaklady/${e.id}`);
-    for (const e of await getCollection('aktualnosci')) if (jestSzkicem(e)) s.add(`/aktualnosci/${slugOf(e.id)}`);
-    for (const e of await getCollection('obrony')) if (jestSzkicem(e)) s.add(`/obrony-doktorskie/${slugOf(e.id)}`);
-    for (const e of await getCollection('seminaria')) if (jestSzkicem(e)) s.add(`/seminaria/${e.id}`);
-    for (const e of await getCollection('granty')) if (jestSzkicem(e)) s.add(`/nauka/granty/${slugOf(e.id)}`);
-    for (const e of await getCollection('warto_wiedziec')) if (jestSzkicem(e) && e.body?.trim()) s.add(`/warto-wiedziec/${slugOf(e.id)}`);
-    for (const dz of ['instytut', 'nauka', 'studia'] as const) if (szkicDzialu(PLIKI_DZIALOW[`../data/${dz}.md`]?.frontmatter)) s.add(`/${dz}`);
-    if (szkicDzialu(popularyzacja)) s.add('/popularyzacja');
-    return s;
+    const s = new Map<string, WpisSzkicu>();
+    const dodaj = (kolekcja: string, e: { filePath?: string }, adres: string) => s.set(adres, { kolekcja, plik: e.filePath, adres });
+    for (const e of await getCollection('strony')) if (jestSzkicem(e) && !jestTekstemListy(e.id)) dodaj('strony', e, `/${e.id}`);
+    for (const e of await getCollection('kierunki')) if (jestSzkicem(e)) dodaj('kierunki', e, `/studia/${e.id}`);
+    for (const e of await specjalnosci()) if (jestSzkicem(e) && !e.data.bez_podstrony) dodaj('specjalnosci', e.tresc, `/studia/${e.data.kierunek}/${e.id}`);
+    for (const e of await getCollection('zaklady')) if (jestSzkicem(e)) dodaj('zaklady', e, `/instytut/zaklady/${e.id}`);
+    for (const e of await getCollection('aktualnosci')) if (jestSzkicem(e)) dodaj('aktualnosci', e, `/aktualnosci/${slugOf(e.id)}`);
+    for (const e of await getCollection('obrony')) if (jestSzkicem(e)) dodaj('obrony', e, `/obrony-doktorskie/${slugOf(e.id)}`);
+    for (const e of await getCollection('seminaria')) if (jestSzkicem(e)) dodaj('seminaria', e, `/seminaria/${e.id}`);
+    for (const e of await getCollection('granty')) if (jestSzkicem(e)) dodaj('granty', e, `/nauka/granty/${slugOf(e.id)}`);
+    for (const e of await getCollection('warto_wiedziec')) if (jestSzkicem(e) && e.body?.trim()) dodaj('warto_wiedziec', e, `/warto-wiedziec/${slugOf(e.id)}`);
+    const d = new Map<string, WpisSzkicu>();
+    const dzial = (nazwa: string, fm?: Record<string, any>) => {
+      if (szkicDzialu(fm)) d.set(`/${nazwa}`, { kolekcja: nazwa === 'popularyzacja' ? 'popularyzacja' : 'strona-dzialu', plik: `src/data/${nazwa}.md`, adres: `/${nazwa}` });
+    };
+    for (const dz of ['instytut', 'nauka', 'studia'] as const) dzial(dz, PLIKI_DZIALOW[`../data/${dz}.md`]?.frontmatter);
+    dzial('popularyzacja', popularyzacja);
+    return new Szkice(s, d);
   })();
   return pamiec;
+}
+
+/** Przy fladze TYLKO_OPUBLIKOWANE: czy strona o tym adresie (adresDoPorownania) ma powstać. Bez flagi zawsze tak. */
+export async function powstaje(adres: string): Promise<boolean> {
+  return !TYLKO_OPUBLIKOWANE || !(await szkice()).powod(adres);
 }

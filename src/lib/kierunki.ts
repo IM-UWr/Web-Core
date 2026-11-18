@@ -6,7 +6,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import ustawienia from '../data/ustawienia.json';
 import { widoczny, TYLKO_OPUBLIKOWANE } from './tresci';
-import { adresySzkicow } from './szkice';
+import { szkice } from './szkice';
 
 export type Kierunek = CollectionEntry<'kierunki'>;
 export type BanerKierunku = CollectionEntry<'kierunki_baner'>['data'];
@@ -27,8 +27,8 @@ const pozycjeUstawien = (): PozycjaKierunku[] =>
 const widoczne = async (): Promise<Kierunek[]> => (await getCollection('kierunki')).filter(widoczny);
 /** Pozycje listy bez tych, które przy fladze prowadzą do strony-szkicu (tej strony wtedy nie ma). */
 const pozycjeBezSzkicow = async (): Promise<PozycjaKierunku[]> => {
-  const szkice = TYLKO_OPUBLIKOWANE ? await adresySzkicow() : undefined;
-  return pozycjeUstawien().filter((p) => !szkice?.has(bezKonca(p.adres)));
+  const sz = TYLKO_OPUBLIKOWANE ? await szkice() : undefined;
+  return pozycjeUstawien().filter((p) => !sz?.has(bezKonca(p.adres)));
 };
 
 /** Widoczne kierunki z listy w Ustawieniach, w jej kolejności (liczby na stronie „Studia”; kierunek spoza listy się nie liczy). */

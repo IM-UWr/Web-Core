@@ -1,0 +1,58 @@
+{
+  "_opis": "Zlecenie 33, część B: odpowiedzi testowe plakietki stanu budowy (?stan=… na localhost, tylko budowa lokalna bez PODGLAD_RUN_ID). Czasy w sekundach względem chwili otwarcia strony; moj = przebieg, z którego jest otwarta strona.",
+  "ok": {
+    "moj": 1003,
+    "runs": [
+      { "id": 1003, "status": "completed", "conclusion": "success", "start": -1500, "koniec": -1418 },
+      { "id": 1002, "status": "completed", "conclusion": "success", "start": -5400, "koniec": -5322 },
+      { "id": 1001, "status": "completed", "conclusion": "cancelled", "start": -5420, "koniec": -5405 },
+      { "id": 1000, "status": "completed", "conclusion": "success", "start": -9000, "koniec": -8911 },
+      { "id": 999, "status": "completed", "conclusion": "success", "start": -12600, "koniec": -12530 },
+      { "id": 998, "status": "completed", "conclusion": "success", "start": -16200, "koniec": -16103 }
+    ]
+  },
+  "w-toku": {
+    "moj": 1003,
+    "runs": [
+      { "id": 1004, "status": "in_progress", "start": -35 },
+      { "id": 1003, "status": "completed", "conclusion": "success", "start": -1500, "koniec": -1418 },
+      { "id": 1002, "status": "completed", "conclusion": "success", "start": -5400, "koniec": -5322 },
+      { "id": 1000, "status": "completed", "conclusion": "success", "start": -9000, "koniec": -8911 },
+      { "id": 999, "status": "completed", "conclusion": "success", "start": -12600, "koniec": -12530 },
+      { "id": 998, "status": "completed", "conclusion": "success", "start": -16200, "koniec": -16103 }
+    ]
+  },
+  "kolejka": {
+    "moj": 1003,
+    "runs": [
+      { "id": 1004, "status": "queued", "start": -3 },
+      { "id": 1003, "status": "completed", "conclusion": "success", "start": -1500, "koniec": -1418 },
+      { "id": 1002, "status": "completed", "conclusion": "success", "start": -5400, "koniec": -5322 },
+      { "id": 1000, "status": "completed", "conclusion": "success", "start": -9000, "koniec": -8911 }
+    ]
+  },
+  "nowa": {
+    "moj": 1003,
+    "runs": [
+      { "id": 1004, "status": "completed", "conclusion": "success", "start": -140, "koniec": -55 },
+      { "id": 1003, "status": "completed", "conclusion": "success", "start": -1500, "koniec": -1418 },
+      { "id": 1002, "status": "completed", "conclusion": "success", "start": -5400, "koniec": -5322 }
+    ]
+  },
+  "blad": {
+    "moj": 1003,
+    "runs": [
+      { "id": 1004, "status": "completed", "conclusion": "failure", "start": -300, "koniec": -262 },
+      { "id": 1003, "status": "completed", "conclusion": "success", "start": -1500, "koniec": -1418 },
+      { "id": 1002, "status": "completed", "conclusion": "success", "start": -5400, "koniec": -5322 }
+    ],
+    "bledy": [
+      { "tytul": "Błąd treści", "tresc": "Web-Aktualnosci › aktualnosci › src/content/aktualnosci/2026-11-16-.md › zalaczniki.0.plik: Required › https://app.pagescms.org/im-uwr/web-aktualnosci/main/collection/aktualnosci/edit/src%2Fcontent%2Faktualnosci%2F2026-11-16-.md" },
+      { "tytul": "Błąd treści", "tresc": "Web-Studia › kierunki › src/content/kierunki/isim.md › nazwa: Expected string, received number › https://app.pagescms.org/im-uwr/web-studia/main/collection/kierunki/edit/src%2Fcontent%2Fkierunki%2Fisim.md" }
+    ]
+  },
+  "limit": {
+    "niedostepny": true,
+    "runs": []
+  }
+}

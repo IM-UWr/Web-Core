@@ -1,0 +1,50 @@
+---
+// Zlecenie 33, część B: plakietka stanu budowy na Podglądzie. Renderuje się tylko przy PODGLAD=1 (podglad.yml w Web-Podglad);
+// w Core i na przyszłej stronie publicznej nie ma tu nic (także skryptu i stylu: src/pages/podglad/[plik].ts).
+// Bez skryptu plakietka pokazuje czas budowy z danych wpisanych przy budowie; skrypt (src/lib/stanBudowy/klient.js) pyta API GitHuba
+// o stan budowy, a plakietkę da się przeciągnąć w inny róg (B3).
+// B4: na stronie, której nie będzie w budowie publicznej (src/lib/szkice.ts: sama strona albo strona nadrzędna z wyłączonym
+// „Opublikowane”), żółty wiersz z linkiem do formularza wpisu w Pages CMS (bez linku, gdy adresu nie da się ustalić).
+import { PODGLAD, PODGLAD_RUN_ID, PODGLAD_START, PODGLAD_REPO, formularzWCms } from '../../lib/podglad';
+import { szkice, adresDoPorownania } from '../../lib/szkice';
+import { u } from '../../lib/url';
+import type { Lang } from '../../lib/daty';
+
+interface Props {
+  lang: Lang;
+  sciezka: string;
+}
+const { lang, sciezka } = Astro.props;
+const en = lang === 'en';
+const adres = adresDoPorownania(sciezka);
+const powod = PODGLAD ? (await szkice()).powod(adres) : undefined;
+const cms = powod ? formularzWCms(powod.kolekcja, powod.plik) : undefined;
+const posrednio = powod && powod.adres !== adres;
+const szkicTekst = en
+  ? `Draft: this page won't be on the public site${posrednio ? ' because its parent page is a draft' : ''}.`
+  : `Szkic: tej strony nie będzie na stronie publicznej${posrednio ? ', bo strona nadrzędna jest szkicem' : ''}.`;
+const szkicCms = en ? 'Turn on “Published” in the CMS →' : 'Włącz »Opublikowane« w CMS →';
+const wersja = PODGLAD_RUN_ID || 'lokalnie';
+const start = PODGLAD_START ? Date.parse(PODGLAD_START) : NaN;
+const czesci = new Intl.DateTimeFormat(en ? 'en-GB' : 'pl-PL', { timeZone: 'Europe/Warsaw', day: en ? 'numeric' : '2-digit', month: en ? 'short' : '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const kiedy = (() => {
+  if (isNaN(start)) return '';
+  const p = Object.fromEntries(czesci.formatToParts(new Date(start)).map((x) => [x.type, x.value]));
+  return en ? `${p.day} ${p.month}, ${p.hour}:${p.minute}` : `${p.day}.${p.month}, ${p.hour}:${p.minute}`;
+})();
+const poczatek = kiedy ? (en ? `Preview · built ${kiedy}` : `Podgląd · zbudowany ${kiedy}`) : en ? 'Local preview' : 'Podgląd lokalny';
+---
+{PODGLAD && (
+  <Fragment>
+    <link rel="stylesheet" href={u(`/podglad/stan-budowy.css?v=${wersja}`)} />
+    <div id="stan-budowy" class="sb" data-rog="ld" data-lang={lang} data-repo={PODGLAD_REPO} data-run={PODGLAD_RUN_ID || undefined} data-start={PODGLAD_START || undefined} data-pagefind-ignore>
+      <button type="button" class="sb-plakietka" aria-expanded="false" aria-controls="sb-szczegoly"><span class="sb-kropka" aria-hidden="true">●</span><span class="sb-tekst">{poczatek}</span></button>
+      {powod && (
+        <p class="sb-szkic" title={posrednio ? powod.adres : undefined}>
+          {cms ? <a href={cms} target="_blank" rel="noopener">{`${szkicTekst} `}<span class="sb-szkic-cms">{szkicCms}</span></a> : <span>{szkicTekst}</span>}
+        </p>
+      )}
+    </div>
+    <script is:inline defer src={u(`/podglad/stan-budowy.js?v=${wersja}`)}></script>
+  </Fragment>
+)}

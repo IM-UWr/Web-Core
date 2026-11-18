@@ -2,7 +2,7 @@
 // grupy z "kierunki": true. Tylko pozycje z listy, z nazwą i opisem wpisanymi na liście (zlecenie 39, src/lib/kierunki.ts).
 import nawigacja from '../data/nawigacja.json';
 import { pozycjeKierunkow } from './kierunki';
-import { adresySzkicow, adresDoPorownania } from './szkice';
+import { szkice, adresDoPorownania } from './szkice';
 import { TYLKO_OPUBLIKOWANE } from './tresci';
 import { wybierz } from './i18n';
 import { isExternal } from './url';
@@ -40,8 +40,8 @@ export async function menuGlowne(): Promise<Pozycja[]> {
     }));
   // Zlecenie 33: przy fladze TYLKO_OPUBLIKOWANE link do strony-szkicu znika z menu (tej strony wtedy nie ma). Na Podglądzie zostaje,
   // a etykietę „szkic” dopisuje src/middleware.ts.
-  const szkice = TYLKO_OPUBLIKOWANE ? await adresySzkicow() : new Set<string>();
-  const bezSzkicow = (linki: Link[]) => (szkice.size ? linki.filter((l) => !szkice.has(adresDoPorownania(l.adres))) : linki);
+  const sz = TYLKO_OPUBLIKOWANE ? await szkice() : undefined;
+  const bezSzkicow = (linki: Link[]) => (sz?.size ? linki.filter((l) => !sz.has(adresDoPorownania(l.adres))) : linki);
   pamiec = (nawigacja.menu as Pozycja[]).map((m) => ({
     ...m,
     grupy: m.grupy?.map((g) => ({ ...g, linki: bezSzkicow(g.kierunki ? [...kierunki, ...g.linki.filter((l) => !kierunki.some((k) => k.adres === l.adres))] : g.linki) })),

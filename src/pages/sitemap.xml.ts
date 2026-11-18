@@ -7,6 +7,7 @@ import { wJezyku } from '../lib/i18n';
 import { wykazy } from '../lib/widoki/publikacje';
 import { specjalnosci } from '../lib/specjalnosci';
 import { jestTekstemListy } from '../lib/tekstyStron';
+import { powstaje } from '../lib/szkice';
 
 export async function GET(context: APIContext) {
   const sciezki: string[] = ['/', '/instytut', '/nauka', '/studia', '/popularyzacja', '/aktualnosci', '/kalendarz', '/seminaria', '/pracownicy', '/obrony-doktorskie', '/nauka/konferencje', '/nauka/granty', '/nauka/sukcesy', '/studia/rok-akademicki'];
@@ -26,7 +27,10 @@ export async function GET(context: APIContext) {
   for (const w of await getCollection('warto_wiedziec')) if (widoczny(w) && w.body?.trim()) sciezki.push(`/warto-wiedziec/${slugOf(w.id)}`);
   sciezki.push('/studia/plan-zajec');
   const url = (p: string) => absolute(p, context.site);
-  const wpisy = sciezki
+  // podstrony szkiców (src/lib/szkice.ts) — przy fladze ich nie ma
+  const powstajace = [];
+  for (const p of sciezki) if (await powstaje(p)) powstajace.push(p);
+  const wpisy = powstajace
     .map((p) => {
       const pl = url(p);
       const en = url(wJezyku(p, 'en'));

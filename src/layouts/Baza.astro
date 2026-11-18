@@ -27,6 +27,9 @@ import '../styles/zal-niski.css';
 import PasekMenu from '../components/zal/PasekMenu.astro';
 import StopkaZ from '../components/zal/StopkaZ.astro';
 import NastepnaStrona from '../components/zal/NastepnaStrona.astro';
+// Podgląd (PODGLAD=1): plakietka stanu budowy i wiersz szkicu (zlecenie 33, część B); w innych budowach nic, bajt w bajt
+// (dlatego w tym samym wierszu co StopkaZ — osobny wiersz dokładał odstęp przed </body>).
+import StanBudowy from '../components/zal/StanBudowy.astro';
 import { dzialZeSciezki } from '../lib/patroni';
 import Naglowek from '../components/Naglowek.astro';
 import { TYLKO_OPUBLIKOWANE } from '../lib/tresci';
@@ -146,6 +149,6 @@ const dzialStrony = dzialZeSciezki(sciezka);
     </main>
     {/* komputer: „Następna strona w dziale” i „Zgłoś błąd” pod treścią podstron z menu działu */}
     {dzialStrony && <NastepnaStrona dzial={dzialStrony} lang={lang} tytul={tytul} />}
-    <StopkaZ lang={lang} />
+    <StopkaZ lang={lang} /><StanBudowy lang={lang} sciezka={sciezka} />
   </body>
 </html>

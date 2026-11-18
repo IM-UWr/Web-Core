@@ -1,12 +1,12 @@
 // Zlecenie 33: odnośniki do szkiców (opublikowany: false), w jednym miejscu dla całej strony.
-// - Podgląd: przy każdym linku do strony-szkicu mała etykieta „szkic” / „draft” (menu, panel hamburgera, listy, kafelki,
+// - Podgląd: przy każdym linku do strony-szkicu (także podstrony szkicu, src/lib/szkice.ts) mała etykieta „szkic” / „draft” (menu, panel hamburgera, listy, kafelki,
 //   „Następna strona w dziale”, linki w treści). Etykieta stoi po pierwszym <b> w linku (nazwa w menu), inaczej na końcu.
 // - Flaga TYLKO_OPUBLIKOWANE=1 (przyszła strona publiczna): stron-szkiców nie ma; menu i listy pomijają je same
 //   (widoczny(), menu.ts, kierunki.ts), a pozostałe linki do nich zamieniamy na sam tekst, z ostrzeżeniem w logu budowy.
 // Bez szkiców w danych middleware nie zmienia niczego (HTML bajt w bajt jak bez niego). Styl etykiety idzie do <head> tylko tych
 // stron, które ją mają, więc nie trafia do wspólnego CSS (ani na stronę publiczną).
 import { defineMiddleware } from 'astro:middleware';
-import { adresySzkicow, adresDoPorownania } from './lib/szkice';
+import { szkice as wczytajSzkice, adresDoPorownania } from './lib/szkice';
 import { TYLKO_OPUBLIKOWANE } from './lib/tresci';
 import { stripBase } from './lib/url';
 
@@ -23,7 +23,7 @@ export const onRequest = defineMiddleware(async (kontekst, dalej) => {
   const sciezka = kontekst.url.pathname;
   const typ = odp.headers.get('content-type');
   if (typ ? !typ.includes('text/html') : /\.[a-z0-9]+$/i.test(sciezka) && !sciezka.endsWith('.html')) return odp;
-  const szkice = await adresySzkicow();
+  const szkice = await wczytajSzkice();
   if (!szkice.size) return odp;
   const html = await odp.text();
   const etykieta = /^\/en(\/|$)/.test(stripBase(sciezka)) ? ETYKIETA.en : ETYKIETA.pl;

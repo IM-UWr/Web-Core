@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { aktualnosci, obrony, seminaria, konferencje, granty, zaklady, slugOf, widoczny } from './tresci';
 import { specjalnosci } from './specjalnosci';
 import { jestTekstemListy } from './tekstyStron';
+import { powstaje } from './szkice';
 
 // Strony tylko widocznych wpisów (zlecenie 33: przy TYLKO_OPUBLIKOWANE=1 szkic nie ma strony); nowszy i starszy z tej samej listy.
 export async function sciezkiAktualnosci() {
@@ -15,7 +16,8 @@ export async function sciezkiAktualnosci() {
 
 // bez tekstów stron z listą (np. strony/nauka/konferencje.md): wyświetla je sama lista (src/lib/tekstyStron.ts, zlecenie 30)
 export async function sciezkiStron() {
-  const strony = (await getCollection('strony')).filter((s) => widoczny(s) && !jestTekstemListy(s.id));
+  const strony = [];
+  for (const s of await getCollection('strony')) if (widoczny(s) && !jestTekstemListy(s.id) && (await powstaje(`/${s.id}`))) strony.push(s);
   return strony.map((strona) => ({ params: { slug: strona.id }, props: { strona } }));
 }
 
@@ -52,6 +54,7 @@ export async function sciezkiKierunkow() {
 
 // specjalność z polami banera (src/lib/specjalnosci.ts): kierunek i „bez podstrony” są w formularzu „Baner i kafelek”
 export async function sciezkiSpecjalnosci() {
-  const s = await specjalnosci();
-  return s.filter((x) => widoczny(x) && !x.data.bez_podstrony).map((specjalnosc) => ({ params: { kierunek: specjalnosc.data.kierunek, specjalnosc: specjalnosc.id }, props: { specjalnosc } }));
+  const s = [];
+  for (const x of await specjalnosci()) if (widoczny(x) && !x.data.bez_podstrony && (await powstaje(`/studia/${x.data.kierunek}/${x.id}`))) s.push(x);
+  return s.map((specjalnosc) => ({ params: { kierunek: specjalnosc.data.kierunek, specjalnosc: specjalnosc.id }, props: { specjalnosc } }));
 }
