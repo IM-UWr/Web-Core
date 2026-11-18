@@ -75,7 +75,9 @@
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   /* stałe wielkości (dawniej rosły z wysokością okna przez --mw): pismo działu, linku, nazwy grupy, sygnet i odstęp za sygnetem.
      O stopień mniejsze od dawnej pełnej skali (30 / 17,5 / 14,5 / 54 / 17 px): przy 1536×864 rozwinięta lista sięgała prawie dołu okna. */
-  .z-menu { --m-h2: 26px; --m-l: 16px; --m-g: 13.5px; --m-s: 46px; --m-k: 16px;
+  /* --menu-wiersz (zlecenie 32, punkt 9): wysokość każdego wiersza listy (zwinięty dział, „Aktualności”, „Rekrutacja ↗”) — sygnet
+     i po 6 px nad nim i pod nim, więc separatory leżą w równych odstępach */
+  .z-menu { --m-h2: 26px; --m-l: 16px; --m-g: 13.5px; --m-s: 46px; --m-k: 16px; --menu-wiersz: calc(var(--m-s) * 1.2 + 12px);
     position: absolute; top: var(--menu-y, 64px); right: var(--menu-x, 32px); z-index: 6;
     width: max-content; max-width: min(560px, calc(100vw - var(--menu-x, 32px) - 16px)); max-height: var(--menu-max-h, calc(100vh - 96px));
     padding: 14px 22px 6px; border: 1px solid rgb(255 255 255 / .1); border-radius: 8px;
@@ -101,6 +103,8 @@
   /* działy jeden pod drugim, bez rozciągania: wysokość listy to wysokość treści */
   .z-menu section { padding: 6px 0; }
   .z-menu section[data-dzial] { grid-template-columns: var(--m-s) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: var(--m-k); align-items: center; }
+  /* zwinięty dział: wiersz wysokości --menu-wiersz (z 6 px nad i pod); rozwinięty jak dotąd, grupy tuż pod nazwą działu */
+  .z-menu section[data-dzial]:not(.rozwiniety) { grid-template-rows: calc(var(--menu-wiersz) - 12px) auto; }
   .z-menu .z-menu-sygnet { grid-row: 1; width: var(--m-s); height: calc(var(--m-s) * 1.2); margin-top: 0; }
   /* rozwinięty: sygnet nie rozpycha rzędu, grupy stoją tuż pod nazwą działu */
   .z-menu section.rozwiniety .z-menu-sygnet { grid-row: 1 / span 2; align-self: start; margin-bottom: calc(var(--m-s) * -1.2); }
@@ -108,10 +112,15 @@
   .z-menu h2 a::after { width: 30px; margin-top: 6px; }
   .z-menu-rozwin { width: 32px; height: 32px; }
   .z-menu-rozwin svg { width: 19px; height: 19px; }
-  .z-menu section.duza { padding: 8px 0 8px calc(var(--m-s) + var(--m-k)); }
+  /* „Aktualności” i „Rekrutacja ↗”: wiersz tej samej wysokości co dział, cały wiersz jest linkiem (punkt 9); tekst wyśrodkowany w pionie
+     (wysokość wiersza minus wysokość linii 1.1em, po połowie nad i pod), w poziomie równo z nazwami działów. Na stronie bieżącej tekst
+     z kreską pod nim (6 + 2 px) jest wyśrodkowany razem, jak nazwa działu z kreską działu; wysokość wiersza się nie zmienia. */
+  .z-menu section.duza { padding: 0; }
   .z-menu section[data-dzial] + section.duza { margin-top: 0; }
   .z-menu section.duza:last-child { border-bottom: 0; }
   .z-menu section.duza h2 { font-size: calc(var(--m-h2) + 1px); }
+  .z-menu section.duza h2 a { display: block; box-sizing: border-box; height: var(--menu-wiersz); padding: calc((var(--menu-wiersz) - 1.1em) / 2) 0 0 calc(var(--m-s) + var(--m-k)); }
+  .z-menu section.duza h2 a[aria-current='page'] { padding-top: calc((var(--menu-wiersz) - 1.1em - 8px) / 2); }
   .z-menu section.duza h2 a.zew::after { font-size: .72em; }
 
   .z-menu .z-menu-grupa h3 { font-size: var(--m-g); }
