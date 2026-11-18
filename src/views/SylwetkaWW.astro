@@ -1,9 +1,12 @@
 ---
 // Strona sylwetki „Warto wiedzieć” (/instytut/warto-wiedziec/<plik>; zlecenie 47, punkt 5; wygląd: prototyp v4.15 — w-hugo-steinhaus.html,
-// w-marek-bozejko.html, w-krzysztof-tabisz.html). Szablon podstrony: imię i nazwisko jako tytuł, podpis w miejscu hasła, „← Warto wiedzieć”.
-// Głowa (.ww2-prof): portret albo placeholder (napis „Zdjęcie” tylko na Podglądzie), pod nim lata (pole „Lata”) i źródło zdjęcia
-// (tylko przy zdjęciu); obok liczby z bloku :::w-skrocie. Dalej w kolejności:
-//   wstęp (tekst przed pierwszym ##) → sekcje Treści (także „Do pobrania” z :::pliki) → „W »Warto wiedzieć«” (nagrody i historie, które
+// w-marek-bozejko.html, w-krzysztof-tabisz.html; zlecenie 52: prototyp .przekazanie/prototypy/52-sylwetki-baner, B-prototyp/zmiany.md).
+// Szablon podstrony: imię i nazwisko jako tytuł (na komputerze w jednej linii), podpis w miejscu hasła, „← Warto wiedzieć”, pod hasłem trzy
+// liczby z pola „Liczby” (styl Pracowników; zapas: :::w-skrocie — liczbyBaneraWW), po prawej figurka z puli Instytutu bez opisu (znakSam).
+// Głowa (.ww2-prof, zlecenie 52): portret albo placeholder (napis „Zdjęcie” tylko na Podglądzie; zdjęcie bez filtra), pod nim lata (pole
+// „Lata”) i źródło zdjęcia (tylko przy zdjęciu) — opływany z prawej przez ramki (błędy bloków, TBA, „Translation in preparation”) i wstęp
+// (tekst przed pierwszym ##). Sekcje z ## zaczynają się pod portretem, na pełnej szerokości. Dalej w kolejności:
+//   sekcje Treści (także „Do pobrania” z :::pliki) → „W »Warto wiedzieć«” (nagrody i historie, które
 //   linkują do osoby; bez nich sekcji nie ma) → „Źródła” (sekcja {#zrodla}, zawsze na końcu, zwinięta) → „Inne sylwetki” (4 losowe).
 // TBA (pusta Treść): imię, lata, placeholder i ramka. /en bez Treści EN: ramka „Translation in preparation” z linkiem do strony polskiej.
 // Spis „Na tej stronie” zawiera wszystkie sekcje.
@@ -11,10 +14,11 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import WartoWiedziec from '../components/WartoWiedziec.astro';
 import SiatkaSylwetek from '../components/ww/SiatkaSylwetek.astro';
 import RamkiWW from '../components/ww/RamkiWW.astro';
+import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { zrodlaLicz } from '../lib/ww.mjs';
-import { ADRES_WW, portretHtml, type WW } from '../lib/wartoWiedziec';
+import { ADRES_WW, portretHtml, liczbyBaneraWW, type WW } from '../lib/wartoWiedziec';
 import { zrodlaJs } from '../lib/wwSkrypty';
 import { daneWpisuWW, sekcjeSylwetki } from '../lib/widoki/wartoWiedziecWpis';
 import type { Lang } from '../lib/daty';
@@ -24,6 +28,7 @@ interface Props { wpis: WW; lang: Lang }
 const { wpis: w, lang } = Astro.props;
 const { T, tytul, tytulLang, zajawka, podpis, lata, tresc, bezTlumaczenia, tytulListy, wstecz, wszystkie } = await daneWpisuWW(w, lang);
 const { powiazane, inne, inneStart } = await sekcjeSylwetki(w, wszystkie);
+const liczby = liczbyBaneraWW(w);
 const sekcje = (tresc?.sekcje ?? []).map((s, i) => ({ ...s, id: s.id || `sekcja-${i + 1}` }));
 const wWW = lang === 'en' ? `In ${tytulListy}` : `W „${tytulListy}”`;
 const spis = [
@@ -34,17 +39,18 @@ const spis = [
 ];
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={tytulLang} opis={zajawka || podpis || undefined} obraz={w.obraz || undefined} opublikowany={w.data.opublikowany}
-  typ="article" uklad="zwarta portal-baner" haslo={podpis || undefined} hasloBezLiczb wstecz={wstecz} dzial="instytut" spis={spis} klasa="tresc z-ww2 z-ww2-os">
+  typ="article" uklad="zwarta portal-baner" haslo={podpis || undefined} hasloBezLiczb wstecz={wstecz} dzial="instytut" spis={spis} klasa="tresc z-ww2 z-ww2-os"
+  znakSam={w.slug}>
+  <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
   <div class="ww2-prof">
     <div class="ww2-prof-l">
       <Fragment set:html={portretHtml(w, 'ww2-duzy')} />
       {lata && <p class="ww2-prof-lata">{lata}</p>}
       {w.obraz && w.obraz_zrodlo && <p class="ww2-prof-zrodlo">{T('Fot.', 'Photo:')} {w.obraz_zrodlo}</p>}
     </div>
-    <div class="ww2-prof-tr">{tresc?.skrot && <Fragment set:html={tresc.skrot} />}</div>
+    <RamkiWW lang={lang} bledy={tresc?.bledy} tba={w.tba} tlumaczenie={bezTlumaczenia ? `${ADRES_WW}/${w.slug}` : undefined} />
+    {tresc?.wstep && <div class="ww2-wstep ww2-tresc"><div class="prose" set:html={tresc.wstep} /></div>}
   </div>
-  <RamkiWW lang={lang} bledy={tresc?.bledy} tba={w.tba} tlumaczenie={bezTlumaczenia ? `${ADRES_WW}/${w.slug}` : undefined} />
-  {tresc?.wstep && <div class="ww2-wstep ww2-tresc"><div class="prose" set:html={tresc.wstep} /></div>}
   {sekcje.map((s) => (
     <section id={s.id} aria-labelledby={`${s.id}-h`}>
       <h2 id={`${s.id}-h`} set:html={s.naglowek} />

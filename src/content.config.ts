@@ -45,6 +45,7 @@ const WYMAGANE_W_LISTACH: Record<string, Record<string, string[]>> = {
   kierunki: { 'baner.liczby': ['wartosc', 'etykieta'] },
   kierunki_baner: { liczby: ['wartosc', 'etykieta'] },
   specjalnosci: { 'baner.liczby': ['n', 'etykieta'] },
+  ww_sylwetki: { liczby: ['n', 'etykieta'] },
 };
 
 type Dane = Record<string, unknown>;
@@ -479,12 +480,15 @@ const zWW = <T extends z.ZodRawShape>(pola: T) => zKarta({
   tresc_en: optStr,
   ...pola,
 });
+// Sylwetka: „Liczby” (zlecenie 52) — liczby w banerze jak na Stronach (n, n_en, etykieta, etykieta_en); pozycja bez liczby albo podpisu
+// wypada z ostrzeżeniem (WYMAGANE_W_LISTACH), pierwsze 3 i zapas z :::w-skrocie — liczbyBaneraWW w src/lib/wartoWiedziec.ts.
 const ww_sylwetki = defineCollection({
-  loader: glob({ pattern: '*.md', base: './src/content/warto_wiedziec/sylwetki' }),
+  loader: zrodlo('ww_sylwetki', '*.md', './src/content/warto_wiedziec/sylwetki'),
   schema: zWW({
     lata: tekst,
     podpis: optStr,
     podpis_en: optStr,
+    liczby: liczbyBanera,
     rocznica_urodzin: tekst,
     obraz_zrodlo: optStr,
   }),

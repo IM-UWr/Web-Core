@@ -358,6 +358,16 @@
   html:not(.js) .z-nagl-pod:has(.z-znak) .z-tyt-g { max-width: calc(100% - max(clamp(400px, calc(570 * var(--jn)), 570px), clamp(470px, calc(676 * var(--jn)), 676px) - var(--marg))); }
   /* w wąskim oknie (mały margines) rząd liczb łamie się przed znakiem, zamiast na niego wchodzić */
   html:not(.js) .z-nagl-pod:has(.z-znak) .z-slot { max-width: calc(100% - max(0px, var(--zn) - var(--marg) + var(--znak-p))); }
+  /* sylwetka „Warto wiedzieć” (zlecenie 52, decyzja 18.11, 23:26): sama figurka bez opisu (.z-znak-sam), imię i nazwisko zawsze w jednej
+     linii; gdy obok figurki się nie mieści, skrypt w nagłówku (DOPASUJ_SAM w NaglowekZ.astro) dodaje .z-znak-brak i figurka znika — tytułu
+     nie łamiemy ani nie zmniejszamy, żeby ją zatrzymać. Bez JS: tytuł bez rezerwy na opis ciekawostki (jej tu nie ma), hasło do figurki
+     minus 40 px; tytuł dłuższy niż 28 znaków (.z-tyt-dlugi-bez-js przy budowie, ok. 15,6 em — granica obok figurki przy 1024 px) chowa figurkę */
+  .z-nagl-pod.z-znak-sam h1 { white-space: nowrap; }
+  .z-nagl-pod.z-znak-sam.z-znak-brak .z-znak { display: none; }
+  html:not(.js) .z-nagl-pod.z-znak-sam .z-tyt-g { max-width: none; }
+  html:not(.js) .z-nagl-pod.z-znak-sam .z-haslo { max-width: calc(100% - max(0px, var(--zn) - var(--marg) + var(--znak-p)) - 40px); }
+  html:not(.js) .z-nagl-pod.z-znak-sam.z-tyt-dlugi-bez-js .z-znak { display: none; }
+  html:not(.js) .z-nagl-pod.z-znak-sam.z-tyt-dlugi-bez-js .z-haslo { max-width: none; }
   .z-tyt-g { position: relative; }
   .z-nagl-pod h1 { margin-top: 6px; font-size: clamp(40px, calc(58 * var(--jn)), 58px); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
   /* sygnet w lewym marginesie przed tytułem, oddzielony pionową kreską; pod nim mały podpis (ok. 56 px) */

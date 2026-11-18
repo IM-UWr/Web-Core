@@ -8,6 +8,7 @@
 // Pola lead, nadtytul, nadtytulTelefon, motyw i motywDane zostają w Props dla zgodności widoków; nowy nagłówek ich nie pokazuje
 // (opis strony trafia do meta description). Stary silnik animacji: archiwum opisane w dok/archiwum-silnika-banerow.md.
 // dzial: dział banera spoza adresu (wpis w Aktualnościach, zlecenie 37: dzialWpisu) — pierwszeństwo przed banerAktualnosci() i działem z adresu.
+// znakSam: figurka bez opisu na podstronie spoza menu działu (sylwetka „Warto wiedzieć”, zlecenie 52; nazwa pliku osoby) — NaglowekZ.
 import NaglowekZ from './zal/NaglowekZ.astro';
 import { PATRONI, banerAktualnosci, dzialZeSciezki, pole, type Dzial } from '../lib/patroni';
 import { t } from '../lib/i18n';
@@ -15,8 +16,8 @@ import { stripBase } from '../lib/url';
 import type { Lang } from '../lib/daty';
 import ustawienia from '../data/ustawienia.json';
 
-interface Props { tytul: string; tytulLang?: string; lead?: string; haslo?: string; hasloBezLiczb?: boolean; bezPodpisu?: boolean; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown; dzial?: Dzial }
-const { tytul, tytulLang, lang, okruszki = [], wstecz, bezPodpisu, hasloBezLiczb, dzial: dzialBanera } = Astro.props;
+interface Props { tytul: string; tytulLang?: string; lead?: string; haslo?: string; hasloBezLiczb?: boolean; bezPodpisu?: boolean; lang: Lang; okruszki?: { etykieta: string; adres?: string }[]; wstecz?: { etykieta: string; adres: string; telefon?: string }; nadtytul?: string; nadtytulTelefon?: string; motyw?: string; motywDane?: unknown; dzial?: Dzial; znakSam?: string }
+const { tytul, tytulLang, lang, okruszki = [], wstecz, bezPodpisu, hasloBezLiczb, dzial: dzialBanera, znakSam } = Astro.props;
 const haslo = Astro.props.haslo?.trim() || undefined;
 const zOkruszkow = [...okruszki].reverse().find((o) => o.adres) as { etykieta: string; adres: string } | undefined;
 const cel: { etykieta: string; adres: string; telefon?: string } = wstecz ?? zOkruszkow ?? { etykieta: t(lang, 'stronaGlowna'), adres: '/' };
@@ -51,5 +52,5 @@ const wsteczZ = zMenuDzialuZ ? { etykieta: pole(patronZ!, 'nazwa', lang), adres:
 <div class:list={['page-head', ozdobny && ['ph', `ph-${wariant}`], zdjecie && 'ph-z-foto', dlugi && 'ph-dlugi', 'ph-z']} data-dzial={ozdobny ? dzial : undefined}>
   {stronaDzialuZ
     ? <NaglowekZ rodzaj="dzial" dzial={dzialZ} tytul={tytul} haslo={haslo} lang={lang} slot={slotZ} wstecz={cel} />
-    : <NaglowekZ rodzaj="podstrona" dzial={dzialZ} tytul={tytul} tytulLang={tytulLang} haslo={haslo} hasloBezLiczb={hasloBezLiczb} lang={lang} slot={slotZ} wstecz={wsteczZ} znak={zMenuDzialuZ} bezPodpisu={bezPodpisu} />}
+    : <NaglowekZ rodzaj="podstrona" dzial={dzialZ} tytul={tytul} tytulLang={tytulLang} haslo={haslo} hasloBezLiczb={hasloBezLiczb} lang={lang} slot={slotZ} wstecz={wsteczZ} znak={zMenuDzialuZ} znakSam={znakSam} bezPodpisu={bezPodpisu} />}
 </div>

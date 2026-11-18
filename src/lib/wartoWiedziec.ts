@@ -5,13 +5,14 @@
 // - nazwa pliku powtórzona w dwóch grupach: zostaje pierwsza (sylwetki → nagrody → historie), druga wypada;
 // - „Dodano” i rocznice w złym formacie: pole puste; historia bez roku (albo ze złym): poza osią czasu;
 // - „Lata” to nie data: tekst tak, jak wpisany („Lata: nie data”); plik w starym układzie (wprost w warto_wiedziec/): historia;
-// - złe linie bloków :::w-skrocie i :::laureaci (przy renderowaniu Treści): linia pominięta, na Podglądzie czerwona ramka.
+// - złe linie bloków :::w-skrocie i :::laureaci (przy renderowaniu Treści): linia pominięta, na Podglądzie czerwona ramka;
+// - liczby banera sylwetki (zlecenie 52): ponad 3 pozycje w polu „Liczby”, zapas z bloku :::w-skrocie (pole puste), blok obok pola.
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { TYLKO_OPUBLIKOWANE, maTresc, jestSzkicem } from './tresci';
 import { renderMarkdownZNaglowkami } from './markdown';
 import { u } from './url';
 import { wybierz, langPola } from './i18n';
-import { parsujLata, rokZLat, liczLaureatow, maBlokLaureatow, linkiDoWW, bezDuplikatow, wybierzNaGlowna, napisNaGlowna, rocznicaBlisko, nowe } from './ww.mjs';
+import { parsujLata, rokZLat, liczLaureatow, maBlokLaureatow, linkiDoWW, bezDuplikatow, wybierzNaGlowna, napisNaGlowna, rocznicaBlisko, nowe, liczbySylwetki } from './ww.mjs';
 import type { Lang } from './daty';
 
 export type GrupaWW = 'sylwetki' | 'nagrody' | 'historie';
@@ -51,6 +52,8 @@ export interface WW {
   lata?: string;
   podpis?: string;
   podpis_en?: string;
+  /** sylwetka: pole „Liczby” (liczby w banerze, zlecenie 52); pozycje bez liczby albo podpisu pomija src/content.config.ts */
+  liczby: { n: string; n_en?: string; etykieta: string; etykieta_en?: string }[];
   /** „MM-DD”: rocznica urodzin (sylwetka) albo wydarzenia (historia) */
   rocznica?: string;
   /** historia: rok wydarzenia (punkt na osi); sylwetka: rok urodzenia z „Lata” (kolejność, wiek w rocznicę) */
@@ -129,7 +132,7 @@ function naWW(grupa: GrupaWW, kolekcja: KolekcjaWW, e: Wpis): WW {
     obraz: d.obraz, obraz_zrodlo: d.obraz_zrodlo, obraz_opis: d.obraz_opis, obraz_opis_en: d.obraz_opis_en,
     link: d.link, link_etykieta: d.link_etykieta, link_etykieta_en: d.link_etykieta_en,
     na_glownej: d.na_glownej !== false, ulubione: d.ulubione === true, zawsze: d.zawsze === true,
-    dodano, lata: d.lata, podpis: d.podpis, podpis_en: d.podpis_en, rocznica, rok,
+    dodano, lata: d.lata, podpis: d.podpis, podpis_en: d.podpis_en, liczby: Array.isArray(d.liczby) ? d.liczby : [], rocznica, rok,
     kolejnosc: typeof d.kolejnosc === 'number' ? d.kolejnosc : 100,
     body, tresc_en: d.tresc_en,
     maTresc: tresc, maTrescEn: trescEn,
@@ -198,12 +201,25 @@ export async function ludzieWpisu(w: WW): Promise<WW[]> {
   return [...w.linki].map((s) => syl.get(s)).filter((x): x is WW => !!x);
 }
 
+// ---------- liczby w banerze sylwetki (zlecenie 52) ----------
+/**
+ * Pozycje do LiczbyBanera (pierwsze 3): pole „Liczby” (EN: etykieta_en, puste = podpis polski — LiczbyBanera.astro), a gdy puste —
+ * zapas z bloku :::w-skrocie Treści polskiej (stare pliki; liczbySylwetki w ww.mjs). Ostrzeżenia w logu budowy: zapas, ponad 3 pozycje,
+ * blok :::w-skrocie obok wypełnionego pola (w treści strony bloku nie ma nigdy — trescWW go wycina).
+ */
+export function liczbyBaneraWW(w: WW): { n: string; n_en?: string; pl: string; en?: string }[] {
+  const l = liczbySylwetki(w.liczby, w.body, parsujLata(w.lata).liczba);
+  const kto = w.plik ?? w.slug;
+  if (l.zrodlo === 'w-skrocie') ostrzezWW(`${kto}: liczby w banerze z bloku :::w-skrocie — przenieś je do pola „Liczby” (Sylwetki → Liczby w banerze), a blok usuń z Treści`);
+  if (l.zrodlo === 'pole' && l.wszystkich > 3) ostrzezWW(`${kto}: pole „Liczby” ma ${l.wszystkich} pozycji — w banerze pokazują się pierwsze 3`);
+  if (l.zrodlo === 'pole' && l.blok) ostrzezWW(`${kto}: blok :::w-skrocie w Treści jest pomijany (liczby w banerze są z pola „Liczby”) — usuń go z Treści`);
+  return l.pozycje;
+}
+
 // ---------- Treść (jawny Markdown z blokami) ----------
 export interface SekcjaWW { id: string; etykieta: string; naglowek: string; html: string }
 export interface BladLiniiWW { nr: number; tekst: string; powod: string; blok: string }
 export interface TrescWW {
-  /** liczby :::w-skrocie (dl.ww2-skrot) — do głowy strony sylwetki */
-  skrot: string;
   /** tekst przed pierwszym ## */
   wstep: string;
   sekcje: SekcjaWW[];
@@ -220,8 +236,8 @@ export async function trescWW(w: WW, lang: Lang): Promise<TrescWW | undefined> {
   let { html } = await renderMarkdownZNaglowkami(src, lang, false, { ww });
   const bledy = ww.bledy ?? [];
   for (const b of bledy) ostrzezWW(`${w.plik}${lang === 'en' ? ' (Treść EN)' : ''}: linia ${b.nr} bloku :::${b.blok} pominięta — ${b.powod}: „${b.tekst}”`);
-  let skrot = '';
-  html = html.replace(/<dl class="ww2-skrot">[\s\S]*?<\/dl>/, (m) => { skrot = m; return ''; });
+  // blok :::w-skrocie (dl.ww2-skrot) nigdy nie stoi w treści: od zlecenia 52 to tylko zapas liczb banera sylwetki (liczbyBaneraWW)
+  html = html.replace(/<dl class="ww2-skrot">[\s\S]*?<\/dl>/g, '');
   const [wstep, ...reszta] = html.split(/(?=<h2[\s>])/);
   const sekcje: SekcjaWW[] = reszta.map((h) => {
     const m = /^<h2(?:\s+id="([^"]*)")?[^>]*>([\s\S]*?)<\/h2>/.exec(h);
@@ -230,7 +246,7 @@ export async function trescWW(w: WW, lang: Lang): Promise<TrescWW | undefined> {
   const z = sekcje.findIndex((s) => s.id === 'zrodla');
   const zrodla = z >= 0 ? { ...sekcje.splice(z, 1)[0], n: 0 } : undefined;
   if (zrodla) zrodla.n = (zrodla.html.match(/<li[\s>]/g) ?? []).length;
-  return { skrot, wstep: wstep.trim(), sekcje, zrodla, bledy: TYLKO_OPUBLIKOWANE ? [] : bledy };
+  return { wstep: wstep.trim(), sekcje, zrodla, bledy: TYLKO_OPUBLIKOWANE ? [] : bledy };
 }
 
 // ---------- strony i przekierowania ----------

@@ -83,6 +83,50 @@ export const liczLaureatow = (md) => linieBlokow(md, 'laureaci').flat().filter((
 /** Czy Treść ma blok :::laureaci (taki wpis nie losuje się na stronie głównej). */
 export const maBlokLaureatow = (md) => linieBlokow(md, 'laureaci').length > 0;
 
+// ---------- liczby w banerze sylwetki (zlecenie 52) ----------
+/**
+ * Krótki tekst z Markdownu jednej linii: bez linków (zostaje ich tekst), znaczników HTML i wyróżnień; gdy dłuższy niż `limit`
+ * znaków — całe słowa do `limit` i „…” (wzór: utnij() w prototypie 52, buduj.py). Podpisy zapasu z :::w-skrocie są długie.
+ */
+export function krotkiTekst(md, limit = Infinity) {
+  const s = String(md ?? '').replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/<[^>]+>/g, '').replace(/[*`]/g, '')
+    .replace(/(^|\s)_+|_+(?=\s|$|[.,;:!?])/g, '$1').replace(/\s+/g, ' ').trim();
+  if (s.length <= limit) return s;
+  let out = '';
+  for (const w of s.split(' ')) {
+    if (`${out} ${w}`.trim().length > limit) break;
+    out = `${out} ${w}`.trim();
+  }
+  return `${(out || s.slice(0, limit - 1)).replace(/[,;:—–-]+$/, '').trim()}…`;
+}
+/**
+ * Liczby do banera sylwetki: pole „Liczby” (pozycje z liczbą i podpisem; puste pozycje pominięte), a gdy w nim nic nie ma —
+ * zapas dla starych plików: punkty pierwszego bloku :::w-skrocie Treści polskiej (bez linków, podpis do 20 znaków, bez punktu
+ * z latami życia, jak w treści do zlecenia 52). Pokazują się pierwsze 3.
+ * @param {{ n?: unknown, n_en?: unknown, etykieta?: unknown, etykieta_en?: unknown }[] | undefined} liczby pole „Liczby”
+ * @param {string | undefined} md Treść polska
+ * @param {string | undefined} lata liczba z pola „Lata” (parsujLata().liczba)
+ * @returns {{ pozycje: { n: string, n_en?: string, pl: string, en?: string }[], zrodlo: 'pole' | 'w-skrocie' | 'brak', wszystkich: number, blok: boolean }}
+ *   wszystkich — ile pozycji było (przed obcięciem do 3); blok — czy Treść ma blok :::w-skrocie
+ */
+export function liczbySylwetki(liczby, md, lata) {
+  const t = (v) => String(v ?? '').trim();
+  const blok = linieBlokow(md, 'w-skrocie').length > 0;
+  const pole = (Array.isArray(liczby) ? liczby : []).filter((x) => t(x?.n) && t(x?.etykieta))
+    .map((x) => ({ n: t(x.n), n_en: t(x.n_en) || undefined, pl: t(x.etykieta), en: t(x.etykieta_en) || undefined }));
+  if (pole.length) return { pozycje: pole.slice(0, 3), zrodlo: 'pole', wszystkich: pole.length, blok };
+  const pkt = (linieBlokow(md, 'w-skrocie')[0] ?? []).map(liniaWSkrocie)
+    .filter((p) => p && !pomijanyPunkt(krotkiTekst(p.wartosc), krotkiTekst(p.podpis), lata))
+    .map((p) => ({ n: krotkiTekst(p.wartosc), pl: krotkiTekst(p.podpis, 20) }));
+  return pkt.length ? { pozycje: pkt.slice(0, 3), zrodlo: 'w-skrocie', wszystkich: pkt.length, blok } : { pozycje: [], zrodlo: 'brak', wszystkich: 0, blok };
+}
+/** FNV-1a 32 bit po bajtach UTF-8 (figurka bez JS na stronie sylwetki: pula[fnv1a(nazwa pliku) % długość puli]; wzór: zmiany.md 52, pkt 2). */
+export function fnv1a(s) {
+  let h = 0x811c9dc5;
+  for (const b of new TextEncoder().encode(String(s))) { h ^= b; h = Math.imul(h, 0x01000193) >>> 0; }
+  return h >>> 0;
+}
+
 // ---------- adresy ----------
 /**
  * Adres wpisu jest płaski (/instytut/warto-wiedziec/<plik>), więc nazwa pliku musi być unikalna we wszystkich trzech grupach.

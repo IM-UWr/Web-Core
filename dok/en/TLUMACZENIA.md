@@ -39,7 +39,7 @@ Zlecenie 47 (poprawka): rektorat Marczewskiego trwał w latach **1953–1957** (
 
 | Gdzie | PL | EN |
 |---|---|---|
-| W skrócie (sylwetka) | W skrócie | At a glance |
+| Liczby w banerze sylwetki (zlecenie 52; dawniej „W skrócie” / “At a glance” obok portretu) | pole „Liczby”: `etykieta` | `etykieta_en` (puste = podpis polski) |
 | Do pobrania (sekcja w Treści) | Do pobrania | Downloads |
 | Źródła (nagłówek z liczbą) | Źródła · „22 źródła · rozwiń” / „zwiń” | Sources · “22 sources · show” / “hide” |
 | sylwetka — inne | Inne sylwetki · Wszystkie sylwetki → | Other profiles · All profiles → |

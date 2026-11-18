@@ -81,3 +81,7 @@ export function pulaDoSkryptu(pula: Ciekawostka[], strony: string[], lang: Lang)
       c.sciezki.map((k) => (k.gruba ? [kompaktD(k.d), 1] : [kompaktD(k.d)]))]),
   };
 }
+
+/** Dane dla skryptu figurki bez opisu (sylwetki „Warto wiedzieć”, zlecenie 52): [[id, waga, ścieżki [d, gruba?]], …]. */
+export const znakiDoSkryptu = (pula: Ciekawostka[]) =>
+  pula.map((c) => [c.id, c.stan === 'ulubiona' ? 3 : 1, c.sciezki.map((k) => (k.gruba ? [kompaktD(k.d), 1] : [kompaktD(k.d)]))]);

@@ -48,10 +48,13 @@ interface Props {
   klasa?: string;
   // dodatkowa klasa ramy .z-pd (np. z-wladze)
   klasaRamy?: string;
+  // figurka z puli działu bez opisu, losowana przy każdym wejściu (sylwetka „Warto wiedzieć”, zlecenie 52): nazwa pliku osoby
+  // (figurka stała bez JS) — NaglowekStrony → zal/NaglowekZ.astro
+  znakSam?: string;
   atrybuty?: Record<string, string>;
 }
-const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, hasloBezLiczb, bezPodpisu, okruszki, wstecz, dzial, dzialBanera, spis = [], klasa, klasaRamy, atrybuty = {} } = Astro.props;
-const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lang, okruszki, wstecz, dzial: dzialBanera };
+const { lang, tytul, tytulLang, tytulKarty, opis, obraz, opublikowany, alternatywa, typ, uklad, lead, haslo, hasloBezLiczb, bezPodpisu, okruszki, wstecz, dzial, dzialBanera, spis = [], klasa, klasaRamy, znakSam, atrybuty = {} } = Astro.props;
+const naglowek = { tytul, tytulLang, lead, haslo, hasloBezLiczb, bezPodpisu, lang, okruszki, wstecz, dzial: dzialBanera, znakSam };
 
 // Zasada treści (zlecenie 25, punkt 1). Pozycja jest zła, gdy ma więcej linii niż limit (różne górne krawędzie prostokątów tekstu, tolerancja pół wysokości linii, tekst tylko
 // dla czytnika pominięty) albo gdy słowo wystaje z kolumny. Chwile: przed pierwszym narysowaniem, po wczytaniu krojów, przy zmianie szerokości okna (od stanu pełnego, w rAF, bez mrugania).

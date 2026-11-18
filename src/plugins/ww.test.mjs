@@ -180,3 +180,34 @@ test('duplikat nazwy pliku: pierwszy w kolejności sylwetki, nagrody, historie z
   assert.equal(duplikaty.length, 1);
   assert.equal(duplikaty[0].pominiety.grupa, 'historie');
 });
+
+test('liczby w banerze sylwetki (zlecenie 52): pole „Liczby”, puste pozycje, więcej niż 3, zapas z :::w-skrocie, nic', async () => {
+  const { liczbySylwetki, krotkiTekst } = await import('../lib/ww.mjs');
+  const blok = ':::w-skrocie\n\n- **1887–1972** — lata życia\n- **1945** — pierwszy dziekan [Wydziału](https://x.pl) Matematyki\n- **20** — *doktorów*\n- **1800+** — publikacji\n- **9** — czwarty punkt\n\n:::\n\nWstęp.';
+  const pole = [{ n: '1945', etykieta: 'pierwszy dziekan', etykieta_en: 'first dean' }, { n: ' ', etykieta: 'pusta liczba' }, { n: 20, n_en: '', etykieta: 'doktorów' }];
+  assert.deepEqual(liczbySylwetki(pole, blok, '1887–1972'), {
+    pozycje: [{ n: '1945', n_en: undefined, pl: 'pierwszy dziekan', en: 'first dean' }, { n: '20', n_en: undefined, pl: 'doktorów', en: undefined }],
+    zrodlo: 'pole', wszystkich: 2, blok: true,
+  });
+  const cztery = ['1', '2', '3', '4'].map((n) => ({ n, etykieta: `p${n}` }));
+  assert.deepEqual(liczbySylwetki(cztery, '', undefined).pozycje.map((x) => x.n), ['1', '2', '3']);
+  assert.equal(liczbySylwetki(cztery, '', undefined).wszystkich, 4);
+  // zapas: pole puste → punkty bloku bez lat życia, bez linków i wyróżnień, podpis do 20 znaków całymi słowami
+  assert.deepEqual(liczbySylwetki([], blok, '1887–1972'), {
+    pozycje: [{ n: '1945', pl: 'pierwszy dziekan…' }, { n: '20', pl: 'doktorów' }, { n: '1800+', pl: 'publikacji' }],
+    zrodlo: 'w-skrocie', wszystkich: 4, blok: true,
+  });
+  assert.deepEqual(liczbySylwetki(undefined, 'Sam tekst.', ''), { pozycje: [], zrodlo: 'brak', wszystkich: 0, blok: false });
+  // blok w komentarzu (szablon) nie jest blokiem
+  assert.equal(liczbySylwetki([], '<!--\n:::w-skrocie\n\n- **1950** — doktorat\n\n:::\n-->', '').zrodlo, 'brak');
+  assert.equal(krotkiTekst('doktorat w [IM PAN](https://www.impan.pl)'), 'doktorat w IM PAN');
+  assert.equal(krotkiTekst('pierwszy dziekan Wydziału Matematyki', 20), 'pierwszy dziekan…');
+});
+
+test('fnv1a: wektory wzorcowe FNV-1a 32 bit (bajty UTF-8)', async () => {
+  const { fnv1a } = await import('../lib/ww.mjs');
+  assert.equal(fnv1a(''), 0x811c9dc5);
+  assert.equal(fnv1a('a'), 0xe40c292c);
+  assert.equal(fnv1a('foobar'), 0xbf9cf968);
+  assert.notEqual(fnv1a('ł'), fnv1a('B'));
+});

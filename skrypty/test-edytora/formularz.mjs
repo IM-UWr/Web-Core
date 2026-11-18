@@ -12,6 +12,7 @@
 // Zlecenie 47: scenariusz 10 — „Warto wiedzieć”: nowa sylwetka z szablonu (nazwa pliku, TBA, „Dodano”), rok historii, dopisanie laureata.
 // Zlecenie 48: scenariusz 11 — przełącznik „Opublikowane” w Aktualnościach, opisie seminarium i Referatach (9 × Web-Sem-*).
 // Zlecenie 49: scenariusz 12 — rodzaj „Seminarium wydziałowe” w Aktualnościach (opcja, opisy, nowy wpis, dwa poprawione wpisy).
+// Zlecenie 52: scenariusz 13 — pole „Liczby w banerze” w Sylwetkach (zapis bez zmian, zmiana liczby, pusty podpis, szablon).
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -356,6 +357,39 @@ function scenariusze(kat, nazwaKonf, nowa) {
     const { body: _b2, ...r2 } = bez.dane ?? {};
     sprawdz(!w.bledy.length && liczLaureatow(w.dane.body) === przed + 1 && JSON.stringify(r1) === JSON.stringify(r2),
       `licznik ${przed} → ${liczLaureatow(w.dane?.body ?? '')}, poza Treścią bez zmian`);
+  }
+
+  // Zlecenie 52: pole „Liczby w banerze (3 pozycje)” w Sylwetkach — zapis bez zmian (kosmetyka pokazana), zmiana jednej liczby,
+  // pozycja bez podpisu, nowa sylwetka z szablonu bez :::w-skrocie
+  const poleL = wws?.fields.find((f) => f.name === 'liczby');
+  if (poleL) {
+    console.log('13. Sylwetka z polem „Liczby” (zlecenie 52): Hugo Steinhaus wczytany i zapisany, zmiana liczby, pusty podpis, nowa sylwetka');
+    const pola = wws.fields.map((f) => f.name);
+    sprawdz(pola.indexOf('liczby') === pola.indexOf('podpis_en') + 1 && poleL.label === 'Liczby w banerze (3 pozycje)' && poleL.list?.collapsible?.summary === '{n} {etykieta}'
+      && poleL.fields.map((f) => `${f.name}${f.hidden ? '(ukryte)' : ''}`).join(',') === 'n,n_en,etykieta,etykieta_en,pozycja(ukryte)',
+      `pole pod „Podpis EN”, zwinięta lista {n} {etykieta}, pola: ${poleL.fields.map((f) => f.name).join(', ')}`);
+    const plikS = path.posix.join(wws.path, 'hugo-steinhaus.md');
+    const tekstS = fs.readFileSync(path.join(kat, 'Web-Instytut', plikS), 'utf8').replace(/\r\n/g, '\n');
+    const bezZm = zapisz(wws, otworz(wws, tekstS, plikS), plikS);
+    const fm = (t) => t.split('\n---\n')[0].split('\n');
+    const usuniete = fm(tekstS).filter((l) => !fm(bezZm.tekst).includes(l));
+    const dodane = fm(bezZm.tekst).filter((l) => !fm(tekstS).includes(l));
+    console.log(`   zapis bez zmian — nagłówek: usunięte ${usuniete.length} linii, dodane ${dodane.length}:\n${[...usuniete.map((l) => '      - ' + l), ...dodane.map((l) => '      + ' + l)].join('\n')}`);
+    const liczbyS = (d) => (d?.liczby ?? []).map((x) => `${x.n}|${x.n_en ?? ''}|${x.etykieta}|${x.etykieta_en ?? ''}`).join(' · ');
+    const wPliku = YAML.parse(tekstS.split('\n---\n')[0].replace(/^---\n/, ''));
+    sprawdz(!bezZm.bledy.length && liczbyS(bezZm.dane) === liczbyS(wPliku) && bezZm.dane.body.trimEnd() === tekstS.split('\n---\n').slice(1).join('\n---\n').trimEnd(),
+      `liczby po zapisie te same (${liczbyS(bezZm.dane)}), Treść bez zmian`);
+    const stanZ = otworz(wws, tekstS, plikS);
+    stanZ.liczby[1].n = '21';
+    w = zapisz(wws, stanZ, plikS);
+    sprawdz(!w.bledy.length && w.dane.liczby[1].n === '21' && w.dane.liczby[0].n === wPliku.liczby[0].n, `zmiana drugiej liczby: ${liczbyS(w.dane)}`);
+    const stanP = otworz(wws, tekstS, plikS);
+    stanP.liczby.push({ ...initializeState(poleL.fields, {}), n: '1887' });
+    w = zapisz(wws, stanP, plikS);
+    sprawdz(w.bledy.some((b) => b.startsWith('liczby.3.etykieta')), `pozycja bez podpisu zablokowana: ${w.bledy.join('; ')}`);
+    w = zapisz(wws, Object.assign(otworz(wws, null), { tytul: 'Sylwetka Testowa' }));
+    sprawdz(!w.bledy.length && !/w-skrocie/.test(w.dane.body) && /Liczby do banera wpisuje się w polu „Liczby”/.test(w.dane.body) && !/^liczby:/m.test(w.tekst),
+      'nowa sylwetka: szablon bez :::w-skrocie, ze zdaniem o polu „Liczby”; puste pole nie trafia do pliku');
   }
 
   // Zlecenie 33: przełącznik „Opublikowane” (default: true) w Stronach, stronach działów, kierunkach i specjalnościach.

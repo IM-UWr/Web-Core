@@ -92,6 +92,13 @@ export async function formularze(repo, opis) {
       if (!p) { seq.items.push(wezel({ name: 'opublikowany', label: OPUBLIKOWANE, description: opis, type: 'boolean', default: true })); return; }
       for (const [k, v] of [['label', OPUBLIKOWANE], ['description', opis], ['type', 'boolean'], ['default', true]]) api.ustaw(p, k, v);
     },
+    /** Wstawia nowe pole tuż za polem `za` (zlecenie 52), gdy pola o tej nazwie jeszcze nie ma; istniejące zostaje bez zmian. */
+    wstawZa(seq, za, obiekt) {
+      if (seq.items.some((p) => p.get('name') === obiekt.name)) return;
+      const i = seq.items.findIndex((p) => p.get('name') === za);
+      if (i < 0) throw Error(`Brak pola ${za}`);
+      seq.items.splice(i + 1, 0, doc.createNode(obiekt, { aliasDuplicateObjects: false }));
+    },
     /** Pokazuje pole w CMS (usuwa hidden). */
     odkryj(wezelPola) { wezelPola.delete('hidden'); },
     /** Zamienia formularz najwyższego poziomu na nowy (to samo miejsce w menu CMS), np. kolekcję na grupę (zlecenie 47). */
@@ -161,16 +168,11 @@ const OPUBLIKOWANE = 'Opublikowane — widoczne na stronie publicznej (na Podgl�
 const KOM = {
   uklad: '<!-- UKŁAD JAWNY: ## rozpoczyna sekcję w spisie. Nazwę można zmieniać; {#id} zachowuje adres. Bloki :::nazwa … ::: sterują wyglądem; komentarze są tylko instrukcjami dla redaktora. -->',
   tekst: '<!-- TEKST: Zwykły Markdown. Specjalny układ wymaga jawnego znacznika bloku. -->',
-  tba: '<!-- TBA: Pusta Treść = sylwetka „TBA” (imię, lata i znaczek TBA). Tekst pisz według innych sylwetek: :::w-skrocie, sekcje ## z {#id}, „## Źródła {#zrodla}”. -->',
+  // zlecenie 52: bez :::w-skrocie (liczby do banera — pole „Liczby”, LICZBY_SYLWETKI niżej)
+  tba: '<!-- TBA: Pusta Treść = sylwetka „TBA” (imię, lata i znaczek TBA). Tekst pisz według innych sylwetek: wstęp, sekcje ## z {#id}, „## Źródła {#zrodla}”. Liczby do banera wpisuje się w polu „Liczby”. -->',
 };
 const SZKIELET_SYLWETKI = [
   '<!-- SZKIELET SYLWETKI: skopiuj poniższe linie nad ten komentarz (bez znaczników komentarza) i wypełnij; komentarz TBA wyżej usuń.',
-  ':::w-skrocie',
-  '',
-  '- **1950** — doktorat na Uniwersytecie Wrocławskim',
-  '',
-  ':::',
-  '',
   'Wstęp: dwa, trzy zdania o osobie.',
   '',
   '## Droga naukowa {#droga}',
@@ -218,6 +220,22 @@ const STRONA_GLOWNA = [
 ];
 const ZRODLA = { name: 'zrodla', label: 'Źródła (dla redakcji, niewyświetlane)', description: 'Skąd są fakty: link albo opis, jeden na pozycję. Na stronie się nie pokazuje. Puste = brak.', type: 'string', list: true };
 const MMDD = { regex: '^(|(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]))$', message: 'Wpisz datę w formacie MM-DD, np. 01-14' };
+// Zlecenie 52: liczby w banerze sylwetki — pole jak „Liczby” Stron i Pracowników (n, n_en, etykieta, etykieta_en, ukryte pozycja),
+// tuż pod „Podpis EN”; opis Treści i szablon nowej sylwetki bez :::w-skrocie (blok został w kodzie tylko jako zapas starych plików).
+const KOMENTARZ_52 = 'Zlecenie 52: Sylwetki — pole „Liczby w banerze (3 pozycje)” (liczby) pod Podpisem EN; opis i szablon Treści bez bloku :::w-skrocie.';
+const LICZBY_SYLWETKI = {
+  name: 'liczby', label: 'Liczby w banerze (3 pozycje)',
+  description: 'Trzy krótkie pozycje pod podpisem na banerze, np. „1945 · pierwszy dziekan”, „20 · doktorów”. Liczba: same cyfry (rok, liczba, 1800+). Podpis: najwyżej ok. 20 znaków, małą literą, bez linków. Pokazują się pierwsze trzy. Puste = baner bez liczb.',
+  type: 'object', list: { collapsible: { collapsed: true, summary: '{n} {etykieta}' } },
+  fields: [
+    { name: 'n', label: 'Liczba (np. 1945 albo 20)', type: 'string', required: true },
+    { name: 'n_en', label: 'Liczba EN (puste = jak po polsku)', type: 'string' },
+    { name: 'etykieta', label: 'Podpis (np. pierwszy dziekan)', type: 'string', required: true },
+    { name: 'etykieta_en', label: 'Podpis EN (puste = podpis polski)', type: 'string' },
+    { name: 'pozycja', type: 'boolean', hidden: true },
+  ],
+};
+const OPIS_TRESCI_SYLWETKI = 'Sylwetka: wstęp (obok portretu), sekcje ## z {#id}, „## Do pobrania {#do-pobrania}” z :::pliki, na końcu „## Źródła {#zrodla}” (na stronie zwinięte). Liczby do banera wpisuje się w polu „Liczby”. Link do innej sylwetki, nagrody albo historii (/instytut/warto-wiedziec/…) łączy wpisy. Pusta Treść (albo same komentarze) = sylwetka „TBA”.';
 const kolekcja = (name, label, katalog, description, view, fields) => ({
   name, label, type: 'collection', path: `src/content/warto_wiedziec/${katalog}`, format: 'yaml-frontmatter', filename: '{primary}.md',
   description, view, fields,
@@ -233,12 +251,13 @@ export const WARTO_WIEDZIEC_47 = {
       [
         { name: 'tytul', label: 'Imię i nazwisko', description: 'Np. „Hugo Steinhaus”. Przy zakładaniu sylwetki powstaje z tego nazwa pliku i adres strony (późniejsza zmiana adresu nie zmienia).', type: 'string', required: true },
         opublikowane('Odznacz, żeby przygotować sylwetkę bez pokazywania jej na stronie publicznej (szkic). Sylwetka osoby żyjącej: szkic, dopóki osoba nie zaakceptuje tekstu.'),
-        tresc('Sylwetka: :::w-skrocie (liczby obok portretu), wstęp, sekcje ## z {#id}, „## Do pobrania {#do-pobrania}” z :::pliki, na końcu „## Źródła {#zrodla}” (na stronie zwinięte). Link do innej sylwetki, nagrody albo historii (/instytut/warto-wiedziec/…) łączy wpisy. Pusta Treść (albo same komentarze) = sylwetka „TBA”.', `${KOM.uklad}\n\n${KOM.tba}\n\n${SZKIELET_SYLWETKI}`),
+        tresc(OPIS_TRESCI_SYLWETKI, `${KOM.uklad}\n\n${KOM.tba}\n\n${SZKIELET_SYLWETKI}`),
         trescEn('Sylwetka po angielsku, w tym samym układzie. Puste = strona angielska pokaże ramkę „Translation in preparation” z linkiem do wersji polskiej.'),
         FORMAT_TRESCI_47,
         { name: 'lata', label: 'Lata', description: 'Np. 1887–1972 albo 1956 (= ur. 1956). Inny tekst pokaże się tak, jak wpisany. Puste = bez lat.', type: 'string', default: '' },
         { name: 'podpis', label: 'Podpis (jedno zdanie)', description: 'Np. „Współtwórca wrocławskiej szkoły matematycznej”. Pod nazwiskiem w banerze i na karcie w siatce sylwetek. Puste = bez podpisu.', type: 'string', default: '' },
         { name: 'podpis_en', label: 'Podpis EN', description: 'Puste = podpis polski.', type: 'string', default: '' },
+        LICZBY_SYLWETKI,
         { name: 'rocznica_urodzin', label: 'Rocznica urodzin', description: 'MM-DD, np. 01-14. Przez 7 dni przed i po tej dacie sylwetka ma pierwszeństwo na stronie głównej. Puste = bez rocznicy.', type: 'string', default: '', pattern: MMDD },
         { name: 'karta', label: 'Karta', description: 'Zajawka i portret.', type: 'object', fields: [
           ...zajawka('Pokazuje się w rzędzie „Warto wiedzieć” na stronie głównej i w opisie strony dla Google.'),
@@ -289,7 +308,7 @@ export const WARTO_WIEDZIEC_47 = {
 };
 
 // ---------- Web-Instytut (etap 1) ----------
-function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz, zamienFormularz }) {
+function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz, zamienFormularz, wstawZa }) {
   komentarz('Zlecenie 40: Strony i strona działu w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, pola EN pod polskimi, szablony Treści zakładu i „Warto wiedzieć”, ukryte notatki i hasło władz.');
 
   // Strona działu
@@ -335,6 +354,13 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
   }
   // Historie: grupa „Karta” wymagana (rok obowiązkowy także wtedy, gdy redaktor nie otworzy karty) — też dla grupy już przeniesionej
   ustaw(pole(pola('ww_historie'), 'karta'), 'required', true);
+  // Sylwetki (zlecenie 52): pole „Liczby” pod Podpisem EN, opis i szablon Treści bez :::w-skrocie — też dla grupy już przeniesionej
+  const sy = pola('ww_sylwetki');
+  wstawZa(sy, 'podpis_en', LICZBY_SYLWETKI);
+  const trescSylwetki = tresc(OPIS_TRESCI_SYLWETKI, `${KOM.uklad}\n\n${KOM.tba}\n\n${SZKIELET_SYLWETKI}`);
+  ustaw(pole(sy, 'body'), 'description', trescSylwetki.description);
+  ustaw(pole(sy, 'body'), 'default', trescSylwetki.default);
+  komentarz(KOMENTARZ_52);
   if (sf.get('description').includes(' warto-wiedziec.md (Warto wiedzieć)')) {
     ustaw(sf, 'description', sf.get('description').replace(' warto-wiedziec.md (Warto wiedzieć)', ' instytut/warto-wiedziec.md (Warto wiedzieć)'));
   }

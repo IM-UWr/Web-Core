@@ -3,13 +3,17 @@
    (pasek prototypu, przełącznik widoków, wyszukiwarka, ramki „Prototyp:”, szkice i monogramy patronów — dziś wszędzie placeholder).
    Importują: ListaWartoWiedziec.astro, SylwetkaWW.astro, WartoWiedziecWpis.astro, zal/DrugiEkran.astro. */
 
-/* ---------- portret: zdjęcie (duotone granat → złoto, po najechaniu kolor) albo placeholder ---------- */
+/* ---------- portret: zdjęcie (duotone granat → złoto, po najechaniu kolor; na stronie sylwetki od razu kolor) albo placeholder ---------- */
 .ww2-portret { --ww2-ciemny: #16203a; --ww2-jasny: #e3c27f; position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; isolation: isolate; background: var(--ww2-ciemny); }
 .ww2-portret.ww2-foto { background: var(--ww2-jasny); }
 .ww2-portret.ww2-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.12) brightness(1.04); mix-blend-mode: multiply; transition: filter .35s; }
 .ww2-portret.ww2-foto::after { content: ""; position: absolute; inset: 0; background: var(--ww2-ciemny); mix-blend-mode: lighten; transition: opacity .35s; pointer-events: none; }
-a:hover .ww2-portret.ww2-foto img, .ww2-portret.ww2-foto.ww2-duzy:hover img { filter: none; mix-blend-mode: normal; }
-a:hover .ww2-portret.ww2-foto::after, .ww2-portret.ww2-foto.ww2-duzy:hover::after { opacity: 0; }
+a:hover .ww2-portret.ww2-foto img { filter: none; mix-blend-mode: normal; }
+a:hover .ww2-portret.ww2-foto::after { opacity: 0; }
+/* duży portret na stronie sylwetki (zlecenie 52, decyzja 18.11, 23:55): zdjęcie od razu w kolorze — bez filtra, nakładki i przejścia,
+   żeby po wejściu na stronę nic się nie „wywoływało”; filtr zostaje tam, gdzie portret jest linkiem (lista, „Inne sylwetki”, :::laureaci) */
+.ww2-prof .ww2-portret.ww2-foto.ww2-duzy img { filter: none; mix-blend-mode: normal; transition: none; }
+.ww2-prof .ww2-portret.ww2-foto.ww2-duzy::after { content: none; }
 .ww2-portret.ww2-ph { display: grid; place-items: center; align-content: center; gap: 6px; background: #1b2540; background-image: repeating-linear-gradient(135deg, rgba(227,194,127,.05) 0 10px, transparent 10px 20px); }
 .ww2-portret.ww2-ph::before { content: ""; position: absolute; inset: 7%; border: 1px dashed rgba(227,194,127,.35); }
 .ww2-portret.ww2-ph svg { width: 46%; height: auto; fill: none; stroke: rgba(227,194,127,.6); stroke-width: 2.2; }
@@ -87,18 +91,23 @@ body .tresc a.ww2-ol-czytaj { font-weight: 600; font-size: 14.5px; }
 .ww2-ol:not(.js) .ww2-ol-panel { padding-top: 18px; }
 @media (prefers-reduced-motion: reduce) { .ww2-ol-pkt::before, .ww2-ol-r, .ww2-ol.js .ww2-ol-karta { transition: none; } }
 
-/* ---------- strona sylwetki: głowa (portret, lata, liczby „W skrócie”) ---------- */
-.ww2-prof { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 28px; align-items: start; margin: 0 0 30px; }
-.ww2-prof-l { position: sticky; top: calc(var(--gora, 70px) + 20px); }
+/* ---------- strona sylwetki: głowa — portret opływany wstępem (zlecenie 52; prototyp 52-sylwetki-baner, zmiany.md pkt 3) ----------
+   .ww2-prof obejmuje portret z latami (float) oraz ramki i wstęp, które go opływają z prawej; sekcje z ## zaczynają się pod tym blokiem,
+   na pełnej szerokości, 40 px pod niższym z dwóch: końcem wstępu albo dołem portretu z latami. Portret 7 px niżej niż góra bloku: góra
+   zdjęcia na wysokości górnej krawędzi wielkich liter pierwszej linii wstępu (18 px / 28,8 px). Liczby „W skrócie” są w banerze. */
+.ww2-prof { display: flow-root; margin: 0 0 40px; }
+.ww2-prof > .ww2-prof-l { float: left; width: 200px; margin: 7px 28px 16px 0; }
 body .tresc .ww2-prof p.ww2-prof-lata { margin: 8px 0 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--d-a); letter-spacing: .01em; font-variant-numeric: lining-nums; }
 body .tresc .ww2-prof p.ww2-prof-zrodlo { margin: 4px 0 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
-body .tresc dl.ww2-skrot { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px 18px; max-width: none; margin: 0; padding: 12px 0 0; border-top: 2px solid var(--ink); }
-body .tresc dl.ww2-skrot > div { margin: 0; }
-body .tresc dl.ww2-skrot dt { font-family: var(--f-display); font-weight: 500; font-size: 24px; line-height: 1.1; color: var(--d-a); font-variant-numeric: lining-nums; }
-body .tresc dl.ww2-skrot dd { margin: 2px 0 0; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
-body .tresc dl.ww2-skrot dd a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-body .tresc dl.ww2-skrot dd a:hover { color: var(--d-a); }
 body .tresc .ww2-wstep { margin: 0 0 40px; }
+/* wstęp obok portretu: odstęp 40 px przejmuje .ww2-prof; mniej bardzo krótkich linii w zwężonej kolumnie (bez text-wrap: pretty — zwykle) */
+body .tresc .ww2-prof > .ww2-wstep { margin: 0; }
+body .tresc .ww2-prof > .ww2-wstep p { text-wrap: pretty; }
+/* bloki z ramką, tłem albo własnymi znacznikami stoją obok portretu, nie wchodzą pod niego */
+.ww2-prof :is(.prose ul, .prose ol, .prose blockquote, .prose figure) { display: flow-root; }
+/* TBA, „Translation in preparation” i ramka błędów bloków (Podgląd): obok portretu, górą na wysokości portretu */
+.ww2-prof > .ww2-tba { display: flow-root; margin: 7px 0 0; }
+body .tresc .ww2-prof > .ww2-bledy { display: flow-root; margin-top: 7px; }
 body .tresc .ww2-wstep .prose > p:first-child { font-size: 18px; line-height: 1.6; color: var(--ink); }
 /* TBA i „Translation in preparation” */
 .ww2-tba { margin: 1.5rem 0 2rem; padding: 1.25rem 1.5rem; border: 1px dashed color-mix(in srgb, currentColor 35%, transparent); border-radius: 4px; max-width: 46em; }
@@ -155,16 +164,13 @@ body .tresc .ww2-zrodla-d > summary h2 { margin: 0; }
 body .tresc .ww2-zrodla .prose { font-size: 14px; line-height: 1.6; }
 body .tresc .ww2-zrodla .prose li { margin: 4px 0; }
 
-/* telefon i wąskie okna (wartości z prototypu: 1023, 700, 640, 560 px) */
+/* telefon i wąskie okna (wartości z prototypów: 1023, 640, 560 px) */
 @media (max-width: 1023px) {
-  .ww2-prof { grid-template-columns: 136px minmax(0, 1fr); gap: 18px; }
-  .ww2-prof-l { position: static; }
-  body .tresc dl.ww2-skrot { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
-  body .tresc dl.ww2-skrot dt { font-size: 21px; }
+  /* portret 160 px (561–1023 px) */
+  .ww2-prof > .ww2-prof-l { width: 160px; margin: 7px 24px 14px 0; }
   body .tresc .ww2-siatka { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
   body .tresc .ww2-siatka-mala { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (min-width: 700px) and (max-width: 1023px) { body .tresc dl.ww2-skrot { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
   body .tresc .ww2-siatka.ww2-inne { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ww2-ol-dek-n { display: none; }
@@ -174,10 +180,8 @@ body .tresc .ww2-zrodla .prose li { margin: 4px 0; }
   body .tresc .prose ul.ww2-l > li > :nth-child(n+3) { grid-column: 2; }
 }
 @media (max-width: 560px) {
-  .ww2-prof { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; }
-  body .tresc dl.ww2-skrot { gap: 8px 12px; padding-top: 10px; }
-  body .tresc dl.ww2-skrot dt { font-size: 18px; }
-  body .tresc dl.ww2-skrot dd { font-size: 12px; }
+  /* telefon: portret 110 px, dalej opływany (przy 390 px kolumna obok ok. 234 px, 22–26 znaków w linii) */
+  .ww2-prof > .ww2-prof-l { width: 110px; margin: 7px 14px 12px 0; }
   body .tresc .ww2-prof p.ww2-prof-lata { font-size: 12.5px; margin-top: 6px; }
   .ww2-portret.ww2-ph.ww2-duzy small { display: none; }
 }

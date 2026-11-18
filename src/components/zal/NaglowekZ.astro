@@ -12,6 +12,8 @@
 //   Obron doktorskich i „Warto wiedzieć” (zlecenie 27; banerAktualnosci() w src/lib/patroni.ts): też bez sygnetu i znaku, ale granat
 //   przechodzi w zdjęcie Aktualności po prawej, w naturalnych kolorach (klasa z-foto-nat). Wpis w Aktualnościach (zlecenie 37): podstrona
 //   działu wpisu (dzialWpisu, prop dzial z NaglowekStrony) — sygnet, kolor i zdjęcie działu; bez znaku, bo wpisu nie ma w menu działu.
+//   Sylwetka „Warto wiedzieć” (zlecenie 52, prop znakSam): sama figurka z puli działu, bez tytułu i zdania ciekawostki, losowana przy
+//   każdym wejściu; na komputerze tytuł zawsze w jednej linii — gdy nie mieści się obok figurki, figurka znika (klasa z-znak-brak).
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import ustawienia from '../../data/ustawienia.json';
@@ -19,7 +21,8 @@ import { u, stripBase } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
 import { menuGlowne } from '../../lib/menu';
 import { PATRONI, pole, znakDzialu, ramkaZnaku, dzialZeSciezki, banerAktualnosci, type Dzial } from '../../lib/patroni';
-import { pulaDzialu, stronyDzialu, ukladStaly, pulaDoSkryptu, tytulCiekawostki, zdanieCiekawostki, type Ciekawostka } from '../../lib/ciekawostki';
+import { pulaDzialu, stronyDzialu, ukladStaly, pulaDoSkryptu, znakiDoSkryptu, tytulCiekawostki, zdanieCiekawostki, type Ciekawostka } from '../../lib/ciekawostki';
+import { fnv1a } from '../../lib/ww.mjs';
 import type { Lang } from '../../lib/daty';
 import { MQ_TELEFON, sizesTelefon } from '../../lib/media';
 
@@ -40,8 +43,11 @@ interface Props {
   znak?: boolean;
   // podstrona bez małego podpisu patrona (strona seminarium); sygnet wtedy na środku bloku z linkiem i tytułem
   bezPodpisu?: boolean;
+  // sama figurka z puli działu, bez opisu, losowana przy każdym wejściu (sylwetka „Warto wiedzieć”, zlecenie 52; strona spoza menu
+  // działu): klucz figurki stałej bez JS — nazwa pliku osoby
+  znakSam?: string;
 }
-const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false, bezPodpisu = false, hasloBezLiczb = false } = Astro.props;
+const { rodzaj, dzial, tytul, tytulLang, lang, slot: slotWidoku = '', wstecz, znak = false, bezPodpisu = false, hasloBezLiczb = false, znakSam } = Astro.props;
 const P = dzial ? PATRONI[dzial] : undefined;
 // Trzy style banerów (zlecenie 11, zalecenie 2): baner działu; podstrona z liczbami (tytuł, hasło, kreska, liczby);
 // podstrona bez liczb (sam tytuł). Hasło i liczby razem albo wcale: liczby bez hasła w danych nie pokazują się
@@ -111,8 +117,18 @@ if (P && pulaCk.length) {
   ck = pulaCk.find((c) => c.id === idStaly) ?? pulaCk[0];
   ckDane = JSON.stringify(pulaDoSkryptu(pulaCk, strony, lang)).replace(/</g, '\\u003c');
 }
-const kreski = ck ? ck.sciezki : P && znak ? znakDzialu(P.dzial, true) : [];
-const ramka = !ck && kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
+// Figurka bez opisu (sylwetki „Warto wiedzieć”, zlecenie 52; prototyp .przekazanie/prototypy/52-sylwetki-baner, zmiany.md pkt 2): pula działu
+// (pulaDzialu: bez ukrytych i odpadających, ulubiona ×3), bez listy stron działu. Bez JS stała figurka pula[fnv1a(nazwa pliku) % długość];
+// z JS skrypt ZNAK_SAM losuje przy każdym wejściu. Na komputerze tytuł w jednej linii (z-znak-sam, DOPASUJ_SAM niżej); bez JS tytuł
+// dłuższy niż 28 znaków (ok. 15,6 em, granica obok figurki przy 1024 px) chowa figurkę klasą z-tyt-dlugi-bez-js (zalozyciele.css).
+const pulaSam = P && znakSam && rodzaj === 'podstrona' ? pulaDzialu(P.dzial) : [];
+const kartaSam = pulaSam.length ? pulaSam[fnv1a(znakSam) % pulaSam.length] : undefined;
+const samDane = kartaSam ? JSON.stringify(znakiDoSkryptu(pulaSam)).replace(/</g, '\\u003c') : '';
+const tytulDlugiBezJs = !!kartaSam && [...tytul.trim()].length > 28;
+// strona nadrzędna (lista „Warto wiedzieć”): jej ciekawostkę z tej wizyty skrypt pomija (adres bez /en, kotwicy i ukośnika, jak klucz zestawu)
+const stronaWyzej = wstecz.adres.replace(/#.*$/, '').replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
+const kreski = ck ? ck.sciezki : kartaSam ? kartaSam.sciezki : P && znak ? znakDzialu(P.dzial, true) : [];
+const ramka = !ck && !kartaSam && kreski.length && zLiczbami ? ramkaZnaku(kreski).join(' ') : '0 0 200 240';
 const opisZnaku = P && ck ? [tytulCiekawostki(ck, lang), zdanieCiekawostki(ck, lang)] : P ? [pole(P, 'znakNazwa', lang), pole(P, 'znakFakt', lang)] : [];
 // EN krócej (zlecenie 14, zalecenie 26): „1887–1972 · section patron · room HS” mieści się w jednej linii
 const patronDzialu = lang === 'en' ? 'section patron' : 'patron działu';
@@ -162,6 +178,19 @@ const CK = `(function(n,D,dz,st){var K='im-ciek-zestaw',ids={},i;for(i=0;i<D.c.l
   `if(document.prerendering)document.addEventListener('prerenderingchange',function(){var z2=czytaj(),u2;if(!z2)return;u2=uloz(z2[dz]||u);` +
   `if(zapisz(z2,u2)&&u2[st]!==u[st]){pokaz(u2[st]);dispatchEvent(new Event('resize'))}},{once:true});` +
   `if(document.prerendering||zapisz(z,u))pokaz(u[st])}}catch(e){}finally{n.classList.remove('z-ck-losuje')}})`;
+// Figurka bez opisu (zlecenie 52; ZNAK_JS w prototypie, buduj.py): losowanie przy każdym wejściu, w skrypcie w linii za figurką, zanim
+// strona się narysuje. Kandydaci: pula bez figurki z poprzedniej sylwetki w tej wizycie (sessionStorage „im-ww-znak”) i bez ciekawostki,
+// którą w tej wizycie pokazuje strona nadrzędna (lista „Warto wiedzieć”; zestaw „im-ciek-zestaw” z CK wyżej); gdy nic nie zostaje — cała
+// pula. Wybór ważony (ulubiona — waga 3). Bez sessionStorage: losowanie bez wykluczeń. Do końca skryptu figurka niewidoczna (z-ck-losuje).
+// Dane: D = [[id, waga, [[d, gruba?], …]], …]; dz — dział, ls — adres strony nadrzędnej (klucz zestawu).
+const ZNAK_SAM = `(function(n,D,dz,ls){var K='im-ww-znak',v=n.querySelector('.z-znak'),bez={},s=0,r,i,j,c,p,k;` +
+  `try{bez[sessionStorage.getItem(K)]=1;bez[((JSON.parse(sessionStorage.getItem('im-ciek-zestaw')||'{}')||{})[dz]||{})[ls]]=1}catch(e){}` +
+  `try{k=D.filter(function(c){return!bez[c[0]]});if(!k.length)k=D;` +
+  `for(i=0;i<k.length;i++)s+=k[i][1];r=Math.random()*s;for(i=0;i<k.length-1;i++){r-=k[i][1];if(r<0)break}c=k[i];` +
+  `if(v&&c[0]!==n.getAttribute('data-ck')){while(v.firstChild)v.removeChild(v.firstChild);` +
+  `for(j=0;j<c[2].length;j++){p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',c[2][j][0]);` +
+  `p.setAttribute('pathLength','1');if(c[2][j][1])p.setAttribute('class','gruba');v.appendChild(p)}n.setAttribute('data-ck',c[0])}` +
+  `try{sessionStorage.setItem(K,c[0])}catch(e){}}catch(e){}finally{n.classList.remove('z-ck-losuje')}})`;
 // Dopasowanie nagłówka (zlecenie 11, zalecenia 2 i 9; zlecenie 24, punkt 3), w linii na końcu nagłówka — zanim strona się narysuje, potem przy
 // zmianie rozmiaru okna i po wczytaniu krojów:
 // - granica z prawej: lewa krawędź ciekawostki (znak z opisem) albo notki o patronie, liczona z prostokątów linii tekstu (tekst jest wyrównany
@@ -199,6 +228,17 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   `if(zaDlugi||(tel&&dod.getBoundingClientRect().bottom>nr.bottom-px(getComputedStyle(n).paddingBottom))||rd.some(function(r){return r.bottom>nr.bottom})||teksty().some(function(t){return rd.some(function(r){return t.left<r.right+m&&r.left<t.right+m&&t.top<r.bottom&&r.top<t.bottom})})){dod.classList.add('z-brak-miejsca');uklad()}}}` +
   `dopasuj();var cz;addEventListener('resize',function(){cancelAnimationFrame(cz);cz=requestAnimationFrame(dopasuj)});` +
   `if(document.fonts)document.fonts.ready.then(dopasuj)})(document.currentScript.parentElement);`;
+// Tytuł w jednej linii obok figurki bez opisu (zlecenie 52, decyzja 18.11, 23:26; DOPASUJ_ZNAK w prototypie): tylko na stronach z z-znak-sam
+// (inne strony mają DOPASUJ bez zmian). Na początku każdego dopasowania (wczytanie, zmiana rozmiaru okna, kroje), przed układem tytułu,
+// hasła i liczb: zdejmuje z-znak-brak, mierzy tytuł w jednej linii (h1 z white-space: nowrap, zakres tekstu, bez stylu z poprzedniego
+// dopasowania); gdy lewa krawędź tytułu + szerokość + 40 px wychodzi za lewą krawędź figurki — z-znak-brak (figurka display: none) i dalej
+// granice liczą się do prawego marginesu. Zdjęcie i dodanie klasy w jednym przebiegu, przed malowaniem — bez mignięcia. Telefon: bez zmian.
+const PRZED_UKLADEM = "if(dod)dod.classList.remove('z-brak-miejsca');var zaDlugi=uklad();";
+if (DOPASUJ.split(PRZED_UKLADEM).length !== 2) throw new Error('NaglowekZ: brak miejsca na wstawkę figurki bez opisu w DOPASUJ');
+const DOPASUJ_SAM = DOPASUJ.replace(PRZED_UKLADEM, "var zs=n.classList.contains('z-znak-sam')&&n.querySelector('.z-znak');" +
+  "if(zs){n.classList.remove('z-znak-brak');if(!tel&&h1){h1.style.fontSize='';h1.style.maxWidth='';" +
+  "var zr=zs.getBoundingClientRect(),q=document.createRange();q.selectNodeContents(h1);" +
+  "if(zr.width&&h1.getBoundingClientRect().left+q.getBoundingClientRect().width+40>zr.left)n.classList.add('z-znak-brak')}}" + PRZED_UKLADEM);
 ---
 {rodzaj === 'dzial' && P && (
   <div class="z-nagl z-baner-dzialu" data-dzial={P.dzial} data-z-baner-dzialu={P.dzial} data-pagefind-ignore>
@@ -223,7 +263,7 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
   </div>
 )}
 {rodzaj === 'podstrona' && (
-  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', bezPodpisu && 'z-bez-podpisu', !P && 'z-granat', fotoNat && 'z-foto-nat', ck && 'z-ck-losuje']} data-dzial={P?.dzial} data-ck={ck?.id} data-pagefind-ignore>
+  <div class:list={['z-nagl', 'z-nagl-pod', zLiczbami && 'z-liczbami', bezPodpisu && 'z-bez-podpisu', !P && 'z-granat', fotoNat && 'z-foto-nat', (ck || kartaSam) && 'z-ck-losuje', kartaSam && 'z-znak-sam', tytulDlugiBezJs && 'z-tyt-dlugi-bez-js']} data-dzial={P?.dzial} data-ck={(ck ?? kartaSam)?.id} data-pagefind-ignore>
     <div class="z-foto"><span class="z-foto-obr"><ZdjecieZ src={f.zdjecie} alt={altFoto} sizes={rozmiar} loading="eager" fetchpriority="high" style={styl} zastepczy /></span></div>
     <div class="z-tyt">
       <div class="z-tyt-g">
@@ -240,11 +280,12 @@ const DOPASUJ = `(function(n){function px(v){return parseFloat(v)||0}` +
         <svg class="z-znak" viewBox={ramka} aria-hidden="true" focusable="false">
           {kreski.map((k) => <path d={k.d} pathLength="1" class={k.gruba ? 'gruba' : undefined} />)}
         </svg>
-        <p class="z-znak-opis"><b>{opisZnaku[0]}</b><span>{opisZnaku[1]}</span></p>
+        {!kartaSam && <p class="z-znak-opis"><b>{opisZnaku[0]}</b><span>{opisZnaku[1]}</span></p>}
         {ck && <script is:inline set:html={`${CK}(document.currentScript.parentElement,${ckDane},${JSON.stringify(P.dzial)},${JSON.stringify(strona)});`} />}
+        {kartaSam && <script is:inline set:html={`${ZNAK_SAM}(document.currentScript.parentElement,${samDane},${JSON.stringify(P.dzial)},${JSON.stringify(stronaWyzej)});`} />}
       </>
     )}
-    <script is:inline set:html={DOPASUJ} />
+    <script is:inline set:html={kartaSam ? DOPASUJ_SAM : DOPASUJ} />
   </div>
 )}
 {rodzaj === 'dzial' && P && <script>import '../../scripts/zal/szkice';</script>}
