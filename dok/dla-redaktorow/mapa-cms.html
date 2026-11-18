@@ -1,0 +1,256 @@
+<!doctype html>
+<!--
+  Źródło PDF „Mapa CMS” dla redaktorów (Web-Podglad/dla-redaktorow/Mapa-CMS-IM-UWr.pdf). Pierwsza wersja (7.11.2026) powstała
+  w rozmowie claude.ai i nie miała źródła w repozytoriach; to jest jej odtworzenie z poprawkami po zleceniach 28–39 (18.11.2026).
+  PDF: node skrypty/pdf-dla-redaktorow.mjs (Edge z systemu, A4, dwie strony).
+  Do przepisania w zleceniu 40 (jawny Markdown we wszystkich działach): tabela „Układy…” na stronie 2.
+-->
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Mapa CMS – strona IM UWr</title>
+<style>
+  @page { size: A4; margin: 11mm 12mm 10mm; }
+  :root {
+    --tekst: #1d2433; --szary: #5d6576; --linia: #d9dde5; --tlo: #f2f4f7; --link: #2a5a9c;
+    --instytut: #8a5a18; --nauka: #24548a; --studia: #2f7a4f; --popularyzacja: #a8383c; --aktualnosci: #57418c; --pracownicy: #4b6470; --ustawienia: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font: 8.6pt/1.36 'DejaVu Sans', 'Segoe UI', Verdana, sans-serif; color: var(--tekst); }
+  a { color: var(--link); text-decoration: none; }
+  b, strong { font-weight: 700; }
+  code { font: 7.6pt/1.3 'DejaVu Sans Mono', Consolas, monospace; background: var(--tlo); padding: 0 .25em; border-radius: 2px; }
+  .strona { height: 276mm; display: flex; flex-direction: column; }
+  .strona + .strona { break-before: page; }
+  .naglowek { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-bottom: 5px; border-bottom: 1.5px solid var(--tekst); margin-bottom: 8px; }
+  h1 { margin: 0; font-size: 15.5pt; line-height: 1.15; }
+  .pod { color: var(--szary); font-size: 8pt; }
+  .prawa { text-align: right; font-size: 8pt; }
+  .prawa a { font-weight: 700; font-size: 8.4pt; }
+  h2 { margin: 0; font-size: 11pt; }
+  ul { margin: 3px 0 0; padding-left: 13px; }
+  li { margin: 1.5px 0; }
+  ol { margin: 4px 0 0; padding-left: 16px; }
+  ol li { margin: 2.5px 0; }
+  .sciezka { color: var(--link); font-size: 7.6pt; }
+  .cms { display: inline-block; padding: 0 5px; border-radius: 3px; color: #fff; font-weight: 700; font-size: 7.4pt; line-height: 1.5; white-space: nowrap; }
+
+  /* strona 1 */
+  .info { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 9px; }
+  .info div { background: var(--tlo); border-radius: 4px; padding: 6px 8px; }
+  .info b { display: block; margin-bottom: 2px; }
+  .dzialy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dzial { border: 1px solid var(--linia); border-left: 4px solid var(--k); border-radius: 4px; padding: 6px 9px 7px; }
+  .dzial header { display: flex; align-items: baseline; gap: 6px; }
+  .dzial header h2 { color: var(--k); flex: 1; }
+  .dzial header .cms { background: var(--k); }
+  .ustawienia { --k: var(--ustawienia); margin-top: 8px; background: var(--tlo); border: 0; border-left: 4px solid var(--k); }
+  .ustawienia .kol { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .seminaria { margin-top: 10px; }
+  .seminaria header { display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--linia); padding-bottom: 3px; }
+  .seminaria header span { color: var(--szary); font-size: 8pt; }
+  .tab-sem { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; margin-top: 2px; }
+  .sem { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 3px 4px; border-bottom: 1px solid var(--linia); }
+  .sem .cms { background: var(--nauka); }
+  .stopka { margin-top: auto; display: flex; justify-content: space-between; gap: 12px; padding-top: 5px; border-top: 1px solid var(--linia); color: var(--szary); font-size: 7.6pt; }
+
+  /* strona 2: gęściej, żeby kroki zmieściły się na jednej kartce */
+  .s2 { font-size: 7.9pt; line-height: 1.3; }
+  .s2 td { padding: 2px 4px; }
+  .s2 ol li { margin: 1.5px 0; }
+  .s2 .trzy div, .s2 .ramka { padding: 5px 8px 6px; }
+  .uklady-glowa { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; margin-bottom: 4px; }
+  .uklady-glowa p { margin: 0; color: var(--szary); font-size: 8pt; max-width: 52%; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 8pt; color: var(--szary); border-bottom: 1.5px solid var(--tekst); padding: 2px 4px; }
+  td { vertical-align: top; padding: 3px 4px; border-bottom: 1px solid var(--linia); }
+  td:nth-child(1) { width: 37%; }
+  td:nth-child(2) { width: 35%; }
+  td:nth-child(2) pre { margin: 0; font: 6.9pt/1.3 'DejaVu Sans Mono', Consolas, monospace; background: var(--tlo); padding: 2px 4px; white-space: pre-wrap; }
+  .trzy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 9px; }
+  .trzy div { background: var(--tlo); border-radius: 4px; padding: 6px 8px; }
+  .trzy b:first-child { display: block; margin-bottom: 2px; }
+  .dwie { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
+  .ramka { border: 1px solid var(--linia); border-top: 3px solid var(--k); border-radius: 4px; padding: 6px 9px 8px; }
+  .ramka h2 { color: var(--k); font-size: 11.5pt; }
+</style>
+</head>
+<body>
+
+<section class="strona">
+  <div class="naglowek">
+    <div>
+      <h1>Mapa CMS: gdzie co edytować</h1>
+      <div class="pod">Strona Instytutu Matematycznego UWr · stan na 18 listopada 2026 · linki są klikalne</div>
+    </div>
+    <div class="prawa">Strona (podgląd):<br><a href="https://im-uwr.github.io/Web-Podglad/">im-uwr.github.io/Web-Podglad</a></div>
+  </div>
+
+  <div class="info">
+    <div><b>1. Logowanie</b>Link z zaproszenia e-mailem otwiera Pages CMS. Konto GitHub nie jest potrzebne. Widzisz tylko swoje repozytoria.</div>
+    <div><b>2. Zapis = publikacja</b>Po kliknięciu „Save” zmiana pojawia się na stronie po ok. 10 minutach. Odśwież stronę: Ctrl+F5.</div>
+    <div><b>3. Pisanie</b>Pole „Treść” działa jak edytor tekstu. Ściągawka (kafelki, oś, pytania, pliki) jest w opisie pola.</div>
+    <div><b>4. Bez obaw</b>Każdy zapis da się cofnąć. Nie zmieniaj gałęzi (branch). W razie kłopotu napisz do administratora strony.</div>
+  </div>
+
+  <div class="dzialy">
+    <div class="dzial" style="--k: var(--instytut)">
+      <header><h2>Instytut</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Instytut">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/instytut/">/instytut</a></header>
+      <ul>
+        <li><b>Strona działu Instytut</b>: tekst „O Instytucie”, „W skrócie”, hasło</li>
+        <li><b>Zakłady</b>: opisy i karty zakładów <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/instytut/struktura/">/instytut/struktura</a></li>
+        <li><b>Władze Instytutu</b> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/instytut/wladze/">/instytut/wladze</a></li>
+        <li><b>Warto wiedzieć</b>: wpisy z historii i ciekawostki <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/warto-wiedziec/">/warto-wiedziec</a></li>
+        <li><b>Strony Instytutu</b>: kontakt, infrastruktura informatyczna, struktura i inne</li>
+      </ul>
+    </div>
+    <div class="dzial" style="--k: var(--nauka)">
+      <header><h2>Nauka</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Nauka">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/nauka/">/nauka</a></header>
+      <ul>
+        <li><b>Strona działu Nauka</b>: tekst „Badania w Instytucie”, „W skrócie”</li>
+        <li><b>Konferencje</b> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/nauka/konferencje/">/nauka/konferencje</a></li>
+        <li><b>Projekty i granty</b> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/nauka/granty/">/nauka/granty</a></li>
+        <li><b>Publikacje</b> i <b>wykazy prac</b> z kolejnych lat <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/nauka/publikacje/">/nauka/publikacje</a></li>
+        <li><b>Strony działu Nauka</b>: teksty nad listami (Seminaria, Konferencje, Granty, Publikacje) i <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/nauka/sukcesy/">Sukcesy</a></li>
+      </ul>
+    </div>
+    <div class="dzial" style="--k: var(--studia)">
+      <header><h2>Studia</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Studia">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/">/studia</a></header>
+      <ul>
+        <li><b>Strona działu Studia</b>: tekst „O studiach”, „W skrócie”</li>
+        <li><b>Kierunki</b>: cała strona kierunku w jednym formularzu (Treść Markdown PL i EN, dane, baner): <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/matematyka/">Matematyka</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/isim/">ISIM</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/siad/">SIAD</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/szkola-doktorska/">Szkoła doktorska</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/podyplomowe/">Studia podyplomowe</a></li>
+        <li><b>Przypomnienia o terminach</b>: na stronie głównej i w kalendarzu</li>
+        <li><b>Specjalności</b>: tekst, baner i kafelek w jednym formularzu: 6 specjalności Matematyki</li>
+        <li><b>Strony studiów</b>: <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/pierwszy-rok/">Pierwszy rok</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/plan-zajec/">Plan zajęć</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/egzaminy-i-dyplom/">Egzaminy i dyplom</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/sprawy-studenckie/">Sprawy studenckie</a> i inne</li>
+        <li><b>Rok akademicki</b> i <b>Kalendarz zajęć</b> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/studia/rok-akademicki/">/studia/rok-akademicki</a></li>
+      </ul>
+    </div>
+    <div class="dzial" style="--k: var(--popularyzacja)">
+      <header><h2>Popularyzacja</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Popularyzacja">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/popularyzacja/">/popularyzacja</a></header>
+      <ul>
+        <li><b>Strona działu Popularyzacja</b>: tekst „O popularyzacji”, „W skrócie”, tradycja</li>
+        <li><b>Strony Popularyzacji</b>: karty „Dla kogo”: <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/popularyzacja/uczniowie/">uczniowie</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/popularyzacja/nauczyciele/">nauczyciele</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/popularyzacja/organizatorzy/">organizatorzy</a>, <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/popularyzacja/wszyscy/">wszyscy</a></li>
+      </ul>
+    </div>
+    <div class="dzial" style="--k: var(--aktualnosci)">
+      <header><h2>Aktualności</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Aktualnosci">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/aktualnosci/">/aktualnosci</a></header>
+      <ul>
+        <li><b>Aktualności</b>: ogłoszenia i wydarzenia (data, miejsce, zdjęcie)</li>
+        <li><b>Obrony doktorskie</b> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/obrony-doktorskie/">/obrony-doktorskie</a></li>
+        <li><b>Strony</b>: teksty nad listami Aktualności i Obron</li>
+      </ul>
+    </div>
+    <div class="dzial" style="--k: var(--pracownicy)">
+      <header><h2>Pracownicy</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Pracownicy">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/pracownicy/">/pracownicy</a></header>
+      <ul>
+        <li><b>Pracownicy</b>: dane osób (stanowisko, zakład, pokój, e-mail, telefon)</li>
+        <li><b>Strony</b>: tekst strony „Pracownicy”</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dzial ustawienia">
+    <header><h2>Ustawienia strony: tylko administrator</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Ustawienia">CMS ↗</a></header>
+    <ul class="kol">
+      <li><b>Strona główna i kontakt</b>, w tym lista kierunków w menu „Studia” i kafelki kierunków</li>
+      <li><b>Menu główne</b>: menu u góry, hamburger, kafelki działów</li>
+      <li><b>Kafelki „Na skróty”</b></li>
+      <li><b>Deklaracja dostępności</b>, <b>Polityka prywatności</b>, <b>O stronie</b></li>
+    </ul>
+  </div>
+
+  <div class="seminaria">
+    <header><h2>Seminaria</h2><span>W każdym: <b>opis seminarium</b> i <b>Referaty</b> (nowy referat = nowy wpis). Tekst w Markdownie, wzory w LaTeX-u: $x^2$.</span></header>
+    <div class="tab-sem">
+      <div>
+        <div class="sem"><span>Analiza harmoniczna i rozwinięcia ortogonalne</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Analiza-Harmoniczna">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/analiza-harmoniczna/">strona</a></span></div>
+        <div class="sem"><span>Dyskretna analiza harmoniczna i niekomutatywna probabilistyka</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Dyskretna-Analiza-Harmoniczna">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/dyskretna-analiza-harmoniczna/">strona</a></span></div>
+        <div class="sem"><span>Geometria</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Geometria">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/geometria/">strona</a></span></div>
+        <div class="sem"><span>Równania różniczkowe</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Rownania-Rozniczkowe">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/rownania-rozniczkowe/">strona</a></span></div>
+        <div class="sem"><span>Statystyka</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Statystyka">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/statystyka/">strona</a></span></div>
+      </div>
+      <div>
+        <div class="sem"><span>Teoria prawdopodobieństwa i modelowanie stochastyczne</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Prawdopodobienstwo">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/prawdopodobienstwo/">strona</a></span></div>
+        <div class="sem"><span>Teoria modeli</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Teoria-Modeli">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/teoria-modeli/">strona</a></span></div>
+        <div class="sem"><span>Topologia</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Topologia">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/topologia/">strona</a></span></div>
+        <div class="sem"><span>Seminarium Pracowni Dydaktyki i Popularyzacji Matematyki</span><span><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Sem-Dydaktyka">CMS ↗</a> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/seminaria/dydaktyka/">strona</a></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stopka"><span>CMS: app.pagescms.org · każdy przycisk „CMS ↗” otwiera właściwe repozytorium</span><span>Instrukcja pisania i dodawania plików: strona 2</span></div>
+</section>
+
+<section class="strona s2">
+  <div class="naglowek">
+    <div>
+      <h1>Instrukcja dla redaktorów: najważniejsze</h1>
+      <div class="pod">Jak pisać, żeby strona sama zrobiła kafelki, oś kroków, pytania i tabele · pliki · nowy kierunek</div>
+    </div>
+    <div class="prawa">Jawne bloki na żywo:<br><a href="https://im-uwr.github.io/Web-Podglad/studia/matematyka/">strona kierunku Matematyka</a></div>
+  </div>
+
+  <div class="uklady-glowa">
+    <h2>Układy, które strona rozpoznaje sama</h2>
+    <p>Strony działów Instytut i Nauka oraz zwykłe strony z zaznaczonym polem „Bloki”. Piszesz zwykłym edytorem; środkowa kolumna to ten sam tekst w widoku Source.</p>
+  </div>
+  <table>
+    <thead><tr><th>Co wpisujesz w edytorze</th><th>Przykład (widok Source)</th><th>Co robi strona</th></tr></thead>
+    <tbody>
+      <tr><td><b>Nagłówek 2</b> (Heading 2)</td><td><pre>## Dlaczego warto</pre></td><td>nowa sekcja; pojawia się w spisie „Na tej stronie”</td></tr>
+      <tr><td><b>Nagłówek 3 zakończony „?”</b>, pod nim odpowiedź (dowolnie długa)</td><td><pre>### Kiedy wybieram specjalność?
+Pod koniec 4. semestru…</pre></td><td><b>rozwijane pytanie (FAQ)</b>; odpowiedź kończy się na następnym nagłówku</td></tr>
+      <tr><td><b>Lista punktowana</b>, każdy punkt zaczyna się <b>pogrubieniem</b></td><td><pre>- **Kategoria A+**: najwyższa ocena…
+- **Pomoc na starcie**: kurs wyrównawczy</pre></td><td><b>kafelki</b> (tytuł + opis)</td></tr>
+      <tr><td><b>Lista numerowana</b>, punkty zaczynają się <b>pogrubieniem</b>; tekst przed dwukropkiem to mała etykieta</td><td><pre>1. **Semestry 1–2: Podstawy**: analiza…
+2. **Semestry 3–4: Wybór**: specjalność…</pre></td><td><b>oś kroków („drabinka”)</b> z etykietą „Semestry 1–2”</td></tr>
+      <tr><td>W punkcie osi lub kafelka: kolejna linia <b>Shift+Enter</b> z „Termin: …” albo z samym linkiem</td><td><pre>Termin: do 30 czerwca
+[Formularz C2](/pliki/studia/c2.pdf)</pre></td><td>para „Termin / wartość”; sam link w linii = <b>przycisk</b></td></tr>
+      <tr><td><b>Tabela</b> (przycisk tabeli w edytorze)</td><td><pre>| Sprawa | Termin |
+|---|---|
+| Wybór specjalności | 30.06 |</pre></td><td><b>tabela</b>; na telefonie każdy wiersz jako osobny blok</td></tr>
+      <tr><td><b>Lista samych linków</b> (opcjonalnie „ — opis”)</td><td><pre>- [Regulamin praktyk](/pliki/studia/regulamin.pdf)</pre></td><td><b>lista plików</b> z ikoną i typem (PDF, DOCX); bez plików: lista linków</td></tr>
+      <tr><td>Punkt: <i>rola kursywą</i>, potem <b>osoba pogrubiona</b>, dalej linie „e-mail: …”, „pokój: …”</td><td><pre>- *Sekretariat* **Anna Nowak**
+e-mail: a.nowak@…</pre></td><td><b>karta kontaktu</b></td></tr>
+      <tr><td><b>Cytat</b> zaczynający się pogrubieniem</td><td><pre>&gt; **Uwaga:** zapisy trwają do…</pre></td><td><b>ramka z uwagą</b></td></tr>
+      <tr><td><b>Studia i Popularyzacja</b> (kierunki, specjalności, strony): <b>jawne bloki</b> zamiast rozpoznawania</td><td><pre>:::kafelki
+- **Kategoria A+** — najwyższa ocena…
+:::</pre></td><td>kafelki, oś (<code>:::etapy</code>), zakładki, ramki itd.; ściągawka w opisie pola „Treść Markdown”</td></tr>
+    </tbody>
+  </table>
+
+  <div class="trzy">
+    <div><b>Gdzie to działa</b>Rozpoznawanie: strony działów Instytut i Nauka, zwykłe strony z zaznaczonym polem „Bloki”. Studia i Popularyzacja: jawne bloki <code>:::…</code>. Seminaria i referaty: zwykły Markdown, wzory w LaTeX-u (<code>$\ell^2$</code>).</div>
+    <div><b>Pułapki</b>Kolejna linia w tym samym punkcie: <b>Shift+Enter</b> (w osi kroków zwykły Enter też zadziała). Akapit zaczęty od „Np.”, „Dr.” edytor zamieni w listę numerowaną: zacznij inaczej albo pogrub skrót. Nagłówek w środku odpowiedzi FAQ kończy pytanie: zamiast niego użyj pogrubienia.</div>
+    <div><b>Wersja angielska</b>Pola <b>„Treść EN”</b>, „Nazwa EN” i inne z „EN” w tych samych formularzach. Puste pole EN: strona angielska pokaże tekst polski. Nagłówki sekcji po angielsku, np. „Why choose it”, „FAQ”.</div>
+  </div>
+
+  <div class="dwie">
+    <div class="ramka" style="--k: var(--nauka)">
+      <h2>Jak dodać plik (PDF, DOCX)</h2>
+      <ol>
+        <li>W CMS swojego repozytorium kliknij w menu po lewej <b>Media</b>, wejdź do właściwego folderu (np. <b>studia</b>) i kliknij <b>Upload</b>. CMS sam poprawi nazwę pliku (bez spacji i polskich znaków); zapamiętaj ją.</li>
+        <li>Adres pliku na stronie to <code>/pliki/</code> + folder + nazwa, np. <code>/pliki/studia/regulamin-praktyk-2026.pdf</code>.</li>
+        <li>W polu „Treść” wpisz opis (np. „Karta zaliczenia praktyki (PDF)”), zaznacz go, kliknij przycisk <b>linku</b> i wklej adres.</li>
+        <li><b>Save.</b> Kilka takich linków w liście da listę plików z ikonami.</li>
+        <li>Nowsza wersja pliku: wgraj nowy plik, zmień link, stary usuń w Media.</li>
+      </ol>
+    </div>
+    <div class="ramka" style="--k: var(--studia)">
+      <h2>Jak dodać nowy kierunek</h2>
+      <ol>
+        <li><b>Web-Studia → Kierunki → nowy wpis.</b> Wpisz Nazwę i Treść Markdown (sekcje <code>##</code>, bloki jak w ściągawce w opisie pola), potem Nazwę EN i Treść Markdown EN. Save. Nazwa pliku powstaje z Nazwy, np. „Matematyka finansowa” → <code>matematyka-finansowa</code>; adres strony: <code>/studia/matematyka-finansowa</code>.</li>
+        <li><b>Baner</b> (w tym samym formularzu, opcjonalnie): nadtytuł, zdanie pod nazwą, hasło i liczby (liczby pokażą się tylko razem z hasłem). Bez banera strona pokaże samą nazwę.</li>
+        <li>Po ok. 10 minutach strona kierunku działa pod adresem <code>/studia/&lt;nazwa-pliku&gt;</code>. W menu „Studia” i w kafelkach pojawi się dopiero po dopisaniu na listę w Ustawieniach (krok 4).</li>
+        <li><b>Menu i kafelki (administrator):</b> Web-Ustawienia → Strona główna i kontakt → „Kierunki w menu „Studia” i kafelki na stronie głównej” → nowa pozycja: adres <code>/studia/&lt;nazwa-pliku&gt;</code>, nazwa i opis w menu, nazwa, napis i zdanie na kafelku (PL i EN), miejsce na liście. Strona pokazuje pola tak, jak są wpisane: puste pole zostaje puste.</li>
+        <li>Terminy kierunku: <b>Kierunki → Przypomnienia o terminach</b>, z linkiem do strony kierunku. Specjalności przypisane do nowego kierunku: poproś administratora (lista kierunków w formularzu specjalności jest stała).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="stopka"><span>Każdy zapis to osobna wersja: pomyłkę administrator cofa jednym kliknięciem. Nie zmieniaj gałęzi (branch).</span><span>Zmiana widoczna po ok. 10 min · odśwież: Ctrl+F5</span></div>
+</section>
+
+</body>
+</html>
