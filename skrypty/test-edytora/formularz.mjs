@@ -7,6 +7,7 @@
 //
 // Uruchomienie:  node skrypty/test-edytora/formularz.mjs <katalog z klonami Web-*> [<katalog ze starymi klonami>]
 // Drugi katalog (opcjonalnie): te same scenariusze na starej konfiguracji — dla porównania (jak było przed zleceniem 31).
+// Zlecenie 33: scenariusz 8 — przełącznik „Opublikowane” (stara strona bez pola, nowa strona, odznaczenie) w 12 formularzach.
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -287,6 +288,29 @@ function scenariusze(kat, nazwaKonf, nowa) {
     const n = generateFilename(f.filename, f, stan);
     console.log(`   ${repo}/${kolekcja}: ${przyOtwarciu ? 'przy otwarciu (tytuł pusty)' : 'przy zapisie z tytułu'}: ${n}`);
     if (nowa) sprawdz(n.endsWith('-medale-uniwersytetu-dla-profesorow-test.md'), `${repo}/${kolekcja}: nazwa z tytułu`);
+  }
+
+  // Zlecenie 33: przełącznik „Opublikowane” (default: true) w Stronach, stronach działów, kierunkach i specjalnościach.
+  const Z33 = [['Web-Aktualnosci', 'strony'], ['Web-Instytut', 'strona-dzialu'], ['Web-Instytut', 'strony'], ['Web-Nauka', 'strona-dzialu'],
+    ['Web-Nauka', 'strony'], ['Web-Popularyzacja', 'popularyzacja'], ['Web-Popularyzacja', 'strony'], ['Web-Pracownicy', 'strony'],
+    ['Web-Studia', 'strona-dzialu'], ['Web-Studia', 'kierunki'], ['Web-Studia', 'specjalnosci'], ['Web-Studia', 'strony']];
+  if (!formularz(konfiguracja(kat, 'Web-Studia'), 'strony').fields.some((f) => f.name === 'opublikowany' && !f.hidden)) return;
+  console.log('8. Przełącznik „Opublikowane” (zlecenie 33): stara strona bez pola, nowa strona, odznaczenie');
+  for (const [repo, nazwaF] of Z33) {
+    const f = formularz(konfiguracja(kat, repo), nazwaF);
+    const pole = f.fields.find((x) => x.name === 'opublikowany');
+    const plik = f.type === 'file' ? f.path : path.posix.join(f.path, fs.readdirSync(path.join(kat, repo, f.path), { recursive: !!f.subfolders })
+      .map((n) => n.replaceAll('\\', '/')).filter((n) => n.endsWith('.md')).sort()[0]);
+    const tekst = fs.readFileSync(path.join(kat, repo, plik), 'utf8').replace(/^opublikowany:.*\r?\n/m, '');
+    const stara = zapisz(f, otworz(f, tekst, plik), plik);
+    const tytul = f.fields.find((x) => ['tytul', 'nazwa', 'imie_nazwisko'].includes(x.name)).name;
+    const nowaS = zapisz(f, Object.assign(otworz(f, null), { [tytul]: 'Strona testowa', ...(f.fields.some((x) => x.name === 'kierunek') ? { kierunek: 'src/content/kierunki/matematyka.md' } : {}) }));
+    const szkic = zapisz(f, Object.assign(otworz(f, tekst, plik), { opublikowany: false }), plik);
+    sprawdz(pole?.type === 'boolean' && pole.default === true && !pole.hidden && f.fields[f.fields.indexOf(pole) - 1].name.startsWith(tytul),
+      `${repo}/${nazwaF}: pole pod tytułem, tak/nie, domyślnie zaznaczone`);
+    sprawdz(!stara.bledy.length && stara.dane.opublikowany === true, `${repo}/${nazwaF}: stara strona bez pola (${plik}) po zapisie bez zmian: opublikowany: true`);
+    sprawdz(!nowaS.bledy.length && nowaS.dane.opublikowany === true, `${repo}/${nazwaF}: nowa strona startuje jako opublikowana${nowaS.bledy.length ? ` (${nowaS.bledy.join('; ')})` : ''}`);
+    sprawdz(!szkic.bledy.length && /^opublikowany: false$/m.test(szkic.tekst), `${repo}/${nazwaF}: po odznaczeniu w pliku „opublikowany: false” (szkic)`);
   }
 }
 

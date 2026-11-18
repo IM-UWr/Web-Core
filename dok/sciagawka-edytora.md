@@ -107,6 +107,16 @@ Lista plików (opis po myślniku jest opcjonalny):
 - **Galeria i załączniki:** każda pozycja musi mieć zdjęcie albo plik. Pozycja pusta albo z samym podpisem daje czerwone „This field is required” i zapis jest zablokowany; zwinięta pozycja ma wtedy czerwony nagłówek, a na górze pojawia się „Please fix the errors before saving.”. Niepotrzebną pozycję usuń ikoną kosza („Remove item”). Tak samo w innych listach: recenzje obron (recenzent i plik), pliki referatów, liczby i fakty, przyciski, skróty i linki menu.
 - **Nazwa pliku nowego wpisu** powstaje z tytułu przy pierwszym zapisie (np. `2026-11-18-medale-uniwersytetu.md`), więc tytuł wpisz przed zapisem. Późniejsza zmiana tytułu nie zmienia adresu wpisu. Tak samo w obronach, konferencjach, grantach i referatach.
 
+## Szkic: przełącznik „Opublikowane” (zlecenie 33)
+
+> **Nowa strona jest od razu opublikowana. Żeby przygotować ją po cichu, odznacz »Opublikowane«: wtedy widać ją tylko na Podglądzie, z żółtym paskiem i etykietą »szkic«.**
+
+- Przełącznik stoi zaraz pod tytułem w formularzach: Kierunki, Specjalności, Strony i Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja).
+- Na Podglądzie szkic widać zawsze. Na górze strony jest żółty pasek, a plakietka stanu budowy (w rogu ekranu) ma żółty wiersz „Szkic: tej strony nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →” z linkiem do formularza tej strony. Przy każdym linku do szkicu (menu, listy, kafelki, tekst) stoi mała etykieta „szkic”.
+- Na przyszłej stronie publicznej szkicu nie ma: znika strona, link w menu, kafelek, pozycja w liczbach, mapie strony i wyszukiwarce. Link do szkicu w tekście innej strony zostaje samym tekstem.
+- Szkic strony działu: strona działu zostaje (prowadzi do niej menu), ale bez tekstu z formularza.
+- Bez przełącznika: aktualności, seminaria, referaty, pracownicy, zakłady i „Warto wiedzieć”.
+
 ## Gdzie co jest
 
 | Co | Gdzie w Pages CMS |

@@ -12,9 +12,11 @@
          lista zmienionych pól z liczbą plików; zmiana spoza migracji = kod wyjścia 1.
 
 Uruchomienie (najpierw git fetch w repozytorium):
-  python skrypty/migracja/kontrola_redaktorow.py przed <repozytorium> [--wynik REF] [--baza REF]
-  python skrypty/migracja/kontrola_redaktorow.py po <repozytorium> --przed REF [--po REF]
+  python skrypty/migracja/kontrola_redaktorow.py przed <repozytorium> [--wynik REF] [--baza REF] [--dopisane POLE=WARTOŚĆ]
+  python skrypty/migracja/kontrola_redaktorow.py po <repozytorium> --przed REF [--po REF] [--dopisane POLE=WARTOŚĆ]
 Domyślnie: --wynik HEAD, --baza = wspólny przodek wyniku i origin/main (baza z etapu 0), --po HEAD.
+--dopisane (zlecenie 33: opublikowany=true): pole najwyższego poziomu z tą wartością = pole bez wartości (migracja dopisała
+jawną wartość domyślną). Każda inna wartość, np. „opublikowany: false” redaktora, jest porównywana jak zwykle.
 """
 import re
 import subprocess
@@ -27,6 +29,7 @@ import yaml
 from termin import DECYZJE, POLA, PRZEMIANOWANIA, WYJATKI, Wczytywacz, pola_wydarzenia, tekst
 
 DANE = re.compile(r'\.(md|json|ya?ml)$')
+DOPISANE: list[tuple[str, object]] = []  # --dopisane: (pole, wartość), np. ('opublikowany', True)
 
 
 def git(repo, *arg, ok=False):
@@ -71,6 +74,9 @@ def porownawczo(sciezka, dane):
     if not isinstance(dane, dict):
         return czysc(dane)
     d = dict(dane)
+    for k, v in DOPISANE:
+        if k in d and d[k] == v:
+            del d[k]
     if '/aktualnosci/' in f'/{sciezka}' and isinstance(d.get('termin'), list):
         t = [x for x in d.pop('termin') if isinstance(x, dict) and x.get('dzien')]
         if t:
@@ -252,6 +258,9 @@ def main():
         raise SystemExit(__doc__)
     opcja = lambda n, d=None: arg[arg.index(n) + 1] if n in arg else d  # noqa: E731
     repo = Path(arg[1]).resolve()
+    if opcja('--dopisane'):
+        k, v = opcja('--dopisane').split('=', 1)
+        DOPISANE.append((k, yaml.safe_load(v)))
     if arg[0] == 'przed':
         sys.exit(przed_pushem(repo, opcja('--wynik', 'HEAD'), opcja('--baza')))
     if not opcja('--przed'):
