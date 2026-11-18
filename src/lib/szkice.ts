@@ -5,8 +5,11 @@
 // Z tego korzystają: getStaticPaths (sciezki.ts), mapa strony, menu (menu.ts), kafelki kierunków (kierunki.ts), linki w treści
 // (src/middleware.ts: na Podglądzie etykieta „szkic”, przy fladze sam tekst) i plakietka stanu budowy na Podglądzie (wiersz szkicu, B4).
 // Strona działu-szkic zostaje i przy fladze (bez tekstu z pliku, bo prowadzi do niej menu): tylko etykieta na Podglądzie.
+// Referaty (zlecenie 48) nie mają własnych stron: referat to kotwica #<plik> na stronie seminarium. Referat-szkic = kotwica-szkic:
+// etykieta przy linkach do niej (Kalendarz, strona główna, lista seminariów), przy samym referacie (Seminarium.astro) i wiersz
+// na plakietce strony seminarium. Referaty seminarium-szkicu są szkicami pośrednio, przez adres strony seminarium.
 import { getCollection } from 'astro:content';
-import { slugOf, jestSzkicem, TYLKO_OPUBLIKOWANE } from './tresci';
+import { slugOf, jestSzkicem, seminariumReferatu, TYLKO_OPUBLIKOWANE } from './tresci';
 import { jestTekstemListy, szkicDzialu } from './tekstyStron';
 import { specjalnosci } from './specjalnosci';
 import { stripBase } from './url';
@@ -33,11 +36,26 @@ export function adresDoPorownania(href: string): string {
   return a.replace(/^\/en(?=\/|$)/, '').replace(/\/+$/, '') || '/';
 }
 
+/** Adres z kotwicą (zlecenie 48: referat = /seminaria/<seminarium>#<plik>); '' dla linku bez kotwicy albo spoza strony. */
+export function kotwicaDoPorownania(href: string): string {
+  const i = href.indexOf('#');
+  const adres = i > 0 ? adresDoPorownania(href) : '';
+  return adres && href.length > i + 1 ? `${adres}${href.slice(i)}` : '';
+}
+
+/** Etykieta „szkic” / „draft” (zlecenie 33): przy linkach dopisuje ją src/middleware.ts, przy referacie — Seminarium.astro. */
+export const ETYKIETA_SZKICU = {
+  pl: '<span class="szkic-etykieta" title="Szkic: widoczny tylko na Podglądzie, nie trafi na stronę publiczną">szkic</span>',
+  en: '<span class="szkic-etykieta" title="Draft: visible only in the preview, not on the public site">draft</span>',
+};
+
 /** Wpis z wyłączonym „Opublikowane”: kolekcja, plik (ścieżka w repozytorium treści, np. src/content/strony/x.md) i adres jego strony. */
 export interface WpisSzkicu {
   kolekcja: string;
   plik?: string;
   adres: string;
+  /** tytuł (referaty: tekst wiersza na plakietce strony seminarium) */
+  tytul?: string;
 }
 
 export class Szkice {
@@ -46,10 +64,17 @@ export class Szkice {
     readonly strony: Map<string, WpisSzkicu>,
     /** strony działów-szkice: tylko na Podglądzie, przy fladze zostają */
     readonly dzialy: Map<string, WpisSzkicu>,
+    /** referaty-szkice (zlecenie 48): adres z kotwicą (/seminaria/<seminarium>#<plik>) → wpis; adres wpisu = strona seminarium */
+    readonly kotwice: Map<string, WpisSzkicu> = new Map(),
   ) {}
 
   get size() {
-    return this.strony.size + this.dzialy.size;
+    return this.strony.size + this.dzialy.size + this.kotwice.size;
+  }
+
+  /** Referaty-szkice na stronie o tym adresie (plakietka stanu budowy, B4). */
+  naStronie(adres: string): WpisSzkicu[] {
+    return [...this.kotwice.values()].filter((w) => w.adres === adres);
   }
 
   /** Wpis, przez który strony o tym adresie nie będzie w budowie publicznej: ona sama albo strona nadrzędna; undefined = będzie. */
@@ -90,7 +115,13 @@ export function szkice(): Promise<Szkice> {
     };
     for (const dz of ['instytut', 'nauka', 'studia'] as const) dzial(dz, PLIKI_DZIALOW[`../data/${dz}.md`]?.frontmatter);
     dzial('popularyzacja', popularyzacja);
-    return new Szkice(s, d);
+    const k = new Map<string, WpisSzkicu>();
+    for (const r of await getCollection('referaty')) {
+      if (!jestSzkicem(r)) continue;
+      const adres = `/seminaria/${seminariumReferatu(r)}`;
+      k.set(`${adres}#${slugOf(r.id)}`, { kolekcja: 'referaty', plik: r.filePath, adres, tytul: r.data.tytul });
+    }
+    return new Szkice(s, d, k);
   })();
   return pamiec;
 }

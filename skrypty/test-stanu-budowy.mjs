@@ -2,6 +2,8 @@
 // Strona: lokalna budowa Podglądu (PODGLAD=1 bez PODGLAD_RUN_ID, więc działa tryb testowy ?stan=…) z wpisami testowymi-szkicami:
 // kierunki/isim, strony/instytut/kontakt, strony/instytut/infrastruktura-informatyczna (podstrony = szkice pośrednio),
 // specjalnosci/matematyka-stosowana, data/nauka (strona działu), zaklady/geometria, warto_wiedziec/historie/wyklad-terencea-tao (decyzja 18.11; od zlecenia 47 w historie/).
+// Zlecenie 48: aktualnosci/2026-11-18-wyklad-popularnonaukowy-z-cyklu-misiu, seminaria/prawdopodobienstwo (opis seminarium: formularz pliku)
+// i referat testowy referaty/statystyka/test-2026-11-25-referat-testowy (wiersz na plakietce strony opublikowanego seminarium).
 //
 // Uruchomienie:  node skrypty/test-stanu-budowy.mjs <adres strony, np. http://localhost:4321/Web-Core> <katalog zrzutów>
 import fs from 'node:fs';
@@ -172,6 +174,10 @@ console.log('3. Strona tylko na Podglądzie (B4)');
     ['/en/instytut/kontakt/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/strony/edit/src%2Fcontent%2Fstrony%2Finstytut%2Fkontakt.md', false],
     ['/instytut/zaklady/geometria/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/zaklady/edit/src%2Fcontent%2Fzaklady%2Fgeometria.md', false],
     ['/instytut/warto-wiedziec/wyklad-terencea-tao/', 'https://app.pagescms.org/im-uwr/web-instytut/main/collection/ww_historie/edit/src%2Fcontent%2Fwarto_wiedziec%2Fhistorie%2Fwyklad-terencea-tao.md', false],
+    // zlecenie 48: aktualność (kolekcja) i opis seminarium (formularz jednego pliku w repozytorium seminarium)
+    ['/aktualnosci/2026-11-18-wyklad-popularnonaukowy-z-cyklu-misiu/', 'https://app.pagescms.org/im-uwr/web-aktualnosci/main/collection/aktualnosci/edit/src%2Fcontent%2Faktualnosci%2F2026-11-18-wyklad-popularnonaukowy-z-cyklu-misiu.md', false],
+    ['/seminaria/prawdopodobienstwo/', 'https://app.pagescms.org/im-uwr/web-sem-prawdopodobienstwo/main/file/seminarium', false],
+    ['/en/seminaria/prawdopodobienstwo/', 'https://app.pagescms.org/im-uwr/web-sem-prawdopodobienstwo/main/file/seminarium', false],
   ];
   for (const [adres, cms, posr] of przypadki) {
     await idz(p, adres, 'ok');
@@ -187,6 +193,16 @@ console.log('3. Strona tylko na Podglądzie (B4)');
     await idz(p, adres, 'ok');
     const w = await p.$eval('.sb-szkic', (e) => ({ tekst: e.innerText, href: e.querySelector('a')?.href })).catch(() => ({}));
     sprawdz(w.href === 'https://app.pagescms.org/im-uwr/web-nauka/main/file/strona-dzialu' && wzor.test(w.tekst || ''), `${adres}: wiersz szkicu strony działu z linkiem do formularza pliku`);
+  }
+  // zlecenie 48: referat-szkic na stronie opublikowanego seminarium — wiersz o referacie z linkiem do formularza „Referaty”, bez paska na górze
+  for (const [adres, wzor] of [['/seminaria/statystyka/', /^Szkic: referatu „Referat testowy \(zlecenie 48\)” nie będzie na stronie publicznej\./], ['/en/seminaria/statystyka/', /^Draft: the talk “Referat testowy \(zlecenie 48\)” won't be on the public site\./]]) {
+    await idz(p, adres, 'ok');
+    const w = await p.$$eval('.sb-szkic', (l) => l.map((e) => ({ tekst: e.innerText, href: e.querySelector('a')?.href })));
+    sprawdz(w.length === 1 && w[0].href === 'https://app.pagescms.org/im-uwr/web-sem-statystyka/main/collection/referaty/edit/src%2Fcontent%2Freferaty%2Fstatystyka%2Ftest-2026-11-25-referat-testowy.md' && wzor.test(w[0].tekst),
+      `${adres}: wiersz referatu-szkicu z linkiem do formularza „Referaty”`);
+    sprawdz(!(await p.isVisible('.notice-warn')), `${adres}: bez żółtego paska (strona seminarium jest opublikowana)`);
+    sprawdz(await p.$$eval('#test-2026-11-25-referat-testowy h3 .szkic-etykieta', (l) => l.length) === 1, `${adres}: etykieta przy tytule referatu`);
+    if (adres === '/seminaria/statystyka/') await zrzut(p, 'komputer-referat-szkic');
   }
   for (const adres of [OPUBLIKOWANA, '/']) {
     await idz(p, adres, 'ok');

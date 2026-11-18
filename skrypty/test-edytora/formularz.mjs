@@ -10,6 +10,7 @@
 // Zlecenie 33: scenariusz 8 — przełącznik „Opublikowane” (stara strona bez pola, nowa strona, odznaczenie) w 12 formularzach.
 // Zlecenie 44: scenariusz 9 — grupa „Termin zgłoszeń” w aktualnościach (oferty „Kariera”).
 // Zlecenie 47: scenariusz 10 — „Warto wiedzieć”: nowa sylwetka z szablonu (nazwa pliku, TBA, „Dodano”), rok historii, dopisanie laureata.
+// Zlecenie 48: scenariusz 11 — przełącznik „Opublikowane” w Aktualnościach, opisie seminarium i Referatach (9 × Web-Sem-*).
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -378,6 +379,33 @@ function scenariusze(kat, nazwaKonf, nowa) {
     sprawdz(!nowaS.bledy.length && nowaS.dane.opublikowany === true, `${repo}/${nazwaF}: nowa strona startuje jako opublikowana${nowaS.bledy.length ? ` (${nowaS.bledy.join('; ')})` : ''}`);
     sprawdz(!szkic.bledy.length && /^opublikowany: false$/m.test(szkic.tekst), `${repo}/${nazwaF}: po odznaczeniu w pliku „opublikowany: false” (szkic)`);
   }
+
+  // Zlecenie 48: to samo w Aktualnościach, opisie seminarium (formularz jednego pliku) i Referatach wszystkich 9 seminariów.
+  // Nowy wpis dostaje wartości pól wymaganych (prelegent, termin…), żeby zapis nie zatrzymał się na nich.
+  const Z48 = [['Web-Aktualnosci', 'aktualnosci'], ...fs.readdirSync(kat).filter((r) => r.startsWith('Web-Sem-')).sort().flatMap((r) => [[r, 'seminarium'], [r, 'referaty']])];
+  if (!formularz(konfiguracja(kat, 'Web-Aktualnosci'), 'aktualnosci').fields.some((f) => f.name === 'opublikowany')) return;
+  console.log('11. Przełącznik „Opublikowane” (zlecenie 48): aktualności, opis seminarium, referaty — stary wpis bez pola, nowy wpis, odznaczenie');
+  const wymagane = (f) => Object.fromEntries(f.fields.filter((x) => x.required && !x.hidden).map((x) => [x.name,
+    x.type === 'date' ? fmt(new Date(2026, 10, 25, 14, 15), wzorDaty(x)) : x.type === 'select' ? (x.options?.values?.[0]?.value ?? x.options?.values?.[0]?.name ?? x.options?.values?.[0]) : 'Test']));
+  const opisy = new Set();
+  for (const [repo, nazwaF] of Z48) {
+    const f = formularz(konfiguracja(kat, repo), nazwaF);
+    const pole = f.fields.find((x) => x.name === 'opublikowany');
+    const plik = f.type === 'file' ? f.path : path.posix.join(f.path, fs.readdirSync(path.join(kat, repo, f.path), { recursive: !!f.subfolders })
+      .map((n) => n.replaceAll('\\', '/')).filter((n) => n.endsWith('.md')).sort()[0]);
+    const tekst = fs.readFileSync(path.join(kat, repo, plik), 'utf8').replace(/^opublikowany:.*\r?\n/m, '');
+    const stara = zapisz(f, otworz(f, tekst, plik), plik);
+    const tytul = f.fields.find((x) => ['tytul', 'nazwa'].includes(x.name)).name;
+    const nowyW = zapisz(f, Object.assign(otworz(f, null), wymagane(f), { [tytul]: 'Wpis testowy' }));
+    const szkic = zapisz(f, Object.assign(otworz(f, tekst, plik), { opublikowany: false }), plik);
+    opisy.add(`${nazwaF}: ${pole?.description}`);
+    sprawdz(pole?.type === 'boolean' && pole.default === true && !pole.hidden && f.fields[f.fields.indexOf(pole) - 1].name.startsWith(tytul)
+      && pole.label === 'Opublikowane — widoczne na stronie publicznej (na Podglądzie widać zawsze)', `${repo}/${nazwaF}: pole pod tytułem, tak/nie, domyślnie zaznaczone, etykieta jak w zleceniu 33`);
+    sprawdz(!stara.bledy.length && stara.dane.opublikowany === true, `${repo}/${nazwaF}: stary wpis bez pola (${plik}) po zapisie bez zmian: opublikowany: true`);
+    sprawdz(!nowyW.bledy.length && nowyW.dane.opublikowany === true, `${repo}/${nazwaF}: nowy wpis startuje jako opublikowany${nowyW.bledy.length ? ` (${nowyW.bledy.join('; ')})` : ''}`);
+    sprawdz(!szkic.bledy.length && /^opublikowany: false$/m.test(szkic.tekst), `${repo}/${nazwaF}: po odznaczeniu w pliku „opublikowany: false” (szkic)`);
+  }
+  sprawdz(opisy.size === 3, `trzy opisy pola (aktualność, seminarium, referat), takie same w 9 seminariach:\n      ${[...opisy].join('\n      ')}`);
 }
 
 // Każdy plik każdego formularza otwarty i zapisany bez zmian: czy dane po zapisie są te same. Za równe uznane są: brak wartości

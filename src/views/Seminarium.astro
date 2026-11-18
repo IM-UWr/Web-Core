@@ -7,6 +7,7 @@
 // na końcu sekcji opisu (wzorzec .kontakty). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
 // w kolorze działu, pod nim „mie rrrr”; obok dzień tygodnia, godzina i sala, tytuł Brygadą, prelegent z afiliacją.
 // Kotwice referatów (#<slug>) bez zmian — prowadzą do nich Kalendarz i lista seminariów.
+// Referat-szkic (zlecenie 48, tylko Podgląd; przy fladze go nie ma): etykieta „szkic” przy tytule, wiersz na plakietce (StanBudowy.astro).
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // etykieta .etyk, pliki ul.pliki. Własne style (na końcu pliku): wiersz referatu z datą, formularz zapisu, blok
 // koordynatorów. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
@@ -17,7 +18,8 @@ import TytulReferatu from '../components/TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
-import { slugOf, sala, salaReferatu, afiliacjaReferatu, maTresc, type Seminarium } from '../lib/tresci';
+import { slugOf, sala, salaReferatu, afiliacjaReferatu, maTresc, jestSzkicem, type Seminarium } from '../lib/tresci';
+import { ETYKIETA_SZKICU } from '../lib/szkice';
 import { daneSeminarium } from '../lib/widoki/seminarium';
 import { mailHtml } from '../lib/limity.mjs';
 
@@ -105,7 +107,7 @@ const spis = [
         <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
         <div>
           <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), true)}</p>
-          <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
+          <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} />{jestSzkicem(r) && <Fragment set:html={ETYKIETA_SZKICU[lang]} />}</h3>
           <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
           {(en || maTresc(r.body)) && <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>}
           {r.data.pliki.length > 0 && (
@@ -125,7 +127,7 @@ const spis = [
           <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
           <div>
             {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
-            <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} /></h3>
+            <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} />{jestSzkicem(r) && <Fragment set:html={ETYKIETA_SZKICU[lang]} />}</h3>
             <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
             {(en || maTresc(r.body)) && (
               <details>

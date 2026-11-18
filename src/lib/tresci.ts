@@ -159,10 +159,13 @@ export function rangaStopnia(stopien?: string): number {
 // Seminarium referatu: pole „Seminarium” z CMS, a gdy puste — folder, w którym leży plik.
 export const seminariumReferatu = (r: Referat) => r.data.seminarium || r.id.split('/')[0];
 
+// Zlecenie 48: przy fladze referaty seminarium-szkicu znikają razem z nim (ukrycie pośrednie, jak podstrony w zleceniu 33) —
+// także z Kalendarza, .ics, „Najbliższych seminariów”, stron zakładów i liczb. Na Podglądzie referat-szkic zostaje z etykietą.
 export async function referaty(): Promise<Referat[]> {
   const items = await getCollection('referaty');
+  const seminariaSzkice = TYLKO_OPUBLIKOWANE ? new Set((await getCollection('seminaria')).filter(jestSzkicem).map((s) => s.id)) : undefined;
   return items
-    .filter(widoczny)
+    .filter((r) => widoczny(r) && !seminariaSzkice?.has(seminariumReferatu(r)))
     .sort((a, b) => (a.data.termin < b.data.termin ? -1 : 1));
 }
 

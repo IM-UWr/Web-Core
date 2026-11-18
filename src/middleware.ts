@@ -3,20 +3,17 @@
 //   „Następna strona w dziale”, linki w treści). Etykieta stoi po pierwszym <b> w linku (nazwa w menu), inaczej na końcu.
 // - Flaga TYLKO_OPUBLIKOWANE=1 (przyszła strona publiczna): stron-szkiców nie ma; menu i listy pomijają je same
 //   (widoczny(), menu.ts, kierunki.ts), a pozostałe linki do nich zamieniamy na sam tekst, z ostrzeżeniem w logu budowy.
+// Zlecenie 48: także linki do referatów-szkiców (kotwica #<plik> na stronie seminarium, src/lib/szkice.ts).
 // Bez szkiców w danych middleware nie zmienia niczego (HTML bajt w bajt jak bez niego). Styl etykiety idzie do <head> tylko tych
 // stron, które ją mają, więc nie trafia do wspólnego CSS (ani na stronę publiczną).
 import { defineMiddleware } from 'astro:middleware';
-import { szkice as wczytajSzkice, adresDoPorownania } from './lib/szkice';
+import { szkice as wczytajSzkice, adresDoPorownania, kotwicaDoPorownania, ETYKIETA_SZKICU as ETYKIETA } from './lib/szkice';
 import { TYLKO_OPUBLIKOWANE } from './lib/tresci';
 import { stripBase } from './lib/url';
 
 const LINK = /<a\b([^>]*?)\shref="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g;
 // Etykieta dyskretna: obrys w kolorze tekstu linku (działa na jasnym i ciemnym tle, w menu na banerze i na liście).
 const STYL = '<style>.szkic-etykieta{display:inline-block;margin-inline-start:.45em;padding:0 .45em;border:1px solid currentColor;border-radius:999px;font-size:.68em;font-weight:600;line-height:1.5;letter-spacing:.04em;text-transform:uppercase;vertical-align:.12em;white-space:nowrap;opacity:.8;text-decoration:none}</style>';
-const ETYKIETA = {
-  pl: '<span class="szkic-etykieta" title="Szkic: widoczny tylko na Podglądzie, nie trafi na stronę publiczną">szkic</span>',
-  en: '<span class="szkic-etykieta" title="Draft: visible only in the preview, not on the public site">draft</span>',
-};
 
 export const onRequest = defineMiddleware(async (kontekst, dalej) => {
   const odp = await dalej();
@@ -28,7 +25,7 @@ export const onRequest = defineMiddleware(async (kontekst, dalej) => {
   const html = await odp.text();
   const etykieta = /^\/en(\/|$)/.test(stripBase(sciezka)) ? ETYKIETA.en : ETYKIETA.pl;
   const nowy = html.replace(LINK, (caly, przed: string, href: string, po: string, srodek: string) => {
-    if (!szkice.has(adresDoPorownania(href))) return caly;
+    if (!szkice.has(adresDoPorownania(href)) && !szkice.kotwice.has(kotwicaDoPorownania(href))) return caly;
     if (TYLKO_OPUBLIKOWANE) {
       console.warn(`[szkice] ${stripBase(sciezka)}: link do szkicu ${href} zamieniony na sam tekst`);
       return srodek;
@@ -38,6 +35,7 @@ export const onRequest = defineMiddleware(async (kontekst, dalej) => {
     const z = b >= 0 ? srodek.slice(0, b + 4) + etykieta + srodek.slice(b + 4) : srodek + etykieta;
     return `<a${przed} href="${href}"${po}>${z}</a>`;
   });
-  const zEtykieta = nowy !== html && nowy.includes('szkic-etykieta') ? nowy.replace('</head>', `${STYL}</head>`) : nowy;
+  // styl także wtedy, gdy etykietę wstawił sam widok (referat-szkic na stronie seminarium, zlecenie 48)
+  const zEtykieta = nowy.includes('class="szkic-etykieta"') && !nowy.includes(STYL) ? nowy.replace('</head>', `${STYL}</head>`) : nowy;
   return new Response(zEtykieta, { status: odp.status, statusText: odp.statusText, headers: odp.headers });
 });

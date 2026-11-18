@@ -27,14 +27,17 @@ function repozytoriumPliku(plik: string): string | undefined {
 // nazwa formularza w .pages.yml = nazwa kolekcji. Strony działów (strona-dzialu, popularyzacja) to formularze jednego pliku
 // (adres …/main/file/<nazwa>); ich strona zostaje i przy fladze, a wiersz szkicu mówi tylko o tekście z pliku.
 // „Warto wiedzieć” od zlecenia 47: trzy formularze w grupie „Warto wiedzieć” (ww_sylwetki, ww_nagrody, ww_historie).
-const KOLEKCJE = new Set(['strony', 'kierunki', 'specjalnosci', 'zaklady', 'ww_sylwetki', 'ww_nagrody', 'ww_historie']);
-const PLIKI = new Set(['strona-dzialu', 'popularyzacja']);
+// Zlecenie 48: aktualności (Web-Aktualnosci) i referaty (Web-Sem-*, kolekcja z podfolderami); opis seminarium to formularz jednego
+// pliku „seminarium” (…/main/file/seminarium) w repozytorium tego seminarium.
+const KOLEKCJE = new Set(['strony', 'kierunki', 'specjalnosci', 'zaklady', 'ww_sylwetki', 'ww_nagrody', 'ww_historie', 'aktualnosci', 'referaty']);
+/** kolekcja w danych strony → nazwa formularza jednego pliku w .pages.yml */
+const PLIKI: Record<string, string> = { 'strona-dzialu': 'strona-dzialu', popularyzacja: 'popularyzacja', seminaria: 'seminarium' };
 
 /** Adres formularza wpisu w Pages CMS albo undefined, gdy nie da się go ustalić (brak pochodzenia albo formularz bez przełącznika). */
 export function formularzWCms(kolekcja: string, plik?: string): string | undefined {
-  if (!plik || !(KOLEKCJE.has(kolekcja) || PLIKI.has(kolekcja))) return undefined;
+  if (!plik || !(KOLEKCJE.has(kolekcja) || Object.hasOwn(PLIKI, kolekcja))) return undefined;
   const repo = repozytoriumPliku(plik);
   if (!repo) return undefined;
   const r = `https://app.pagescms.org/${tresci.organizacja.toLowerCase()}/${repo.toLowerCase()}/main`;
-  return PLIKI.has(kolekcja) ? `${r}/file/${kolekcja}` : `${r}/collection/${kolekcja}/edit/${encodeURIComponent(plik)}`;
+  return Object.hasOwn(PLIKI, kolekcja) ? `${r}/file/${PLIKI[kolekcja]}` : `${r}/collection/${kolekcja}/edit/${encodeURIComponent(plik)}`;
 }

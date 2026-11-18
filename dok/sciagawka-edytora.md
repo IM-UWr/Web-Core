@@ -153,16 +153,19 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 - **Galeria i załączniki:** każda pozycja musi mieć zdjęcie albo plik. Pozycja pusta albo z samym podpisem daje czerwone „This field is required” i zapis jest zablokowany; zwinięta pozycja ma wtedy czerwony nagłówek, a na górze pojawia się „Please fix the errors before saving.”. Niepotrzebną pozycję usuń ikoną kosza („Remove item”). Tak samo w innych listach: recenzje obron (recenzent i plik), pliki referatów, liczby i fakty, przyciski, skróty i linki menu.
 - **Nazwa pliku nowego wpisu** powstaje z tytułu przy pierwszym zapisie (np. `2026-11-18-medale-uniwersytetu.md`), więc tytuł wpisz przed zapisem. Późniejsza zmiana tytułu nie zmienia adresu wpisu. Tak samo w obronach, konferencjach, grantach i referatach.
 
-## Szkic: przełącznik „Opublikowane” (zlecenie 33)
+## Szkic: przełącznik „Opublikowane” (zlecenia 33 i 48)
 
 > **Nowa strona jest od razu opublikowana. Żeby przygotować ją po cichu, odznacz »Opublikowane«: wtedy widać ją tylko na Podglądzie, z żółtym paskiem i etykietą »szkic«.**
 
-- Przełącznik stoi pod tytułem i tytułem EN w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady i trzy formularze grupy „Warto wiedzieć”: Sylwetki, Nagrody i wyróżnienia, Historie (Web-Instytut).
+- Przełącznik stoi pod tytułem i tytułem EN (referat nie ma tytułu EN: zaraz pod tytułem) w formularzach: Kierunki, Specjalności, Strony, Strona działu … (Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja), Zakłady, trzy formularze grupy „Warto wiedzieć”: Sylwetki, Nagrody i wyróżnienia, Historie (Web-Instytut), a od zlecenia 48 także Aktualności (Web-Aktualnosci, razem z ofertami „Kariera”) oraz opis seminarium i Referaty (każde z 9 repozytoriów seminariów Web-Sem-…). Redaktor seminarium nie musi go dotykać: jest domyślnie włączony.
 - Na Podglądzie szkic widać zawsze. Pod paskiem menu jest żółty pasek, a plakietka stanu budowy (w rogu ekranu) ma żółty wiersz „Szkic: tej strony nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →” z linkiem do formularza tej strony. Przy każdym linku do szkicu (menu, listy, kafelki, tekst) stoi mała etykieta „szkic”.
 - Na przyszłej stronie publicznej szkicu nie ma: znika strona, link w menu, kafelek, pozycja w liczbach, mapie strony i wyszukiwarce. Link do szkicu w tekście innej strony zostaje samym tekstem.
 - Szkic strony działu: strona działu zostaje (prowadzi do niej menu), ale bez tekstu z formularza. Plakietka ma wtedy wiersz „Szkic: tekstu tej strony nie będzie na stronie publicznej (strona zostanie, bez tekstu)” z linkiem do formularza.
 - Dymek „Nowa wersja strony gotowa — Odśwież” pojawia się tylko wtedy, gdy nowa budowa zmieniła otwartą stronę.
-- Bez przełącznika: aktualności, obrony, konferencje, granty, seminaria, referaty i pracownicy.
+- **Odznaczenie »Opublikowane« w opisie seminarium ukrywa całe seminarium razem z referatami.** Na stronie publicznej znika strona seminarium, pozycja na liście seminariów, w Kalendarzu i na stronach kierunków i specjalności, a z nim wszystkie jego referaty (także z „Najbliższych seminariów” i plików kalendarza).
+- Referat nie ma własnej strony (to pozycja na stronie seminarium). Referat-szkic widać na Podglądzie z etykietą „szkic” przy tytule, a plakietka strony seminarium ma żółty wiersz „Szkic: referatu „…” nie będzie na stronie publicznej. Włącz »Opublikowane« w CMS →”. Na stronie publicznej znika z zapowiedzi i archiwum seminarium, z „Najbliższych seminariów” na stronie głównej, z Kalendarza i plików kalendarza i nie wchodzi do liczb („zapowiedziane referaty”, „referaty w archiwum”).
+- Aktualność-szkic (także oferta „Kariera”) znika z listy Aktualności, ze strony głównej, z Kalendarza, z Kariery i ze strony Studiów, a liczby (okładka, ramka Kariery, banery) liczą się bez niej. Powiększona na liście jest zawsze najnowsza opublikowana aktualność.
+- Bez przełącznika: obrony, konferencje, granty i pracownicy.
 
 ## „Warto wiedzieć”: sylwetki, nagrody i historie (zlecenie 47)
 

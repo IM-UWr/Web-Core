@@ -6,6 +6,9 @@
 // B4: na stronie, której nie będzie w budowie publicznej (src/lib/szkice.ts: sama strona albo strona nadrzędna z wyłączonym
 // „Opublikowane”), żółty wiersz z linkiem do formularza wpisu w Pages CMS (bez linku, gdy adresu nie da się ustalić).
 // Strona działu-szkic (decyzja właściciela 18.11) zostaje i na stronie publicznej, więc wiersz mówi tylko o tekście z pliku.
+// Zlecenie 48: referat nie ma własnej strony (kotwica na stronie seminarium), więc referat-szkic dostaje wiersz na plakietce strony
+// swojego seminarium (gdy ta strona sama nie jest szkicem) z linkiem do formularza „Referaty”. Referat seminarium-szkicu prowadzi
+// do formularza opisu seminarium wierszem samej strony (strona seminarium jest szkicem).
 // Dymek „Nowa wersja gotowa” (decyzja 18.11) tylko wtedy, gdy zmieniła się ta strona: data-skrot i data-plik wpisuje po budowie
 // src/integracje/skrotyPodgladu.mjs (skrót HTML strony bez danych tej budowy), a nowe skróty są w /podglad/skroty.json.
 import { PODGLAD, PODGLAD_RUN_ID, PODGLAD_START, PODGLAD_REPO, formularzWCms } from '../../lib/podglad';
@@ -26,6 +29,10 @@ const dzial = powod ? undefined : wszystkie?.dzialy.get(adres);
 const wpis = powod ?? dzial;
 const cms = wpis ? formularzWCms(wpis.kolekcja, wpis.plik) : undefined;
 const posrednio = powod && powod.adres !== adres;
+const referatySzkice = wszystkie && !wpis ? wszystkie.naStronie(adres).map((r) => ({ ...r, cms: formularzWCms(r.kolekcja, r.plik) })) : [];
+const referatTekst = (tytul?: string) => en
+  ? `Draft: the talk “${tytul ?? ''}” won't be on the public site.`
+  : `Szkic: referatu „${tytul ?? ''}” nie będzie na stronie publicznej.`;
 const szkicTekst = dzial
   ? en
     ? 'Draft: the text of this page won’t be on the public site (the page stays, without the text).'
@@ -54,6 +61,11 @@ const poczatek = kiedy ? (en ? `Preview · built ${kiedy}` : `Podgląd · zbudow
           {cms ? <a href={cms} target="_blank" rel="noopener">{`${szkicTekst} `}<span class="sb-szkic-cms">{szkicCms}</span></a> : <span>{szkicTekst}</span>}
         </p>
       )}
+      {referatySzkice.map((r) => (
+        <p class="sb-szkic">
+          {r.cms ? <a href={r.cms} target="_blank" rel="noopener">{`${referatTekst(r.tytul)} `}<span class="sb-szkic-cms">{szkicCms}</span></a> : <span>{referatTekst(r.tytul)}</span>}
+        </p>
+      ))}
     </div>
     <script is:inline defer src={u(`/podglad/stan-budowy.js?v=${wersja}`)}></script>
   </Fragment>

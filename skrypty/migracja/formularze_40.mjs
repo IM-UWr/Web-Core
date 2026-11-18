@@ -38,7 +38,8 @@ function wcieciaKotwic(wynik, zrodlo) {
 
 export async function formularze(repo, opis) {
   const plik = path.join(repo, '.pages.yml');
-  const zrodlo = await fs.readFile(plik, 'utf8');
+  // klon z core.autocrlf=true ma w katalogu roboczym CRLF: porównania linii (wcieciaKotwic) i wynik na LF (Git zapisuje LF)
+  const zrodlo = (await fs.readFile(plik, 'utf8')).replace(/\r\n/g, '\n');
   const doc = YAML.parseDocument(zrodlo);
   const wezel = (o) => doc.createNode(o);
   // formularze najwyższego poziomu i z grup (type: group, items: …), np. „Ustawienia strony” w Web-Ustawienia
@@ -83,6 +84,13 @@ export async function formularze(repo, opis) {
     usun(seq, nazwa) {
       const i = seq.items.findIndex((p) => p.get('name') === nazwa);
       if (i >= 0) seq.items.splice(i, 1);
+    },
+    /** Przełącznik „Opublikowane” (zlecenie 33; zlecenie 48: aktualności, opis seminarium, referaty): dodaje pole, gdy go nie ma,
+     *  i ustawia etykietę, opis, typ i default jak w zleceniu 33. Miejsce (zaraz pod tytułem) ustala potem kolejnosc(). */
+    przelacznikOpublikowane(seq, opis) {
+      const p = seq.items.find((i) => i.get('name') === 'opublikowany');
+      if (!p) { seq.items.push(wezel({ name: 'opublikowany', label: OPUBLIKOWANE, description: opis, type: 'boolean', default: true })); return; }
+      for (const [k, v] of [['label', OPUBLIKOWANE], ['description', opis], ['type', 'boolean'], ['default', true]]) api.ustaw(p, k, v);
     },
     /** Pokazuje pole w CMS (usuwa hidden). */
     odkryj(wezelPola) { wezelPola.delete('hidden'); },
@@ -398,8 +406,9 @@ function nauka({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentar
 // ---------- Web-Aktualnosci (etap 3) ----------
 // Działa na .pages.yml sprzed zlecenia 44 i po nim (44 dodaje w Aktualnościach grupę „Termin zgłoszeń” — zgloszenia — za terminem
 // wydarzenia, opis pola „Rodzaj” i stronę kariera.md w opisie Stron); każde inne pole spoza listy = błąd kolejności (STOP).
-function aktualnosci({ pola, pole, kolejnosc, ustaw, formatTresci, etykietyEn, formularz, komentarz }) {
+function aktualnosci({ pola, pole, kolejnosc, ustaw, formatTresci, etykietyEn, formularz, komentarz, przelacznikOpublikowane }) {
   komentarz('Zlecenie 40: Strony w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, tytuł EN i zajawka EN pod polskimi, etykiety „… EN”, opisy formularzy Aktualności i Obron, szablony Treści aktualności i obrony.');
+  komentarz('Zlecenie 48: przełącznik „Opublikowane” w Aktualnościach, zaraz pod tytułem (odznaczone = szkic, widoczny tylko na Podglądzie).');
   const ma = (seq, nazwa) => seq.items.some((i) => i.get('name') === nazwa);
 
   // Aktualności (decyzja 18.11, pytanie 3): tytuł, tytuł EN → data, rodzaj, terminy → Treść, Treść EN → zajawka, zajawka EN → reszta.
@@ -407,7 +416,9 @@ function aktualnosci({ pola, pole, kolejnosc, ustaw, formatTresci, etykietyEn, f
   ustaw(formularz('aktualnosci'), 'description', 'Ogłoszenia, wydarzenia, sukcesy i oferty pracy, staży i stypendiów. Ogłoszenia, wydarzenia i sukcesy widać w Aktualnościach i na stronie głównej; wydarzenie z terminem trafia też do kalendarza. Oferty (rodzaj „Kariera”) są na stronie Kariera i na stronie Studiów.');
   const a = pola('aktualnosci');
   etykietyEn(a);
-  kolejnosc(a, ['tytul', 'tytul_en', 'data', 'rodzaj', 'termin', ...(ma(a, 'zgloszenia') ? ['zgloszenia'] : []), 'body', 'tresc_en', 'zajawka', 'zajawka_en', 'dla', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en', 'galeria', 'album', 'zalaczniki', 'zaklad']);
+  // zlecenie 48: „Opublikowane” pod parą tytuł / tytuł EN, jak w zleceniu 33
+  przelacznikOpublikowane(a, 'Odznacz, żeby przygotować wpis bez pokazywania go na stronie publicznej (szkic).');
+  kolejnosc(a, ['tytul', 'tytul_en', 'opublikowany', 'data', 'rodzaj', 'termin', ...(ma(a, 'zgloszenia') ? ['zgloszenia'] : []), 'body', 'tresc_en', 'zajawka', 'zajawka_en', 'dla', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en', 'galeria', 'album', 'zalaczniki', 'zaklad']);
   ustaw(pole(a, 'body'), 'description', WPIS);
   ustaw(pole(a, 'body'), 'default', SZABLON_AKTUALNOSCI);
 
@@ -459,20 +470,25 @@ function pracownicy({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, kom
 }
 
 // ---------- Web-Sem-* (etap 5: jeden wzór dla 9 repozytoriów seminariów) ----------
-function seminaria({ pola, pole, kolejnosc, ustaw, formularz, komentarz }) {
+function seminaria({ pola, pole, kolejnosc, ustaw, formularz, komentarz, przelacznikOpublikowane }) {
   komentarz('Zlecenie 40: opis seminarium i streszczenie referatu zaraz pod tytułem, pola EN pod polskimi, ściągawka przy Treści, szablon streszczenia, ukryta notatka redakcyjna.');
+  komentarz('Zlecenie 48: przełącznik „Opublikowane” w opisie seminarium i w referatach, zaraz pod tytułem (odznaczone = szkic, widoczny tylko na Podglądzie; seminarium-szkic ukrywa też swoje referaty).');
 
   // Opis seminarium (plik): Treść i Treść EN pod nazwą (dziś na 11. i 12. miejscu)
   ustaw(formularz('seminarium'), 'description', 'Opis seminarium: prowadzący, kontakt, archiwum. Widać go na stronie seminarium w Nauce → Seminaria.');
   const s = pola('seminarium');
-  kolejnosc(s, ['nazwa', 'nazwa_en', 'body', 'tresc_en', 'haslo', 'haslo_en', 'prowadzacy', 'kontakt', 'archiwum', 'zaklad', 'aktywne', 'do_uzupelnienia']);
+  // zlecenie 48: „Opublikowane” pod parą nazwa / nazwa EN
+  przelacznikOpublikowane(s, 'Odznacz, żeby przygotować seminarium bez pokazywania go na stronie publicznej (szkic). Razem z nim znikną wszystkie jego referaty.');
+  kolejnosc(s, ['nazwa', 'nazwa_en', 'opublikowany', 'body', 'tresc_en', 'haslo', 'haslo_en', 'prowadzacy', 'kontakt', 'archiwum', 'zaklad', 'aktywne', 'do_uzupelnienia']);
   ustaw(pole(s, 'body'), 'description', `${WPIS} Wzory w $…$.`);
   // notatka dla redakcji (decyzje 18.11: ukryta, wartość zostaje w pliku)
   ustaw(pole(s, 'do_uzupelnienia'), 'hidden', true);
 
   // Referaty: streszczenie i jego wersja EN pod danymi referatu, pliki na końcu (dziś pliki nad streszczeniem)
   const r = pola('referaty');
-  kolejnosc(r, ['tytul', 'jezyk', 'prelegent', 'afiliacja', 'afiliacja_en', 'termin', 'sala', 'sala_en', 'body', 'tresc_en', 'pliki']);
+  // zlecenie 48: „Opublikowane” zaraz pod tytułem (referat nie ma tytułu EN)
+  przelacznikOpublikowane(r, 'Odznacz, żeby przygotować referat bez pokazywania go na stronie publicznej (szkic).');
+  kolejnosc(r, ['tytul', 'opublikowany', 'jezyk', 'prelegent', 'afiliacja', 'afiliacja_en', 'termin', 'sala', 'sala_en', 'body', 'tresc_en', 'pliki']);
   ustaw(pole(r, 'body'), 'description', `${WPIS} Wzory w $…$. Pusta Treść (albo sam komentarz) = referat bez streszczenia.`);
   ustaw(pole(r, 'body'), 'default', '<!-- STRESZCZENIE: Zwykły tekst; wzory w $…$. Slajdy: dodaj w „Pliki” niżej. -->');
 }

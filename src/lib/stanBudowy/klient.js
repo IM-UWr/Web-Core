@@ -68,7 +68,9 @@
 
   // ---------- elementy ----------
   function E(tag, klasa, tekst) { var x = document.createElement(tag); if (klasa) x.className = klasa; if (tekst != null) x.textContent = tekst; return x; }
-  var szkic = el.querySelector('.sb-szkic');
+  // wierszy szkicu bywa kilka (zlecenie 48: referaty-szkice na stronie seminarium) — dymek i szczegóły idą za ostatnim
+  var wierszeSzkicu = [].slice.call(el.querySelectorAll('.sb-szkic'));
+  var szkic = wierszeSzkicu[wierszeSzkicu.length - 1];
   var plakietka = el.querySelector('.sb-plakietka');
   var kropka = plakietka.querySelector('.sb-kropka');
   var tekst = plakietka.querySelector('.sb-tekst');
@@ -437,6 +439,6 @@
   }
   document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(zegar); else cykl(false); });
   window.addEventListener('storage', function (e) { if (e.key === K_STAN && e.newValue) { var c = czytaj(K_STAN); pokaz(c); planuj(odstep(c)); } });
-  if (szkic) szkic.hidden = false;
+  wierszeSzkicu.forEach(function (w) { w.hidden = false; });
   cykl(true);
 })();
