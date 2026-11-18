@@ -11,6 +11,7 @@
 // Zlecenie 44: scenariusz 9 — grupa „Termin zgłoszeń” w aktualnościach (oferty „Kariera”).
 // Zlecenie 47: scenariusz 10 — „Warto wiedzieć”: nowa sylwetka z szablonu (nazwa pliku, TBA, „Dodano”), rok historii, dopisanie laureata.
 // Zlecenie 48: scenariusz 11 — przełącznik „Opublikowane” w Aktualnościach, opisie seminarium i Referatach (9 × Web-Sem-*).
+// Zlecenie 49: scenariusz 12 — rodzaj „Seminarium wydziałowe” w Aktualnościach (opcja, opisy, nowy wpis, dwa poprawione wpisy).
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -406,6 +407,25 @@ function scenariusze(kat, nazwaKonf, nowa) {
     sprawdz(!szkic.bledy.length && /^opublikowany: false$/m.test(szkic.tekst), `${repo}/${nazwaF}: po odznaczeniu w pliku „opublikowany: false” (szkic)`);
   }
   sprawdz(opisy.size === 3, `trzy opisy pola (aktualność, seminarium, referat), takie same w 9 seminariach:\n      ${[...opisy].join('\n      ')}`);
+
+  const rodzaj = form.fields.find((f) => f.name === 'rodzaj');
+  const opcje = (rodzaj?.options?.values ?? []).map((v) => [v.name ?? v.value ?? v, v.label ?? v]);
+  if (!opcje.some(([n]) => n === 'seminarium-wydzialowe')) return;
+  console.log('12. Rodzaj „Seminarium wydziałowe” (zlecenie 49): opcja pod „Wydarzenie”, opisy, nowy wpis z terminem, poprawione wpisy zapisane bez zmian');
+  sprawdz(opcje.map(([n]) => n).join(',') === 'ogloszenie,wydarzenie,seminarium-wydzialowe,sukces,kariera' && opcje[2][1] === 'Seminarium wydziałowe',
+    `opcje „Rodzaju”: ${opcje.map(([, l]) => l).join(', ')}; domyślnie ${rodzaj.default}`);
+  sprawdz(/^„Seminarium wydziałowe” działa jak „Wydarzenie”: dodaj „Termin wydarzenia”\. W tytule wpisz prelegenta.*Tytuł wykładu wpisz w zajawce\. „Kariera”/.test(rodzaj.description ?? ''),
+    `opis pola „Rodzaj”: ${rodzaj.description}`);
+  sprawdz(/^Ogłoszenia, wydarzenia, seminaria wydziałowe, sukcesy .*Ogłoszenia, wydarzenia, seminaria wydziałowe i sukcesy widać/.test(form.description ?? ''), `opis kolekcji: ${form.description}`);
+  w = zapisz(form, nowy({ tytul: 'Prof. Jan Kowalski', rodzaj: 'seminarium-wydzialowe', zajawka: 'Tytuł wykładu', termin: [{ ...pustyTermin(), dzien: '2026-12-02', godzina: '13:00', miejsce: 'sala 119' }] }));
+  console.log('   ' + (w.bledy.length ? pokaz(w) : `w pliku: ${w.tekst.split('\n').filter((l) => /^(tytul|rodzaj|zajawka):|^  - dzien:/.test(l)).join(' | ')}`));
+  sprawdz(!w.bledy.length && /^rodzaj: seminarium-wydzialowe$/m.test(w.tekst), 'nowy wpis: w pliku „rodzaj: seminarium-wydzialowe”');
+  for (const nazwa of ['2026-11-10-seminarium-wydzialowe-problem-milenijny.md', '2026-06-16-seminarium-wydzialowe.md']) {
+    const p = `src/content/aktualnosci/${nazwa}`;
+    const z = zapisz(form, otworz(form, fs.readFileSync(path.join(kat, 'Web-Aktualnosci', p), 'utf8'), p), p);
+    sprawdz(!z.bledy.length && z.dane.rodzaj === 'seminarium-wydzialowe' && /^Prof\. /.test(z.dane.tytul) && !!z.dane.zajawka,
+      `${nazwa}: otwarty i zapisany bez zmian — rodzaj ${z.dane?.rodzaj}, tytuł „${z.dane?.tytul}”, zajawka „${z.dane?.zajawka}”`);
+  }
 }
 
 // Każdy plik każdego formularza otwarty i zapisany bez zmian: czy dane po zapisie są te same. Za równe uznane są: brak wartości
