@@ -251,6 +251,47 @@ function nauka({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentar
   ustaw(pole(g, 'body'), 'default', '<!-- OPIS PROJEKTU: Cel i wyniki projektu. Pusta Treść = strona projektu pokaże same dane. -->');
 }
 
+// ---------- Web-Aktualnosci (etap 3) ----------
+// Działa na .pages.yml sprzed zlecenia 44 i po nim (44 dodaje w Aktualnościach grupę „Termin zgłoszeń” — zgloszenia — za terminem
+// wydarzenia, opis pola „Rodzaj” i stronę kariera.md w opisie Stron); każde inne pole spoza listy = błąd kolejności (STOP).
+function aktualnosci({ pola, pole, kolejnosc, ustaw, formatTresci, etykietyEn, formularz, komentarz }) {
+  komentarz('Zlecenie 40: Strony w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, tytuł EN i zajawka EN pod polskimi, etykiety „… EN”, opisy formularzy Aktualności i Obron, szablony Treści aktualności i obrony.');
+  const ma = (seq, nazwa) => seq.items.some((i) => i.get('name') === nazwa);
+
+  // Aktualności (decyzja 18.11, pytanie 3): tytuł, tytuł EN → data, rodzaj, terminy → Treść, Treść EN → zajawka, zajawka EN → reszta.
+  // Opis z raportu 40-0 uzupełniony o oferty: od zlecenia 44 „Kariera” ma własną stronę (i stronę Studiów), nie listę Aktualności.
+  ustaw(formularz('aktualnosci'), 'description', 'Ogłoszenia, wydarzenia, sukcesy i oferty pracy, staży i stypendiów. Ogłoszenia, wydarzenia i sukcesy widać w Aktualnościach i na stronie głównej; wydarzenie z terminem trafia też do kalendarza. Oferty (rodzaj „Kariera”) są na stronie Kariera i na stronie Studiów.');
+  const a = pola('aktualnosci');
+  etykietyEn(a);
+  kolejnosc(a, ['tytul', 'tytul_en', 'data', 'rodzaj', 'termin', ...(ma(a, 'zgloszenia') ? ['zgloszenia'] : []), 'body', 'tresc_en', 'zajawka', 'zajawka_en', 'dla', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en', 'galeria', 'album', 'zalaczniki', 'zaklad']);
+  ustaw(pole(a, 'body'), 'description', WPIS);
+  ustaw(pole(a, 'body'), 'default', SZABLON_AKTUALNOSCI);
+
+  // Obrony doktorskie: kolejność bez zmian (kandydat, tytuł rozprawy, termin, miejsce → Treść, Treść EN → reszta)
+  ustaw(formularz('obrony'), 'description', 'Publiczne obrony rozpraw doktorskich. Lista w Nauce → Obrony doktorskie. Pusta Treść = strona sama napisze zaproszenie.');
+  const o = pola('obrony');
+  etykietyEn(o);
+  ustaw(pole(o, 'body'), 'description', `${WPIS} Pusta Treść (albo sam komentarz) = zaproszenie złożone z danych.`);
+  ustaw(pole(o, 'body'), 'default', '<!-- Zostaw puste, a strona sama napisze zaproszenie. Własny tekst zastępuje zaproszenie. -->');
+  // strona angielska bierze tylko Treść EN, inaczej zaproszenie z danych — nigdy polski opis (src/lib/widoki/obrona.ts)
+  ustaw(pole(o, 'tresc_en'), 'description', 'Opis po angielsku, w tym samym układzie. Puste = wersja angielska pokaże zaproszenie złożone z danych (także wtedy, gdy polski opis jest wpisany).');
+
+  // Strony (teksty stron z listą: Aktualności, Obrony doktorskie, od zlecenia 44 też Kariera)
+  const sf = formularz('strony');
+  const JAK_W_STUDIACH = ' Treść w jawnym Markdownie, jak w Studiach.';
+  if (!sf.get('description').endsWith(JAK_W_STUDIACH)) ustaw(sf, 'description', sf.get('description') + JAK_W_STUDIACH);
+  const s = pola('strony');
+  formatTresci(s);
+  etykietyEn(s);
+  kolejnosc(s, ['tytul', 'tytul_en', 'opublikowany', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'haslo_podstron', 'haslo_podstron_en', 'liczby', 'pasek_boczny', 'bloki']);
+  ustaw(pole(s, 'body'), 'description', `${JAWNY} Strona z listą (Aktualności, Kariera, Obrony doktorskie): tekst stoi nad listą; pusta Treść (albo sam komentarz) = sama lista.`);
+  ustaw(pole(s, 'tresc_en'), 'description', `${JAWNY} Puste = strona angielska pokaże treść polską.`);
+  ustaw(pole(s, 'opis'), 'label', 'Krótki opis (Google i podgląd linku)');
+  ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla (baner pokazuje tytuł i hasło). Np. „Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.”. Puste = ogólny opis serwisu.');
+  // „Bloki wzorca”: w jawnym formacie strona ich nie czyta (układ wskazują bloki :::) — ukryte, wartości zostają w plikach.
+  ustaw(pole(s, 'bloki'), 'hidden', true);
+}
+
 // ---------- Web-Pracownicy (etap 4) ----------
 function pracownicy({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz }) {
   komentarz('Zlecenie 40: tekst strony Pracownicy w jawnym Markdownie (ukryte format_tresci), ściągawka przy Treści, opis formularza Pracownicy.');
@@ -453,7 +494,7 @@ function popularyzacja({ pola, pole, kolejnosc, ustaw, etykietyEn, komentarz }) 
   ustaw(pole(s, 'haslo'), 'description', 'Tytuł karty tej strony na stronie Popularyzacji; puste = tytuł strony. Na samej stronie się nie wyświetla.');
 }
 
-const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony, 'Web-Studia': studia, 'Web-Popularyzacja': popularyzacja };
+const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Aktualnosci': aktualnosci, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony, 'Web-Studia': studia, 'Web-Popularyzacja': popularyzacja };
 for (const r of ['Analiza-Harmoniczna', 'Dydaktyka', 'Dyskretna-Analiza-Harmoniczna', 'Geometria', 'Prawdopodobienstwo', 'Rownania-Rozniczkowe', 'Statystyka', 'Teoria-Modeli', 'Topologia']) OPISY[`Web-Sem-${r}`] = seminaria;
 
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
