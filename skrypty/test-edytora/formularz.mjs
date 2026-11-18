@@ -276,6 +276,18 @@ function scenariusze(kat, nazwaKonf, nowa) {
   const nazwa = otwarcie ?? generateFilename(form.filename, form, nowy({}));
   console.log(`   ${otwarcie ? 'pole nazwy przy otwarciu (tytuł jeszcze pusty), redaktor go nie zmienia' : 'nazwa przy zapisie z tytułu'}: ${nazwa}`);
   if (nowa) sprawdz(nazwa.endsWith('-medale-uniwersytetu-dla-profesorow-test.md'), 'nazwa z tytułu');
+
+  console.log('7. Nazwa pliku nowego wpisu w innych kolekcjach z {primary} w nazwie (konferencje, granty, referaty)');
+  const inne = [['Web-Nauka', 'konferencje'], ['Web-Nauka', 'granty'],
+    ...fs.readdirSync(kat).filter((r) => r.startsWith('Web-Sem-')).sort().map((r) => [r, 'referaty'])];
+  for (const [repo, kolekcja] of inne) {
+    const f = formularz(konfiguracja(kat, repo), kolekcja);
+    const przyOtwarciu = f.filenameField === 'create';
+    const stan = przyOtwarciu ? otworz(f, null) : Object.assign(otworz(f, null), { [f.view.primary]: 'Medale Uniwersytetu dla profesorów — test' });
+    const n = generateFilename(f.filename, f, stan);
+    console.log(`   ${repo}/${kolekcja}: ${przyOtwarciu ? 'przy otwarciu (tytuł pusty)' : 'przy zapisie z tytułu'}: ${n}`);
+    if (nowa) sprawdz(n.endsWith('-medale-uniwersytetu-dla-profesorow-test.md'), `${repo}/${kolekcja}: nazwa z tytułu`);
+  }
 }
 
 // Każdy plik każdego formularza otwarty i zapisany bez zmian: czy dane po zapisie są te same. Za równe uznane są: brak wartości

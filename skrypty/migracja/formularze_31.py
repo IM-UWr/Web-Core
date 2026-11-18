@@ -10,7 +10,8 @@ Co robi (szczegóły i powody: RAPORT-ZLECENIE-31.md):
   2a  Web-Aktualnosci: pola wydarzenie_poczatek / _koniec / _miejsce znikają, zamiast nich grupa `termin` (lista, najwyżej 1 pozycja)
       zaraz pod „Rodzaj”. Dane przenosi skrypt termin.py.
   2d  Opcjonalne pola dat dostają `default: ""` (bez tego Pages CMS wpisuje do pustego pola datę otwarcia formularza).
-  3   Web-Aktualnosci: bez `filename.field: create` — nazwa pliku powstaje przy zapisie z tytułu.
+  3   Bez `filename.field: create` — nazwa pliku powstaje przy zapisie z tytułu: Web-Aktualnosci (aktualności, obrony),
+      Web-Nauka (konferencje, granty) i Web-Sem-* (referaty; decyzja właściciela 18.11, pytanie 4 w raporcie).
 
 Skrypt odmawia, jeśli formularz już ma zmianę (np. pole `pozycja`) albo nie ma oczekiwanego pola.
 
@@ -76,6 +77,8 @@ ZMIANY = {
         ('wladze/linki', 'pozycja'),
     ],
     'Web-Nauka': [
+        ('konferencje', 'bez_field_create'),
+        ('granty', 'bez_field_create'),
         ('strona-dzialu/badania_fakty', 'wymagane', {'wartosc': None}),
         ('strona-dzialu/badania_fakty', 'pozycja'),
         ('strony/liczby', 'pozycja'),
@@ -123,7 +126,8 @@ ZMIANY = {
         ('nawigacja/menu/grupy/linki', 'wymagane', {'etykieta': None, 'adres': None}),
         ('nawigacja/menu/grupy/linki', 'pozycja'),
     ],
-    **{r: [('referaty/pliki', 'wymagane', {'plik': opis_kosza('pliku')}), ('referaty/pliki', 'pozycja')]
+    **{r: [('referaty', 'bez_field_create'),
+           ('referaty/pliki', 'wymagane', {'plik': opis_kosza('pliku')}), ('referaty/pliki', 'pozycja')]
        for r in ('Web-Sem-Analiza-Harmoniczna', 'Web-Sem-Dydaktyka', 'Web-Sem-Dyskretna-Analiza-Harmoniczna', 'Web-Sem-Geometria',
                  'Web-Sem-Prawdopodobienstwo', 'Web-Sem-Rownania-Rozniczkowe', 'Web-Sem-Statystyka', 'Web-Sem-Teoria-Modeli',
                  'Web-Sem-Topologia')},
