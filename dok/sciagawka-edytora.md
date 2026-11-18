@@ -2,10 +2,8 @@
 
 W Pages CMS są dwa rodzaje tekstu (zlecenie 40):
 
-- **Jawny Markdown** — kierunki i specjalności (Web-Studia) oraz Strony i strona działu w Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja, Web-Pracownicy i strony ze stopki (Web-Ustawienia: deklaracja dostępności, polityka prywatności, „O stronie”). Zwykły tekst, listy i tabele piszesz bez znaczników, specjalny układ (kafelki, oś kroków, pytania, pliki, kontakty) zamykasz w bloku `:::nazwa` … `:::`. Pełny opis: `dok/jawny-markdown.md`. Plik ma `format_tresci: jawne` (ukryte pole formularza; nowa Strona dostaje je sama).
+- **Jawny Markdown** — kierunki i specjalności (Web-Studia) oraz Strony i strona działu w Web-Instytut, Web-Nauka, Web-Studia, Web-Popularyzacja, Web-Aktualnosci, Web-Pracownicy i strony ze stopki (Web-Ustawienia: deklaracja dostępności, polityka prywatności, „O stronie”). Zwykły tekst, listy i tabele piszesz bez znaczników, specjalny układ (kafelki, oś kroków, pytania, pliki, kontakty) zamykasz w bloku `:::nazwa` … `:::`. Pełny opis: `dok/jawny-markdown.md`. Plik ma `format_tresci: jawne` (ukryte pole formularza; nowa Strona dostaje je sama).
 - **Zwykły Markdown** — wpisy: aktualności, obrony, zakłady, „Warto wiedzieć”, konferencje, projekty i granty, opisy seminariów i referaty. Bez bloków `:::`; wzory w LaTeX-u (`$\ell^2$`).
-
-Strony Web-Aktualnosci (`aktualnosci`, `obrony-doktorskie` i inne) są jeszcze w dawnym formacie, w którym strona sama rozpoznaje układy (etap 3 zlecenia 40; opis dawnego formatu: `zasady-parsera.md`).
 
 **Formularze:** tytuł, tytuł EN (i „Opublikowane”) → Treść, Treść EN → reszta pól; pola EN tuż pod polskimi, z etykietą „… EN”. Puste pole EN = strona angielska pokaże tekst polski. Pole Treść to edytor Markdownu (pole `code`): wygląd sprawdzasz na Podglądzie po przebudowaniu (ok. 10 minut).
 
@@ -105,7 +103,7 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 
 ## Strony z listą, sekcje przenoszone, karty
 
-- **Tekst nad listą:** tytuł, opis, hasło i tekst stron Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje, Obrony doktorskie, Aktualności, Pracownicy, Struktura i zakłady, Warto wiedzieć i Plan zajęć to zwykłe Strony w repozytorium, z którego pochodzi lista, pod adresem strony z listą (np. `nauka/konferencje.md` → `/nauka/konferencje`). Tekst stoi nad listą. Brak takiej Strony nic nie psuje: lista ma domyślny tytuł i hasło, bez tekstu.
+- **Tekst nad listą:** tytuł, opis, hasło i tekst stron Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje, Obrony doktorskie, Aktualności, Kariera, Pracownicy, Struktura i zakłady, Warto wiedzieć i Plan zajęć to zwykłe Strony w repozytorium, z którego pochodzi lista, pod adresem strony z listą (np. `nauka/konferencje.md` → `/nauka/konferencje`). Tekst stoi nad listą. Brak takiej Strony nic nie psuje: lista ma domyślny tytuł i hasło, bez tekstu.
 - **Sekcja przenoszona** (decyduje jawne id, nie nazwa nagłówka):
   - `## Ostatnie sukcesy {#sukcesy}` (EN: `## Recent achievements {#sukcesy}`) na końcu strony działu Instytut — zdanie nad ostatnimi sukcesami;
   - `## Czasopisma redagowane w Instytucie {#czasopisma}` (EN: `## Journals edited at the Institute {#czasopisma}`) na Stronie Publikacje — tekst nad listą czasopism; bez tego nagłówka czasopisma są bez tekstu.
@@ -113,7 +111,7 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 
 ## Szablony nowych wpisów i pola, których strona nie pokazuje
 
-- **Szablon Treści:** nowy zakład, pozycja „Warto wiedzieć”, konferencja, projekt i referat startują z komentarzem w Treści, np. `<!-- TEKST: … -->` albo `<!-- STRESZCZENIE: … -->`. Treść z samym komentarzem liczy się jak pusta: wpis nie dostaje pustej podstrony ani pustego streszczenia. Konferencja i projekt z opisem mają własną stronę; konferencja bez opisu prowadzi od razu na swoją stronę internetową.
+- **Szablon Treści:** nowa aktualność, obrona, zakład, pozycja „Warto wiedzieć”, konferencja, projekt i referat startują z komentarzem w Treści, np. `<!-- TEKST: … -->` albo `<!-- STRESZCZENIE: … -->`. Treść z samym komentarzem liczy się jak pusta: wpis nie dostaje pustej podstrony ani pustego streszczenia, a obrona dostaje zaproszenie złożone z danych. Konferencja i projekt z opisem mają własną stronę; konferencja bez opisu prowadzi od razu na swoją stronę internetową.
 - **Opis strony dla Google** (dawniej „Wstęp pod tytułem”, strony działów) i **Krótki opis** Stron trafiają tylko do Google i do podglądu linku; nowy nagłówek ich nie pokazuje. Wyjątek: w Popularyzacji opis Strony to zdanie na karcie „Dla kogo”.
 - **Hasło Strony** pokazuje się na banerze tylko razem z liczbami (hasło bez liczb i liczby bez hasła się nie wyświetlają). Listy Aktualności, Kalendarza, Obron, Ofert i „Warto wiedzieć” pokazują hasło także bez liczb.
 - **Nadtytuł kierunku** (Kierunki → Baner) na stronie się nie wyświetla; strona liczy z niego stopnie studiów na stronie „Studia”.
@@ -154,7 +152,7 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 | Tekst „O Instytucie” / „Badania w Instytucie” / „O studiach”, tytuł, hasło, „W skrócie” (Instytut: też godziny sekretariatu), opis strony dla Google | Web-Instytut / Web-Nauka / Web-Studia → Strona działu … |
 | Tytuł, opis, hasło i tekst nad listą: Seminaria, Konferencje, Projekty i granty, Sukcesy, Publikacje (też hasło rocznika) | Web-Nauka → Strony → `seminaria`, `nauka/konferencje`, `nauka/granty`, `nauka/sukcesy`, `nauka/publikacje` |
 | To samo: Struktura i zakłady, Warto wiedzieć | Web-Instytut → Strony → `instytut/struktura`, `warto-wiedziec` |
-| To samo: Aktualności, Obrony doktorskie (też hasło strony obrony) | Web-Aktualnosci → Strony → `aktualnosci`, `obrony-doktorskie` |
+| To samo: Aktualności, Kariera (oferty), Obrony doktorskie (też hasło strony obrony) | Web-Aktualnosci → Strony → `aktualnosci`, `kariera`, `obrony-doktorskie` |
 | To samo: Pracownicy; Plan zajęć | Web-Pracownicy → Strony → `pracownicy`; Web-Studia → Strony → `studia/plan-zajec` |
 | Termin wydarzenia (Kalendarz, nadchodzące wydarzenia, .ics) | Web-Aktualnosci → Aktualności → Termin wydarzenia (pod „Rodzaj”; zwykła informacja: tylko „Data”) |
 | Deklaracja dostępności, Polityka prywatności, O stronie (linki w stopce) | Web-Ustawienia → formularze o tych nazwach (jawny Markdown; tylko administrator) |
@@ -162,4 +160,4 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 
 **Stały adres sekcji w jawnym Markdownie** to `{#id}` przy nagłówku `##` (np. `## Terminy {#terminy}`); przy migracji każdy nagłówek dostał id z dawnym adresem, więc linki działają jak przedtem. Zmieniając nazwę nagłówka, id zostaw; bez `{#…}` adres powstaje z tekstu nagłówka. Kotwicy w HTML (`<a id="…">`) w treści nie wpisuj.
 
-Dawny format (Strony Web-Aktualnosci): stałe kotwice nazw sekcji (np. `#terminy`) są w `src/plugins/kotwice.mjs` (typ `strona` — strony działów i strony z listą, typ `naglowek` — zwykłe strony); inny nagłówek 2 dostaje kotwicę z tekstu. Kotwica w HTML nie przetrwa zapisu, stała kotwica idzie do `kotwice.mjs`.
+Dawny format (plik bez `format_tresci: jawne`; od etapu 3 zlecenia 40 żadna Strona): stałe kotwice nazw sekcji (np. `#terminy`) są w `src/plugins/kotwice.mjs` (typ `strona` — strony działów i strony z listą, typ `naglowek` — zwykłe strony); inny nagłówek 2 dostaje kotwicę z tekstu. Kotwica w HTML nie przetrwa zapisu, stała kotwica idzie do `kotwice.mjs`.

@@ -4,7 +4,7 @@
   w rozmowie claude.ai i nie miała źródła w repozytoriach; to jest jej odtworzenie z poprawkami po zleceniach 28–39 (18.11.2026).
   PDF: node skrypty/pdf-dla-redaktorow.mjs (Edge z systemu, A4, dwie strony).
   Zlecenie 40 (18.11.2026): strona 2 przepisana na jawny Markdown (tabela bloków zamiast „Układów, które strona rozpoznaje sama”);
-  formularze: pola EN pod polskimi, Treść na górze. Strony Aktualności zostają w dawnym formacie do etapu 3 zlecenia 40.
+  formularze: pola EN pod polskimi, Treść na górze. Etap 3 (18.11): Strony Aktualności (z Karierą ze zlecenia 44) też jawne.
 -->
 <html lang="pl">
 <head>
@@ -137,9 +137,9 @@
     <div class="dzial" style="--k: var(--aktualnosci)">
       <header><h2>Aktualności</h2><a class="cms" href="https://app.pagescms.org/IM-UWr/Web-Aktualnosci">CMS ↗</a><a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/aktualnosci/">/aktualnosci</a></header>
       <ul>
-        <li><b>Aktualności</b>: ogłoszenia i wydarzenia (data, miejsce, zdjęcie)</li>
+        <li><b>Aktualności</b>: ogłoszenia, wydarzenia (data, miejsce, zdjęcie) i oferty pracy (rodzaj „Kariera”)</li>
         <li><b>Obrony doktorskie</b> <a class="sciezka" href="https://im-uwr.github.io/Web-Podglad/obrony-doktorskie/">/obrony-doktorskie</a></li>
-        <li><b>Strony</b>: teksty nad listami Aktualności i Obron</li>
+        <li><b>Strony</b>: teksty nad listami Aktualności, Kariery i Obron</li>
       </ul>
     </div>
     <div class="dzial" style="--k: var(--pracownicy)">
@@ -227,7 +227,7 @@ Zapisy trwają do…
   </table>
 
   <div class="trzy">
-    <div><b>Gdzie to działa</b>Jawny Markdown: Strony i strony działów Instytutu, Nauki, Studiów, Popularyzacji i Pracowników, kierunki, specjalności, strony ze stopki. Strony Aktualności: jeszcze dawny format. Wpisy (aktualności, zakłady, konferencje, granty, referaty): zwykły Markdown, wzory w LaTeX-u (<code>$\ell^2$</code>).</div>
+    <div><b>Gdzie to działa</b>Jawny Markdown: Strony i strony działów Instytutu, Nauki, Studiów, Popularyzacji, Aktualności i Pracowników, kierunki, specjalności, strony ze stopki. Wpisy (aktualności, zakłady, konferencje, granty, referaty): zwykły Markdown, wzory w LaTeX-u (<code>$\ell^2$</code>).</div>
     <div><b>Pułapki</b>Każdy blok zamknij osobną linią <code>:::</code> (tyle dwukropków, ile przy otwarciu). Nie usuwaj <code>{#…}</code> przy nagłówkach: linki do sekcji przestałyby działać. Wygląd sprawdzaj na Podglądzie po przebudowaniu (ok. 10 min).</div>
     <div><b>Wersja angielska</b>Pola <b>„… EN”</b> tuż pod polskimi, w tych samych formularzach. Puste pole EN: strona angielska pokaże tekst polski. W Treści EN te same bloki; <code>{#…}</code> przy nagłówkach EN też zostaw.</div>
   </div>
