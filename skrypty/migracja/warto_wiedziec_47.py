@@ -12,7 +12,10 @@ Co robi (idempotentnie — drugie uruchomienie niczego nie zmienia):
    konflikt (redaktor zmienił tę samą linię) = STOP, nic nie jest nadpisywane.
 2. Stary wpis o medalach (medale-uniwersytetu-dla-…) usuwa `git rm`; zastępuje go ogólny wpis nagrody/medal-uniwersytetu.md.
    Jeśli redaktor zmienił stary wpis od bazy — STOP (zmianę trzeba przenieść ręcznie).
-3. Pozostałe pliki z załącznika A dopisuje bez zmian (plik już istniejący i inny — STOP).
+3. Pozostałe pliki z załącznika A dopisuje bez zmian (plik już istniejący i inny — STOP). Wyjątek — cztery historie z
+   LINKI_HISTORII (pytanie 1 z raportu 47, decyzja właściciela 18.11.2026): pogrubione nazwiska osób, które mają sylwetkę,
+   stają się linkami do sylwetek, żeby pod historią pokazały się „Ludzie w tej historii”. Historia już dopisana bez linków
+   (pierwsze uruchomienie) dostaje je przy następnym.
 4. src/data/instytut.md: „3 rektorów” → „4 rektorów” (PL i EN, opis z Łukaszewiczem) — tylko gdy wartości są jak w bazie.
 5. --dodano: pole „Dodano” u Bożejki, Rolskiego i Bilera (dzień pusha Web-Instytut), tylko gdy puste.
 6. --ustawienia: menu Instytutu (nawigacja.json): „Warto wiedzieć” pierwszą pozycją grupy „Więcej”, nowy opis grupy.
@@ -49,6 +52,37 @@ MENU_POZYCJA = {
     'opis_en': 'people, awards, stories', 'adres': '/instytut/warto-wiedziec',
 }
 MENU_OPIS = ('ludzie i historia, informatyka, biblioteka', 'people and history, IT, library')
+SYL = '/instytut/warto-wiedziec/'
+LINKI_HISTORII = {
+    f'{WW}/historie/pierwsze-wyklady.md': [
+        ('**Hugo Steinhaus**', f'[**Hugo Steinhaus**]({SYL}hugo-steinhaus)'),
+        ('**Edward Marczewski**', f'[**Edward Marczewski**]({SYL}edward-marczewski)'),
+        ('**Bronisław Knaster**', f'[**Bronisław Knaster**]({SYL}bronislaw-knaster)'),
+        ('**Władysław Ślebodziński**', f'[**Władysław Ślebodziński**]({SYL}wladyslaw-slebodzinski)'),
+    ],
+    f'{WW}/historie/nowa-ksiega-szkocka.md': [
+        ('**Hugo Steinhaus**', f'[**Hugo Steinhaus**]({SYL}hugo-steinhaus)'),
+    ],
+    f'{WW}/historie/taksonomia-wroclawska.md': [
+        ('**Florek, Łukaszewicz, Perkal, Steinhaus i Zubrzycki**',
+         f'**Florek, Łukaszewicz, [Perkal]({SYL}julian-perkal), [Steinhaus]({SYL}hugo-steinhaus) i Zubrzycki**'),
+    ],
+    f'{WW}/historie/aksjomat-determinacji.md': [
+        ('**Jan Mycielski**', f'[**Jan Mycielski**]({SYL}jan-mycielski)'),
+        ('**Hugo Steinhaus**', f'[**Hugo Steinhaus**]({SYL}hugo-steinhaus)'),
+    ],
+}
+
+
+def z_linkami(rel, t):
+    """Historia z załącznika A z linkami do sylwetek (LINKI_HISTORII); inne pliki bez zmian. Idempotentne."""
+    for a, b in LINKI_HISTORII.get(rel, []):
+        if b in t:
+            continue
+        if t.count(a) != 1:
+            stop(f'{rel}: nie znalazłem dokładnie raz „{a}” — dodaj link ręcznie')
+        t = t.replace(a, b)
+    return t
 
 
 def stop(komunikat):
@@ -138,15 +172,25 @@ def main():
         for f in sorted(pliki):
             rel = os.path.relpath(os.path.join(dp, f), zal).replace('\\', '/')
             cel = os.path.join(repo, rel)
+            surowy = czytaj(os.path.join(dp, f))
+            oczekiwany = z_linkami(rel, surowy)
             if os.path.exists(cel):
                 if any(rel == n for _, n in PRZENIESIENIA):
                     continue
-                if lf(czytaj(cel)) != lf(czytaj(os.path.join(dp, f))) and not dodano:
+                teraz = lf(czytaj(cel))
+                if teraz == lf(oczekiwany):
+                    continue
+                if teraz == lf(surowy):  # historia dopisana wcześniej bez linków do sylwetek
+                    zapisz(cel, oczekiwany)
+                    git(repo, 'add', rel)
+                    zmiany.append(f'linki do sylwetek: {rel}')
+                    continue
+                if not dodano:
                     stop(f'{rel}: plik już jest i różni się od załącznika A')
                 continue
-            zapisz(cel, czytaj(os.path.join(dp, f)))
+            zapisz(cel, oczekiwany)
             git(repo, 'add', rel)
-            zmiany.append(f'nowy: {rel}')
+            zmiany.append(f'nowy: {rel}' + (' (z linkami do sylwetek)' if oczekiwany != surowy else ''))
 
     # 4. „4 rektorów”
     p_ins = os.path.join(repo, INSTYTUT_MD)
