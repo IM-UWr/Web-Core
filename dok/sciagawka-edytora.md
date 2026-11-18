@@ -1,4 +1,4 @@
-# Ściągawka edytora: kierunki, specjalności, strony działów i strony
+# Ściągawka edytora: kierunki, specjalności, strony działów, strony i aktualności
 
 Strona kierunku (np. `/studia/matematyka`) to jeden tekst: pole **Treść** w Pages CMS (Web-Studia → Kierunki → Treść), po angielsku pole **Treść EN**. Ten sam tekst jest w opisie pola „Treść” w formularzu (zlecenie 28). Tak samo strona specjalności (Web-Spec-* → „Specjalność: …” → Treść) i tekst „O popularyzacji” (Web-Popularyzacja → Strona działu Popularyzacja) — zlecenie 29; różnice niżej.
 
@@ -98,6 +98,15 @@ Lista plików (opis po myślniku jest opcjonalny):
 - [Harmonogram wygaszania](/pliki/studia/zmiany2026.pdf) — Część przedmiotów jest wygaszana.
 ```
 
+## Aktualności: termin wydarzenia, zdjęcia i załączniki (zlecenie 31)
+
+> **Wydarzenie = kliknij »Add an item« pod »Termin wydarzenia«; zwykła informacja = nic nie klikaj, dzień w polu »Data«.**
+
+- **Termin wydarzenia** (pod „Rodzaj”): obowiązkowy jest tylko „Dzień”; puste pole po „Add an item” daje czerwone „Invalid date” i blokuje zapis. Bez godziny wydarzenie jest całodniowe. Godzinę wpisz jak 13:00 („9.30” też przejdzie, strona pokaże 09:30; „25:00” da czerwone „Wpisz godzinę w formacie 13:00”). Bez godziny zakończenia strona przyjmie 2 godziny po rozpoczęciu; „Dzień zakończenia” tylko przy wydarzeniach wielodniowych. Termin jest najwyżej jeden (przycisk „Add an item” znika); usuwasz go ikoną kosza.
+- Wpis z terminem trafia do Kalendarza, „Nadchodzących wydarzeń”, pliku .ics i Szybkiego dostępu, a po końcu wydarzenia znika z Aktualności na stronie głównej. Wpis bez terminu to zwykła aktualność, także z rodzajem „Wydarzenie”. CMS nie wpisuje już sam żadnej daty wydarzenia.
+- **Galeria i załączniki:** każda pozycja musi mieć zdjęcie albo plik. Pozycja pusta albo z samym podpisem daje czerwone „This field is required” i zapis jest zablokowany; zwinięta pozycja ma wtedy czerwony nagłówek, a na górze pojawia się „Please fix the errors before saving.”. Niepotrzebną pozycję usuń ikoną kosza („Remove item”). Tak samo w innych listach: recenzje obron (recenzent i plik), pliki referatów, liczby i fakty, przyciski, skróty i linki menu.
+- **Nazwa pliku nowego wpisu** powstaje z tytułu przy pierwszym zapisie (np. `2026-11-18-medale-uniwersytetu.md`), więc tytuł wpisz przed zapisem. Późniejsza zmiana tytułu nie zmienia adresu wpisu.
+
 ## Gdzie co jest
 
 | Co | Gdzie w Pages CMS |
@@ -114,5 +123,6 @@ Lista plików (opis po myślniku jest opcjonalny):
 | To samo: Struktura i zakłady, Warto wiedzieć | Web-Instytut → Strony → `instytut/struktura`, `warto-wiedziec` |
 | To samo: Aktualności, Obrony doktorskie (też hasło strony obrony) | Web-Aktualnosci → Strony → `aktualnosci`, `obrony-doktorskie` |
 | To samo: Pracownicy; Plan zajęć | Web-Pracownicy → Strony → `pracownicy`; Web-Studia → Strony → `studia/plan-zajec` |
+| Termin wydarzenia (Kalendarz, nadchodzące wydarzenia, .ics) | Web-Aktualnosci → Aktualności → Termin wydarzenia (pod „Rodzaj”; zwykła informacja: tylko „Data”) |
 
 Nazwy sekcji, które dostają stałe kotwice w adresie (np. `#terminy` w linkach przypomnień), są w `src/plugins/kotwice.mjs` (kotwice kierunku i specjalności osobno, pole `typ`; kotwice stron działów i stron z listą — typ `strona` z adresem strony; na zwykłych stronach — typ `naglowek`, np. „Konsultacje” / „Office hours” → `#konsultacje`, linki z Pierwszego roku). Inny nagłówek 2 też jest sekcją, z kotwicą z jego tekstu. Kotwicy w HTML (`<a id="…">`) w treści nie wpisuj — edytor z przyciskami usuwa ją przy zapisie; stała kotwica idzie do `kotwice.mjs`.
