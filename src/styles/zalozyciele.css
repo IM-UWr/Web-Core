@@ -2,6 +2,8 @@
    Kierunek „Założyciele” — wygląd na komputer (≥ 1024 px). Specyfikacja: dok/estetyka.md (gałąź kopia/2026-11-01-estetyka-prototypy),
    wzorzec: prototyp proto/zalozyciele.src.html (ustawienia domyślne).
    Telefon (≤ 1023 px) bez zmian: tu poza @media komputera są wyłącznie nowe zmienne (nieużywane na telefonie).
+   Dotyk w układzie komputerowym (zlecenie 36): najechanie okładki tylko pod @media (hover: hover) i bez [data-z-dotyk], stuknięty kafel .z-dotyk
+      — opis zachowania w src/scripts/zal/okladka.ts.
    ========================================================================== */
 
 /* ---------- zmienne: paleta »Lazur i malina« (jasny / głęboki / atrament / tło), granat, kroje, kolumna ----------
@@ -460,15 +462,15 @@
   .z-okl-dz:hover { color: #fff; }
   .z-okl-dz::before { content: ''; position: absolute; inset: 0; background: radial-gradient(52% 50% at 50% 34%, color-mix(in srgb, var(--d-g) 95%, transparent) 0, color-mix(in srgb, var(--d-g) 40%, transparent) 58%, transparent 100%);
     opacity: 0; transition: opacity .6s var(--rytm); pointer-events: none; }
-  .z-okl-dz:hover::before, .z-okl-dz:focus-visible::before { opacity: 1; }
+  .z-okl-dz:is(:focus-visible, .z-dotyk)::before { opacity: 1; }
   .z-okl-dz > * { position: relative; }
   .z-okl-szkic { --sz: calc(var(--sk) * clamp(84px, calc(var(--hp) * .18), 176px)); display: block; width: calc(var(--sz) * .833); height: var(--sz); margin: 0 auto calc(var(--sk) * clamp(4px, calc(var(--hp) * .01), 10px)); }
   .z-okl-szkic .duch path { stroke: rgb(255 255 255 / .2); stroke-width: 1.25; }
   .z-okl-szkic .tusz path { stroke: var(--d-j); stroke-width: 1.25; stroke-dashoffset: 1; opacity: 0; }
   .z-okl-szkic .detale path { stroke: var(--d-j); stroke-width: 1.05; }
   .z-okl-szkic .detale { opacity: 0; }
-  .z-okl-dz:is(:hover, :focus-visible) .tusz path { stroke-dashoffset: 0; opacity: 1; }
-  .z-okl-dz:is(:hover, :focus-visible) .detale { opacity: 1; }
+  .z-okl-dz:is(:focus-visible, .z-dotyk) .tusz path { stroke-dashoffset: 0; opacity: 1; }
+  .z-okl-dz:is(:focus-visible, .z-dotyk) .detale { opacity: 1; }
   /* suma szerokości czterech nazw to około 16 × czcionka: przy węższym oknie czcionka maleje, żeby „Popularyzacja” nie wychodziła poza okno (działa bez JS; ze skalą szerokość w pikselach projektu jest co najmniej 1920) */
   .z-okl-nazwa { display: block; margin: 0; font-family: var(--f-display); font-weight: 500; font-size: calc(var(--sk) * clamp(30px, min(calc(var(--hp) * .056), calc((100vw / var(--sk) - 260px) / 16)), 54px)); line-height: 1.05; letter-spacing: -.01em; }
   /* po najechaniu: kreska pod nazwą wysuwa się od lewej i nazwa lekko świeci kolorem działu — kreska (::after) przez
@@ -479,16 +481,35 @@
     transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--t-dlugi) var(--rytm); }
   .z-okl-nazwa span::before { content: attr(data-t); position: absolute; z-index: -1; left: 0; top: 0; white-space: nowrap; line-height: normal; color: transparent;
     text-shadow: 0 0 22px color-mix(in srgb, var(--d-j) 55%, transparent); opacity: 0; transition: opacity var(--t-dlugi) var(--rytm); pointer-events: none; }
-  .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::after { transform: none; }
-  .z-okl-dz:is(:hover, :focus-visible) .z-okl-nazwa span::before { opacity: 1; }
+  .z-okl-dz:is(:focus-visible, .z-dotyk) .z-okl-nazwa span::after { transform: none; }
+  .z-okl-dz:is(:focus-visible, .z-dotyk) .z-okl-nazwa span::before { opacity: 1; }
   .z-okl-dz:focus-visible .z-okl-nazwa span { outline: 2px solid var(--d-j); outline-offset: 6px; }
   .z-okl-dz .slot { position: relative; display: block; height: 2.8em; margin-top: calc(6px * var(--sk)); font-size: max(13px, calc(var(--sk) * clamp(13.5px, calc(var(--hp) * .021), 16px))); line-height: 1.4; }
   .z-okl-dz .slot > span { position: absolute; inset: 0; transition: opacity var(--t-dlugi) var(--rytm), transform var(--t-dlugi) var(--rytm); }
   .z-okl-dz .haslo-dz { color: var(--na-ciemnym-2); text-wrap: balance; }
   .z-okl-dz .patron { opacity: 0; transform: translateY(4px); color: var(--na-ciemnym-2); }
   .z-okl-dz .patron b { display: block; font-family: var(--f-display); font-style: italic; font-weight: 500; color: #fff; }
-  .z-okl-dz:is(:hover, :focus-visible) .haslo-dz { opacity: 0; transform: translateY(-4px); }
-  .z-okl-dz:is(:hover, :focus-visible) .patron { opacity: 1; transform: none; }
+  .z-okl-dz:is(:focus-visible, .z-dotyk) .haslo-dz { opacity: 0; transform: translateY(-4px); }
+  .z-okl-dz:is(:focus-visible, .z-dotyk) .patron { opacity: 1; transform: none; }
+  /* najechanie kursorem (zlecenie 36, punkt 6): tylko gdy urządzenie ma kursor, bo przeglądarki dotykowe zostawiają :hover na
+     ostatnio stukniętym kaflu (po „wstecz” patron zostawałby narysowany); [data-z-dotyk] na okładce — ostatnim wskaźnikiem był palec
+     (laptop z ekranem dotykowym: palcem jak tablet, myszą jak komputer; ustawia okladka.ts). Fokus z klawiatury — bez warunku, wyżej. */
+  @media (hover: hover) {
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover::before { opacity: 1; }
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover .tusz path { stroke-dashoffset: 0; opacity: 1; }
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover .detale { opacity: 1; }
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover .z-okl-nazwa span::after { transform: none; }
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover .z-okl-nazwa span::before { opacity: 1; }
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover .haslo-dz { opacity: 0; transform: translateY(-4px); }
+    .z-okladka:not([data-z-dotyk]) .z-okl-dz:hover .patron { opacity: 1; transform: none; }
+  }
+  /* dotyk (zlecenie 36, wariant A): stuknięcie dorysowuje patrona w ok. 0,3 s od stanu, w jakim rysunek akurat jest, potem przejście
+     (okladka.ts). Czasy .z-dotyk mają pierwszeństwo przed zwykłymi: 18 kresek z odstępem 6 ms (17 × 6 ms ≈ 0,1 s) + 0,2 s na kreskę,
+     detale 0,2 s po 0,1 s; poświata, nazwa, nazwisko i barwienie 0,3 s. Przy ograniczonym ruchu klasy nie ma (przejście od razu). */
+  .z-okl-dz.z-dotyk .z-okl-szkic .tusz path { transition: stroke-dashoffset .2s cubic-bezier(.35,.6,.2,1) calc(var(--i, 0) * 6ms), opacity .12s; }
+  .z-okl-dz.z-dotyk .z-okl-szkic .detale { transition: opacity .2s ease .1s; }
+  .z-okl-dz.z-dotyk::before, .z-okl-dz.z-dotyk .slot > span, .z-okl-dz.z-dotyk .z-okl-nazwa span::before, .z-okl-dz.z-dotyk .z-okl-nazwa span::after { transition-duration: .3s; }
+  .z-okladka:has(.z-okl-dz.z-dotyk) .z-barwa { transition-duration: .3s; }
   /* barwienie zdjęcia po najechaniu na dział (zlecenie 11, zalecenie 1; prototyp „Barwione”): warstwa nad zdjęciem, pod
      ciemnym polem; kolor --d-j z data-dzial warstwy (okladka.ts) */
   .z-barwa { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: var(--d-j, transparent); mix-blend-mode: soft-light; opacity: 0; transition: opacity .6s var(--rytm); }
@@ -503,7 +524,9 @@
   /* opis patrona środkowych działów (3 linie) sięga przy niższych oknach (np. 1366×768, 1280×720) do linii liczb —
      wtedy liczby na chwilę gasną; dział ma pierwszeństwo */
   .z-okl-liczby { transition: opacity var(--t-sredni) var(--rytm); }
-  .z-okladka:has(.z-okl-dz:is(:nth-child(2), :nth-child(3)):is(:hover, :focus-visible)) .z-okl-liczby { opacity: 0; }
+  .z-okladka:has(.z-okl-dz:is(:nth-child(2), :nth-child(3)):is(:focus-visible, .z-dotyk)) .z-okl-liczby { opacity: 0; }
+  /* najechanie tylko z kursorem i gdy ostatnim wskaźnikiem nie był palec (zlecenie 36, jak reguły kafli wyżej) */
+  @media (hover: hover) { .z-okladka:not([data-z-dotyk]):has(.z-okl-dz:is(:nth-child(2), :nth-child(3)):hover) .z-okl-liczby { opacity: 0; } }
   .z-strzalka { position: absolute; left: 50%; bottom: calc(var(--sk) * clamp(10px, calc(var(--hp) * .022), 24px)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: calc(10px * var(--sk));
     padding: calc(6px * var(--sk)) calc(12px * var(--sk)); font-size: max(13px, calc(14px * var(--sk))); color: rgb(255 255 255 / .74); text-decoration: none; white-space: nowrap; }
   .z-strzalka:hover { color: #fff; }
