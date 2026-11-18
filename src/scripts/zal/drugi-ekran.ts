@@ -1,11 +1,14 @@
 // Drugi ekran strony głównej (src/components/zal/DrugiEkran.astro): trzy kolumny, z których jedna (slot 2) jest długa.
-// - Długa kolumna pokazuje tyle pozycji, ile się zmieści; pod nimi „i jeszcze N · Wszystkie … →” („N more · All … →”).
+// - Długa kolumna pokazuje tyle pozycji, ile się zmieści; pod nimi „i jeszcze N · Wszystkie … →” („N more · All … →”). Minione pozycje
+//   („Ostatnio”, zlecenie 35, część B) stoją pod nadchodzącymi tylko wtedy, gdy zmieściły się wszystkie nadchodzące i zostało miejsce.
+// - Krótkie kolumny i odstępy między rzędami (zlecenie 35, D3.4; zastępuje drabinkę wysokości ze zlecenia 26, punkt 3): uloz().
+//   Krótkie kolumny pokazują tyle pozycji, ile się zmieści (co najmniej 3 nadchodzące, na niskim oknie 2), a w wolnym miejscu pod
+//   nadchodzącymi minione („Ostatnio”). Odstępy rosną z wolnym miejscem do 88 px; Studia nie są przypinane do dołu ekranu.
 // - Zajawka wyróżnionej aktualności: jedna linia, a gdy się nie mieści, „… czytaj dalej” (komputer; zlecenie 18, punkt 8).
 // - „Zobacz więcej” zamienia klikniętą krótką kolumnę z długą: płynne przejście FLIP (0,35 s — jeden rytm,
 //   zlecenie 13, punkt 9), kolejne pozycje rozwiniętej listy pojawiają się po kolei. Przy prefers-reduced-motion — od razu, z krótkim rozjaśnieniem kolumn, które zmieniły
 //   miejsce. Fokus zawsze przechodzi na nagłówek rozwiniętej kolumny (klawiatura, czytniki ekranu).
-// - Wydarzenia, które już się skończyły, znikają od razu w przeglądarce (zlecenie 06, punkt 4).
-// - Na niskim oknie komputera drabinka wysokości (zlecenie 26, punkt 3): kolejno ustępują stopka, „Warto wiedzieć” i trzecia pozycja krótkich kolumn.
+// - Wydarzenia, które skończą się przy otwartej stronie, przechodzą na początek „Ostatnio” (zlecenie 35, punkt 12; dawniej znikały, zlecenie 06, punkt 4).
 import { hasTime, now, today } from '../../lib/daty';
 import { MQ_TELEFON } from '../../lib/media';
 
@@ -16,93 +19,167 @@ const TELEFON = matchMedia(MQ_TELEFON);
 const RYTM = 'cubic-bezier(.22, .8, .2, 1)';
 
 const druga = siatka?.closest<HTMLElement>('.z-druga') ?? null;
+const rt = document.documentElement;
 
-// Strona przebudowuje się 2× dziennie, więc po usunięciu zakończonych liczymy widok od nowa: CSS pokazuje pierwsze trzy
-// pozostałe, N w „Zobacz więcej (N)” liczy liczWiecej(), przy 0 pokazuje się komunikat.
-function schowajZakonczone() {
+// Odstępy między rzędami siatki (kolumny → Studia: --z-g1, Studia → „Warto wiedzieć”: --z-g2) w px projektu, czyli przed skalą k (zlecenie 35):
+// G0 — odstęp nominalny (i jedyny na oknie, które i tak się przewija);
+// GPREF — krótkie kolumny dostają kolejne pozycje, dopóki odstępy między rzędami nie spadłyby poniżej tej wartości;
+// GMAX — odstęp nigdy nie jest większy; nadwyżka wysokości zostaje pod „Warto wiedzieć”, a długa kolumna sięga do stopki.
+const G0 = 22, GPREF = 56, GMAX = 88;
+
+// skala k drugiego ekranu (CSS zoom na ekranach większych od Full HD, zlecenie 26, punkt 2; --z-k ustawia skrypt okładki)
+const zoomK = () => parseFloat(getComputedStyle(rt).getPropertyValue('--z-k')) || 1;
+// wysokości z getBoundingClientRect są w px okna (pod CSS zoom k razy większe niż px CSS)
+const wys = (e: Element | null) => (e ? e.getBoundingClientRect().height : 0);
+const kolumny = () => Array.from(siatka?.querySelectorAll<HTMLElement>('.z-kolumna') ?? []);
+const krotkie = () => kolumny().filter((k) => k.dataset.slot !== '2');
+// pozycje kolumny w kolejności z HTML: nadchodzące, potem minione („Ostatnio”, klasa z-przeszle)
+const pozycje = (k: HTMLElement) => Array.from(k.querySelectorAll<HTMLElement>('.pozycje > .z-w'));
+const przeszla = (w: HTMLElement) => w.classList.contains('z-przeszle');
+const nadchodzace = (k: HTMLElement) => pozycje(k).filter((w) => !przeszla(w));
+const widac = (k: HTMLElement) => pozycje(k).filter((w) => !w.hidden).length;
+
+// Wydarzenia, które skończyły się już w przeglądarce (strona przebudowuje się 2× dziennie), przechodzą na początek „Ostatnio”: klasy
+// minelo i z-przeszle, zaraz pod nagłówkiem, najnowsze pierwsze. Gdy nie zostało żadne nadchodzące — komunikat „Brak wydarzeń…”.
+// Zwraca, czy coś się zmieniło (wtedy układ liczy się od nowa).
+function schowajZakonczone(): boolean {
   const kol = siatka?.querySelector<HTMLElement>('.z-kolumna[data-key="wyd"]');
-  if (!kol) return;
+  if (!kol) return false;
   const n = now(), d = today();
-  kol.querySelectorAll<HTMLElement>('[data-koniec]').forEach((w) => {
+  const h = kol.querySelector<HTMLElement>('.z-ostatnio-h');
+  let zmiana = false;
+  kol.querySelectorAll<HTMLElement>('.pozycje > .z-w:not(.z-przeszle)[data-koniec]').forEach((w) => {
     const koniec = w.dataset.koniec || '';
-    if (koniec && (hasTime(koniec) ? koniec < n : koniec < d)) w.remove();
+    if (!koniec || !(hasTime(koniec) ? koniec < n : koniec < d)) return;
+    w.classList.add('minelo', 'z-przeszle');
+    w.hidden = true;
+    delete w.dataset.koniec;
+    // kolejne zakończone (chronologicznie) wstawiane tuż pod nagłówek, więc najnowsze stoi pierwsze
+    if (h) h.after(w); else w.remove();
+    zmiana = true;
   });
-  if (!kol.querySelector('.z-w')) kol.querySelector('.z-pusto')?.removeAttribute('hidden');
+  if (!kol.querySelector('.pozycje > .z-w:not(.z-przeszle)')) kol.querySelector('.z-pusto')?.removeAttribute('hidden');
+  return zmiana;
 }
 
-// „Zobacz więcej (N)”: N = pozycje, których krótka kolumna nie pokazuje. Komputer: 3, z powiększonym wpisem 2, na niskim oknie (krok 3 drabinki) o jedną mniej;
-// telefon: zawsze 3 (.z-ile-k i .z-ile-t, CSS pokazuje właściwą). Bez ukrytych pozycji przycisk znika.
-function liczWiecej() {
-  const krok3 = druga?.dataset.krok === '3' || druga?.dataset.krok === '4';
-  siatka?.querySelectorAll<HTMLElement>('.z-kolumna').forEach((kol) => {
-    const b = kol.querySelector<HTMLElement>('.z-wiecej');
-    if (!b) return;
-    const n = kol.querySelectorAll('.z-w').length;
-    const k = Math.max(0, n - ((kol.querySelector('.z-w.wyr') ? 2 : 3) - (krok3 ? 1 : 0)));
-    const t = Math.max(0, n - 3);
-    const ik = b.querySelector('.z-ile-k'), it = b.querySelector('.z-ile-t');
-    if (ik) ik.textContent = String(k);
-    if (it) it.textContent = String(t);
-    b.hidden = !(TELEFON.matches ? t : k);
-  });
+// Nagłówek „Ostatnio…” tylko razem z pierwszą widoczną minioną pozycją.
+function ostatnioNaglowek(k: HTMLElement) {
+  const h = k.querySelector<HTMLElement>('.z-ostatnio-h');
+  if (h) h.hidden = !k.querySelector('.pozycje > .z-w.z-przeszle:not([hidden])');
 }
 
-// Drabinka wysokości (zlecenie 26, punkt 3; komputer przy skali ≤ 1): gdy drugi ekran z paskiem i stopką nie mieści się w oknie, ustępują kolejno
-// 1. stopka (schodzi pod ekran), 2. „Warto wiedzieć” (w całości pod ekran), 3. trzecia pozycja krótkich kolumn; 4. gdy i to za mało, układ z kroku 3 i zwykłe przewijanie.
-// „Pod ekran”: siatka (Szybki dostęp, kolumny, Studia) wypełnia pierwszy ekran, reszta stoi pod nią. Kolejność w HTML (czytnik ekranu) się nie zmienia.
-// Krok zapisany w data-krok na .z-druga, wysokości w --z-druga-h i --z-siatka-h (CSS: zalozyciele-strony.css). Bez kroku układ jak dotąd:
-// tak jest przy 1707×830, 1920×950 i każdym oknie, w którym wszystko się mieści. Tolerancja 1 px na zaokrąglenia.
+// „Zobacz więcej (N)”: na komputerze N = ukryte nadchodzące (.z-ile-k; minione się nie liczą), na telefonie wszystkie nadchodzące ponad
+// trzy (.z-ile-t; CSS pokazuje właściwą liczbę). Przy N = 0 przycisk znika.
+function liczWiecej(k: HTMLElement) {
+  const b = k.querySelector<HTMLElement>('.z-wiecej');
+  if (!b) return;
+  const nad = nadchodzace(k);
+  const ukryte = nad.filter((w) => w.hidden).length, t = Math.max(0, nad.length - 3);
+  const ik = b.querySelector('.z-ile-k'), it = b.querySelector('.z-ile-t');
+  if (ik) ik.textContent = String(ukryte);
+  if (it) it.textContent = String(t);
+  b.hidden = !(TELEFON.matches ? t : ukryte);
+}
+
+// Krótka kolumna: widać pierwsze n pozycji (nadchodzące, potem minione).
+function pokaz(k: HTMLElement, n: number) {
+  pozycje(k).forEach((w, i) => { w.hidden = i >= n; });
+  ostatnioNaglowek(k);
+  liczWiecej(k);
+}
+
 // Kreski pod nagłówkami kolumn na jednej wysokości (zlecenie 26, punkt 4.1): gdy w wąskiej kolumnie link (po polsku „Kalendarz →” przy 1024–1072 px)
 // schodzi pod nagłówek, pozostałe nagłówki dostają tę samą wysokość. Przy równych nagłówkach nic się nie zmienia.
 function wyrownajKreski() {
   const h = Array.from(siatka?.querySelectorAll<HTMLElement>('.z-kolumna > .z-h') ?? []);
   h.forEach((e) => { e.style.minHeight = ''; });
   if (TELEFON.matches) return;
-  const wys = h.map((e) => e.getBoundingClientRect().height), max = Math.max(...wys);
-  if (wys.some((x) => x < max - 0.5)) h.forEach((e) => { e.style.minHeight = `${max}px`; });
+  const ws = h.map((e) => e.getBoundingClientRect().height), max = Math.max(...ws);
+  if (ws.some((x) => x < max - 0.5)) h.forEach((e) => { e.style.minHeight = `${max}px`; });
 }
 
+// Układ drugiego ekranu na komputerze (zlecenie 35, D3.4; przy każdej skali k). Kolejność ustępowania, gdy brakuje wysokości okna:
+// stopka, „Warto wiedzieć”, trzecia pozycja krótkich kolumn, a na końcu zwykłe przewijanie. Tryb wybiera pierwszy, który się mieści,
+// najpierw przy co najmniej 3 nadchodzących pozycjach na krótką kolumnę (albo tylu, ile ich jest), potem przy 2:
+//   0 — pasek, drugi ekran i stopka w oknie;  1 — stopka pod ekranem;
+//   2 — „Warto wiedzieć” pod ekranem: w oknie pasek, Szybki dostęp, kolumny i Studia (z dolnym marginesem drugiego ekranu); Studia nie są przypinane do dołu;
+//   3 — nic się nie mieści: krótkie kolumny po 2 pozycje i zwykłe przewijanie.
+// Potem każda krótka kolumna osobno dostaje kolejne pozycje (nadchodzące, a za nimi minione z nagłówkiem „Ostatnio”), dopóki jej wysokość
+// nie przekroczy R = wysokość wyższej krótkiej kolumny + (budżet − wysokość całości − rezerwa), rezerwa = liczba odstępów × (GPREF − G0) × k.
+// Krótsza kolumna dopełnia się więc do wysokości sąsiedniej bez kosztu. Na koniec odstępy z resztą wolnego miejsca (najwyżej GMAX).
+// Pomiar w trybie „miara” (klasa z-miara: bez min-height i rozciągania). Stan: data-tryb na .z-druga, --z-druga-h, --z-g1, --z-g2.
 let skrH = -1;
-function drabinka() {
+type Tryb = { id: number; budzet: number; miara: () => number; odstepy: number };
+function uloz() {
   if (!siatka || !druga) return;
   const pasek = document.querySelector<HTMLElement>('.z-pasek-jasny'), stopka = document.querySelector<HTMLElement>('.z-stopka');
   const skr = druga.querySelector<HTMLElement>('.z-skr'), studia = siatka.querySelector<HTMLElement>('.z-studia');
-  const k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z-k')) || 1;
-  const ustaw = (krok: string | null, druga_h?: number, siatka_h?: number) => {
-    if (krok === null) delete druga.dataset.krok; else druga.dataset.krok = krok;
-    if (druga_h === undefined) druga.style.removeProperty('--z-druga-h'); else druga.style.setProperty('--z-druga-h', `${druga_h}px`);
-    if (siatka_h === undefined) druga.style.removeProperty('--z-siatka-h'); else druga.style.setProperty('--z-siatka-h', `${siatka_h}px`);
-    // przycisk „Zobacz więcej” zależy od kroku (w kroku 3 pojawia się także w kolumnie z trzema pozycjami), a ma wysokość: przed każdym pomiarem
-    liczWiecej();
-  };
-  ustaw(null);
+  for (const p of ['--z-druga-h', '--z-g1', '--z-g2']) druga.style.removeProperty(p);
+  // podczas pomiaru data-tryb="miara", nie brak atrybutu: bez niego działa zapas bez JS (CSS pokazuje 3 pozycje), a pomiar musi widzieć każdą dodaną pozycję
+  druga.dataset.tryb = 'miara';
   wyrownajKreski();
   skrH = skr?.offsetHeight ?? -1;
-  if (TELEFON.matches || k > 1 || !druga.offsetHeight) return;
-  const H = document.documentElement.clientHeight;
-  const wys = (e: HTMLElement | null) => (e ? e.getBoundingClientRect().height : 0);
-  const P = wys(pasek), F = wys(stopka);
-  const wybierz = (): void => {
-    // bez kroku: min-height z CSS (okno − pasek − 47 px) — mieści się albo nie
-    if (P + wys(druga) + F <= H + 1) return ustaw(null);
-    ustaw('1');
-    const D = wys(druga);
-    // wszystko mieści się bez rozciągania, tylko stopka na niższych oknach jest wyższa niż 47 px: druga część dokładnie do stopki
-    if (P + D + F <= H + 1) return ustaw('0', H - P - F);
-    if (P + D <= H + 1) return ustaw('1', H - P);
-    // „na styk”: Studia mogą sięgać krawędzi okna; gdy jest miejsce, nad krawędzią zostaje odstęp siatki (22 px), a długa kolumna sięga do dołu Studiów
-    const gap = parseFloat(getComputedStyle(siatka).rowGap) || 0;
-    for (const krok of ['2', '3']) {
-      ustaw(krok);
-      const g = druga.getBoundingClientRect(), s = siatka.getBoundingClientRect();
-      if (studia && P + studia.getBoundingClientRect().bottom - g.top <= H + 1) return ustaw(krok, undefined, H - P - (s.top - g.top) - gap);
+  if (TELEFON.matches || !druga.offsetHeight || !studia) {
+    delete druga.dataset.tryb;
+    // telefon: nadchodzące w HTML (CSS pokazuje trzy, „Zobacz więcej” rozwija w miejscu), minione schowane
+    kolumny().forEach((k) => { pozycje(k).forEach((w) => { w.hidden = przeszla(w); }); ostatnioNaglowek(k); liczWiecej(k); });
+    return;
+  }
+  const kk = krotkie();
+  const k = zoomK();
+  const H = rt.clientHeight, P = wys(pasek), F = wys(stopka);
+  const pad = parseFloat(getComputedStyle(druga).paddingBottom) * k;
+  druga.classList.add('z-miara');
+  const calosc = () => wys(druga);
+  const doStudiow = () => studia.getBoundingClientRect().bottom - druga.getBoundingClientRect().top + pad;
+  const TRYBY: Tryb[] = [
+    { id: 0, budzet: H - P - F, miara: calosc, odstepy: 2 },
+    { id: 1, budzet: H - P, miara: calosc, odstepy: 2 },
+    { id: 2, budzet: H - P, miara: doStudiow, odstepy: 1 },
+  ];
+  let wybor: Tryb | null = null;
+  for (const minimum of [3, 2]) {
+    for (const t of TRYBY) {
+      // minimum liczy tylko nadchodzące: minione nigdy nie są wymuszane
+      kk.forEach((c) => pokaz(c, Math.min(nadchodzace(c).length, minimum)));
+      if (t.miara() > t.budzet + 1) continue;
+      const R = Math.max(...kk.map(wys)) + (t.budzet - t.miara() - t.odstepy * (GPREF - G0) * k);
+      for (const c of kk) {
+        const wszystkie = pozycje(c).length;
+        for (let n = widac(c); n < wszystkie; n++) {
+          pokaz(c, n + 1);
+          if (wys(c) > R + 0.5) { pokaz(c, n); break; }
+        }
+      }
+      wybor = t;
+      break;
     }
-    // jak w zleceniu 25 kroki się sumują: układ z kroku 3 zostaje, strona się przewija
-    ustaw('4');
-  };
-  wybierz();
+    if (wybor) break;
+  }
+  if (!wybor) kk.forEach((c) => pokaz(c, Math.min(nadchodzace(c).length, 2)));
+  // wolne miejsce w px projektu
+  const luz = wybor ? Math.max(0, (wybor.budzet - wybor.miara()) / k) : 0;
+  druga.classList.remove('z-miara');
+  const id = wybor ? wybor.id : 3;
+  druga.dataset.tryb = String(id);
+  const ustaw = (p: string, v: number) => druga.style.setProperty(p, `${v}px`);
+  if (id <= 1) {
+    // odstępy rosną z wolnym miejscem, najwyżej do GMAX; reszta zostaje pod „Warto wiedzieć” (długa kolumna sięga do stopki)
+    const g = G0 + Math.min(GMAX - G0, luz / 2);
+    ustaw('--z-g1', g); ustaw('--z-g2', g);
+    ustaw('--z-druga-h', (id === 0 ? H - P - F : H - P) / k);
+  } else if (id === 2) {
+    // w oknie: odstęp kolumny → Studia do GMAX, reszta przed „Warto wiedzieć”, które zaczyna się tuż pod dolną krawędzią okna
+    const g1 = G0 + Math.min(GMAX - G0, luz);
+    ustaw('--z-g1', g1); ustaw('--z-g2', G0 + luz - (g1 - G0));
+    ustaw('--z-druga-h', 0);
+  } else {
+    ustaw('--z-druga-h', 0);
+  }
 }
 
+// Długa kolumna: nadchodzące, ile się zmieści, a gdy zmieściły się wszystkie — pod nimi minione z nagłówkiem „Ostatnio”, też ile się zmieści.
+// „i jeszcze N” liczy tylko ukryte nadchodzące.
 function dopasujDluga() {
   if (!siatka || !siatka.offsetHeight || TELEFON.matches) return;
   const kol = siatka.querySelector<HTMLElement>('.z-kolumna[data-slot="2"]');
@@ -110,13 +187,16 @@ function dopasujDluga() {
   const box = kol.querySelector<HTMLElement>('.pozycje');
   const link = kol.querySelector<HTMLAnchorElement>('.reszta');
   if (!box || !link) return;
-  const wiersze = Array.from(box.querySelectorAll<HTMLElement>('.z-w'));
+  const wiersze = pozycje(kol);
+  const h = kol.querySelector<HTMLElement>('.z-ostatnio-h');
   wiersze.forEach((w) => { w.hidden = false; });
+  if (h) h.hidden = false;
   const limit = box.clientHeight;
-  let ukryte = 0;
-  wiersze.forEach((w) => {
-    if (ukryte || w.offsetTop - box.offsetTop + w.offsetHeight > limit + 1) { w.hidden = true; ukryte++; }
-  });
+  const miesci = (w: HTMLElement) => w.offsetTop - box.offsetTop + w.offsetHeight <= limit + 1;
+  let ukryte = 0, jestMiejsce = true;
+  for (const w of wiersze.filter((x) => !przeszla(x))) if (!jestMiejsce || !miesci(w)) { w.hidden = true; ukryte++; jestMiejsce = false; }
+  for (const w of wiersze.filter(przeszla)) if (!jestMiejsce || !miesci(w)) { w.hidden = true; jestMiejsce = false; }
+  ostatnioNaglowek(kol);
   // data-wiecej: wzór z {n} („i jeszcze {n}”, po angielsku „{n} more” — liczba przed słowem)
   link.textContent = ukryte ? `${(link.dataset.wiecej || '{n}').replace('{n}', String(ukryte))} · ${link.dataset.wsz}` : link.dataset.wsz || '';
 }
@@ -137,6 +217,8 @@ function dalej() {
   });
 }
 
+function wszystko() { uloz(); dopasujDluga(); dalej(); }
+
 function zamien(key: string) {
   if (!siatka) return;
   if (TELEFON.matches) {
@@ -148,22 +230,19 @@ function zamien(key: string) {
   const kliknieta = siatka.querySelector<HTMLElement>(`.z-kolumna[data-key="${key}"]`);
   const dluga = siatka.querySelector<HTMLElement>('.z-kolumna[data-slot="2"]');
   if (!kliknieta || !dluga || kliknieta === dluga) return;
-  const kolumny = Array.from(siatka.querySelectorAll<HTMLElement>('.z-kolumna'));
-  const stare = new Map(kolumny.map((el) => [el, el.getBoundingClientRect()]));
+  const stare = new Map(kolumny().map((el) => [el, el.getBoundingClientRect()]));
   // ile pozycji było widać w klikniętej krótkiej kolumnie: kolejne pojawią się po kolei
-  const bylo = Array.from(kliknieta.querySelectorAll<HTMLElement>('.z-w')).filter((w) => w.getClientRects().length).length;
+  const bylo = widac(kliknieta);
   const slot = kliknieta.dataset.slot!;
   kliknieta.dataset.slot = '2';
   dluga.dataset.slot = slot;
-  // w krótkiej kolumnie wszystkie pozycje z powrotem widoczne (CSS i tak pokazuje pierwsze trzy, przy powiększonym wpisie dwa)
-  dluga.querySelectorAll<HTMLElement>('.z-w').forEach((w) => { w.hidden = false; });
-  // inna krótka kolumna może mieć inną wysokość, więc drabinka liczy krok od nowa
-  drabinka();
+  // nowa krótka kolumna ma inną wysokość, więc układ (tryb, pozycje krótkich kolumn, odstępy) liczy się od nowa, przed FLIP
+  uloz();
   dopasujDluga();
   kliknieta.querySelector<HTMLElement>('.z-h h2')?.focus({ preventScroll: true });
   const bezRuchu = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // getBoundingClientRect podaje piksele okna, a przesunięcie pod CSS zoom rośnie k razy (ekrany większe od Full HD, zlecenie 26, punkt 2)
-  const k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z-k')) || 1;
+  const k = zoomK();
   for (const el of [kliknieta, dluga]) {
     const o = stare.get(el)!, n = el.getBoundingClientRect();
     const dx = (o.left - n.left) / k, dy = (o.top - n.top) / k;
@@ -174,20 +253,28 @@ function zamien(key: string) {
       .finished.then(() => { el.style.zIndex = ''; }).catch(() => {});
   }
   if (bezRuchu) return;
-  Array.from(kliknieta.querySelectorAll<HTMLElement>('.z-w:not([hidden])')).slice(bylo).forEach((w, i) =>
+  Array.from(kliknieta.querySelectorAll<HTMLElement>('.pozycje > .z-w:not([hidden])')).slice(bylo).forEach((w, i) =>
     w.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 250, delay: 250 + i * 35, easing: RYTM, fill: 'backwards' }));
 }
 
 if (siatka) {
   schowajZakonczone();
-  drabinka();
+  wszystko();
   siatka.querySelectorAll<HTMLButtonElement>('.z-wiecej').forEach((b) => b.addEventListener('click', () => zamien(b.dataset.key || '')));
   const dopasuj = () => { dopasujDluga(); dalej(); };
   new ResizeObserver(dopasuj).observe(siatka);
-  // drabinka zależy od okna (resize; skalę --z-k ustawia wcześniej skrypt okładki), czcionek i wysokości paska Szybkiego dostępu, którą po wczytaniu
-  // może zmienić kolor dnia (kolor-dnia.ts). Ta ostatnia przez requestAnimationFrame: zmiana siatki wewnątrz ResizeObservera dałaby błąd pętli obserwatora.
-  addEventListener('resize', drabinka);
-  document.fonts?.ready.then(() => { drabinka(); dopasuj(); });
+  // układ zależy od okna (resize; skalę --z-k ustawia wcześniej skrypt okładki), czcionek i wysokości paska Szybkiego dostępu, którą po wczytaniu
+  // może zmienić kolor dnia (kolor-dnia.ts). Przez requestAnimationFrame (raz na klatkę): zmiana siatki wewnątrz ResizeObservera dałaby błąd pętli obserwatora.
+  let zaplanowane = false;
+  const zaplanuj = () => {
+    if (zaplanowane) return;
+    zaplanowane = true;
+    requestAnimationFrame(() => { zaplanowane = false; wszystko(); });
+  };
+  addEventListener('resize', zaplanuj);
+  document.fonts?.ready.then(zaplanuj);
   const skr = siatka.parentElement?.querySelector<HTMLElement>('.z-skr');
-  if (skr) new ResizeObserver(() => { if (skr.offsetHeight !== skrH) requestAnimationFrame(drabinka); }).observe(skr);
+  if (skr) new ResizeObserver(() => { if (skr.offsetHeight !== skrH) zaplanuj(); }).observe(skr);
+  // wydarzenie kończy się przy otwartej stronie: co minutę sprawdzenie, przejście do „Ostatnio” i nowy układ
+  setInterval(() => { if (schowajZakonczone()) wszystko(); }, 60_000);
 }

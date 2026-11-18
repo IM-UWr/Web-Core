@@ -30,8 +30,10 @@
   .z-skr-kd[data-kolor="niebieski"] .z-kd-kropka, .z-skr-kd[data-kolor="brak"][data-nastepny="niebieski"] .z-kd-kropka { background: var(--kd-n); }
   .z-skr-kd[data-kolor="pomaranczowy"] .z-kd-kropka, .z-skr-kd[data-kolor="brak"][data-nastepny="pomaranczowy"] .z-kd-kropka { background: var(--kd-p); }
   .z-skr-kd:not([data-zamiana=""]) .z-kd-kropka { width: auto; height: auto; padding: 0 6px; border-radius: 999px; font-size: 11px; font-weight: 800; color: #fff; }
-  /* trzy kolumny: dwie krótkie po 3 pozycje (sloty 0 i 1), pod nimi Studia i Warto wiedzieć na 2/3, z prawej długa (slot 2) */
-  .z-siatka { flex: 1 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; align-content: space-between; gap: 22px 36px; margin-top: 22px; }
+  /* trzy kolumny: dwie krótkie (sloty 0 i 1), pod nimi Studia i Warto wiedzieć na 2/3, z prawej długa (slot 2). Rzędy stoją od góry, odstępy
+     między nimi to marginesy Studiów i „Warto wiedzieć” (--z-g1, --z-g2; zlecenie 35), a ostatni rząd bierze resztę wysokości: długa kolumna
+     sięga do stopki, nadwyżka zostaje pod „Warto wiedzieć” (dawniej align-content: space-between oddawało ją przerwom, bez górnej granicy) */
+  .z-siatka { flex: 1 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto 1fr; align-content: start; gap: 0 36px; margin-top: 22px; }
   .z-kolumna { position: relative; isolation: isolate; min-width: 0; background: var(--bg); }
   /* kliknięta liczba na okładce (zlecenie 11, zalecenie 15): krótkie podświetlenie kolumny; przy ograniczonym ruchu — obrys.
      Tło i obwódka w warstwie pod treścią kolumny, która gaśnie przez opacity (zlecenie 13, punkt 8; dawniej animacja
@@ -45,7 +47,6 @@
   .z-kolumna[data-slot="0"] { grid-column: 1; grid-row: 1; }
   .z-kolumna[data-slot="1"] { grid-column: 2; grid-row: 1; }
   .z-kolumna[data-slot="2"] { grid-column: 3; grid-row: 1 / span 3; display: flex; flex-direction: column; }
-  .z-kolumna:not([data-slot="2"]) .z-w:nth-child(n+4) { display: none; }
   .z-kolumna:not([data-slot="2"]) .reszta, .z-kolumna[data-slot="2"] .z-wiecej { display: none; }
   .z-kolumna[data-slot="2"] > .lista { position: relative; flex: 1 1 auto; min-height: 200px; }
   .z-kolumna[data-slot="2"] .lista-in { position: absolute; inset: 0; display: flex; flex-direction: column; }
@@ -183,21 +184,33 @@
 @media (min-width: 1024px) and (min-height: 501px) and (max-width: 1365px), (min-width: 1024px) and (pointer: fine) and (max-width: 1365px) {
   .z-warto .rzad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-/* W krótkiej kolumnie powiększony wpis liczy się za dwa: obok niego jeszcze jeden zwykły wiersz */
+/* Komputer: skala k, układ drugiego ekranu (zlecenie 35), „Ostatnio”, powiększona pierwsza aktualność */
 @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
   /* Ekrany większe od Full HD (zlecenie 26, punkt 2): drugi ekran, pasek menu i stopka strony głównej rosną tą samą skalą co okładka. --z-k ustawia tylko strona główna (ULOZ w Okladka.astro); przy s ≤ 1 równe 1 */
   .z-druga, .z-pasek.z-pasek-jasny, body:has(.z-druga) .z-stopka { zoom: var(--z-k, 1); }
-  .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
   .z-wiecej .z-ile-t { display: none; }
 
-  /* Drabinka wysokości na niskim oknie (zlecenie 26, punkt 3): krok i wysokości ustawia drabinka() w src/scripts/zal/drugi-ekran.ts.
-     0: drugi ekran dokładnie do stopki; 1: stopka pod ekranem; 2: „Warto wiedzieć” pod ekranem — długa kolumna kończy się ze Studiami, które
-     stoją na dole pierwszego ekranu; 3: jak 2, krótkie kolumny po 2 pozycje (powiększony wpis za dwie); 4: układ z kroku 3, który się nie mieści, i zwykłe przewijanie. */
-  .z-druga[data-krok] { min-height: var(--z-druga-h, 0px); }
-  .z-druga:is([data-krok="2"], [data-krok="3"], [data-krok="4"]) .z-kolumna[data-slot="2"] { grid-row: 1 / span 2; min-height: var(--z-siatka-h, 0px); }
-  .z-druga:is([data-krok="2"], [data-krok="3"], [data-krok="4"]) .z-studia { align-self: end; }
-  .z-druga:is([data-krok="3"], [data-krok="4"]) .z-kolumna:not([data-slot="2"]) .z-w:nth-child(n+3),
-  .z-druga:is([data-krok="3"], [data-krok="4"]) .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+2) { display: none; }
+  /* Szybki dostęp bez dziur (zlecenie 35, D3.4; dawniej drabinka wysokości ze zlecenia 26, punkt 3, z przypinaniem Studiów do dołu ekranu).
+     Tryb, wysokość i odstępy ustawia uloz() w src/scripts/zal/drugi-ekran.ts; tam też liczba pozycji krótkich kolumn (atrybut hidden; ukryte
+     pozycje chowa [hidden] { display: none !important } z global.css). Odstępy kolumny → Studia (--z-g1) i Studia → „Warto wiedzieć” (--z-g2)
+     rosną z wolnym miejscem najwyżej do 88 px. data-tryb: 0 — drugi ekran ze stopką w oknie; 1 — stopka pod ekranem; 2 — „Warto wiedzieć” pod
+     ekranem; 3 — nic się nie mieści: krótkie kolumny po 2 pozycje i zwykłe przewijanie. Bez JS (bez data-tryb): rzędy co 22 px od góry,
+     krótkie kolumny po 3 pozycje, z powiększonym wpisem 2 (obok niego jeszcze jeden zwykły wiersz). */
+  .z-druga[data-tryb] { min-height: var(--z-druga-h, 0px); }
+  .z-studia { margin-top: var(--z-g1, 22px); }
+  .z-warto { align-self: start; margin-top: var(--z-g2, 22px); }
+  .z-druga:not([data-tryb]) .z-kolumna:not([data-slot="2"]) .z-w:nth-child(n+4),
+  .z-druga:not([data-tryb]) .z-kolumna:not([data-slot="2"]) .pozycje:has(> .z-w.wyr) > .z-w:nth-child(n+3) { display: none; }
+  /* pomiar (uloz()): bez rozciągania drugiego ekranu i siatki, krótkie kolumny o wysokości treści */
+  .z-druga.z-miara { min-height: 0 !important; }
+  .z-druga.z-miara .z-siatka { flex: none; }
+  .z-druga.z-miara .z-kolumna:not([data-slot="2"]) { align-self: start; }
+  /* „Ostatnio” (zlecenie 35, część B): minione pozycje pod nadchodzącymi, tylko w wolnym miejscu kolumny; nagłówek razem z pierwszą widoczną.
+     Data przygaszona (klasa minelo), tytuł lżejszy, „dział · …” lekko przygaszone; kolory z tokenów (tryb ciemny bez osobnych reguł) */
+  .z-ostatnio-h { margin: 0; padding: 10px 0 6px; border-bottom: 1px solid var(--line); font-family: var(--f-text); font-size: 12px; font-weight: 700; line-height: 1.4;
+    letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .z-w.z-przeszle .t { font-weight: 500; color: var(--text); }
+  .z-w.z-przeszle .gdzie { opacity: .8; }
 
   /* Powiększona pierwsza aktualność (zlecenie 14, zalecenie 22; wzór: prototyp v92, .ok-w.wyr): wartości z prototypu (50 | tekst | 168×126,
      tytuł 21 px) przy kolumnie 584 px, czyli 1920 px strony. Węższe kolumny: zdjęcie proporcjonalnie, tytuł od 18 px, żeby tekst nie zszedł
@@ -250,6 +263,8 @@
   .z-druga .z-kolumna .z-w:nth-child(n+4) { display: none; }
   .z-druga .z-kolumna.z-rozwin .z-w { display: grid; }
   .z-druga .z-kolumna .z-w[hidden] { display: none !important; }
+  /* „Ostatnio” (zlecenie 35) tylko na komputerze */
+  .z-druga :is(.z-ostatnio-h, .z-w.z-przeszle) { display: none !important; }
   .z-druga .z-kolumna .reszta { display: none; }
   .z-druga .z-kolumna .z-wiecej { display: flex; }
   .z-wiecej .z-ile-k { display: none; }

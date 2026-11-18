@@ -331,9 +331,14 @@ export function tydzienSeminariow(): { od: string; do: string; przyszly: boolean
 export interface ReferatWLiscie { termin: string; sala?: string; seminarium: string; seminariumId: string; jezyk?: string; tytul: string; prelegent: string; href: string }
 
 export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLiscie[]> {
+  const { od, do: doDnia } = tydzienSeminariow();
+  return referatyMiedzy(od, doDnia, lang);
+}
+
+// Referaty seminariów z listy (seminaria opublikowane) z datą od `od` do `doDnia` włącznie, chronologicznie.
+async function referatyMiedzy(od: string, doDnia: string, lang: Lang): Promise<ReferatWLiscie[]> {
   const [ref, sem] = await Promise.all([referaty(), seminaria()]);
   const nazwy = new Map(sem.map((s) => [s.id, (lang === 'en' && s.data.nazwa_en) || s.data.nazwa]));
-  const { od, do: doDnia } = tydzienSeminariow();
   return ref
     .filter((r) => r.data.termin.slice(0, 10) >= od && r.data.termin.slice(0, 10) <= doDnia && nazwy.has(seminariumReferatu(r)))
     .map((r) => {
@@ -343,6 +348,28 @@ export async function referatyWTygodniu(lang: Lang = 'pl'): Promise<ReferatWLisc
         prelegent: r.data.prelegent, href: `/seminaria/${semId}#${slugOf(r.id)}`,
       };
     });
+}
+
+// „Ostatnio” na drugim ekranie strony głównej (zlecenie 35, część B): minione pozycje z ostatnich OSTATNIO_DNI dni, od najnowszej,
+// najwyżej OSTATNIO_LIMIT. Strona pokazuje je tylko w wolnym miejscu krótkiej kolumny, pod nadchodzącymi (src/scripts/zal/drugi-ekran.ts).
+// Stałe w kodzie, bez pola w CMS.
+export const OSTATNIO_DNI = 14;
+export const OSTATNIO_LIMIT = 6;
+
+// Wydarzenia (bez referatów i przypomnień terminów) zakończone w chwili budowy, z początkiem nie wcześniej niż dziś − `dni`.
+// Koniec jak w kalendarzu .ics (koniecIcs: koniec podany przez redaktora albo domyślny), a gdy go brak — koniec albo początek.
+export async function wydarzeniaMinione(lang: Lang = 'pl', dni = OSTATNIO_DNI, limit = OSTATNIO_LIMIT): Promise<Wydarzenie[]> {
+  const od = addDays(today(), -dni), n = now(), d = today();
+  const zakonczone = (w: Wydarzenie) => { const k = w.koniecIcs || w.koniec || w.poczatek; return hasTime(k) ? k < n : k < d; };
+  return (await wszystkieWydarzenia(lang))
+    .filter((w) => w.rodzaj !== 'referat' && w.rodzaj !== 'termin' && w.poczatek.slice(0, 10) >= od && zakonczone(w))
+    .sort((a, b) => (a.poczatek < b.poczatek ? 1 : -1))
+    .slice(0, limit);
+}
+
+// Referaty z ostatnich `dni` dni (od dziś − `dni` do wczoraj), od najnowszego.
+export async function referatyMinione(lang: Lang = 'pl', dni = OSTATNIO_DNI, limit = OSTATNIO_LIMIT): Promise<ReferatWLiscie[]> {
+  return (await referatyMiedzy(addDays(today(), -dni), addDays(today(), -1), lang)).reverse().slice(0, limit);
 }
 
 // Domyślne zdjęcie obrony doktorskiej (gdy w CMS nie dodano własnego).
