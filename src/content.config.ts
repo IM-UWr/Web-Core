@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, type Loader } from 'astro/loaders';
+import { relative } from 'node:path';
 
 // Pages CMS zapisuje puste pola jako "" albo null — traktujemy je jak brak wartości.
 const empty = (v: unknown) => (v === '' || v === null ? undefined : v);
@@ -25,8 +26,111 @@ const idList = z.preprocess((v) => (v == null || v === '' ? [] : (Array.isArray(
 const strList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.string()));
 const published = z.preprocess((v) => (v == null || v === '' ? true : v), z.boolean());
 
+// lista z pola CMS (puste = brak pozycji)
+const lista = <T extends z.ZodTypeAny>(item: T) => z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(item));
+
 const plik = z.object({ nazwa: optStr, nazwa_en: optStr, plik: z.string() });
-const plikList = z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(plik));
+const plikList = lista(plik);
+
+// Puste pozycje list (zlecenie 31, etap 1b). Pages CMS potrafi zapisać pozycję bez wymaganego pola — np. „- {}” po kliknięciu
+// „Add an item” bez wybrania zdjęcia. Formularze blokują to od zlecenia 31 (ukryte pole „pozycja” w każdej takiej liście), a gdyby
+// coś jednak przeszło (zmiana na GitHubie, inna wersja CMS), strona pomija taką pozycję z ostrzeżeniem w logu budowy (plik, pole,
+// numer pozycji), zamiast przerywać budowę. Klucz: pole-lista (z kropką: lista w obiekcie, np. baner.liczby), wartość: pola,
+// bez których pozycja nie ma sensu. Pole „pozycja” (false) w pliku strona pomija jak każde pole spoza schematu.
+const WYMAGANE_W_LISTACH: Record<string, Record<string, string[]>> = {
+  aktualnosci: { galeria: ['plik'], zalaczniki: ['plik'], termin: ['dzien'] },
+  strony: { liczby: ['n', 'etykieta'] },
+  referaty: { pliki: ['plik'] },
+  obrony: { recenzje: ['recenzent', 'plik'] },
+  kierunki: { 'baner.liczby': ['wartosc', 'etykieta'] },
+  kierunki_baner: { liczby: ['wartosc', 'etykieta'] },
+  specjalnosci: { 'baner.liczby': ['n', 'etykieta'] },
+};
+
+type Dane = Record<string, unknown>;
+const brakWartosci = (v: unknown) => v == null || (typeof v === 'string' && v.trim() === '');
+const obiekt = (v: unknown): v is Dane => !!v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Date);
+
+// Jedna funkcja pomocnicza dla wszystkich list: zwraca dane bez pozycji, którym brakuje wymaganego pola.
+function bezPustychPozycji(kolekcja: string, dane: Dane, plik: string, ostrzez: (m: string) => void): Dane {
+  const wynik: Dane = { ...dane };
+  for (const [sciezka, wymagane] of Object.entries(WYMAGANE_W_LISTACH[kolekcja] ?? {})) {
+    const [gora, dol] = sciezka.split('.');
+    const rodzic = dol ? wynik[gora] : wynik;
+    const pole = dol ?? gora;
+    if (!obiekt(rodzic) || !Array.isArray(rodzic[pole])) continue;
+    const pozycje = rodzic[pole] as unknown[];
+    const zostaja = pozycje.filter((poz, i) => {
+      const brak = obiekt(poz) ? wymagane.filter((k) => brakWartosci(poz[k])) : wymagane;
+      if (brak.length) ostrzez(`${plik}: ${sciezka}, pozycja ${i + 1} pominięta — brak pola ${brak.map((k) => `„${k}”`).join(', ')}`);
+      return brak.length === 0;
+    });
+    if (zostaja.length === pozycje.length) continue;
+    if (dol) wynik[gora] = { ...rodzic, [pole]: zostaja };
+    else wynik[pole] = zostaja;
+  }
+  return wynik;
+}
+
+// Godzina terminu: „13:00”, „9.30”, „9:30” → „GG:MM”; liczba z YAML-a (np. 9.3 z ręcznie wpisanego 9.30) też; zła wartość = brak.
+const GODZINA = /^([01]?\d|2[0-3])[:.]([0-5]\d)$/;
+function godzinaGGMM(v: unknown): string | undefined {
+  if (v == null || v === '') return undefined;
+  const s = typeof v === 'number' ? ((([h, m = '']) => `${h}:${m.padEnd(2, '0')}`)(String(v).split('.'))) : String(v).trim();
+  const m = s.match(GODZINA);
+  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : undefined;
+}
+
+// Uwagi do pojedynczego wpisu (przed walidacją), z nazwą pliku w logu budowy.
+function kontrolaWpisu(kolekcja: string, dane: unknown, plik: string, ostrzez: (m: string) => void): unknown {
+  if (!obiekt(dane)) return dane;
+  const wynik = bezPustychPozycji(kolekcja, dane, plik, ostrzez);
+  if (kolekcja === 'aktualnosci') {
+    const termin = Array.isArray(wynik.termin) ? (wynik.termin as unknown[]) : [];
+    if (termin.length > 1) ostrzez(`${plik}: termin ma ${termin.length} pozycje — strona bierze pierwszą`);
+    const t = termin[0];
+    if (obiekt(t)) {
+      for (const k of ['godzina', 'godzina_konca'])
+        if (!brakWartosci(t[k]) && !godzinaGGMM(t[k])) ostrzez(`${plik}: termin.${k} „${t[k]}” to nie godzina (GG:MM) — pominięta`);
+    } else if (!brakWartosci(wynik.wydarzenie_poczatek)) {
+      ostrzez(`${plik}: stary zapis terminu (wydarzenie_poczatek) — przenieś do pola „termin” (skrypty/migracja/termin.py)`);
+    }
+  }
+  return wynik;
+}
+
+// Loader z kontrolą wpisu: dane każdego pliku przechodzą przez kontrolaWpisu, zanim sprawdzi je schemat kolekcji.
+function zKontrola(kolekcja: string, loader: Loader): Loader {
+  return {
+    ...loader,
+    load: (ctx) => loader.load({
+      ...ctx,
+      parseData: ((wpis) => ctx.parseData({
+        ...wpis,
+        data: kontrolaWpisu(kolekcja, wpis.data, relative(process.cwd(), wpis.filePath ?? wpis.id).replaceAll('\\', '/'),
+          (m) => ctx.logger.warn(m)) as typeof wpis.data,
+      })) as typeof ctx.parseData,
+    }),
+  };
+}
+const zrodlo = (kolekcja: string, pattern: string, base: string) => zKontrola(kolekcja, glob({ pattern, base }));
+
+// Termin wydarzenia w aktualności (zlecenie 31, etap 2): grupa „termin” w formularzu — lista z najwyżej jedną pozycją, dodawana
+// jednym kliknięciem; bez niej wpis jest zwykłą aktualnością. Strona wylicza z niej dotychczasowe pola wydarzenie_poczatek,
+// wydarzenie_koniec i wydarzenie_miejsce, więc reszta kodu się nie zmienia:
+//   początek = dzień (+ godzina); koniec = dzień zakończenia (+ godzina zakończenia), albo dzień + godzina zakończenia,
+//   albo brak (strona przyjmie 2 godziny po początku albo cały dzień); miejsce = miejsce.
+// Okres przejściowy: wpis bez terminu, a ze starymi polami wydarzenie_* — strona bierze stare pola (z ostrzeżeniem w logu).
+const godzina = z.preprocess(godzinaGGMM, z.string().optional());
+const terminWydarzenia = z.object({ dzien: date, godzina, dzien_konca: optDate, godzina_konca: godzina, miejsce: optStr });
+type Termin = z.infer<typeof terminWydarzenia>;
+const polaWydarzenia = (t: Termin) => ({
+  wydarzenie_poczatek: t.godzina ? `${t.dzien}T${t.godzina}` : t.dzien,
+  wydarzenie_koniec: t.dzien_konca
+    ? (t.godzina_konca ? `${t.dzien_konca}T${t.godzina_konca}` : t.dzien_konca)
+    : (t.godzina_konca ? `${t.dzien}T${t.godzina_konca}` : undefined),
+  wydarzenie_miejsce: t.miejsce,
+});
 
 // Baner podstrony na telefonie (zlecenie 01, decyzje 31.10.2026): krótkie bursztynowe hasło zamiast opisu (puste = opis
 // jak dotąd albo reguła widoku) i — tylko tam, gdzie liczb nie da się policzyć z danych — stałe liczby pod kreską
@@ -40,7 +144,7 @@ const liczbyBanera = z.preprocess((v) => (v == null || v === '' ? [] : v), z.arr
 })));
 
 const aktualnosci = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/aktualnosci' }),
+  loader: zrodlo('aktualnosci', '**/*.md', './src/content/aktualnosci'),
   schema: z.object({
     tytul: z.string(),
     data: date,
@@ -50,9 +154,11 @@ const aktualnosci = defineCollection({
     zdjecie: optStr,
     zdjecie_opis: optStr,
     zdjecie_opis_en: optStr,
-    galeria: z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.object({ plik: z.string(), podpis: optStr }))),
+    galeria: lista(z.object({ plik: z.string(), podpis: optStr })),
     album: optStr,
     zalaczniki: plikList,
+    termin: lista(terminWydarzenia),
+    // stary zapis terminu (do migracji danych, skrypty/migracja/termin.py); przy polu „termin” nieużywany
     wydarzenie_poczatek: optDate,
     wydarzenie_koniec: optDate,
     wydarzenie_miejsce: optStr,
@@ -61,11 +167,11 @@ const aktualnosci = defineCollection({
     tresc_en: optStr,
     zaklad: optId,
     opublikowany: published,
-  }),
+  }).transform(({ termin, ...d }) => (termin[0] ? { ...d, ...polaWydarzenia(termin[0]) } : d)),
 });
 
 const strony = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/strony' }),
+  loader: zrodlo('strony', '**/*.md', './src/content/strony'),
   schema: z.object({
     format_tresci: z.enum(['jawne']).optional(),
     tytul: z.string(),
@@ -126,7 +232,7 @@ const seminaria = defineCollection({
 });
 
 const referaty = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/referaty' }),
+  loader: zrodlo('referaty', '**/*.md', './src/content/referaty'),
   schema: z.object({
     // seminarium referatu (puste = folder, w którym leży plik)
     seminarium: optId,
@@ -148,7 +254,7 @@ const referaty = defineCollection({
 });
 
 const obrony = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/obrony' }),
+  loader: zrodlo('obrony', '**/*.md', './src/content/obrony'),
   schema: z.object({
     kandydat: z.string(),
     tytul_rozprawy: z.string(),
@@ -166,7 +272,7 @@ const obrony = defineCollection({
     rozprawa: optStr,
     streszczenie_pl: optStr,
     streszczenie_en: optStr,
-    recenzje: z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(z.object({ recenzent: z.string(), plik: z.string() }))),
+    recenzje: lista(z.object({ recenzent: z.string(), plik: z.string() })),
     bip: optStr,
     zaklad: optId,
     w_aktualnosciach: published,
@@ -208,8 +314,6 @@ const zaklady = defineCollection({
   }),
 });
 
-// lista z pola CMS (puste = brak pozycji)
-const lista = <T extends z.ZodTypeAny>(item: T) => z.preprocess((v) => (v == null || v === '' ? [] : v), z.array(item));
 
 const banerKierunkuSchema = z.object({
     kierunek: optStr,
@@ -260,7 +364,7 @@ const schematSpecjalnosci = z.object({
 // Menu i kafelki działu Studia: Ustawienia (studia.kierunki), przypomnienia o terminach
 // w src/data/przypomnienia.json (src/lib/kierunki.ts, src/lib/tresci.ts).
 const kierunki = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/kierunki' }),
+  loader: zrodlo('kierunki', '**/*.md', './src/content/kierunki'),
   schema: z.object({
     format_tresci: jawnyFormat,
     baner: banerKierunkuSchema.optional(),
@@ -278,7 +382,7 @@ const kierunki = defineCollection({
 // liczby: wartosc_en — wartość po angielsku (np. „3 years”; puste = jak po polsku); etykieta_krotka(_en) — krótsza etykieta
 // na telefon (wąskie kolumny; zlecenie 01), np. „punktów ECTS”
 const kierunki_baner = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/kierunki-baner' }),
+  loader: zrodlo('kierunki_baner', '*.json', './src/content/kierunki-baner'),
   schema: banerKierunkuSchema,
 });
 
@@ -287,7 +391,7 @@ const kierunki_baner = defineCollection({
 // kotwice typu „specjalnosc” w kotwice.mjs), wygląd w src/views/Specjalnosc.astro. Pola banera i kafelka na stronie kierunku —
 // w nowym formacie: pole baner oraz relacje w tym samym wpisie. Specjalnosci_baner pozostaje zgodnością.
 const specjalnosci = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/specjalnosci' }),
+  loader: zrodlo('specjalnosci', '**/*.md', './src/content/specjalnosci'),
   schema: schematSpecjalnosci,
 });
 
