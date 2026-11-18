@@ -418,8 +418,12 @@ function studia({ pola, pole, kolejnosc, ustaw, usun, etykietyEn, naglowkiMd, ko
   const s = pola('strony');
   etykietyEn(s);
   ustaw(pole(s, 'opis'), 'label', 'Krótki opis (Google i podgląd linku)');
-  ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla (baner pokazuje tytuł i hasło). Puste = ogólny opis serwisu.');
+  ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla. Puste = ogólny opis serwisu.');
   ustaw(pole(s, 'opis_en'), 'label', 'Krótki opis EN');
+  // hasło strony (decyzja 18.11, pytanie 3): baner pokazuje hasło i liczby tylko razem; pola nie da się ukryć tylko na stronach bez
+  // liczb (jeden formularz dla wszystkich Stron), więc opis mówi, kiedy się pokaże
+  ustaw(pole(s, 'haslo'), 'label', 'Hasło na banerze (jedna linia)');
+  ustaw(pole(s, 'haslo'), 'description', 'Hasło i liczby (pole „Liczby…” niżej) pokazują się na banerze tylko razem: samo hasło albo same liczby się nie wyświetlają.');
   etykietyEn(pola('rok-akademicki'));
   const p = pole(pola('przypomnienia'), 'przypomnienia').get('fields');
   etykietyEn(p);
@@ -440,6 +444,11 @@ function popularyzacja({ pola, pole, kolejnosc, ustaw, etykietyEn, komentarz }) 
   const s = pola('strony');
   etykietyEn(s);
   kolejnosc(s, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'pasek_boczny']);
+  // opis i hasło: nowy baner strony ich nie pokazuje (Strony nie mają liczb), widać je na kartach „Dla kogo” strony działu
+  ustaw(pole(s, 'opis'), 'label', 'Opis (zdanie na karcie „Dla kogo”)');
+  ustaw(pole(s, 'opis'), 'description', 'Zdanie na karcie tej strony na stronie Popularyzacji; trafia też do Google i do podglądu linku. Na samej stronie się nie wyświetla.');
+  ustaw(pole(s, 'haslo'), 'label', 'Hasło (tytuł karty „Dla kogo”)');
+  ustaw(pole(s, 'haslo'), 'description', 'Tytuł karty tej strony na stronie Popularyzacji; puste = tytuł strony. Na samej stronie się nie wyświetla.');
 }
 
 const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony, 'Web-Studia': studia, 'Web-Popularyzacja': popularyzacja };
