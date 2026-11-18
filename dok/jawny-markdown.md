@@ -11,7 +11,6 @@ Teksty Popularyzacji są w **Web-Popularyzacja/main**: strona działu i podstron
 W tych wpisach treść, dane i baner znajdują się razem. Nie ma osobnych formularzy „Treść” i „Baner i kafelek”. Nie zmieniaj nazw istniejących plików: to ich identyfikatory używane w adresach i powiązaniach.
 
 Pole `code` wyróżnia składnię. Wygląd strony sprawdzamy po jej przebudowaniu. Komentarze `<!-- ... -->` są instrukcjami redakcyjnymi i nie pojawiają się jako tekst na stronie.
-
 Zwykły tekst jest prozą domyślnie. Akapity, zwykłe listy i tabele nie wymagają otaczania przez `:::proza` ani `::::proza`. Znaczniki są potrzebne do specjalnych układów. Dawne otoczki `proza` nadal są obsługiwane dla zgodności.
 
 Dotyczy to również pól „Koniec strony” PL/EN Roku akademickiego. Dawny przełącznik „Bloki wzorca” w formularzach Studiów zastępują jawne znaczniki. Plan zajęć, kalendarz, terminy semestrów i zamiany dni nadal są generowane z danych; komentarze w plikach wyjaśniają, gdzie trafia część tekstowa. Nie trzeba przepisywać tych danych do Markdownu.
@@ -45,6 +44,8 @@ Kolejność sekcji i bloków w Markdownie jest kolejnością na stronie. Nazwy �
 | `:::pytania` | Każdy nagłówek `###` tworzy rozwijany punkt, odpowiedź znajduje się pod nim. Znak zapytania nie jest wymagany. |
 | `:::ramka{tytul="Dla kogo"}` | Ramka z podaną etykietą i treścią wewnątrz. |
 | `:::zakladki` | Nagłówki `###` rozpoczynają zakładki. Jedna podsekcja to jeden panel bez przycisków; bez JavaScriptu wszystkie panele są widoczne. |
+| `:::pary` | Lista `- **Etykieta:** treść`: etykieta w kolumnie obok treści, kreski między parami; na telefonie etykieta nad treścią. Dalsze linie punktu należą do tej samej treści. |
+| `:::grafik` | Tylko zwykłe Strony: grafik dyżurów (Tutornia). Linie `Sala:`, `Od:`, `Do:`, potem jeden dyżur na linię `- pon. 12:15–14:00 **Imię Nazwisko** — przedmioty`. Strona rysuje plan tygodnia, ramkę „Teraz” nad treścią i liczby banera. Jeden blok na stronę; pusty blok w Treści EN bierze grafik z wersji polskiej. Szczegóły: „Grafik dyżurów i pary”. |
 | `::opiekun` | Tylko specjalność: wstawia opiekunów wybranych w formularzu, ich aktualne kontakty i przypisany zakład. |
 | `::seminaria` | Tylko specjalność: wstawia odnośniki do seminariów wybranych w formularzu. |
 | `::wybor` | Tylko specjalność: wstawia ramkę z odnośnikiem do terminów i formularzy na stronie kierunku. |
@@ -94,6 +95,55 @@ Trzy spacje utrzymują `Termin:` wewnątrz numerowanego punktu. Dwie spacje **na
 
 To tekstowa informacja o terminie, widoczna razem z osią. Nie jest harmonogramem przypomnień z `src/data/przypomnienia.json` i nie znika automatycznie po upływie daty. Automatyczne przypomnienia i ogłoszenia o zamianach dni nie są zmieniane w tej migracji.
 
+## Grafik dyżurów i pary (zlecenie 45)
+
+Strona `/studia/tutornia` (Web-Studia, „Strony studiów”) ma grafik dyżurów wpisywany w Treści, bez nowych pól formularza: sala i daty to linie w bloku. Pole „Liczby” zostaje puste — liczby banera (tutorzy, dyżury w tygodniu, sala) strona liczy z bloku; wpisane „Liczby” mają pierwszeństwo.
+
+```markdown
+<!-- GRAFIK: Najpierw Sala:, Od: (np. 19.10.2026) i Do: (puste = do końca zajęć), potem jeden dyżur na linię: - pon. 12:15–14:00 **Imię Nazwisko** — przedmioty. -->
+
+:::grafik
+Sala: 202
+Od: 19.10.2026
+Do:
+
+- pon. 12:15–14:00 **Paulina Pawlik** — AM1, AM3, Algebra liniowa 1
+- śr. 14:15–16:00 **Jacek Kowalski** — AM1, Algebra liniowa 1
+:::
+```
+
+- **Linia dyżuru:** dzień (`pon.`, `pn`, `poniedziałek`, `Mon`, `Monday`…), godziny (`12:15–14:00`, `12.15-14`, `12:15 do 14:00`), potem imię i nazwisko (pogrubione albo bez pogrubienia przed `—`, ` - ` lub `:`), dalej przedmioty. Kolejność linii dowolna; nakładające się dyżury dzielą kolumnę.
+- **Od / Do:** `19.10.2026` albo `2026-10-19`. Puste `Do` = do końca zajęć semestru, w którym leży `Od` (kalendarz zajęć z Web-Studia „Kalendarz zajęć”). Dni wolne, przerwy i zamiany dni (np. piątek według planu środy) strona bierze z tego samego kalendarza.
+- **Oś godzin** liczy się sama: od najwcześniejszego do najpóźniejszego dyżuru w tygodniu, etykiety na początkach dyżurów i na końcu ostatniego; w lukach ponad 90 min dochodzą pełne godziny.
+- **Treść EN:** pusty blok `:::grafik` + `:::` wstawia grafik z wersji polskiej (napisy po angielsku). Nie przepisuj dyżurów.
+- **Błędna linia nie zatrzymuje budowy:** strona pomija linię, na Podglądzie nad planem stoi czerwona ramka „Podgląd: tych linii grafiku strona nie rozumie” (numer linii w bloku — `:::grafik` to linia 1 — tekst, powód, wzór linii); na stronie publicznej ramki nie ma. `skrypty/sprawdz_tresci.py` wypisuje to samo jako ostrzeżenie (ten sam parser, `src/lib/grafik.mjs`, przez Node). Drugi blok `:::grafik` na stronie też trafia do tej ramki (strona pokazuje pierwszy). Błędem budowy jest tylko blok poza zwykłą Stroną (np. w kierunku).
+- **Ramka „Teraz”** nad pierwszą sekcją i podpis kafelka „Tutornia” w Szybkim dostępie liczą się w przeglądarce co minutę (Europe/Warsaw). Bez JavaScriptu: „Sala 202 · dyżury według planu poniżej” i plan bez zaznaczeń.
+
+`:::pary` to ogólny blok etykieta–treść (klasa `dl.pary`), np. „Gdzie i jak” w Tutorni:
+
+```markdown
+<!-- PARY: Każdy punkt: **Etykieta:** treść. -->
+
+:::pary
+- **Gdzie:** sala 202 na poziomie 200.
+- **Dla kogo:** dla wszystkich studentów.
+:::
+```
+
+**Komentarze wzorcowe** (jednoliniowy komentarz, pusta linia, blok; komentarze nie trafiają na stronę):
+
+| Gdzie | Komentarz |
+|-|-|
+| początek Treści i Treści EN | `<!-- UKŁAD JAWNY: ## rozpoczyna sekcję w spisie. Nazwę można zmieniać; {#id} zachowuje adres. Bloki :::nazwa … ::: sterują wyglądem; komentarze są tylko instrukcjami dla redaktora. -->` |
+| przed pierwszą sekcją strony z grafikiem | `<!-- TERAZ: Ramkę „Teraz” (kto dyżuruje teraz, kiedy następny dyżur) strona tworzy sama z grafiku. Nic tu nie wpisuj. -->` |
+| przed tekstem sekcji | `<!-- TEKST: Zwykły Markdown. Specjalny układ wymaga jawnego znacznika bloku. -->` |
+| przed `:::grafik` (Treść) | `<!-- GRAFIK: Najpierw Sala:, Od: (np. 19.10.2026) i Do: (puste = do końca zajęć), potem jeden dyżur na linię: - pon. 12:15–14:00 **Imię Nazwisko** — przedmioty. -->` |
+| przed `:::grafik` (Treść EN) | `<!-- GRAFIK: Pusty blok wstawia grafik z wersji polskiej. Nie przepisuj dyżurów. -->` |
+| przed `:::pary` | `<!-- PARY: Każdy punkt: **Etykieta:** treść. -->` |
+| przed `:::linki` | `<!-- LINKI: Jeden link na punkt; po — można dopisać opis. -->` |
+
+Kod: parser i stany `src/lib/grafik.mjs` (testy `src/plugins/grafik.test.mjs`), blok `src/plugins/rehype-bloki.mjs`, widok `src/components/grafik/` (Plan, Teraz, Kafelek), skrypt `src/scripts/grafik.ts`, wygląd `src/styles/grafik.css`.
+
 ## Kafelki specjalności i opiekunowie
 
 Kafelki na stronie kierunku edytujesz **w Markdownie kierunku**, w `:::specjalnosci`: tekst, kolejność, odnośniki, etykiety i podpisy są jawne. Dodanie specjalności w formularzu nie dopisuje automatycznie kafelka. Zmiana banera specjalności nie zmienia treści kafelka.
@@ -117,7 +167,7 @@ Matematyka w ekonomii pozostaje specjalnością wygaszaną bez osobnej podstrony
 
 ## Błędy i kontrola
 
-Budowanie wykrywa nieznane znaczniki, niezamknięte bloki, powtórzone identyfikatory sekcji i wstawki, nieprawidłowe listy i brak wskazanego opiekuna. Formularz `code` nie wykonuje tej walidacji podczas pisania — wynik pochodzi z testu/budowania.
+Budowanie wykrywa nieznane znaczniki, niezamknięte bloki, powtórzone identyfikatory sekcji i wstawki, nieprawidłowe listy i brak wskazanego opiekuna. Formularz `code` nie wykonuje tej walidacji podczas pisania — wynik pochodzi z testu/budowania. Wyjątek: błędne linie grafiku dyżurów nie zatrzymują budowy (czerwona ramka na Podglądzie i ostrzeżenie w `sprawdz_tresci.py`, „Grafik dyżurów i pary”).
 
 Po pobraniu nowych treści:
 

@@ -85,6 +85,8 @@ Termin:Do 30 czerwca
 
 Zwykły akapit „Termin: …” poza przekształcanym blokiem nie staje się automatycznie parą.
 
+**Jawny format (zlecenie 45):** samodzielną listę par etykieta–treść zapisuje się blokiem `:::pary` z punktami `- **Etykieta:** treść` (dwukropek w pogrubieniu albo zaraz za nim; dalsze linie punktu należą do tej samej treści). Strona rysuje `dl.pary`: etykieta w kolumnie obok treści, kreski między parami, na telefonie etykieta nad treścią. Punkt bez pogrubionej etykiety zatrzymuje budowę z błędem. Grafik dyżurów (`:::grafik`, Tutornia) ma własny zapis linii i nie zatrzymuje budowy przy błędnych liniach — opis w `dok/jawny-markdown.md`, „Grafik dyżurów i pary”.
+
 ## 7. Przycisk z linku
 
 Sam link w dalszej linii kafelka, kroku lub kontaktu tworzy przycisk:
@@ -315,7 +317,7 @@ Komórki tabel do 30 znaków, bez wzorów, dostają znacznik limitu dwóch linii
 <!-- EDYTOR: Tu zaczyna się oś semestrów. -->
 ```
 
-Komentarze HTML nie są widoczne na stronie. Umieszczaj je przed całymi blokami. Nie używaj jako komentarzy redakcyjnych znaczników technicznych `<!--specjalnosci-->`, `<!--wstaw:seminaria-->`, `<!--wstaw:opiekun-->` ani `<!--wstaw:wybor-->`; są przeznaczone do automatycznych wstawek.
+Komentarze HTML nie są widoczne na stronie. Umieszczaj je przed całymi blokami. Nie używaj jako komentarzy redakcyjnych znaczników technicznych `<!--specjalnosci-->`, `<!--wstaw:seminaria-->`, `<!--wstaw:opiekun-->`, `<!--wstaw:wybor-->` ani `<!--wstaw:grafik-->`; są przeznaczone do automatycznych wstawek.
 
 ## 25. Kolejność i pułapki
 
@@ -355,6 +357,7 @@ W polskiej treści specjalności słowa „program od” i „wspóln” w nazwa
 ## Źródła kodu
 
 - [Parser bloków](https://github.com/IM-UWr/Web-Core/blob/main/src/plugins/rehype-bloki.mjs)
+- [Grafik dyżurów: parser, oś godzin i stany „teraz”](https://github.com/IM-UWr/Web-Core/blob/main/src/lib/grafik.mjs)
 - [Mapa nagłówków](https://github.com/IM-UWr/Web-Core/blob/main/src/plugins/kotwice.mjs)
 - [Automatyka specjalności](https://github.com/IM-UWr/Web-Core/blob/main/src/lib/widoki/specjalnosc.ts)
 - [Teksty działów i list](https://github.com/IM-UWr/Web-Core/blob/main/src/lib/tekstyStron.ts)

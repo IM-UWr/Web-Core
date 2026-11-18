@@ -12,7 +12,8 @@ const odm = (n: number, jeden: string, kilka: string, wiele: string) =>
   n === 1 ? jeden : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? kilka : wiele;
 
 // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
-type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
+// adres — link z wartości (opcjonalny, zlecenie 45; np. Tutornia → /studia/tutornia), w TrescDzialu.astro
+type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string; adres?: string };
 
 export async function daneDzialuStudia(lang: Lang) {
   const en = lang === 'en';
@@ -46,7 +47,7 @@ export async function daneDzialuStudia(lang: Lang) {
   const { d: tekst, tytul, html: oStudiach, szkic } = await stronaDzialu('studia', lang);
   const fakty = (((tekst as any).o_studiach_fakty ?? []) as Fakt[])
     .filter((f) => f?.wartosc?.trim())
-    .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
+    .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2'), a: f.adres?.trim() || undefined }));
   // (zakres lat, np. 2022–2025, nie łamie się po półpauzie — wąska kolumna ramki, 300 px)
 
   // Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;

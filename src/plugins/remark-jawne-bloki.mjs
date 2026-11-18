@@ -1,5 +1,5 @@
 // Jawna składnia układu; remark-directive odpowiada za standardową gramatykę.
-const BLOKI = new Set(['proza', 'kafelki', 'etapy', 'kontakty', 'linki', 'pliki', 'pytania', 'ramka', 'zakladki', 'tabela', 'kreski', 'tematy', 'specjalnosci']);
+const BLOKI = new Set(['proza', 'kafelki', 'etapy', 'kontakty', 'linki', 'pliki', 'pytania', 'ramka', 'zakladki', 'tabela', 'kreski', 'tematy', 'specjalnosci', 'pary', 'grafik']);
 const WSTAWKI = new Set(['opiekun', 'seminaria', 'wybor']);
 
 export default function remarkJawneBloki() {
@@ -43,6 +43,16 @@ export default function remarkJawneBloki() {
           ...(block ? { dataBlok: node.name } : { dataWstawka: node.name }),
           ...(node.attributes?.tytul ? { dataTytul: node.attributes.tytul } : {}),
         } };
+        // Grafik (zlecenie 45): linie bloku czytamy z tekstu źródłowego, bo Markdown w środku nie ma znaczenia; dalej
+        // (rehype-bloki.mjs) parser z src/lib/grafik.mjs. Wnętrze nie idzie do drzewa, więc nic w nim nie zatrzyma budowy.
+        if (block && node.name === 'grafik') {
+          const linie = String(file.value).slice(node.position.start.offset, node.position.end.offset).split(/\r?\n/).slice(1);
+          if (/^:{3,}\s*$/.test(linie.at(-1) ?? '')) linie.pop();
+          node.data.hProperties.dataZrodlo = JSON.stringify(linie);
+          node.data.hProperties.dataLinia = node.position.start.line;
+          node.children = [];
+          return;
+        }
       }
       // Instrukcje redakcyjne nie są zawartością strony (także przy sprawdzaniu pustego tekstu).
       if (node.children) node.children = node.children.filter((child) => !(child.type === 'html' && /^\s*<!--[\s\S]*?-->\s*$/.test(child.value)));

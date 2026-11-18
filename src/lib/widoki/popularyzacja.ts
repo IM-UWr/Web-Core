@@ -14,7 +14,7 @@ import { menuGlowne } from '../menu';
 
 type Tekst = string | null | undefined;
 // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku)
-type Fakt = { wartosc?: Tekst; wartosc_en?: Tekst; opis?: Tekst; opis_en?: Tekst };
+type Fakt = { wartosc?: Tekst; wartosc_en?: Tekst; opis?: Tekst; opis_en?: Tekst; adres?: Tekst };
 // nazwa w dopełniaczu, bo liczba stoi przed nią („37 lat Zimowych Szkół”); EN: „37 years of Winter Schools”
 type Tradycja = { rok: number; nazwa: string; nazwa_en?: Tekst };
 type Dane = {
@@ -55,7 +55,7 @@ export async function danePopularyzacji(lang: Lang) {
   const html = (await renderMarkdownZNaglowkami(zrodlo, lang, !jawne, jawne)).html.replace(/<p>/, '<p class="wst">');
   const fakty = (d.o_popularyzacji_fakty ?? [])
     .filter((f) => f?.wartosc?.trim())
-    .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2') }));
+    .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2'), a: f.adres?.trim() || undefined }));
 
   // Karty „Dla kogo”: każda strona z katalogu popularyzacja/ (nazwa = tytuł strony, tytuł karty = hasło, opis = opis), więc
   // nowa strona sama dostaje kartę. Kolejność: najpierw jak w menu działu, strony spoza menu (Organizatorzy) na końcu.

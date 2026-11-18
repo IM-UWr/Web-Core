@@ -1,0 +1,25 @@
+---
+// Ramka „Teraz” nad treścią strony z blokiem :::grafik (zlecenie 45: Tutornia), jak „Dziś” w Roku akademickim (RokAkademicki.astro):
+// kółko z inicjałami (pełne, gdy dyżur trwa), etykieta z datą i godziną, tytuł Brygadą i opis. Stan liczy skrypt w przeglądarce
+// (src/scripts/grafik.ts, Europe/Warsaw, co minutę) z tych samych danych co plan. Bez JavaScriptu: neutralny tekst bez stanu z chwili
+// budowania (strona przebudowuje się raz dziennie, więc taki stan byłby nieaktualny). aria-live tylko na tytule i opisie, a skrypt
+// zmienia je wyłącznie wtedy, gdy zmienia się stan (godzina w etykiecie co minutę nie jest odczytywana).
+import '../../styles/grafik.css';
+import type { GrafikStrony } from '../../lib/grafikStrony';
+
+interface Props { grafik: GrafikStrony }
+const { grafik } = Astro.props;
+const { lang, sala } = grafik;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const neutralny = sala ? T(`Sala ${sala} · dyżury według planu poniżej`, `Room ${sala} · sessions as in the schedule below`) : T('Dyżury według planu poniżej', 'Sessions as in the schedule below');
+---
+<div class="tu-teraz" data-tu-teraz role="group" aria-labelledby="tu-teraz-t" data-pagefind-ignore>
+  <span class="tu-kolko" aria-hidden="true" data-tu-kolko></span>
+  <div class="tu-teraz-txt">
+    <span class="etyk" data-tu-etyk hidden></span>
+    <div aria-live="polite">
+      <p class="tu-tytul" id="tu-teraz-t" data-tu-tytul>{neutralny}</p>
+      <p class="tu-opis" data-tu-opis hidden></p>
+    </div>
+  </div>
+</div>

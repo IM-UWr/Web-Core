@@ -1,0 +1,73 @@
+---
+// Plan dyżurów z bloku :::grafik (zlecenie 45: Tutornia), w miejscu bloku w treści strony (Strona.astro).
+// Budowany przy budowaniu, więc działa bez JavaScriptu: siatka tygodnia na komputerze (≥ 1024 px; kolumny pn–pt i oś godzin,
+// wiersz = 5 min), lista dni na telefonie (te same elementy, inny CSS). Każdy dzień to section z h3, dyżury jako lista.
+// Na żywo (src/scripts/grafik.ts): dziś, linia „teraz”, trwający dyżur i przygaszone dyżury bieżącego tygodnia, bez zmiany układu.
+// Na Podglądzie nad planem czerwona ramka z liniami bloku, których parser nie rozumie (na stronie publicznej jej nie ma).
+import '../../styles/grafik.css';
+import { godziny, hm, nazwyDni, osGodzin, WZOR_LINII } from '../../lib/grafik.mjs';
+import type { GrafikStrony } from '../../lib/grafikStrony';
+
+interface Props { grafik: GrafikStrony }
+const { grafik } = Astro.props;
+const { lang, meta, dane, bledy } = grafik;
+const dyzury = grafik.wynik.dyzury;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+const D = nazwyDni(lang);
+const KROK = 5; // minut na wiersz siatki
+
+// oś godzin sama z grafiku (osGodzin w grafik.mjs): zakres od najwcześniejszego do najpóźniejszego dyżuru, linie i etykiety na początkach
+// dyżurów, etykieta na końcu ostatniego, pełne godziny w lukach ponad 90 min
+const { p, k, linie, etykiety } = osGodzin(dyzury, KROK);
+const N = (k - p) / KROK;
+// wiersz siatki (od 2; wiersz 1 — nazwy dni); godzina spoza kroku 5 min (np. 12:17) — najbliższy wiersz
+const wiersz = (m: number) => Math.round((m - p) / KROK) + 2;
+// nakładające się dyżury dzielą kolumnę po równo (pas — który, ile — ile pasów w grupie)
+const dni = [0, 1, 2, 3, 4].map((d) => {
+  const lst = dyzury.filter((x) => x.dz === d).map((x) => ({ ...x, pas: 0, ile: 1 }));
+  lst.forEach((x, i) => { for (let j = 0; j < i; j++) if (lst[j].do > x.od && lst[j].pas === x.pas) x.pas++; });
+  lst.forEach((x) => { for (const y of lst) if (y.od < x.do && y.do > x.od) x.ile = Math.max(x.ile, y.pas + 1); });
+  return { d, lst };
+});
+const styl = (x: { dz: number; od: number; do: number; pas: number; ile: number }) =>
+  `grid-column:${x.dz + 2};grid-row:${wiersz(x.od)}/${wiersz(x.do)}` + (x.ile > 1 ? `;width:calc((100% - 6px) / ${x.ile});margin-left:calc(3px + (100% - 6px) * ${x.pas} / ${x.ile})` : '');
+---
+<div class="tu-grafik" data-tu-grafik data-tu-dane={dane} data-lang={lang}>
+  {bledy.length > 0 && (
+    <div class="tu-bledy" role="alert" lang="pl" data-pagefind-ignore>
+      <b>Podgląd: tych linii grafiku strona nie rozumie</b>
+      <ul>{bledy.map((b) => <li>Linia {b.nr}: <code>{b.tekst}</code> — {b.powod}</li>)}</ul>
+      <small>Wzór linii: <code>{WZOR_LINII}</code>. Linie liczone od „:::grafik” (linia 1). Na stronie publicznej ta ramka się nie pokazuje.</small>
+    </div>
+  )}
+  {meta && <p class="tu-plan-meta">{meta}</p>}
+  {dyzury.length ? (
+    <div class="tu-siatka" style={`--tu-n:${N}`} data-p={p} data-k={k}>
+      {dni.map(({ d }) => (
+        <span class="tu-tlo" data-dz={d} style={`grid-column:${d + 2}`} aria-hidden="true">
+          {linie.map((m) => <i style={`top:calc(var(--tu-r) * ${(m - p) / KROK})`}></i>)}
+        </span>
+      ))}
+      {etykiety.map((m) => <span class="tu-czas" data-m={m} style={`grid-row:${wiersz(m)}`} aria-hidden="true">{hm(m)}</span>)}
+      {dni.map(({ d, lst }) => (
+        <section class="tu-dzien" data-dz={d} aria-labelledby={`tu-d${d}`}>
+          <h3 id={`tu-d${d}`} style={`grid-column:${d + 2}`}>{D.dni[d]}</h3>
+          {lst.length === 0 ? <p class="tu-brak" style={`grid-column:${d + 2}`}>{T('bez dyżurów', 'no sessions')}</p> : (
+            <ul>
+              {lst.map((x) => (
+                <li class:list={['tu-dyz', x.do - x.od < 60 && 'tu-krotki']} data-dz={x.dz} data-od={x.od} data-do={x.do} style={styl(x)}>
+                  <span class="tu-godz">{godziny(x)}</span>
+                  <b class="tu-kto">{x.kto}</b>
+                  {x.przedm && <span class="tu-przedm">{x.przedm}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))}
+    </div>
+  ) : (
+    <p class="tu-pusto">{T('Plan dyżurów pojawi się tutaj wkrótce.', 'The schedule will appear here soon.')}</p>
+  )}
+</div>
+<script>import '../../scripts/grafik';</script>

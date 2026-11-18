@@ -64,6 +64,11 @@
   .z-dz-skrot dl > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
   .z-dz-skrot dt { font-family: var(--f-display); font-size: 34px; font-weight: 500; line-height: 1; color: var(--d-a); }
   .z-dz-skrot dd { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  /* wartość z linkiem (pole „Link (opcjonalnie)”, zlecenie 45): bez podkreślenia, podkreślenie po najechaniu, mała strzałka →
+     (link poza stronę zostaje przy ↗ z global.css) */
+  .z-dz-skrot a.z-dz-skrot-a { color: inherit; text-decoration: none; }
+  .z-dz-skrot a.z-dz-skrot-a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .z-dz-skrot a.z-dz-skrot-a:not(.zew)::after { content: '\00a0→'; font-family: var(--f-text); font-size: .55em; vertical-align: .2em; }
 
   /* ---------- sekcja działu: nagłówek z linkami po prawej ---------- */
   .z-dz-sek { padding: 34px var(--marg) 40px; border-top: 1px solid var(--line); }

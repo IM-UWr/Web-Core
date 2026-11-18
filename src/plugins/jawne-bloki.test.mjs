@@ -75,6 +75,33 @@ test('pusta sekcja zwykłej strony nie trafia do HTML ani spisu',async()=>{
  assert.doesNotMatch(html,/>Pusta</);assert.match(html,/<h2 id="aa">AA<\/h2>/);
 });
 
+test('pary: etykieta i treść w dl.pary, dalsze linie w tej samej treści, błąd bez etykiety',async()=>{
+ const html=await render('## Gdzie {#gdzie}\n\n:::pary\n- **Gdzie:** sala 202.\n- **Kto**: starsi studenci\n  i tutorzy.\n:::','strona');
+ assert.match(html,/<dl class="pary"><dt>Gdzie<\/dt><dd>sala 202\.<\/dd><dt>Kto<\/dt><dd>starsi studenci\s*i tutorzy\.<\/dd><\/dl>/);
+ await assert.rejects(render(':::pary\n- Gdzie: sala 202\n:::','strona'),/Etykiety:/);
+ await assert.rejects(render(':::pary\n- **Gdzie:**\n:::','strona'),/Etykiety:/);
+});
+
+test('grafik: znacznik w miejscu bloku, wynik parsera w opcjach, błędne linie nie zatrzymują budowy',async()=>{
+ const strona={jawne:true};
+ const md='## Plan {#plan}\n\n<!-- GRAFIK: instrukcja. -->\n\n:::grafik\nSala: 202\nOd: 19.10.2026\n\n- pon. 12:15–14:00 **Paulina Pawlik** — AM1: wstęp\n- sob. 10–11 **Ktoś**\n- :zle 12\n:::\n\nTekst pod siatką.';
+ const html=(await p.render(md,{frontmatter:{strona}})).code;
+ assert.match(html,/<h2 id="plan">Plan<\/h2>\s*<!--wstaw:grafik-->\s*<p>Tekst pod siatką\.<\/p>/);
+ assert.equal(strona.grafik.dyzury.length,1);
+ assert.equal(strona.grafik.dyzury[0].przedm,'AM1: wstęp');
+ assert.deepEqual(strona.grafik.bledy.map((b)=>b.nr),[6,7]);
+ assert.deepEqual(strona.grafik.pola,{sala:'202',od:'2026-10-19'});
+});
+
+test('grafik: pusty blok (EN), drugi blok jako błąd, sekcja z samym grafikiem zostaje, poza zwykłą stroną błąd',async()=>{
+ const strona={jawne:true};
+ const html=(await p.render('## Plan {#plan}\n\n:::grafik\n:::\n\n:::grafik\n- pon. 1–2 **A B**\n:::',{frontmatter:{strona}})).code;
+ assert.match(html,/<h2 id="plan">Plan<\/h2>\s*<!--wstaw:grafik-->/);
+ assert.equal(strona.grafik.pusty,true);
+ assert.match(strona.grafik.bledy[0].powod,/drugi blok/);
+ await assert.rejects(render(':::grafik\n:::','kierunek'),/zwykłych stron/);
+});
+
 test('jawna podstrona Popularyzacji zachowuje wyróżniony wstęp i wygląd ramki',async()=>{
  const html=await render('## Dowolna nazwa {#sekcja}\n\nWstęp.\n\n:::ramka{tytul="Uwaga"}\n\nOpis.\n\n:::','strona',{wstepPoH2:true});
  assert.match(html,/<p class="wst">Wstęp\.<\/p>/);

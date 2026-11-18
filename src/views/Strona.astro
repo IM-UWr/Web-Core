@@ -9,10 +9,14 @@ import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { t, wybierz, langPola } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneStrony } from '../lib/widoki/strona';
+import GrafikTeraz from '../components/grafik/Teraz.astro';
+import GrafikPlan from '../components/grafik/Plan.astro';
 
 interface Props { strona: CollectionEntry<'strony'>; lang: Lang }
 const { strona, lang } = Astro.props;
-const { d, tytul, opis, haslo, liczby, Content, htmlEn, tylkoPolski, dzial, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ } = await daneStrony(strona, lang);
+const { d, tytul, opis, haslo, liczby, Content, htmlEn, tylkoPolski, dzial, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ, grafik } = await daneStrony(strona, lang);
+// grafik dyżurów (zlecenie 45): ramka „Teraz” nad treścią, plan w miejscu bloku :::grafik (znacznik <!--wstaw:grafik--> z rehype-bloki.mjs)
+const [przedGrafikiem, poGrafiku] = grafik ? htmlEn.split('<!--wstaw:grafik-->') : [htmlEn];
 const okruszki = [...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang) as string, adres: dzial.adres }] : []), ...(rodzic ? [{ etykieta: wybierz(rodzic, 'etykieta', lang) as string, adres: rodzic.adres }] : []), { etykieta: tytul }];
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={opis} opublikowany={d.opublikowany} uklad={wygladPortalZwarta ? 'zwarta portal-baner' : undefined}
@@ -21,6 +25,9 @@ const okruszki = [...(dzial ? [{ etykieta: wybierz(dzial, 'etykieta', lang) as s
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
   {tylkoPolski && <p class="notice">{t('en', 'wersjaPolska')}</p>}
   <div class="prose" lang={tylkoPolski ? 'pl' : undefined}>
-    {htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}
+    {grafik && <GrafikTeraz grafik={grafik} />}
+    {htmlEn ? (poGrafiku !== undefined
+      ? <><Fragment set:html={przedGrafikiem} /><GrafikPlan grafik={grafik!} /><Fragment set:html={poGrafiku} /></>
+      : <Fragment set:html={htmlEn} />) : <Content />}
   </div>
 </Podstrona>

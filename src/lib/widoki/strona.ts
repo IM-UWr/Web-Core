@@ -4,6 +4,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import { menuGlowne } from '../menu';
 import { isExternal } from '../url';
 import { renderMarkdownZNaglowkami } from '../markdown';
+import { wybierzGrafik, liczbyBaneraGrafiku } from '../grafikStrony';
 import type { Lang } from '../daty';
 
 type Link = { etykieta: string; etykieta_en?: string; adres: string };
@@ -22,7 +23,7 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
   // Baner na telefonie (zlecenie 01): hasło z pól haslo / haslo_en (po angielsku tylko haslo_en — bez polskich resztek;
   // puste = opis jak dotąd) i stałe liczby z pola „liczby” (wartość + etykieta; po angielsku tylko pozycje z etykieta_en).
   const haslo = (lang === 'en' ? d.haslo_en : d.haslo) || undefined;
-  const liczby = d.liczby
+  const liczbyPola = d.liczby
     .filter((l) => lang !== 'en' || l.etykieta_en)
     .map((l) => ({ n: l.n, n_en: l.n_en, pl: l.etykieta, en: l.etykieta_en }));
   const { Content, headings } = await render(strona);
@@ -38,6 +39,10 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
     : lang === 'en' && d.tresc_en ? await renderMarkdownZNaglowkami(d.tresc_en, lang, d.bloki === true) : undefined;
   const htmlEn = en?.html ?? '';
   const naglowki = en ? en.naglowki : headings;
+  // Grafik dyżurów z bloku :::grafik (zlecenie 45: Tutornia): plan w miejscu bloku, ramka „Teraz” nad treścią; pusty blok w treści EN
+  // bierze grafik z treści polskiej. Puste pole „Liczby” — liczby banera z bloku (tutorzy, dyżury w tygodniu, sala).
+  const grafik = jawne ? wybierzGrafik(en?.grafik, strona.body, langTekstu) : undefined;
+  const liczby = d.liczby.length || !grafik?.wynik.dyzury.length ? liczbyPola : liczbyBaneraGrafiku(grafik);
 
   // Dział menu, do którego należy strona — do okruszków i bocznej nawigacji.
   const adres = '/' + strona.id;
@@ -56,5 +61,5 @@ export async function daneStrony(strona: CollectionEntry<'strony'>, lang: Lang) 
   // komputer (kierunek „Założyciele”): dział strony (boczna nawigacja) i spis „Na tej stronie” z nagłówków drugiego stopnia
   const dzialZ = dzialZeSciezki('/' + strona.id.replace(/\.md$/, ''));
   const spisZ = naglowki.filter((h: { depth: number }) => h.depth === 2).map((h: { slug: string; text: string }) => ({ id: h.slug, etykieta: h.text }));
-  return { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ };
+  return { d, tytul, opis, haslo, liczby, Content, htmlEn, naglowki, tylkoPolski, adres, dzial, linkiDzialu, rodzic, pasek, wygladPortalZwarta, dzialZ, spisZ, grafik };
 }

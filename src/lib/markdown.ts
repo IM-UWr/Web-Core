@@ -23,8 +23,13 @@ export async function renderMarkdown(src: string | undefined, lang: Lang = 'pl')
   return (await renderMarkdownZNaglowkami(src, lang)).html;
 }
 
+// Wynik parsera bloku :::grafik (src/lib/grafik.mjs, zlecenie 45); w HTML w miejscu bloku <!--wstaw:grafik-->.
+export interface DyzurGrafiku { dz: number; od: number; do: number; kto: string; przedm: string; nr: number }
+export interface WynikGrafiku { dyzury: DyzurGrafiku[]; bledy: { nr: number; tekst: string; powod: string }[]; pola: { sala?: string; od?: string; do?: string }; pusty: boolean }
+
 // bloki — pole „Bloki wzorca” strony: listy Markdown jako bloki wzorca treści (src/plugins/rehype-bloki.mjs)
-export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl', bloki = false, jawne: TrybJawny = false): Promise<{ html: string; naglowki: Naglowek[] }> {
+// grafik — tylko treść jawna z blokiem :::grafik (zlecenie 45)
+export async function renderMarkdownZNaglowkami(src: string | undefined, lang: Lang = 'pl', bloki = false, jawne: TrybJawny = false): Promise<{ html: string; naglowki: Naglowek[]; grafik?: WynikGrafiku }> {
   if (!src) return { html: '', naglowki: [] };
   const format = typeof jawne === 'object' ? jawne : {};
   const key = `${lang}:${Boolean(jawne)}:${Boolean(format.limityLinii)}`;
@@ -39,8 +44,9 @@ export async function renderMarkdownZNaglowkami(src: string | undefined, lang: L
     } as any);
     procesory.set(key, processor);
   }
-  const result = await processor.render(src, { frontmatter: { bloki, ...(jawne ? { strona: { jawne: true, ...format } } : {}) } });
-  return { html: result.code, naglowki: ((result.metadata as any)?.headings ?? []) as Naglowek[] };
+  const strona: Record<string, unknown> | undefined = jawne ? { jawne: true, ...format } : undefined;
+  const result = await processor.render(src, { frontmatter: { bloki, ...(strona ? { strona } : {}) } });
+  return { html: result.code, naglowki: ((result.metadata as any)?.headings ?? []) as Naglowek[], ...(strona?.grafik ? { grafik: strona.grafik as WynikGrafiku } : {}) };
 }
 
 // ---------- Treść kierunku (zlecenie 28): jeden Markdown, sekcje po ## (src/plugins/rehype-bloki.mjs, kotwice w kotwice.mjs) ----------

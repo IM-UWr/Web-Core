@@ -1,6 +1,7 @@
 ---
 // Drugi ekran strony głównej na komputer (≥ 1024 px; kierunek „Założyciele”, dok/estetyka.md „Drugi ekran”):
-// - pasek „Szybki dostęp”: Plan zajęć, kolor dnia („Dziś brak zajęć” / „Dziś: dzień …”), Pracownicy, Seminaria;
+// - pasek „Szybki dostęp”: Plan zajęć, kolor dnia („Dziś brak zajęć” / „Dziś: dzień …”), Pracownicy, Seminaria, Tutornia (podpis na żywo
+//   z grafiku dyżurów, zlecenie 45: components/grafik/Kafelek.astro); do pięciu kafelków, kolumn tyle, ile kafelków;
 // - trzy kolumny: sloty 0 i 1 — krótkie kolumny z tyloma pozycjami, ile się zmieści (co najmniej 3 nadchodzące, na niskim oknie 2;
 //   zlecenie 35, D3.4) i „Zobacz więcej (N)”, slot 2 — długa kolumna na całą wysokość (tyle pozycji, ile się zmieści). „Zobacz więcej”
 //   płynnie zamienia klikniętą kolumnę z długą (FLIP 0,35 s, bez ruchu przy prefers-reduced-motion; fokus na nagłówek rozwiniętej
@@ -18,6 +19,7 @@
 import Link from '../Link.astro';
 import '../../styles/zalozyciele-strony.css';
 import Szkic from './Szkic.astro';
+import KafelekGrafiku from '../grafik/Kafelek.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
 import { rozmiarPola } from '../../lib/zdjecia';
 import { MQ_KOMPUTER, sizesTelefon } from '../../lib/media';
@@ -30,6 +32,7 @@ import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { pozycjeKierunkow } from '../../lib/kierunki';
 import { tekstDnia } from '../../lib/kolory-dni';
+import { grafikDlaAdresu } from '../../lib/grafikStrony';
 import { wydarzeniaNaTelefon, wydarzeniaMinione, aktualnosciNaGlowna, referatyWTygodniu, referatyMinione, tydzienSeminariow, pracownicy, aktualnosci as wszystkieAktualnosci, slugOf, poPolskuNaEn, DOPISEK_PO_POLSKU, widoczny, maTresc, type Wydarzenie, type ReferatWLiscie } from '../../lib/tresci';
 import { dzialWpisu, dzialWydarzenia, skrotNazwy, type Dzial } from '../../lib/patroni';
 
@@ -100,13 +103,16 @@ const KOL = {
 } as const;
 const SLOTY = ['wyd', 'sem', 'akt'] as const;
 
-// Szybki dostęp: kafelki z Ustawień („Na skróty”, pierwsze cztery); kolor dnia jak w kafelku KafelekKoloryDni
+// Szybki dostęp: kafelki z Ustawień („Na skróty”, pierwsze pięć; zlecenie 45); kolor dnia jak w kafelku KafelekKoloryDni,
+// strona z blokiem :::grafik (Tutornia) — podpis na żywo z grafiku (components/grafik/Kafelek.astro)
 const KOLORY_DNI = '/studia/rok-akademicki';
 const dzis = tekstDnia(today(), lang);
 const osob = (await pracownicy()).filter((p) => p.data.grupa !== 'emeryt').length;
-const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
+const skr = await Promise.all((skroty.kafelki as any[]).slice(0, 5).map(async (k) => {
   const adres = k.adres as string;
   if (adres === KOLORY_DNI) return { adres, kd: true, tytul: !dzis.kolor && !dzis.nastepny ? (wybierz(k, 'etykieta', lang) as string) : dzis.tytul, opis: dzis.opis };
+  const grafik = isExternal(adres) ? undefined : await grafikDlaAdresu(adres, lang);
+  if (grafik?.wynik.dyzury.length) return { adres, kd: false, grafik, tytul: wybierz(k, 'etykieta', lang) as string, opis: (wybierz(k, 'opis', lang) as string) || '' };
   const sem = (plan.semestry as any[]).find((x) => x.od <= today() && today() <= x.do) ?? (plan.semestry as any[])[0];
   const opis = adres === '/studia/plan-zajec' && sem ? ((en && sem.nazwa_en) || sem.nazwa).replace(/^Semestr/, 'semestr').replace(/^Winter/, 'winter').replace(/^Summer/, 'summer')
     // „e-maile”: po łączniku U+2060 (łącznik słów, bez szerokości), żeby wyraz się nie łamał (zlecenie 26, punkt 4.2); łącznika niełamiącego
@@ -114,8 +120,8 @@ const skr = (skroty.kafelki as any[]).slice(0, 4).map((k) => {
     : adres === '/pracownicy' ? T(`${osob} osób, pokoje, e-⁠maile`, `${osob} people, rooms, e-⁠mails`)
     : adres === '/seminaria' ? T(`${seminaria.length} ${seminaria.length === 1 ? 'referat' : 'referatów'} w tym tygodniu`, `${seminaria.length} talks this week`)
     : (wybierz(k, 'opis', lang) as string) || '';
-  return { adres, kd: false, tytul: wybierz(k, 'etykieta', lang) as string, opis };
-});
+  return { adres, kd: false, grafik: undefined, tytul: wybierz(k, 'etykieta', lang) as string, opis };
+}));
 
 // Studia: kierunki (SIAD jako skrót, pełna nazwa w podpowiedzi) z listy w Ustawieniach (studia.kierunki, kolejność listy;
 // tylko pozycje z listy, z tym, co na niej wpisano — src/lib/kierunki.ts, zlecenie 39), opis i rekrutacja z Ustawień
@@ -143,12 +149,14 @@ const LOSUJ = `(function(box){if(!box||!box.dataset.losuj||!matchMedia('${MQ_KOM
   `st.concat(r).forEach(function(e,k){e.hidden=k>=n;box.appendChild(e)})})(document.currentScript.previousElementSibling);`;
 ---
 <section class="z-druga" aria-label={T('Szybki dostęp', 'Quick access')}>
-  <nav class="z-skr" data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
+  <nav class="z-skr" style={`--skr-n:${skr.length}`} data-ile={skr.length} data-pagefind-ignore aria-label={T('Szybki dostęp', 'Quick access')}>
     <h2>{T('Szybki dostęp', 'Quick access')}</h2>
     {skr.map((k) => k.kd ? (
       <a class="z-skr-kd" href={href(k.adres)} data-kd-kafelek data-etykieta={k.tytul} data-kolor={dzis.kolor ?? 'brak'} data-zamiana={dzis.zamiana ?? ''} data-nastepny={dzis.nastepnyKolor ?? ''}>
         <b data-kd-tytul>{k.tytul}</b><small><span class="z-kd-kropka" aria-hidden="true" data-kd-litera>{dzis.litera}</span><span data-kd-opis>{k.opis}</span></small>
       </a>
+    ) : k.grafik ? (
+      <KafelekGrafiku href={href(k.adres)} tytul={k.tytul} grafik={k.grafik} opis={k.opis} />
     ) : (
       <Link href={href(k.adres)}><b>{k.tytul}</b>{k.opis && <small>{k.opis}</small>}</Link>
     ))}

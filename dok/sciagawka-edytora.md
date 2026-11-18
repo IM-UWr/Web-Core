@@ -13,7 +13,7 @@ Strony i strony działów (jawny Markdown):
 
 > Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i wklej link. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
 
-Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
+W „Stronach studiów” (Web-Studia) lista przykładowych bloków ma też `:::pary` i `:::grafik` (zlecenie 45; w Treści EN: „pusty blok wstawia grafik z wersji polskiej”). Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
 
 Wpisy (zwykły Markdown):
 
@@ -99,6 +99,33 @@ Dla osób, które lubią równania różniczkowe i chcą łączyć matematykę z
 :::
 ```
 
+Pary etykieta–treść (etykieta w kolumnie obok treści; na telefonie nad treścią):
+
+```markdown
+:::pary
+- **Gdzie:** sala 202 na poziomie 200.
+- **Dla kogo:** dla wszystkich studentów.
+:::
+```
+
+Grafik dyżurów (zlecenie 45, Tutornia; tylko zwykłe Strony, jeden blok na stronę). Strona rysuje z niego plan tygodnia, ramkę „Teraz” nad treścią, liczby banera i podpis kafelka „Tutornia” w Szybkim dostępie:
+
+```markdown
+:::grafik
+Sala: 202
+Od: 19.10.2026
+Do:
+
+- pon. 12:15–14:00 **Paulina Pawlik** — AM1, AM3, Algebra liniowa 1
+- śr. 14:15–16:00 **Jacek Kowalski** — AM1, Algebra liniowa 1
+:::
+```
+
+- jeden dyżur na linię: dzień, godziny, **imię i nazwisko**, po `—` przedmioty; kolejność linii dowolna;
+- `Do:` puste = do końca zajęć semestru; dni wolne i zamiany dni strona bierze z „Kalendarza zajęć”;
+- w Treści EN wystarczy pusty blok (`:::grafik` i `:::`) — grafik przyjdzie z wersji polskiej;
+- linia, której strona nie rozumie, nie psuje budowy: nie ma jej w planie, a na Podglądzie nad planem stoi czerwona ramka z numerem linii i powodem.
+
 Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::specjalnosci`, wstawki `::opiekun`, `::seminaria`, `::wybor`) opisuje `dok/jawny-markdown.md`.
 
 ## Strony z listą, sekcje przenoszone, karty
@@ -157,6 +184,9 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 | Termin wydarzenia (Kalendarz, nadchodzące wydarzenia, .ics) | Web-Aktualnosci → Aktualności → Termin wydarzenia (pod „Rodzaj”; zwykła informacja: tylko „Data”) |
 | Deklaracja dostępności, Polityka prywatności, O stronie (linki w stopce) | Web-Ustawienia → formularze o tych nazwach (jawny Markdown; tylko administrator) |
 | Zdjęcia i kadry nagłówków działów, ikony Facebooka i YouTube w stopce | Web-Ustawienia → Strona główna i kontakt → Nagłówki działów; Facebook; YouTube (tylko administrator) |
+| Grafik dyżurów Tutorni (plan, ramka „Teraz”, liczby w banerze, podpis kafelka w Szybkim dostępie) | Web-Studia → Strony studiów → `studia/tutornia` → Treść, blok `:::grafik` (Treść EN: pusty blok) |
+| Link przy pozycji „W skrócie” (np. „Tutornia →”) | Web-Studia / Web-Instytut / Web-Nauka / Web-Popularyzacja → Strona działu … → „W skrócie” → „Link (opcjonalnie)” |
+| Kafelki „Szybki dostęp” na stronie głównej (pierwsze pięć) | Web-Ustawienia → Kafelki „Na skróty” (tylko właściciel); kafelek z adresem strony z grafikiem dyżurów ma podpis na żywo |
 
 **Stały adres sekcji w jawnym Markdownie** to `{#id}` przy nagłówku `##` (np. `## Terminy {#terminy}`); przy migracji każdy nagłówek dostał id z dawnym adresem, więc linki działają jak przedtem. Zmieniając nazwę nagłówka, id zostaw; bez `{#…}` adres powstaje z tekstu nagłówka. Kotwicy w HTML (`<a id="…">`) w treści nie wpisuj.
 

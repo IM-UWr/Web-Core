@@ -162,6 +162,49 @@ for a in sys.argv[1:] or ['src/content']:
         pliki.append(a.replace(os.sep, '/'))
 wszystkie = [b for p in pliki for b in sprawdz(p)]
 
+
+def sprawdz_grafiki(md_pliki):
+    """Blok :::grafik (zlecenie 45: Tutornia) w Treści i Treści EN: linie, których parser nie rozumie — ostrzeżenie, nie błąd
+    (strona się zbuduje, linia nie trafi do planu; na Podglądzie czerwona ramka nad planem). Parser ten sam co na stronie
+    (src/lib/grafik.mjs przez Node), więc kontrola i strona nie mogą się rozjechać; bez Node tylko ostrzeżenie, że nie sprawdzono."""
+    import subprocess, pathlib
+    wej = []
+    for p in md_pliki:
+        txt = open(p, encoding='utf-8').read()
+        if ':::grafik' not in txt:
+            continue
+        m = re.match(r'^---\n(.*?)\n---\n?(.*)$', txt, re.S)
+        if not m:
+            continue
+        try:
+            fm = yaml.load(m.group(1), Loader=Wczytywacz) or {}
+        except yaml.YAMLError:
+            continue  # błąd YAML zgłasza sprawdz()
+        wej.append([p, 'Treść', m.group(2)])
+        if isinstance(fm, dict) and isinstance(fm.get('tresc_en'), str):
+            wej.append([p, 'Treść EN', fm['tresc_en']])
+    if not wej:
+        return
+    modul = pathlib.Path('src/lib/grafik.mjs').resolve().as_uri()
+    js = (f"import {{ grafikZMarkdown }} from {json.dumps(modul)}; import {{ readFileSync }} from 'node:fs';"
+          " const w = JSON.parse(readFileSync(0, 'utf8')).map(([p, pole, md]) => [p, pole, (grafikZMarkdown(md) || { bledy: [] }).bledy]);"
+          " process.stdout.write(JSON.stringify(w));")
+    try:
+        r = subprocess.run(['node', '--input-type=module', '-e', js], input=json.dumps(wej), capture_output=True, text=True,
+                           encoding='utf-8', timeout=60)
+        wynik = json.loads(r.stdout) if r.returncode == 0 else None
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        wynik = None
+    if wynik is None:
+        ostrzezenia.append(f'grafiki dyżurów ({len(wej)} pól) niesprawdzone — kontrola potrzebuje Node i pliku src/lib/grafik.mjs')
+        return
+    for p, pole, bledy in wynik:
+        for b in bledy:
+            ostrzezenia.append(f'{p}: {pole}, blok :::grafik, linia {b["nr"]} („{b["tekst"]}”): {b["powod"]} — tej linii nie będzie w planie')
+
+
+sprawdz_grafiki([p for p in pliki if p.endswith('.md')])
+
 # Kierunki (zlecenie 28): baner <id>.json tylko dla istniejącego kierunku; przypomnienia o terminach — sprawa i data RRRR-MM-DD.
 # Tylko bez argumentów (pełna kontrola), jak ciekawostki niżej.
 if not sys.argv[1:]:

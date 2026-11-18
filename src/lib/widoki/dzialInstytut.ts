@@ -10,7 +10,7 @@ import { stronaDzialu } from '../tekstyStron';
 
 // Ramka „W skrócie” obok tekstu (komputer): lista {wartosc, opis, opis_en} z CMS; pozycje bez wartości pomijamy.
 // wartosc_en — etykieta w wersji angielskiej (puste = jak po polsku, np. liczby i lata)
-type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string };
+type Fakt = { wartosc?: string; wartosc_en?: string; opis?: string; opis_en?: string; adres?: string };
 
 export async function daneDzialuInstytut(lang: Lang) {
   const { d: dzial, tytul, html: oInstytucie, sekcje, szkic } = await stronaDzialu('instytut', lang);
@@ -51,7 +51,7 @@ export async function daneDzialuInstytut(lang: Lang) {
   const haslo = wybierz(dzial, 'haslo', lang);
   const fakty = (((dzial as any).o_instytucie_fakty ?? []) as Fakt[])
     .filter((f) => f?.wartosc?.trim())
-    .map((f) => ({ w: ((lang === 'en' && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: (lang === 'en' && f.opis_en) || f.opis || '' }));
+    .map((f) => ({ w: ((lang === 'en' && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: (lang === 'en' && f.opis_en) || f.opis || '', a: f.adres?.trim() || undefined }));
   // zdanie nad sukcesami: sekcja „Ostatnie sukcesy” z treści (HTML)
   const sukcesyOpis = sekcje.sukcesy?.html ?? '';
 

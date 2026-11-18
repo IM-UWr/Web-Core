@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Grafik dyżurów z bloku :::grafik (zlecenie 45: Tutornia) — ramka „Teraz” (components/grafik/Teraz.astro) i plan tygodnia
+   (components/grafik/Plan.astro), stany na żywo: scripts/grafik.ts. Wygląd z prototypu przyjętego 18.11 (tutornia.css).
+   Kolory działu: --d-j, --d-a, --d-g; linie --line, tło --bg. Kafelek Szybkiego dostępu: zalozyciele-strony.css.
+   Plan i ramka stoją w treści strony (.tresc .prose), więc selektory zaczynają się od „body .tresc .prose”: mają większą moc niż reguły
+   treści (body .tresc .prose h3, p, ul > li w zal-tresc.css), których plan nie dziedziczy.
+   ========================================================================== */
+.tu-teraz, .tu-grafik { --tu-b: color-mix(in oklab, var(--d-j) 15%, var(--bg)); --tu-k: var(--d-a); --tu-tb: color-mix(in oklab, var(--d-j) 36%, var(--bg)); --tu-tk: var(--d-g); }
+:root[data-theme="dark"] :is(.tu-teraz, .tu-grafik) { --tu-b: color-mix(in oklab, var(--d-j) 12%, var(--bg)); --tu-k: var(--d-j); --tu-tb: color-mix(in oklab, var(--d-j) 34%, var(--bg)); --tu-tk: var(--d-j); }
+
+/* ---- „Teraz” (jak „Dziś: dzień …” w Roku akademickim) ---- */
+body .tresc .prose .tu-teraz { display: flex; align-items: center; gap: 20px; margin: 0 0 40px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+body .tresc .prose .tu-kolko { flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; border: 2px dashed var(--line); color: var(--muted); font-size: 22px; font-weight: 800; letter-spacing: .02em; line-height: 1; }
+body .tresc .prose .tu-kolko:empty { font-size: 0; }
+body .tresc .prose .tu-kolko.tu-kolko-pelne { border: 0; background: var(--d-j); color: #04222b; }
+body .tresc .prose .tu-teraz-txt { min-width: 0; }
+body .tresc .prose .tu-teraz p { margin: 0; max-width: none; }
+body .tresc .prose .tu-teraz .tu-tytul { font-family: var(--f-display); font-weight: 500; font-size: 30px; line-height: 1.2; color: var(--ink); }
+body .tresc .prose .tu-teraz .tu-opis { margin-top: 6px; max-width: 64ch; font-size: 15.5px; line-height: 1.55; }
+body .tresc .prose .tu-teraz .etyk[hidden], body .tresc .prose .tu-teraz .tu-opis[hidden] { display: none; }
+/* ramka stoi przed pierwszą sekcją: jej dolna kreska zastępuje kreskę nad pierwszym ## (jak > h2:first-child w zal-tresc.css);
+   Astro wstawia między nie <script> planu */
+body .tresc .prose > .tu-teraz + h2, body .tresc .prose > .tu-teraz + script + h2 { margin-top: 0; padding-top: 0; border-top: 0; }
+/* ---- ramka błędów (tylko Podgląd) ---- */
+body .tresc .prose .tu-bledy { margin: 0 0 28px; padding: 12px 16px; border: 2px solid #c62828; border-radius: 4px; background: color-mix(in oklab, #c62828 6%, var(--bg)); font-size: 14px; line-height: 1.5; color: var(--text); }
+body .tresc .prose .tu-bledy ul { margin: 6px 0; padding-left: 0; max-width: none; }
+body .tresc .prose .tu-bledy li { margin: 0; padding-left: 0; font-size: inherit; max-width: none; }
+body .tresc .prose .tu-bledy li::before { content: none !important; }
+body .tresc .prose .tu-bledy code { font-size: 13px; }
+
+/* ---- siatka tygodnia (komputer) ---- */
+body .tresc .prose .tu-plan-meta { margin: -4px 0 6px !important; color: var(--muted); font-size: 14.5px; }
+body .tresc .prose .tu-siatka { --tu-r: 9px; --tu-h: 50px; position: relative; display: grid; grid-template-columns: 54px repeat(5, minmax(0, 1fr)); grid-template-rows: var(--tu-h) repeat(var(--tu-n), var(--tu-r)); margin: 14px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+body .tresc .prose .tu-dzien, body .tresc .prose .tu-dzien ul { display: contents; }
+body .tresc .prose .tu-dzien h3 { grid-row: 1; align-self: end; margin: 0 !important; padding: 0 0 10px 12px; border-bottom: 2px solid var(--rule, var(--ink)); font-family: var(--f-display); font-weight: 500; font-size: 18px; line-height: 1.2; color: var(--ink); white-space: nowrap; }
+body .tresc .prose .tu-dzien h3 small { margin-left: 6px; font-family: var(--f-text); font-size: 12.5px; font-weight: 700; color: var(--d-a); }
+body .tresc .prose .tu-dzien-dzis h3 { color: var(--d-a); border-bottom-color: var(--d-a); }
+body .tresc .prose .tu-brak { grid-row: 2 / span 6; margin: 10px 12px !important; font-size: 13px; color: var(--muted); }
+body .tresc .prose .tu-tlo { grid-row: 2 / -1; position: relative; border-left: 1px solid var(--line); }
+body .tresc .prose .tu-tlo i { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
+body .tresc .prose .tu-tlo-dzis { background: color-mix(in oklab, var(--d-j) 8%, transparent); }
+body .tresc .prose .tu-czas { grid-column: 1; align-self: start; transform: translateY(-50%); padding-right: 10px; text-align: right; font-size: 12.5px; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; }
+body .tresc .prose .tu-czas[hidden] { display: none; }
+
+body .tresc .prose .tu-dyz { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; max-width: none !important; margin: 2px 4px 1px 5px; padding: 8px 10px 8px 11px; overflow: hidden; list-style: none; border-left: 3px solid var(--tu-k); border-radius: 0 4px 4px 0; background: var(--tu-b); }
+body .tresc .prose .tu-dyz::before { content: none !important; }
+body .tresc .prose .tu-godz { font-size: 12px; font-weight: 700; line-height: 1.3; color: var(--d-a); font-variant-numeric: tabular-nums; }
+body .tresc .prose .tu-kto { font-family: var(--f-display); font-weight: 500 !important; font-size: 17px; line-height: 1.2; color: var(--ink); }
+body .tresc .prose .tu-przedm { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; font-size: 12.5px; line-height: 1.38; color: var(--muted); }
+body .tresc .prose .tu-krotki { padding-top: 6px; padding-bottom: 5px; }
+body .tresc .prose .tu-krotki .tu-godz { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body .tresc .prose .tu-krotki .tu-przedm { -webkit-line-clamp: 2; }
+body .tresc .prose .tu-teraz-dyz { --tu-b: var(--tu-tb); border-left-color: var(--tu-tk); }
+body .tresc .prose .tu-zn { position: absolute; top: 8px; right: 9px; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--tu-tk); }
+body .tresc .prose .tu-zn::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+body .tresc .prose .tu-krotki.tu-teraz-dyz .tu-kto { padding-right: 56px; }
+/* Wąska kolumna dnia (komputer ok. 1024–1250 px, dwa dyżury obok siebie): znacznik „teraz” w osobnej linii nad godziną,
+   długie nazwiska i przedmioty łamane zamiast ucinane, w krótkim dyżurze (poniżej godziny) samo nazwisko. */
+body .tresc .prose .tu-dyz { container-type: inline-size; }
+@container (max-width: 139.98px) {
+  body .tresc .prose .tu-dyz .tu-zn { position: static; order: -1; }
+  body .tresc .prose .tu-dyz .tu-kto, body .tresc .prose .tu-krotki.tu-teraz-dyz .tu-kto { padding-right: 0; font-size: 14px; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; }
+  body .tresc .prose .tu-dyz .tu-przedm { font-size: 12px; overflow-wrap: anywhere; }
+  body .tresc .prose .tu-krotki .tu-przedm { display: none; }
+}
+body .tresc .prose .tu-minal { opacity: .5; }
+body .tresc .prose .tu-linia { position: absolute; z-index: 2; left: 0; right: 0; height: 0; border-top: 2px solid var(--d-a); pointer-events: none; }
+body .tresc .prose .tu-linia::before { content: ""; position: absolute; left: -5px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--d-a); }
+body .tresc .prose .tu-linia-czas { position: absolute; z-index: 2; grid-column: 1 / 2; left: 0; right: 0; transform: translateY(-50%); padding: 2px 10px 2px 0; text-align: right; font-size: 12px; font-weight: 700; line-height: 1; color: var(--d-a); background: var(--bg); font-variant-numeric: tabular-nums; }
+body .tresc .prose .tu-pusto { color: var(--muted); }
+/* zdanie z treści pod siatką (akapit po bloku) */
+body .tresc .prose .tu-grafik + p { margin-top: 12px; font-size: 14px; color: var(--muted); max-width: 52em; }
+:root[data-theme="dark"] .tu-linia-czas { background: var(--bg); }
+
+/* ---- telefon i wąskie okna: lista dni zamiast siatki ---- */
+/* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts */
+@media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+  body .tresc .prose .tu-teraz { align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  body .tresc .prose .tu-kolko { width: 56px; height: 56px; font-size: 18px; }
+  body .tresc .prose .tu-teraz .tu-tytul { font-size: 25px; }
+  body .tresc .prose .tu-siatka { display: block; margin-top: 6px; border: 0; padding: 0; }
+  body .tresc .prose .tu-tlo, body .tresc .prose .tu-czas, body .tresc .prose .tu-linia, body .tresc .prose .tu-linia-czas { display: none; }
+  body .tresc .prose .tu-dzien { display: block; padding: 14px 0 8px; border-top: 1px solid var(--line); }
+  body .tresc .prose .tu-dzien ul { display: block; margin: 0; padding: 0; }
+  body .tresc .prose .tu-dzien h3 { padding: 0 0 8px; border: 0; font-size: 21px; }
+  body .tresc .prose .tu-brak { margin: 0 0 8px !important; }
+  body .tresc .prose .tu-dyz { display: grid; grid-template-columns: 96px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; margin: 0 0 8px !important; width: auto !important; padding: 10px 12px; }
+  body .tresc .prose .tu-dyz .tu-godz, body .tresc .prose .tu-krotki .tu-godz { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-row: 1 / 4; font-size: 14px; padding-top: 2px; }
+  body .tresc .prose .tu-przedm { -webkit-line-clamp: unset !important; font-size: 13.5px; }
+  body .tresc .prose .tu-zn { top: 10px; right: 10px; }
+}

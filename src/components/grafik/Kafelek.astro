@@ -1,0 +1,17 @@
+---
+// Kafelek Szybkiego dostępu dla strony z blokiem :::grafik (zlecenie 45: Tutornia; DrugiEkran.astro), jak kafelek kolorów dni:
+// nazwa i podpis na żywo z tej samej funkcji co ramka „Teraz” (stanGrafiku w src/lib/grafik.mjs, skrypt src/scripts/grafik.ts):
+// „teraz: Jacek Kowalski, do 16:00” z kropką 8 px w kolorze Studiów, „od 14:15: …”, „dziś od 12:15 · sala 202”, „jutro od …”,
+// „nieczynna, wraca 7 sty”, „rusza 19 paź”. Dane grafiku osadzone przy budowaniu (data-tu-dane). Bez JavaScriptu: „sala 202”.
+// Wygląd: zalozyciele-strony.css (.z-skr-tu).
+import type { GrafikStrony } from '../../lib/grafikStrony';
+
+interface Props { href: string; tytul: string; grafik: GrafikStrony; opis?: string }
+const { href, tytul, grafik, opis } = Astro.props;
+const T = (pl: string, en: string) => (grafik.lang === 'en' ? en : pl);
+const podpis = grafik.sala ? T(`sala ${grafik.sala}`, `room ${grafik.sala}`) : (opis ?? '');
+---
+<a class="z-skr-tu" href={href} data-tu-kafelek data-tu-dane={grafik.dane} data-lang={grafik.lang} data-tu-kropka="">
+  <b>{tytul}</b><small><span class="tu-kropka" aria-hidden="true"></span><span data-tu-krotko>{podpis}</span></small>
+</a>
+<script>import '../../scripts/grafik';</script>

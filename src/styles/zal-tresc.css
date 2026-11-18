@@ -10,7 +10,7 @@
      wczytaniem Manrope łamały tekst tak samo; zlecenie 13, punkt 3); pierwszy akapit (.wst) w kolorze nagłówków; tekst w elementach
      z danymi 15,5 px / 1,55; linki: kolor tekstu, podkreślenie 1 px w kolorze działu (55%), po najechaniu kolor działu;
    - elementy: lista z kreskami (ul.kreski), ramka uwagi (.uwaga), dwie kolumny cech (ul.dwa), siatka boksów (ul.boksy), lista linków (ul.linki),
-     ścieżka etapów (ol.etapy), pary etykieta–wartość (dl.para), tabela (table.tab), przełącznik wariantów (.tresc-taby),
+     ścieżka etapów (ol.etapy), pary etykieta–wartość (dl.para; blok :::pary — dl.pary w kolumnach z kreskami), tabela (table.tab), przełącznik wariantów (.tresc-taby),
      pliki do pobrania (ul.pliki), pytania (.faq details), kontakt (.kontakty);
    - nigdy: kafelki, cienie, zaokrąglenia, tła sekcji (wyjątek: ramka uwagi), ikony ozdobne (wyjątek: ikona pliku).
    Telefon (≤ 1023 px): sekcja 26 px, podsekcja 20 px, tekst 16 px, dwie kolumny → jedna, kontakt w jednej kolumnie,
@@ -222,8 +222,17 @@ body .tresc .prose .kontakty { margin: 0 0 16px; }
 body .tresc .prose .kontakty p { margin: 0 0 8px; font-size: 15px; line-height: 1.55; }
 body .tresc .prose :is(.kontakty, ul.dwa) .akcja a { color: var(--d-a); font-weight: 600; font-size: 14.5px; }
 body .tresc .prose blockquote .etyk { margin-bottom: 4px; }
+/* blok :::pary (zlecenie 45): etykieta w kolumnie 150 px obok treści, kreski między parami; na telefonie etykieta nad treścią */
+body .tresc .prose dl.pary { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 0; max-width: 46em; margin: 0 0 16px; }
+body .tresc .prose dl.pary :is(dt, dd) { margin: 0; padding: 12px 0; border-top: 1px solid var(--line); }
+body .tresc .prose dl.pary dt { padding-right: 16px; font-weight: 700; color: var(--ink); }
+body .tresc .prose dl.pary > :nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
 @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
   body .tresc .prose h2 { margin-top: 30px; padding-top: 28px; font-size: 26px; line-height: 1.25; margin-bottom: 12px; }
+  body .tresc .prose dl.pary { grid-template-columns: minmax(0, 1fr); }
+  body .tresc .prose dl.pary dt { padding-bottom: 0; }
+  body .tresc .prose dl.pary dd { padding-top: 2px; border-top: 0; }
+  body .tresc .prose dl.pary > :nth-last-child(2) { border-bottom: 0; }
   body .tresc .prose > h2:first-child { margin-top: 0; padding-top: 0; }
   body .tresc .prose h3 { font-size: 20px; margin-top: 24px; }
   body .tresc .prose :is(ul.dwa, ul.linki) { grid-template-columns: minmax(0, 1fr); gap: 0; }

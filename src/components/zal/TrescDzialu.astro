@@ -23,7 +23,8 @@ import type { Lang } from '../../lib/daty';
 // Grupa podstron: grupa z menu działu (src/lib/menu.ts).
 export type LinkPod = { etykieta: string; etykieta_en?: string; opis?: string; opis_en?: string; adres: string };
 export type GrupaPod = { nazwa: string; nazwa_en?: string; opis?: string; opis_en?: string; linki: LinkPod[] };
-export type Fakt = { w: string; o?: string };
+// a — adres z pola „Link (opcjonalnie)” (zlecenie 45): wartość staje się linkiem (bez podkreślenia, podkreślenie po najechaniu, mała →)
+export type Fakt = { w: string; o?: string; a?: string };
 
 interface Props {
   dzial: Dzial;
@@ -107,7 +108,7 @@ const kolumny = (n: number) => (n <= 5 ? Math.max(n, 3) : n === 6 ? 3 : 4);
         <aside class="z-dz-skrot" aria-labelledby="z-dz-skrot-h">
           <h3 id="z-dz-skrot-h">{en ? 'At a glance' : 'W skrócie'}</h3>
           <dl>
-            {fakty.map((f) => <div><dt>{f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
+            {fakty.map((f) => <div><dt>{f.a ? <Link class="z-dz-skrot-a" href={href(f.a)} lang={lang}>{f.w}</Link> : f.w}</dt>{f.o && <dd>{f.o}</dd>}</div>)}
           </dl>
         </aside>
       )}

@@ -21,6 +21,7 @@
 // Opcje: lang ('pl' | 'en', domyślnie pl), site i base (linki poza stronę: typ „strona”/„website” na liście plików).
 import { kotwica, kolejnosc, idNaglowka, KOTWICE, NAGLOWEK_SPECJALNOSCI } from './kotwice.mjs';
 import { zewnetrzny } from './rehype-zewn.mjs';
+import { parsujGrafik, POWODY } from '../lib/grafik.mjs';
 
 const el = (tagName, klasa, children = [], props = {}) => ({
   type: 'element', tagName, properties: { ...(klasa ? { className: [klasa] } : {}), ...props }, children,
@@ -100,6 +101,28 @@ function para(linia) {
   return { klucz: m[1], wartosc: przytnij([...(m[2] ? [tekst(m[2])] : []), ...r]) };
 }
 const samLink = (linia) => (linia?.length === 1 && jest(linia[0], 'a') ? linia[0] : undefined);
+
+// punkt bloku :::pary (zlecenie 45): „**Etykieta:** treść” (także „**Etykieta**: treść”) → { etyk, tresc }; dalsze linie punktu
+// (Shift+Enter albo kolejne akapity) idą do tej samej treści, po <br>. Bez etykiety albo bez treści — undefined (błąd bloku).
+function paraPunktu(L) {
+  const [a, ...r] = L[0]?.linia ?? [];
+  if (!jest(a, 'strong')) return undefined;
+  const t = tekstW(a).replace(/\s+/g, ' ').trim();
+  let reszta = przytnij(r);
+  let etyk;
+  if (/:$/.test(t)) etyk = t.replace(/\s*:$/, '');
+  else if (reszta[0]?.type === 'text' && /^:/.test(reszta[0].value)) {
+    etyk = t;
+    reszta = przytnij([tekst(reszta[0].value.slice(1)), ...reszta.slice(1)]);
+  }
+  if (!etyk) return undefined;
+  const tresc = [...reszta];
+  for (const x of L.slice(1)) {
+    if (x.blok) tresc.push(x.blok);
+    else tresc.push(...(tresc.length ? [el('br')] : []), ...x.linia);
+  }
+  return tresc.length ? { etyk: [tekst(etyk)], tresc } : undefined;
+}
 
 // dalsze linie punktu: pary — dl.para (paryNaPoczatku: wszystkie w jednej liście zaraz po opisie, jak w kafelkach),
 // sam link — p.akcja, inne bloki bez zmian, reszta — akapit
@@ -402,7 +425,7 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
     const out = []; let group;
     for (const child of nodes) {
       const special = jestBlokiem(child) || jest(child, 'section') || jest(child, 'h2') || child.type === 'comment'
-        || ['prose', 'dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski'].some((c) => child.properties?.className?.includes(c));
+        || ['prose', 'dwa', 'etapy', 'kontakty', 'linki', 'pliki', 'faq', 'uwaga', 'tresc-taby', 'kier-prog', 'tab', 'kreski', 'pary'].some((c) => child.properties?.className?.includes(c));
       if (special) { out.push(child); group = undefined; }
       else { if (!group) { group = el('div', 'prose', [], implicit ? { dataProzaDomyslna: '' } : {}); out.push(group); } group.children.push(child); }
     }
@@ -461,6 +484,25 @@ function jawnaSekcja(tree, ctx, opcje, typ, file) {
       return [kind === 'pliki' ? naPliki(ul, ctx) : naLinki(ul)];
     }
     if (kind === 'kreski' || kind === 'tematy') return [naKreski(listIn(n, 'ul'), { ...ctx, opisPo: kind === 'tematy' })];
+    if (kind === 'pary') {
+      // zlecenie 45: „- **Etykieta:** treść” → dl.pary (etykieta obok treści, linie między parami); dalsze linie punktu w tej samej treści
+      const ul = listIn(n, 'ul');
+      const pary = pozycje(ul).map((li) => paraPunktu(linie(li)));
+      if (!pary.every(Boolean)) fail('Każdy punkt bloku pary zaczyna się od **Etykiety:** i treści, np. - **Gdzie:** sala 202.', n);
+      return [zBlokiem(el('dl', 'pary', pary.flatMap(({ etyk, tresc }) => [el('dt', null, etyk), el('dd', null, tresc)])))];
+    }
+    if (kind === 'grafik') {
+      // zlecenie 45: grafik dyżurów. Błędy linii nie zatrzymują budowy (grafik zmieniają też studenci-redaktorzy): parser je zbiera,
+      // a widok strony pokazuje na Podglądzie czerwoną ramkę. W HTML tylko znacznik <!--wstaw:grafik-->, w jego miejsce widok
+      // (Strona.astro) wstawia plan z kalendarzem zajęć; wynik parsera w opcje.grafik. Drugi blok na stronie: błąd w tej samej ramce.
+      if (typ !== 'strona') fail('Blok grafik jest dla zwykłych stron (np. Strony studiów).', n);
+      if (opcje.grafik) {
+        opcje.grafik.bledy.push({ nr: 1, tekst: `:::grafik (linia ${n.properties.dataLinia ?? '?'} treści)`, powod: POWODY.drugi });
+        return [];
+      }
+      opcje.grafik = parsujGrafik(JSON.parse(n.properties.dataZrodlo ?? '[]'));
+      return [wstaw('grafik')];
+    }
     if (kind === 'tabela') {
       const b = bloki(n);
       if (b.length !== 1 || !jest(b[0], 'table')) fail('Blok tabela wymaga jednej tabeli Markdown.', n);
