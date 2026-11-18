@@ -1,0 +1,100 @@
+---
+// Strona Kariera (/aktualnosci/kariera, EN /en/aktualnosci/kariera; zlecenie 44, wariant A): oferty pracy, staży i stypendiów, czyli wpisy
+// Aktualności z rodzajem „Kariera” (ten sam formularz w Web-Aktualnosci; na liście Aktualności ich nie ma, jest ramka z linkiem tutaj).
+// Szablon jak lista Aktualności (ListaAktualnosci.astro): baner Aktualności, panel z prawej (zal/ListaPokaz.astro) — tu samo pole szukania,
+// bez filtra rodzaju — i wiersze WierszAktualnosci (z dopiskiem terminu zgłoszeń). Link wstecz „← Aktualności”.
+// - U góry aktualne oferty, od najnowszej daty publikacji; gdy ich brak — „Obecnie brak aktualnych ofert.”
+// - Pod nimi „Zakończone”: oferty po terminie zgłoszeń, przygaszone (szara data i etykieta, szare zdjęcie), w tym samym układzie.
+// Bez wyróżnionego pierwszego wiersza (lista ofert, nie zapowiedzi). Szukanie jak w Aktualnościach (także bez polskich znaków),
+// puste sekcje znikają. Bez JS: pole szukania schowane, widać całą listę.
+import Podstrona from '../components/zal/Podstrona.astro';
+import ListaPokaz from '../components/zal/ListaPokaz.astro';
+import WierszAktualnosci from '../components/WierszAktualnosci.astro';
+import type { Lang } from '../lib/daty';
+import { daneListyOfert } from '../lib/widoki/listaOfert';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const en = lang === 'en';
+const { aktualne, zakonczone, tytul, lead, haslo, html, tytulAktualnosci, szukajDlugo } = await daneListyOfert(lang);
+---
+<Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
+  okruszki={[{ etykieta: tytulAktualnosci, adres: '/aktualnosci' }, { etykieta: tytul }]} klasa="z-ak z-kar" klasaRamy="z-pd-pelna"
+  atrybuty={{ 'data-lista-ofert': '', 'data-dalej': en ? '… read more' : '… czytaj dalej' }}>
+
+  <ListaPokaz lang={lang} etykieta="" opcje={[]} szukaj={szukajDlugo} bezFiltra>
+    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
+    <section class="kar-sekcja" data-grupa aria-labelledby="kar-aktualne">
+      <h2 id="kar-aktualne" class="sr-only">{en ? 'Current offers' : 'Aktualne oferty'}</h2>
+      {aktualne.map((p) => <WierszAktualnosci p={p} lang={lang} />)}
+    </section>
+    {aktualne.length === 0 && <p class="kar-brak" data-brak-aktualnych>{en ? 'No current offers.' : 'Obecnie brak aktualnych ofert.'}</p>}
+    {zakonczone.length > 0 && (
+      <section class="kar-sekcja kar-zak" data-grupa aria-labelledby="kar-zakonczone">
+        <h2 id="kar-zakonczone">{en ? 'Closed' : 'Zakończone'}</h2>
+        {zakonczone.map((p) => <WierszAktualnosci p={p} lang={lang} />)}
+      </section>
+    )}
+    <p class="kar-pusto" role="status" data-pusto hidden>{en ? 'No offers match your search.' : 'Brak ofert spełniających kryteria.'}</p>
+  </ListaPokaz>
+</Podstrona>
+
+<script>
+  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
+  import { czytajDalej, czytajDalejNaBiezaco } from '../scripts/zal/czytaj-dalej';
+  const lista = document.querySelector<HTMLElement>('[data-lista-ofert]');
+  if (lista) {
+    const pozycje = Array.from(lista.querySelectorAll<HTMLElement>('[data-wa]'));
+    const grupy = Array.from(lista.querySelectorAll<HTMLElement>('[data-grupa]'));
+    const pusto = lista.querySelector<HTMLElement>('[data-pusto]');
+    const brak = lista.querySelector<HTMLElement>('[data-brak-aktualnych]');
+    // tekst do szukania: raz, przed pierwszym dopiskiem „… czytaj dalej”
+    const tekstWpisu = new Map(pozycje.map((p) => [p, norm(p.textContent ?? '')]));
+    const dalej = () => czytajDalej(pozycje, lista.dataset.dalej ?? '');
+    const panel = panelPokaz(document, () => {
+      const q = panel.szukane();
+      let ile = 0;
+      for (const p of pozycje) {
+        p.hidden = !!q && !(tekstWpisu.get(p) ?? '').includes(q);
+        if (!p.hidden) ile++;
+      }
+      for (const g of grupy) g.hidden = !g.querySelector('[data-wa]:not([hidden])');
+      // „Obecnie brak aktualnych ofert” tylko bez szukania; przy szukaniu bez wyników — „Brak ofert spełniających kryteria”
+      if (brak) brak.hidden = !!q;
+      if (pusto) pusto.hidden = ile > 0 || (!q && pozycje.length === 0);
+      dalej();
+    });
+    // (filtruje też według tekstu, który przeglądarka przywróciła w polu szukania po powrocie na stronę)
+    panel.ustaw(null);
+    czytajDalejNaBiezaco(dalej);
+  }
+</script>
+
+<style>
+  [hidden] { display: none !important; }
+  /* panel (pole szukania, układ z prawą kolumną): zal/ListaPokaz.astro; wiersze: WierszAktualnosci.astro */
+  .kar-sekcja { margin: 0; padding: 0; border: 0; }
+  /* „Zakończone”: nagłówek jak miesiąc na liście Aktualności (ListaAktualnosci.astro) */
+  .kar-sekcja h2:not(.sr-only) { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
+    font-size: 23px; line-height: 1.4; color: var(--d-a); }
+  /* przygaszone: data, etykieta i tytuł po najechaniu szare, zdjęcie w szarości; tekst dalej czytelny (bez przezroczystości) */
+  .kar-zak :global(.wa) { --d-a: var(--muted); }
+  .kar-zak :global(.wa h3) { color: var(--text); }
+  .kar-zak :global(.wa-fot) { filter: grayscale(1); opacity: .75; }
+  .kar-brak { margin: 18px 0 0; color: var(--text); }
+  .kar-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
+
+  /* ---------- komputer (≥ 1024 px): wiersze w dwóch kolumnach, gdy lista ma co najmniej 880 px (jak Aktualności) ---------- */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    @container (min-width: 880px) {
+      .kar-sekcja { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+      .kar-sekcja h2 { grid-column: 1 / -1; }
+    }
+  }
+
+  /* ---------- telefon (≤ 1023 px) ---------- */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .kar-sekcja h2:not(.sr-only) { margin-top: 22px; font-size: 20px; }
+  }
+</style>

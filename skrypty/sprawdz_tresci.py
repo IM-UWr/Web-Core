@@ -23,7 +23,7 @@ Wczytywacz.add_constructor('tag:yaml.org,2002:float', _bez_szescdziesiatkowych('
 # Listy obiektów, w których bez pola pozycja nie ma sensu — strona pomija taką pozycję z ostrzeżeniem w logu budowy
 # (WYMAGANE_W_LISTACH w src/content.config.ts, zlecenie 31). Z kropką: lista w obiekcie.
 WYMAGANE_W_LISTACH = {
-    'aktualnosci': {'galeria': ['plik'], 'zalaczniki': ['plik'], 'termin': ['dzien']},
+    'aktualnosci': {'galeria': ['plik'], 'zalaczniki': ['plik'], 'termin': ['dzien'], 'zgloszenia': ['do_dnia']},
     'strony': {'liczby': ['n', 'etykieta']},
     'referaty': {'pliki': ['plik']},
     'obrony': {'recenzje': ['recenzent', 'plik']},
@@ -115,6 +115,17 @@ def sprawdz(p):
             for k in ('godzina', 'godzina_konca'):
                 if not pusta(t.get(k)) and not GODZINA.match(str(t.get(k)).strip()):
                     ostrzezenia.append(f'{p}: termin.{k} „{t.get(k)}” to nie godzina w formacie 13:00 — strona ją pominie')
+        # zlecenie 44: termin zgłoszeń tylko w ofertach („Kariera”); nazwa pliku „kariera” zajęta przez stronę ofert
+        zgloszenia = [t for t in (dane.get('zgloszenia') or []) if isinstance(t, dict) and not pusta(t.get('do_dnia'))]
+        if zgloszenia and rodzaj != 'kariera':
+            ostrzezenia.append(f'{p}: termin zgłoszeń przy rodzaju „{rodzaj}” — strona go pominie (termin zgłoszeń jest tylko dla ofert: Rodzaj „Kariera”)')
+        if len(zgloszenia) > 1:
+            ostrzezenia.append(f'{p}: termin zgłoszeń ma {len(zgloszenia)} pozycje — strona bierze pierwszą')
+        for t in zgloszenia:
+            if not re.match(r'^\d{4}-\d{2}-\d{2}', str(t.get('do_dnia'))):
+                bledy.append(f'{p}: termin zgłoszeń „{t.get("do_dnia")}” to nie data RRRR-MM-DD')
+        if os.path.basename(p) == 'kariera.md':
+            bledy.append(f'{p}: nazwa pliku „kariera” jest zajęta przez stronę ofert /aktualnosci/kariera — zmień nazwę pliku (strona pominie ten wpis)')
     for k in LISTY_OBIEKTOW.get(kol, []):
         v = dane.get(k)
         if v is not None and not isinstance(v, list):

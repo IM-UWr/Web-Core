@@ -9,12 +9,13 @@
 // Sloty: domyślny — lista; „nad” — blok nad listą w kolumnie listy (np. przełącznik Nadchodzące / Archiwum w Kalendarzu; na telefonie
 // nad filtrami); „panel” — dodatek w panelu pod filtrami (np. „Pokazuję wpisy dla:” w Aktualnościach).
 // Właściwości: etykieta — nazwa grupy filtrów (dla czytnika ekranu i listy wyboru); opcje — wartości filtra bez „Wszystkie” (dodawane tu,
-// wartość ''); szukaj — podpowiedź w polu szukania. Przyciski mają data-filtr (wartość), lista wyboru data-filtr-lista, pole data-szukaj.
+// wartość ''); szukaj — podpowiedź w polu szukania; bezFiltra — samo pole szukania, bez „Pokaż” i opcji (strona Kariera, zlecenie 44).
+// Przyciski mają data-filtr (wartość), lista wyboru data-filtr-lista, pole data-szukaj.
 import { t } from '../../lib/i18n';
 import type { Lang } from '../../lib/daty';
 
-interface Props { lang: Lang; etykieta: string; opcje: { wartosc: string; etykieta: string }[]; szukaj: string }
-const { lang, etykieta, opcje, szukaj } = Astro.props;
+interface Props { lang: Lang; etykieta: string; opcje: { wartosc: string; etykieta: string }[]; szukaj: string; bezFiltra?: boolean }
+const { lang, etykieta, opcje, szukaj, bezFiltra = false } = Astro.props;
 // slot „nad” podany warunkowo ({html && <div slot="nad">…}, zlecenie 30) też „jest” — liczy się to, co wyrenderował
 const nad = Astro.slots.has('nad') ? await Astro.slots.render('nad') : '';
 const maNad = nad.trim() !== '';
@@ -24,6 +25,7 @@ const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
   {maNad && <div class="lp-nad" set:html={nad} />}
   <div class="lp-panel">
     <div class="lp-narz" data-pagefind-ignore>
+      {!bezFiltra && <>
       <p class="lp-pokaz" aria-hidden="true">{lang === 'en' ? 'Show' : 'Pokaż'}</p>
       <div class="lp-opcje" role="group" aria-label={etykieta}>
         {wszystkie.map((o, i) => <button type="button" aria-pressed={i === 0 ? 'true' : 'false'} data-filtr={o.wartosc}>{o.etykieta}</button>)}
@@ -36,6 +38,7 @@ const wszystkie = [{ wartosc: '', etykieta: t(lang, 'wszystkie') }, ...opcje];
         </select>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
       </label>
+      </>}
       <input type="search" class="lp-szukaj" placeholder={szukaj} aria-label={szukaj} autocomplete="off" data-szukaj />
     </div>
     <slot name="panel" />

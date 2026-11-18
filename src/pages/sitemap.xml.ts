@@ -10,7 +10,7 @@ import { jestTekstemListy } from '../lib/tekstyStron';
 import { powstaje } from '../lib/szkice';
 
 export async function GET(context: APIContext) {
-  const sciezki: string[] = ['/', '/instytut', '/nauka', '/studia', '/popularyzacja', '/aktualnosci', '/kalendarz', '/seminaria', '/pracownicy', '/obrony-doktorskie', '/nauka/konferencje', '/nauka/granty', '/nauka/sukcesy', '/studia/rok-akademicki'];
+  const sciezki: string[] = ['/', '/instytut', '/nauka', '/studia', '/popularyzacja', '/aktualnosci', '/aktualnosci/kariera', '/kalendarz', '/seminaria', '/pracownicy', '/obrony-doktorskie', '/nauka/konferencje', '/nauka/granty', '/nauka/sukcesy', '/studia/rok-akademicki'];
   for (const a of await aktualnosci()) sciezki.push(`/aktualnosci/${slugOf(a.id)}`);
   for (const o of await obrony()) sciezki.push(`/obrony-doktorskie/${slugOf(o.id)}`);
   for (const s of await seminaria()) sciezki.push(`/seminaria/${s.id}`);

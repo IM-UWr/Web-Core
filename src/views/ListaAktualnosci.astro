@@ -12,22 +12,29 @@
 // - kolumna listy ≥ 880 px (okno ≥ 1180 px, przy pasku ≥ 888 px): wpisy w dwóch kolumnach, węższa: w jednej;
 // - telefon (≤ 1023 px): rodzaje jako lista wyboru (zlecenie 11, zalecenie 4), pole szukania pod nią, pasek nieprzyklejony.
 // „… czytaj dalej” dopisuje skrypt, tylko gdy zajawka się nie mieści (wygląd w WierszAktualnosci.astro).
+// Oferty „Kariera” (zlecenie 44): nie ma ich na liście; w panelu, w miejscu dawnego filtra, ramka „Oferty pracy, staży i stypendiów (N) →”
+// do strony /aktualnosci/kariera (N = aktualne oferty, przy zerze bez liczby): komputer — w prawej kolumnie pod filtrami i szukaniem,
+// telefon — na całą szerokość pod polem szukania. Stary adres ?rodzaj=kariera przekierowuje na tę stronę.
 // Bez JS: filtry schowane, widać całą listę.
 import Podstrona from '../components/zal/Podstrona.astro';
 import ListaPokaz from '../components/zal/ListaPokaz.astro';
 import Link from '../components/Link.astro';
 import WierszAktualnosci from '../components/WierszAktualnosci.astro';
-import { RODZAJE_FILTRY, ODBIORCY } from '../lib/i18n';
+import { RODZAJE_FILTRY, ODBIORCY, wJezyku } from '../lib/i18n';
+import { u } from '../lib/url';
 import type { Lang } from '../lib/daty';
 import { daneListyAktualnosci } from '../lib/widoki/listaAktualnosci';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
+const { ustawienia, grupy, rodzaje, ofertyAktualne, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo } = await daneListyAktualnosci(lang);
+const adresKariery = u(wJezyku('/aktualnosci/kariera', lang));
 ---
 <Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
   okruszki={[{ etykieta: tytul }]} klasa="z-ak" klasaRamy="z-pd-pelna" atrybuty={{ 'data-lista': '', 'data-dalej': en ? '… read more' : '… czytaj dalej' }}>
+  {/* stary filtr „Kariera” (zlecenie 44): od razu na stronę ofert, zanim narysuje się lista */}
+  <script is:inline define:vars={{ adresKariery }}>if (new URLSearchParams(location.search).get('rodzaj') === 'kariera') location.replace(adresKariery);</script>
 
   <ListaPokaz lang={lang} etykieta={filtrEtykieta} opcje={rodzaje.map((r) => ({ wartosc: r, etykieta: RODZAJE_FILTRY[r][lang] }))} szukaj={szukajDlugo}>
     {html && <div slot="nad" class="lp-wstep" set:html={html} />}
@@ -35,6 +42,7 @@ const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szu
       <span>{en ? 'Showing posts for:' : 'Pokazuję wpisy dla:'} {Object.entries(ODBIORCY).map(([k, v]) => <strong data-dla-etykieta={k} hidden>{v[lang].toLowerCase()}</strong>)}</span>
       <button type="button" data-dla-wyczysc>{en ? 'Show all' : 'Pokaż wszystkie'}</button>
     </p>
+    <a slot="panel" class="ak-kariera" href={adresKariery} data-pagefind-ignore>{en ? 'Jobs, internships and scholarships' : 'Oferty pracy, staży i stypendiów'}{ofertyAktualne > 0 && ` (${ofertyAktualne})`}&nbsp;→</a>
     {grupy.map((g, nrGrupy) => (
       <section class="ak-mies" data-grupa>
         <h2>{g.miesiac}</h2>
@@ -52,6 +60,7 @@ const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szu
 <script>
   import { sizesTelefon } from '../lib/media';
   import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
+  import { czytajDalej, czytajDalejNaBiezaco } from '../scripts/zal/czytaj-dalej';
   const lista = document.querySelector('[data-lista]');
   const pozycje = Array.from(document.querySelectorAll<HTMLElement>('[data-lista] [data-wa]'));
   const grupy = Array.from(document.querySelectorAll<HTMLElement>('[data-grupa]'));
@@ -70,24 +79,9 @@ const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szu
     if (tak) w.querySelector('img')?.setAttribute('loading', 'eager');
   }
 
-  // „… czytaj dalej” (zlecenie 18, punkt 3): tylko w zajawce, która się nie mieści; bez znaczenia dla czytnika ekranu,
-  // bo klikalny jest cały wiersz. Tolerancja 1 px na zaokrąglenie wysokości linii (ucięta linia to co najmniej 20 px).
+  // „… czytaj dalej” (zlecenie 18, punkt 3): src/scripts/zal/czytaj-dalej.ts
   const dopisek = lista instanceof HTMLElement ? lista.dataset.dalej ?? '' : '';
-  function dalej() {
-    for (const p of pozycje) {
-      const z = p.querySelector<HTMLElement>('.wa-zaj');
-      if (!z || p.hidden) continue;
-      const d = z.querySelector('.wa-dalej');
-      const ucieta = z.scrollHeight > z.clientHeight + 1;
-      if (ucieta && !d) {
-        const s = document.createElement('span');
-        s.className = 'wa-dalej';
-        s.setAttribute('aria-hidden', 'true');
-        s.textContent = dopisek;
-        z.append(s);
-      } else if (!ucieta && d) d.remove();
-    }
-  }
+  const dalej = () => czytajDalej(pozycje, dopisek);
 
   // rodzaj z panelu „Pokaż” (zal/ListaPokaz.astro)
   const panel = panelPokaz(document, filtruj);
@@ -128,11 +122,7 @@ const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szu
     if (d) ustawDla(d);
     // (filtruje też według tekstu, który przeglądarka przywróciła w polu szukania po powrocie na stronę)
     panel.ustaw(p.get('rodzaj'));
-    // dopisek zależy od szerokości i fontu: po narysowaniu, po załadowaniu fontów i po zmianie rozmiaru okna
-    requestAnimationFrame(dalej);
-    document.fonts?.ready.then(dalej);
-    let klatka = 0;
-    addEventListener('resize', () => { cancelAnimationFrame(klatka); klatka = requestAnimationFrame(dalej); });
+    czytajDalejNaBiezaco(dalej);
   }
 </script>
 
@@ -155,6 +145,11 @@ const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szu
   .ak-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
   .ak-archiwum { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
   .ak-archiwum a { color: var(--d-a); }
+  /* ramka do strony Kariera (zlecenie 44) w stylu panelu: obramowanie jak przycisk „Pokaż wszystkie”, bez nowego koloru */
+  .ak-kariera { display: block; margin: 14px 0 0; padding: 11px 14px; border: 1px solid var(--line-ui); font-size: 15px; font-weight: 600; line-height: 1.4;
+    color: var(--ink); text-decoration: none; }
+  .ak-kariera:hover { border-color: var(--d-a); color: var(--d-a); }
+  .ak-kariera:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
 
   /* ---------- komputer (≥ 1024 px): lista w dwóch kolumnach, gdy ma co najmniej 880 px (kontener: kolumna listy w ListaPokaz.astro) ---------- */
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
@@ -166,6 +161,8 @@ const { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szu
     .ak-dla { display: grid; justify-items: start; gap: 8px; margin: 16px 0 0; font-size: 14px; line-height: 1.45; }
     .ak-dla button { border-radius: 5px; }
     .ak-dla button:focus-visible { outline-offset: -2px; }
+    .ak-kariera { margin-top: 18px; padding: 9px 12px; border-radius: 5px; font-size: 14px; }
+    .ak-kariera:focus-visible { outline-offset: -2px; }
   }
 
   /* ---------- telefon (≤ 1023 px) ---------- */

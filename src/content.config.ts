@@ -38,7 +38,7 @@ const plikList = lista(plik);
 // numer pozycji), zamiast przerywać budowę. Klucz: pole-lista (z kropką: lista w obiekcie, np. baner.liczby), wartość: pola,
 // bez których pozycja nie ma sensu. Pole „pozycja” (false) w pliku strona pomija jak każde pole spoza schematu.
 const WYMAGANE_W_LISTACH: Record<string, Record<string, string[]>> = {
-  aktualnosci: { galeria: ['plik'], zalaczniki: ['plik'], termin: ['dzien'] },
+  aktualnosci: { galeria: ['plik'], zalaczniki: ['plik'], termin: ['dzien'], zgloszenia: ['do_dnia'] },
   strony: { liczby: ['n', 'etykieta'] },
   referaty: { pliki: ['plik'] },
   obrony: { recenzje: ['recenzent', 'plik'] },
@@ -95,6 +95,12 @@ function kontrolaWpisu(kolekcja: string, dane: unknown, plik: string, ostrzez: (
     } else if (!brakWartosci(wynik.wydarzenie_poczatek)) {
       ostrzez(`${plik}: stary zapis terminu (wydarzenie_poczatek) — przenieś do pola „termin” (skrypty/migracja/termin.py)`);
     }
+    // termin zgłoszeń (zlecenie 44): tylko oferty („Kariera”); przy innym rodzaju strona go pomija
+    const zgl = Array.isArray(wynik.zgloszenia) ? (wynik.zgloszenia as unknown[]) : [];
+    if (zgl.length > 1) ostrzez(`${plik}: termin zgłoszeń ma ${zgl.length} pozycje — strona bierze pierwszą`);
+    if (zgl.length && (wynik.rodzaj ?? 'ogloszenie') !== 'kariera') ostrzez(`${plik}: termin zgłoszeń przy rodzaju innym niż „Kariera” — strona go pomija`);
+    // nazwa pliku zajęta przez podstronę /aktualnosci/kariera (ZAJETE_NAZWY_AKTUALNOSCI w src/lib/tresci.ts)
+    if (/(^|\/)kariera\.md$/.test(plik)) ostrzez(`${plik}: nazwa pliku „kariera” jest zajęta przez stronę ofert /aktualnosci/kariera — wpis pominięty; zmień nazwę pliku`);
   }
   return wynik;
 }
@@ -132,6 +138,11 @@ const polaWydarzenia = (t: Termin) => ({
   wydarzenie_miejsce: t.miejsce,
 });
 
+// Termin zgłoszeń w ofercie (zlecenie 44): grupa „zgloszenia” jak „termin” wyżej (lista z najwyżej jedną pozycją, dodawana kliknięciem),
+// jedno pole „Do dnia”. Strona wylicza z niej zgloszenia_do (RRRR-MM-DD), tylko przy rodzaju „Kariera” (przy innym pomija;
+// ostrzeżenie w logu i w skrypty/sprawdz_tresci.py). Bez terminu oferta jest aktualna (ofertaAktualna w src/lib/tresci.ts).
+const terminZgloszen = z.object({ do_dnia: date });
+
 // Baner podstrony na telefonie (zlecenie 01, decyzje 31.10.2026): krótkie bursztynowe hasło zamiast opisu (puste = opis
 // jak dotąd albo reguła widoku) i — tylko tam, gdzie liczb nie da się policzyć z danych — stałe liczby pod kreską
 // (wartość, np. „8” albo „3 lata”, i etykieta). Komputer bez zmian.
@@ -158,6 +169,7 @@ const aktualnosci = defineCollection({
     album: optStr,
     zalaczniki: plikList,
     termin: lista(terminWydarzenia),
+    zgloszenia: lista(terminZgloszen),
     // stary zapis terminu (do migracji danych, skrypty/migracja/termin.py); przy polu „termin” nieużywany
     wydarzenie_poczatek: optDate,
     wydarzenie_koniec: optDate,
@@ -167,7 +179,11 @@ const aktualnosci = defineCollection({
     tresc_en: optStr,
     zaklad: optId,
     opublikowany: published,
-  }).transform(({ termin, ...d }) => (termin[0] ? { ...d, ...polaWydarzenia(termin[0]) } : d)),
+  }).transform(({ termin, zgloszenia, ...d }) => ({
+    ...d,
+    ...(termin[0] ? polaWydarzenia(termin[0]) : {}),
+    zgloszenia_do: d.rodzaj === 'kariera' && zgloszenia[0] ? zgloszenia[0].do_dnia.slice(0, 10) : undefined,
+  })),
 });
 
 const strony = defineCollection({

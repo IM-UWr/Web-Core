@@ -8,6 +8,8 @@
 // „Galeria” (Galeria.tsx — podgląd na pełnym ekranie), „Załączniki” (ul.pliki) i „Najbliższe wydarzenia” (WierszWydarzenia.astro;
 // tylko gdy są blisko), kreski między sekcjami; na końcu „Nowszy / Starszy wpis”.
 // Bez przycisku „Udostępnij” (decyzja 30.10.2026: nigdzie na stronie).
+// Oferta („Kariera”, zlecenie 44): link wstecz „Wszystkie oferty” do /aktualnosci/kariera, a w etykiecie termin zgłoszeń
+// („Zgłoszenia do 15 grudnia 2026”, po terminie „Nabór zakończony”), gdy oferta go ma. Adres wpisu bez zmian.
 // Karta (zlecenie 18, punkt 4; podgląd: wariant B „karta boczna”). Jedna wersja HTML:
 // - okno ≥ 1104 px: dwie kolumny, treść i przyklejona karta 360 px; sekcja wpisu ma display: contents, żeby karta mogła iść
 //   przez całą wysokość lewej kolumny, także obok Galerii i Załączników;
@@ -23,8 +25,8 @@ import Galeria from '../components/Galeria.tsx';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, langPola } from '../lib/i18n';
-import { short, longWithDay, range, dayNum, monthShort, parse, hasTime, time, type Lang } from '../lib/daty';
-import { slugOf, type Aktualnosc } from '../lib/tresci';
+import { short, long, longWithDay, range, dayNum, monthShort, parse, hasTime, time, type Lang } from '../lib/daty';
+import { slugOf, ofertaAktualna, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
 import { zdjecie } from '../lib/zdjecia';
 import { sizesTelefon } from '../lib/media';
@@ -56,12 +58,16 @@ const godzOd = wydarzenie && hasTime(wydarzenie.poczatek) ? time(wydarzenie.pocz
 const godzDo = wydarzenie?.koniec && hasTime(wydarzenie.koniec) ? time(wydarzenie.koniec) : '';
 const szerPliku = (await zdjecie(d.zdjecie))?.width;
 const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}` : '';
+const oferta = d.rodzaj === 'kariera';
+const wstecz = oferta ? { etykieta: en ? 'All offers' : 'Wszystkie oferty', adres: '/aktualnosci/kariera' } : { etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' };
+const zgloszenia = !d.zgloszenia_do ? '' : ofertaAktualna({ zgloszenia: d.zgloszenia_do })
+  ? `${en ? 'Apply by' : 'Zgłoszenia do'} ${long(d.zgloszenia_do, lang, false)}` : en ? 'Closed' : 'Nabór zakończony';
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={zajawka} obraz={d.zdjecie} opublikowany={d.opublikowany} typ="article" uklad="zwarta"
-  wstecz={{ etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' }} dzial={oWydarzeniu ? dzialWpisu(d) : undefined} dzialBanera={dzialWpisu(d)}
+  wstecz={wstecz} dzial={oWydarzeniu ? dzialWpisu(d) : undefined} dzialBanera={dzialWpisu(d)}
   klasa={['tresc', zKarta && 'akt-z-karta', oWydarzeniu && 'akt-wydarzenie'].filter(Boolean).join(' ')} klasaRamy={zKarta ? 'z-pd-pelna' : undefined}>
   <section class="akt-wpis">
-    <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}</p>
+    <p class="etyk akt-meta"><span>{RODZAJE[d.rodzaj][lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={d.data.slice(0, 10)}>{short(d.data, lang)}</time></span>{dlaTekst && <> · <span>{dlaTekst}</span></>}{zgloszenia && <> · <span>{zgloszenia}</span></>}</p>
     {zajawka && <p class="wst" lang={langPola(d, 'zajawka', lang)}>{zajawka}</p>}
 
     {zKarta && <div class="akt-karta">

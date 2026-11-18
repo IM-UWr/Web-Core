@@ -30,6 +30,13 @@ export const STRONY_Z_LISTA: Record<string, Domyslne> = {
     opis: p('Ogłoszenia, wydarzenia i sukcesy Instytutu Matematycznego.', 'Announcements, events and achievements of the Mathematical Institute.'),
     haslo: p('Co słychać w Instytucie', "What's new at the Institute"),
   },
+  // oferty pracy, staży i stypendiów (zlecenie 44): strona /aktualnosci/kariera, plik Web-Aktualnosci src/content/strony/kariera.md
+  // (Strony → Kariera; nazwa pliku z zlecenia — wyjątek od reguły „adres = ścieżka pliku”, jak strona listy w tej samej kolekcji)
+  kariera: {
+    tytul: p('Kariera', 'Careers'),
+    opis: p('Oferty pracy, staży i stypendiów dla studentów, absolwentów i doktorantów.', 'Job, internship and scholarship offers for students, graduates and PhD students.'),
+    haslo: p('Praca, staże, stypendia', 'Jobs, internships, scholarships'),
+  },
   'obrony-doktorskie': {
     tytul: p('Obrony doktorskie', 'PhD defences'),
     opis: p('Publiczne obrony rozpraw doktorskich z matematyki: zawiadomienia, rozprawy, streszczenia i recenzje.', 'Public defences of doctoral theses in mathematics: notices, theses, abstracts and reviews.'),

@@ -8,6 +8,7 @@
 // Uruchomienie:  node skrypty/test-edytora/formularz.mjs <katalog z klonami Web-*> [<katalog ze starymi klonami>]
 // Drugi katalog (opcjonalnie): te same scenariusze na starej konfiguracji — dla porównania (jak było przed zleceniem 31).
 // Zlecenie 33: scenariusz 8 — przełącznik „Opublikowane” (stara strona bez pola, nowa strona, odznaczenie) w 12 formularzach.
+// Zlecenie 44: scenariusz 9 — grupa „Termin zgłoszeń” w aktualnościach (oferty „Kariera”).
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
@@ -288,6 +289,35 @@ function scenariusze(kat, nazwaKonf, nowa) {
     const n = generateFilename(f.filename, f, stan);
     console.log(`   ${repo}/${kolekcja}: ${przyOtwarciu ? 'przy otwarciu (tytuł pusty)' : 'przy zapisie z tytułu'}: ${n}`);
     if (nowa) sprawdz(n.endsWith('-medale-uniwersytetu-dla-profesorow-test.md'), `${repo}/${kolekcja}: nazwa z tytułu`);
+  }
+
+  // Zlecenie 44: termin zgłoszeń w ofercie (grupa „zgloszenia”, lista najwyżej 1, pole „Do dnia”) — jak termin wydarzenia wyżej
+  const poleZgl = form.fields.find((f) => f.name === 'zgloszenia');
+  if (poleZgl) {
+    const pustyZgl = () => initializeState(poleZgl.fields, {});
+    const oferta = (zmiany) => nowy({ rodzaj: 'kariera', ...zmiany });
+    console.log('9a. Stara oferta bez terminu zgłoszeń (2026-10-16-praca-dla-korepetytora-z-matematyki.md) otwarta i zapisana bez zmian');
+    const plik9 = path.join(kat, 'Web-Aktualnosci/src/content/aktualnosci/2026-10-16-praca-dla-korepetytora-z-matematyki.md');
+    const tekst9 = fs.readFileSync(plik9, 'utf8');
+    w = zapisz(form, otworz(form, tekst9));
+    console.log('   ' + (w.bledy.length ? pokaz(w) : `w pliku: ${Object.keys(w.dane).filter((k) => /zgloszenia|termin|wydarzenie/.test(k)).join(', ') || 'bez terminu zgłoszeń, terminu i dat wydarzenia'}`));
+    sprawdz(!w.bledy.length && !Object.keys(w.dane).some((k) => /zgloszenia|termin|wydarzenie/.test(k)), 'nie dostaje terminu zgłoszeń ani dat');
+    console.log('9b. „Add an item” w terminie zgłoszeń i zapis bez wypełnienia');
+    w = zapisz(form, oferta({ zgloszenia: [pustyZgl()] }));
+    console.log('   ' + pokaz(w));
+    sprawdz(w.bledy.some((b) => b.startsWith('zgloszenia.0.do_dnia')), 'czerwone przy „Do dnia”, zapis zablokowany');
+    console.log('9c. Termin zgłoszeń 15.12.2026');
+    w = zapisz(form, oferta({ zgloszenia: [{ ...pustyZgl(), do_dnia: '2026-12-15' }] }));
+    console.log('   ' + pokaz(w));
+    sprawdz(!w.bledy.length && w.tekst.includes(['', 'zgloszenia:', '  - do_dnia: 2026-12-15', '    pozycja: false', ''].join('\n')), 'zapisana grupa „zgloszenia: - do_dnia: 2026-12-15” (i „pozycja: false”)');
+    console.log('9d. Stara oferta: dodany termin zgłoszeń, reszta bez zmian');
+    w = zapisz(form, Object.assign(otworz(form, tekst9), { zgloszenia: [{ ...pustyZgl(), do_dnia: '2026-12-15' }] }));
+    const bez = zapisz(form, otworz(form, tekst9));
+    const { zgloszenia: _z, ...reszta } = w.dane ?? {};
+    sprawdz(!w.bledy.length && JSON.stringify(reszta) === JSON.stringify(bez.dane) && w.dane.zgloszenia?.[0]?.do_dnia === '2026-12-15', 'w pliku dochodzi tylko „zgloszenia”');
+    console.log('9e. Drugi termin zgłoszeń (przycisk znika przy 1 pozycji; gdyby jednak)');
+    w = zapisz(form, oferta({ zgloszenia: [{ ...pustyZgl(), do_dnia: '2026-12-15' }, { ...pustyZgl(), do_dnia: '2026-12-16' }] }));
+    sprawdz(w.bledy.length > 0, `zablokowany: ${w.bledy.join('; ')}`);
   }
 
   // Zlecenie 33: przełącznik „Opublikowane” (default: true) w Stronach, stronach działów, kierunkach i specjalnościach.

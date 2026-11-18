@@ -32,10 +32,15 @@ export const maTresc = (t?: string | null) => bezKomentarzy(t).trim() !== '';
 // Identyfikator wpisu bez rozszerzenia i podfolderów daty.
 export const slugOf = (id: string) => id.split('/').pop()!.replace(/\.(md|ya?ml)$/, '');
 
+// Nazwy plików aktualności zajęte przez strony (zlecenie 44): /aktualnosci/kariera to podstrona ofert. Generator nazw w Pages CMS
+// (data na początku nazwy) takiej nazwy nie da, ale plik wgrany na GitHubie mógłby; taki wpis strona pomija (ostrzeżenie w logu budowy:
+// content.config.ts, błąd w skrypty/sprawdz_tresci.py).
+export const ZAJETE_NAZWY_AKTUALNOSCI = ['kariera'];
+
 export async function aktualnosci(): Promise<Aktualnosc[]> {
   const items = await getCollection('aktualnosci');
   return items
-    .filter(widoczny)
+    .filter((a) => widoczny(a) && !ZAJETE_NAZWY_AKTUALNOSCI.includes(slugOf(a.id)))
     .sort((a, b) => (a.data.data < b.data.data ? 1 : a.data.data > b.data.data ? -1 : 0) || a.id.localeCompare(b.id));
 }
 
@@ -409,19 +414,29 @@ export interface PozycjaListy {
   koniec?: string;
   // zakład z CMS — do reguły działu wpisu (dzialWpisu w src/lib/patroni.ts)
   zaklad?: string;
+  // oferta („Kariera”, zlecenie 44): ostatni dzień zgłoszeń RRRR-MM-DD z grupy „Termin zgłoszeń”; brak = bez terminu
+  zgloszenia?: string;
 }
+
+// Oferty pracy, staży i stypendiów (rodzaj „Kariera”, zlecenie 44) mają własną podstronę /aktualnosci/kariera: nie ma ich na liście
+// Aktualności, na stronie głównej (kolumna Aktualności i liczba na okładce) ani w RSS. Strona Studiów pokazuje tylko aktualne.
+export const jestOferta = (p: { rodzaj: string }) => p.rodzaj === 'kariera';
+// Aktualna = bez terminu zgłoszeń albo termin dziś lub później (cały dzień terminu oferta jest jeszcze aktualna). Liczone przy budowie;
+// Podgląd przebudowuje się codziennie, więc oferta sama przechodzi do „Zakończonych”.
+export const ofertaAktualna = (p: { zgloszenia?: string }) => !p.zgloszenia || p.zgloszenia >= today();
 
 // Czy wydarzenie z wpisu już się odbyło (wpis bez wydarzenia — nigdy).
 const odbyloSie = (p: PozycjaListy) => !!p.wydarzenie && !trwaLubBedzie({ poczatek: p.wydarzenie, koniec: p.koniec });
 
-export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
+// Wszystkie pozycje list aktualności, także oferty „Kariera” (listaAktualnosci, listaOfert, strona Studiów).
+export async function pozycjeAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
   const [akt, obr] = await Promise.all([aktualnosci(), obrony()]);
   const items: PozycjaListy[] = akt.map((a) => ({
     rodzaj: a.data.rodzaj, tytul: (lang === 'en' && a.data.tytul_en) || a.data.tytul, tytulLang: langPola(a.data, 'tytul', lang), data: a.data.data,
     zajawka: (lang === 'en' && a.data.zajawka_en) || a.data.zajawka, zajawkaLang: langPola(a.data, 'zajawka', lang), zdjecie: a.data.zdjecie,
     zdjecie_opis: (lang === 'en' && a.data.zdjecie_opis_en) || a.data.zdjecie_opis, dla: a.data.dla, href: `/aktualnosci/${slugOf(a.id)}`, wydarzenie: a.data.wydarzenie_poczatek,
     koniec: a.data.wydarzenie_poczatek && (a.data.wydarzenie_koniec || koniecDomyslny(a.data.wydarzenie_poczatek, 120)),
-    id: `akt-${slugOf(a.id)}`, zaklad: a.data.zaklad,
+    id: `akt-${slugOf(a.id)}`, zaklad: a.data.zaklad, zgloszenia: a.data.zgloszenia_do,
   }));
   for (const o of obr) {
     if (o.data.w_aktualnosciach === false) continue;
@@ -436,6 +451,16 @@ export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[
   items.push(...pozycjeZamianDni(lang, today()));
   // przy tej samej dacie stała kolejność (po id), żeby lista nie zmieniała się między przebudowami
   return items.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0) || a.id.localeCompare(b.id));
+}
+
+// Lista Aktualności (strona /aktualnosci, strona główna, RSS): bez ofert „Kariera” (zlecenie 44).
+export async function listaAktualnosci(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
+  return (await pozycjeAktualnosci(lang)).filter((p) => !jestOferta(p));
+}
+
+// Oferty „Kariera” (podstrona /aktualnosci/kariera, zlecenie 44): od najnowszej daty publikacji.
+export async function listaOfert(lang: Lang = 'pl'): Promise<PozycjaListy[]> {
+  return (await pozycjeAktualnosci(lang)).filter(jestOferta);
 }
 
 // Strona główna (decyzja z 30.10.2026): Aktualności to zapowiedzi — chronologicznie według daty publikacji (obrony razem

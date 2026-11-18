@@ -3,7 +3,7 @@ import { wybierz } from '../i18n';
 import type { Lang } from '../daty';
 import { menuGlowne } from '../menu';
 import { listaKierunkow, jestSzkolaDoktorska, jestPodyplomowe, stopnieKierunku } from '../kierunki';
-import { listaAktualnosci, widoczny } from '../tresci';
+import { pozycjeAktualnosci, jestOferta, ofertaAktualna, widoczny } from '../tresci';
 import { specjalnosci as wszystkieSpecjalnosci } from '../specjalnosci';
 import { stronaDzialu } from '../tekstyStron';
 
@@ -51,7 +51,8 @@ export async function daneDzialuStudia(lang: Lang) {
 
   // Aktualności dla studentów (komputer — wariant „Zwarta”: cztery karty, jeden pełny rząd;
   // telefon — wygląd „Portal”: zwarta lista sześciu).
-  const dlaStudentow = (await listaAktualnosci(lang)).filter((p) => p.dla.includes('studenci'));
+  // oferty „Kariera” zostają, ale tylko aktualne (zlecenie 44: po terminie zgłoszeń znikają stąd, zostają w „Zakończonych” na stronie Kariera)
+  const dlaStudentow = (await pozycjeAktualnosci(lang)).filter((p) => p.dla.includes('studenci') && (!jestOferta(p) || ofertaAktualna(p)));
   const aktualnosci = dlaStudentow.slice(0, 4);
   const aktualnosciTel = dlaStudentow.slice(0, 6);
 

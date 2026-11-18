@@ -1,7 +1,7 @@
 // Dane listy aktualności (ListaAktualnosci.astro): wpisy po miesiącach, rodzaje do filtra, teksty i ustawienia.
 import ustawienia from '../../data/ustawienia.json';
 import { monthYear, type Lang } from '../daty';
-import { listaAktualnosci } from '../tresci';
+import { listaAktualnosci, listaOfert, ofertaAktualna } from '../tresci';
 import { stronaListy } from '../tekstyStron';
 
 export async function daneListyAktualnosci(lang: Lang) {
@@ -16,7 +16,9 @@ export async function daneListyAktualnosci(lang: Lang) {
     if (ost && ost.miesiac === m) ost.pozycje.push(p);
     else grupy.push({ miesiac: m, pozycje: [p] });
   }
-  const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'kariera', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
+  // bez „Kariera”: oferty mają własną stronę (zlecenie 44), a w ich miejscu w panelu jest ramka z linkiem i liczbą aktualnych ofert
+  const rodzaje = ['ogloszenie', 'wydarzenie', 'sukces', 'obrona'].filter((r) => lista.some((p) => p.rodzaj === r));
+  const ofertyAktualne = (await listaOfert(lang)).filter(ofertaAktualna).length;
   // Tytuł, opis, hasło (na telefonie zamiast opisu — NaglowekStrony.astro; decyzja 31.10.2026) i tekst nad listą:
   // Web-Aktualnosci → Strony → Aktualności (src/content/strony/aktualnosci.md; zlecenie 30, src/lib/tekstyStron.ts).
   const { tytul, opis: lead, haslo, html } = await stronaListy('aktualnosci', lang);
@@ -27,5 +29,5 @@ export async function daneListyAktualnosci(lang: Lang) {
   const filtrEtykieta = T('Filtruj według rodzaju', 'Filter by type');
   const szukajDlugo = T('Szukaj w aktualnościach', 'Search news');
 
-  return { ustawienia, grupy, rodzaje, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo };
+  return { ustawienia, grupy, rodzaje, ofertyAktualne, tytul, lead, haslo, html, filtrEtykieta, szukajDlugo };
 }
