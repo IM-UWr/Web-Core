@@ -11,7 +11,11 @@ Wszystko działa anonimowo — bez klucza USOS API, bez logowania i bez dostępu
    courses/classtypes_index (nazwy typów zajęć). Gdy eksport (1) nie działa, plan składany jest
    awaryjnie z API: courses/search + tt/course_edition + courses/course_edition (bez kolumny „uwagi”).
 
-Domyślnie pobierany jest bieżący i następny semestr. Jeśli USOS nie odpowiada, dane semestru zostają
+Domyślnie pobierany jest semestr zimowy i letni jednego roku akademickiego. Od 1 sierpnia roku R (czas
+Europe/Warsaw; dzień zmiany: stała ZMIANA_ROKU niżej) jest to rok R/R+1, wcześniej (R−1)/R — także gdy
+USOS API nie odpowiada (wtedy nazwy z identyfikatora, bez dat). Semestr, którego USOS jeszcze nie zna,
+trafia do pliku bez planu i bez dat; strona pokazuje wtedy „Plan na ten semestr nie jest jeszcze dostępny
+w USOS”. Semestry spoza tej pary znikają z pliku. Jeśli USOS nie odpowiada, dane semestru z pary zostają
 z poprzedniego pliku (nic nie jest kasowane), a skrypt kończy się kodem 0 z ostrzeżeniem.
 Data „zaktualizowano” zmienia się tylko wtedy, gdy zmieniły się same dane, więc plik nie zmienia się
 przy każdym uruchomieniu.
@@ -36,6 +40,10 @@ try:
     STREFA = ZoneInfo('Europe/Warsaw')
 except Exception:  # starszy Python bez bazy stref — czas UTC
     STREFA = dt.timezone.utc
+
+# Dzień, od którego plan pokazuje następny rok akademicki: od 1 sierpnia (czas STREFA) obie zakładki,
+# zimowa i letnia, przechodzą na nowy rok (decyzja właściciela 18.11.2026, zlecenie 43).
+ZMIANA_ROKU = (8, 1)  # miesiąc, dzień
 
 KATALOG_REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 DOMYSLNY_PLIK = os.path.join(KATALOG_REPO, 'src', 'data', 'plan', 'plan.json')
@@ -165,45 +173,50 @@ def semestry_z_api():
     return sorted(wynik, key=lambda t: t['od'] or '')
 
 
+def rok_akademicki(dzis):
+    """Pierwszy rok roku akademickiego, którego plan pokazujemy: od ZMIANA_ROKU roku R — R (R/R+1), wcześniej R−1."""
+    return dzis.year if (dzis.month, dzis.day) >= ZMIANA_ROKU else dzis.year - 1
+
+
+def para_semestrow(dzis):
+    """Identyfikatory USOS semestru zimowego i letniego jednego roku akademickiego, np. ('2026/27-Z', '2026/27-L')."""
+    r = rok_akademicki(dzis)
+    rok = f'{r}/{(r + 1) % 100:02d}'
+    return f'{rok}-Z', f'{rok}-L'
+
+
 def semestry_z_kalendarza(dzis):
-    # Awaryjnie (gdy API nie odpowiada): semestr zimowy X–I, letni od drugiej połowy lutego.
-    r, m = dzis.year, dzis.month
-    if m >= 10:
-        biezacy, nastepny = f'{r}/{(r + 1) % 100:02d}-Z', f'{r}/{(r + 1) % 100:02d}-L'
-    elif m == 1 or (m == 2 and dzis.day < 20):
-        biezacy, nastepny = f'{r - 1}/{r % 100:02d}-Z', f'{r - 1}/{r % 100:02d}-L'
-    else:
-        biezacy, nastepny = f'{r - 1}/{r % 100:02d}-L', f'{r}/{(r + 1) % 100:02d}-Z'
+    # Awaryjnie (gdy API nie odpowiada): ta sama para co z API, nazwy z identyfikatora, bez dat.
     wynik = []
-    for sid in (biezacy, nastepny):
+    for sid in para_semestrow(dzis):
         pl, en = nazwa_semestru(sid)
         wynik.append({'id': sid, 'nazwa': pl, 'nazwa_en': en, 'od': None, 'do': None})
     return wynik
 
 
 def wybierz_semestry(dzis, wskazane):
+    """Semestry do pobrania: wskazane w --semestr albo zimowy i letni roku akademickiego (para_semestrow)."""
     try:
         wszystkie = semestry_z_api()
     except Exception as e:
         ostrzez(f'USOS API (terms/terms_index) nie odpowiada ({e}); semestry ustalone z kalendarza.')
-        wszystkie = semestry_z_kalendarza(dzis)
-        if wskazane:
-            wszystkie = []
-    if wskazane:
-        po_id = {t['id']: t for t in wszystkie}
-        wynik = []
-        for sid in wskazane:
-            if sid not in po_id:
-                pl, en = nazwa_semestru(sid)
-                po_id[sid] = {'id': sid, 'nazwa': pl, 'nazwa_en': en, 'od': None, 'do': None}
+        if not wskazane:
+            return semestry_z_kalendarza(dzis)
+        wszystkie = []
+    po_id = {t['id']: t for t in wszystkie}
+    wynik = []
+    for sid in wskazane or para_semestrow(dzis):
+        if sid in po_id:
             wynik.append(po_id[sid])
-        return wynik
-    d = dzis.isoformat()
-    rozpoczete = [t for t in wszystkie if t['od'] and t['od'] <= d]
-    przyszle = [t for t in wszystkie if t['od'] and t['od'] > d]
-    if not rozpoczete and not przyszle:
-        return wszystkie[:2]
-    return rozpoczete[-1:] + przyszle[:1]
+            continue
+        pl, en = nazwa_semestru(sid)
+        sem = {'id': sid, 'nazwa': pl, 'nazwa_en': en, 'od': None, 'do': None}
+        if not wskazane and wszystkie:
+            # USOS odpowiada, ale tego semestru jeszcze nie zna (np. od 1 sierpnia letni nowego roku):
+            # bez pobierania planu, zakładka z komunikatem; to nie błąd
+            sem['brak_w_usos'] = True
+        wynik.append(sem)
+    return wynik
 
 
 # ---------------------------------------------------------------- wspólne przetwarzanie
@@ -536,7 +549,8 @@ def main():
     ap = argparse.ArgumentParser(description='Pobiera plan zajęć IM UWr z USOS (anonimowo) do src/data/plan/plan.json.')
     ap.add_argument('--zrodlo', choices=['auto', 'eksport', 'api'], default='auto',
                     help='auto: eksport planIM.php, a gdy nie działa — USOS API (domyślnie)')
-    ap.add_argument('--semestr', action='append', help='identyfikator semestru z USOS, np. 2026/27-Z (można kilka razy); domyślnie bieżący i następny')
+    ap.add_argument('--semestr', action='append', help='identyfikator semestru z USOS, np. 2026/27-Z (można kilka razy); domyślnie zimowy i letni '
+                    'roku akademickiego, od 1 sierpnia następnego (ZMIANA_ROKU)')
     ap.add_argument('--wyjscie', default=DOMYSLNY_PLIK, help='plik wynikowy')
     ap.add_argument('--budzet-api', type=int, default=2500, help='limit zapytań do USOS API w trybie awaryjnym')
     arg = ap.parse_args()
@@ -554,13 +568,17 @@ def main():
         sid = sem['id']
         sloty = nazwy = adres = None
         zrodlo = None
-        if arg.zrodlo in ('auto', 'eksport'):
+        tryb = arg.zrodlo
+        if sem.get('brak_w_usos'):
+            print(f'{sid}: semestru nie ma jeszcze w USOS (terms/terms_index) — zakładka bez planu.')
+            tryb = None
+        if tryb in ('auto', 'eksport'):
             try:
                 sloty, nazwy, adres = plan_z_eksportu(sid)
                 zrodlo = 'usosweb-eksport'
             except Exception as e:
                 ostrzez(f'{sid}: eksport planu z USOSweb niedostępny ({e})')
-        if sloty is None and arg.zrodlo in ('auto', 'api'):
+        if sloty is None and tryb in ('auto', 'api'):
             try:
                 sloty, nazwy, adres = plan_z_api(sem, znane_kody, LICZNIK_API['n'] + arg.budzet_api)
                 zrodlo = 'usos-api'
