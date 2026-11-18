@@ -3,6 +3,8 @@
 // Każde repozytorium (zlecenie 40): Strony i strona działu — Treść i Treść EN jako kolorowany edytor Markdown, ukryte pole
 // format_tresci (domyślnie jawne), każdy plik w jawnym formacie, każde pole pliku w formularzu (zapis w CMS niczego nie wytnie).
 // Web-Studia dodatkowo: kierunki, specjalności, rok akademicki, scalony baner i powiązania opiekunów ze spisem pracowników.
+// Web-Ustawienia (etap 6): zamiast Stron — formularze plików deklaracja, prywatnosc, o-stronie (strony z linków w stopce);
+// ich pole „opublikowany: true” nie ma pola w formularzu (celowo, bez wersji roboczych): zapis w CMS je wytnie, a brak = true.
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -65,8 +67,10 @@ let headings = 0, withoutId = 0;
 function countHeadings(text) {
   for (const line of String(text ?? '').split(/\r?\n/)) if (/^##\s/.test(line)) { headings++; if (!/\{#[^}]+\}\s*$/.test(line)) withoutId++; }
 }
+const ustawienia = config.content.some((c) => c.name === 'deklaracja');
 for (const name of studia ? ['kierunki', 'specjalnosci', 'strony'] : ['strony']) {
   const collection = config.content.find((c) => c.name === name);
+  if (!collection && ustawienia) continue;
   assert.ok(collection && collection.type === 'collection', `Brak formularza ${name}`);
   hiddenFormat(collection);
   const names = collection.fields.map((f) => f.name);
@@ -90,13 +94,14 @@ for (const name of studia ? ['kierunki', 'specjalnosci', 'strony'] : ['strony'])
     entries++;
   }
 }
-for (const name of studia ? ['strona-dzialu', 'rok-akademicki'] : ['strona-dzialu', 'popularyzacja']) {
+for (const name of studia ? ['strona-dzialu', 'rok-akademicki'] : ['strona-dzialu', 'popularyzacja', ...(ustawienia ? ['deklaracja', 'prywatnosc', 'o-stronie'] : [])]) {
   const collection = config.content.find((c) => c.name === name);
   if (!studia && !collection) continue;
   assert.ok(collection, `Brak formularza ${name}`);
   codeFields(collection);
   hiddenFormat(collection);
   const data = await readMd(path.join(target, collection.path));
+  if (ustawienia && data.opublikowany === true && !collection.fields.some((f) => f.name === 'opublikowany')) delete data.opublikowany;
   coverage(data, collection.fields, collection.path);
   assert.equal(data.format_tresci, 'jawne', `${collection.path}: brak jawnego formatu`);
   countHeadings((await fs.readFile(path.join(target, collection.path), 'utf8')).replace(/^---[\s\S]*?\n---/, '')); countHeadings(data.tresc_en);

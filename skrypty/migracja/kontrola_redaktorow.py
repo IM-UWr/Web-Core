@@ -13,14 +13,17 @@
 
 Uruchomienie (najpierw git fetch w repozytorium):
   python skrypty/migracja/kontrola_redaktorow.py przed <repozytorium> [--wynik REF] [--baza REF] [--dopisane POLE=WARTOŚĆ]
-  python skrypty/migracja/kontrola_redaktorow.py po <repozytorium> --przed REF [--po REF] [--dopisane POLE=WARTOŚĆ]
+  python skrypty/migracja/kontrola_redaktorow.py po <repozytorium> --przed REF [--po REF] [--dopisane POLE=WARTOŚĆ] [--pomin POLE]
 Domyślnie: --wynik HEAD, --baza = wspólny przodek wyniku i origin/main (baza z etapu 0), --po HEAD.
 --dopisane (zlecenie 33: opublikowany=true): pole najwyższego poziomu z tą wartością = pole bez wartości (migracja dopisała
 jawną wartość domyślną). Każda inna wartość, np. „opublikowany: false” redaktora, jest porównywana jak zwykle. Opcję można
 podać kilka razy (zlecenie 40: --dopisane format_tresci=jawne).
 --jawne (zlecenie 40, migracja do jawnego Markdownu): Treść i Treść EN porównywane jako tekst po migracji — bez komentarzy
 <!-- … --> i bez {#id} na końcu nagłówków, z białymi znakami zwiniętymi do spacji. Każde słowo redaktora musi być w wyniku.
+--pomin POLE (zlecenie 40, etap 6): pole usunięte albo zmienione decyzją właściciela (ścieżka z kropkami, np. przyciski,
+baner.kadr, naglowki_podstron.zdjecia) — pomijane po obu stronach porównania. Opcję można podać kilka razy.
 """
+import copy
 import re
 import subprocess
 import sys
@@ -34,6 +37,16 @@ from termin import DECYZJE, POLA, PRZEMIANOWANIA, WYJATKI, Wczytywacz, pola_wyda
 DANE = re.compile(r'\.(md|json|ya?ml)$')
 DOPISANE: list[tuple[str, object]] = []  # --dopisane: (pole, wartość), np. ('opublikowany', True)
 JAWNE = False  # --jawne: Treść i Treść EN jako tekst po migracji do jawnego Markdownu
+POMIN: list[str] = []  # --pomin: pola z decyzji właściciela (ścieżki z kropkami), pomijane w porównaniu
+
+
+def bez_sciezki(d, sciezka):
+    """Usuwa pole o ścieżce z kropkami (np. baner.kadr) z dict d (w miejscu); brak pola = bez zmian."""
+    *rodzice, ostatni = sciezka.split('.')
+    for r in rodzice:
+        d = d.get(r) if isinstance(d, dict) else None
+    if isinstance(d, dict):
+        d.pop(ostatni, None)
 
 
 def tekst_jawny(t):
@@ -84,7 +97,9 @@ def porownawczo(sciezka, dane):
         return skalar(v)
     if not isinstance(dane, dict):
         return czysc(dane)
-    d = dict(dane)
+    d = copy.deepcopy(dane) if POMIN else dict(dane)
+    for p in POMIN:
+        bez_sciezki(d, p)
     for k, v in DOPISANE:
         if k in d and d[k] == v:
             del d[k]
@@ -279,6 +294,7 @@ def main():
             DOPISANE.append((k, yaml.safe_load(v)))
     global JAWNE
     JAWNE = '--jawne' in arg
+    POMIN.extend(arg[i + 1] for i, a in enumerate(arg[:-1]) if a == '--pomin')
     if arg[0] == 'przed':
         sys.exit(przed_pushem(repo, opcja('--wynik', 'HEAD'), opcja('--baza')))
     if not opcja('--przed'):

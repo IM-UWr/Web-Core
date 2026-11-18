@@ -1,6 +1,6 @@
 ---
 // Odchudzona stopka na komputer (≥ 1024 px; kierunek „Założyciele”): jedna linia na granacie, w kolumnie 1240 px —
-// nazwa, adres, telefon i e-mail; deklaracja dostępności, polityka prywatności, „O stronie” i „© … · Created by Szymon Cygan”.
+// nazwa, adres, telefon, e-mail i ikony profili (Facebook, YouTube); deklaracja dostępności, polityka prywatności, „O stronie” i „© … · Created by Szymon Cygan”.
 // „Archiwum starej strony” nie ma w stopce (zlecenie 14, zalecenie 27): prowadzą do niego strona „O stronie” i strona 404.
 // Telefon (≤ 1023 px): ta sama stopka w kilku wierszach (zal-telefon.css).
 // Elementy (nazwa, adres, telefon, e-mail; „© …” i „Created by …”) nie łamią się w środku, a kropka „·” między nimi to ::before
@@ -10,10 +10,18 @@ import ustawienia from '../../data/ustawienia.json';
 import { u } from '../../lib/url';
 import { t, wJezyku } from '../../lib/i18n';
 import type { Lang } from '../../lib/daty';
+import Ikona from '../Ikona.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const k = ustawienia.kontakt;
+// Profile Instytutu (zlecenie 40, decyzja 18.11): ikony z linkami na końcu linii kontaktu, z pól Facebook i YouTube
+// w Web-Ustawienia → Strona główna i kontakt; puste pole = bez ikony.
+const ust = ustawienia as { facebook?: string; youtube?: string };
+const spol = [
+  { adres: ust.facebook?.trim(), ikona: 'facebook', etykieta: lang === 'en' ? 'The Institute on Facebook' : 'Instytut na Facebooku' },
+  { adres: ust.youtube?.trim(), ikona: 'youtube', etykieta: lang === 'en' ? 'The Institute on YouTube' : 'Instytut na YouTube' },
+].filter((s) => s.adres);
 const rok = new Date().getFullYear();
 ---
 <footer class="z-stopka">
@@ -23,6 +31,7 @@ const rok = new Date().getFullYear();
       <span class="z-st">{k.adres}</span>
       <span class="z-st"><a href={`tel:${k.telefon.replace(/\s/g, '')}`}>{k.telefon}</a></span>
       <span class="z-st"><a href={`mailto:${k.email}`}>{k.email}</a></span>
+      {spol.length > 0 && <span class="z-st z-spol">{spol.map((s) => <a href={s.adres} aria-label={s.etykieta} title={s.etykieta}><Ikona nazwa={s.ikona} rozmiar={17} /></a>)}</span>}
     </div></div>
     <nav aria-label={lang === 'en' ? 'Legal' : 'Informacje prawne'}>
       <a href={u(wJezyku('/deklaracja-dostepnosci', lang))}>{t(lang, 'deklaracja')}</a>
@@ -43,4 +52,8 @@ const rok = new Date().getFullYear();
   .z-st::before { content: '·'; content: '·' / ''; display: inline-block; width: 12px; font-family: var(--f-text); font-size: 13.5px; font-weight: 400; text-align: center; }
   .z-st a:focus-visible { outline-width: 2px; outline-offset: 0; }
   .z-stopka nav > a { white-space: nowrap; }
+  /* ikony profili: po kropce, w linii z tekstem; pole kliknięcia 24 px wysokości (bez zmiany wysokości wiersza) */
+  .z-spol { display: inline-flex; gap: 4px; align-self: center; }
+  .z-spol a { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-block: -4px; border-radius: 4px; }
+  .z-spol :global(.ico) { stroke-width: 1.8; }
 </style>

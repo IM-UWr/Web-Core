@@ -1,7 +1,8 @@
 // Zlecenie 40 (decyzje właściciela 18.11): formularze Pages CMS „jak w Studiach” — kolejność pól (tytuł, tytuł EN → Treść,
 // Treść EN → reszta; pola EN tuż pod polskimi), ściągawki przy Treści, ukryte pole format_tresci (jawny Markdown Stron i strony
-// działu), szablony Treści nowych wpisów (default), ukrycia z etapu 0. Zmienia tylko .pages.yml (Document API biblioteki yaml:
-// komentarze, cudzysłowy i bloki | zostają; nieruszone fragmenty pliku bez zmian).
+// działu), szablony Treści nowych wpisów (default), ukrycia z etapu 0. Zmienia .pages.yml (Document API biblioteki yaml:
+// komentarze, cudzysłowy i bloki | zostają; nieruszone fragmenty pliku bez zmian); w Web-Ustawienia także src/data/ustawienia.json
+// (pola usunięte decyzją właściciela, zdjęcia nagłówków działów).
 // Uruchomienie z katalogu Web-Core:  node skrypty/migracja/formularze_40.mjs <checkout repozytorium treści>
 // Repozytorium rozpoznaje po nazwie katalogu (Web-Instytut…); każdy etap zlecenia dopisuje tu swój opis formularzy.
 import fs from 'node:fs/promises';
@@ -40,11 +41,14 @@ export async function formularze(repo, opis) {
   const zrodlo = await fs.readFile(plik, 'utf8');
   const doc = YAML.parseDocument(zrodlo);
   const wezel = (o) => doc.createNode(o);
+  // formularze najwyższego poziomu i z grup (type: group, items: …), np. „Ustawienia strony” w Web-Ustawienia
+  const wszystkie = (lista) => lista.flatMap((i) => [i, ...(i.get('items')?.items ? wszystkie(i.get('items').items) : [])]);
   const formularz = (nazwa) => {
-    const f = doc.get('content').items.find((i) => i.get('name') === nazwa);
+    const f = wszystkie(doc.get('content').items).find((i) => i.get('name') === nazwa);
     if (!f) throw Error(`Brak formularza ${nazwa}`);
     return f;
   };
+  const dane = [];
   const pole = (seq, nazwa) => {
     const p = seq.items.find((i) => i.get('name') === nazwa);
     if (!p) throw Error(`Brak pola ${nazwa}`);
@@ -75,6 +79,26 @@ export async function formularze(repo, opis) {
     },
     /** Linia komentarza w nagłówku pliku (pod dotychczasowymi). */
     komentarz(linia) { komentarze.push(`# ${linia}`); },
+    /** Usuwa pole z formularza (decyzja właściciela; strona go nie czyta). Brak pola = już usunięte. */
+    usun(seq, nazwa) {
+      const i = seq.items.findIndex((p) => p.get('name') === nazwa);
+      if (i >= 0) seq.items.splice(i, 1);
+    },
+    /** Pokazuje pole w CMS (usuwa hidden). */
+    odkryj(wezelPola) { wezelPola.delete('hidden'); },
+    /** Etykiety „EN: coś” → „Coś EN” we wszystkich polach listy, także zagnieżdżonych (raport 40-0, sekcja 3). */
+    etykietyEn(seq) {
+      for (const p of seq.items) {
+        const l = p.get('label');
+        if (typeof l === 'string' && l.startsWith('EN: ')) {
+          const [, tekst, nawias = ''] = /^(.*?)( \(.*\))?$/.exec(l.slice(4));
+          p.set('label', `${tekst[0].toUpperCase()}${tekst.slice(1)} EN${nawias}`);
+        }
+        if (p.get('fields')?.items) api.etykietyEn(p.get('fields'));
+      }
+    },
+    /** Zmiana pliku danych JSON repozytorium (zapis jak w źródle: 2 spacje, ten sam koniec pliku). fn zmienia obiekt w miejscu. */
+    daneJson(rel, fn) { dane.push({ rel, fn }); },
   };
   const komentarze = [];
   opis(api);
@@ -87,7 +111,18 @@ export async function formularze(repo, opis) {
     wynik = linie.join('\n');
   }
   await fs.writeFile(plik, wynik);
-  return wynik !== zrodlo;
+  let zmiana = wynik !== zrodlo;
+  for (const { rel, fn } of dane) {
+    const p = path.join(repo, rel);
+    const tekst = await fs.readFile(p, 'utf8');
+    const obiekt = JSON.parse(tekst);
+    fn(obiekt);
+    const crlf = tekst.includes('\r\n');
+    let nowy = JSON.stringify(obiekt, null, 2) + (/\n$/.test(tekst) ? '\n' : '');
+    if (crlf) nowy = nowy.replace(/\n/g, '\r\n');
+    if (nowy !== tekst) { await fs.writeFile(p, nowy); zmiana = true; console.log(`Zapisano ${rel}`); }
+  }
+  return zmiana;
 }
 
 // ---------- Web-Instytut (etap 1) ----------
@@ -242,7 +277,102 @@ function seminaria({ pola, pole, kolejnosc, ustaw, formularz, komentarz }) {
   ustaw(pole(r, 'body'), 'default', '<!-- STRESZCZENIE: Zwykły tekst; wzory w $…$. Slajdy: dodaj w „Pliki” niżej. -->');
 }
 
-const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy };
+// ---------- Web-Ustawienia (etap 6) ----------
+// Zdjęcia nagłówków działów: dane z bazy f145d85 (nieużywane) → zdjęcia i kadry, które nowy nagłówek miał wpisane w NaglowekZ.astro,
+// więc po podłączeniu strona wygląda tak samo. Inna wartość w pliku = zmiana redaktora: STOP (nie nadpisujemy).
+const NAGLOWKI_STARE = {
+  instytut: ['/pliki/naglowki/instytut.jpg', 'center 45%'], nauka: ['/pliki/naglowki/nauka.jpg', 'center 40%'],
+  studia: ['/pliki/naglowki/studia.jpg', 'center 35%'], aktualnosci: ['/pliki/naglowki/aktualnosci.jpg', 'center 40%'],
+  popularyzacja: ['/pliki/naglowki/popularyzacja.jpg', 'center 50%'],
+};
+const NAGLOWKI_NOWE = {
+  instytut: ['/pliki/naglowki/instytut.jpg', '50% 42%'], nauka: ['/pliki/naglowki/nauka.jpg', '50% 30%'],
+  studia: ['/pliki/naglowki/studia.jpg', '50% 40%'], aktualnosci: ['/pliki/naglowki/aktualnosci-skok.jpg', '48% 52%'],
+  popularyzacja: ['/pliki/naglowki/popularyzacja.jpg', '50% 40%'],
+};
+
+function ustawieniaStrony({ pola, pole, kolejnosc, ustaw, usun, odkryj, etykietyEn, daneJson, formatTresci, formularz, komentarz }) {
+  komentarz('Zlecenie 40: opisy formularzy (tylko właściciel; gdzie widać), Facebook i YouTube w stopce, podłączone zdjęcia nagłówków działów, usunięte resztki starego banera i przyciski okładki, ukryte hasła bez liczb; deklaracja, prywatność i „O stronie” w jawnym Markdownie.');
+
+  // Strona główna i kontakt
+  ustaw(formularz('ustawienia'), 'description', 'Tylko właściciel. Okładka strony głównej (zdjęcie, tekst pod nazwą Instytutu, wydarzenia), sekcja „Studiuj matematykę” i menu „Studia”, zdjęcia w nagłówkach działów, kontakt i profile w stopce.');
+  const u = pola('ustawienia');
+  etykietyEn(u);
+  const b = pole(u, 'baner');
+  // decyzja 18.11 (lista 1a): resztki starego banera — nowa okładka sama dobiera rozmiary i kadr, podpisu nie pokazuje
+  for (const n of ['zdjecie_male', 'zdjecie_telefon', 'podpis', 'podpis_en', 'kadr']) usun(b.get('fields'), n);
+  ustaw(b, 'description', 'Zdjęcie okładki strony głównej (pierwszy ekran). Rozmiar i kadr na komputerze i telefonie strona dobiera sama.');
+  ustaw(pole(b.get('fields'), 'opis'), 'description', 'Co widać na zdjęciu, jednym zdaniem; czytają je czytniki ekranu. Np. „Kampus przy placu Grunwaldzkim o zmierzchu…”.');
+  // zdjęcia nagłówków działów (decyzja 18.11: podłączone; wygląd nagłówka — pole „wariant” — zostaje ukryty)
+  const n = pole(u, 'naglowki_podstron');
+  odkryj(n);
+  ustaw(n, 'label', 'Nagłówki działów');
+  ustaw(n, 'description', 'Zdjęcia w nagłówkach stron działów i ich podstron (komputer i telefon).');
+  ustaw(pole(n.get('fields'), 'wariant'), 'hidden', true);
+  const z = pole(n.get('fields'), 'zdjecia');
+  ustaw(z, 'label', 'Zdjęcia działów');
+  ustaw(z, 'description', 'Puste zdjęcie albo kadr = zdjęcie i kadr domyślne działu.');
+  for (const d of z.get('fields').items) {
+    const f = d.get('fields');
+    ustaw(pole(f, 'zdjecie'), 'description', 'Zdjęcie poziome, co najmniej ok. 1200 px szerokości. Puste = zdjęcie domyślne działu.');
+    ustaw(pole(f, 'kadr'), 'label', 'Kadr');
+    ustaw(pole(f, 'kadr'), 'description', d.get('name') === 'aktualnosci'
+      ? 'Który fragment zdjęcia widać, gdy strona je przycina: położenie w poziomie i w pionie w procentach, np. „48% 52%”. Puste = kadr domyślny.'
+      : 'Który fragment zdjęcia widać, gdy strona je przycina: położenie w poziomie i w pionie w procentach, np. „50% 40%” (środek, trochę powyżej połowy). Działa na stronie działu; podstrony mają stały kadr. Puste = kadr domyślny.');
+  }
+  ustaw(pole(z.get('fields'), 'aktualnosci'), 'description', 'Nagłówki Aktualności, Kalendarza i listy „Warto wiedzieć”.');
+  // decyzja 18.11 (pytanie 3): hasło strony wyszukiwania się nie pokazuje (nowy nagłówek pokazuje hasło tylko z liczbami) — ukryte
+  ustaw(pole(u, 'szukaj_haslo'), 'hidden', true);
+  ustaw(pole(u, 'szukaj_haslo_en'), 'hidden', true);
+  // decyzja 18.11 (lista 1a): przyciski pod tekstem okładki — nowa okładka ich nie pokazuje
+  usun(u, 'przyciski');
+  // decyzja 18.11: Facebook i YouTube — ikony z linkami w stopce (StopkaZ.astro)
+  for (const [nazwa, etykieta, przyklad] of [['facebook', 'Facebook (adres profilu)', 'https://www.facebook.com/IMUWr'], ['youtube', 'YouTube (adres kanału)', 'https://www.youtube.com/channel/…']]) {
+    const p = pole(u, nazwa);
+    odkryj(p);
+    ustaw(p, 'label', etykieta);
+    ustaw(p, 'description', `Ikona z linkiem w stopce każdej strony, polskiej i angielskiej. Np. ${przyklad}. Puste = bez ikony.`);
+  }
+  daneJson('src/data/ustawienia.json', (d) => {
+    for (const k of ['zdjecie_male', 'zdjecie_telefon', 'podpis', 'podpis_en', 'kadr']) delete d.baner[k];
+    delete d.przyciski;
+    const zd = d.naglowki_podstron.zdjecia;
+    for (const [dzial, [zdjecie, kadr]] of Object.entries(NAGLOWKI_NOWE)) {
+      const [stZ, stK] = NAGLOWKI_STARE[dzial];
+      const w = zd[dzial] ?? {};
+      if (w.zdjecie === zdjecie && w.kadr === kadr) continue;
+      if (w.zdjecie !== stZ || w.kadr !== stK) throw Error(`naglowki_podstron.zdjecia.${dzial}: wartość inna niż w bazie (${w.zdjecie}, ${w.kadr}) — zmiana redaktora?`);
+      zd[dzial] = { ...w, zdjecie, kadr };
+    }
+  });
+
+  // „Na skróty” i Menu główne
+  ustaw(formularz('skroty'), 'description', 'Tylko właściciel. Pierwsze cztery kafelki widać na stronie głównej, w pasku „Szybki dostęp” pod okładką.');
+  etykietyEn(pola('skroty'));
+  ustaw(formularz('nawigacja'), 'description', 'Tylko właściciel. Pozycje menu na górze każdej strony i ich rozwijane listy (komputer i telefon); grupy i linki widać też w polu ze stronami na stronach działów. Kierunki w menu „Studia” są w „Strona główna i kontakt”.');
+  etykietyEn(pola('nawigacja'));
+
+  // Deklaracja dostępności, Polityka prywatności, O stronie (linki w stopce): jawny Markdown jak Strony, Treść EN pod Treścią
+  for (const [nazwa, tytul] of [['deklaracja', 'Deklaracja dostępności'], ['prywatnosc', 'Polityka prywatności'], ['o-stronie', 'O stronie']]) {
+    ustaw(formularz(nazwa), 'description', `Tekst strony „${tytul}” (link w stopce). Treść w jawnym Markdownie, jak w Studiach.`);
+    const s = pola(nazwa);
+    formatTresci(s);
+    etykietyEn(s);
+    kolejnosc(s, ['tytul', 'tytul_en', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'pasek_boczny', 'bloki']);
+    ustaw(pole(s, 'body'), 'description', JAWNY);
+    ustaw(pole(s, 'tresc_en'), 'description', `${JAWNY} Puste = strona angielska pokaże treść polską.`);
+    ustaw(pole(s, 'opis'), 'label', 'Krótki opis (Google i podgląd linku)');
+    ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla (baner pokazuje tytuł). Puste = ogólny opis serwisu.');
+    ustaw(pole(s, 'opis_en'), 'label', 'Krótki opis EN');
+    // decyzja 18.11 (pytanie 3): hasło bez liczb się nie pokazuje — ukryte, wartości zostają w plikach
+    ustaw(pole(s, 'haslo'), 'hidden', true);
+    ustaw(pole(s, 'haslo_en'), 'hidden', true);
+    // „Bloki wzorca”: w jawnym formacie strona ich nie czyta — ukryte
+    ustaw(pole(s, 'bloki'), 'hidden', true);
+  }
+}
+
+const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony };
 for (const r of ['Analiza-Harmoniczna', 'Dydaktyka', 'Dyskretna-Analiza-Harmoniczna', 'Geometria', 'Prawdopodobienstwo', 'Rownania-Rozniczkowe', 'Statystyka', 'Teoria-Modeli', 'Topologia']) OPISY[`Web-Sem-${r}`] = seminaria;
 
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
