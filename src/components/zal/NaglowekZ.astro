@@ -14,6 +14,7 @@
 //   działu wpisu (dzialWpisu, prop dzial z NaglowekStrony) — sygnet, kolor i zdjęcie działu; bez znaku, bo wpisu nie ma w menu działu.
 import Szkic from './Szkic.astro';
 import ZdjecieZ from '../ZdjecieZ.astro';
+import ustawienia from '../../data/ustawienia.json';
 import { u, stripBase } from '../../lib/url';
 import { t, wJezyku, wybierz } from '../../lib/i18n';
 import { menuGlowne } from '../../lib/menu';
@@ -55,7 +56,10 @@ const slot = zLiczbami ? slotWidoku : slotWidoku.replace(LISTA_LICZB, '').trim()
 // do uzupełnienia w CMS: ostrzeżenie przy budowaniu (lista stron w RAPORT-ZLECENIE-11.md)
 if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola hasła w CMS): ${Astro.url.pathname}`);
 
-// Zdjęcia działów (na razie z public/pliki/naglowki, repozytorium treści Web-Ustawienia): kadr i jasność dobrane w prototypie.
+// Zdjęcia działów (public/pliki/naglowki, repozytorium treści Web-Ustawienia): kadr i jasność dobrane w prototypie. Zdjęcie i kadr
+// działu można zmienić w CMS (Ustawienia → Strona główna i kontakt → Nagłówki działów; zlecenie 40, decyzja 18.11); puste pole =
+// wartość stąd. Kadr z CMS działa na stronie działu i na listach Aktualności (podstrony mają stały kadr 50% 40%, jak dotąd).
+// Opis zdjęcia (alt) tylko przy zdjęciu stąd — inne zdjęcie z CMS jest ozdobne (alt=""); filtr Nauki zostaje przy dziale.
 // Studia (zlecenie 11, zalecenie 17): sala HS od tyłu (3200 px), domyślny filtr bez rozjaśnienia; na komputerze zdjęcie przypięte
 // do szkicu patrona (zalozyciele.css), na telefonie zwykłe object-fit: cover.
 const strona = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
@@ -73,8 +77,11 @@ const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?
     pl: 'Hol Wydziału Matematyki i Informatyki: student w skoku pod tablicą kierunkową',
     en: 'The hall of the Faculty of Mathematics and Computer Science: a student jumping under the direction sign' } },
 };
-const f = FOTO[fotoNat ? 'aktualnosci' : (dzial ?? 'granat')];
-const altFoto = f.alt ? f.alt[lang] : '';
+const kluczFoto = fotoNat ? 'aktualnosci' : (dzial ?? 'granat');
+const zCms = kluczFoto === 'granat' ? undefined : ((ustawienia as any).naglowki_podstron?.zdjecia?.[kluczFoto] as { zdjecie?: string; kadr?: string } | undefined);
+const wbud = FOTO[kluczFoto];
+const f = { ...wbud, zdjecie: zCms?.zdjecie?.trim() || wbud.zdjecie, kadr: zCms?.kadr?.trim() || wbud.kadr };
+const altFoto = wbud.alt && f.zdjecie === wbud.zdjecie ? wbud.alt[lang] : '';
 const styl = `object-position:${rodzaj === 'podstrona' && !fotoNat ? '50% 40%' : f.kadr}${f.filtr ? `;--filtr:${f.filtr}` : ''}`;
 // szerokość zdjęcia na ekranie (sizes; zlecenie 13, punkt 6) — jak w zalozyciele.css: baner działu od 36% szerokości, Studia
 // w szerokości --sz przypiętej do szkicu (zlecenie 11, zalecenie 17), podstrona Studiów 122% (same tablice; na telefonie 220%, zlecenie 18,

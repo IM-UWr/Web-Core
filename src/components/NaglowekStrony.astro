@@ -33,7 +33,8 @@ const dzial = dzialBanera ?? DZIALY[czlon] ?? 'inne';
 const ust = ((ustawienia as any).naglowki_podstron ?? {}) as { wariant?: string; zdjecia?: Record<string, { zdjecie?: string }> };
 const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : 'granat';
 const domyslneZdjecia = Object.fromEntries(['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].map((d) => [d, { zdjecie: `/pliki/naglowki/${d}.jpg` }]));
-const zdjecie = (wariant === 'zdjecie' || wariant === 'granat') && !!(ust.zdjecia ?? domyslneZdjecia)[dzial]?.zdjecie;
+// puste zdjęcie w CMS = zdjęcie domyślne działu (NaglowekZ.astro; zlecenie 40)
+const zdjecie = (wariant === 'zdjecie' || wariant === 'granat') && !!(ust.zdjecia?.[dzial]?.zdjecie || domyslneZdjecia[dzial]?.zdjecie);
 const ozdobny = wariant !== 'prosty';
 const dlugi = ozdobny && tytul.trim().length > 20;
 
