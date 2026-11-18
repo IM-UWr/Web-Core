@@ -223,7 +223,27 @@ function pracownicy({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, kom
   ustaw(pole(s, 'bloki'), 'hidden', true);
 }
 
+// ---------- Web-Sem-* (etap 5: jeden wzór dla 9 repozytoriów seminariów) ----------
+function seminaria({ pola, pole, kolejnosc, ustaw, formularz, komentarz }) {
+  komentarz('Zlecenie 40: opis seminarium i streszczenie referatu zaraz pod tytułem, pola EN pod polskimi, ściągawka przy Treści, szablon streszczenia, ukryta notatka redakcyjna.');
+
+  // Opis seminarium (plik): Treść i Treść EN pod nazwą (dziś na 11. i 12. miejscu)
+  ustaw(formularz('seminarium'), 'description', 'Opis seminarium: prowadzący, kontakt, archiwum. Widać go na stronie seminarium w Nauce → Seminaria.');
+  const s = pola('seminarium');
+  kolejnosc(s, ['nazwa', 'nazwa_en', 'body', 'tresc_en', 'haslo', 'haslo_en', 'prowadzacy', 'kontakt', 'archiwum', 'zaklad', 'aktywne', 'do_uzupelnienia']);
+  ustaw(pole(s, 'body'), 'description', `${WPIS} Wzory w $…$.`);
+  // notatka dla redakcji (decyzje 18.11: ukryta, wartość zostaje w pliku)
+  ustaw(pole(s, 'do_uzupelnienia'), 'hidden', true);
+
+  // Referaty: streszczenie i jego wersja EN pod danymi referatu, pliki na końcu (dziś pliki nad streszczeniem)
+  const r = pola('referaty');
+  kolejnosc(r, ['tytul', 'jezyk', 'prelegent', 'afiliacja', 'afiliacja_en', 'termin', 'sala', 'sala_en', 'body', 'tresc_en', 'pliki']);
+  ustaw(pole(r, 'body'), 'description', `${WPIS} Wzory w $…$. Pusta Treść (albo sam komentarz) = referat bez streszczenia.`);
+  ustaw(pole(r, 'body'), 'default', '<!-- STRESZCZENIE: Zwykły tekst; wzory w $…$. Slajdy: dodaj w „Pliki” niżej. -->');
+}
+
 const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Pracownicy': pracownicy };
+for (const r of ['Analiza-Harmoniczna', 'Dydaktyka', 'Dyskretna-Analiza-Harmoniczna', 'Geometria', 'Prawdopodobienstwo', 'Rownania-Rozniczkowe', 'Statystyka', 'Teoria-Modeli', 'Topologia']) OPISY[`Web-Sem-${r}`] = seminaria;
 
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
   const repo = path.resolve(process.argv[2] ?? '');
