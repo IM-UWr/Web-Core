@@ -60,6 +60,12 @@ export async function konferencje(): Promise<Konferencja[]> {
     .sort((a, b) => (a.data.poczatek < b.data.poczatek ? 1 : a.data.poczatek > b.data.poczatek ? -1 : 0));
 }
 
+// Dokąd prowadzi konferencja (lista, strona działu Nauka, strona zakładu, kalendarz). Zlecenie 40, decyzja 18.11:
+// konferencja z opisem ma własną stronę (/nauka/konferencje/<slug>, src/views/Konferencja.astro), jak projekt;
+// bez opisu — od razu strona internetowa konferencji (pole `strona`); bez obu — pozycja bez linku.
+export const adresKonferencji = (k: Konferencja): string | undefined =>
+  maTresc(k.body) ? `/nauka/konferencje/${slugOf(k.id)}` : k.data.strona || undefined;
+
 export async function granty(): Promise<Grant[]> {
   const items = await getCollection('granty');
   return items
@@ -203,8 +209,8 @@ export interface Wydarzenie {
   // koniec do kalendarza .ics i do ustalania, czy wydarzenie trwa (domyślnie +2 h / +1,5 h)
   koniecIcs?: string;
   miejsce?: string;
-  // adres pozycji: ścieżka na naszej stronie (/aktualnosci/…) albo adres zewnętrzny (strona konferencji — konferencje
-  // nie mają własnych podstron); brak = pozycja bez linku (konferencja bez podanej strony)
+  // adres pozycji: ścieżka na naszej stronie (/aktualnosci/…) albo adres zewnętrzny (strona konferencji bez opisu,
+  // adresKonferencji); brak = pozycja bez linku (konferencja bez opisu i bez podanej strony)
   href?: string;
   uid: string;
   opis?: string;
@@ -236,7 +242,7 @@ export async function wszystkieWydarzenia(lang: Lang = 'pl'): Promise<Wydarzenie
     if (k.data.odwolana) continue;
     out.push({
       rodzaj: 'konferencja', tytul: (lang === 'en' && k.data.tytul_en) || k.data.tytul, tytulLang: langPola(k.data, 'tytul', lang), poczatek: k.data.poczatek, koniec: k.data.koniec,
-      miejsce: miejsce(k.data.miejsce, lang), href: k.data.strona || undefined, uid: `konf-${slugOf(k.id)}`,
+      miejsce: miejsce(k.data.miejsce, lang), href: adresKonferencji(k), uid: `konf-${slugOf(k.id)}`,
     });
   }
   for (const r of ref) {

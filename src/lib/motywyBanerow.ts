@@ -12,6 +12,7 @@ export const MOTYWY_STRON: Record<string, string> = {
   popularyzacja: 'zloty-podzial',
   // zlecenie 03: podstrony Nauki, seminaria (zakłady dostają wariant „zaklad” motywu swojego seminarium — Zaklad.astro)
   'nauka/konferencje': 'banach',
+  'nauka/konferencje/*': 'banach', // strona konferencji z opisem (zlecenie 40): motyw listy
   'obrony-doktorskie': 'genealogia',
   'obrony-doktorskie/*': 'genealogia/obrona',
   kalendarz: 'trzy-odleglosci',

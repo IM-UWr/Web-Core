@@ -1,6 +1,6 @@
 // Listy adresów do wygenerowania (getStaticPaths) — wspólne dla wersji PL i EN.
 import { getCollection } from 'astro:content';
-import { aktualnosci, obrony, seminaria, konferencje, granty, zaklady, slugOf, widoczny } from './tresci';
+import { aktualnosci, obrony, seminaria, konferencje, granty, zaklady, slugOf, widoczny, maTresc } from './tresci';
 import { specjalnosci } from './specjalnosci';
 import { jestTekstemListy } from './tekstyStron';
 import { powstaje } from './szkice';
@@ -31,8 +31,9 @@ export async function sciezkiObron() {
   return ob.map((o) => ({ params: { slug: slugOf(o.id) }, props: { obrona: o } }));
 }
 
+// Strona tylko dla konferencji z opisem (zlecenie 40, decyzja 18.11; adresKonferencji w tresci.ts).
 export async function sciezkiKonferencji() {
-  const k = await konferencje();
+  const k = (await konferencje()).filter((x) => maTresc(x.body));
   return k.map((konferencja) => ({ params: { slug: slugOf(konferencja.id) }, props: { konferencja } }));
 }
 

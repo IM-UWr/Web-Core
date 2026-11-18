@@ -12,6 +12,29 @@ export const JAWNY = 'Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#
 export const WPIS = 'Zwykły Markdown: akapity oddziela pusta linia; **pogrubienie**, *kursywa*, [tekst linku](https://…); lista: „- ” na początku linii; ## = nagłówek sekcji. Plik PDF: wgraj w „Media” i wklej link. Komentarze <!-- … --> to podpowiedzi; na stronie ich nie widać.';
 const FORMAT_TRESCI = { name: 'format_tresci', label: 'Format treści', type: 'string', hidden: true, default: 'jawne' };
 
+// Biblioteka yaml wcina listę z kotwicą („values: &id001” i niżej „  - name: …”) mimo indentSeq: false. Gdy w pliku źródłowym
+// ta sama kotwica stała nad listą bez wcięcia, cofamy wcięcie tej listy — reszta pliku i znaczenie YAML bez zmian.
+function wcieciaKotwic(wynik, zrodlo) {
+  const linie = wynik.split('\n');
+  for (let i = 0; i < linie.length - 1; i++) {
+    const m = /^(\s*)(?:- )?[\w-]+: &[\w-]+$/.exec(linie[i]);
+    if (!m) continue;
+    const zr = zrodlo.split('\n');
+    const j = zr.indexOf(linie[i]);
+    if (j < 0 || !zr[j + 1]) continue;
+    const wciecieZrodla = /^(\s*)- /.exec(zr[j + 1])?.[1];
+    const wciecieWyniku = /^(\s*)- /.exec(linie[i + 1])?.[1];
+    if (wciecieZrodla === undefined || wciecieWyniku === undefined || wciecieWyniku.length <= wciecieZrodla.length) continue;
+    const roznica = wciecieWyniku.length - wciecieZrodla.length;
+    for (let k = i + 1; k < linie.length; k++) {
+      const w = /^(\s*)/.exec(linie[k])[1].length;
+      if (linie[k].trim() && w < wciecieWyniku.length) break;
+      linie[k] = linie[k].slice(Math.min(roznica, w));
+    }
+  }
+  return linie.join('\n');
+}
+
 export async function formularze(repo, opis) {
   const plik = path.join(repo, '.pages.yml');
   const zrodlo = await fs.readFile(plik, 'utf8');
@@ -55,7 +78,7 @@ export async function formularze(repo, opis) {
   };
   const komentarze = [];
   opis(api);
-  let wynik = doc.toString({ indentSeq: false, lineWidth: 0 });
+  let wynik = wcieciaKotwic(doc.toString({ indentSeq: false, lineWidth: 0, flowCollectionPadding: false }), zrodlo);
   const linie = wynik.split('\n');
   const nowe = komentarze.filter((k) => !linie.includes(k));
   if (nowe.length) {
@@ -124,7 +147,61 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
   ustaw(pole(osoby, 'zdjecie'), 'description', 'Puste = karta bez zdjęcia.');
 }
 
-const OPISY = { 'Web-Instytut': instytut };
+// ---------- Web-Nauka (etap 2) ----------
+// Szablon Aktualności z raportu 40-0 (sekcja 4); konferencja dostaje go z dopiskiem o programie i opłatach.
+export const SZABLON_AKTUALNOSCI = '<!-- TEKST: Zwykły tekst. Akapity oddziela pusta linia. Pliki: wgraj w „Media” i wklej link. -->\n<!-- Rejestracja, program, plakat: wstaw link w osobnej linii. -->';
+
+function nauka({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz }) {
+  komentarz('Zlecenie 40: Strony i strona działu w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, pola EN pod polskimi, opisy formularzy, szablony Treści konferencji i projektu; konferencja z opisem ma własną stronę.');
+
+  // Strona działu
+  const sdf = formularz('strona-dzialu');
+  const opisSd = sdf.get('description');
+  if (opisSd.includes('tekst pod tytułem')) ustaw(sdf, 'description', opisSd.replace('tekst pod tytułem', 'opis strony dla Google'));
+  const sd = pola('strona-dzialu');
+  formatTresci(sd);
+  kolejnosc(sd, ['tytul', 'tytul_en', 'opublikowany', 'body', 'tresc_en', 'format_tresci', 'wstep', 'wstep_en', 'haslo', 'haslo_en', 'badania_fakty']);
+  ustaw(pole(sd, 'body'), 'description', `${JAWNY} To tekst sekcji „Badania w Instytucie”; pierwszy akapit strona pokazuje większą czcionką.`);
+  ustaw(pole(sd, 'tresc_en'), 'description', `${JAWNY} Tekst „Badania w Instytucie” po angielsku. Puste = strona angielska pokaże tekst polski.`);
+  ustaw(pole(sd, 'wstep'), 'label', 'Opis strony dla Google (1–2 zdania)');
+  ustaw(pole(sd, 'wstep'), 'description', 'Trafia do Google i do podglądu linku; na samej stronie się nie wyświetla. Np. „Badania w ośmiu zakładach naukowych Instytutu…”. Puste = ogólny opis serwisu.');
+  ustaw(pole(sd, 'wstep_en'), 'label', 'EN: opis strony dla Google');
+  ustaw(pole(sd, 'haslo'), 'description', 'Np. „Poznaj nasze badania na A+”. Puste = hasło domyślne działu.');
+
+  // Strony (w tym teksty stron z listą: konferencje, granty, sukcesy, publikacje)
+  const sf = formularz('strony');
+  const JAK_W_STUDIACH = ' Treść w jawnym Markdownie, jak w Studiach.';
+  if (!sf.get('description').endsWith(JAK_W_STUDIACH)) ustaw(sf, 'description', sf.get('description') + JAK_W_STUDIACH);
+  const s = pola('strony');
+  formatTresci(s);
+  kolejnosc(s, ['tytul', 'tytul_en', 'opublikowany', 'body', 'tresc_en', 'format_tresci', 'opis', 'opis_en', 'haslo', 'haslo_en', 'haslo_podstron', 'haslo_podstron_en', 'liczby', 'pasek_boczny', 'bloki']);
+  ustaw(pole(s, 'body'), 'description', `${JAWNY} Strona z listą (Konferencje, Projekty i granty, Sukcesy, Publikacje): tekst stoi nad listą. Na stronie Publikacje część pod „## Czasopisma redagowane w Instytucie {#czasopisma}” stoi nad listą czasopism (bez tego nagłówka czasopisma są bez tekstu).`);
+  ustaw(pole(s, 'tresc_en'), 'description', `${JAWNY} Puste = strona angielska pokaże treść polską. Na stronie Publikacje tekst nad czasopismami pod nagłówkiem z {#czasopisma}.`);
+  ustaw(pole(s, 'opis'), 'label', 'Krótki opis (Google i podgląd linku)');
+  ustaw(pole(s, 'opis'), 'description', 'Na samej stronie się nie wyświetla (baner pokazuje tytuł i hasło). Np. „Wykazy publikacji pracowników Instytutu według roku wydania…”. Puste = opis domyślny.');
+  // „Bloki wzorca”: w jawnym formacie strona ich nie czyta (układ wskazują bloki :::) — ukryte, wartości zostają w plikach.
+  ustaw(pole(s, 'bloki'), 'hidden', true);
+
+  // Konferencje (decyzja 18.11: konferencja z opisem ma własną stronę, link z listy)
+  const kf = formularz('konferencje');
+  ustaw(kf, 'description', 'Konferencje i warsztaty Instytutu. Lista w Nauce → Konferencje (nadchodzące i według lat). Konferencja z opisem ma własną stronę; bez opisu link prowadzi od razu na jej stronę internetową.');
+  const k = pola('konferencje');
+  kolejnosc(k, ['tytul', 'tytul_en', 'poczatek', 'koniec', 'miejsce', 'body', 'strona', 'organizatorzy', 'zaklad', 'zdjecie', 'odwolana']);
+  ustaw(pole(k, 'body'), 'label', 'Opis (opcjonalnie; konferencja z opisem ma własną stronę)');
+  ustaw(pole(k, 'body'), 'description', `${WPIS} Pusta Treść (albo sam komentarz) = konferencja bez własnej strony; link prowadzi wtedy na jej stronę internetową.`);
+  ustaw(pole(k, 'body'), 'default', `${SZABLON_AKTUALNOSCI}\n<!-- Program, rejestracja, opłaty: każda informacja w osobnym akapicie. -->`);
+
+  // Projekty i granty. Stronę ma każdy projekt (także bez opisu: same dane), więc szablon i opis mówią „bez opisu”,
+  // nie „bez własnej strony” (poprawka względem raportu 40-0).
+  const gf = formularz('granty');
+  ustaw(gf, 'description', 'Projekty badawcze pracowników. Lista w Nauce → Projekty i granty; każdy projekt ma własną stronę z danymi, opis pokazuje się pod nimi.');
+  const g = pola('granty');
+  kolejnosc(g, ['tytul', 'tytul_en', 'rodzaj', 'rok_od', 'rok_do', 'body', 'kod', 'program', 'kierownik', 'wykonawcy', 'kwota', 'zaklad', 'strona']);
+  ustaw(pole(g, 'body'), 'description', `${WPIS} Pusta Treść (albo sam komentarz) = strona projektu pokaże same dane.`);
+  ustaw(pole(g, 'body'), 'default', '<!-- OPIS PROJEKTU: Cel i wyniki projektu. Pusta Treść = strona projektu pokaże same dane. -->');
+}
+
+const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka };
 
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {
   const repo = path.resolve(process.argv[2] ?? '');

@@ -68,7 +68,7 @@ export function plikIcs(wydarzenia: Wydarzenie[], nazwa: string, site: URL | und
     ...VTIMEZONE,
   ];
   for (const w of wydarzenia) {
-    // adres: nasza podstrona albo strona zewnętrzna (konferencje); konferencja bez strony — bez linku i bez pola URL
+    // adres: nasza podstrona albo strona zewnętrzna (konferencja bez opisu); konferencja bez opisu i bez strony — bez linku i bez pola URL
     const adres = w.href ? absolute(w.href, site) : undefined;
     const opis = [w.podtytul, w.opis, adres].filter(Boolean).join('\n');
     lines.push(

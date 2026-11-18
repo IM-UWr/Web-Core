@@ -11,7 +11,7 @@ import Wiersz from '../components/zal/dzial/Wiersz.astro';
 import { u, isExternal } from '../lib/url';
 import { wJezyku, wybierz, RODZAJE_GRANTOW, bezSierotek, langPola } from '../lib/i18n';
 import { range, type Lang } from '../lib/daty';
-import { slugOf, miejsce, type Grant } from '../lib/tresci';
+import { slugOf, miejsce, adresKonferencji, type Grant } from '../lib/tresci';
 import { daneDzialuNauka } from '../lib/widoki/dzialNauka';
 import { tytulyWJezyku } from '../lib/osoby';
 
@@ -57,7 +57,7 @@ const { realizowane, przyklady, nadchodzaceKonf, pokazKonf, liczby, liczbyKomput
       {pokazKonf.length > 0 && (
         <div class="z-dz-wiersze jedna">
           {pokazKonf.map((k) => (
-            <Wiersz data={k.data.poczatek} lang={lang} tytul={wybierz(k.data, 'tytul', lang)} adres={k.data.strona || undefined} odwolana={k.data.odwolana}
+            <Wiersz data={k.data.poczatek} lang={lang} tytul={wybierz(k.data, 'tytul', lang)} adres={adresKonferencji(k)} odwolana={k.data.odwolana}
               etykieta={[range(k.data.poczatek, k.data.koniec, lang), miejsce(k.data.miejsce, lang)].filter(Boolean).join(' · ')} />
           ))}
         </div>

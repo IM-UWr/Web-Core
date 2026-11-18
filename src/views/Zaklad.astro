@@ -15,10 +15,10 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
-import { u } from '../lib/url';
+import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE_GRANTOW, langPola } from '../lib/i18n';
 import { range, long, dayNum, monthShort, parse, type Lang } from '../lib/daty';
-import { slugOf, sala, salaReferatu, miejsce, trwaLubBedzie, type Zaklad, type Pracownik } from '../lib/tresci';
+import { slugOf, sala, salaReferatu, miejsce, trwaLubBedzie, adresKonferencji, type Zaklad, type Pracownik, type Konferencja } from '../lib/tresci';
 import { daneZakladu } from '../lib/widoki/zaklad';
 import { mailHtml } from '../lib/limity.mjs';
 
@@ -40,6 +40,8 @@ const imie = (o: Pracownik) => zTytulem(o.data.stopien, o.data.imie_nazwisko, la
 // jeden wzór daty: dzień, pod nim skrót miesiąca i rok
 const data = (s: string) => ({ iso: s.slice(0, 10), dzien: dayNum(s), reszta: `${monthShort(s, lang)} ${parse(s).y}` });
 const konfPokaz = konf.slice(0, 8);
+// konferencja z opisem — nasza strona (w języku strony), bez opisu — strona konferencji, bez obu — brak linku
+const hrefKonf = (k: Konferencja) => { const a = adresKonferencji(k); return a && !isExternal(a) ? u(wJezyku(a, lang)) : a; };
 // spis „Na tej stronie”: sekcje z danych widoku (naglowki) i lista zakładów na końcu
 const spis = [...naglowki.map((h) => ({ id: h.slug, etykieta: h.text })), { id: 'zaklady', etykieta: T('Zakłady Instytutu', 'Departments') }];
 const kierTel = kierownik?.data.telefon || d.telefon;
@@ -170,8 +172,8 @@ const kierTel = kierownik?.data.telefon || d.telefon;
                   {range(k.data.poczatek, k.data.koniec, lang)}{k.data.miejsce ? ` · ${miejsce(k.data.miejsce, lang)}` : ''}
                   {trwaLubBedzie({ poczatek: k.data.poczatek, koniec: k.data.koniec }) && <span class="zk-nadch">{T('nadchodząca', 'upcoming')}</span>}
                 </span>
-                {/* konferencje nie mają naszych podstron: link na stronę konferencji, bez strony — sam tytuł */}
-                <p class="t">{k.data.strona ? <Link href={k.data.strona}>{wybierz(k.data, 'tytul', lang)}</Link> : wybierz(k.data, 'tytul', lang)}</p>
+                {/* konferencja z opisem — nasza strona, bez opisu — strona konferencji, bez obu — sam tytuł (adresKonferencji) */}
+                <p class="t">{hrefKonf(k) ? <Link href={hrefKonf(k)}>{wybierz(k.data, 'tytul', lang)}</Link> : wybierz(k.data, 'tytul', lang)}</p>
               </div>
             </li>
           );

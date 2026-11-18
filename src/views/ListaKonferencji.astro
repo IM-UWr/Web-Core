@@ -2,8 +2,8 @@
 // Konferencje (/nauka/konferencje), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro: tekst wprowadzający
 // (Treść strony Web-Nauka → Strony → Konferencje; zlecenie 30, src/lib/tekstyStron.ts; brak = bez tekstu), nadchodzące u góry, minione według lat
 // (rok jako nagłówek Brygadą w kolorze działu, kotwice #rok-RRRR bez zmian). Spis „Na tej stronie”: Nadchodzące i lata.
-// Konferencje nie mają naszych podstron: tytuł prowadzi od razu na stronę konferencji (pole `strona`, ↗; cały wiersz
-// klikalny); konferencja bez strony — wiersz bez linku. Wiersze jak na stronie działu (zal/dzial/Wiersz.astro): dzień
+// Konferencja z opisem prowadzi na swoją stronę (/nauka/konferencje/<slug>, zlecenie 40, decyzja 18.11; Konferencja.astro),
+// bez opisu — od razu na stronę konferencji (pole `strona`, ↗); cały wiersz klikalny; bez obu — wiersz bez linku. Wiersze jak na stronie działu (zal/dzial/Wiersz.astro): dzień
 // początku dużą Brygadą w kolorze działu, pod nim „mie rrrr”, nad tytułem daty i miejsce.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // lata jako podsekcje h3, etykieta .etyk, pierwszy akapit .wst. Własne style (na końcu pliku) tylko dla wiersza z datą.
@@ -11,9 +11,10 @@
 import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
-import { odmiana, langPola } from '../lib/i18n';
+import { odmiana, langPola, wJezyku } from '../lib/i18n';
+import { u, isExternal } from '../lib/url';
 import { dayNum, monthShort, parse, range, type Lang } from '../lib/daty';
-import { miejsce, type Konferencja } from '../lib/tresci';
+import { miejsce, adresKonferencji, type Konferencja } from '../lib/tresci';
 import { daneListyKonferencji } from '../lib/widoki/listaKonferencji';
 
 interface Props { lang: Lang }
@@ -25,6 +26,8 @@ const { przyszle, lata, odwolana, naglowek, lead, haslo, html, liczby } = await 
 const etykieta = (k: Konferencja) => [range(k.data.poczatek, k.data.koniec, lang), miejsce(k.data.miejsce, lang)].filter(Boolean).join(' · ');
 const ileKonf = (n: number) => `${n} ${odmiana(n, ['konferencja', 'konferencje', 'konferencji'], ['conference', 'conferences'], lang)}`;
 const tytulNadch = T('Nadchodzące', 'Upcoming');
+// adres wiersza (adresKonferencji): nasza strona w języku strony albo strona konferencji; brak = wiersz bez linku
+const hrefKonf = (k: Konferencja) => { const a = adresKonferencji(k); return a && !isExternal(a) ? u(wJezyku(a, lang)) : a; };
 // sekcje: nadchodzące i minione (lata jako podsekcje); wspólny wzór wiersza
 const sekcje = [
   { id: 'z-nadchodzace', tytul: tytulNadch, grupy: [{ rok: '', lista: przyszle }] },
@@ -51,13 +54,13 @@ const spis = [
           {g.rok && <h3 id={`rok-${g.rok}`}>{g.rok}<span class="sr-only">, </span> <small>{ileKonf(g.lista.length)}</small></h3>}
           <ul class:list={['wiersze', g.rok && 'dwie']}>
             {g.lista.map((k) => (
-              <li class:list={['wiersz', k.data.strona && 'klik']}>
+              <li class:list={['wiersz', hrefKonf(k) && 'klik']}>
                 <time class="dz" datetime={k.data.poczatek.slice(0, 10)}>{dayNum(k.data.poczatek)}<small> {monthShort(k.data.poczatek, lang)} {parse(k.data.poczatek).y}</small></time>
                 <div>
                   <p class="etyk">{etykieta(k)}{k.data.odwolana && <span class="odw">{odwolana}</span>}</p>
                   <h4 lang={langPola(k.data, 'tytul', lang)}>
-                    {k.data.strona
-                      ? <Link href={k.data.strona}>{tytul(k)}</Link>
+                    {hrefKonf(k)
+                      ? <Link href={hrefKonf(k)}>{tytul(k)}</Link>
                       : tytul(k)}
                   </h4>
                 </div>

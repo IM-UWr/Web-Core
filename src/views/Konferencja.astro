@@ -1,0 +1,66 @@
+---
+// Strona konferencji (/nauka/konferencje/<slug>; zlecenie 40, decyzja właściciela 18.11: „osobna strona konferencji
+// z opisem i link z listy, jak granty”), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro.
+// Stronę ma tylko konferencja z opisem (Treść niepusta po usunięciu komentarzy, maTresc; src/lib/sciezki.ts). Do niej
+// prowadzą lista konferencji, strona działu Nauka, strona zakładu i kalendarz (adresKonferencji w src/lib/tresci.ts);
+// konferencja bez opisu prowadzi jak dotąd od razu na swoją stronę internetową (pole `strona`).
+// Wzór: strona projektu (Grant.astro). Baner: „← Wszystkie konferencje”, tytuł, tytuł w drugim języku, plakietka
+// (odwołana / nadchodząca). Treść: dane jako pary etykieta–wartość (dl.para: termin, miejsce, zakład), „Strona
+// konferencji ↗” (główny przycisk-link) i opis. Pole „Organizatorzy z Instytutu” jest ukryte w CMS, więc go nie pokazujemy.
+// Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc); bez spisu „Na tej stronie”.
+// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px).
+import Link from '../components/Link.astro';
+import Podstrona from '../components/zal/Podstrona.astro';
+import { u } from '../lib/url';
+import { wJezyku, wybierz, langPola } from '../lib/i18n';
+import type { Lang } from '../lib/daty';
+import type { Konferencja } from '../lib/tresci';
+import { daneKonferencji } from '../lib/widoki/konferencja';
+
+interface Props { konferencja: Konferencja; lang: Lang }
+const { konferencja, lang } = Astro.props;
+const d = konferencja.data;
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+
+const { tytul, tytulDrugi, Content, opisLang, termin, gdzie, zaklad, stan, opis } = await daneKonferencji(konferencja, lang);
+---
+<Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
+  wstecz={{ etykieta: T('Wszystkie konferencje', 'All conferences'), adres: '/nauka/konferencje' }} dzial="nauka" klasa="tresc z-konf">
+  <Fragment slot="baner">
+    {/* jak na stronie projektu: na /en oryginalny tytuł z etykietą */}
+    {tytulDrugi && (lang === 'en'
+      ? <p class="lead">Original title: <span lang="pl">{tytulDrugi.tekst}</span></p>
+      : <p class="lead" lang={tytulDrugi.lang}>{tytulDrugi.tekst}</p>)}
+    {stan && <div class="tags"><span class:list={['badge', 'kf-stan', stan.trwa && 'kf-trwa']}>{stan.etykieta}</span></div>}
+  </Fragment>
+
+  <section aria-label={T('Informacje o konferencji', 'Conference details')}>
+    <dl class="para fakty">
+      <dt>{T('Termin', 'Dates')}</dt><dd>{termin}</dd>
+      {gdzie && <><dt>{T('Miejsce', 'Venue')}</dt><dd>{gdzie}</dd></>}
+      {zaklad && <><dt>{T('Zakład', 'Department')}</dt><dd><a href={u(wJezyku(`/instytut/zaklady/${zaklad.id}`, lang))}>{wybierz(zaklad.data, 'nazwa', lang)}</a></dd></>}
+    </dl>
+    {d.strona && <p class="akcja glowny"><Link href={d.strona}>{T('Strona konferencji', 'Conference website')}</Link></p>}
+    <div class="prose opis" lang={opisLang}><Content /></div>
+  </section>
+</Podstrona>
+
+<style>
+  /* plakietka stanu w banerze (jak „realizowany” na stronie projektu): „nadchodząca” z kropką w kolorze działu */
+  .kf-stan { background: var(--bg); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+  .kf-trwa { box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .kf-trwa::before { content: ''; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--accent); }
+
+  /* dane konferencji: pary etykieta–wartość (wzorzec dl.para) w stopniu tekstu z danymi, jak na stronie projektu */
+  :global(.z-konf) dl.fakty { gap: 6px 18px; font-size: 15.5px; line-height: 1.55; }
+  .fakty dd { overflow-wrap: anywhere; }
+  .akcja { margin: 22px 0 0; }
+  .opis { margin-top: 28px; }
+  .opis > :global(:last-child) { margin-bottom: 0; }
+
+  /* ---------- telefon (≤ 1023 px) ---------- */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
+    .tags { margin-top: 12px; }
+  }
+</style>

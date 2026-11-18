@@ -95,17 +95,19 @@ function blokEn(fm) {
   const linie = fm.split('\n');
   const start = linie.findIndex((l) => /^tresc_en:/.test(l));
   if (start < 0) return undefined;
-  const m = /^tresc_en:\s*(\|[-+]?)\s*$/.exec(linie[start]);
+  // blok | albo |- (tekst wprost) albo blok składany > / >- (wartość z YAML, zapis jako | / |- — ta sama wartość)
+  const m = /^tresc_en:\s*([|>])([-]?)\s*$/.exec(linie[start]);
   if (!m) {
     const wartosc = YAML.parse(fm).tresc_en;
-    if (typeof wartosc === 'string' && wartosc.trim()) throw Error(`tresc_en nie jest blokiem | — zmień ręcznie`);
+    if (typeof wartosc === 'string' && wartosc.trim()) throw Error(`tresc_en nie jest blokiem | ani > — zmień ręcznie`);
     return undefined;
   }
   let koniec = start + 1;
   while (koniec < linie.length && (linie[koniec] === '' || /^\s/.test(linie[koniec]))) koniec++;
   while (koniec > start + 1 && linie[koniec - 1] === '') koniec--;
   const wciecie = Math.min(...linie.slice(start + 1, koniec).filter((l) => l.trim()).map((l) => /^ */.exec(l)[0].length));
-  return { start, koniec, styl: m[1], wciecie, tekst: linie.slice(start + 1, koniec).map((l) => l.slice(wciecie)).join('\n') };
+  const tekst = m[1] === '>' ? String(YAML.parse(fm).tresc_en).replace(/\n$/, '') : linie.slice(start + 1, koniec).map((l) => l.slice(wciecie)).join('\n');
+  return { start, koniec, styl: `|${m[2]}`, wciecie, tekst };
 }
 
 async function plikiFormularza(repo, wpis) {
@@ -135,7 +137,7 @@ export async function migruj(repo, { zapisz = false, formularze = ['strony', 'st
       const m = NAGLOWEK.exec(zrodlo.replace(/\r\n/g, '\n'));
       if (!m) throw Error(`Brak nagłówka YAML: ${plik}`);
       const dane = YAML.parse(m[1]) ?? {};
-      if (dane.format_tresci === 'jawne') { raport.push({ plik: path.relative(repo, plik), pominiety: 'już jawny' }); continue; }
+      if (dane.format_tresci === 'jawne') { raport.push({ plik: path.relative(repo, plik).split(path.sep).join('/'), pominiety: 'już jawny' }); continue; }
       if (dane.format_tresci != null) throw Error(`${plik}: nieznany format_tresci ${dane.format_tresci}`);
       const bloki = dzial || dane.bloki === true;
       const pl = await migrujTekst(m[2], { adres, lang: 'pl', bloki });
@@ -147,7 +149,7 @@ export async function migruj(repo, { zapisz = false, formularze = ['strony', 'st
         zmianyEn = wynik.zmiany;
         const wciecie = ' '.repeat(en.wciecie);
         const linie = wynik.tekst.replace(/\n+$/, '').split('\n').map((l) => (l ? wciecie + l : ''));
-        fm = [...fm.slice(0, en.start + 1), ...linie, ...fm.slice(en.koniec)];
+        fm = [...fm.slice(0, en.start), `tresc_en: ${en.styl}`, ...linie, ...fm.slice(en.koniec)];
       }
       fm.push('format_tresci: jawne');
       const nowy = `---\n${fm.join('\n')}\n---\n${pl.tekst.replace(/\n*$/, '\n')}`;

@@ -1,7 +1,7 @@
 // Mapa strony dla wyszukiwarek (widoczne treści — przy fladze TYLKO_OPUBLIKOWANE tylko opublikowane, zlecenie 33; obie wersje językowe).
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
-import { aktualnosci, obrony, seminaria, granty, slugOf, widoczny, maTresc } from '../lib/tresci';
+import { aktualnosci, obrony, seminaria, konferencje, granty, slugOf, widoczny, maTresc } from '../lib/tresci';
 import { absolute } from '../lib/url';
 import { wJezyku } from '../lib/i18n';
 import { wykazy } from '../lib/widoki/publikacje';
@@ -14,7 +14,8 @@ export async function GET(context: APIContext) {
   for (const a of await aktualnosci()) sciezki.push(`/aktualnosci/${slugOf(a.id)}`);
   for (const o of await obrony()) sciezki.push(`/obrony-doktorskie/${slugOf(o.id)}`);
   for (const s of await seminaria()) sciezki.push(`/seminaria/${s.id}`);
-  // konferencje nie mają własnych podstron (lista /nauka/konferencje prowadzi na zewnętrzne strony konferencji)
+  // własną stronę ma tylko konferencja z opisem (zlecenie 40; reszta prowadzi na zewnętrzną stronę konferencji)
+  for (const k of await konferencje()) if (maTresc(k.body)) sciezki.push(`/nauka/konferencje/${slugOf(k.id)}`);
   for (const g of await granty()) sciezki.push(`/nauka/granty/${slugOf(g.id)}`);
   // teksty stron z listą (zlecenie 30) nie mają własnych stron — ich adresy są wyżej
   for (const s of await getCollection('strony')) if (widoczny(s) && !jestTekstemListy(s.id)) sciezki.push(`/${s.id}`);
