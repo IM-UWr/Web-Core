@@ -29,7 +29,7 @@ import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, langPola } from '../lib/i18n';
 import { short, long, longWithDay, range, dayNum, monthShort, parse, hasTime, time, type Lang } from '../lib/daty';
-import { slugOf, ofertaAktualna, jakWydarzenie, type Aktualnosc } from '../lib/tresci';
+import { slugOf, ofertaAktualna, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
 import { zdjecie } from '../lib/zdjecia';
 import { sizesTelefon } from '../lib/media';
@@ -48,8 +48,7 @@ const tytulInny = (w?: Aktualnosc) => (w ? (lang === 'en' && w.data.tytul_en) ||
 const { tytul, zajawka, zajawkaNaStronie, opisZdjecia, Content, htmlEn, tylkoPolski, wydarzenie, minelo, trwa, najblizsze, dzialWiersza } = await daneAktualnosci(wpis, lang);
 // Wpis o wydarzeniu w kolorze swojego wiersza na liście (zlecenie 21, punkt 6): etykieta, data i linki w tekście; reszta jak dotąd (zalozyciele.css, .akt-wydarzenie).
 // Baner i menu (zlecenie 37): każdy wpis ma baner podstrony swojego działu (dzialWpisu) i ten dział podświetlony w menu; kolory treści jak wyżej.
-// „Seminarium wydziałowe” (zlecenie 49) jak „Wydarzenie”: jakWydarzenie w src/lib/tresci.ts.
-const oWydarzeniu = jakWydarzenie(d.rodzaj);
+const oWydarzeniu = d.rodzaj === 'wydarzenie';
 const href = (a: string) => (isExternal(a) ? a : u(a));
 // typ pliku z prawej w liście plików (wzorzec: „PDF”, „strona ↗”)
 const typPliku = (a: string) => (isExternal(a) && !/\.[a-z0-9]{2,5}$/i.test(a.split(/[?#]/)[0]) ? (en ? 'website' : 'strona') : (a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,5})$/i)?.[1] ?? '').toUpperCase());

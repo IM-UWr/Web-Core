@@ -105,11 +105,12 @@ def sprawdz(p):
         rodzaj = dane.get('rodzaj') or 'ogloszenie'
         if stary:
             ostrzezenia.append(f'{p}: stary zapis terminu (wydarzenie_*) — przenieś do pola „termin” (skrypty/migracja/termin.py)')
+        # zlecenie 54 (cofnięcie 49): strona czyta starą wartość jak „wydarzenie” (src/content.config.ts)
+        if rodzaj == 'seminarium-wydzialowe':
+            ostrzezenia.append(f'{p}: stary rodzaj „Seminarium wydziałowe” — strona traktuje wpis jak „Wydarzenie”; zmień Rodzaj w CMS')
+            rodzaj = 'wydarzenie'
         if rodzaj == 'wydarzenie' and not termin and not stary:
             ostrzezenia.append(f'{p}: rodzaj „wydarzenie” bez terminu — wpis nie trafi do Kalendarza (dodaj „Termin wydarzenia” albo zmień rodzaj)')
-        # zlecenie 49: „Seminarium wydziałowe” działa jak „Wydarzenie”
-        if rodzaj == 'seminarium-wydzialowe' and not termin and not stary:
-            ostrzezenia.append(f'{p}: rodzaj „Seminarium wydziałowe” bez terminu — wpis nie trafi do Kalendarza (dodaj „Termin wydarzenia”)')
         if rodzaj in ('sukces', 'kariera') and (termin or stary):
             ostrzezenia.append(f'{p}: termin wydarzenia przy rodzaju „{rodzaj}” — to zwykle pomyłka (dzień informacji wpisuje się w „Data”)')
         if len(termin) > 1:

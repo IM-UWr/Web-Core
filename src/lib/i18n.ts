@@ -247,7 +247,6 @@ export function t(lang: Lang, key: Klucz): string {
 export const RODZAJE: Record<string, { pl: string; en: string }> = {
   ogloszenie: { pl: 'Ogłoszenie', en: 'Announcement' },
   wydarzenie: { pl: 'Wydarzenie', en: 'Event' },
-  'seminarium-wydzialowe': { pl: 'Seminarium wydziałowe', en: 'Faculty seminar' },
   sukces: { pl: 'Sukces', en: 'Achievement' },
   kariera: { pl: 'Kariera', en: 'Careers' },
   obrona: { pl: 'Obrona doktorska', en: 'PhD defence' },
@@ -261,7 +260,6 @@ export const RODZAJE: Record<string, { pl: string; en: string }> = {
 export const RODZAJE_FILTRY: Record<string, { pl: string; en: string }> = {
   ogloszenie: { pl: 'Ogłoszenia', en: 'Announcements' },
   wydarzenie: { pl: 'Wydarzenia', en: 'Events' },
-  'seminarium-wydzialowe': { pl: 'Seminaria wydziałowe', en: 'Faculty seminars' },
   sukces: { pl: 'Sukcesy', en: 'Achievements' },
   kariera: { pl: 'Kariera', en: 'Careers' },
   obrona: { pl: 'Obrony', en: 'PhD defences' },
