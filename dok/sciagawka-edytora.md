@@ -186,11 +186,24 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 - **`:::w-skrocie` już się nie wpisuje** (do zlecenia 52: liczby obok portretu w Treści). Liczby do banera wpisuje się w polu „Liczby”. Stary plik z blokiem i pustym polem „Liczby”: baner weźmie pierwsze 3 punkty bloku (bez linków, podpis skrócony), w treści bloku nie ma, a log budowy ma ostrzeżenie „przenieś do pola Liczby”.
 - **`:::laureaci`** (nagroda, w sekcji `## Laureaci z Instytutu {#laureaci}`): jedna osoba na linię, `- **2026** Imię Nazwisko — [aktualność](/aktualnosci/…)` (część po ` — ` jest opcjonalna). Link do sylwetki (`[Imię Nazwisko](/instytut/warto-wiedziec/imie-nazwisko)`, także z „prof.” przed linkiem) daje mini portret, kartę w „Sylwetkach laureatów” i wpis w „Zobacz też” na stronie osoby. Licznik „N laureatów z Instytutu” na liście liczy się sam. Nagroda z laureatami nie losuje się na stronie głównej.
 - **Nagłówki sekcji:** zalecany zapis to nadal `## Tytuł {#id}` (`{#id}` działa też bez spacji, np. `## Tytuł{#id}`). Tekst wklejony np. z czatu AI strona poprawia sama (zlecenie 53): usuwa `#` z imieniem i nazwiskiem albo tytułem wpisu na początku Treści, pozostałe `#` traktuje jak `##`, a gdy w Treści nie ma żadnego `##`, najwyższe użyte nagłówki (np. `###`) stają się sekcjami. Strona wygląda wtedy jak inne wpisy, a log budowy ma ostrzeżenie „nagłówki poprawione automatycznie”.
-- **„Do pobrania”** (np. noty biograficzne): sekcja `## Do pobrania {#do-pobrania}` z blokiem `:::pliki` (jak na Stronach: `- [Nota biograficzna](/pliki/….pdf) — opis`).
+- **„Do pobrania”** (np. noty biograficzne; tylko pliki, których nie ma w „Źródłach”): sekcja `## Do pobrania {#do-pobrania}` z blokiem `:::pliki` (jak na Stronach: `- [Nota biograficzna](/pliki/….pdf) — opis`).
 - **„Źródła”**: sekcja `## Źródła {#zrodla}` na końcu Treści; na stronie jest zwinięta, z liczbą („22 źródła · rozwiń”).
-- **Powiązania biorą się z linków:** link w Treści nagrody albo historii do sylwetki (`/instytut/warto-wiedziec/<plik>`) dodaje kartę osoby w „Ludzie w tej historii” (przy nagrodzie z laureatami: „Sylwetki laureatów”) i ten wpis w „Zobacz też” na stronie osoby. Samo pogrubione nazwisko powiązania nie daje. Pola „Osoby” nie ma.
+- **Powiązania biorą się z linków:** link w Treści nagrody albo historii do sylwetki (`/instytut/warto-wiedziec/<plik>`) dodaje kartę osoby w „Ludzie w tej historii” (przy nagrodzie z laureatami: „Sylwetki laureatów”) i ten wpis w „Zobacz też” na stronie osoby. Samo nazwisko bez linku powiązania nie daje. Pola „Osoby” nie ma.
 - **Strona główna:** rząd „Warto wiedzieć” losuje wpisy z włączonym „Pokaż na stronie głównej”: najpierw rocznice (±7 dni: „140. urodziny · 14 stycznia”, „81 lat temu · 15 listopada”), potem „Zawsze pokazuj”, potem najnowsza „Nowa sylwetka”, resztę losowo („Ulubione” 3× częściej). Bez nagród z laureatami, TBA i (na stronie angielskiej) wpisów bez Treści EN.
 - **Wersja angielska:** pusta Treść EN przy wypełnionej polskiej = strona angielska z ramką „Translation in preparation” i linkiem „Read in Polish →”, na liście EN znaczek „PL”. Puste tytuł, zajawka albo podpis EN = tekst polski.
+- **Styl tekstu (zlecenie 54; sylwetki, nagrody i historie):**
+  - **Tytuł naukowy** ma w sylwetce tylko jej bohater, tylko przy pierwszej wzmiance i krótko: „Prof. Hugo Steinhaus należy…”, „Dr Krzysztof Tabisz jest…” (nie „Profesor” ani „Prof. dr hab.”).
+    - Dalej samo nazwisko albo „jego”/„jej”.
+    - Inne osoby bez tytułów. Opis kariery („był profesorem we Lwowie”) zostaje.
+    - Pole „Imię i nazwisko” (baner) i zajawka bez tytułów. Zajawka nie zaczyna się od imienia i nazwiska, bo karta pokazuje je nad nią.
+    - W nagrodzie i historii tytuł ma najwyżej laureat albo główna osoba wpisu, przy pierwszej wzmiance.
+  - **Pierwsze zdanie sylwetki** to ciągłe zdanie, bez definicji z myślnikiem („X (1900–1980) – matematyk…”) i bez lat w nawiasie: lata stoją pod portretem.
+  - **Bez pogrubień w tekście.** Zostają tylko:
+    - hasło na początku akapitu wyliczenia (`**Twierdzenie Knastera–Tarskiego (1928).** …`);
+    - rok w `:::laureaci`.
+
+    Powiązanie z sylwetką daje link, nie pogrubienie.
+  - **Publikacja ze „Źródeł”** wspomniana w tekście jest linkiem do niej.
 
 ## Gdzie co jest
 
