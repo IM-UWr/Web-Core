@@ -261,8 +261,8 @@ export const WARTO_WIEDZIEC_47 = {
         { name: 'rocznica_urodzin', label: 'Rocznica urodzin', description: 'MM-DD, np. 01-14. Przez 7 dni przed i po tej dacie sylwetka ma pierwszeństwo na stronie głównej. Puste = bez rocznicy.', type: 'string', default: '', pattern: MMDD },
         { name: 'karta', label: 'Karta', description: 'Zajawka i portret.', type: 'object', fields: [
           ...zajawka('Pokazuje się w rzędzie „Warto wiedzieć” na stronie głównej i w opisie strony dla Google.'),
-          { ...OBRAZ, description: 'Portret, tylko z prawem do publikacji. Puste = sylwetka zastępcza.' },
-          { name: 'obraz_zrodlo', label: 'Źródło zdjęcia', description: 'Autor, licencja, link, np. „Fot. Jan Kowalski, CC BY-SA 4.0”. Pokazuje się drobno pod portretem. Puste = bez podpisu.', type: 'string', default: '' },
+          { ...OBRAZ, description: 'Portret pionowy 4:5, najlepiej 600×750 px (co najmniej 400×500), oczy na ok. 2/5 wysokości od góry. Tylko z prawem do publikacji. Puste = sylwetka zastępcza.' },
+          { name: 'obraz_zrodlo', label: 'Źródło zdjęcia', description: 'Krótko, bez „Fot.” (strona dopisuje je sama): autor albo instytucja i licencja, np. „Konrad Jacobs / MFO, CC BY-SA 2.0 DE” albo „Archiwum UWr”. Pokazuje się drobno pod portretem na stronie osoby. Pełny opis z linkiem i licencją dopisz na stronie „O stronie” (Web-Ustawienia). Puste = bez podpisu.', type: 'string', default: '' },
         ] },
         ...STRONA_GLOWNA,
       ]),
