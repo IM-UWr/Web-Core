@@ -20,6 +20,7 @@ import { wJezyku, wybierz } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import type { Specjalnosc } from '../lib/specjalnosci';
 import { daneSpecjalnosci } from '../lib/widoki/specjalnosc';
+import BrakOsoby from '../components/BrakOsoby.astro';
 import { mailHtml } from '../lib/limity.mjs';
 
 interface Props { specjalnosc: Specjalnosc; lang: Lang }
@@ -56,7 +57,7 @@ const doTerminow = u(wJezyku(`/studia/${d.kierunek}#terminy`, lang));
           {opiekunowie.map((o) => (
             <div>
               {o.rola && <span class="etyk">{w(o, 'rola')}</span>}
-              <b data-limit-linii="2">{o.osoba?.data.strona
+              <b data-limit-linii="2">{o.brak ? <BrakOsoby lang={lang} /> : o.osoba?.data.strona
                 ? <Link href={o.osoba.data.strona}>{zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang)}</Link>
                 : o.osoba ? zTytulem(o.osoba.data.stopien, o.osoba.data.imie_nazwisko, lang) : o.imie_nazwisko}</b>
               {o.osoba && (o.osoba.data.email || o.osoba.data.pokoj || o.osoba.data.telefon) && (

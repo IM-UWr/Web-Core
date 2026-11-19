@@ -2,7 +2,8 @@
 import { render } from 'astro:content';
 import { RODZAJE_GRANTOW } from '../i18n';
 import { today, type Lang } from '../daty';
-import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, maTresc, type Grant } from '../tresci';
+import { granty, zaklady, zakladGrantu, kierownicyGrantu, lataGrantu, maTresc, type Grant } from '../tresci';
+import { wszyscyPracownicy } from '../osobySpisu';
 
 // Pole „program” nie ma wersji angielskiej: po angielsku znane polskie nazwy tłumaczymy, resztę zostawiamy (nazwy konkursów,
 // np. OPUS, są takie same w obu językach). Używane w plakietce, karcie danych, haśle, opisie strony i na liście projektów.
@@ -51,8 +52,9 @@ export async function daneGrantu(grant: Grant, lang: Lang) {
   const motywDane = d.rok_od && d.rok_do ? { od: d.rok_od, do: d.rok_do, dzien: today() } : undefined;
 
   // Kierownik (albo kilku) ze spisu pracowników: imię i nazwisko z tytułem; link do strony domowej, a gdy jej brak — do zakładu.
-  const osoby = await pracownicy();
-  const kierownicy = kierownicyGrantu(d.kierownik, osoby, lang);
+  // cały spis (zlecenie 42): kierownik, który odszedł, zostaje przy projekcie (tekst bez linku: `osoba` puste)
+  const osoby = await wszyscyPracownicy();
+  const kierownicy = kierownicyGrantu(grant, osoby, lang);
   const wszystkieZaklady = await zaklady();
   const zaklad = wszystkieZaklady.find((z) => z.id === zakladGrantu(grant, osoby));
   const zakladOsoby = (id?: string) => (id && wszystkieZaklady.some((z) => z.id === id) ? id : undefined);

@@ -1,6 +1,7 @@
 // Dane listy projektów i grantów (src/views/ListaGrantow.astro): podział na realizowane/zakończone/bez lat, liczby, spis sekcji.
 import { today, type Lang } from '../daty';
-import { granty, pracownicy, zaklady, zakladGrantu, kierownicyGrantu, type Grant } from '../tresci';
+import { granty, zaklady, zakladGrantu, kierownicyGrantu, type Grant } from '../tresci';
+import { wszyscyPracownicy } from '../osobySpisu';
 import { stronaListy } from '../tekstyStron';
 
 // liczebniki: 1 projekt, 2–4 (22–24…) projekty, 5+ projektów
@@ -14,7 +15,8 @@ export async function daneListyGrantow(lang: Lang) {
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 
   const wszystkie = await granty();
-  const osoby = await pracownicy();
+  // cały spis (zlecenie 42): kierownik, który odszedł, zostaje przy projekcie (tekst bez linku)
+  const osoby = await wszyscyPracownicy();
   const listaZakladow = await zaklady();
   const rok = Number(today().slice(0, 4));
   // Realizowane — tak samo jak na /nauka i na stronach zakładów: rok zakończenia ≥ bieżący rok.
@@ -25,7 +27,7 @@ export async function daneListyGrantow(lang: Lang) {
     .sort((a, b) => b - a)
     .map((r) => ({ rok: r, lista: zakonczone.filter((g) => g.data.rok_do === r) }));
 
-  const kier = (g: Grant) => kierownicyGrantu(g.data.kierownik, osoby, lang);
+  const kier = (g: Grant) => kierownicyGrantu(g, osoby, lang);
   const zakladProjektu = (g: Grant) => listaZakladow.find((z) => z.id === zakladGrantu(g, osoby));
 
   // Pasek liczb — wszystko liczone z kolekcji (kwot nie sumujemy: różne waluty i zapisy).

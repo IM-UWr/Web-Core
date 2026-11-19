@@ -459,6 +459,86 @@ function scenariusze(kat, nazwaKonf, nowa) {
     sprawdz(!z.bledy.length && z.dane.rodzaj === 'wydarzenie' && z.tekst === przed,
       `${nazwa}: otwarty i zapisany bez zmian (pusty diff) — rodzaj ${z.dane?.rodzaj}, tytuł „${z.dane?.tytul}”${z.bledy.length ? ` (${z.bledy.join('; ')})` : ''}`);
   }
+
+  if (!formularz(konfiguracja(kat, 'Web-Nauka'), 'granty').fields.some((f) => f.name === 'kierownik_ze_spisu')) return;
+  zlecenie42(kat);
+}
+
+// Zlecenie 42: osoby wybierane ze spisu. Odwołanie zapisuje ścieżkę pliku katalogu (_cms/pracownicy/<id>.yml); Pages CMS
+// (fields/core/reference, sprawdzone w etapie 0) zostawia przy zapisie wartość także wtedy, gdy nie ma jej na liście wyboru.
+function zlecenie42(kat) {
+  console.log('14. Osoby ze spisu (zlecenie 42): grant z kierownikiem, który odszedł, nowy grant, zakład, seminarium, władze, spis pracowników');
+  const czytaj = (repo, p) => fs.readFileSync(path.join(kat, repo, p), 'utf8');
+  // dane wpisu bez Treści (pusta Treść dostaje przy zapisie komentarz z szablonu — znane, scenariusz „zapis bez zmian”) i bez kolejności kluczy
+  // (ukryte „pozycja: false” Pages CMS dopisuje przy każdym zapisie — wartość domyślna, jak w scenariuszu „zapis bez zmian”)
+  const posortuj = (v) => (Array.isArray(v) ? v.map(posortuj) : v && typeof v === 'object'
+    ? Object.fromEntries(Object.keys(v).sort().filter((k) => !(k === 'pozycja' && v[k] === false)).map((k) => [k, posortuj(v[k])])) : v);
+  const bezTresci = (o) => { const { body, ...r } = o; return JSON.stringify(posortuj(sanitizeObject(r))); };
+  const dane = (f, tekst, p) => bezTresci(wczytajPlik(tekst, { ...f, fields: f.fields.map((x) => ({ ...x, type: x.type === 'date' ? 'string' : x.type })) }, p));
+  const katalog = (repo) => fs.readdirSync(path.join(kat, repo, '_cms/pracownicy')).filter((n) => n.endsWith('.yml'))
+    .map((n) => YAML.parse(fs.readFileSync(path.join(kat, repo, '_cms/pracownicy', n), 'utf8')));
+  // grant z kierownikiem ze spisu: osoba „odchodzi” (katalog: pracuje: false, etykieta z dopiskiem) — wpis otwarty i zapisany bez zmian
+  const g = formularz(konfiguracja(kat, 'Web-Nauka'), 'granty');
+  const pole = g.fields.find((f) => f.name === 'kierownik_ze_spisu');
+  sprawdz(pole?.type === 'reference' && pole.options?.collection === 'katalog-pracownikow' && pole.options.multiple && pole.options.value === '{path}'
+    && g.fields[g.fields.indexOf(pole) + 1]?.name === 'kierownik_spoza', 'granty: „Kierownik ze spisu pracowników” (wybór, kilka osób) i zaraz pod nim „Kierownik spoza spisu” (tekst, lista)');
+  const pg = 'src/content/granty/2018-2017-25-b-st1-01335.md';
+  const tg = czytaj('Web-Nauka', pg);
+  const zg = zapisz(g, otworz(g, tg, pg), pg);
+  sprawdz(!zg.bledy.length && JSON.stringify(zg.dane.kierownik_ze_spisu) === '["_cms/pracownicy/damian-osajda.yml"]' && dane(g, zg.tekst, pg) === dane(g, tg, pg),
+    `${pg} (kierownik damian-osajda, w teście „były pracownik”): zapis bez zmian — odwołanie zostaje, dane te same${zg.bledy.length ? ` (${zg.bledy.join('; ')})` : ''}`);
+  const ps = 'src/content/granty/2010-n-201-525638.md';
+  const ts = czytaj('Web-Nauka', ps);
+  const zs = zapisz(g, otworz(g, ts, ps), ps);
+  sprawdz(!zs.bledy.length && JSON.stringify(zs.dane.kierownik_spoza) === '["prof. dr hab. Zbigniew Palmowski"]' && dane(g, zs.tekst, ps) === dane(g, ts, ps),
+    `${ps}: kierownik spoza spisu po zapisie bez zmian: ${JSON.stringify(zs.dane?.kierownik_spoza)}`);
+  const kat42 = katalog('Web-Nauka');
+  const etykiety = kat42.map((o) => o.etykieta).sort((a, b) => a.localeCompare(b, 'pl'));
+  sprawdz(kat42.length > 100 && kat42.every((o) => o.imie_nazwisko && o.id && o.etykieta && typeof o.pracuje === 'boolean' && !('email' in o)),
+    `nowy grant — lista wyboru (Web-Nauka/_cms/pracownicy): ${kat42.length} osób, np. ${etykiety.slice(0, 4).join(', ')}…; bez danych kontaktowych`);
+  const ng = zapisz(g, Object.assign(otworz(g, null), { tytul: 'Grant testowy', rok_od: 2026, rodzaj: g.fields.find((f) => f.name === 'rodzaj')?.default ?? 'ncn',
+    kierownik_ze_spisu: ['_cms/pracownicy/damian-osajda.yml', '_cms/pracownicy/ewa-damek.yml'], kierownik_spoza: ['prof. dr hab. Jan Kowalski'] }), '2026-grant-testowy.md');
+  sprawdz(!ng.bledy.length && /kierownik_ze_spisu:\n {2}- _cms\/pracownicy\/damian-osajda\.yml\n {2}- _cms\/pracownicy\/ewa-damek\.yml\nkierownik_spoza:\n {2}- prof\. dr hab\. Jan Kowalski/.test(ng.tekst),
+    `nowy grant: dwie osoby ze spisu i jedna spoza — ${ng.bledy.length ? ng.bledy.join('; ') : 'zapis jak oczekiwano'}`);
+  // zakład, seminarium: zapis bez zmian zostawia odwołania
+  const z = formularz(konfiguracja(kat, 'Web-Instytut'), 'zaklady');
+  const pz = 'src/content/zaklady/geometria.md';
+  const tz = czytaj('Web-Instytut', pz);
+  const zz = zapisz(z, otworz(z, tz, pz), pz);
+  sprawdz(!zz.bledy.length && zz.dane.karta?.kierownik_ze_spisu === '_cms/pracownicy/jacek-swiatkowski.yml' && dane(z, zz.tekst, pz) === dane(z, tz, pz),
+    `${pz}: kierownik ze spisu po zapisie bez zmian: ${zz.dane?.karta?.kierownik_ze_spisu}`);
+  const s = formularz(konfiguracja(kat, 'Web-Sem-Topologia'), 'seminarium');
+  const tsm = czytaj('Web-Sem-Topologia', s.path);
+  const zsm = zapisz(s, otworz(s, tsm, s.path), s.path);
+  sprawdz(!zsm.bledy.length && zsm.dane.prowadzacy_ze_spisu?.length === 2 && zsm.dane.prowadzacy_spoza?.length === 3 && dane(s, zsm.tekst, s.path) === dane(s, tsm, s.path),
+    `Topologia: koordynatorzy po zapisie bez zmian — ze spisu ${zsm.dane?.prowadzacy_ze_spisu?.length}, spoza ${zsm.dane?.prowadzacy_spoza?.length}`);
+  // władze: osoba ze spisu wymagana w dyrekcji, e-mail Wydziału w „Inne dane niż w spisie”
+  const w = formularz(konfiguracja(kat, 'Web-Instytut'), 'wladze');
+  const tw = czytaj('Web-Instytut', w.path);
+  const zw = zapisz(w, otworz(w, tw, w.path), w.path);
+  sprawdz(!zw.bledy.length && zw.dane.osoby[0].osoba === '_cms/pracownicy/grzegorz-karch.yml' && zw.dane.wydzial.osoby[0].inne?.email === 'Dariusz.Buraczewski@uwr.edu.pl'
+    && zw.dane.sekretariat.osoby_ze_spisu?.length === 2 && bezTresci(zw.dane) === bezTresci(JSON.parse(tw)),
+    `władze: zapis bez zmian — dyrektor ${zw.dane?.osoby?.[0]?.osoba}, e-mail dziekana w „Inne dane” ${zw.dane?.wydzial?.osoby?.[0]?.inne?.email}, sekretariat ${zw.dane?.sekretariat?.osoby_ze_spisu?.length} osoby`);
+  const bezOsoby = JSON.parse(tw);
+  delete bezOsoby.osoby[1].osoba;
+  const zb = zapisz(w, otworz(w, JSON.stringify(bezOsoby), w.path), w.path);
+  sprawdz(zb.bledy.some((b) => /osoby\.1\.osoba/.test(b)), `władze: pozycja dyrekcji bez osoby — zapis zablokowany (${zb.bledy.join('; ')})`);
+  // spis pracowników: „Pracuje w Instytucie” — stary plik bez pola, odznaczenie, nowa osoba; usuwanie wyłączone
+  const p = formularz(konfiguracja(kat, 'Web-Pracownicy'), 'pracownicy');
+  const pp = fs.readdirSync(path.join(kat, 'Web-Pracownicy', p.path)).filter((n) => n.endsWith('.yml')).sort()[0];
+  const tp = czytaj('Web-Pracownicy', `${p.path}/${pp}`);
+  const bezPola = zapisz(p, otworz(p, tp.replace(/^pracuje:.*\r?\n/m, ''), pp), pp);
+  const odszedl = zapisz(p, Object.assign(otworz(p, tp, pp), { pracuje: false, data_odejscia: '2026-11-30' }), pp);
+  const nowaOsoba = zapisz(p, Object.assign(otworz(p, null), { imie_nazwisko: 'Jan Testowy', grupa: 'nauczyciel' }), 'jan-testowy.yml');
+  sprawdz(!bezPola.bledy.length && bezPola.dane.pracuje === true, `${pp}: plik bez pola „pracuje” po zapisie bez zmian: pracuje: ${bezPola.dane?.pracuje}`);
+  sprawdz(!odszedl.bledy.length && /^pracuje: false$/m.test(odszedl.tekst) && /^data_odejscia: 2026-11-30$/m.test(odszedl.tekst), `${pp}: odznaczenie „Pracuje w Instytucie” i data odejścia zapisane w pliku`);
+  sprawdz(!nowaOsoba.bledy.length && nowaOsoba.dane.pracuje === true, `nowa osoba startuje z „Pracuje w Instytucie” zaznaczonym${nowaOsoba.bledy.length ? ` (${nowaOsoba.bledy.join('; ')})` : ''}`);
+  sprawdz(p.operations?.delete === false, 'spis pracowników: usuwanie w CMS wyłączone (operations.delete: false)');
+  // katalog w każdym repozytorium z polami osób: tylko do odczytu, te same osoby
+  const repoKat = ['Web-Instytut', 'Web-Nauka', 'Web-Studia', ...fs.readdirSync(kat).filter((r) => r.startsWith('Web-Sem-')).sort()];
+  const ids = (repo) => katalog(repo).map((o) => o.id).sort().join();
+  sprawdz(repoKat.every((r) => { const k = formularz(konfiguracja(kat, r), 'katalog-pracownikow'); return k && k.operations?.create === false && k.operations?.delete === false && k.fields.every((f) => f.readonly) && ids(r) === ids('Web-Nauka'); }),
+    `katalog „Katalog pracowników (tylko odczyt)” w ${repoKat.length} repozytoriach: tylko odczyt, ta sama lista osób`);
 }
 
 // Każdy plik każdego formularza otwarty i zapisany bez zmian: czy dane po zapisie są te same. Za równe uznane są: brak wartości

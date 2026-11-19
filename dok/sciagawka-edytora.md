@@ -205,6 +205,17 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
     Powiązanie z sylwetką daje link, nie pogrubienie.
   - **Publikacja ze „Źródeł”** wspomniana w tekście jest linkiem do niej.
 
+## Osoby: wybór ze spisu pracowników (zlecenie 42)
+
+> **Osoby wybieraj z listy; ręcznie tylko osoby spoza Instytutu. Po odejściu pracownika odznacz »Pracuje w Instytucie«, nie usuwaj.**
+
+- **Pola „… ze spisu”:** kierownik zakładu (Web-Instytut → Zakłady → Karta → Kierownik), dyrekcja i władze Wydziału („Osoba ze spisu”), osoby sekretariatu (Web-Instytut → Władze), kierownik grantu (Web-Nauka → Projekty i granty), koordynatorzy seminarium (Web-Sem-… → opis seminarium) i opiekunowie specjalności (Web-Studia). Wpisz kilka liter nazwiska (z polskimi literami albo bez) i wybierz osobę z listy. Tytuł, e-mail, pokój, link i zakład strona weźmie ze spisu pracowników, także po zmianie nazwiska albo tytułu.
+- **Pola „… spoza spisu”** (kierownik grantu, koordynatorzy seminarium; przy władzach Wydziału „Osoba spoza spisu”): tylko osoby, których nie ma w spisie, wpisane z tytułem, np. „prof. dr hab. Jan Kowalski”. Na stronie najpierw stoją osoby ze spisu, potem spoza.
+- **Władze:** grupa „Inne dane niż w spisie (zwykle puste)” na dole pozycji. Wypełnij ją tylko wtedy, gdy na stronie władz ma być coś innego niż w spisie (np. wydziałowy e-mail dziekana).
+- **Lista wyboru** to „Katalog pracowników (tylko odczyt)” w każdym z tych repozytoriów. Nie edytuj go: aktualizuje się sam po zmianie spisu (do czasu włączenia automatu robi to administrator skryptem). Nowa osoba pojawia się na liście po tej aktualizacji.
+- **Odejście:** Web-Pracownicy → Pracownicy → osoba → odznacz „Pracuje w Instytucie” (opcjonalnie „Data odejścia”). Usuwanie osób w CMS jest wyłączone. Osoba znika ze spisu pracowników i ze składu zakładu, a przy dawnych grantach zostaje jej nazwisko, bez linku. Na liście wyboru ma dopisek „(były pracownik)”.
+- **Funkcja bez osoby** (puste pole albo osoba, która odeszła: kierownik zakładu, koordynator, opiekun, władze, sekretariat): na Podglądzie w miejscu osoby jest znacznik „nie przypisano osoby — uzupełnij w CMS”, a plakietka stanu budowy ma wiersz „Nie przypisano osoby: … Popraw w CMS →”. Na stronie publicznej ten wiersz znika.
+
 ## Gdzie co jest
 
 | Co | Gdzie w Pages CMS |

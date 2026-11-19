@@ -31,7 +31,8 @@ function repozytoriumPliku(plik: string): string | undefined {
 // pliku „seminarium” (…/main/file/seminarium) w repozytorium tego seminarium.
 const KOLEKCJE = new Set(['strony', 'kierunki', 'specjalnosci', 'zaklady', 'ww_sylwetki', 'ww_nagrody', 'ww_historie', 'aktualnosci', 'referaty']);
 /** kolekcja w danych strony → nazwa formularza jednego pliku w .pages.yml */
-const PLIKI: Record<string, string> = { 'strona-dzialu': 'strona-dzialu', popularyzacja: 'popularyzacja', seminaria: 'seminarium' };
+// Zlecenie 42: „wladze” (Web-Instytut, formularz jednego pliku src/data/wladze.json) — wiersz „nie przypisano osoby” na plakietce.
+const PLIKI: Record<string, string> = { 'strona-dzialu': 'strona-dzialu', popularyzacja: 'popularyzacja', seminaria: 'seminarium', wladze: 'wladze' };
 
 /** Adres formularza wpisu w Pages CMS albo undefined, gdy nie da się go ustalić (brak pochodzenia albo formularz bez przełącznika). */
 export function formularzWCms(kolekcja: string, plik?: string): string | undefined {

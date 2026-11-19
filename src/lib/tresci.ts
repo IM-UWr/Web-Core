@@ -4,6 +4,7 @@ import { now, today, weekday, addDays, hasTime, plusMinutes, type Lang } from '.
 import { swietaPanstwowe, pozycjeZamianDni } from './kolory-dni';
 import { zTytulem, tytulyWJezyku } from './osoby';
 import { langPola } from './i18n';
+import { aktywny, osobaPoId, idy, teksty } from './osobySpisu';
 
 export type Aktualnosc = CollectionEntry<'aktualnosci'>;
 export type Obrona = CollectionEntry<'obrony'>;
@@ -83,8 +84,10 @@ export async function zaklady(): Promise<Zaklad[]> {
   return items.filter(widoczny).sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || a.data.nazwa.localeCompare(b.data.nazwa, 'pl'));
 }
 
+// Spis pracowników bez osób, które odeszły (zlecenie 42: „Pracuje w Instytucie” odznaczone) — spis, listy zakładów, liczby
+// i dopasowanie starych pól tekstowych. Odwołania z pól „… ze spisu” sięgają też do osób, które odeszły (osobySpisu.ts).
 export async function pracownicy(): Promise<Pracownik[]> {
-  return (await getCollection('pracownicy')).filter(widoczny);
+  return (await getCollection('pracownicy')).filter(aktywny);
 }
 
 // Pierwsza osoba z zapisu typu „prof. dr hab. P. Borodulin-Nadzieja”, „dr Ś. R. Gal” albo „prof. Piotr Biler, prof. Grzegorz Karch”:
@@ -113,9 +116,18 @@ export function osobaGrantu(zapis: string | undefined, osoby: Pracownik[]): Prac
   return pasujace.find((o) => o.data.zaklad) ?? pasujace[0];
 }
 
-// Zakład projektu: pole „zakład”, a gdy puste — zakład kierownika (pierwszej osoby) znalezionego w spisie pracowników.
-export function zakladGrantu(g: Grant, osoby: Pracownik[]): string | undefined {
-  return g.data.zaklad || osobaGrantu(g.data.kierownik, osoby)?.data.zaklad;
+// Zlecenie 42: czy grant ma już pola kierownika z wyboru („ze spisu” / „spoza spisu”); bez nich — stare pole tekstowe „kierownik”.
+const nowyKierownik = (g: Grant) => idy(g.data.kierownik_ze_spisu).length > 0 || teksty(g.data.kierownik_spoza).length > 0;
+
+// Zakład projektu: pole „zakład”, a gdy puste — zakład kierownika (pierwszej osoby). Zlecenie 42: pierwsza osoba ze spisu
+// (także taka, która odeszła: historia projektu), a gdy jej nie ma — dopasowanie pierwszej osoby spoza spisu po nazwisku.
+// `wszyscy` — cały spis (wszyscyPracownicy()); stare pole tekstowe dopasowuje się tylko do osób, które pracują.
+export function zakladGrantu(g: Grant, wszyscy: Pracownik[]): string | undefined {
+  if (g.data.zaklad) return g.data.zaklad;
+  const aktywni = wszyscy.filter(aktywny);
+  if (!nowyKierownik(g)) return osobaGrantu(g.data.kierownik, aktywni)?.data.zaklad;
+  const pierwszy = idy(g.data.kierownik_ze_spisu).map((id) => wszyscy.find((p) => p.id === id)).find(Boolean);
+  return pierwszy ? pierwszy.data.zaklad : osobaGrantu(teksty(g.data.kierownik_spoza)[0], aktywni)?.data.zaklad;
 }
 
 // Lata realizacji projektu do wyświetlenia: „2019–2023”, „2010” (początek = koniec albo tylko jeden rok), '' gdy brak.
@@ -127,8 +139,30 @@ export const lataGrantu = (g: Grant) => {
 // Kierownicy projektu z pola „kierownik” (kilka osób rozdzielonych przecinkami lub średnikami), każdy dopasowany do spisu pracowników.
 // Fragment z samym tytułem („dr hab. Jan Dymara, prof. UWr”, „dr hab., prof. UWr Jan Dymara”) zostaje przy sąsiedniej osobie.
 // `tekst` — zapis z pola; `nazwa` — imię i nazwisko z tytułem ze spisu (zTytulem), a gdy osoby nie ma w spisie lub nie ma tam tytułu — `tekst`.
+// Zlecenie 42: najpierw kierownicy ze spisu (imię, nazwisko i tytuł z aktualnego spisu; osoba, która odeszła — ten sam tekst bez linku:
+// `osoba` puste), potem spoza spisu (tekst jak wpisany, tytuły po angielsku jak dotąd). Bez nowych pól — stare pole tekstowe jak dotąd.
+// `wszyscy` — cały spis (wszyscyPracownicy()).
 export interface KierownikGrantu { tekst: string; nazwa: string; osoba?: Pracownik }
-export function kierownicyGrantu(zapis: string | undefined, osoby: Pracownik[], lang: Lang = 'pl'): KierownikGrantu[] {
+export function kierownicyGrantu(g: Grant, wszyscy: Pracownik[], lang: Lang = 'pl'): KierownikGrantu[] {
+  const aktywni = wszyscy.filter(aktywny);
+  if (!nowyKierownik(g)) return kierownicyZTekstu(g.data.kierownik, aktywni, lang);
+  const ze = idy(g.data.kierownik_ze_spisu)
+    .map((id) => osobaPoId(id, wszyscy, `Projekt ${g.id}: Kierownik ze spisu`))
+    .filter((o): o is Pracownik => !!o)
+    .map((o) => {
+      const nazwa = zTytulem(o.data.stopien, o.data.imie_nazwisko, lang);
+      return { tekst: nazwa, nazwa, osoba: aktywny(o) ? o : undefined };
+    });
+  return [...ze, ...teksty(g.data.kierownik_spoza).map((t) => ({ tekst: t, nazwa: tytulyWJezyku(t, lang) }))];
+}
+
+/** Kierownicy projektu jednym tekstem (strona działu Nauka, strona zakładu). Stare pole: tekst z pola jak dotąd. */
+export function kierownikGrantuTekst(g: Grant, wszyscy: Pracownik[], lang: Lang = 'pl'): string {
+  if (!nowyKierownik(g)) return g.data.kierownik ? tytulyWJezyku(g.data.kierownik, lang) : '';
+  return kierownicyGrantu(g, wszyscy, lang).map((k) => k.nazwa).join(', ');
+}
+
+function kierownicyZTekstu(zapis: string | undefined, osoby: Pracownik[], lang: Lang): KierownikGrantu[] {
   const czesci: { tekst: string; osoba?: Pracownik }[] = [];
   let przedrostek = '';
   for (const czesc of (zapis ?? '').split(/[,;]/).map((s) => s.trim()).filter(Boolean)) {

@@ -150,16 +150,15 @@ Kod: parser i stany `src/lib/grafik.mjs` (testy `src/plugins/grafik.test.mjs`), 
 
 Kafelki na stronie kierunku edytujesz **w Markdownie kierunku**, w `:::specjalnosci`: tekst, kolejność, odnośniki, etykiety i podpisy są jawne. Dodanie specjalności w formularzu nie dopisuje automatycznie kafelka. Zmiana banera specjalności nie zmienia treści kafelka.
 
-Opiekunów podstrony specjalności wybierasz **poniżej Markdownu w formularzu specjalności**. Lista pokazuje nazwiska, zapisuje `_cms/pracownicy/<id>.yml`. Identyfikator odpowiada istniejącej nazwie pliku pracownika w Web-Pracownicy, więc nie trzeba nadawać nowych numerów. Aktualne nazwisko, tytuł, e-mail i pokój strona pobiera przy budowaniu z Web-Pracownicy. Brak wskazanego opiekuna przerywa budowanie z błędem.
+Opiekunów podstrony specjalności wybierasz **poniżej Markdownu w formularzu specjalności**. Lista pokazuje nazwiska, zapisuje `_cms/pracownicy/<id>.yml`. Identyfikator odpowiada istniejącej nazwie pliku pracownika w Web-Pracownicy, więc nie trzeba nadawać nowych numerów. Aktualne nazwisko, tytuł, e-mail i pokój strona pobiera przy budowaniu z Web-Pracownicy. Opiekun, który odszedł („Pracuje w Instytucie” odznaczone; zlecenie 42), na Podglądzie ma znacznik „nie przypisano osoby”, a na stronie publicznej znika; odwołanie do osoby, której nie ma w spisie, daje ostrzeżenie w budowie i jest pomijane.
 
-Lista wyboru w CMS jest lokalnym katalogiem nazwisk, ponieważ powiązania Pages CMS nie obejmują innego repozytorium. Odśwież ją po dodaniu pracownika lub zmianie nazwiska:
+Lista wyboru w CMS jest lokalnym katalogiem nazwisk („Katalog pracowników (tylko odczyt)”), ponieważ powiązania Pages CMS nie obejmują innego repozytorium. Od zlecenia 42 ten sam katalog jest w Web-Instytut, Web-Nauka, 9 × Web-Sem-* i Web-Studia i odświeża go automat w Web-Pracownicy (`.github/workflows/katalog-pracownikow.yml`, po zmianie spisu i raz na dobę). Do czasu jego włączenia — ręcznie, po dodaniu pracownika, zmianie nazwiska albo odejściu:
 
 ```sh
-python skrypty/pobierz_tresci.py
-node skrypty/synchronizuj-katalog-opiekunow.mjs ../Web-Studia
+node skrypty/synchronizuj-katalog-pracownikow.mjs ../Web-Pracownicy ../Web-Instytut ../Web-Nauka ../Web-Studia ../Web-Sem-Analiza-Harmoniczna …
 ```
 
-Zapisz zmiany katalogu w Web-Studia. Katalog nie zawiera kontaktów i ma pola tylko do odczytu. Nazwiska wpisane jako zwykły tekst w kafelkach kierunku lub w akapitach pozostają tekstem redakcyjnym — trzeba je aktualizować osobno.
+(`--na-sucho` tylko wypisuje zmiany). Zapisz zmiany katalogów w tych repozytoriach (tylko pliki `_cms/pracownicy/`). Skrypt nie usuwa osób, do których są odwołania. Katalog nie zawiera kontaktów i ma pola tylko do odczytu. Nazwiska wpisane jako zwykły tekst w kafelkach kierunku lub w akapitach pozostają tekstem redakcyjnym — trzeba je aktualizować osobno.
 
 ## Baner i dane
 

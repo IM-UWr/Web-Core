@@ -16,13 +16,14 @@ import { t, wJezyku, wybierz, langPola, odmiana } from '../lib/i18n';
 import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
 import { sala, salaReferatu, type Seminarium } from '../lib/tresci';
 import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
+import BrakOsoby from '../components/BrakOsoby.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 const nazwa = (s: Seminarium) => (lang === 'en' && s.data.nazwa_en) || s.data.nazwa;
 // html — tekst nad listą — Treść strony (Web-Nauka → Strony → Seminaria; zlecenie 30)
-const { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, tytul, lead, haslo, html, liczby } = await daneListySeminariow(lang);
+const { nastepny, zakladySem, koordynatorzy, nieaktywne, grupy, tydzien, wTygodniu, tytul, lead, haslo, html, liczby } = await daneListySeminariow(lang);
 const tytulTygodnia = t(lang, tydzien.przyszly ? 'seminariaPrzyszly' : 'seminariaTydzien');
 // sekcje strony (id w treści) — spis „Na tej stronie”
 const idGrupy = (id: string) => id.replace(/^h-/, 'z-');
@@ -72,7 +73,8 @@ const osoby = (l: string[]) => l.length <= 2
             const r = nastepny(s.id);
             const zs = zakladySem(s);
             const hasloSem = (lang === 'en' ? s.data.haslo_en : s.data.haslo)?.trim();
-            const prow = s.data.prowadzacy.map((p) => p.trim()).filter(Boolean);
+            const k = koordynatorzy(s);
+            const prow = k.lista.map((x) => x.imie);
             return (
               <li class="boks">
                 {zs.length > 0 && <p class="etyk">{zs.map((z) => wybierz(z.data, 'nazwa', lang)).join(' · ')}</p>}
@@ -89,7 +91,8 @@ const osoby = (l: string[]) => l.length <= 2
                 ) : (
                   <p class="b-brak pusto">{t(lang, 'brakNadchodzacych')}</p>
                 )}
-                {prow.length > 0 && <dl class="para"><dt>{prow.length > 1 ? T('Prowadzą', 'Led by') : T('Prowadzi', 'Led by')}</dt><dd>{osoby(prow)}</dd></dl>}
+                {prow.length > 0 ? <dl class="para"><dt>{prow.length > 1 ? T('Prowadzą', 'Led by') : T('Prowadzi', 'Led by')}</dt><dd>{osoby(prow)}</dd></dl>
+                  : k.brak && <dl class="para"><dt>{T('Prowadzi', 'Led by')}</dt><dd><BrakOsoby lang={lang} /></dd></dl>}
               </li>
             );
           })}

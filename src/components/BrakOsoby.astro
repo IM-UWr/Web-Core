@@ -1,0 +1,12 @@
+---
+// Zlecenie 42: znacznik w miejscu osoby, gdy funkcja (kierownik zakładu, koordynator seminarium, opiekun specjalności, sekretariat,
+// dyrekcja, władze Wydziału) nie ma przypisanej osoby albo ma tylko osoby, które odeszły. Tylko na Podglądzie (domyślna budowa);
+// na stronie publicznej (TYLKO_OPUBLIKOWANE=1) wiersz z funkcją znika (src/lib/osobySpisu.ts). Styl etykiety „szkic” (zlecenie 33):
+// klasa szkic-etykieta (dokładnie tak: po niej src/middleware.ts rozpoznaje stronę, która potrzebuje stylu etykiety).
+import type { Lang } from '../lib/daty';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const en = lang === 'en';
+---
+<span class="szkic-etykieta" data-brak-osoby title={en ? 'Preview only: choose the person from the staff list in the CMS (on the public site this line is hidden)' : 'Tylko na Podglądzie: wybierz osobę ze spisu pracowników w CMS (na stronie publicznej tego wiersza nie będzie)'}>{en ? 'no person assigned — fill in the CMS' : 'nie przypisano osoby — uzupełnij w CMS'}</span>

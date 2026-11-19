@@ -3,21 +3,23 @@ import { getCollection } from 'astro:content';
 import type { Osoba } from '../../components/TabelaPracownikow.tsx';
 import { t, wybierz, wJezyku } from '../i18n';
 import { u } from '../url';
-import { zaklady as pobierzZaklady, widoczny } from '../tresci';
+import { zaklady as pobierzZaklady } from '../tresci';
+import { aktywny } from '../osobySpisu';
 import type { Lang } from '../daty';
 import { stronaListy } from '../tekstyStron';
 
 export async function danePracownikow(lang: Lang) {
   const nazwisko = (s: string) => s.trim().split(/\s+/).pop() ?? s;
+  // zlecenie 42: bez osób, które odeszły (pracuje: false; na stronie publicznej także bez szkiców, jak dotąd)
   const osoby: Osoba[] = (await getCollection('pracownicy'))
-    .filter(widoczny)
+    .filter(aktywny)
     // funkcja (np. „Sekretariat”) po angielsku z pola funkcja_en, a gdy puste — po polsku
     .map((p) => {
       const funkcja = wybierz(p.data, 'funkcja', lang);
       return { id: p.id, ...p.data, ...(funkcja ? { funkcja } : {}) };
     })
     .sort((a, b) => nazwisko(a.imie_nazwisko).localeCompare(nazwisko(b.imie_nazwisko), 'pl') || a.imie_nazwisko.localeCompare(b.imie_nazwisko, 'pl'))
-    .map(({ opublikowany, funkcja_en, ...o }: any) => o);
+    .map(({ opublikowany, funkcja_en, pracuje, data_odejscia, ...o }: any) => o);
   // krotko: nazwa grupy w liście rozwijanej na telefonie (grupa „Kto”; krócej, żeby mieściła się w wąskim polu)
   const KROTKO: Record<string, [string, string]> = { emeryt: ['Emerytowani', 'Retired'] };
   const grupy = (['nauczyciel', 'doktorant', 'administracja', 'emeryt'] as const)

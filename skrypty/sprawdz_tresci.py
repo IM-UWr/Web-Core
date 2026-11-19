@@ -332,6 +332,80 @@ if not sys.argv[1:]:
             if not re.match(r'^\d{4}-\d{2}-\d{2}$', str(t.get('data') or '')[:10]):
                 wszystkie.append(f'{p}: przypomnienie {i + 1} („{t.get("sprawa", "?")}”): data musi mieć postać RRRR-MM-DD')
 
+# Zlecenie 42: funkcje bez osoby (pusta albo tylko osoby z „Pracuje w Instytucie” odznaczonym) i odwołania do osób spoza spisu —
+# ostrzeżenie, nie błąd (strona: na Podglądzie znacznik „nie przypisano osoby”, na stronie publicznej wiersz znika; src/lib/osobySpisu.ts).
+# Pola „… ze spisu” zapisują ścieżkę pliku katalogu (_cms/pracownicy/<id>.yml); stare pola tekstowe (przed migracją) — dokładne
+# imię i nazwisko osoby ze spisu. Tylko bez argumentów (pełna kontrola).
+if not sys.argv[1:] and glob.glob('src/content/pracownicy/*.y*ml'):
+    spis = {}
+    for p in glob.glob('src/content/pracownicy/*.y*ml'):
+        try:
+            d = yaml.load(open(p, encoding='utf-8').read(), Loader=Wczytywacz) or {}
+        except yaml.YAMLError:
+            continue  # błąd składni zgłasza kontrola wyżej
+        spis[re.sub(r'\.ya?ml$', '', os.path.basename(p))] = d
+    pracuje = lambda d: d.get('pracuje') is not False
+    po_nazwie = lambda n: [d for d in spis.values() if str(d.get('imie_nazwisko') or '').strip() == str(n or '').strip() and pracuje(d)]
+
+    def aktywni_ze_spisu(p, funkcja, wartosci):
+        """Osoby z pola „… ze spisu”, które pracują; odwołanie do osoby spoza spisu — ostrzeżenie."""
+        wynik = []
+        for v in [x for x in (wartosci if isinstance(wartosci, list) else [wartosci]) if str(x or '').strip()]:
+            oid = re.sub(r'\.(md|ya?ml|json)$', '', str(v).strip().split('/')[-1])
+            if oid not in spis:
+                ostrzezenia.append(f'{p}: {funkcja}: „{v}” — tej osoby nie ma w spisie pracowników; strona ją pominie')
+            elif pracuje(spis[oid]):
+                wynik.append(oid)
+        return wynik
+
+    def bez_osoby(p, funkcja):
+        ostrzezenia.append(f'{p}: {funkcja} — nie przypisano osoby (Podgląd: znacznik „nie przypisano osoby”, strona publiczna: wiersz znika); wybierz osobę w CMS')
+
+    def naglowek_md(p):
+        m = re.match(r'^---\r?\n(.*?)\r?\n---', open(p, encoding='utf-8').read(), re.S)
+        try:
+            return (yaml.load(m.group(1), Loader=Wczytywacz) or {}) if m else {}
+        except yaml.YAMLError:
+            return {}
+
+    for p in sorted(glob.glob('src/content/zaklady/*.md')):
+        k = naglowek_md(p).get('karta') or {}
+        if not aktywni_ze_spisu(p, 'Kierownik zakładu', k.get('kierownik_ze_spisu')) and not (k.get('kierownik') and not k.get('kierownik_ze_spisu')):
+            bez_osoby(p, 'Kierownik zakładu')
+    for p in sorted(glob.glob('src/content/seminaria/*.md')):
+        d = naglowek_md(p)
+        stare = [x for x in d.get('prowadzacy') or [] if str(x or '').strip()]
+        if not (aktywni_ze_spisu(p, 'Koordynator seminarium', d.get('prowadzacy_ze_spisu') or [])
+                or [x for x in d.get('prowadzacy_spoza') or [] if str(x or '').strip()]
+                or (stare and not d.get('prowadzacy_ze_spisu') and not d.get('prowadzacy_spoza'))):
+            bez_osoby(p, 'Koordynator seminarium')
+    for p in sorted(glob.glob('src/content/specjalnosci/*.md')):
+        for i, o in enumerate(naglowek_md(p).get('opiekunowie') or []):
+            if isinstance(o, dict) and o.get('osoba') and not aktywni_ze_spisu(p, f'Opiekun specjalności {i + 1}', o.get('osoba')):
+                if re.sub(r'\.(md|ya?ml|json)$', '', str(o['osoba']).strip().split('/')[-1]) in spis:
+                    rola = str(o.get('rola') or '').strip()
+                    bez_osoby(p, f'Opiekun specjalności {i + 1}{" (" + rola + ")" if rola and not rola.lower().startswith("opiekun") else ""}')
+    p = 'src/data/wladze.json'
+    if os.path.exists(p):
+        try:
+            w = json.load(open(p, encoding='utf-8'))
+        except ValueError:
+            w = {}
+        for nazwa, lista, spoza in (('Dyrekcja', w.get('osoby') or [], False), ('Władze Wydziału', (w.get('wydzial') or {}).get('osoby') or [], True)):
+            for o in lista:
+                if not isinstance(o, dict) or not any(str(v or '').strip() for v in o.values()):
+                    continue  # pusta pozycja: ostrzeżenie „pusta pozycja” wyżej
+                f = f'{nazwa}: {o.get("rola") or "?"}'
+                if o.get('osoba'):
+                    if not aktywni_ze_spisu(p, f, o['osoba']):
+                        bez_osoby(p, f)
+                elif not (o.get('imie_nazwisko') and (spoza or po_nazwie(o['imie_nazwisko']))):
+                    bez_osoby(p, f)
+        sek = w.get('sekretariat') or {}
+        if sek and not (aktywni_ze_spisu(p, 'Sekretariat: osoby', sek.get('osoby_ze_spisu') or [])
+                        or ('osoby_ze_spisu' not in sek and any(po_nazwie(x) for x in sek.get('osoby') or []))):
+            bez_osoby(p, 'Sekretariat: osoby')
+
 # Ciekawostki patronów: nazwisko patrona w każdej karcie (src/data/ciekawostki/README.md). Tylko bez argumentów, czyli przy pełnej kontroli.
 # Zaimków nie sprawdzamy: w „kierował nim Marczewski” słowo „nim” to Instytut.
 PATRONI = {'instytut': 'Marczewsk', 'nauka': 'Ślebodzińsk', 'studia': 'Knaster', 'popularyzacja': 'Steinhaus'}

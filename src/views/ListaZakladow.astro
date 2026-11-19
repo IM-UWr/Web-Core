@@ -12,11 +12,12 @@ import { t, wJezyku, wybierz, odmiana } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { daneListyZakladow } from '../lib/widoki/listaZakladow';
 import { tytulyWJezyku } from '../lib/osoby';
+import BrakOsoby from '../components/BrakOsoby.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { lista, osoby, liczby, naglowek, html, lead, haslo } = await daneListyZakladow(lang);
+const { lista, osoby, kierownik, liczby, naglowek, html, lead, haslo } = await daneListyZakladow(lang);
 const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], ['person', 'people'], lang)}`;
 ---
 <Podstrona lang={lang} tytul={naglowek} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo}
@@ -33,6 +34,7 @@ const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], [
       <ul class="boksy zs-lista">
         {lista.map((z) => {
           const n = osoby.filter((o) => o.data.zaklad === z.id).length;
+          const kier = kierownik(z);
           const obszary = lang === 'en' && z.data.obszary_en.length ? z.data.obszary_en : z.data.obszary;
           const opisZ = (wybierz(z.data, 'opis', lang) as string | undefined) || (lang === 'en' ? z.data.haslo_en : z.data.haslo);
           // etykieta mówi „Zakład” albo „Pracownia”, więc nazwa krótka w mianowniku („Geometria”); bez niej pełna nazwa
@@ -44,7 +46,8 @@ const ileOsob = (n: number) => `${n} ${odmiana(n, ['osoba', 'osoby', 'osób'], [
               {opisZ && <p>{opisZ}</p>}
               {obszary.length > 0 && <p class="zs-obszary">{obszary.slice(0, 4).join(' · ')}</p>}
               <dl class="para">
-                {z.data.kierownik && <><dt>{T('Kierownik', 'Head')}</dt><dd>{tytulyWJezyku(z.data.kierownik, lang)}</dd></>}
+                {kier.imie ? <><dt>{T('Kierownik', 'Head')}</dt><dd>{tytulyWJezyku(kier.imie, lang)}</dd></>
+                  : kier.brak && <><dt>{T('Kierownik', 'Head')}</dt><dd><BrakOsoby lang={lang} /></dd></>}
                 <dt>{T('Skład', 'Members')}</dt><dd>{ileOsob(n)}</dd>
               </dl>
             </li>

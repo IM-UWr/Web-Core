@@ -15,6 +15,7 @@ import Link from '../components/Link.astro';
 import Podstrona from '../components/zal/Podstrona.astro';
 import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
+import BrakOsoby from '../components/BrakOsoby.astro';
 import { u, isExternal } from '../lib/url';
 import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
@@ -28,7 +29,7 @@ const { seminarium, lang } = Astro.props;
 const d = seminarium.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, adresListy, maKoord } = await daneSeminarium(seminarium, lang);
+const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, brakKoordynatora, adresListy, maKoord } = await daneSeminarium(seminarium, lang);
 // linia nad tytułem referatu: (dzień tygodnia ·) godzina · sala — puste pomijane
 const dzienTygodnia = (termin: string) => longWithDay(termin, lang).split(', ')[0];
 const kiedyGdzie = (termin: string, s: string | undefined, zDniem: boolean) =>
@@ -76,10 +77,11 @@ const spis = [
       {maOpis && <div class="prose" lang={lang === 'en' && !htmlEn ? 'pl' : undefined}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>}
       {maKoord && (
         <div class="kontakty sem-dane">
-          {koordynatorzy.length > 0 && (
+          {(koordynatorzy.length > 0 || brakKoordynatora) && (
             <div>
               <span class="etyk">{koordynatorzy.length > 1 ? T('Koordynatorzy', 'Coordinators') : T('Koordynator', 'Coordinator')}</span>
-              {koordynatorzy.map((k) => <b data-limit-linii="2">{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</b>)}
+              {brakKoordynatora ? <b><BrakOsoby lang={lang} /></b>
+                : koordynatorzy.map((k) => <b data-limit-linii="2">{k.strona ? <Link href={k.strona}>{k.nazwa}</Link> : k.nazwa}</b>)}
             </div>
           )}
           {d.kontakt && (

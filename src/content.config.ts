@@ -227,6 +227,10 @@ const pracownicy = defineCollection({
     pokoj: optStr,
     strona: optStr,
     opublikowany: published,
+    // zlecenie 42: „Pracuje w Instytucie” (odznaczone = osoba odeszła: znika ze spisu i z list zakładów, zostaje przy dawnych
+    // grantach jako tekst bez linku; src/lib/osobySpisu.ts) i opcjonalna data odejścia (strona jej nie pokazuje)
+    pracuje: published,
+    data_odejscia: z.preprocess(toDateString, z.string().optional()),
   }),
 });
 
@@ -236,6 +240,9 @@ const seminaria = defineCollection({
     nazwa: z.string(),
     nazwa_en: optStr,
     prowadzacy: strList,
+    // zlecenie 42: koordynatorzy wybrani ze spisu (reference → id osoby) i wpisani ręcznie; stare „prowadzacy” działa do migracji
+    prowadzacy_ze_spisu: idList,
+    prowadzacy_spoza: strList,
     kontakt: optStr,
     strona: optStr,
     grupa_google: optStr,
@@ -318,6 +325,8 @@ const zaklady = defineCollection({
     nazwa_krotka_en: optStr,
     kolejnosc: z.preprocess(empty, z.coerce.number().default(99)),
     kierownik: optStr,
+    // zlecenie 42: kierownik wybrany ze spisu (reference → id osoby); stare „kierownik” (tekst) działa do migracji
+    kierownik_ze_spisu: optId,
     telefon: optStr,
     opis: optStr,
     opis_en: optStr,
@@ -448,6 +457,9 @@ const granty = defineCollection({
     rodzaj: z.preprocess(empty, z.enum(['ncn', 'ue', 'wewnetrzny', 'inny']).default('inny')),
     program: optStr,
     kierownik: optStr,
+    // zlecenie 42: kierownicy ze spisu (reference → id osoby) i spoza spisu (tekst z tytułem); stare „kierownik” działa do migracji
+    kierownik_ze_spisu: idList,
+    kierownik_spoza: strList,
     wykonawcy: optStr,
     rok_od: rok,
     rok_do: rok,

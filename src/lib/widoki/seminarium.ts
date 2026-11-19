@@ -1,9 +1,9 @@
 // Dane strony seminarium (src/views/Seminarium.astro): opis, nadchodzące i minione referaty, koordynatorzy, zakłady.
 import { render } from 'astro:content';
 import type { Lang } from '../daty';
-import { referaty, seminariumReferatu, zaklady, pracownicy, type Seminarium } from '../tresci';
+import { referaty, seminariumReferatu, zaklady, type Seminarium } from '../tresci';
 import { wPrzyszlosci } from '../liczbyTerminow';
-import { zTytulem } from '../osoby';
+import { wszyscyPracownicy, koordynatorzySeminarium } from '../osobySpisu';
 import { renderMarkdown } from '../markdown';
 import ustawienia from '../../data/ustawienia.json';
 
@@ -24,17 +24,13 @@ export async function daneSeminarium(seminarium: Seminarium, lang: Lang) {
   const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(zTresc));
   // zakład(y), do których należy seminarium — link zamiast listy uczestników (skład jest na stronie zakładu)
   const zakladySem = (await zaklady()).filter((z) => d.zaklad.includes(z.id));
-  // Koordynator(zy) = pole „prowadzący”: nazwisko z tytułem ze spisu pracowników, link do strony domowej, jeśli jest.
+  // Koordynator(zy): ze spisu (nazwisko z tytułem, link do strony domowej, jeśli jest), potem spoza spisu (jak wpisani);
+  // stare pole „prowadzący” — jak dotąd (src/lib/osobySpisu.ts, zlecenie 42). Brak koordynatora: znacznik na Podglądzie.
   // Termin i sala nie są stałe — każdy referat ma własne.
-  const osoby = await pracownicy();
-  const koordynatorzy = d.prowadzacy.map((imie) => {
-    const kand = osoby.filter((p) => p.data.imie_nazwisko === imie.trim());
-    const o = kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
-    return { nazwa: zTytulem(o?.data.stopien, imie, lang), strona: o?.data.strona as string | undefined };
-  });
+  const { lista: koordynatorzy, brak: brakKoordynatora } = koordynatorzySeminarium(seminarium, await wszyscyPracownicy(), lang);
   // Adres automatu listy mailingowej (Google Apps Script, patrz README → „Powiadomienia e-mail”); pusty = zapisy wyłączone.
   const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
-  const maKoord = koordynatorzy.length > 0 || zakladySem.length > 0 || !!d.kontakt;
+  const maKoord = koordynatorzy.length > 0 || brakKoordynatora || zakladySem.length > 0 || !!d.kontakt;
 
-  return { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, adresListy, maKoord };
+  return { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, brakKoordynatora, adresListy, maKoord };
 }

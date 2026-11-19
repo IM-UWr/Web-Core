@@ -8,6 +8,7 @@ import type { Lang } from '../daty';
 import { renderSpecjalnosci, type WstawkaSpecjalnosci, type DaneSpecjalnosci } from '../markdown';
 import { zaklady, pracownicy, seminaria } from '../tresci';
 import type { Specjalnosc } from '../specjalnosci';
+import { wszyscyPracownicy, aktywny, osobaPoId, brakOsoby } from '../osobySpisu';
 
 export type CzescTresci = { html: string } | { wstawka: WstawkaSpecjalnosci };
 // klasa tekstu w ramce uwagi z cytatu „> **Dla kogo**” (style w Specjalnosc.astro, jak dotąd)
@@ -28,10 +29,20 @@ export async function daneSpecjalnosci(specjalnosc: Specjalnosc, lang: Lang) {
     const kand = osoby.filter((p) => p.data.imie_nazwisko === n.trim());
     return kand.find((p) => p.data.grupa === 'nauczyciel') ?? kand.find((p) => p.data.grupa !== 'administracja') ?? kand[0];
   };
-  const opiekunowie = d.opiekunowie.map((o) => {
-    const osoba = o.osoba ? osoby.find((p) => p.id === o.osoba) : (o.imie_nazwisko ? znajdz(o.imie_nazwisko) : undefined);
-    if (o.osoba && !osoba) throw new Error(`Specjalność ${specjalnosc.id}: nie istnieje opiekun ${o.osoba}.`);
-    return { ...o, imie_nazwisko: osoba?.data.imie_nazwisko ?? o.imie_nazwisko ?? '', osoba };
+  // Zlecenie 42: opiekun z katalogu, który odszedł (pracuje: false) — na Podglądzie znacznik „nie przypisano osoby” w jego miejscu,
+  // na stronie publicznej pozycja znika. Odwołanie do osoby spoza spisu: ostrzeżenie w budowie i pozycja pominięta (dotąd błąd budowy).
+  const wszyscy = await wszyscyPracownicy();
+  const adres = `/studia/${d.kierunek}/${specjalnosc.id}`;
+  const opiekunowie = d.opiekunowie.flatMap((o) => {
+    if (o.osoba) {
+      const p = osobaPoId(o.osoba, wszyscy, `Specjalność ${specjalnosc.id}: Opiekun`);
+      if (!p) return [];
+      if (aktywny(p)) return [{ ...o, imie_nazwisko: p.data.imie_nazwisko, osoba: p as typeof p | undefined, brak: false }];
+      const funkcja = `Opiekun specjalności${o.rola && !/^opiekun/i.test(o.rola.trim()) ? ` (${o.rola})` : ''}`;
+      return brakOsoby({ adres, funkcja, kolekcja: 'specjalnosci', plik: specjalnosc.tresc.filePath }) ? [{ ...o, imie_nazwisko: '', osoba: undefined, brak: true }] : [];
+    }
+    const osoba = o.imie_nazwisko ? znajdz(o.imie_nazwisko) : undefined;
+    return [{ ...o, imie_nazwisko: osoba?.data.imie_nazwisko ?? o.imie_nazwisko ?? '', osoba, brak: false }];
   });
   const nazwa = w(d, 'nazwa');
   const sem = d.seminaria.length ? (await seminaria()).filter((s) => d.seminaria.includes(s.id)).sort((a, b) => d.seminaria.indexOf(a.id) - d.seminaria.indexOf(b.id)) : [];

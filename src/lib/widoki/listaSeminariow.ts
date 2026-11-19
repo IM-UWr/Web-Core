@@ -3,6 +3,7 @@ import { wPrzyszlosci, ETYKIETY } from '../liczbyTerminow';
 import { now, today, hasTime, type Lang } from '../daty';
 import { seminaria, referaty, zaklady, seminariumReferatu, referatyWTygodniu, tydzienSeminariow } from '../tresci';
 import { stronaListy } from '../tekstyStron';
+import { wszyscyPracownicy, koordynatorzySeminarium } from '../osobySpisu';
 
 export async function daneListySeminariow(lang: Lang) {
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
@@ -23,6 +24,9 @@ export async function daneListySeminariow(lang: Lang) {
     { id: 'h-zakladow', tytul: T('Seminaria zakładów', 'Department seminars'), lista: zakladowe },
     { id: 'h-niezalezne', tytul: T('Seminaria niezależne', 'Independent seminars'), lista: niezalezne },
   ].filter((g) => g.lista.length > 0);
+  // koordynatorzy w boksie (zlecenie 42: ze spisu, potem spoza; stare pole „prowadzący” jak dotąd) — imiona i nazwiska bez tytułów
+  const wszyscy = await wszyscyPracownicy();
+  const koordynatorzy = (s: (typeof sem)[number]) => koordynatorzySeminarium(s, wszyscy, lang);
   const tydzien = tydzienSeminariow();
   const wTygodniu = await referatyWTygodniu(lang);
   // tytuł, opis, hasło i tekst nad listą: Web-Nauka → Strony → Seminaria (src/content/strony/seminaria.md; zlecenie 30, src/lib/tekstyStron.ts)
@@ -39,5 +43,5 @@ export async function daneListySeminariow(lang: Lang) {
     { n: refSem.length - zapowiedziane, ...ETYKIETY.archiwum },
   ];
 
-  return { nastepny, zakladySem, nieaktywne, grupy, tydzien, wTygodniu, tytul, lead, haslo, html, liczby };
+  return { nastepny, zakladySem, koordynatorzy, nieaktywne, grupy, tydzien, wTygodniu, tytul, lead, haslo, html, liczby };
 }

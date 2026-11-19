@@ -8,6 +8,7 @@ import {
   zaklady, pracownicy, seminaria, referaty, granty, konferencje, obrony, aktualnosci,
   seminariumReferatu, zakladGrantu, rangaStopnia, type Zaklad, type Pracownik,
 } from '../tresci';
+import { wszyscyPracownicy, kierownikZakladu } from '../osobySpisu';
 
 export async function daneZakladu(zaklad: Zaklad, lang: Lang) {
   const d = zaklad.data;
@@ -26,9 +27,13 @@ export async function daneZakladu(zaklad: Zaklad, lang: Lang) {
   const sortuj = (a: Pracownik, b: Pracownik) =>
     rangaStopnia(a.data.stopien) - rangaStopnia(b.data.stopien) || nazwisko(a.data.imie_nazwisko).localeCompare(nazwisko(b.data.imie_nazwisko), 'pl');
   const czlonkowie = osoby.filter((o) => o.data.zaklad === id);
-  const kierownik = czlonkowie.find((o) => o.data.imie_nazwisko === d.kierownik);
+  // Kierownik (zlecenie 42): osoba wybrana ze spisu (pracująca), a do migracji — stare pole tekstowe jak dotąd (dokładne imię
+  // i nazwisko wśród osób zakładu; bez dopasowania sam tekst: kierownikTekst). Brak osoby: znacznik na Podglądzie (kierownikBrak),
+  // na stronie publicznej bez wiersza „Kierownik”.
+  const wszyscy = await wszyscyPracownicy();
+  const { osoba: kierownik, tekst: kierownikTekst, brak: kierownikBrak } = kierownikZakladu(zaklad, wszyscy);
   const grupySkladu = [
-    { tytul: lang === 'en' ? 'Staff' : 'Pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'nauczyciel' && o !== kierownik).sort(sortuj) },
+    { tytul: lang === 'en' ? 'Staff' : 'Pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'nauczyciel' && o.id !== kierownik?.id).sort(sortuj) },
     { tytul: lang === 'en' ? 'PhD students' : 'Doktoranci', osoby: czlonkowie.filter((o) => o.data.grupa === 'doktorant').sort(sortuj) },
     { tytul: lang === 'en' ? 'Retired staff' : 'Emerytowani pracownicy', osoby: czlonkowie.filter((o) => o.data.grupa === 'emeryt').sort(sortuj) },
   ].filter((g) => g.osoby.length);
@@ -45,7 +50,7 @@ export async function daneZakladu(zaklad: Zaklad, lang: Lang) {
 
   // Granty (pole „zakład” albo zakład kierownika)
   const rok = Number(today().slice(0, 4));
-  const gr = (await granty()).filter((g) => zakladGrantu(g, osoby) === id);
+  const gr = (await granty()).filter((g) => zakladGrantu(g, wszyscy) === id);
   const grTrwa = gr.filter((g) => (g.data.rok_do ?? 0) >= rok);
   const grKon = gr.filter((g) => (g.data.rok_do ?? 0) < rok);
 
@@ -79,7 +84,7 @@ export async function daneZakladu(zaklad: Zaklad, lang: Lang) {
 
   return {
     d, id, nazwa, opis, opisZdjecia, obszary, Content, htmlEn,
-    czlonkowie, kierownik, grupySkladu,
+    czlonkowie, kierownik, kierownikTekst, kierownikBrak, grupySkladu, wszyscy,
     sem, motyw, nastepny,
     gr, grTrwa, grKon, konf, obr, akt,
     haslo, liczby, naglowki, wszystkieZaklady,

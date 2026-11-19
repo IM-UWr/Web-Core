@@ -4,6 +4,7 @@
 // - Flaga TYLKO_OPUBLIKOWANE=1 (przyszła strona publiczna): stron-szkiców nie ma; menu i listy pomijają je same
 //   (widoczny(), menu.ts, kierunki.ts), a pozostałe linki do nich zamieniamy na sam tekst, z ostrzeżeniem w logu budowy.
 // Zlecenie 48: także linki do referatów-szkiców (kotwica #<plik> na stronie seminarium, src/lib/szkice.ts).
+// Zlecenie 42: znacznik „nie przypisano osoby” (BrakOsoby.astro) ma ten sam styl — strona z nim dostaje styl i bez szkiców.
 // Bez szkiców w danych middleware nie zmienia niczego (HTML bajt w bajt jak bez niego). Styl etykiety idzie do <head> tylko tych
 // stron, które ją mają, więc nie trafia do wspólnego CSS (ani na stronę publiczną).
 import { defineMiddleware } from 'astro:middleware';
@@ -11,8 +12,12 @@ import { szkice as wczytajSzkice, adresDoPorownania, kotwicaDoPorownania, ETYKIE
 import { TYLKO_OPUBLIKOWANE } from './lib/tresci';
 import { stripBase } from './lib/url';
 
+// Znaczniki braku osoby są tylko w domyślnej budowie (Podgląd); przy fladze TYLKO_OPUBLIKOWANE ich nie ma.
+const PODGLAD_Z_BRAKAMI = !TYLKO_OPUBLIKOWANE;
 const LINK = /<a\b([^>]*?)\shref="([^"]*)"([^>]*)>([\s\S]*?)<\/a>/g;
 // Etykieta dyskretna: obrys w kolorze tekstu linku (działa na jasnym i ciemnym tle, w menu na banerze i na liście).
+// Zlecenie 42: znacznik braku osoby stoi w miejscu imienia i nazwiska (często w wąskiej kolumnie) — bez odstępu z lewej, z zawijaniem.
+const STYL_BRAK = '<style>[data-brak-osoby]{margin-inline-start:0;white-space:normal;vertical-align:baseline;border-radius:.5em;max-width:100%}</style>';
 const STYL = '<style>.szkic-etykieta{display:inline-block;margin-inline-start:.45em;padding:0 .45em;border:1px solid currentColor;border-radius:999px;font-size:.68em;font-weight:600;line-height:1.5;letter-spacing:.04em;text-transform:uppercase;vertical-align:.12em;white-space:nowrap;opacity:.8;text-decoration:none}</style>';
 
 export const onRequest = defineMiddleware(async (kontekst, dalej) => {
@@ -21,8 +26,10 @@ export const onRequest = defineMiddleware(async (kontekst, dalej) => {
   const typ = odp.headers.get('content-type');
   if (typ ? !typ.includes('text/html') : /\.[a-z0-9]+$/i.test(sciezka) && !sciezka.endsWith('.html')) return odp;
   const szkice = await wczytajSzkice();
-  if (!szkice.size) return odp;
+  // zlecenie 42: strona ze znacznikiem braku osoby potrzebuje stylu etykiety także bez szkiców (widać to dopiero w gotowym HTML)
+  if (!szkice.size && !PODGLAD_Z_BRAKAMI) return odp;
   const html = await odp.text();
+  if (!szkice.size && !html.includes('data-brak-osoby')) return new Response(html, { status: odp.status, statusText: odp.statusText, headers: odp.headers });
   const etykieta = /^\/en(\/|$)/.test(stripBase(sciezka)) ? ETYKIETA.en : ETYKIETA.pl;
   const nowy = html.replace(LINK, (caly, przed: string, href: string, po: string, srodek: string) => {
     if (!szkice.has(adresDoPorownania(href)) && !szkice.kotwice.has(kotwicaDoPorownania(href))) return caly;
@@ -36,6 +43,7 @@ export const onRequest = defineMiddleware(async (kontekst, dalej) => {
     return `<a${przed} href="${href}"${po}>${z}</a>`;
   });
   // styl także wtedy, gdy etykietę wstawił sam widok (referat-szkic na stronie seminarium, zlecenie 48)
-  const zEtykieta = nowy.includes('class="szkic-etykieta"') && !nowy.includes(STYL) ? nowy.replace('</head>', `${STYL}</head>`) : nowy;
+  const zEtykieta = nowy.includes('class="szkic-etykieta"') && !nowy.includes(STYL)
+    ? nowy.replace('</head>', `${STYL}${nowy.includes('data-brak-osoby') ? STYL_BRAK : ''}</head>`) : nowy;
   return new Response(zEtykieta, { status: odp.status, statusText: odp.statusText, headers: odp.headers });
 });

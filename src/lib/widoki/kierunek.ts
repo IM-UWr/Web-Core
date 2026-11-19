@@ -26,7 +26,8 @@ export async function daneKierunku(kierunek: CollectionEntry<'kierunki'>, lang: 
     .map((s) => ({
       ...s.data,
       strona: s.data.bez_podstrony ? undefined : s.id,
-      opiekunowie: s.data.opiekunowie.map((o) => zTytulemZeSpisu(o.imie_nazwisko || osoby.find((p) => p.id === o.osoba)?.data.imie_nazwisko || '')).join(', '),
+      // osoba, która odeszła (zlecenie 42), nie ma jej w osoby — pomijana
+      opiekunowie: s.data.opiekunowie.map((o) => o.imie_nazwisko || osoby.find((p) => p.id === o.osoba)?.data.imie_nazwisko || '').filter(Boolean).map(zTytulemZeSpisu).join(', '),
       dla_kogo: s.data.kafelek_dla_kogo,
       dla_kogo_en: s.data.kafelek_dla_kogo_en,
       kariera: s.data.kafelek_kariera,

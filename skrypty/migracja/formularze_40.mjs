@@ -99,6 +99,27 @@ export async function formularze(repo, opis) {
       if (i < 0) throw Error(`Brak pola ${za}`);
       seq.items.splice(i + 1, 0, doc.createNode(obiekt, { aliasDuplicateObjects: false }));
     },
+    /** Węzeł YAML z obiektu albo listy (wartość klucza, np. view.fields). */
+    wezel,
+    /** Zlecenie 42: zamienia pole `stara` na pola `nowe` w tym samym miejscu. Gdy pola `stara` już nie ma (drugie uruchomienie),
+     *  odświeża definicje nowych pól w ich miejscach; brakujące nowe pole wstawia przed polem `przed` (albo na końcu). */
+    zamienPole(seq, stara, nowe, przed) {
+      const i = seq.items.findIndex((p) => p.get('name') === stara);
+      if (i >= 0) { seq.items.splice(i, 1, ...nowe.map((o) => doc.createNode(o, { aliasDuplicateObjects: false }))); return; }
+      for (const o of nowe) {
+        const j = seq.items.findIndex((p) => p.get('name') === o.name);
+        if (j >= 0) { seq.items[j] = doc.createNode(o, { aliasDuplicateObjects: false }); continue; }
+        const k = przed ? seq.items.findIndex((p) => p.get('name') === przed) : -1;
+        seq.items.splice(k >= 0 ? k : seq.items.length, 0, doc.createNode(o, { aliasDuplicateObjects: false }));
+      }
+    },
+    /** Zlecenie 42: formularz najwyższego poziomu (np. katalog pracowników) — dopisany na końcu albo zastąpiony w swoim miejscu. */
+    dodajFormularz(obiekt) {
+      const lista = doc.get('content');
+      const i = lista.items.findIndex((x) => x.get('name') === obiekt.name);
+      const n = doc.createNode(obiekt, { aliasDuplicateObjects: false });
+      if (i >= 0) lista.items[i] = n; else lista.items.push(n);
+    },
     /** Pokazuje pole w CMS (usuwa hidden). */
     odkryj(wezelPola) { wezelPola.delete('hidden'); },
     /** Zamienia formularz najwyższego poziomu na nowy (to samo miejsce w menu CMS), np. kolekcję na grupę (zlecenie 47). */
@@ -235,6 +256,7 @@ const LICZBY_SYLWETKI = {
     { name: 'pozycja', type: 'boolean', hidden: true },
   ],
 };
+const STYL_SYLWETKI_54 = 'Styl: tytuł (Prof., Dr) tylko przy pierwszej wzmiance bohatera, dalej samo nazwisko; pierwsze zdanie bez myślnika i bez lat; bez pogrubień poza hasłem na początku akapitu wyliczenia (**Hasło.**).';
 const OPIS_TRESCI_SYLWETKI = 'Sylwetka: wstęp (obok portretu), sekcje ## z {#id}, „## Do pobrania {#do-pobrania}” z :::pliki, na końcu „## Źródła {#zrodla}” (na stronie zwinięte). Liczby do banera wpisuje się w polu „Liczby”. Link do innej sylwetki, nagrody albo historii (/instytut/warto-wiedziec/…) łączy wpisy. Pusta Treść (albo same komentarze) = sylwetka „TBA”.';
 const kolekcja = (name, label, katalog, description, view, fields) => ({
   name, label, type: 'collection', path: `src/content/warto_wiedziec/${katalog}`, format: 'yaml-frontmatter', filename: '{primary}.md',
@@ -308,8 +330,10 @@ export const WARTO_WIEDZIEC_47 = {
 };
 
 // ---------- Web-Instytut (etap 1) ----------
-function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz, zamienFormularz, wstawZa }) {
+function instytut(api) {
+  const { pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz, zamienFormularz, wstawZa } = api;
   komentarz('Zlecenie 40: Strony i strona działu w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, pola EN pod polskimi, szablony Treści zakładu i „Warto wiedzieć”, ukryte notatki i hasło władz.');
+  instytut42(api);
 
   // Strona działu
   const sd = pola('strona-dzialu');
@@ -329,7 +353,7 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
   kolejnosc(z, ['nazwa', 'nazwa_en', 'opublikowany', 'body', 'tresc_en', 'karta', 'kolejnosc']);
   ustaw(pole(z, 'body'), 'description', WPIS);
   ustaw(pole(z, 'body'), 'default', '<!-- TEKST: Czym zajmuje się zakład. Skład i seminaria strona dopisze sama. -->');
-  kolejnosc(pole(z, 'karta').get('fields'), ['nazwa_krotka', 'nazwa_krotka_en', 'kierownik', 'telefon', 'opis', 'opis_en', 'haslo', 'haslo_en', 'obszary', 'obszary_en', 'strona', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en']);
+  kolejnosc(pole(z, 'karta').get('fields'), ['nazwa_krotka', 'nazwa_krotka_en', 'kierownik_ze_spisu', 'telefon', 'opis', 'opis_en', 'haslo', 'haslo_en', 'obszary', 'obszary_en', 'strona', 'zdjecie', 'zdjecie_opis', 'zdjecie_opis_en']);
   ustaw(pole(z, 'kolejnosc'), 'description', 'Mniejsza liczba = wyżej na liście „Struktura i zakłady”, np. 1, 2, 3…');
 
   // Strony
@@ -358,7 +382,8 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
   const sy = pola('ww_sylwetki');
   wstawZa(sy, 'podpis_en', LICZBY_SYLWETKI);
   const trescSylwetki = tresc(OPIS_TRESCI_SYLWETKI, `${KOM.uklad}\n\n${KOM.tba}\n\n${SZKIELET_SYLWETKI}`);
-  ustaw(pole(sy, 'body'), 'description', trescSylwetki.description);
+  // zlecenie 54A: zdanie o stylu tekstu na końcu opisu Treści (w Treści EN dopisane w .pages.yml; generator jej nie zmienia)
+  ustaw(pole(sy, 'body'), 'description', `${trescSylwetki.description} ${STYL_SYLWETKI_54}`);
   ustaw(pole(sy, 'body'), 'default', trescSylwetki.default);
   komentarz(KOMENTARZ_52);
   if (sf.get('description').includes(' warto-wiedziec.md (Warto wiedzieć)')) {
@@ -371,7 +396,7 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
   ustaw(pole(wl, 'haslo_en'), 'hidden', true);
   ustaw(pole(wl, 'do_uzupelnienia'), 'hidden', true);
   const osoby = pole(wl, 'osoby').get('fields');
-  ustaw(pole(osoby, 'imie_nazwisko'), 'description', 'Np. „Jan Kowalski” — dokładnie jak w Pracownikach; stamtąd strona weźmie tytuł, e-mail, pokój i zakład.');
+  // (opis imienia i nazwiska ze zlecenia 40 — od zlecenia 42 pole „Osoba ze spisu”, instytut42)
   ustaw(pole(osoby, 'zdjecie'), 'description', 'Puste = karta bez zdjęcia.');
 }
 
@@ -379,8 +404,10 @@ function instytut({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komen
 // Szablon Aktualności z raportu 40-0 (sekcja 4); konferencja dostaje go z dopiskiem o programie i opłatach.
 export const SZABLON_AKTUALNOSCI = '<!-- TEKST: Zwykły tekst. Akapity oddziela pusta linia. Pliki: wgraj w „Media” i wklej link. -->\n<!-- Rejestracja, program, plakat: wstaw link w osobnej linii. -->';
 
-function nauka({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz }) {
+function nauka(api) {
+  const { pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz } = api;
   komentarz('Zlecenie 40: Strony i strona działu w jawnym Markdownie (ukryte format_tresci), ściągawki przy Treści, pola EN pod polskimi, opisy formularzy, szablony Treści konferencji i projektu; konferencja z opisem ma własną stronę.');
+  nauka42(api);
 
   // Strona działu
   const sdf = formularz('strona-dzialu');
@@ -424,7 +451,7 @@ function nauka({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentar
   const gf = formularz('granty');
   ustaw(gf, 'description', 'Projekty badawcze pracowników. Lista w Nauce → Projekty i granty; każdy projekt ma własną stronę z danymi, opis pokazuje się pod nimi.');
   const g = pola('granty');
-  kolejnosc(g, ['tytul', 'tytul_en', 'rodzaj', 'rok_od', 'rok_do', 'body', 'kod', 'program', 'kierownik', 'wykonawcy', 'kwota', 'zaklad', 'strona']);
+  kolejnosc(g, ['tytul', 'tytul_en', 'rodzaj', 'rok_od', 'rok_do', 'body', 'kod', 'program', 'kierownik_ze_spisu', 'kierownik_spoza', 'wykonawcy', 'kwota', 'zaklad', 'strona']);
   ustaw(pole(g, 'body'), 'description', `${WPIS} Pusta Treść (albo sam komentarz) = strona projektu pokaże same dane.`);
   ustaw(pole(g, 'body'), 'default', '<!-- OPIS PROJEKTU: Cel i wyniki projektu. Pusta Treść = strona projektu pokaże same dane. -->');
 }
@@ -474,11 +501,13 @@ function aktualnosci({ pola, pole, kolejnosc, ustaw, formatTresci, etykietyEn, f
 }
 
 // ---------- Web-Pracownicy (etap 4) ----------
-function pracownicy({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz }) {
+function pracownicy(api) {
+  const { pola, pole, kolejnosc, ustaw, formatTresci, formularz, komentarz } = api;
   komentarz('Zlecenie 40: tekst strony Pracownicy w jawnym Markdownie (ukryte format_tresci), ściągawka przy Treści, opis formularza Pracownicy.');
 
-  // Pracownicy: kolejność bez zmian (formularz nie ma Treści), opis „co to i gdzie widać” (raport 40-0, sekcja 3)
-  ustaw(formularz('pracownicy'), 'description', 'Spis osób: pracownicy, doktoranci, administracja. Widać go w Pracownikach, na stronach zakładów i przy władzach.');
+  // Pracownicy: kolejność bez zmian (formularz nie ma Treści), opis „co to i gdzie widać” (raport 40-0, sekcja 3);
+  // zlecenie 42: „Pracuje w Instytucie”, data odejścia, bez usuwania (pracownicy42)
+  pracownicy42(api);
 
   // Strony (tylko tekst strony z listą: pracownicy.md)
   const sf = formularz('strony');
@@ -496,16 +525,18 @@ function pracownicy({ pola, pole, kolejnosc, ustaw, formatTresci, formularz, kom
 }
 
 // ---------- Web-Sem-* (etap 5: jeden wzór dla 9 repozytoriów seminariów) ----------
-function seminaria({ pola, pole, kolejnosc, ustaw, formularz, komentarz, przelacznikOpublikowane }) {
+function seminaria(api) {
+  const { pola, pole, kolejnosc, ustaw, formularz, komentarz, przelacznikOpublikowane } = api;
   komentarz('Zlecenie 40: opis seminarium i streszczenie referatu zaraz pod tytułem, pola EN pod polskimi, ściągawka przy Treści, szablon streszczenia, ukryta notatka redakcyjna.');
   komentarz('Zlecenie 48: przełącznik „Opublikowane” w opisie seminarium i w referatach, zaraz pod tytułem (odznaczone = szkic, widoczny tylko na Podglądzie; seminarium-szkic ukrywa też swoje referaty).');
+  seminaria42(api);
 
   // Opis seminarium (plik): Treść i Treść EN pod nazwą (dziś na 11. i 12. miejscu)
   ustaw(formularz('seminarium'), 'description', 'Opis seminarium: prowadzący, kontakt, archiwum. Widać go na stronie seminarium w Nauce → Seminaria.');
   const s = pola('seminarium');
   // zlecenie 48: „Opublikowane” pod parą nazwa / nazwa EN
   przelacznikOpublikowane(s, 'Odznacz, żeby przygotować seminarium bez pokazywania go na stronie publicznej (szkic). Razem z nim znikną wszystkie jego referaty.');
-  kolejnosc(s, ['nazwa', 'nazwa_en', 'opublikowany', 'body', 'tresc_en', 'haslo', 'haslo_en', 'prowadzacy', 'kontakt', 'archiwum', 'zaklad', 'aktywne', 'do_uzupelnienia']);
+  kolejnosc(s, ['nazwa', 'nazwa_en', 'opublikowany', 'body', 'tresc_en', 'haslo', 'haslo_en', 'prowadzacy_ze_spisu', 'prowadzacy_spoza', 'kontakt', 'archiwum', 'zaklad', 'aktywne', 'do_uzupelnienia']);
   ustaw(pole(s, 'body'), 'description', `${WPIS} Wzory w $…$.`);
   // notatka dla redakcji (decyzje 18.11: ukryta, wartość zostaje w pliku)
   ustaw(pole(s, 'do_uzupelnienia'), 'hidden', true);
@@ -617,8 +648,10 @@ function ustawieniaStrony({ pola, pole, kolejnosc, ustaw, usun, odkryj, etykiety
 // ---------- Web-Studia i Web-Popularyzacja (etap 7: format już jawny, porządek pól) ----------
 const OPIS_GOOGLE = 'Trafia do Google i do podglądu linku; na samej stronie się nie wyświetla. Puste = ogólny opis serwisu.';
 
-function studia({ pola, pole, kolejnosc, ustaw, usun, etykietyEn, naglowkiMd, komentarz }) {
+function studia(api) {
+  const { pola, pole, kolejnosc, ustaw, usun, etykietyEn, naglowkiMd, komentarz } = api;
   komentarz('Zlecenie 40: pola EN pod polskimi, etykiety „… EN”, usunięty krótszy podpis liczb kierunku (etykieta_krotka), opisy pól, które strona pokazuje inaczej, niż mówiła etykieta.');
+  studia42(api);
 
   // Strona działu: wstęp trafia tylko do Google (nowy nagłówek go nie pokazuje)
   const sd = pola('strona-dzialu');
@@ -678,6 +711,129 @@ function popularyzacja({ pola, pole, kolejnosc, ustaw, etykietyEn, komentarz }) 
   ustaw(pole(s, 'opis'), 'description', 'Zdanie na karcie tej strony na stronie Popularyzacji; trafia też do Google i do podglądu linku. Na samej stronie się nie wyświetla.');
   ustaw(pole(s, 'haslo'), 'label', 'Hasło (tytuł karty „Dla kogo”)');
   ustaw(pole(s, 'haslo'), 'description', 'Tytuł karty tej strony na stronie Popularyzacji; puste = tytuł strony. Na samej stronie się nie wyświetla.');
+}
+
+// ---------- Zlecenie 42: osoby wybierane ze spisu pracowników ----------
+// Pole „… ze spisu” = reference do katalogu `katalog-pracownikow` (pliki _cms/pracownicy/<id>.yml w tym samym repozytorium:
+// Pages CMS szuka tylko w nim; katalog uzupełnia skrypty/synchronizuj-katalog-pracownikow.mjs, a docelowo automat w Web-Pracownicy).
+// Zapis: ścieżka pliku katalogu (jak u opiekunów specjalności), strona bierze z niej id osoby. „… spoza spisu” = zwykły tekst.
+// Zamiana jest powtarzalna: drugie uruchomienie na przerobionym pliku tylko odświeża definicje nowych pól.
+const KOMENTARZ_42 = 'Zlecenie 42: osoby wybierane ze spisu pracowników (pola „… ze spisu”: lista z katalogu _cms/pracownicy, który aktualizuje się sam po zmianie spisu), osoby spoza spisu wpisywane ręcznie.';
+const ZE_SPISU = 'Wybierz z listy (wpisz nazwisko). Tytuł, link i zakład strona weźmie ze spisu pracowników.';
+const SPOZA = 'Tylko osoby, których nie ma w spisie (np. recenzent z innej uczelni). Wpisz z tytułem: prof. dr hab. Jan Kowalski.';
+export const KATALOG_42 = {
+  name: 'katalog-pracownikow',
+  label: 'Katalog pracowników (tylko odczyt)',
+  type: 'collection',
+  path: '_cms/pracownicy',
+  format: 'yaml',
+  filename: '{primary}.yml',
+  view: { primary: 'etykieta', fields: ['imie_nazwisko', 'pracuje'] },
+  description: 'Lista wyboru osób ze spisu pracowników (Web-Pracownicy). Nie edytuj: aktualizuje się sama po zmianie spisu (automat; do czasu jego włączenia skrypt skrypty/synchronizuj-katalog-pracownikow.mjs w Web-Core). Dane kontaktowe nie są kopiowane.',
+  fields: [
+    { name: 'imie_nazwisko', label: 'Imię i nazwisko', type: 'string', readonly: true },
+    { name: 'id', label: 'Stały identyfikator', type: 'string', readonly: true },
+    { name: 'etykieta', label: 'Nazwa na liście wyboru', type: 'string', readonly: true },
+    { name: 'pracuje', label: 'Pracuje w Instytucie', type: 'boolean', default: true, readonly: true },
+  ],
+  operations: { create: false, rename: false, delete: false },
+};
+// search: etykieta (z polskimi literami: „Łyżwa”) i nazwa pliku (bez nich: „lyzwa”)
+const wyborOsoby = (name, label, description, wiele, wymagane = false) => ({
+  name, label, description, type: 'reference', ...(wymagane ? { required: true } : {}),
+  options: { collection: 'katalog-pracownikow', value: '{path}', label: '{etykieta}', search: 'etykieta,name', ...(wiele ? { multiple: true } : {}) },
+});
+const osobySpoza = (name, label) => ({ name, label, description: SPOZA, type: 'string', list: true });
+const INNE_42 = (opis) => ({
+  name: 'inne', label: 'Inne dane niż w spisie (zwykle puste)', type: 'object',
+  description: `Wypełnij tylko, jeśli na tej stronie ma być coś innego niż w spisie pracowników (np. e-mail dziekanatu).${opis ? ` ${opis}` : ''}`,
+  fields: [
+    { name: 'stopien', label: 'Tytuł/stopień', type: 'string' },
+    { name: 'email', label: 'E-mail', type: 'string' },
+    { name: 'pokoj', label: 'Pokój', type: 'string' },
+    { name: 'strona', label: 'Strona domowa', type: 'string' },
+  ],
+});
+
+function katalog42({ dodajFormularz }) {
+  dodajFormularz(KATALOG_42);
+}
+
+function instytut42(api) {
+  const { pola, pole, kolejnosc, ustaw, formularz, komentarz, zamienPole, wezel } = api;
+  komentarz(KOMENTARZ_42);
+  // Zakłady: kierownik ze spisu (jedna osoba)
+  const zf = formularz('zaklady');
+  ustaw(zf.get('view'), 'fields', wezel(['nazwa', 'karta.kierownik_ze_spisu']));
+  const karta = pole(pola('zaklady'), 'karta').get('fields');
+  zamienPole(karta, 'kierownik', [wyborOsoby('kierownik_ze_spisu', 'Kierownik', 'Wybierz z listy (wpisz nazwisko). Tytuł, e-mail, pokój i link strona weźmie ze spisu pracowników.', false)]);
+  // Władze: dyrekcja i władze Wydziału — „Osoba ze spisu” zamiast imienia i nazwiska, nadpisania w grupie „Inne dane niż w spisie”
+  ustaw(formularz('wladze'), 'description', 'Pierwsza osoba na liście = dyrektor (duża karta). Osobę wybierz ze spisu pracowników: tytuł, e-mail, pokój, stronę domową i zakład strona weźmie stamtąd. Telefonów pracowników naukowych nie podajemy.');
+  const wl = pola('wladze');
+  const dyr = pole(wl, 'osoby');
+  dyr.get('list').get('collapsible').set('summary', '{rola}');
+  const os = dyr.get('fields');
+  zamienPole(os, 'imie_nazwisko', [wyborOsoby('osoba', 'Osoba ze spisu', ZE_SPISU, false, true)]);
+  for (const n of ['stopien', 'email', 'pokoj', 'strona']) api.usun(os, n);
+  zamienPole(os, 'inne', [INNE_42()], 'pozycja');
+  kolejnosc(os, ['rola', 'osoba', 'zakres', 'dyzur', 'zdjecie', 'rola_en', 'zakres_en', 'dyzur_en', 'inne', 'pozycja']);
+  const wyd = pole(pole(wl, 'wydzial').get('fields'), 'osoby');
+  wyd.get('list').get('collapsible').set('summary', '{rola}');
+  const wo = wyd.get('fields');
+  if (!wo.items.some((p) => p.get('name') === 'osoba')) {
+    const i = wo.items.findIndex((p) => p.get('name') === 'imie_nazwisko');
+    wo.items.splice(i, 0, wezel(wyborOsoby('osoba', 'Osoba ze spisu', `${ZE_SPISU} Dziekana spoza Instytutu wpisz w polu niżej.`, false)));
+  }
+  zamienPole(wo, 'imie_nazwisko', [{ name: 'imie_nazwisko', label: 'Osoba spoza spisu (z tytułem)', description: 'Tylko gdy osoby nie ma w spisie pracowników, np. dziekan z Instytutu Informatyki. Wpisz z tytułem: prof. dr hab. Jan Kowalski.', type: 'string' }]);
+  for (const n of ['email', 'pokoj']) api.usun(wo, n);
+  zamienPole(wo, 'inne', [INNE_42('Pokój spisu Wydział nie bierze: wpisz go tutaj.')], 'pozycja');
+  kolejnosc(wo, ['rola', 'osoba', 'imie_nazwisko', 'dyzur', 'zdjecie', 'zakres', 'rola_en', 'dyzur_en', 'zakres_en', 'inne', 'pozycja']);
+  const sek = pole(wl, 'sekretariat').get('fields');
+  zamienPole(sek, 'osoby', [wyborOsoby('osoby_ze_spisu', 'Osoby (ze spisu pracowników)', 'Wybierz z listy (wpisz nazwisko). E-mail i telefon strona weźmie ze spisu pracowników.', true)]);
+  katalog42(api);
+}
+
+function nauka42(api) {
+  const { pola, formularz, ustaw, komentarz, zamienPole, wezel } = api;
+  komentarz(KOMENTARZ_42);
+  ustaw(formularz('granty').get('view'), 'fields', wezel(['tytul', 'kierownik_ze_spisu', 'rok_od', 'rodzaj']));
+  zamienPole(pola('granty'), 'kierownik', [
+    wyborOsoby('kierownik_ze_spisu', 'Kierownik ze spisu pracowników', ZE_SPISU, true),
+    osobySpoza('kierownik_spoza', 'Kierownik spoza spisu'),
+  ]);
+  katalog42(api);
+}
+
+function seminaria42(api) {
+  const { pola, komentarz, zamienPole } = api;
+  komentarz(KOMENTARZ_42);
+  zamienPole(pola('seminarium'), 'prowadzacy', [
+    wyborOsoby('prowadzacy_ze_spisu', 'Koordynatorzy ze spisu pracowników', `${ZE_SPISU} Termin i salę wpisuje się przy każdym referacie osobno.`, true),
+    osobySpoza('prowadzacy_spoza', 'Koordynatorzy spoza spisu'),
+  ]);
+  katalog42(api);
+}
+
+function studia42(api) {
+  const { pola, pole, ustaw, komentarz } = api;
+  komentarz('Zlecenie 42: wspólny „Katalog pracowników” (z polem „Pracuje w Instytucie”), wyszukiwanie opiekuna po nazwisku z polskimi literami.');
+  const op = pole(pola('specjalnosci'), 'opiekunowie');
+  ustaw(op, 'description', 'Wybierz osoby z listy (wpisz nazwisko). Zapisujemy identyfikator osoby, a aktualny tytuł i kontakt strona pobiera ze spisu pracowników. Miejsce w tekście: ::opiekun.');
+  const osoba = pole(op.get('fields'), 'osoba');
+  osoba.set('options', api.wezel({ collection: 'katalog-pracownikow', value: '{path}', label: '{etykieta}', search: 'etykieta,name' }));
+  katalog42(api);
+}
+
+function pracownicy42({ pola, formularz, ustaw, komentarz, wstawZa, wezel }) {
+  komentarz('Zlecenie 42: przełącznik „Pracuje w Instytucie” (odznaczone = osoba odeszła; pliku nie usuwamy) i data odejścia; usuwanie osób w CMS wyłączone.');
+  const f = formularz('pracownicy');
+  const OPIS = 'Spis osób: pracownicy, doktoranci, administracja. Widać go w Pracownikach, na stronach zakładów i przy władzach. Usuwanie wyłączone: po odejściu odznacz „Pracuje w Instytucie”.';
+  ustaw(f, 'description', OPIS);
+  ustaw(f.get('view'), 'fields', wezel(['imie_nazwisko', 'grupa', 'zaklad', 'pokoj', 'pracuje']));
+  ustaw(f, 'operations', wezel({ delete: false }));
+  const p = pola('pracownicy');
+  wstawZa(p, 'grupa', { name: 'pracuje', label: 'Pracuje w Instytucie', description: 'Po odejściu odznacz. Nie usuwaj osoby — jej nazwisko zostaje przy dawnych grantach i obronach.', type: 'boolean', default: true });
+  wstawZa(p, 'pracuje', { name: 'data_odejscia', label: 'Data odejścia (opcjonalnie)', type: 'date', default: '' });
 }
 
 const OPISY = { 'Web-Instytut': instytut, 'Web-Nauka': nauka, 'Web-Aktualnosci': aktualnosci, 'Web-Pracownicy': pracownicy, 'Web-Ustawienia': ustawieniaStrony, 'Web-Studia': studia, 'Web-Popularyzacja': popularyzacja };

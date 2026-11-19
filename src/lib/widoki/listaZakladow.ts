@@ -2,11 +2,18 @@
 import type { Lang } from '../daty';
 import { zaklady, pracownicy, rangaStopnia } from '../tresci';
 import { stronaListy } from '../tekstyStron';
+import { wszyscyPracownicy, kierownikZakladu } from '../osobySpisu';
 
 export async function daneListyZakladow(lang: Lang) {
   const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
   const lista = await zaklady();
   const osoby = await pracownicy();
+  // kierownik w boksie (zlecenie 42): imię i nazwisko ze spisu bez tytułu (jak dotąd tekst z pola); brak — znacznik na Podglądzie
+  const wszyscy = await wszyscyPracownicy();
+  const kierownik = (z: (typeof lista)[number]) => {
+    const k = kierownikZakladu(z, wszyscy);
+    return { imie: k.osoba?.data.imie_nazwisko ?? k.tekst, brak: k.brak };
+  };
   const kadra = osoby.filter((o) => o.data.grupa === 'nauczyciel');
   const ile = (r: number) => kadra.filter((o) => rangaStopnia(o.data.stopien) === r).length;
   const liczby = [
@@ -37,5 +44,5 @@ export async function daneListyZakladow(lang: Lang) {
     p: lista.filter((z) => !OBSZARY.flat().includes(z.id)).map((z) => czlonkowie(z.id)).filter((n) => n > 0),
   };
 
-  return { lista, osoby, liczby, naglowek, html, lead, haslo, liczbyTel, motywDane };
+  return { lista, osoby, kierownik, liczby, naglowek, html, lead, haslo, liczbyTel, motywDane };
 }

@@ -27,7 +27,7 @@ const {
 } = await daneGrantu(grant, lang);
 // wiersz innego projektu: tytuł i linia „rodzaj · kierownik · lata · numer” (puste pomijane)
 const tytulGrantu = (g: Grant) => (lang === 'en' && g.data.tytul_en) || g.data.tytul;
-const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kierownicyGrantu(g.data.kierownik, osoby, lang).map((k) => k.nazwa).join(', '), lataGrantu(g)]
+const linia = (g: Grant) => [RODZAJE_GRANTOW[g.data.rodzaj]?.[lang] ?? '', kierownicyGrantu(g, osoby, lang).map((k) => k.nazwa).join(', '), lataGrantu(g)]
   .filter(Boolean);
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner" haslo={haslo}

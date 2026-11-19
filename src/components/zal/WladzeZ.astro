@@ -9,15 +9,16 @@ import OsobaZ from './OsobaZ.astro';
 import { u, isExternal } from '../../lib/url';
 import { wJezyku } from '../../lib/i18n';
 import { mailHtml } from '../../lib/limity.mjs';
+import BrakOsoby from '../BrakOsoby.astro';
 import type { Lang } from '../../lib/daty';
 
-type Os = { rola: string; nazwa: string; inicjaly: string; email: string; pokoj: string; strona: string; zakres: string; dyzur: string; zdjecie: string; zaklad?: { nazwa: string; adres: string } };
+type Os = { rola: string; nazwa: string; inicjaly: string; email: string; pokoj: string; strona: string; zakres: string; dyzur: string; zdjecie: string; zaklad?: { nazwa: string; adres: string }; brak?: boolean };
 interface Props {
   lang: Lang;
   wstep?: string;
   dyrektor?: Os; zastepcy: Os[];
   wydzial: { tytul: string; opis: string; osoby: Os[]; link?: { etykieta: string; adres: string } };
-  sekretariat?: { nazwa: string; opis: string; email?: string; telefony: string[]; adres: string; pokoj?: string; godziny: string; osoby: { nazwa: string; email: string; telefon: string }[] };
+  sekretariat?: { nazwa: string; opis: string; email?: string; telefony: string[]; adres: string; pokoj?: string; godziny: string; osoby: { nazwa: string; email: string; telefon: string }[]; brak?: boolean };
   kadencjaHtml?: string; radaHtml?: string; radaTytul: string;
   linki: { etykieta: string; adres: string }[];
 }
@@ -27,12 +28,13 @@ const href = (a: string) => (isExternal(a) ? a : u(a.startsWith('/pliki/') ? a :
 const tel = (n: string) => { const c = n.replace(/[^\d+]/g, ''); return `tel:${c.startsWith('+') ? c : `+48${c}`}`; };
 const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
 ---
-{dyrektor && (
+{/* zlecenie 42: na stronie publicznej dyrektor bez osoby znika, zastępcy zostają */}
+{(dyrektor || zastepcy.length > 0) && (
   <section id="z-dyrekcja" aria-labelledby="z-dyrekcja-h">
     <h2 id="z-dyrekcja-h">{T('Dyrekcja', 'Management')}</h2>
     {wstep && <p class="wst">{wstep}</p>}
     <div class="z-drzewo">
-      <OsobaZ o={dyrektor} lang={lang} class="z-dyr" />
+      {dyrektor && <OsobaZ o={dyrektor} lang={lang} class="z-dyr" />}
       {zastepcy.length > 0 && <div class="z-zast">{zastepcy.map((o) => <OsobaZ o={o} lang={lang} />)}</div>}
     </div>
   </section>
@@ -58,6 +60,7 @@ const pok = (p: string) => (/^\d/.test(p) ? `${T('pok.', 'room')} ${p}` : p);
         {(sekretariat.adres || sekretariat.pokoj) && <div><dt>{T('Adres', 'Address')}</dt><dd>{[sekretariat.adres, sekretariat.pokoj && pok(sekretariat.pokoj)].filter(Boolean).join(', ')}</dd></div>}
         {sekretariat.godziny && <div><dt>{T('Godziny', 'Hours')}</dt><dd>{sekretariat.godziny}</dd></div>}
       </dl>
+      {sekretariat.brak && <div class="z-sek-osoby"><div class="z-os"><div class="imie"><BrakOsoby lang={lang} /></div></div></div>}
       {sekretariat.osoby.length > 0 && (
         <div class="z-sek-osoby">
           {sekretariat.osoby.map((o) => (

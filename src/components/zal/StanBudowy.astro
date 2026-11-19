@@ -11,8 +11,11 @@
 // do formularza opisu seminarium wierszem samej strony (strona seminarium jest szkicem).
 // Dymek „Nowa wersja gotowa” (decyzja 18.11) tylko wtedy, gdy zmieniła się ta strona: data-skrot i data-plik wpisuje po budowie
 // src/integracje/skrotyPodgladu.mjs (skrót HTML strony bez danych tej budowy), a nowe skróty są w /podglad/skroty.json.
+// Zlecenie 42: funkcja bez osoby na tej stronie (kierownik zakładu, koordynator seminarium, opiekun specjalności, władze) — żółty
+// wiersz „Nie przypisano osoby” z linkiem do formularza; lista zakładów i lista seminariów pokazują braki swoich podstron.
 import { PODGLAD, PODGLAD_RUN_ID, PODGLAD_START, PODGLAD_REPO, formularzWCms } from '../../lib/podglad';
 import { szkice, adresDoPorownania } from '../../lib/szkice';
+import { brakiNaStronie } from '../../lib/brakiOsob';
 import { u } from '../../lib/url';
 import type { Lang } from '../../lib/daty';
 
@@ -30,6 +33,9 @@ const wpis = powod ?? dzial;
 const cms = wpis ? formularzWCms(wpis.kolekcja, wpis.plik) : undefined;
 const posrednio = powod && powod.adres !== adres;
 const referatySzkice = wszystkie && !wpis ? wszystkie.naStronie(adres).map((r) => ({ ...r, cms: formularzWCms(r.kolekcja, r.plik) })) : [];
+const brakiOsob = PODGLAD ? (await brakiNaStronie(adres)).map((b) => ({ ...b, cms: formularzWCms(b.kolekcja, b.plik) })) : [];
+const brakTekst = (funkcja: string) => (en ? `No person assigned: ${funkcja}.` : `Nie przypisano osoby: ${funkcja}.`);
+const brakCms = en ? 'Fix in the CMS →' : 'Popraw w CMS →';
 const referatTekst = (tytul?: string) => en
   ? `Draft: the talk “${tytul ?? ''}” won't be on the public site.`
   : `Szkic: referatu „${tytul ?? ''}” nie będzie na stronie publicznej.`;
@@ -61,6 +67,11 @@ const poczatek = kiedy ? (en ? `Preview · built ${kiedy}` : `Podgląd · zbudow
           {cms ? <a href={cms} target="_blank" rel="noopener">{`${szkicTekst} `}<span class="sb-szkic-cms">{szkicCms}</span></a> : <span>{szkicTekst}</span>}
         </p>
       )}
+      {brakiOsob.map((b) => (
+        <p class="sb-szkic" title={b.adres}>
+          {b.cms ? <a href={b.cms} target="_blank" rel="noopener">{`${brakTekst(b.funkcja)} `}<span class="sb-szkic-cms">{brakCms}</span></a> : <span>{brakTekst(b.funkcja)}</span>}
+        </p>
+      ))}
       {referatySzkice.map((r) => (
         <p class="sb-szkic">
           {r.cms ? <a href={r.cms} target="_blank" rel="noopener">{`${referatTekst(r.tytul)} `}<span class="sb-szkic-cms">{szkicCms}</span></a> : <span>{referatTekst(r.tytul)}</span>}
