@@ -6,8 +6,8 @@
 // Głowa (.ww2-prof, zlecenie 52): portret albo placeholder (napis „Zdjęcie” tylko na Podglądzie; zdjęcie bez filtra), pod nim lata (pole
 // „Lata”) i źródło zdjęcia (tylko przy zdjęciu) — opływany z prawej przez ramki (błędy bloków, TBA, „Translation in preparation”) i wstęp
 // (tekst przed pierwszym ##). Sekcje z ## zaczynają się pod portretem, na pełnej szerokości. Dalej w kolejności:
-//   sekcje Treści (także „Do pobrania” z :::pliki) → „W »Warto wiedzieć«” (nagrody i historie, które
-//   linkują do osoby; bez nich sekcji nie ma) → „Źródła” (sekcja {#zrodla}, zawsze na końcu, zwinięta) → „Inne sylwetki” (4 losowe).
+//   sekcje Treści (także „Do pobrania” z :::pliki) → „Zobacz też” (zlecenie 53; nagrody i historie, które
+//   linkują do osoby, z nazwą grupy w każdym wierszu; bez nich sekcji nie ma) → „Źródła” (sekcja {#zrodla}, zawsze na końcu, zwinięta) → „Inne sylwetki” (4 losowe).
 // TBA (pusta Treść): imię, lata, placeholder i ramka. /en bez Treści EN: ramka „Translation in preparation” z linkiem do strony polskiej.
 // Spis „Na tej stronie” zawiera wszystkie sekcje.
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -26,14 +26,15 @@ import '../styles/warto-wiedziec.css';
 
 interface Props { wpis: WW; lang: Lang }
 const { wpis: w, lang } = Astro.props;
-const { T, tytul, tytulLang, zajawka, podpis, lata, tresc, bezTlumaczenia, tytulListy, wstecz, wszystkie } = await daneWpisuWW(w, lang);
+const { T, tytul, tytulLang, zajawka, podpis, lata, tresc, bezTlumaczenia, wstecz, wszystkie } = await daneWpisuWW(w, lang);
 const { powiazane, inne, inneStart } = await sekcjeSylwetki(w, wszystkie);
 const liczby = liczbyBaneraWW(w);
 const sekcje = (tresc?.sekcje ?? []).map((s, i) => ({ ...s, id: s.id || `sekcja-${i + 1}` }));
-const wWW = lang === 'en' ? `In ${tytulListy}` : `W „${tytulListy}”`;
+// „Zobacz też” (zlecenie 53; dawniej „W »Warto wiedzieć«” — dublowało dział): wiersze mają nazwę grupy, nagłówek jej nie powtarza
+const zobaczTez = T('Zobacz też', 'See also');
 const spis = [
   ...sekcje.map((s) => ({ id: s.id, etykieta: s.etykieta })),
-  ...(powiazane.length ? [{ id: 'w-warto-wiedziec', etykieta: wWW }] : []),
+  ...(powiazane.length ? [{ id: 'zobacz-tez', etykieta: zobaczTez }] : []),
   ...(tresc?.zrodla ? [{ id: 'zrodla', etykieta: tresc.zrodla.etykieta || T('Źródła', 'Sources') }] : []),
   ...(inne.length ? [{ id: 'inne-sylwetki', etykieta: T('Inne sylwetki', 'Other profiles') }] : []),
 ];
@@ -58,8 +59,8 @@ const spis = [
     </section>
   ))}
   {powiazane.length > 0 && (
-    <section id="w-warto-wiedziec" aria-labelledby="w-warto-wiedziec-h">
-      <h2 id="w-warto-wiedziec-h">{wWW}</h2>
+    <section id="zobacz-tez" aria-labelledby="zobacz-tez-h">
+      <h2 id="zobacz-tez-h">{zobaczTez}</h2>
       <WartoWiedziec lang={lang} wpisy={powiazane} zGrupa />
     </section>
   )}

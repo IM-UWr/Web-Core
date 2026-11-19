@@ -190,7 +190,7 @@ export async function portretyWW(): Promise<Record<string, string>> {
 }
 
 // ---------- powiązania (linki w Treści) ----------
-/** „W »Warto wiedzieć«” na stronie sylwetki: nagrody i historie, które linkują do tej osoby (bez innych sylwetek). */
+/** „Zobacz też” na stronie sylwetki (zlecenie 53): nagrody i historie, które linkują do tej osoby (bez innych sylwetek). */
 export async function wpisyZOsoba(slug: string): Promise<WW[]> {
   const l = (await widoczneWW()).filter((w) => w.grupa !== 'sylwetki' && w.linki.has(slug));
   return [...l.filter((w) => w.grupa === 'historie'), ...l.filter((w) => w.grupa === 'nagrody')];
@@ -232,10 +232,16 @@ export interface TrescWW {
 export async function trescWW(w: WW, lang: Lang): Promise<TrescWW | undefined> {
   const src = lang === 'en' ? (w.maTrescEn ? w.tresc_en : undefined) : w.maTresc ? w.body : undefined;
   if (!src) return undefined;
-  const ww: { lata?: string; portrety: Record<string, string>; bledy?: BladLiniiWW[] } = { lata: parsujLata(w.lata).liczba, portrety: await portretyWW() };
+  // tytul — reguła A autokorekty nagłówków (zlecenie 53: remark-jawne-bloki.mjs, poprawNaglowkiWW); naglowki — opis poprawek (wyjście)
+  const ww: { lata?: string; portrety: Record<string, string>; tytul: string; bledy?: BladLiniiWW[]; naglowki?: string[] } = {
+    lata: parsujLata(w.lata).liczba, portrety: await portretyWW(), tytul: (lang === 'en' && w.tytul_en) || w.tytul,
+  };
   let { html } = await renderMarkdownZNaglowkami(src, lang, false, { ww });
   const bledy = ww.bledy ?? [];
-  for (const b of bledy) ostrzezWW(`${w.plik}${lang === 'en' ? ' (Treść EN)' : ''}: linia ${b.nr} bloku :::${b.blok} pominięta — ${b.powod}: „${b.tekst}”`);
+  const kto = `${w.plik}${lang === 'en' ? ' (Treść EN)' : ''}`;
+  for (const b of bledy) ostrzezWW(`${kto}: linia ${b.nr} bloku :::${b.blok} pominięta — ${b.powod}: „${b.tekst}”`);
+  // bez ramki na Podglądzie: strona wygląda dobrze, redaktor nie ma czego poprawiać (zlecenie 53)
+  if (ww.naglowki) ostrzezWW(`${kto}: nagłówki poprawione automatycznie — ${ww.naglowki.join(', ')}`);
   // blok :::w-skrocie (dl.ww2-skrot) nigdy nie stoi w treści: od zlecenia 52 to tylko zapas liczb banera sylwetki (liczbyBaneraWW)
   html = html.replace(/<dl class="ww2-skrot">[\s\S]*?<\/dl>/g, '');
   const [wstep, ...reszta] = html.split(/(?=<h2[\s>])/);

@@ -32,7 +32,7 @@ export async function daneWpisuWW(w: WW, lang: Lang) {
   };
 }
 
-/** Sylwetka: „W »Warto wiedzieć«” (nagrody i historie, które linkują do osoby) i „Inne sylwetki” (4 losowe, bez TBA i bez bieżącej). */
+/** Sylwetka: „Zobacz też” (nagrody i historie, które linkują do osoby) i „Inne sylwetki” (4 losowe, bez TBA i bez bieżącej). */
 export async function sekcjeSylwetki(w: WW, wszystkie: WW[]) {
   const pula = wszystkie.filter((x) => x.grupa === 'sylwetki' && !x.tba && x.slug !== w.slug);
   return {

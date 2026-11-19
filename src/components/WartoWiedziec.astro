@@ -1,7 +1,7 @@
 ---
 // „Warto wiedzieć” — wiersze wpisów (nagrody, historie) we wzorcu treści podstron (klasa .tresc — src/styles/zal-tresc.css; zlecenie 11,
 // zalecenie 14). Od zlecenia 47 dostaje gotową listę wpisów (src/lib/wartoWiedziec.ts) — widoki: lista /instytut/warto-wiedziec
-// („Nagrody i wyróżnienia”), strona sylwetki („W »Warto wiedzieć«”), strona nagrody i historii („Zobacz też w »…«”).
+// („Nagrody i wyróżnienia”), strona sylwetki („Zobacz też”), strona nagrody i historii („Zobacz też w »…«”).
 // uklad: 'lista' = wiersze w stylu listy Aktualności (wzór: WierszAktualnosci.astro): rok dużą Brygadą (tylko historie; nagrody są bez
 //                  roku — klasa ww2-bez-roku), tytuł Brygadą (link do strony wpisu albo zewnętrzny z ↗; cały wiersz klikalny), zajawka,
 //                  oznaczenia (grupa — zGrupa; „N laureatów z Instytutu”, gdy wpis ma blok :::laureaci), przy wpisie bez strony etykieta
@@ -22,7 +22,7 @@ interface Props {
   lang: Lang;
   wpisy: WW[];
   uklad?: 'lista' | 'linki';
-  // nazwa grupy w oznaczeniach (lista mieszana: „W »Warto wiedzieć«” na stronie sylwetki)
+  // nazwa grupy w oznaczeniach (lista mieszana: „Zobacz też” na stronie sylwetki)
   zGrupa?: boolean;
 }
 const { lang, wpisy, uklad = 'lista', zGrupa = false } = Astro.props;

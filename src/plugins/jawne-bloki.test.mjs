@@ -107,3 +107,10 @@ test('jawna podstrona Popularyzacji zachowuje wyróżniony wstęp i wygląd ramk
  assert.match(html,/<p class="wst">Wstęp\.<\/p>/);
  assert.match(html,/<blockquote><span class="etyk">Uwaga<\/span><p>Opis\.<\/p><\/blockquote>/);
 });
+test('zlecenie 53: {#id} bez spacji przy ## i przy ### (bez trybu ww)',async()=>{
+ const html=await render('## Tytuł{#id-sekcji}\n\nA.\n\n### Pod{#pod}\n\nB.\n\n#### Głębiej {#glebiej}\n\nC.');
+ assert.match(html,/<section id="id-sekcji" aria-labelledby="id-sekcji-h"><h2 id="id-sekcji-h">Tytuł<\/h2>/);
+ assert.match(html,/<h3 id="pod">Pod<\/h3>/);assert.match(html,/<h4 id="glebiej">Głębiej<\/h4>/);
+ assert.doesNotMatch(html,/\{#/);
+ const s=await render('## Tytuł{#a}\n\nA.','strona');assert.match(s,/<h2 id="a">Tytuł<\/h2>/);assert.doesNotMatch(s,/\{#/);
+});

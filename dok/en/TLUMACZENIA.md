@@ -43,7 +43,7 @@ Zlecenie 47 (poprawka): rektorat Marczewskiego trwał w latach **1953–1957** (
 | Do pobrania (sekcja w Treści) | Do pobrania | Downloads |
 | Źródła (nagłówek z liczbą) | Źródła · „22 źródła · rozwiń” / „zwiń” | Sources · “22 sources · show” / “hide” |
 | sylwetka — inne | Inne sylwetki · Wszystkie sylwetki → | Other profiles · All profiles → |
-| sylwetka — powiązania | W „Warto wiedzieć” (nazwa z tytułu strony listy) | In Highlights (name from the list page’s `tytul_en`) |
+| sylwetka — powiązania (zlecenie 53) | Zobacz też | See also |
 | nagroda / historia — ludzie | Ludzie w tej historii · Sylwetki laureatów | People in this story · Recipients’ profiles |
 | nagroda / historia — pozostałe | Zobacz też w „Historie” / „Nagrody i wyróżnienia” | See also in “Stories” / “Awards and distinctions” |
 | nazwy grup | Sylwetki · Nagrody i wyróżnienia · Historie | Profiles · Awards and distinctions · Stories |

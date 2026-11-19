@@ -211,3 +211,49 @@ test('fnv1a: wektory wzorcowe FNV-1a 32 bit (bajty UTF-8)', async () => {
   assert.equal(fnv1a('foobar'), 0xbf9cf968);
   assert.notEqual(fnv1a('ł'), fnv1a('B'));
 });
+
+// ---------- zlecenie 53 (dawniej 51): autokorekta nagłówków Treści „Warto wiedzieć” (remark-jawne-bloki.mjs, poprawNaglowkiWW) ----------
+test('autokorekta nagłówków: Tabisz w miniaturze (# z tytułem, akapit, 3 × ### z {#id}, jeden bez spacji)', async () => {
+  const md = '<!-- TEKST: komentarz -->\n# Dr Krzysztof Tabisz\n\n**Dr Krzysztof Tabisz (ur. 1950)** – matematyk.\n\n### Działalność naukowa i akademicka{#DzialalnoscNaukowa}\n\nA.\n\n### Działalność społeczna {#DzialalnoscSpoleczna}\n\nB.\n\n### Odznaczenia i wyróżnienia {#Odznaczenia}\n\nC.';
+  const { html, ww } = await render(md, { tytul: 'Krzysztof Tabisz' });
+  assert.doesNotMatch(html, /<h1|\{#/);
+  assert.match(html, /^<p><strong>Dr Krzysztof Tabisz \(ur\. 1950\)<\/strong> – matematyk\.<\/p><h2 id="DzialalnoscNaukowa">Działalność naukowa i akademicka<\/h2>/);
+  assert.match(html, /<h2 id="DzialalnoscSpoleczna">Działalność społeczna<\/h2><p>B\.<\/p><h2 id="Odznaczenia">Odznaczenia i wyróżnienia<\/h2>/);
+  assert.equal((html.match(/<h2/g) ?? []).length, 3);
+  assert.deepEqual(ww.naglowki, ['usunięty tytuł „# Dr Krzysztof Tabisz”', '### → ## (3)']);
+  // EN: tytuł „Krzysztof Tabisz” zawiera się w nagłówku; identyfikatory sekcji z tekstu nagłówka
+  const en = await render('# Dr Krzysztof Tabisz\n\nIntro.\n\n### Academic work\n\nA.\n\n### Awards\n\nB.', { tytul: 'Krzysztof Tabisz' });
+  assert.match(en.html, /^<p>Intro\.<\/p><h2 id="academic-work">Academic work<\/h2><p>A\.<\/p><h2 id="awards">Awards<\/h2>/);
+});
+
+test('autokorekta nagłówków: # na początku, który nie jest tytułem, staje się sekcją ##', async () => {
+  const { html, ww } = await render('# Inny nagłówek\n\nTekst.', { tytul: 'Krzysztof Tabisz' });
+  assert.equal(html, '<h2 id="inny-naglowek">Inny nagłówek</h2><p>Tekst.</p>');
+  assert.deepEqual(ww.naglowki, ['# → ## (1)']);
+  // proza przed # — reguła A nie działa (tylko B)
+  const r = await render('Wstęp.\n\n# Krzysztof Tabisz\n\nT.', { tytul: 'Krzysztof Tabisz' });
+  assert.match(r.html, /<h2 id="krzysztof-tabisz">Krzysztof Tabisz<\/h2>/);
+  assert.deepEqual(r.ww.naglowki, ['# → ## (1)']);
+});
+
+test('autokorekta nagłówków: Treść z ## i ### zostaje bez zmian', async () => {
+  const md = 'Wstęp.\n\n## Sekcja {#sekcja}\n\nA.\n\n### Pod\n\nB.';
+  const z = await render(md, { tytul: 'Sekcja' });
+  const bez = (await p.render(md, { frontmatter: { strona: { jawne: true } } })).code.replace(/>\s+</g, '><');
+  assert.equal(z.html, bez);
+  assert.equal(z.ww.naglowki, undefined);
+  assert.match(z.html, /<h2 id="sekcja">Sekcja<\/h2><p>A\.<\/p><h3 id="pod">Pod<\/h3>/);
+});
+
+test('autokorekta nagłówków: ### i #### bez ## dają ## i ###', async () => {
+  const { html, ww } = await render('### A\n\nT.\n\n#### B\n\nU.\n\n### C\n\nV.', { tytul: 'X' });
+  assert.equal(html, '<h2 id="a">A</h2><p>T.</p><h3 id="b">B</h3><p>U.</p><h2 id="c">C</h2><p>V.</p>');
+  assert.deepEqual(ww.naglowki, ['### → ## (2)', '#### → ### (1)']);
+});
+
+test('autokorekta nagłówków: nagłówek wewnątrz bloku ::: zostaje bez zmian', async () => {
+  const { html, ww } = await render(':::ramka{tytul="Uwaga"}\n\n### Wewnątrz\n\nTekst.\n\n:::\n\n#### Sekcja\n\nA.', { tytul: 'X' });
+  assert.match(html, /<blockquote><span class="etyk">Uwaga<\/span><h3 id="wewnątrz">Wewnątrz<\/h3>/);
+  assert.match(html, /<h2 id="sekcja">Sekcja<\/h2>/);
+  assert.deepEqual(ww.naglowki, ['#### → ## (1)']);
+});
