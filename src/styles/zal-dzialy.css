@@ -9,9 +9,11 @@
 @media all {
 
   .z-dz { --marg: max(var(--marg-min), calc((100% - var(--kol)) / 2)); font-size: 16px; line-height: 1.6; color: var(--text); }
-  .z-dz :is(h2, h3) { line-height: 1.6; letter-spacing: normal; }
-  .z-dz a { text-decoration: none; }
-  .z-dz ul { list-style: none; margin: 0; padding: 0; }
+  /* poza tekstem działu w otoczce .tresc (zlecenie 56): bloki z Markdownu mają tam wzorzec treści podstron (zal-tresc.css);
+     :where() — moc selektorów bez zmian */
+  .z-dz :is(h2, h3):where(:not(.tresc *)) { line-height: 1.6; letter-spacing: normal; }
+  .z-dz a:where(:not(.tresc *)) { text-decoration: none; }
+  .z-dz ul:where(:not(.tresc *)) { list-style: none; margin: 0; padding: 0; }
 
   /* ---------- podstrony bez JS: pas w jasnym kolorze działu z wierszami grup (zlecenie 11, zalecenie 5; prototyp: menu E) ----------
      Nazwa grupy z lewej (kolumna 140 px), strony jako zwykłe linki Brygadą 21 px; wiersze rozdziela kreska w kolorze działu.
@@ -54,10 +56,16 @@
   /* ---------- tekst działu i „W skrócie” ---------- */
   .z-dz-tresc { display: grid; grid-template-columns: minmax(0, 1fr) clamp(220px, 25%, 300px); gap: clamp(32px, 6%, 72px); padding: 30px var(--marg) 50px; }
   /* interlinia 1,2 z marginesami zamiast 1,6: jedna linia stoi tam gdzie przedtem, a dwie nie rozjeżdżają się (zlecenie 25, punkt 2.11) */
-  .z-dz-tresc h2 { margin: 6.8px 0 18.8px; font-family: var(--f-display); font-weight: 500; font-size: 34px; line-height: 1.2; color: var(--ink); }
-  .z-dz-tresc p { margin: 0 0 14px; max-width: 42.7em; font-size: 17px; line-height: 1.68; color: var(--text); }
-  /* lead: ten sam stopień i interlinia co reszta tekstu, wyróżniony tylko kolorem nagłówków (zlecenie 11, zalecenie 11) */
-  .z-dz-tresc p.wst { color: var(--ink); }
+  .z-dz-tresc > div > h2 { margin: 6.8px 0 18.8px; font-family: var(--f-display); font-weight: 500; font-size: 34px; line-height: 1.2; color: var(--ink); }
+  /* Tekst działu (zlecenie 56): HTML z Markdownu w otoczce div.tresc > div.prose (TrescDzialu.astro), więc bloki :::, listy, tabele,
+     ### i cytaty wyglądają jak w treści podstrony (zal-tresc.css). Akapity stojące bezpośrednio w tekście i linki w nich — jak przed
+     otoczką: 17 px / 1,68 (telefon 15,5 px / 1,62), lead tylko kolorem nagłówków (zlecenie 11, zalecenie 11), link bez podkreślenia.
+     Selektory mocniejsze od body .tresc .prose p / > p:first-child / a / a:hover; akapitów i linków w blokach nie dotyczą. */
+  .z-dz .z-dz-tresc .tresc .prose > p { margin: 0 0 14px; max-width: 42.7em; font-size: 17px; line-height: 1.68; color: var(--text); }
+  .z-dz .z-dz-tresc .tresc .prose > p.wst { color: var(--ink); }
+  .z-dz .z-dz-tresc .tresc .prose > p a { color: var(--ink); text-decoration: none; text-underline-offset: auto; transition: all 0s; }
+  .z-dz .z-dz-tresc .tresc .prose > p a:hover { color: var(--primary); }
+  :root[data-theme="dark"] .z-dz .z-dz-tresc .tresc .prose > p a:hover { color: var(--accent); }
   .z-dz-skrot { align-self: start; border-top: 2px solid var(--rule); padding-top: 8px; }
   .z-dz-skrot h3 { margin: 0 0 8px; font-family: var(--f-text); font-size: 13px; font-weight: 700; color: var(--muted); }
   .z-dz-skrot dl { margin: 0; }
@@ -252,8 +260,10 @@
   :root[data-theme="dark"] .z-dz .z-dz-rzad a:is(:hover, :active, :focus-visible)::before { background-color: color-mix(in oklab, var(--d-a) 14%, var(--d-kafel, var(--d-t))); }
   .z-dz .z-dz-pas + .z-dz-tresc { padding-top: 22px; }
   .z-dz .z-dz-tresc { grid-template-columns: 1fr; gap: 18px; padding: 18px 16px 24px; }
-  .z-dz .z-dz-tresc h2 { margin: 0 0 12px; font-size: 28px; line-height: 1.6; }
-  .z-dz .z-dz-tresc p { font-size: 15.5px; line-height: 1.62; }
+  .z-dz .z-dz-tresc > div > h2 { margin: 0 0 12px; font-size: 28px; line-height: 1.6; }
+  .z-dz .z-dz-tresc .tresc .prose > p { font-size: 15.5px; line-height: 1.62; }
+  /* link w akapicie jak przed otoczką: wartości lżejszego podkreślenia z main a:not(.btn) (telefon.css), kreski nadal brak */
+  .z-dz .z-dz-tresc .tresc .prose > p a { text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 3px; }
   .z-dz .z-dz-skrot dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
   .z-dz .z-dz-skrot dt { font-size: 26px; }
   .z-dz .z-dz-skrot dd { font-size: 13px; }

@@ -147,6 +147,24 @@ function podziel(src: string, adres: string, jawne = false): { glowny: string; k
   return { glowny: glowny.join('\n').trim(), kotwiczone: kotwiczone.map((s) => ({ id: s.id, naglowek: s.naglowek, tresc: s.linie.join('\n').trim() })) };
 }
 
+// Klasa wst dla pierwszego akapitu stojącego bezpośrednio w tekście (zlecenie 56): pierwsze zwykłe <p> na najwyższym poziomie HTML
+// z Markdownu. Dawniej pierwsze <p> w ogóle — gdy tekst zaczynał się od bloku (pytania, ramka, zakładki…), klasa trafiała do akapitu
+// w bloku. Tekst zaczynający się od akapitu dostaje klasę tam gdzie przedtem. Komentarze i zawartość <script>/<style> pomijane.
+const ZNACZNIK_HTML = /<!--[\s\S]*?-->|<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>|<(\/?)([a-zA-Z][\w:-]*)((?:"[^"]*"|'[^']*'|[^'">])*)>/g;
+const PUSTE_HTML = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+export function wstPierwszemu(html: string): string {
+  let glebokosc = 0;
+  for (const m of html.matchAll(ZNACZNIK_HTML)) {
+    const [caly, , zamkniecie, nazwa, atrybuty] = m;
+    if (nazwa === undefined) continue;
+    const tag = nazwa.toLowerCase();
+    if (zamkniecie) { glebokosc = Math.max(0, glebokosc - 1); continue; }
+    if (glebokosc === 0 && caly === '<p>') return html.slice(0, m.index) + '<p class="wst">' + html.slice(m.index! + caly.length);
+    if (!PUSTE_HTML.has(tag) && !/\/\s*$/.test(atrybuty)) glebokosc++;
+  }
+  return html;
+}
+
 /** Markdown strony → HTML tekstu (z wtyczką bloków, gdy bloki) i sekcji pod kotwicami strony `adres`. */
 export async function renderTekstu(src: string | undefined, adres: string, lang: Lang, opcje: { bloki?: boolean; wst?: boolean; jawne?: boolean } = {}): Promise<Tekst> {
   // Jawny format nie przypisuje tekstu do miejsc w szablonie na podstawie nazwy nagłówka — tylko po jawnym {#id} kotwicy strony.
@@ -154,7 +172,7 @@ export async function renderTekstu(src: string | undefined, adres: string, lang:
   const render = async (s: string) => (s ? (await renderMarkdownZNaglowkami(s, lang, opcje.bloki === true, opcje.jawne)).html : '');
   const result = await renderMarkdownZNaglowkami(glowny, lang, opcje.bloki === true, opcje.jawne);
   let html = result.html;
-  if (opcje.wst) html = html.replace(/<p>/, '<p class="wst">');
+  if (opcje.wst) html = wstPierwszemu(html);
   const sekcje: Record<string, Sekcja> = {};
   for (const s of kotwiczone) if (!sekcje[s.id]) sekcje[s.id] = { naglowek: s.naglowek, html: await render(s.tresc) };
   return { html, sekcje, ...(opcje.jawne ? { naglowki: result.naglowki } : {}) };

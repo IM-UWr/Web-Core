@@ -6,7 +6,7 @@
 import { getCollection } from 'astro:content';
 import { wybierz } from '../i18n';
 import { widoczny, TYLKO_OPUBLIKOWANE } from '../tresci';
-import { polaPlikuDzialu, szkicDzialu } from '../tekstyStron';
+import { polaPlikuDzialu, szkicDzialu, wstPierwszemu } from '../tekstyStron';
 import type { Lang } from '../daty';
 import * as Strona from '../../data/popularyzacja.md';
 import { renderMarkdownZNaglowkami } from '../markdown';
@@ -52,7 +52,7 @@ export async function danePopularyzacji(lang: Lang) {
   // z dawnych akapitów oddzielonych pustą linią).
   const zrodlo = TYLKO_OPUBLIKOWANE && Strona.frontmatter?.opublikowany === false ? '' : (en && d.tresc_en?.trim()) || Strona.rawContent();
   const jawne = d.format_tresci === 'jawne';
-  const html = (await renderMarkdownZNaglowkami(zrodlo, lang, !jawne, jawne)).html.replace(/<p>/, '<p class="wst">');
+  const html = wstPierwszemu((await renderMarkdownZNaglowkami(zrodlo, lang, !jawne, jawne)).html);
   const fakty = (d.o_popularyzacji_fakty ?? [])
     .filter((f) => f?.wartosc?.trim())
     .map((f) => ({ w: ((en && f.wartosc_en?.trim()) || f.wartosc!).trim(), o: ((en && f.opis_en) || f.opis || '').replace(/(\d)–(\d)/g, '$1⁠–⁠$2'), a: f.adres?.trim() || undefined }));

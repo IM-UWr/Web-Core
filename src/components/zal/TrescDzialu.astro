@@ -11,6 +11,9 @@
 // Jedna wersja na każdą szerokość; telefon (≤ 1023 px) — jedna kolumna (koniec zal-dzialy.css). Lista podstron poza indeksem wyszukiwarki.
 // Telefon (zlecenie 18, punkt 16, wariant I): w pasie po jednej karcie na grupę, naciśnięcie pokazuje niżej strony tej grupy, bez przycisku
 // Rekrutacji (jest w menu), bez opisów. Bez JS karty schowane i wszystkie grupy z nagłówkami widoczne, jak na komputerze jedna pod drugą.
+// Tekst działu (zlecenie 56): HTML z Markdownu w tej samej otoczce co treść podstrony (div.tresc > div.prose, src/styles/zal-tresc.css),
+// więc bloki ::: (kafelki, linki, etapy, pytania, zakładki…) wyglądają i działają jak na podstronach; akapity stojące bezpośrednio
+// w tekście i linki w nich zachowują wygląd tekstu działu (src/styles/zal-dzialy.css). Skrypt zakładek jak w Podstrona.astro.
 import Link from '../Link.astro';
 import '../../styles/zal-dzialy.css';
 import { u, isExternal } from '../../lib/url';
@@ -102,7 +105,9 @@ const kolumny = (n: number) => (n <= 5 ? Math.max(n, 3) : n === 6 ? 3 : 4);
     <section class="z-dz-tresc" aria-labelledby="z-dz-tresc-h">
       <div>
         <h2 id="z-dz-tresc-h">{tekst.tytul}</h2>
-        {tekst.html ? <Fragment set:html={tekst.html} /> : tekst.akapity.map((a, i) => <p class:list={[i === 0 && 'wst']}>{a}</p>)}
+        <div class="tresc z-dz-proza"><div class="prose">
+          {tekst.html ? <Fragment set:html={tekst.html} /> : tekst.akapity.map((a, i) => <p class:list={[i === 0 && 'wst']}>{a}</p>)}
+        </div></div>
       </div>
       {fakty.length > 0 && (
         <aside class="z-dz-skrot" aria-labelledby="z-dz-skrot-h">
@@ -119,6 +124,8 @@ const kolumny = (n: number) => (n <= 5 ? Math.max(n, 3) : n === 6 ? 3 : 4);
 </div>
 
 <script>
+  // Zakładki z bloku :::zakladki w tekście działu (zlecenie 56): ten sam skrypt co na podstronach.
+  import '../../scripts/tresc-zakladki';
   // Karty grup w pasie działu (komputer i telefon). Otwarta jedna grupa naraz, ponowne naciśnięcie zamyka.
   // Esc zamyka otwartą grupę, gdy fokus jest w pasie, i oddaje fokus karcie.
   document.querySelectorAll('[data-z-dz-karty]').forEach((pas) => {
