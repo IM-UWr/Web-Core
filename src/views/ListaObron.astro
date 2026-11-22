@@ -1,17 +1,20 @@
 ---
-// Obrony doktorskie (/obrony-doktorskie), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro. W stylu listy Aktualności
-// (zlecenie 27, punkt 2): ten sam baner (granat przechodzi w zdjęcie Aktualności, bez liczb, z hasłem), panel „Pokaż” z prawej
-// (zal/ListaPokaz.astro) z filtrem lat (lata, w których są obrony, od najnowszego; w adresie ?rok=2026) i polem szukania (kandydat,
-// tytuł rozprawy, promotor), bez spisu „Na tej stronie”. Nad listą tekst wprowadzający (Treść strony Web-Aktualnosci → Strony →
-// Obrony doktorskie; zlecenie 30; brak = bez tekstu), pod nim nadchodzące i odbyte obrony (grupy jak miesiące w Aktualnościach) i link do archiwum.
-// Wiersze: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie) — dzień w kolorze Nauki (obrona doktorska, jak w Aktualnościach),
+// Obrony doktorskie (/obrony-doktorskie), kierunek „Założyciele”, szablon podstrony zal/Podstrona.astro — układ jak Konferencje
+// (zlecenie 57, decyzja 22.11; wzór: ListaKonferencji.astro): tekst wprowadzający (Treść strony Web-Aktualnosci → Strony →
+// Obrony doktorskie; zlecenie 30, src/lib/tekstyStron.ts; pierwszy akapit .wst; brak = bez tekstu), potem sekcje „Nadchodzące”
+// (od najbliższej, bez podziału na lata; bez obron — napis) i „Odbyte” (lata jako podsekcje h3 z liczbą obron, kotwice #rok-RRRR,
+// od najnowszego roku, w roku od najnowszej obrony). Spis „Na tej stronie”: Nadchodzące i lata (wyliczone z danych).
+// Baner bez zmian: hasło bez liczb (jak w Aktualnościach, zlecenie 27, punkt 2), okruszki „← Nauka”. Bez panelu „Pokaż”
+// (filtr lat i szukanie) i bez linku do archiwum starej strony (zlecenie 57). Stare adresy ?rok=RRRR (dawny filtr) — skrypt
+// na dole przenosi do #rok-RRRR (nieznany rok: góra strony), w adresie nie zostaje ?rok; bez JS cała strona jak zwykle.
+// Wiersze: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie), wygląd jak przed zleceniem 57 — dzień w kolorze Nauki,
 // obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy, promotor.
-// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px; filtry nad listą). Bez JS: bez filtrów, cała lista.
+// Nagłówek wiersza: h3 pod „Nadchodzące”, h4 pod rokiem. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css,
+// klasa .tresc): sekcje h2 z kreską między nimi, lata h3. Własne style (na końcu pliku): rok z kreską pod spodem (prototyp 57), promotor.
+// Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px; spis zwinięty jak w Konferencjach).
 import Podstrona from '../components/zal/Podstrona.astro';
-import ListaPokaz from '../components/zal/ListaPokaz.astro';
-import Link from '../components/Link.astro';
 import WierszWydarzenia from '../components/WierszWydarzenia.astro';
-import { t } from '../lib/i18n';
+import { t, odmiana } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
 import { miejsce, slugOf, type Obrona, type Wydarzenie } from '../lib/tresci';
 import { tytulyWJezyku } from '../lib/osoby';
@@ -20,81 +23,97 @@ import { daneListyObron } from '../lib/widoki/listaObron';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const en = lang === 'en';
-// html — tekst nad listą — Treść strony (Web-Aktualnosci → Strony → Obrony doktorskie; zlecenie 30), nad listą w kolumnie listy
-const { przyszle, odbyte, lata, tytul, lead, haslo, html, ustawienia } = await daneListyObron(lang);
+const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
+// html — tekst nad listą — Treść strony (Web-Aktualnosci → Strony → Obrony doktorskie; zlecenie 30), pierwsza sekcja strony
+const { przyszle, lata, tytul, lead, haslo, html } = await daneListyObron(lang);
 // obrona jako pozycja kalendarza (ten sam wiersz co w Kalendarzu)
 const wiersz = (o: Obrona): Wydarzenie => ({
   rodzaj: 'obrona', tytul: o.data.kandydat, podtytul: o.data.tytul_rozprawy, poczatek: o.data.termin, miejsce: miejsce(o.data.miejsce, lang),
   href: `/obrony-doktorskie/${slugOf(o.id)}`, uid: `obr-${slugOf(o.id)}`,
 });
-const grupy = [
-  { h: t(lang, 'nadchodzaceObrony'), lista: przyszle },
-  { h: t(lang, 'odbyteObrony'), lista: odbyte },
-].filter((g) => g.lista.length > 0);
-const archiwum = `${ustawienia.archiwum}postepowania-w-sprawie-nadania-stopnia-doktora-w-instytucie-matematycznym`;
+const ileObron = (n: number) => `${n} ${odmiana(n, ['obrona', 'obrony', 'obron'], ['defence', 'defences'], lang)}`;
+const tytulNadch = T('Nadchodzące', 'Upcoming');
+// sekcje: nadchodzące (bez lat) i odbyte (lata jako podsekcje); wspólny wzór wiersza
+const sekcje = [
+  { id: 'z-nadchodzace', tytul: tytulNadch, grupy: [{ rok: '', lista: przyszle }] },
+  ...(lata.length > 0 ? [{ id: 'z-odbyte', tytul: T('Odbyte', 'Past'), grupy: lata }] : []),
+];
+// spis „Na tej stronie”: Nadchodzące i lata od najnowszego
+const spis = [
+  { id: 'z-nadchodzace', etykieta: tytulNadch },
+  ...lata.map((g) => ({ id: `rok-${g.rok}`, etykieta: g.rok })),
+];
 ---
 <Podstrona lang={lang} tytul={tytul} opis={lead} uklad="zwarta portal-baner" lead={lead} haslo={haslo} hasloBezLiczb
-  okruszki={[{ etykieta: en ? 'Research' : 'Nauka', adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} klasa="z-ob" klasaRamy="z-pd-pelna" atrybuty={{ 'data-obrony': '' }}>
+  okruszki={[{ etykieta: T('Nauka', 'Research'), adres: '/nauka' }, { etykieta: t(lang, 'obrony') }]} dzial="nauka" spis={spis} klasa="tresc z-ob">
 
-  <ListaPokaz lang={lang} etykieta={en ? 'Filter by year' : 'Filtruj według roku'} opcje={lata.map((r) => ({ wartosc: r, etykieta: r }))}
-    szukaj={en ? 'Search defences' : 'Szukaj w obronach'}>
-    {html && <div slot="nad" class="lp-wstep" set:html={html} />}
+  {html && <section set:html={html} />}
 
-    {grupy.map((g) => (
-      <section class="ob-grupa" data-grupa>
-        <h2>{g.h}</h2>
-        {g.lista.map((o) => (
-          <WierszWydarzenia w={wiersz(o)} lang={lang} dzial="nauka" zwarty bezRodzaju>
-            {o.data.promotorzy.length > 0 && (
-              <p class="ob-prom"><strong>{o.data.promotorzy.length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {o.data.promotorzy.map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
-            )}
-          </WierszWydarzenia>
-        ))}
-      </section>
-    ))}
-    <p class="ob-pusto" role="status" data-pusto hidden>{en ? 'No defences match the selected filters.' : 'Brak obron spełniających wybrane kryteria.'}</p>
-    <p class="ob-archiwum">{t(lang, 'archiwumObron')} <Link href={archiwum}>{t(lang, 'archiwum')}</Link>.</p>
-  </ListaPokaz>
+  {sekcje.map((sek) => (
+    <section id={sek.id} class="ob-sek" aria-labelledby={`h-${sek.id}`}>
+      <h2 id={`h-${sek.id}`}>{sek.tytul}</h2>
+      {sek.grupy.every((g) => g.lista.length === 0) && <p class="pusto">{T('Nie zapowiedziano jeszcze kolejnych obron.', 'No upcoming defences announced.')}</p>}
+      {sek.grupy.filter((g) => g.lista.length > 0).map((g) => (
+        <>
+          {g.rok && <h3 id={`rok-${g.rok}`} class="ob-rok">{g.rok}<span class="sr-only">, </span> <small>{ileObron(g.lista.length)}</small></h3>}
+          {g.lista.map((o) => (
+            <WierszWydarzenia w={wiersz(o)} lang={lang} poziom={g.rok ? 'h4' : 'h3'} dzial="nauka" zwarty bezRodzaju>
+              {o.data.promotorzy.length > 0 && (
+                <p class="ob-prom"><strong>{o.data.promotorzy.length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {o.data.promotorzy.map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
+              )}
+            </WierszWydarzenia>
+          ))}
+        </>
+      ))}
+    </section>
+  ))}
 </Podstrona>
 
 <script>
-  // Filtr lat z panelu „Pokaż” (?rok=… z adresu) i szukanie po tekście wiersza (kandydat, tytuł rozprawy, promotor, termin, miejsce).
-  import { panelPokaz, norm } from '../scripts/zal/panel-pokaz';
-  const lista = document.querySelector<HTMLElement>('[data-obrony]');
-  if (lista) {
-    const pozycje = Array.from(lista.querySelectorAll<HTMLElement>('[data-ww]'));
-    const tekst = new Map(pozycje.map((p) => [p, norm(p.querySelector('.ww-tresc')?.textContent ?? '')]));
-    const grupy = Array.from(lista.querySelectorAll<HTMLElement>('[data-grupa]'));
-    const pusto = lista.querySelector<HTMLElement>('[data-pusto]');
-    const pokaz = () => {
-      const rok = panel.filtr();
-      const q = panel.szukane();
-      for (const p of pozycje) p.hidden = (!!rok && !(p.querySelector('time')?.dateTime ?? '').startsWith(rok)) || (!!q && !(tekst.get(p) ?? '').includes(q));
-      grupy.forEach((g) => (g.hidden = !g.querySelector('[data-ww]:not([hidden])')));
-      if (pusto) pusto.hidden = grupy.length === 0 || grupy.some((g) => !g.hidden);
-    };
-    const panel = panelPokaz(lista, pokaz);
-    panel.ustaw(new URLSearchParams(location.search).get('rok'));
+  // Stare adresy z filtrem lat (?rok=RRRR, panel „Pokaż” do zlecenia 57): przejście do sekcji roku (#rok-RRRR) bez przeładowania,
+  // nieznany rok — góra strony; w adresie nie zostaje ?rok (inne parametry i kotwica zostają).
+  const adres = new URL(location.href);
+  const rok = adres.searchParams.get('rok');
+  if (rok !== null) {
+    adres.searchParams.delete('rok');
+    const cel = /^\d{4}$/.test(rok) ? document.getElementById(`rok-${rok}`) : null;
+    history.replaceState(history.state, '', adres);
+    if (cel) {
+      // odstęp nad nagłówkiem: scroll-margin-top (src/styles/zal-podstrona.css), tak samo jak po kliknięciu w spis (zal/SpisStrony.astro;
+      // scrollIntoView i przewijanie przeglądarki do kotwicy dodałyby jeszcze scroll-padding-top z html)
+      let y = -1;
+      const przewin = () => {
+        window.scrollTo({ top: window.scrollY + cel.getBoundingClientRect().top - (parseFloat(getComputedStyle(cel).scrollMarginTop) || 20), behavior: 'instant' });
+        y = window.scrollY;
+      };
+      // po wczytaniu krojów i strony układ może się przesunąć (zal/Podstrona.astro) — poprawka, jeśli nikt jeszcze nie przewijał
+      const popraw = () => { if (window.scrollY === y) przewin(); };
+      przewin();
+      document.fonts?.ready.then(popraw);
+      // kotwica w adresie dopiero po wczytaniu strony: wcześniej przeglądarka sama przewinęłaby do niej po swojemu
+      const kotwica = () => { popraw(); adres.hash = `rok-${rok}`; history.replaceState(history.state, '', adres); };
+      if (document.readyState === 'complete') kotwica();
+      else window.addEventListener('load', kotwica, { once: true });
+    }
   }
 </script>
 
 <style>
-  [hidden] { display: none !important; }
-  /* grupa (nadchodzące, odbyte): nagłówek jak miesiąc w Aktualnościach */
-  .ob-grupa { margin: 0; padding: 0; border: 0; }
-  .ob-grupa h2 { margin: 26px 0 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-family: var(--f-display); font-weight: 500;
-    font-size: 23px; line-height: 1.4; color: var(--d-a); }
+  /* Sekcje, lata (h3), akapity — wzorzec treści .tresc (src/styles/zal-tresc.css). Nagłówek sekcji tuż nad wierszami; rok jak
+     w Konferencjach (Brygada w kolorze działu, liczba obron małym krojem tekstu) z kreską pod spodem, od której zaczynają się wiersze. */
+  .ob-sek h2 { margin-bottom: 0; }
+  h3.ob-rok { margin-bottom: 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3.ob-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  .pusto { margin: 10px 0 0; font-style: italic; color: var(--muted); }
+  /* wiersz jak przed zleceniem 57: link kandydata bez przejścia koloru i odsunięcia podkreślenia linków .tresc (zal-tresc.css) */
+  .ob-sek :global(.ww-t a) { transition: initial; text-underline-offset: initial; }
   /* promotor: jak „Kiedy:” w wierszu Aktualności */
   .ob-prom { margin: 2px 0 0; max-width: none; font-size: 13px; line-height: 1.5; color: var(--muted); }
   .ob-prom strong { font-weight: 700; color: var(--ink); }
-  .ob-pusto { margin: 18px 0 0; font-style: italic; color: var(--muted); }
-  .ob-archiwum { margin: 26px 0 0; font-size: 14.5px; color: var(--muted); }
-  .ob-archiwum :global(a) { color: var(--d-a); }
 
-  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1).
-     Tekst nad listą (dawniej .ob-wstep) — style .lp-wstep w ListaPokaz.astro (zlecenie 30). */
+  /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
-    .ob-grupa h2 { margin-top: 22px; font-size: 20px; }
+    .ob-sek :global(.ww-t a) { text-underline-offset: 3px; } /* jak main a w telefon.css */
     .ob-prom { font-size: 13.5px; }
   }
 </style>

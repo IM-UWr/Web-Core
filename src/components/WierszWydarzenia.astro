@@ -4,7 +4,7 @@
 // „Rodzaj · dzień i godzina · miejsce”, tytuł Brygadą (referat — wzory przez KaTeX, strona zewnętrzna — z ikoną), podtytuł
 // i opis referatu. Cały wiersz klikalny (link w tytule); konferencja bez strony — wiersz bez linku. Wiersze rozdzielone
 // cienką linią. Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px, węższa kolumna daty).
-// data-ww i data-rodzaj — filtr i szukanie w Kalendarzu i na liście Obron (szukanie w .ww-tresc, bez daty).
+// data-ww i data-rodzaj — filtr i szukanie w Kalendarzu (szukanie w .ww-tresc, bez daty).
 // zwarty — listy w stylu Aktualności (Kalendarz, Obrony; zlecenie 27): na komputerze ten sam wzór wiersza co WierszAktualnosci.astro
 //   (węższa kolumna daty, mniejsze pismo), a data także minionych pozycji w kolorze działu. bezRodzaju — etykieta bez rodzaju (lista Obron).
 // Slot: dodatkowe linie pod opisem (np. promotor na liście Obron).
@@ -17,7 +17,8 @@ import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
 import type { Dzial } from '../lib/patroni';
 
 // dzial — własny kolor wiersza pod wpisem o wydarzeniu (zlecenie 21, punkt 6); bez niego kolor otoczenia
-interface Props { w: Wydarzenie; lang: Lang; poziom?: 'h2' | 'h3'; dzial?: Dzial; zwarty?: boolean; bezRodzaju?: boolean }
+// poziom — nagłówek wiersza; h4 na liście Obron pod rokiem h3 (zlecenie 57), wygląd ten sam
+interface Props { w: Wydarzenie; lang: Lang; poziom?: 'h2' | 'h3' | 'h4'; dzial?: Dzial; zwarty?: boolean; bezRodzaju?: boolean }
 const { w, lang, poziom = 'h3', dzial, zwarty = false, bezRodzaju = false } = Astro.props;
 const H = poziom;
 const zewn = !!w.href && isExternal(w.href);
