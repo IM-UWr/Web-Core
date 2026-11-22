@@ -8,8 +8,10 @@
 // w src/lib/daty.ts), podsekcja h3#rok-RRRR-RR („2025/26” i liczba referatów), lata od najnowszego, w roku od najnowszego
 // referatu; każdy rok ma własną siatkę .ref-dwie (układ zlecenia 65), a details name="streszczenie-minione" jest wspólne
 // dla całej strony (rozwinięte jedno streszczenie, także między latami). Tytuł minionego referatu pod rokiem w h4 (wygląd wiersza
-// bez zmian). Spis: Nadchodzące, Minione, potem lata (płasko, jak w Konferencjach; wyliczone z danych). Minione tylko z jednego
-// roku akademickiego: bez podziału i bez lat w spisie (tytuł w h3, jak przed zleceniem 68). Link do archiwum pod ostatnim rokiem.
+// bez zmian). Dwa najnowsze lata rozwinięte, starsze zwinięte (details.sem-rok-zw, rok i liczba w summary; klik rozwija;
+// decyzja właściciela 23.11). Spis tylko „Nadchodzące” i „Minione” — bez lat, żeby zapis na powiadomienia pod spisem
+// nie zjeżdżał (decyzja 23.11). Minione tylko z jednego roku akademickiego: bez podziału (tytuł w h3, jak przed zleceniem 68).
+// Kotwica referatu albo roku w zwiniętym roku (#<slug> z Kalendarza, #rok-RRRR-RR) rozwija ten rok. Link do archiwum na końcu.
 // Baner (zlecenie 17, punkt 4): link wstecz, sygnet i nazwa, bez hasła, liczb i podpisu. Koordynatorzy, e-mail i zakład
 // na końcu sekcji opisu (wzorzec .kontakty). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
 // w kolorze działu, pod nim „mie rrrr”; obok dzień tygodnia, godzina i sala, tytuł Brygadą, prelegent z afiliacją.
@@ -52,10 +54,12 @@ const typPliku = (a: string) => {
 const zLatami = lataMinionych.length > 1;
 const grupyMinionych = zLatami ? lataMinionych : minione.length > 0 ? [{ rok: '', id: '', lista: minione }] : [];
 const ileRef = (n: number) => `${n} ${odmiana(n, ['referat', 'referaty', 'referatów'], ['talk', 'talks'], lang)}`;
+// rozwinięte: dwa najnowsze lata z minionymi referatami; starsze zwinięte (decyzja właściciela 23.11)
+const ROZWINIETE_LATA = 2;
+// spis „Na tej stronie”: bez lat (decyzja 23.11 — długi spis spychał zapis na powiadomienia)
 const spis = [
   { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
   ...(minione.length > 0 ? [{ id: 'z-minione', etykieta: t(lang, 'minione') }] : []),
-  ...(zLatami ? lataMinionych.map((g) => ({ id: g.id, etykieta: g.rok })) : []),
 ];
 ---
 <Podstrona lang={lang} tytul={nazwa} tytulLang={langPola(d, 'nazwa', lang)} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
@@ -136,30 +140,37 @@ const spis = [
   {(minione.length > 0 || d.archiwum) && (
     <section id="z-minione" aria-labelledby="h-min">
       {minione.length > 0 && <h2 id="h-min">{t(lang, 'minione')}</h2>}
-      {grupyMinionych.map((g) => { const H = g.rok ? 'h4' : 'h3'; return (<>
-      {g.rok && <h3 id={g.id} class="sem-rok">{g.rok}<span class="sr-only">, </span> <small>{ileRef(g.lista.length)}</small></h3>}
-      <div class="ref-dwie">
-      {g.lista.map(({ r, C, en }) => (
-        <article class="ref maly" id={slugOf(r.id)}>
-          <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
-          <div>
-            {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
-            <H><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} />{jestSzkicem(r) && <Fragment set:html={ETYKIETA_SZKICU[lang]} />}</H>
-            <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
-            {(en || maTresc(r.body)) && (
-              <details name="streszczenie-minione">
-                <summary>{t(lang, 'streszczenie')}</summary>
-                <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>
-              </details>
-            )}
-            {r.data.pliki.length > 0 && (
-              <ul class="pliki">{r.data.pliki.map((p) => <li><Link href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></Link></li>)}</ul>
-            )}
+      {grupyMinionych.map((g, k) => {
+        const H = g.rok ? 'h4' : 'h3';
+        const zwiniety = k >= ROZWINIETE_LATA;
+        const naglowek = g.rok && <h3 class="sem-rok" id={zwiniety ? undefined : g.id}>{g.rok}<span class="sr-only">, </span> <small>{ileRef(g.lista.length)}</small>{zwiniety && <svg class="sem-rok-ikona" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>}</h3>;
+        const siatka = (
+          <div class="ref-dwie">
+          {g.lista.map(({ r, C, en }) => (
+            <article class="ref maly" id={slugOf(r.id)}>
+              <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
+              <div>
+                {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
+                <H><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} />{jestSzkicem(r) && <Fragment set:html={ETYKIETA_SZKICU[lang]} />}</H>
+                <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
+                {(en || maTresc(r.body)) && (
+                  <details name="streszczenie-minione">
+                    <summary>{t(lang, 'streszczenie')}</summary>
+                    <div class="prose streszcz" lang={en ? undefined : langTekstu(r.body, lang)}>{en ? <Fragment set:html={en} /> : <C />}</div>
+                  </details>
+                )}
+                {r.data.pliki.length > 0 && (
+                  <ul class="pliki">{r.data.pliki.map((p) => <li><Link href={href(p.plik)}><Ikona nazwa="plik" rozmiar={18} /><span>{p.nazwa || p.plik.split('/').pop()}</span><span class="typ">{typPliku(p.plik)}</span></Link></li>)}</ul>
+                )}
+              </div>
+            </article>
+          ))}
           </div>
-        </article>
-      ))}
-      </div>
-      </>); })}
+        );
+        return zwiniety
+          ? <details class="sem-rok-zw" id={g.id}><summary>{naglowek}</summary>{siatka}</details>
+          : <>{naglowek}{siatka}</>;
+      })}
       {d.archiwum && <p class="archiwum"><Link href={d.archiwum}>{t(lang, 'archiwumSem')}</Link></p>}
     </section>
   )}
@@ -194,10 +205,24 @@ const spis = [
         const w = (e.target as Element).closest('summary')?.closest<HTMLElement>('.ref');
         if (w) kotwica = { el: w, y: w.getBoundingClientRect().top };
       });
-      // toggle nie wypływa w górę — nasłuch w fazie przechwytywania
-      siatka.addEventListener('toggle', uloz, true);
     });
+    // toggle nie wypływa w górę — nasłuch w fazie przechwytywania; na całej sekcji, bo rozwinięcie zwiniętego roku
+    // (details.sem-rok-zw) też wymaga przeliczenia (siatka w zwiniętym roku nie ma kolumn)
+    document.getElementById('z-minione')?.addEventListener('toggle', uloz, true);
   }
+
+  // Starsze lata zwinięte (decyzja 23.11): kotwica w zwiniętym roku — referat z Kalendarza (#<slug>) albo rok (#rok-RRRR-RR) —
+  // rozwija ten rok i przewija do celu (przeglądarka nie zawsze przewija do treści zwiniętego details).
+  const odkryj = () => {
+    let cel: HTMLElement | null = null;
+    try { cel = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null; } catch { cel = null; }
+    const rok = cel?.closest<HTMLDetailsElement>('details.sem-rok-zw');
+    if (!cel || !rok) return;
+    if (!rok.open) rok.open = true;
+    cel.scrollIntoView({ block: 'start', behavior: 'instant' });
+  };
+  odkryj();
+  window.addEventListener('hashchange', odkryj);
 
   // Zapis na listę: wysyłka w tle (bez przeładowania strony). Automat zawsze odpowiada tak samo,
   // żeby nie zdradzać, czy adres już jest na liście.
@@ -262,6 +287,21 @@ const spis = [
   /* rok akademicki (podsekcja h3 minionych, zlecenie 68): wygląd lat w Konferencjach i Obronach — rok wzorcem .tresc h3,
      liczba referatów małym krojem tekstu */
   h3.sem-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  /* starsze lata zwinięte (decyzja 23.11): wiersz roku jak nagłówek roku, ze strzałką z prawej; zwinięte lata jeden pod drugim,
+     rozdzielone cienką kreską; po rozwinięciu siatka referatów pod spodem */
+  .sem-rok-zw { margin-top: 30px; border-bottom: 1px solid var(--line); }
+  .sem-rok-zw + .sem-rok-zw { margin-top: 0; }
+  .sem-rok-zw[open] { border-bottom: 0; }
+  .sem-rok-zw > summary { display: block; list-style: none; cursor: pointer; }
+  .sem-rok-zw > summary::-webkit-details-marker { display: none; }
+  .sem-rok-zw > summary h3.sem-rok { display: flex; align-items: baseline; margin: 0; padding: 12px 0; }
+  .sem-rok-zw[open] > summary h3.sem-rok { padding-bottom: 8px; }
+  .sem-rok-ikona { align-self: center; flex: none; margin-left: auto; color: var(--d-a); transition: transform var(--t-krotki) var(--rytm); }
+  .sem-rok-zw[open] .sem-rok-ikona { transform: rotate(180deg); }
+  .sem-rok-zw > summary:hover h3.sem-rok small { color: var(--d-a); }
+  .sem-rok-zw > summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }
+  .sem-rok-zw[id] { scroll-margin-top: 20px; }
+  @media (prefers-reduced-motion: reduce) { .sem-rok-ikona { transition: none; } }
   /* kotwice referatów: zapas nad wpisem */
   .ref[id] { scroll-margin-top: 20px; }
 
@@ -311,5 +351,6 @@ const spis = [
     /* streszczenie na całą szerokość (pod dniem też) — wąska kolumna obok dnia jest za wąska na dłuższy tekst */
     .ref .streszcz { margin-left: -66px; }
     .ref[id] { scroll-margin-top: calc(var(--hdr-h) + 16px); }
+    .sem-rok-zw[id] { scroll-margin-top: calc(var(--hdr-h) + 16px); }
   }
 </style>
