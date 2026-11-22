@@ -215,7 +215,7 @@ const LOSUJ = glownaJs(lang);
         <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Highlights')}</h2><a href={href(ADRES_WW)}>{T('Wszystkie →', 'All →')}</a></div>
         <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((p) => (
           <Link href={href(p.adres)} {...p.dane} hidden={!p.widoczna}>
-            {p.w.grupa === 'sylwetki' ? <span class="ww2-twarz" set:html={portretHtml(p.w)} /> : p.w.grupa === 'historie' && <span>{p.w.rok}</span>}
+            {p.w.grupa === 'sylwetki' ? <span class="ww2-twarz" set:html={portretHtml(p.w, '', lang)} /> : p.w.grupa === 'historie' && <span>{p.w.rok}</span>}
             <b class="t">{p.napis && <i class="ww2-ozn">{p.napis}</i>}<span class="ww2-t" lang={p.tytulLang}>{p.tytul}</span></b>
           </Link>
         ))}</div>

@@ -25,7 +25,7 @@ const nowe = !mala && wpisy.some((w) => w.dodano && !w.tba);
     return (
       <li hidden={!!pokaz && !pokaz.has(w.slug)}>
         <Link href={href(adresWW(w))}>
-          <Fragment set:html={portretHtml(w)} />
+          <Fragment set:html={portretHtml(w, '', lang)} />
           <b lang={langPola(w, 'tytul', lang)}>{w.tytul}</b>
           {lata && <small>{lata}</small>}
           {podpis && <span class="ww2-pd" lang={langPola(w, 'podpis', lang)}>{podpis}</span>}

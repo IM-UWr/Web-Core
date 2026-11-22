@@ -50,7 +50,7 @@ const spis = [
   <Fragment slot="baner"><LiczbyBanera lang={lang} pozycje={liczby} /></Fragment>
   <div class="ww2-prof">
     <div class="ww2-prof-l">
-      <Fragment set:html={portretHtml(w, 'ww2-duzy')} />
+      <Fragment set:html={portretHtml(w, 'ww2-duzy', lang)} />
       {lata && <p class="ww2-prof-lata">{lata}</p>}
       {w.obraz && zrodloZdjecia && <p class="ww2-prof-zrodlo">{T('Fot.', 'Photo:')} {zrodloLang ? <span lang={zrodloLang}>{zrodloZdjecia}</span> : zrodloZdjecia}</p>}
     </div>

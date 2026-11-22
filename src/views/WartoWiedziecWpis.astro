@@ -65,7 +65,7 @@ const ostatnia = wszystkieSekcje.length - 1;
       <h2 id="ludzie-h">{ludzieTytul}</h2>
       <ul class="ww2-ludzie">
         {ludzie.map((o) => (
-          <li><a href={href(`${ADRES_WW}/${o.slug}`)}><Fragment set:html={portretHtml(o)} /><span><b>{o.tytul}</b>{o.lata && <small>{parsujLata(o.lata, lang).tekst}</small>}<i>{T('Sylwetka', 'Profile')} <span aria-hidden="true">→</span></i></span></a></li>
+          <li><a href={href(`${ADRES_WW}/${o.slug}`)}><Fragment set:html={portretHtml(o, '', lang)} /><span><b>{o.tytul}</b>{o.lata && <small>{parsujLata(o.lata, lang).tekst}</small>}<i>{T('Sylwetka', 'Profile')} <span aria-hidden="true">→</span></i></span></a></li>
         ))}
       </ul>
     </section>

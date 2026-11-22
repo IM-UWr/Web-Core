@@ -180,14 +180,15 @@ export const bezTlumaczenia = (w: WW, lang: Lang) => lang === 'en' && w.maTresc 
 const SYLWETKA_SVG = '<svg viewBox="0 0 80 100" aria-hidden="true" focusable="false"><circle cx="40" cy="36" r="15"/><path d="M12 96c0-17 12.5-30 28-30s28 13 28 30"/></svg>';
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 /** HTML portretu: zdjęcie (pole „Zdjęcie”) albo sylwetka zastępcza; napis „Zdjęcie” (duże zastępcze) tylko na Podglądzie. */
-export function portretHtml(w: WW | undefined, klasa = ''): string {
+// lang — napis portretu zastępczego (tylko Podgląd): „Zdjęcie”, na /en „Photo” (zlecenie 59, punkt 4)
+export function portretHtml(w: WW | undefined, klasa = '', lang: Lang = 'pl'): string {
   const k = klasa ? ` ${klasa}` : '';
   if (w?.obraz) return `<span class="ww2-portret ww2-foto${k}"><img src="${esc(u(w.obraz))}" alt="" loading="lazy" decoding="async"></span>`;
-  return `<span class="ww2-portret ww2-ph${k}" aria-hidden="true">${SYLWETKA_SVG}${TYLKO_OPUBLIKOWANE ? '' : '<small lang="pl">Zdjęcie</small>'}</span>`;
+  return `<span class="ww2-portret ww2-ph${k}" aria-hidden="true">${SYLWETKA_SVG}${TYLKO_OPUBLIKOWANE ? '' : lang === 'en' ? '<small lang="en">Photo</small>' : '<small lang="pl">Zdjęcie</small>'}</span>`;
 }
 /** Małe portrety sylwetek widocznych (blok :::laureaci; szkice przy fladze bez portretu). */
-export async function portretyWW(): Promise<Record<string, string>> {
-  return Object.fromEntries((await widoczneWW()).filter((w) => w.grupa === 'sylwetki').map((w) => [w.slug, portretHtml(w, 'ww2-mini')]));
+export async function portretyWW(lang: Lang = 'pl'): Promise<Record<string, string>> {
+  return Object.fromEntries((await widoczneWW()).filter((w) => w.grupa === 'sylwetki').map((w) => [w.slug, portretHtml(w, 'ww2-mini', lang)]));
 }
 
 // ---------- powiązania (linki w Treści) ----------
@@ -235,7 +236,7 @@ export async function trescWW(w: WW, lang: Lang): Promise<TrescWW | undefined> {
   if (!src) return undefined;
   // tytul — reguła A autokorekty nagłówków (zlecenie 53: remark-jawne-bloki.mjs, poprawNaglowkiWW); naglowki — opis poprawek (wyjście)
   const ww: { lata?: string; portrety: Record<string, string>; tytul: string; bledy?: BladLiniiWW[]; naglowki?: string[] } = {
-    lata: parsujLata(w.lata).liczba, portrety: await portretyWW(), tytul: (lang === 'en' && w.tytul_en) || w.tytul,
+    lata: parsujLata(w.lata).liczba, portrety: await portretyWW(lang), tytul: (lang === 'en' && w.tytul_en) || w.tytul,
   };
   let { html } = await renderMarkdownZNaglowkami(src, lang, false, { ww });
   const bledy = ww.bledy ?? [];
