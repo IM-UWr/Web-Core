@@ -38,6 +38,10 @@ Wskazówki:
 - **Pliki (PDF, zdjęcia)** wgrywaj w „Media” swojego repozytorium. Każde repozytorium ma własne foldery (np. seminarium:
   `/pliki/seminaria/topologia/`), bo na stronie pliki ze wszystkich repozytoriów są we wspólnym `/pliki`, a ten sam plik
   w dwóch repozytoriach zatrzymuje budowę. Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisuje `-1`.
+  W linku wystarczy nazwa pliku tak, jak widać ją w Media: `[Program](program.pdf)`, plik w folderze `slajdy/wyklad-1.pdf`,
+  plik z Media innego repozytorium `[Lista](Web-Nauka/lista.pdf)`. Przy budowie zamienia się to na pełny adres `/pliki/…`
+  (`skrypty/adresy_plikow.py`); pełne adresy też działają. Link do pliku, którego nie ma w Media, to ostrzeżenie
+  „Plik w treści” w przebiegu budowy.
 
 ## Struktura repozytorium
 

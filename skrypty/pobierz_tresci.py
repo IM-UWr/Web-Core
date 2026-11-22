@@ -19,6 +19,10 @@ i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
 - --zrodlo Repo=katalog nakłada wskazany lokalny checkout zamiast kopii tego repozytorium.
 - --wymagaj Repo przerywa pobieranie, jeśli Repo nie ma gałęzi podanej przez --galaz (bez powrotu do main).
 - .tresci/zrodla.json zapisuje pełne SHA pobranych repozytoriów; lokalne nakładki są opisane jako lokalne.
+- Krótkie adresy plików (skrypty/adresy_plikow.py): w linkach i obrazkach Markdownu w plikach src/ redaktor może pisać
+  sam plik z Media swojego repozytorium (nadzieja-seminarium.pdf) albo innego (Web-Nauka/publikacje/lista.pdf); przy
+  nakładaniu zamieniają się na pełne /pliki/…. Brakujący plik to ostrzeżenie (na GitHubie adnotacja „Plik w treści”),
+  nie błąd budowy.
 """
 import concurrent.futures
 import json
@@ -26,6 +30,8 @@ import os
 import shutil
 import subprocess
 import sys
+
+from adresy_plikow import Adresy, foldery_media
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, '.tresci')
@@ -87,6 +93,34 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
 
 json.dump({r: wersja for r, _, wersja in wyniki}, open(os.path.join(CACHE, 'zrodla.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 
+# krótkie adresy plików: foldery Media repozytoriów i wszystkie pliki public/pliki (Web-Core i repozytoria treści)
+publiczne = set()
+for baza in [ROOT] + [kat for _, kat, _ in wyniki if kat]:
+    for dp, _, pliki in os.walk(os.path.join(baza, 'public', 'pliki')):
+        publiczne |= {os.path.relpath(os.path.join(dp, f), baza).replace(os.sep, '/') for f in pliki}
+adresy = Adresy({repo: foldery_media(kat) for repo, kat, _ in wyniki if kat}, publiczne)
+TEKSTOWE = ('.md', '.mdx', '.json', '.yml', '.yaml')
+krotkie = []  # (repozytorium, plik, adres w treści, pełny adres, czy plik istnieje)
+
+
+def naloz(zrodlowy, cel, repo, rel):
+    """Kopiuje plik; w plikach tekstowych z src/ zamienia krótkie adresy plików na pełne."""
+    if rel.startswith('src' + os.sep) and rel.endswith(TEKSTOWE):
+        try:
+            with open(zrodlowy, encoding='utf-8', newline='') as we:
+                tekst = we.read()
+        except UnicodeDecodeError:
+            tekst = None
+        if tekst is not None:
+            nowy, zmiany = adresy.przepisz(tekst, repo)
+            if zmiany:
+                with open(cel, 'w', encoding='utf-8', newline='') as wy:
+                    wy.write(nowy)
+                krotkie.extend((repo, rel.replace(os.sep, '/'), *z) for z in zmiany)
+                return
+    shutil.copy2(zrodlowy, cel)
+
+
 # 3. nałóż src/ i public/
 zrodlo = {}
 bledy = []
@@ -107,12 +141,21 @@ for repo, kat, wersja in wyniki:
                     bledy.append((rel, 'Web-Core', repo))
                     continue
                 os.makedirs(os.path.dirname(cel), exist_ok=True)
-                shutil.copy2(os.path.join(dp, f), cel)
+                naloz(os.path.join(dp, f), cel, repo, rel)
                 zrodlo[rel] = repo
                 n += 1
     print(f'  {repo} ({wersja}): {n} plików')
 
 json.dump(sorted(zrodlo), open(MANIFEST, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+if krotkie:
+    print(f'\nKrótkie adresy plików zamienione na /pliki/…: {len(krotkie)}.')
+    brak = [k for k in krotkie if not k[4]]
+    for repo, plik, adres, pelny, _ in brak:
+        print(f'  BRAK PLIKU  {repo}: {plik}: „{adres}” → {pelny}')
+    if brak and os.environ.get('GITHUB_ACTIONS') == 'true':
+        for repo, plik, adres, pelny, _ in brak[:10]:
+            print(f'::warning title=Plik w treści::{repo}: {plik}: link „{adres}” prowadzi do {pelny}, a takiego pliku nie ma '
+                  f'w Media. Sprawdź nazwę pliku w Media (CMS mógł dopisać -1).')
 def opis_kolizji(rel, pierwsze, drugie):
     """Zdanie dla redaktora: adres pliku na stronie (/pliki/…) albo ścieżka w repozytorium i oba źródła."""
     rel = rel.replace(os.sep, '/')

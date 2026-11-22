@@ -11,13 +11,13 @@ W Pages CMS są dwa rodzaje tekstu (zlecenie 40):
 
 Strony i strony działów (jawny Markdown):
 
-> Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i wklej link. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
+> Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i w linku wpisz samą nazwę pliku: [tekst](nazwa.pdf); plik z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
 
 W „Stronach studiów” (Web-Studia) lista przykładowych bloków ma też `:::pary` i `:::grafik` (zlecenie 45; w Treści EN: „pusty blok wstawia grafik z wersji polskiej”). Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
 
 Wpisy (zwykły Markdown):
 
-> Zwykły Markdown: akapity oddziela pusta linia; \*\*pogrubienie\*\*, \*kursywa\*, [tekst linku](https://…); lista: „- ” na początku linii; ## = nagłówek sekcji. Plik PDF: wgraj w „Media” i wklej link. Komentarze <!-- … --> to podpowiedzi; na stronie ich nie widać.
+> Zwykły Markdown: akapity oddziela pusta linia; \*\*pogrubienie\*\*, \*kursywa\*, [tekst linku](https://…); lista: „- ” na początku linii; ## = nagłówek sekcji. Plik PDF: wgraj w „Media” i w linku wpisz samą nazwę pliku: [tekst](nazwa.pdf); plik z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Komentarze <!-- … --> to podpowiedzi; na stronie ich nie widać.
 
 ## Przykłady (jawny Markdown)
 
