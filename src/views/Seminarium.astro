@@ -4,6 +4,12 @@
 // Konferencje, rozwinięte streszczenie na całą szerokość, jedno naraz — zlecenie 65); zapis na powiadomienia e-mail w prawej
 // kolumnie pod spisem (slot „bok”, na telefonie pod treścią)
 // i link do archiwum. Spis „Na tej stronie” z sekcji; na telefonie zwijany nad treścią.
+// Minione według lat akademickich (zlecenie 68, jak lata w Konferencjach i Obronach, zlecenie 57): rok od 1.10 (rokAkademicki
+// w src/lib/daty.ts), podsekcja h3#rok-RRRR-RR („2025/26” i liczba referatów), lata od najnowszego, w roku od najnowszego
+// referatu; każdy rok ma własną siatkę .ref-dwie (układ zlecenia 65), a details name="streszczenie-minione" jest wspólne
+// dla całej strony (rozwinięte jedno streszczenie, także między latami). Tytuł minionego referatu pod rokiem w h4 (wygląd wiersza
+// bez zmian). Spis: Nadchodzące, Minione, potem lata (płasko, jak w Konferencjach; wyliczone z danych). Minione tylko z jednego
+// roku akademickiego: bez podziału i bez lat w spisie (tytuł w h3, jak przed zleceniem 68). Link do archiwum pod ostatnim rokiem.
 // Baner (zlecenie 17, punkt 4): link wstecz, sygnet i nazwa, bez hasła, liczb i podpisu. Koordynatorzy, e-mail i zakład
 // na końcu sekcji opisu (wzorzec .kontakty). Referaty z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą
 // w kolorze działu, pod nim „mie rrrr”; obok dzień tygodnia, godzina i sala, tytuł Brygadą, prelegent z afiliacją.
@@ -18,7 +24,7 @@ import Ikona from '../components/Ikona.astro';
 import TytulReferatu from '../components/TytulReferatu.astro';
 import BrakOsoby from '../components/BrakOsoby.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz, RODZAJE, langPola, langTekstu } from '../lib/i18n';
+import { t, wJezyku, wybierz, odmiana, RODZAJE, langPola, langTekstu } from '../lib/i18n';
 import { dayNum, longWithDay, monthShort, parse, time, type Lang } from '../lib/daty';
 import { slugOf, sala, salaReferatu, afiliacjaReferatu, maTresc, jestSzkicem, type Seminarium } from '../lib/tresci';
 import { ETYKIETA_SZKICU } from '../lib/szkice';
@@ -30,7 +36,7 @@ const { seminarium, lang } = Astro.props;
 const d = seminarium.data;
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
-const { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, brakKoordynatora, adresListy, maKoord } = await daneSeminarium(seminarium, lang);
+const { nazwa, Content, htmlEn, nadchodzace, minione, lataMinionych, zakladySem, koordynatorzy, brakKoordynatora, adresListy, maKoord } = await daneSeminarium(seminarium, lang);
 // linia nad tytułem referatu: (dzień tygodnia ·) godzina · sala — puste pomijane
 const dzienTygodnia = (termin: string) => longWithDay(termin, lang).split(', ')[0];
 const kiedyGdzie = (termin: string, s: string | undefined, zDniem: boolean) =>
@@ -42,9 +48,14 @@ const typPliku = (a: string) => {
   const m = a.split(/[?#]/)[0].match(/\.([a-z0-9]{2,4})$/i);
   return m ? m[1].toUpperCase() : isExternal(a) ? T('strona', 'website') : '';
 };
+// minione: podział na lata akademickie tylko, gdy jest ich więcej niż jeden (inaczej jedna grupa bez nagłówka roku — jak dawniej)
+const zLatami = lataMinionych.length > 1;
+const grupyMinionych = zLatami ? lataMinionych : minione.length > 0 ? [{ rok: '', id: '', lista: minione }] : [];
+const ileRef = (n: number) => `${n} ${odmiana(n, ['referat', 'referaty', 'referatów'], ['talk', 'talks'], lang)}`;
 const spis = [
   { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
   ...(minione.length > 0 ? [{ id: 'z-minione', etykieta: t(lang, 'minione') }] : []),
+  ...(zLatami ? lataMinionych.map((g) => ({ id: g.id, etykieta: g.rok })) : []),
 ];
 ---
 <Podstrona lang={lang} tytul={nazwa} tytulLang={langPola(d, 'nazwa', lang)} opis={`${RODZAJE.referat[lang]}: ${nazwa}`} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
@@ -125,13 +136,15 @@ const spis = [
   {(minione.length > 0 || d.archiwum) && (
     <section id="z-minione" aria-labelledby="h-min">
       {minione.length > 0 && <h2 id="h-min">{t(lang, 'minione')}</h2>}
-      {minione.length > 0 && <div class="ref-dwie">
-      {minione.map(({ r, C, en }) => (
+      {grupyMinionych.map((g) => { const H = g.rok ? 'h4' : 'h3'; return (<>
+      {g.rok && <h3 id={g.id} class="sem-rok">{g.rok}<span class="sr-only">, </span> <small>{ileRef(g.lista.length)}</small></h3>}
+      <div class="ref-dwie">
+      {g.lista.map(({ r, C, en }) => (
         <article class="ref maly" id={slugOf(r.id)}>
           <time class="dz" datetime={r.data.termin.slice(0, 10)}>{dayNum(r.data.termin)}<small> {monthShort(r.data.termin, lang)} {parse(r.data.termin).y}</small></time>
           <div>
             {kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false) && <p class="etyk">{kiedyGdzie(r.data.termin, salaReferatu(r.data, lang), false)}</p>}
-            <h3><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} />{jestSzkicem(r) && <Fragment set:html={ETYKIETA_SZKICU[lang]} />}</h3>
+            <H><TytulReferatu tekst={r.data.tytul} jezyk={r.data.jezyk} lang={lang} />{jestSzkicem(r) && <Fragment set:html={ETYKIETA_SZKICU[lang]} />}</H>
             <p class="kto">{r.data.prelegent}{afiliacjaReferatu(r.data, lang) && <span> ({afiliacjaReferatu(r.data, lang)})</span>}</p>
             {(en || maTresc(r.body)) && (
               <details name="streszczenie-minione">
@@ -145,7 +158,8 @@ const spis = [
           </div>
         </article>
       ))}
-      </div>}
+      </div>
+      </>); })}
       {d.archiwum && <p class="archiwum"><Link href={d.archiwum}>{t(lang, 'archiwumSem')}</Link></p>}
     </section>
   )}
@@ -156,27 +170,33 @@ const spis = [
   // rozwinięte jest jedno naraz (details name — rozwinięcie kolejnego zwija poprzednie). Wiersz z prawej kolumny dostaje order
   // tuż przed sąsiadem z lewej: zostaje w swoim rzędzie, a sąsiad schodzi pod niego. Kliknięty wiersz nie ucieka spod kursora:
   // po zmianie układu strona przewija się o tyle, o ile przesunął się jego górny brzeg (np. po zwinięciu streszczenia wyżej).
-  const siatka = document.querySelector<HTMLElement>('.ref-dwie');
-  if (siatka) {
-    const wiersze = [...siatka.children] as HTMLElement[];
+  // Każdy rok akademicki ma własną siatkę (zlecenie 68); name jest wspólne dla strony, więc rozwinięcie w jednym roku może zwinąć
+  // streszczenie w innym — po każdym toggle układ liczy się we wszystkich siatkach naraz.
+  const siatki = [...document.querySelectorAll<HTMLElement>('.ref-dwie')];
+  if (siatki.length) {
+    const wiersze = siatki.map((s) => [...s.children] as HTMLElement[]);
     let kotwica: { el: HTMLElement; y: number } | null = null;
-    siatka.addEventListener('click', (e) => {
-      const w = (e.target as Element).closest('summary')?.closest<HTMLElement>('.ref');
-      if (w) kotwica = { el: w, y: w.getBoundingClientRect().top };
-    });
     const uloz = () => {
-      const kolumny = getComputedStyle(siatka).gridTemplateColumns.split(' ').filter((s) => s && s !== 'none').length;
-      wiersze.forEach((w, i) => {
-        const c = kolumny > 1 ? i % kolumny : 0;
-        w.style.order = String(c && w.querySelector('details[open]') ? 2 * (i - c) - 1 : 2 * i);
+      siatki.forEach((siatka, k) => {
+        const kolumny = getComputedStyle(siatka).gridTemplateColumns.split(' ').filter((s) => s && s !== 'none').length;
+        wiersze[k].forEach((w, i) => {
+          const c = kolumny > 1 ? i % kolumny : 0;
+          w.style.order = String(c && w.querySelector('details[open]') ? 2 * (i - c) - 1 : 2 * i);
+        });
       });
       if (kotwica) {
         window.scrollBy({ top: kotwica.el.getBoundingClientRect().top - kotwica.y, behavior: 'instant' });
         kotwica = null;
       }
     };
-    // toggle nie wypływa w górę — nasłuch w fazie przechwytywania
-    siatka.addEventListener('toggle', uloz, true);
+    siatki.forEach((siatka) => {
+      siatka.addEventListener('click', (e) => {
+        const w = (e.target as Element).closest('summary')?.closest<HTMLElement>('.ref');
+        if (w) kotwica = { el: w, y: w.getBoundingClientRect().top };
+      });
+      // toggle nie wypływa w górę — nasłuch w fazie przechwytywania
+      siatka.addEventListener('toggle', uloz, true);
+    });
   }
 
   // Zapis na listę: wysyłka w tle (bez przeładowania strony). Automat zawsze odpowiada tak samo,
@@ -218,13 +238,15 @@ const spis = [
   .ref .dz small { display: block; margin-top: 4px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
   .ref p { margin: 0; max-width: none; }
   .ref .etyk { font-variant-numeric: tabular-nums; }
-  .ref h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
-  .ref.maly h3 { font-size: 18.5px; }
+  /* tytuł: h3 (nadchodzące, minione bez podziału na lata) albo h4 (minione pod rokiem; zlecenie 68) — ten sam wygląd;
+     odstęp liter jak h3 w main (zalozyciele.css, zal-telefon.css), bo global.css daje h4 -0.01em */
+  .ref :is(h3, h4) { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; letter-spacing: -0.005em; color: var(--ink); }
+  .ref.maly :is(h3, h4) { font-size: 18.5px; }
   .ref .kto { font-size: 15.5px; font-weight: 600; line-height: 1.55; color: var(--ink); }
   /* minione referaty przygaszone jak „Ostatnio” w Szybkim dostępie (zalozyciele-strony.css: .z-w.minelo, .z-przeszle):
      data szara, tytuł i prelegent lżejsze, etykieta lekko przygaszona; kolory z tokenów (tryb ciemny bez osobnych reguł) */
   .ref.maly .dz { color: var(--muted); }
-  .ref.maly h3 { color: var(--text); }
+  .ref.maly :is(h3, h4) { color: var(--text); }
   .ref.maly .kto { font-weight: 500; color: var(--text); }
   .ref.maly .etyk { opacity: .8; }
   .ref .kto span { font-weight: 400; color: var(--muted); }
@@ -237,6 +259,9 @@ const spis = [
   .ref .pliki { margin-top: 10px; }
   .pusto { font-style: italic; color: var(--muted); }
   .archiwum { margin: 18px 0 0; font-weight: 600; }
+  /* rok akademicki (podsekcja h3 minionych, zlecenie 68): wygląd lat w Konferencjach i Obronach — rok wzorcem .tresc h3,
+     liczba referatów małym krojem tekstu */
+  h3.sem-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
   /* kotwice referatów: zapas nad wpisem */
   .ref[id] { scroll-margin-top: 20px; }
 
@@ -270,7 +295,7 @@ const spis = [
      Jedno naraz daje sam atrybut name przy details (także bez JS); bez JS lukę obok sąsiada wypełnia następny wiersz (dense). */
   @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
     .ref-dwie { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(300px, 45%), 1fr)); grid-auto-flow: row dense; gap: 0 48px; }
-    .ref-dwie .ref.maly h3 { font-size: 19px; }
+    .ref-dwie .ref.maly :is(h3, h4) { font-size: 19px; }
     .ref-dwie > .ref:has(details[open]) { grid-column: 1 / -1; }
   }
 
@@ -279,8 +304,8 @@ const spis = [
     .ref { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 0; }
     .ref .dz { font-size: 28px; }
     .ref .dz small { font-size: 12.5px; white-space: nowrap; }
-    .ref h3 { font-size: 18.5px; }
-    .ref.maly h3 { font-size: 17.5px; }
+    .ref :is(h3, h4) { font-size: 18.5px; }
+    .ref.maly :is(h3, h4) { font-size: 17.5px; }
     .ref .kto { font-size: 14px; }
     .ref .streszcz :global(p) { font-size: 15px; }
     /* streszczenie na całą szerokość (pod dniem też) — wąska kolumna obok dnia jest za wąska na dłuższy tekst */

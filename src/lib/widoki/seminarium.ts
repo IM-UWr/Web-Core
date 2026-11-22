@@ -1,6 +1,7 @@
-// Dane strony seminarium (src/views/Seminarium.astro): opis, nadchodzące i minione referaty, koordynatorzy, zakłady.
+// Dane strony seminarium (src/views/Seminarium.astro): opis, nadchodzące i minione referaty (także według lat akademickich),
+// koordynatorzy, zakłady.
 import { render } from 'astro:content';
-import type { Lang } from '../daty';
+import { rokAkademicki, type Lang } from '../daty';
 import { referaty, seminariumReferatu, zaklady, type Seminarium } from '../tresci';
 import { wPrzyszlosci } from '../liczbyTerminow';
 import { wszyscyPracownicy, koordynatorzySeminarium } from '../osobySpisu';
@@ -22,6 +23,15 @@ export async function daneSeminarium(seminarium: Seminarium, lang: Lang) {
   });
   const nadchodzace = await Promise.all(wszystkie.filter(przyszle).map(zTresc));
   const minione = await Promise.all(wszystkie.filter((r) => !przyszle(r)).reverse().map(zTresc));
+  // minione według lat akademickich (od 1.10; zlecenie 68, jak daneListyKonferencji): lata od najnowszego, w roku od najnowszego
+  // referatu; lata wyliczone z danych. Kotwica roku: #rok-RRRR-RR (np. rok-2025-26).
+  const lataMinionych: { rok: string; id: string; lista: typeof minione }[] = [];
+  for (const m of minione) {
+    const rok = rokAkademicki(m.r.data.termin);
+    const ost = lataMinionych[lataMinionych.length - 1];
+    if (ost && ost.rok === rok) ost.lista.push(m);
+    else lataMinionych.push({ rok, id: `rok-${rok.replace('/', '-')}`, lista: [m] });
+  }
   // zakład(y), do których należy seminarium — link zamiast listy uczestników (skład jest na stronie zakładu)
   const zakladySem = (await zaklady()).filter((z) => d.zaklad.includes(z.id));
   // Koordynator(zy): ze spisu (nazwisko z tytułem, link do strony domowej, jeśli jest), potem spoza spisu (jak wpisani);
@@ -32,5 +42,5 @@ export async function daneSeminarium(seminarium: Seminarium, lang: Lang) {
   const adresListy = ((ustawienia as any).powiadomienia?.adres ?? '') as string;
   const maKoord = koordynatorzy.length > 0 || brakKoordynatora || zakladySem.length > 0 || !!d.kontakt;
 
-  return { nazwa, Content, htmlEn, nadchodzace, minione, zakladySem, koordynatorzy, brakKoordynatora, adresListy, maKoord };
+  return { nazwa, Content, htmlEn, nadchodzace, minione, lataMinionych, zakladySem, koordynatorzy, brakKoordynatora, adresListy, maKoord };
 }

@@ -25,6 +25,14 @@ export function parse(s: string): Parts {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+// Rok akademicki terminu, od 1 października — minione referaty seminarium według lat (zlecenie 68): 15.09.2025 → „2024/25”,
+// 1.10.2025 → „2025/26”. Inna reguła niż Plan zajęć (rok od 1.08, zlecenie 43).
+export function rokAkademicki(s: string): string {
+  const { y, m } = parse(s);
+  const r = m >= 10 ? y : y - 1;
+  return `${r}/${pad((r + 1) % 100)}`;
+}
+
 export function hasTime(s?: string): boolean {
   return !!s && s.includes('T');
 }
