@@ -107,7 +107,7 @@ Thumbs.db
 .test-jawne/
 .test-proza/
 
-# Historia zleceń (zlecenia, dziennik, raporty) jest w prywatnym repozytorium IM-UWr/Web-Zlecenia, sklonowanym do .przekazanie/ (zob. CLAUDE.md).
+# Historia zleceń (zlecenia, dziennik, raporty) jest w repozytorium IM-UWr/Web-Zlecenia, sklonowanym do .przekazanie/ (zob. CLAUDE.md).
 # Raporty zapisuj w .przekazanie/raporty/; dawne raporty i zrzuty są też w znaczniku archiwum/pierwsza-wersja.
 /.przekazanie/
 /raport-zrzuty/
