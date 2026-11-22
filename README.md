@@ -10,6 +10,12 @@ Nowa strona Instytutu Matematycznego Uniwersytetu Wrocławskiego — kod strony 
 
 ## Dla redaktorów (Pages CMS)
 
+Instrukcje w PDF (link otwiera od razu plik; adresy się nie zmieniają, przy każdej aktualizacji podmieniany jest ten sam plik):
+- **Mapa CMS** (2 strony: co gdzie jest, jak pisać i dodawać pliki): https://im-uwr.github.io/Web-Podglad/dla-redaktorow/Mapa-CMS-IM-UWr.pdf
+- **Ściągawka edytora** (bloki jawnego Markdownu, przykłady, „gdzie co jest”): https://im-uwr.github.io/Web-Podglad/dla-redaktorow/Sciagawka-edytora-IM-UWr.pdf
+
+Źródła: `dok/dla-redaktorow/mapa-cms.html` i `dok/sciagawka-edytora.md`; PDF-y w `public/dla-redaktorow/` robi `node skrypty/pdf-dla-redaktorow.mjs`.
+
 1. Wejdź na https://app.pagescms.org i zaloguj się kontem GitHub (albo przez link z zaproszenia e-mailowego).
 2. Wybierz repozytorium swojej części strony, np. `IM-UWr/Web-Aktualnosci`, `IM-UWr/Web-Sem-Topologia`, `IM-UWr/Web-Ustawienia`.
 3. Edytuj treści w sekcjach po lewej.
