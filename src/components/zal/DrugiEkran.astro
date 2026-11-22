@@ -31,7 +31,7 @@ import ustawienia from '../../data/ustawienia.json';
 import skroty from '../../data/skroty.json';
 import plan from '../../data/plan/plan.json';
 import { u, isExternal } from '../../lib/url';
-import { wJezyku, wybierz, RODZAJE, ODBIORCY, langTekstu } from '../../lib/i18n';
+import { wJezyku, wybierz, odmiana, RODZAJE, ODBIORCY, langTekstu } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { pozycjeKierunkow } from '../../lib/kierunki';
 import { tekstDnia } from '../../lib/kolory-dni';
@@ -121,7 +121,8 @@ const skr = await Promise.all((skroty.kafelki as any[]).slice(0, 5).map(async (k
     // „e-maile”: po łączniku U+2060 (łącznik słów, bez szerokości), żeby wyraz się nie łamał (zlecenie 26, punkt 4.2); łącznika niełamiącego
     // U+2011 Manrope nie ma, przeglądarka wzięłaby go z innego kroju
     : adres === '/pracownicy' ? T(`${osob} osób, pokoje, e-⁠maile`, `${osob} people, rooms, e-⁠mails`)
-    : adres === '/seminaria' ? T(`${seminaria.length} ${seminaria.length === 1 ? 'referat' : 'referatów'} w tym tygodniu`, `${seminaria.length} ${seminaria.length === 1 ? 'talk' : 'talks'} this week`)
+    // odmiana: 1 referat, 2–4 referaty, 5+ referatów (zlecenie 59, punkt 24)
+    : adres === '/seminaria' ? T(`${seminaria.length} ${odmiana(seminaria.length, ['referat', 'referaty', 'referatów'], ['talk', 'talks'], 'pl')} w tym tygodniu`, `${seminaria.length} ${odmiana(seminaria.length, ['referat', 'referaty', 'referatów'], ['talk', 'talks'], 'en')} this week`)
     : (wybierz(k, 'opis', lang) as string) || '';
   return { adres, kd: false, grafik: undefined, tytul: wybierz(k, 'etykieta', lang) as string, opis };
 }));

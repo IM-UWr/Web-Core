@@ -326,6 +326,9 @@ export function wybierzZJezykiem<T extends Record<string, any>>(obj: T, pole: st
 export const langPola = <T extends Record<string, any>>(obj: T, pole: string, lang: Lang) => wybierzZJezykiem(obj, pole, lang).lang;
 // To samo dla tekstu bez odpowiednika _en (tematy prac, streszczenia).
 export const langTekstu = (tekst: string | undefined | null, lang: Lang): 'pl' | undefined => (lang === 'en' && wygladaNaPolski(tekst) ? 'pl' : undefined);
+// Język tytułu rozprawy (obrony doktorskie; zlecenie 59, punkt 26): tytuł polski — na /en lang="pl", po polsku bez lang;
+// tytuł w innym języku (zwykle angielski) — lang="en" na obu wersjach strony, jak dotąd.
+export const langRozprawy = (tekst: string | undefined | null, lang: Lang): 'pl' | 'en' | undefined => (wygladaNaPolski(tekst) ? (lang === 'en' ? 'pl' : undefined) : 'en');
 
 // Polska typografia (decyzja 31.10.2026): po jednoliterowych wyrazach (a, i, o, u, w, z) twarda spacja, żeby nie
 // zostawały na końcu linijki — np. etykiety liczb w banerach działów: „w ostatnim miesiącu”, „zakłady i pracownie”.

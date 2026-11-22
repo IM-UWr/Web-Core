@@ -11,7 +11,7 @@
 import Link from './Link.astro';
 import TytulReferatu from './TytulReferatu.astro';
 import { u, isExternal } from '../lib/url';
-import { wJezyku, RODZAJE, langTekstu } from '../lib/i18n';
+import { wJezyku, RODZAJE, langRozprawy } from '../lib/i18n';
 import { dayNum, monthShort, dayShort, parse, range, time, hasTime, type Lang } from '../lib/daty';
 import { trwaLubBedzie, type Wydarzenie } from '../lib/tresci';
 import type { Dzial } from '../lib/patroni';
@@ -20,7 +20,8 @@ import type { Dzial } from '../lib/patroni';
 // poziom — nagłówek wiersza; h4 na liście Obron pod rokiem h3 (zlecenie 57), wygląd ten sam
 interface Props { w: Wydarzenie; lang: Lang; poziom?: 'h2' | 'h3' | 'h4'; dzial?: Dzial; zwarty?: boolean; bezRodzaju?: boolean }
 const { w, lang, poziom = 'h3', dzial, zwarty = false, bezRodzaju = false } = Astro.props;
-// tytuł rozprawy (podtytuł obrony): na /en polski tytuł z lang="pl" (decyzja D14); po polsku jak dotąd lang="en"
+// tytuł rozprawy (podtytuł obrony): lang według języka tytułu (langRozprawy) — polski na /en z lang="pl" (decyzja D14), po polsku bez lang;
+// angielski z lang="en" (zlecenie 59, punkt 26)
 const H = poziom;
 const zewn = !!w.href && isExternal(w.href);
 const adres = w.href ? (zewn ? w.href : u(wJezyku(w.href, lang))) : undefined;
@@ -37,7 +38,7 @@ const etykieta = [bezRodzaju ? '' : RODZAJE[w.rodzaj]?.[lang], kiedy, w.miejsce]
         ? <Link href={adres}>{w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}</Link>
         : w.rodzaj === 'referat' ? <TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /> : w.tytul}
     </H>
-    {w.podtytul && <p lang={w.rodzaj === 'obrona' ? langTekstu(w.podtytul, lang) ?? 'en' : undefined}>{w.podtytul}</p>}
+    {w.podtytul && <p lang={w.rodzaj === 'obrona' ? langRozprawy(w.podtytul, lang) : undefined}>{w.podtytul}</p>}
     {w.rodzaj === 'referat' && w.opis && <p class="ww-opis">{w.opis}</p>}
     <slot />
   </div>

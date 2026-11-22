@@ -390,7 +390,7 @@
     "zdanie": "Każdy homeomorfizm między domkniętymi, nigdzie gęstymi podzbiorami zbioru Cantora przedłuża się na cały zbiór.",
     "zdanie_en": "Every homeomorphism between closed nowhere dense subsets of the Cantor set extends to the whole set.",
     "ukryta": true,
-    "notka": "Knaster i jego doktorant Marian Reichbach (doktorat we Wrocławiu 1956) udowodnili to w pracy „Notion d’homogénéité et prolongements des homéomorphies” (Fundamenta Mathematicae 40, 1953, s. 180–193), dając topologiczny dowód wyniku Czesława Ryll-Nardzewskiego z 1951 r., który rozwiązał problem Knastera metodą algebr Boole’a, ale go nie opublikował. Problem przedłużania homeomorfizmów był jednym z tematów, na które Knaster kierował uczestników seminarium (wspomnienie R. Dudy). Rysunek: zbiór Cantora (trzy kroki) u góry i u dołu; pogrubione — homeomorfizm zadany na wybranych kawałkach, cienkie — jego przedłużenie.",
+    "notka": "Knaster i jego doktorant Marian Reichbach (doktorat we Wrocławiu 1956) udowodnili to w pracy „Notion d’homogénéité et prolongements des homéomorphies” (Fundamenta Mathematicae 40, 1953, s. 180–193), dając topologiczny dowód wyniku Czesława Rylla-Nardzewskiego z 1951 r., który rozwiązał problem Knastera metodą algebr Boole’a, ale go nie opublikował. Problem przedłużania homeomorfizmów był jednym z tematów, na które Knaster kierował uczestników seminarium (wspomnienie R. Dudy). Rysunek: zbiór Cantora (trzy kroki) u góry i u dołu; pogrubione — homeomorfizm zadany na wybranych kawałkach, cienkie — jego przedłużenie.",
     "rodzaj": "twierdzenie",
     "pewnosc": "pewne",
     "zrodla": [

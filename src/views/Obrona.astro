@@ -11,7 +11,7 @@ import Ikona from '../components/Ikona.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
-import { t, langTekstu } from '../lib/i18n';
+import { t, langTekstu, langRozprawy } from '../lib/i18n';
 import { longWithDay, short, dayNum, monthShort, parse, type Lang } from '../lib/daty';
 import { miejsce, promotorzyNaStronie, type Obrona } from '../lib/tresci';
 import { daneObrony } from '../lib/widoki/obrona';
@@ -20,13 +20,15 @@ import { tytulyWJezyku } from '../lib/osoby';
 interface Props { obrona: Obrona; lang: Lang }
 const { obrona, lang } = Astro.props;
 const d = obrona.data;
-// promotorzy na stronie bez promotorów pomocniczych (promotorzyNaStronie w src/lib/tresci.ts, decyzja 22.11); na /en przy dwóch i więcej „Supervisors”
+// promotorzy na stronie bez promotorów pomocniczych (promotorzyNaStronie w src/lib/tresci.ts, decyzja 22.11); przy dwóch i więcej
+// „Promotorzy” / „Supervisors” (zlecenie 59, punkt 25)
 const prom = promotorzyNaStronie(obrona);
 const href = (a: string) => (isExternal(a) ? a : u(a));
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 // tytuł karty (<title>): „Obrona doktoratu: …”; w banerze samo imię i nazwisko
 const { Content, html, tytul, przyszla, opisZdjecia, dokumenty, haslo, liczby } = await daneObrony(obrona, lang);
-// na /en polski tytuł rozprawy zostaje w oryginale z etykietą „Original title:” (decyzja D5) i lang="pl" (D14); po polsku bez zmian
+// na /en polski tytuł rozprawy zostaje w oryginale z etykietą „Original title:” (decyzja D5) i lang="pl" (D14); poza tym lang według
+// języka tytułu (langRozprawy): polski po polsku bez lang, angielski z lang="en" (zlecenie 59, punkt 26)
 const tytulPl = lang === 'en' && !!langTekstu(d.tytul_rozprawy, lang);
 // typ pliku z prawej (wzorzec ul.pliki): rozszerzenie („PDF”) albo „strona ↗” dla linku bez rozszerzenia
 const typPliku = (a: string) => {
@@ -39,7 +41,7 @@ const typPliku = (a: string) => {
   dzial="nauka" klasa="tresc z-obr">
   <Fragment slot="baner">
     <LiczbyBanera lang={lang} pozycje={liczby} />
-    <p class="lead rozprawa" lang={tytulPl ? undefined : 'en'}>{tytulPl ? <>Original title: <span lang="pl">{d.tytul_rozprawy}</span></> : d.tytul_rozprawy}</p>
+    <p class="lead rozprawa" lang={tytulPl ? undefined : langRozprawy(d.tytul_rozprawy, lang)}>{tytulPl ? <>Original title: <span lang="pl">{d.tytul_rozprawy}</span></> : d.tytul_rozprawy}</p>
   </Fragment>
 
   <section aria-label={T('Szczegóły obrony', 'Defence details')}>
@@ -51,7 +53,7 @@ const typPliku = (a: string) => {
         <dl class="para">
           <dt>{t(lang, 'kiedy')}</dt><dd>{longWithDay(d.termin, lang)}</dd>
           {d.miejsce && <><dt>{t(lang, 'gdzie')}</dt><dd>{miejsce(d.miejsce, lang)}</dd></>}
-          {prom.length > 0 && <><dt>{lang === 'en' && prom.length > 1 ? 'Supervisors' : t(lang, 'promotorzy')}</dt><dd>{prom.map((p) => tytulyWJezyku(p, lang)).join(', ')}</dd></>}
+          {prom.length > 0 && <><dt>{prom.length > 1 ? T('Promotorzy', 'Supervisors') : t(lang, 'promotorzy')}</dt><dd>{prom.map((p) => tytulyWJezyku(p, lang)).join(', ')}</dd></>}
         </dl>
       </div>
     </div>
