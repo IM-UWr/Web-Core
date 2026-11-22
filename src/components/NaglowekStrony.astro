@@ -33,7 +33,7 @@ const czlon = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').split('
 const dzial = dzialBanera ?? DZIALY[czlon] ?? 'inne';
 const ust = ((ustawienia as any).naglowki_podstron ?? {}) as { wariant?: string; zdjecia?: Record<string, { zdjecie?: string }> };
 const wariant = ['motyw', 'zdjecie', 'granat', 'prosty'].includes(ust.wariant ?? '') ? ust.wariant! : 'granat';
-const domyslneZdjecia = Object.fromEntries(['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].map((d) => [d, { zdjecie: `/pliki/naglowki/${d}.jpg` }]));
+const domyslneZdjecia = Object.fromEntries(['instytut', 'nauka', 'studia', 'aktualnosci', 'popularyzacja'].map((d) => [d, { zdjecie: `/pliki/ustawienia/naglowki/${d}.jpg` }]));
 // puste zdjęcie w CMS = zdjęcie domyślne działu (NaglowekZ.astro; zlecenie 40)
 const zdjecie = (wariant === 'zdjecie' || wariant === 'granat') && !!(ust.zdjecia?.[dzial]?.zdjecie || domyslneZdjecia[dzial]?.zdjecie);
 const ozdobny = wariant !== 'prosty';

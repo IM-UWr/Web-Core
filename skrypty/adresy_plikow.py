@@ -1,12 +1,12 @@
-"""Krótkie adresy plików w treściach: redaktor pisze nazwę pliku tak, jak widzi go w Media swojego repozytorium,
-a pobierz_tresci.py przy nakładaniu treści zamienia ją na pełny adres /pliki/….
+"""Krótkie adresy plików w treściach: redaktor pisze, gdzie plik leży w Media swojego repozytorium,
+a pobierz_tresci.py przy nakładaniu treści zamienia to na pełny adres /pliki/….
 
+Każde repozytorium treści ma jedno Media (jeden folder public/pliki/<folder repozytorium>; pilnuje sprawdz_pola_cms.py).
 W linkach i obrazkach Markdownu ([tekst](adres), ![opis](adres)) w plikach src/ repozytoriów treści:
-  nadzieja-seminarium.pdf            plik z Media tego repozytorium (ukośnik na początku też działa: /nadzieja-seminarium.pdf)
-  slajdy/wyklad-1.pdf                plik w folderze „slajdy” w Media
+  nadzieja-seminarium.pdf            plik w Media tego repozytorium (ukośnik na początku też działa: /nadzieja-seminarium.pdf)
+  slajdy/wyklad-1.pdf                plik w folderze „slajdy” w Media (tyle folderów, ile widać w Media)
   Web-Nauka/publikacje/lista.pdf     plik z Media innego repozytorium (nazwa repozytorium jak w Pages CMS)
-W repozytorium z kilkoma folderami Media (np. „Media: studia”, „Media: szkoła doktorska”) adres bez nazwy folderu
-oznacza pierwszy z nich, a z nazwą folderu na początku (szkola-doktorska/…) — ten folder.
+Adres to zawsze ścieżka od Media w górę, bez folderu repozytorium (seminaria/topologia/… dopisuje skrypt).
 
 Krótki adres to adres bez schematu (https:, mailto:), bez # i // na początku, zakończony rozszerzeniem pliku (.pdf, .jpg…).
 Pełne adresy /pliki/…, /grafiki/…, /kalendarz/… i linki do stron (bez rozszerzenia) zostają bez zmian. Link w `kodzie`
@@ -82,11 +82,7 @@ class Adresy:
         foldery = self.media.get(cel) or []
         if not foldery:
             return None
-        wzgledna = '/'.join(czlony)
-        for _, folder in foldery:
-            if wzgledna.startswith(folder + '/'):
-                return f'/pliki/{wzgledna}{reszta_url}'
-        return f'/pliki/{foldery[0][1]}/{wzgledna}{reszta_url}'
+        return f'/pliki/{foldery[0][1]}/{"/".join(czlony)}{reszta_url}'
 
     def przepisz(self, tekst, repo):
         """(nowy tekst, [(adres w treści, pełny adres, czy plik istnieje)]) dla krótkich adresów w tekście."""

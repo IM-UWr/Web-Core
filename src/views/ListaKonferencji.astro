@@ -54,7 +54,7 @@ const spis = [
           {g.rok && <h3 id={`rok-${g.rok}`}>{g.rok}<span class="sr-only">, </span> <small>{ileKonf(g.lista.length)}</small></h3>}
           <ul class:list={['wiersze', g.rok && 'dwie']}>
             {g.lista.map((k) => (
-              <li class:list={['wiersz', hrefKonf(k) && 'klik']}>
+              <li class:list={['wiersz', hrefKonf(k) && 'klik', sek.id === 'z-minione' && 'minelo']}>
                 <time class="dz" datetime={k.data.poczatek.slice(0, 10)}>{dayNum(k.data.poczatek)}<small> {monthShort(k.data.poczatek, lang)} {parse(k.data.poczatek).y}</small></time>
                 <div>
                   <p class="etyk">{etykieta(k)}{k.data.odwolana && <span class="odw">{odwolana}</span>}</p>
@@ -85,6 +85,10 @@ const spis = [
   .wiersz .odw { margin-left: 8px; padding: 1px 7px; border: 1px solid var(--line); border-radius: 3px; font-size: 11.5px; font-weight: 700; color: var(--muted); }
   .wiersz h4 { margin: 2px 0 0; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .wiersz h4 a { color: inherit; text-decoration: none; }
+  /* minione konferencje przygaszone jak „Ostatnio” w Szybkim dostępie (zalozyciele-strony.css: .z-w.minelo, .z-przeszle) */
+  .wiersz.minelo .dz { color: var(--muted); }
+  .wiersz.minelo h4 { color: var(--text); }
+  .wiersz.minelo .etyk { opacity: .8; }
   .wiersz a.zew::after { font-family: var(--f-text); font-size: .75em; color: var(--muted); }
   .pusto { font-style: italic; color: var(--muted); }
   /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */

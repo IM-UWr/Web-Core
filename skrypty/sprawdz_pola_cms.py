@@ -8,9 +8,9 @@ redaktora. Skrypt zgłasza:
   3. wartości, których formularz nie przyjmie (wymagane puste, spoza listy wyboru, zły typ, zła data),
   4. foldery Media, które mogą dać ten sam plik w dwóch repozytoriach. Na stronie pliki ze wszystkich repozytoriów są we
      wspólnym /pliki, a pobierz_tresci.py przerywa budowę, gdy dwa repozytoria mają plik o tej samej ścieżce. Dlatego
-     `media` w .pages.yml to lista własnych folderów repozytorium (public/pliki/<folder>, nigdy całe public/pliki),
-     foldery różnych repozytoriów nie pokrywają się, każde pole pliku/obrazka wskazuje swój folder (options.media; bez
-     niego Pages CMS wgrywa do pierwszego folderu), a pliki w public/ leżą w folderach Media.
+     `media` w .pages.yml to jeden własny folder repozytorium (public/pliki/<folder>, nigdy całe public/pliki; jedno
+     Media, bo redaktor wpisuje w linku ścieżkę od Media — skrypty/adresy_plikow.py), foldery różnych repozytoriów nie
+     pokrywają się, każde pole pliku/obrazka wskazuje folder Media (options.media), a pliki w public/ leżą w Media.
 
 Użycie:  python skrypty/sprawdz_pola_cms.py <katalog z klonami repozytoriów treści>
 Lista repozytoriów: tresci.json. Kod wyjścia 1, gdy są problemy. Wymaga PyYAML.
@@ -92,8 +92,11 @@ def sprawdz_media(repo, kat, konfiguracja, zajete, zglos):
     """Punkt 4 z opisu skryptu. `zajete`: [(repozytorium, folder)] z repozytoriów sprawdzonych wcześniej."""
     media = konfiguracja.get('media')
     if not isinstance(media, list) or not media:
-        zglos(f'{repo}: media w .pages.yml ma być listą własnych folderów (name, input: public/pliki/<folder>, output)')
+        zglos(f'{repo}: media w .pages.yml ma być listą z jednym własnym folderem (name, input: public/pliki/<folder>, output)')
         return
+    if len(media) != 1:
+        zglos(f'{repo}: Media ma być jedno (jeden folder repozytorium, w nim podfoldery), jest {len(media)}: '
+              f'redaktor wpisuje w linku ścieżkę od Media (skrypty/adresy_plikow.py)')
     foldery = {}
     for zrodlo in media:
         nazwa = zrodlo.get('name')

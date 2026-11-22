@@ -9,14 +9,14 @@ from adresy_plikow import Adresy, foldery_media  # noqa: E402
 
 MEDIA = {
     'Web-Sem-Rownania-Rozniczkowe': [('seminarium', 'seminaria/rownania-rozniczkowe')],
-    'Web-Nauka': [('nauka', 'nauka'), ('konferencje', 'konferencje')],
-    'Web-Studia': [('studia', 'studia'), ('szkola-doktorska', 'szkola-doktorska')],
+    'Web-Nauka': [('nauka', 'nauka')],
+    'Web-Studia': [('studia', 'studia')],
 }
 PLIKI = {
     'public/pliki/seminaria/rownania-rozniczkowe/nadzieja-seminarium.pdf',
     'public/pliki/seminaria/rownania-rozniczkowe/slajdy/wyklad-1.pdf',
     'public/pliki/nauka/publikacje/publikacje_2024.pdf',
-    'public/pliki/szkola-doktorska/programy/program.pdf',
+    'public/pliki/studia/szkola-doktorska/programy/program.pdf',
     'public/pliki/studia/regulamin.pdf',
 }
 A = Adresy(MEDIA, PLIKI)
@@ -28,19 +28,20 @@ class Pelny(unittest.TestCase):
         for adres in ('nadzieja-seminarium.pdf', '/nadzieja-seminarium.pdf'):
             self.assertEqual(A.pelny(adres, ROWNANIA), '/pliki/seminaria/rownania-rozniczkowe/nadzieja-seminarium.pdf')
         self.assertEqual(A.pelny('slajdy/wyklad-1.pdf', ROWNANIA), '/pliki/seminaria/rownania-rozniczkowe/slajdy/wyklad-1.pdf')
-        # przepisany z opisu pola folder seminarium też działa
-        self.assertEqual(A.pelny('seminaria/rownania-rozniczkowe/a.pdf', ROWNANIA), '/pliki/seminaria/rownania-rozniczkowe/a.pdf')
 
     def test_inne_repozytorium(self):
-        for adres in ('Web-Nauka/publikacje/publikacje_2024.pdf', '/web-nauka/nauka/publikacje/publikacje_2024.pdf'):
+        for adres in ('Web-Nauka/publikacje/publikacje_2024.pdf', '/web-nauka/publikacje/publikacje_2024.pdf'):
             self.assertEqual(A.pelny(adres, ROWNANIA), '/pliki/nauka/publikacje/publikacje_2024.pdf')
         self.assertEqual(A.pelny('Web-Sem-Rownania-Rozniczkowe/nadzieja-seminarium.pdf', 'Web-Nauka'),
                          '/pliki/seminaria/rownania-rozniczkowe/nadzieja-seminarium.pdf')
 
-    def test_kilka_folderow_media(self):
+    def test_foldery_w_media_jak_w_cms(self):
         self.assertEqual(A.pelny('regulamin.pdf', 'Web-Studia'), '/pliki/studia/regulamin.pdf')
-        self.assertEqual(A.pelny('szkola-doktorska/programy/program.pdf', 'Web-Studia'), '/pliki/szkola-doktorska/programy/program.pdf')
-        self.assertEqual(A.pelny('konferencje/plakat.jpg', 'Web-Nauka'), '/pliki/konferencje/plakat.jpg')
+        self.assertEqual(A.pelny('szkola-doktorska/programy/program.pdf', 'Web-Studia'),
+                         '/pliki/studia/szkola-doktorska/programy/program.pdf')
+        self.assertEqual(A.pelny('konferencje/plakat.jpg', 'Web-Nauka'), '/pliki/nauka/konferencje/plakat.jpg')
+        # adres zawsze od Media: folder o nazwie jak folder repozytorium to zwykły podfolder
+        self.assertEqual(A.pelny('studia/a.pdf', 'Web-Studia'), '/pliki/studia/studia/a.pdf')
 
     def test_kotwica_i_zapytanie_zostaja(self):
         self.assertEqual(A.pelny('nadzieja-seminarium.pdf#page=3', ROWNANIA), '/pliki/seminaria/rownania-rozniczkowe/nadzieja-seminarium.pdf#page=3')

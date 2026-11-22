@@ -13,7 +13,7 @@ import TytulReferatu from '../components/TytulReferatu.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u } from '../lib/url';
 import { t, wJezyku, wybierz, langPola, odmiana } from '../lib/i18n';
-import { dayNum, dayShort, monthShort, parse, time, type Lang } from '../lib/daty';
+import { dayNum, dayShort, monthShort, now, parse, plusMinutes, time, type Lang } from '../lib/daty';
 import { sala, salaReferatu, type Seminarium } from '../lib/tresci';
 import { daneListySeminariow } from '../lib/widoki/listaSeminariow';
 import BrakOsoby from '../components/BrakOsoby.astro';
@@ -34,6 +34,9 @@ const spis = [
 ];
 // część wiersza: godzina i sala (puste pomijane)
 const kiedyGdzie = (termin: string, s?: string) => [time(termin), sala(s, lang) ?? ''].filter(Boolean).join(' · ');
+// referat w tygodniu jest „miniony” 90 minut po początku: przygaszony jak „Ostatnio” w Szybkim dostępie; skrypt niżej
+// przygasza też te, które skończyły się już po zbudowaniu strony
+const koniecReferatu = (termin: string) => plusMinutes(termin, 90);
 // prowadzący w boksie: do dwóch nazwisk, przy większej liczbie „i N innych” (cały skład jest na stronie seminarium)
 const osoby = (l: string[]) => l.length <= 2
   ? l.join(', ')
@@ -49,7 +52,7 @@ const osoby = (l: string[]) => l.length <= 2
     {wTygodniu.length > 0 && (
       <ul class="wiersze">
         {wTygodniu.map((w) => (
-          <li class="wiersz klik">
+          <li class:list={['wiersz klik', koniecReferatu(w.termin) < now() && 'minelo']} data-koniec={koniecReferatu(w.termin)}>
             <time class="dz" datetime={w.termin.slice(0, 10)}>{dayNum(w.termin)}<small> {monthShort(w.termin, lang)} {parse(w.termin).y}</small></time>
             <div>
               <p class="etyk">{[dayShort(w.termin, lang), kiedyGdzie(w.termin, w.sala)].filter(Boolean).join(' · ')}</p>
@@ -124,6 +127,10 @@ const osoby = (l: string[]) => l.length <= 2
   .wiersz h3 a { color: inherit; text-decoration: none; }
   .wiersz .kto { font-size: 15.5px; line-height: 1.55; color: var(--text); }
   .wiersz .sem { color: var(--muted); }
+  /* miniony referat tygodnia przygaszony jak „Ostatnio” w Szybkim dostępie (zalozyciele-strony.css: .z-w.minelo, .z-przeszle) */
+  .wiersz.minelo .dz { color: var(--muted); }
+  .wiersz.minelo h3 { color: var(--text); }
+  .wiersz.minelo .etyk { opacity: .8; }
   .pusto { font-style: italic; color: var(--muted); }
   /* cały wiersz klikalny (link w tytule), fokus na całym wierszu */
   .klik { position: relative; }
@@ -151,3 +158,12 @@ const osoby = (l: string[]) => l.length <= 2
     .wiersz .kto { font-size: 15px; }
   }
 </style>
+
+<script>
+  import { now } from '../lib/daty';
+  // referaty tygodnia, które skończyły się po zbudowaniu strony, też przygaszone (data-koniec w formacie dat z treści)
+  const teraz = now();
+  document.querySelectorAll<HTMLElement>('#z-tydzien .wiersz[data-koniec]').forEach((w) => {
+    if ((w.dataset.koniec || '') < teraz) w.classList.add('minelo');
+  });
+</script>

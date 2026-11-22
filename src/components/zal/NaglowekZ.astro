@@ -62,7 +62,7 @@ const slot = zLiczbami ? slotWidoku : slotWidoku.replace(LISTA_LICZB, '').trim()
 // do uzupełnienia w CMS: ostrzeżenie przy budowaniu (lista stron w RAPORT-ZLECENIE-11.md)
 if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola hasła w CMS): ${Astro.url.pathname}`);
 
-// Zdjęcia działów (public/pliki/naglowki, repozytorium treści Web-Ustawienia): kadr i jasność dobrane w prototypie. Zdjęcie i kadr
+// Zdjęcia działów (public/pliki/ustawienia/naglowki, repozytorium treści Web-Ustawienia): kadr i jasność dobrane w prototypie. Zdjęcie i kadr
 // działu można zmienić w CMS (Ustawienia → Strona główna i kontakt → Nagłówki działów; zlecenie 40, decyzja 18.11); puste pole =
 // wartość stąd. Kadr z CMS działa na stronie działu i na listach Aktualności (podstrony mają stały kadr 50% 40%, jak dotąd).
 // Opis zdjęcia (alt) tylko przy zdjęciu stąd — inne zdjęcie z CMS jest ozdobne (alt=""); filtr Nauki zostaje przy dziale.
@@ -71,15 +71,15 @@ if (maLiczby && !hasloDanych) console.warn(`[baner] liczby bez hasła (brak pola
 const strona = stripBase(Astro.url.pathname).replace(/^\/en(?=\/|$)/, '').replace(/\/$/, '') || '/';
 const fotoNat = !P && banerAktualnosci(strona);
 const FOTO: Record<string, { zdjecie: string; kadr: string; filtr?: string; alt?: { pl: string; en: string } }> = {
-  instytut: { zdjecie: '/pliki/naglowki/instytut.jpg', kadr: '50% 42%' },
-  nauka: { zdjecie: '/pliki/naglowki/nauka.jpg', kadr: '50% 30%', filtr: 'grayscale(1) contrast(1.15) brightness(1.45)' },
-  studia: { zdjecie: '/pliki/naglowki/studia.jpg', kadr: '50% 40%', alt: {
+  instytut: { zdjecie: '/pliki/ustawienia/naglowki/instytut.jpg', kadr: '50% 42%' },
+  nauka: { zdjecie: '/pliki/ustawienia/naglowki/nauka.jpg', kadr: '50% 30%', filtr: 'grayscale(1) contrast(1.15) brightness(1.45)' },
+  studia: { zdjecie: '/pliki/ustawienia/naglowki/studia.jpg', kadr: '50% 40%', alt: {
     pl: 'Sala wykładowa HS: wykład przy tablicach, studenci w ławkach od tyłu',
     en: 'Lecture room HS: a lecture at the blackboards, students in the benches seen from behind' } },
-  popularyzacja: { zdjecie: '/pliki/naglowki/popularyzacja.jpg', kadr: '50% 40%' },
-  granat: { zdjecie: '/pliki/naglowki/aktualnosci.jpg', kadr: '50% 40%' },
+  popularyzacja: { zdjecie: '/pliki/ustawienia/naglowki/popularyzacja.jpg', kadr: '50% 40%' },
+  granat: { zdjecie: '/pliki/ustawienia/naglowki/aktualnosci.jpg', kadr: '50% 40%' },
   // kadr: cała skacząca postać pod paskiem menu przy 1024–2560 px (zlecenie 27, punkt 3; szerokość zdjęcia w zalozyciele.css)
-  aktualnosci: { zdjecie: '/pliki/naglowki/aktualnosci-skok.jpg', kadr: '48% 52%', alt: {
+  aktualnosci: { zdjecie: '/pliki/ustawienia/naglowki/aktualnosci-skok.jpg', kadr: '48% 52%', alt: {
     pl: 'Hol Wydziału Matematyki i Informatyki: student w skoku pod tablicą kierunkową',
     en: 'The hall of the Faculty of Mathematics and Computer Science: a student jumping under the direction sign' } },
 };

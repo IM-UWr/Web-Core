@@ -11,13 +11,13 @@ W Pages CMS są dwa rodzaje tekstu (zlecenie 40):
 
 Strony i strony działów (jawny Markdown):
 
-> Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i w linku wpisz samą nazwę pliku: [tekst](nazwa.pdf); plik z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
+> Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i w linku wpisz, gdzie leży w Media: [tekst](nazwa.pdf), w folderze: [tekst](folder/nazwa.pdf); z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
 
 W „Stronach studiów” (Web-Studia) lista przykładowych bloków ma też `:::pary` i `:::grafik` (zlecenie 45; w Treści EN: „pusty blok wstawia grafik z wersji polskiej”). Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
 
 Wpisy (zwykły Markdown):
 
-> Zwykły Markdown: akapity oddziela pusta linia; \*\*pogrubienie\*\*, \*kursywa\*, [tekst linku](https://…); lista: „- ” na początku linii; ## = nagłówek sekcji. Plik PDF: wgraj w „Media” i w linku wpisz samą nazwę pliku: [tekst](nazwa.pdf); plik z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Komentarze <!-- … --> to podpowiedzi; na stronie ich nie widać.
+> Zwykły Markdown: akapity oddziela pusta linia; \*\*pogrubienie\*\*, \*kursywa\*, [tekst linku](https://…); lista: „- ” na początku linii; ## = nagłówek sekcji. Plik PDF: wgraj w „Media” i w linku wpisz, gdzie leży w Media: [tekst](nazwa.pdf), w folderze: [tekst](folder/nazwa.pdf); z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Komentarze <!-- … --> to podpowiedzi; na stronie ich nie widać.
 
 ## Przykłady (jawny Markdown)
 
@@ -224,7 +224,7 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 | Zdanie pod nazwą, hasło, liczby w nagłówku kierunku | Web-Studia → Kierunki → Baner (nazwa pliku = nazwa pliku kierunku, np. `matematyka`; bez banera nagłówek ma samą nazwę; nadtytuł się nie wyświetla) |
 | Przypomnienia na stronie głównej (np. deklaracja specjalności) | Web-Studia → Przypomnienia o terminach |
 | Kolejność i napisy w menu „Studia” i na kafelkach strony głównej | Web-Ustawienia → Strona główna i kontakt → „Kierunki w menu „Studia” i kafelki na stronie głównej”. Nowy kierunek pojawi się w menu i kafelkach dopiero po dopisaniu go tutaj (robi to administrator). Każda pozycja ma wszystko wpisane: nazwa i opis w menu, nazwa, napis nad nią i zdanie na kafelku (puste pole zostaje puste na stronie). Studia podyplomowe to też kierunek (`/studia/podyplomowe`). |
-| Treść strony specjalności (PL i EN), opiekunowie, zakład, seminaria, baner | Web-Studia → Specjalności (repozytoria Web-Spec-* nie są już czytane) |
+| Treść strony specjalności (PL i EN), opiekunowie, zakład, seminaria, baner | Web-Studia → Specjalności |
 | Kafelki specjalności na stronie kierunku | Web-Studia → Kierunki → Treść Markdown, blok `:::specjalnosci` (nowa specjalność nie dopisuje kafelka sama) |
 | Tekst „O popularyzacji”, tytuł, „W skrócie”, lata tradycji | Web-Popularyzacja → Strona działu Popularyzacja |
 | Karty „Dla kogo” na stronie Popularyzacji | Web-Popularyzacja → Strony (tytuł karty = Hasło, zdanie = Opis) |

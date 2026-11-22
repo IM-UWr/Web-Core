@@ -25,7 +25,6 @@ Nowa strona Instytutu Matematycznego Uniwersytetu Wrocławskiego — kod strony 
 | Web-Nauka | konferencje, projekty i granty, publikacje, sukcesy |
 | Web-Studia | kierunki, strony studiów i szkoły doktorskiej, rok akademicki i kolory dni |
 | Web-Popularyzacja | popularyzacja |
-| Web-Spec-… | po jednej specjalności |
 | Web-Sem-… | po jednym seminarium (opis i referaty) |
 
 Wskazówki:
@@ -35,13 +34,17 @@ Wskazówki:
 - **Referaty** — dodawaj w folderze właściwego seminarium. Streszczenia piszemy w Markdown, wzory w `$...$`.
 - **Wersja angielska** — pola „EN: …”. Jeśli są puste, angielska wersja strony pokaże tekst polski z odpowiednią informacją.
 - **Linki wewnętrzne** zaczynaj od `/`, np. `/studia/matematyka` albo `/pliki/aktualnosci/plakat.pdf`.
-- **Pliki (PDF, zdjęcia)** wgrywaj w „Media” swojego repozytorium. Każde repozytorium ma własne foldery (np. seminarium:
-  `/pliki/seminaria/topologia/`), bo na stronie pliki ze wszystkich repozytoriów są we wspólnym `/pliki`, a ten sam plik
-  w dwóch repozytoriach zatrzymuje budowę. Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisuje `-1`.
-  W linku wystarczy nazwa pliku tak, jak widać ją w Media: `[Program](program.pdf)`, plik w folderze `slajdy/wyklad-1.pdf`,
-  plik z Media innego repozytorium `[Lista](Web-Nauka/lista.pdf)`. Przy budowie zamienia się to na pełny adres `/pliki/…`
-  (`skrypty/adresy_plikow.py`); pełne adresy też działają. Link do pliku, którego nie ma w Media, to ostrzeżenie
-  „Plik w treści” w przebiegu budowy.
+- **Pliki (PDF, zdjęcia)** wgrywaj w „Media” swojego repozytorium. Każde repozytorium ma jedno Media we własnym folderze
+  (np. seminarium: `/pliki/seminaria/topologia/`), bo na stronie pliki ze wszystkich repozytoriów są we wspólnym `/pliki`,
+  a ten sam plik w dwóch repozytoriach zatrzymuje budowę. Foldery w Media zakładasz sam. Po wgraniu sprawdź nazwę
+  w Media: gdy taka już jest, CMS dopisuje `-1`.
+  **Zasada linku: wpisz, gdzie plik leży w Media.** Plik w Media: `[Program](program.pdf)`; plik w folderze:
+  `[Wykład 1](slajdy/wyklad-1.pdf)` (tyle folderów, ile widać w Media); plik z Media innego repozytorium:
+  `[Lista](Web-Nauka/lista.pdf)`. Przy budowie zamienia się to na pełny adres `/pliki/…` (`skrypty/adresy_plikow.py`);
+  pełne adresy też działają. Link do pliku, którego nie ma w Media, to ostrzeżenie „Plik w treści” w przebiegu budowy.
+- **Obrony doktorskie** — pliki dodawaj w formularzu obrony. Automat przenosi je do `Media → obrony → ImieNazwisko`
+  (np. `obrony/MalwinaMrowinska/`), a po usunięciu obrony usuwa ten folder (Web-Aktualnosci,
+  `.github/workflows/obrony-pliki.yml`).
 
 ## Struktura repozytorium
 
