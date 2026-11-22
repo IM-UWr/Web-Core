@@ -9,7 +9,9 @@ i lokalnie przed `npm run dev`:  python3 skrypty/pobierz_tresci.py
   gałąź; repozytorium bez tej gałęzi daje main. Lokalnie, na czas pracy na gałęzi, trzeba jej użyć, bo inaczej skrypt
   nadpisze nakładkę treściami z main:  python3 skrypty/pobierz_tresci.py --galaz wyglad/zlecenie-16
 - Każdy plik może pochodzić tylko z jednego miejsca: jeśli dwa repozytoria (albo repozytorium i Web-Core) mają ten sam
-  plik, skrypt kończy się błędem i wypisuje oba źródła.
+  plik, skrypt kończy się błędem i wypisuje oba źródła. Na GitHubie (GITHUB_ACTIONS) każdy taki plik jest też adnotacją
+  „Błąd plików”, którą plakietka stanu budowy na Podglądzie pokazuje redaktorom. Kolizji zapobiegają osobne foldery
+  Media każdego repozytorium (media w .pages.yml; pilnuje skrypty/sprawdz_pola_cms.py).
 - Pliki nałożone poprzednim razem są najpierw usuwane (lista w .tresci/nalozone.json), więc usunięcie pliku
   w repozytorium treści usuwa go też ze strony.
 - Opcja --lokalnie <katalog>: zamiast pobierać z GitHuba, bierze repozytoria z podkatalogów <katalog>/<Repo>/
@@ -99,10 +101,10 @@ for repo, kat, wersja in wyniki:
                 rel = os.path.relpath(os.path.join(dp, f), kat)
                 cel = os.path.join(ROOT, rel)
                 if rel in zrodlo:
-                    bledy.append(f'{rel}: jest w {zrodlo[rel]} i w {repo}')
+                    bledy.append((rel, zrodlo[rel], repo))
                     continue
                 if os.path.exists(cel):
-                    bledy.append(f'{rel}: jest w Web-Core i w {repo}')
+                    bledy.append((rel, 'Web-Core', repo))
                     continue
                 os.makedirs(os.path.dirname(cel), exist_ok=True)
                 shutil.copy2(os.path.join(dp, f), cel)
@@ -111,8 +113,23 @@ for repo, kat, wersja in wyniki:
     print(f'  {repo} ({wersja}): {n} plików')
 
 json.dump(sorted(zrodlo), open(MANIFEST, 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+def opis_kolizji(rel, pierwsze, drugie):
+    """Zdanie dla redaktora: adres pliku na stronie (/pliki/…) albo ścieżka w repozytorium i oba źródła."""
+    rel = rel.replace(os.sep, '/')
+    gdzie = '/' + rel[len('public/'):] if rel.startswith('public/') else rel
+    if pierwsze == 'Web-Core':
+        return f'Plik {gdzie} z repozytorium {drugie} jest już w kodzie strony (Web-Core). Zmień jego nazwę albo folder w {drugie}.'
+    return (f'Plik {gdzie} jest w dwóch repozytoriach: {pierwsze} i {drugie}. Strona się nie zbuduje, dopóki w jednym '
+            f'z nich nie zmienisz nazwy pliku albo go nie usuniesz (Media w Pages CMS).')
+
+
 if bledy:
     print('\nTe same pliki w dwóch miejscach (każdy plik może pochodzić tylko z jednego repozytorium):')
-    print('\n'.join('  ' + b for b in bledy))
+    print('\n'.join(f'  {rel}: jest w {a} i w {b}' for rel, a, b in bledy))
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        # adnotacje dla plakietki stanu budowy (src/lib/stanBudowy/klient.js: tytuł „Błąd …”, treść jako zwykły tekst)
+        for rel, a, b in bledy[:10]:
+            tresc = opis_kolizji(rel, a, b).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+            print(f'::error title=Błąd plików::{tresc}')
     sys.exit(1)
 print(f'Treści: {len(zrodlo)} plików z {sum(1 for _, k, _ in wyniki if k)} repozytoriów.')

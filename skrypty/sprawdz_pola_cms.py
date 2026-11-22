@@ -5,7 +5,12 @@ Pages CMS przy zapisie zostawia w pliku tylko pola z formularza, więc pole spoz
 redaktora. Skrypt zgłasza:
   1. pliki danych bez formularza,
   2. pola w danych, których nie ma w formularzu (także w listach i obiektach),
-  3. wartości, których formularz nie przyjmie (wymagane puste, spoza listy wyboru, zły typ, zła data).
+  3. wartości, których formularz nie przyjmie (wymagane puste, spoza listy wyboru, zły typ, zła data),
+  4. foldery Media, które mogą dać ten sam plik w dwóch repozytoriach. Na stronie pliki ze wszystkich repozytoriów są we
+     wspólnym /pliki, a pobierz_tresci.py przerywa budowę, gdy dwa repozytoria mają plik o tej samej ścieżce. Dlatego
+     `media` w .pages.yml to lista własnych folderów repozytorium (public/pliki/<folder>, nigdy całe public/pliki),
+     foldery różnych repozytoriów nie pokrywają się, każde pole pliku/obrazka wskazuje swój folder (options.media; bez
+     niego Pages CMS wgrywa do pierwszego folderu), a pliki w public/ leżą w folderach Media.
 
 Użycie:  python skrypty/sprawdz_pola_cms.py <katalog z klonami repozytoriów treści>
 Lista repozytoriów: tresci.json. Kod wyjścia 1, gdy są problemy. Wymaga PyYAML.
@@ -65,6 +70,58 @@ def sciezki_pol(pola, przed=''):
         if pole.get('type') == 'object' or pole.get('fields'):
             wynik |= sciezki_pol(pole.get('fields'), sciezka + '.')
     return wynik
+
+
+def pola_plikow(pola, przed=''):
+    """[(ścieżka pola, pole)] dla pól typu file/image, także w obiektach i listach obiektów."""
+    wynik = []
+    for pole in pola or []:
+        sciezka = przed + str(pole.get('name'))
+        if pole.get('type') in ('file', 'image'):
+            wynik.append((sciezka, pole))
+        if pole.get('fields'):
+            wynik += pola_plikow(pole.get('fields'), sciezka + '.')
+    return wynik
+
+
+def w_folderze(sciezka, folder):
+    return sciezka == folder or sciezka.startswith(folder + '/')
+
+
+def sprawdz_media(repo, kat, konfiguracja, zajete, zglos):
+    """Punkt 4 z opisu skryptu. `zajete`: [(repozytorium, folder)] z repozytoriów sprawdzonych wcześniej."""
+    media = konfiguracja.get('media')
+    if not isinstance(media, list) or not media:
+        zglos(f'{repo}: media w .pages.yml ma być listą własnych folderów (name, input: public/pliki/<folder>, output)')
+        return
+    foldery = {}
+    for zrodlo in media:
+        nazwa = zrodlo.get('name')
+        wejscie = str(zrodlo.get('input') or '').strip('/')
+        if not wejscie.startswith('public/pliki/'):
+            zglos(f'{repo}: folder Media „{nazwa}” ({wejscie or "bez input"}) ma być w public/pliki/<folder>, nie wyżej')
+            continue
+        if str(zrodlo.get('output') or '').rstrip('/') != '/' + wejscie[len('public/'):]:
+            zglos(f'{repo}: folder Media „{nazwa}”: output ma być /{wejscie[len("public/"):]}')
+        for inne_repo, inny in zajete + [(repo, f) for f in foldery.values()]:
+            if w_folderze(wejscie, inny) or w_folderze(inny, wejscie):
+                zglos(f'{repo}: folder Media {wejscie} pokrywa się z {inny} ({inne_repo})')
+        foldery[nazwa] = wejscie
+    zajete += [(repo, f) for f in foldery.values()]
+    for form in formularze(konfiguracja.get('content')):
+        for sciezka, pole in pola_plikow(form.get('fields')):
+            opcje = pole.get('options') or {}
+            if opcje.get('media') not in foldery:
+                zglos(f'{repo} / {form.get("name")}: pole „{sciezka}” bez options.media wskazującego folder Media '
+                      f'({", ".join(foldery)})')
+            elif opcje.get('path') and not w_folderze(str(opcje['path']).strip('/'), foldery[opcje['media']]):
+                zglos(f'{repo} / {form.get("name")}: pole „{sciezka}”: path {opcje["path"]} jest poza folderem Media '
+                      f'{foldery[opcje["media"]]}')
+    for gora, _, nazwy in os.walk(os.path.join(kat, 'public')):
+        for n in nazwy:
+            plik = os.path.relpath(os.path.join(gora, n), kat).replace(os.sep, '/')
+            if not any(w_folderze(plik, f) for f in foldery.values()):
+                zglos(f'{repo}: plik {plik} leży poza folderami Media ({", ".join(foldery.values())})')
 
 
 def sciezki_danych(obiekt, przed=''):
@@ -145,9 +202,11 @@ def main():
     repozytoria = json.load(open(os.path.join(ROOT, 'tresci.json'), encoding='utf-8'))['repozytoria']
     problemy = []
     plikow = 0
+    zajete = []
     for repo in repozytoria:
         kat = os.path.join(katalog, repo)
         konfiguracja = yaml.safe_load(open(os.path.join(kat, '.pages.yml'), encoding='utf-8'))
+        sprawdz_media(repo, kat, konfiguracja, zajete, problemy.append)
         objete = set()
         for form in formularze(konfiguracja.get('content')):
             nazwa = form.get('name')

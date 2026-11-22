@@ -42,6 +42,7 @@
   .info div { background: var(--tlo); border-radius: 4px; padding: 6px 8px; }
   .info b { display: block; margin-bottom: 2px; }
   .dzialy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dzialy li { font-size: 8.2pt; line-height: 1.3; }
   .dzial { border: 1px solid var(--linia); border-left: 4px solid var(--k); border-radius: 4px; padding: 6px 9px 7px; }
   .dzial header { display: flex; align-items: baseline; gap: 6px; }
   .dzial header h2 { color: var(--k); flex: 1; }
@@ -83,7 +84,7 @@
   <div class="naglowek">
     <div>
       <h1>Mapa CMS: gdzie co edytować</h1>
-      <div class="pod">Strona Instytutu Matematycznego UWr · stan na 18 listopada 2026 · linki są klikalne</div>
+      <div class="pod">Strona Instytutu Matematycznego UWr · stan na 22 listopada 2026 · linki są klikalne</div>
     </div>
     <div class="prawa">Strona (podgląd):<br><a href="https://im-uwr.github.io/Web-Podglad/">im-uwr.github.io/Web-Podglad</a></div>
   </div>
@@ -237,8 +238,8 @@ Zapisy trwają do…
     <div class="ramka" style="--k: var(--nauka)">
       <h2>Jak dodać plik (PDF, DOCX)</h2>
       <ol>
-        <li>W CMS swojego repozytorium kliknij w menu po lewej <b>Media</b>, wejdź do właściwego folderu (np. <b>studia</b>) i kliknij <b>Upload</b>. CMS sam poprawi nazwę pliku (bez spacji i polskich znaków); zapamiętaj ją.</li>
-        <li>Adres pliku na stronie to <code>/pliki/</code> + folder + nazwa, np. <code>/pliki/studia/regulamin-praktyk-2026.pdf</code>.</li>
+        <li>W CMS swojego repozytorium kliknij w menu po lewej <b>Media</b> (gdzie jest ich kilka, np. <b>Media: studia</b>, wybierz właściwe) i <b>Upload</b>. CMS poprawi nazwę (bez spacji i polskich znaków), a gdy taka już jest, dopisze <code>-1</code>; sprawdź ją w Media.</li>
+        <li>Adres pliku to <code>/pliki/</code> + folder + nazwa, np. <code>/pliki/studia/regulamin-praktyk-2026.pdf</code>, w seminarium <code>/pliki/seminaria/topologia/…</code>. Plik z innego repozytorium: adres wpisz ręcznie.</li>
         <li>W polu „Treść” wpisz link: <code>[Karta zaliczenia praktyki (PDF)](/pliki/studia/karta.pdf)</code>.</li>
         <li><b>Save.</b> Kilka takich linków (po jednym w punkcie listy) w bloku <code>:::pliki</code> da listę plików z ikonami.</li>
         <li>Nowsza wersja pliku: wgraj nowy plik, zmień link, stary usuń w Media.</li>

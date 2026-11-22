@@ -35,6 +35,9 @@ Wskazówki:
 - **Referaty** — dodawaj w folderze właściwego seminarium. Streszczenia piszemy w Markdown, wzory w `$...$`.
 - **Wersja angielska** — pola „EN: …”. Jeśli są puste, angielska wersja strony pokaże tekst polski z odpowiednią informacją.
 - **Linki wewnętrzne** zaczynaj od `/`, np. `/studia/matematyka` albo `/pliki/aktualnosci/plakat.pdf`.
+- **Pliki (PDF, zdjęcia)** wgrywaj w „Media” swojego repozytorium. Każde repozytorium ma własne foldery (np. seminarium:
+  `/pliki/seminaria/topologia/`), bo na stronie pliki ze wszystkich repozytoriów są we wspólnym `/pliki`, a ten sam plik
+  w dwóch repozytoriach zatrzymuje budowę. Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisuje `-1`.
 
 ## Struktura repozytorium
 
