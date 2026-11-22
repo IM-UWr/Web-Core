@@ -15,7 +15,7 @@ KLONY=../tresci
 
 **1. Lista na „Dla uczniów” po zapisie w CMS jest rozstrzygnięta.** Próba w CMS (zlecenie 22, etap 9) wykonana 6.11: 8 z 9 zapisów dobrych, a każdy zapis tej strony psuje jej listę numerowaną (szczegóły w `RAPORT-ZLECENIE-22.md`, znacznik `archiwum/pierwsza-wersja`). Do tego aplikacja Pages CMS musi być zainstalowana w organizacji IM-UWr, bo bez niej każdy zapis kończy się błędem „Resource not accessible by integration”. Od 6.11 jest zainstalowana (179410413), na wszystkich repozytoriach; wystarczy 21 repozytoriów treści.
 
-**2. Wpisy testowe są usunięte.** To 8 wpisów i 4 zdjęcia dodane na prośbę właściciela, wyłącznie na gałęzi `wyglad/zlecenie-16`. Usunąć je w klonach, na tej gałęzi, i wypchnąć tylko tę gałąź.
+**2. Wpisy testowe są usunięte.** Zrobione 22.11.2026 (zlecenie 66), już na `main`: 8 referatów testowych („TEST:”, „Prelegent testowy”, sala „TEST”) i 4 zdjęcia dawnych aktualności testowych. Referaty miały wtedy inne nazwy plików niż w tabeli niżej (np. `test-2026-11-09-dydaktyka.md`), a cztery aktualności testowe i referat w Równaniach różniczkowych zniknęły wcześniej. Tabela zostaje jako zapis pierwotnej listy.
 
 | Repozytorium | Pliki do usunięcia |
 | --- | --- |
