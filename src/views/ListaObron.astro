@@ -8,7 +8,8 @@
 // (filtr lat i szukanie) i bez linku do archiwum starej strony (zlecenie 57). Stare adresy ?rok=RRRR (dawny filtr) — skrypt
 // na dole przenosi do #rok-RRRR (nieznany rok: góra strony), w adresie nie zostaje ?rok; bez JS cała strona jak zwykle.
 // Wiersze: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie), wygląd jak przed zleceniem 57 — dzień w kolorze Nauki,
-// obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy, promotor.
+// obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy, promotor
+// (bez promotorów pomocniczych — promotorzyNaStronie w src/lib/tresci.ts, decyzja 22.11).
 // Nagłówek wiersza: h3 pod „Nadchodzące”, h4 pod rokiem. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css,
 // klasa .tresc): sekcje h2 z kreską między nimi, lata h3. Własne style (na końcu pliku): rok z kreską pod spodem (prototyp 57), promotor.
 // Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px; spis zwinięty jak w Konferencjach).
@@ -16,7 +17,7 @@ import Podstrona from '../components/zal/Podstrona.astro';
 import WierszWydarzenia from '../components/WierszWydarzenia.astro';
 import { t, odmiana } from '../lib/i18n';
 import type { Lang } from '../lib/daty';
-import { miejsce, slugOf, type Obrona, type Wydarzenie } from '../lib/tresci';
+import { miejsce, slugOf, promotorzyNaStronie, type Obrona, type Wydarzenie } from '../lib/tresci';
 import { tytulyWJezyku } from '../lib/osoby';
 import { daneListyObron } from '../lib/widoki/listaObron';
 
@@ -58,8 +59,8 @@ const spis = [
           {g.rok && <h3 id={`rok-${g.rok}`} class="ob-rok">{g.rok}<span class="sr-only">, </span> <small>{ileObron(g.lista.length)}</small></h3>}
           {g.lista.map((o) => (
             <WierszWydarzenia w={wiersz(o)} lang={lang} poziom={g.rok ? 'h4' : 'h3'} dzial="nauka" zwarty bezRodzaju>
-              {o.data.promotorzy.length > 0 && (
-                <p class="ob-prom"><strong>{o.data.promotorzy.length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {o.data.promotorzy.map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
+              {promotorzyNaStronie(o).length > 0 && (
+                <p class="ob-prom"><strong>{promotorzyNaStronie(o).length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {promotorzyNaStronie(o).map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
               )}
             </WierszWydarzenia>
           ))}

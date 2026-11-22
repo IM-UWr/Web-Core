@@ -4,7 +4,7 @@ import { t, wybierz } from '../i18n';
 import { renderMarkdown } from '../markdown';
 import { tytulyEn, tytulyWJezyku } from '../osoby';
 import { long, longWithDay, dayNum, monthShort, time, plusMinutes, type Lang } from '../daty';
-import { miejsce, slugOf, trwaLubBedzie, maTresc, type Obrona, type Wydarzenie } from '../tresci';
+import { miejsce, slugOf, trwaLubBedzie, maTresc, promotorzyNaStronie, type Obrona, type Wydarzenie } from '../tresci';
 import { stronaListy } from '../tekstyStron';
 
 export async function daneObrony(obrona: Obrona, lang: Lang) {
@@ -60,7 +60,9 @@ function zaproszenieEn(obrona: Obrona, przyszla: boolean): string {
   const gdzie = miejsce(d.miejsce, 'en');
   const kiedy = `on ${esc(longWithDay(d.termin, 'en'))}${gdzie ? `, in ${esc(gdzie)}` : ''}`;
   const akapity = [przyszla ? `You are cordially invited to the public defence of ${kto}, ${kiedy}.` : `The public defence of ${kto}, took place ${kiedy}.`];
-  if (d.promotorzy.length) akapity[0] += ` ${d.promotorzy.length > 1 ? 'Supervisors' : 'Supervisor'}: ${esc(d.promotorzy.map(tytulyEn).join(', '))}.`;
+  // bez promotorów pomocniczych (promotorzyNaStronie, decyzja 22.11)
+  const prom = promotorzyNaStronie(obrona);
+  if (prom.length) akapity[0] += ` ${prom.length > 1 ? 'Supervisors' : 'Supervisor'}: ${esc(prom.map(tytulyEn).join(', '))}.`;
   const dok = [d.rozprawa && 'dissertation', (d.streszczenie_pl || d.streszczenie_en) && (d.streszczenie_pl && d.streszczenie_en ? 'abstracts' : 'abstract'), d.recenzje.length && (d.recenzje.length > 1 ? 'reviews' : 'review')]
     .filter(Boolean) as string[];
   if (dok.length) akapity.push(`The ${lista(dok)} ${dok.length > 1 || /s$/.test(dok[0]) ? 'are' : 'is'} available below.`);

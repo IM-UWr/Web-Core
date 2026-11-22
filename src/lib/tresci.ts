@@ -52,6 +52,11 @@ export async function obrony(): Promise<Obrona[]> {
     .sort((a, b) => (a.data.termin < b.data.termin ? 1 : -1));
 }
 
+// Promotorzy obrony pokazywani na stronie (decyzja właściciela 22.11.2026): bez promotorów pomocniczych. W CMS zostają w polu
+// promotorów z dopiskiem „(promotor pomocniczy)”, na stronie ich nie ma: wiersz listy obron (ListaObron.astro), strona obrony
+// (Obrona.astro) i zaproszenie EN złożone z danych (widoki/obrona.ts). Kopromotor zostaje.
+export const promotorzyNaStronie = (o: Obrona): string[] => o.data.promotorzy.filter((p) => !/\(\s*promotor\s+pomocniczy\s*\)/i.test(p));
+
 export async function seminaria(): Promise<Seminarium[]> {
   const items = await getCollection('seminaria');
   return items
