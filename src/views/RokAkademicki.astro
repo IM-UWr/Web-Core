@@ -69,8 +69,8 @@ const ps = (id: string) => (panele ? { 'data-ps-dla': id, 'data-ps-aktywny': id 
       'Days without classes are not counted, and a swapped day counts as the day whose timetable it follows.',
     )}</p>
     <ul class="kd-legenda" aria-label={T('Legenda', 'Legend')}>
-      <li><span class="kd-wzor niebieski" aria-hidden="true"></span><span><strong>{T('Dzień niebieski', 'Blue day')}</strong> — {T('dzień tygodnia występuje w semestrze po raz nieparzysty', 'the weekday occurs in the semester for an odd time')}</span></li>
-      <li><span class="kd-wzor pomaranczowy" aria-hidden="true"></span><span><strong>{T('Dzień pomarańczowy', 'Orange day')}</strong> — {T('dzień tygodnia występuje w semestrze po raz parzysty', 'the weekday occurs in the semester for an even time')}</span></li>
+      <li><span class="kd-wzor niebieski" aria-hidden="true"></span><span><strong>{T('Dzień niebieski', 'Blue day')}</strong> — {T('dzień tygodnia występuje w semestrze po raz nieparzysty', 'an odd-numbered occurrence of that weekday in the semester')}</span></li>
+      <li><span class="kd-wzor pomaranczowy" aria-hidden="true"></span><span><strong>{T('Dzień pomarańczowy', 'Orange day')}</strong> — {T('dzień tygodnia występuje w semestrze po raz parzysty', 'an even-numbered occurrence of that weekday in the semester')}</span></li>
       <li><span class="kd-wzor niebieski kd-wzor-zam" aria-hidden="true">{SKROT_PLANU[lang][3]}</span><span><strong>{T('Zamiana dni', 'Day swap')}</strong> — {T('zajęcia według planu innego dnia; skrót podaje którego (np. „ŚR” — według planu środy)', 'classes follow another day’s timetable; the abbreviation tells which (e.g. “WED” — Wednesday timetable)')}</span></li>
       <li><span class="kd-wzor wolne" aria-hidden="true"></span><span>{T('Dzień wolny od zajęć (święto, przerwa, dzień rektorski)', 'No classes (public holiday, break, Rector’s day off)')}</span></li>
       <li><span class="kd-wzor weekend" aria-hidden="true"></span><span>{T('Sobota i niedziela', 'Saturday and Sunday')}</span></li>

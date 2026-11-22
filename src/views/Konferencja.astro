@@ -22,7 +22,7 @@ const { konferencja, lang } = Astro.props;
 const d = konferencja.data;
 const T = (pl: string, en: string) => (lang === 'en' ? en : pl);
 
-const { tytul, tytulDrugi, Content, opisLang, termin, gdzie, zaklad, stan, opis } = await daneKonferencji(konferencja, lang);
+const { tytul, tytulDrugi, Content, htmlEn, opisLang, termin, gdzie, zaklad, stan, opis } = await daneKonferencji(konferencja, lang);
 ---
 <Podstrona lang={lang} tytul={tytul} tytulLang={langPola(d, 'tytul', lang)} opis={opis} opublikowany={d.opublikowany} uklad="zwarta portal-baner"
   wstecz={{ etykieta: T('Wszystkie konferencje', 'All conferences'), adres: '/nauka/konferencje' }} dzial="nauka" klasa="tresc z-konf">
@@ -41,7 +41,7 @@ const { tytul, tytulDrugi, Content, opisLang, termin, gdzie, zaklad, stan, opis 
       {zaklad && <><dt>{T('Zakład', 'Department')}</dt><dd><a href={u(wJezyku(`/instytut/zaklady/${zaklad.id}`, lang))}>{wybierz(zaklad.data, 'nazwa', lang)}</a></dd></>}
     </dl>
     {d.strona && <p class="akcja glowny"><Link href={d.strona}>{T('Strona konferencji', 'Conference website')}</Link></p>}
-    <div class="prose opis" lang={opisLang}><Content /></div>
+    <div class="prose opis" lang={opisLang}>{htmlEn ? <Fragment set:html={htmlEn} /> : <Content />}</div>
   </section>
 </Podstrona>
 

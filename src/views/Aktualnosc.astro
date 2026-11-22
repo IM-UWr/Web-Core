@@ -27,7 +27,7 @@ import WierszWydarzenia from '../components/WierszWydarzenia.astro';
 import Galeria from '../components/Galeria.tsx';
 import ZdjecieZ from '../components/ZdjecieZ.astro';
 import { u, isExternal } from '../lib/url';
-import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, langPola } from '../lib/i18n';
+import { t, wJezyku, wybierz, RODZAJE, ODBIORCY, odbiorcyMalymi, langPola } from '../lib/i18n';
 import { short, long, longWithDay, range, dayNum, monthShort, parse, hasTime, time, type Lang } from '../lib/daty';
 import { slugOf, ofertaAktualna, type Aktualnosc } from '../lib/tresci';
 import { daneAktualnosci } from '../lib/widoki/aktualnosc';
@@ -60,7 +60,7 @@ const kilkaDni = !!wydarzenie?.koniec && wydarzenie.koniec.slice(0, 10) !== wyda
 const godzOd = wydarzenie && hasTime(wydarzenie.poczatek) ? time(wydarzenie.poczatek) : '';
 const godzDo = wydarzenie?.koniec && hasTime(wydarzenie.koniec) ? time(wydarzenie.koniec) : '';
 const szerPliku = (await zdjecie(d.zdjecie))?.width;
-const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}` : '';
+const dlaTekst = d.dla.length > 0 ? `${t(lang, 'dla')}: ${d.dla.map((x) => odbiorcyMalymi(x, lang)).join(', ')}` : '';
 const oferta = d.rodzaj === 'kariera';
 const wstecz = oferta ? { etykieta: en ? 'All offers' : 'Wszystkie oferty', adres: '/aktualnosci/kariera' } : { etykieta: t(lang, 'wszystkieAktualnosci'), adres: '/aktualnosci' };
 const zgloszenia = !d.zgloszenia_do ? '' : ofertaAktualna({ zgloszenia: d.zgloszenia_do })
@@ -110,7 +110,7 @@ const zgloszenia = !d.zgloszenia_do ? '' : ofertaAktualna({ zgloszenia: d.zglosz
       <h2 id="h-galeria">{t(lang, 'galeria')}</h2>
       <Galeria
         client:visible
-        zdjecia={d.galeria.map((g) => ({ src: u(g.plik), podpis: g.podpis }))}
+        zdjecia={d.galeria.map((g) => ({ src: u(g.plik), podpis: wybierz(g, 'podpis', lang) || undefined }))}
         etykieta={t(lang, 'galeria')}
         zamknij={en ? 'Close' : 'Zamknij'}
         poprzednie={en ? 'Previous photo' : 'Poprzednie zdjęcie'}

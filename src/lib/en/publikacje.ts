@@ -23,6 +23,13 @@ const UWAGI: Record<string, string> = {
 };
 export const uwagiEn = (s?: string) => s && s.split(/,\s*/).map((c) => UWAGI[c.trim()] ?? c).join(', ');
 
+// „Materiały V Konferencji "…", 9-10 grudnia 2016” (wykaz 2018): liczebnik rzymski → porządkowy, data po angielsku
+const MIESIACE_D = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const RZYM: Record<string, number> = { I: 1, V: 5, X: 10, L: 50, C: 100 };
+const rzymska = (r: string) => [...r].reduce((s, c, i, a) => s + (RZYM[c] < (RZYM[a[i + 1]] ?? 0) ? -RZYM[c] : RZYM[c]), 0);
+const porzadkowa = (n: number) => `${n}${n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th'}`;
+
 // Źródło i opis pracy (kolejność ma znaczenie: dłuższe zwroty przed krótszymi).
 const ZRODLO: Regula[] = [
   [/Przy nazwisku (.+?) (podwójna afiliacja|dwie afiliacje|potrójna afiliacja) ?: (.+?)\.?(?= Przy nazwisku| Oświadczenie|$)/g,
@@ -33,6 +40,12 @@ const ZRODLO: Regula[] = [
     (_, s, kto, k, r) => `Proceedings of the symposium "${s}" devoted to the book "${k}" by ${kto.replace(/^Andrzeja Kisielewicza$/, 'Andrzej Kisielewicz')}, Wrocław, December ${r}.`],
   [/\(tom, mimo daty (\d{4})r\., ukazał się dopiero w roku (\d{4}), praca nie była sprawozdawana w (\d{4})r\.\)/,
     (_, a, b, c) => `(the volume, although dated ${a}, appeared only in ${b}; the paper was not reported in ${c})`],
+  [/\(praca, mimo daty (\d{4}),? ukazała się dopiero w (?:roku (\d{4})|(\d{4}) roku)[,;] (?:praca )?nie była sprawozdawana w (?:roku (\d{4})|(\d{4}) roku)\)/g,
+    (_, a, b1, b2, c1, c2) => `(the paper, although dated ${a}, appeared only in ${b1 ?? b2}; it was not reported in ${c1 ?? c2})`],
+  [/^Japoński przekład /, 'Japanese translation of '],
+  [/Recenzent ?: /g, 'Reviewer: '],
+  [/Materiały ([IVXLC]+) Konferencji ("[^"]+"), (\d{1,2})-(\d{1,2}) (\p{L}+) (\d{4})/gu,
+    (_, r, t, a, b, m, y) => `Proceedings of the ${porzadkowa(rzymska(r))} Conference ${t}, ${a}–${b} ${MONTHS[MIESIACE_D.indexOf(m)] ?? m} ${y}`],
   [/Bibliografia na stronach (\d+)-(\d+)/, 'Bibliography on pp. $1–$2'],
   [/Bibliogr\./g, 'Bibliography.'],
   [/Streszcz\. w jęz\. ang\./g, 'Abstract in English.'],
@@ -50,6 +63,7 @@ const ZRODLO: Regula[] = [
   [/\b[sS]\. ?(\d+) ?[-–] ?(\d+)/g, 'pp. $1–$2'],
   [/\bs\.(\d+)\b/g, 'p. $1'],
   [/\b(\d+) s\./g, '$1 pp.'],
+  [/\b(\d+) stron\./g, '$1 pp.'],
   [/\bss\. ?(\d+)/g, '$1 pp.'],
   [/ : il\./g, ' : ill.'],
   [/\[wyd\. (\d{4})\]/g, '[published $1]'],

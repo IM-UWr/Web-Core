@@ -38,7 +38,10 @@ export function tytulyEn(tekst: string): string {
     .replace(new RegExp(`${przed}dr\\.?\\s+inż\\.\\s+`, 'gi'), '$1Dr ')
     .replace(new RegExp(`${przed}dr\\.?\\s+`, 'gi'), '$1Dr ')
     .replace(new RegExp(`${przed}mgr\\.?(?:\\s+inż\\.)?\\s+`, 'gi'), '$1')
-    .replace(new RegExp(`${przed}inż\\.\\s+`, 'gi'), '$1');
+    .replace(new RegExp(`${przed}inż\\.\\s+`, 'gi'), '$1')
+    // dopiski przy promotorach (pole promotorzy obrony)
+    .replace(/\bpromotor pomocniczy\b/gi, 'auxiliary supervisor')
+    .replace(/\bkopromotor\b/gi, 'co-supervisor');
 }
 
 export const tytulyWJezyku = (tekst: string, lang: Lang): string => (lang === 'en' ? tytulyEn(tekst) : tekst);

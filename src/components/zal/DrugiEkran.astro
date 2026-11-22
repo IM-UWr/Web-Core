@@ -31,7 +31,7 @@ import ustawienia from '../../data/ustawienia.json';
 import skroty from '../../data/skroty.json';
 import plan from '../../data/plan/plan.json';
 import { u, isExternal } from '../../lib/url';
-import { wJezyku, wybierz, RODZAJE, ODBIORCY } from '../../lib/i18n';
+import { wJezyku, wybierz, RODZAJE, ODBIORCY, langTekstu } from '../../lib/i18n';
 import { today, parse, weekday, type Lang } from '../../lib/daty';
 import { pozycjeKierunkow } from '../../lib/kierunki';
 import { tekstDnia } from '../../lib/kolory-dni';
@@ -66,7 +66,7 @@ const wierszWydarzenia = (w: Wydarzenie): Wiersz => {
   return {
     dzial: dz, ...data(w.poczatek), gdzie: dz ? T(...NAZWY_DZ[dz]) : T('Wydarzenie', 'Event'),
     co: [RODZ_WYD[w.rodzaj] ? T(...RODZ_WYD[w.rodzaj]) : '', godzina(w.poczatek), krotkieMiejsce(w.miejsce)].filter(Boolean).join(' · '),
-    tytul: w.rodzaj === 'obrona' && w.podtytul ? w.podtytul : w.tytul, tytulLang: w.tytulLang, adres: w.href,
+    tytul: w.rodzaj === 'obrona' && w.podtytul ? w.podtytul : w.tytul, tytulLang: w.rodzaj === 'obrona' && w.podtytul ? langTekstu(w.podtytul, lang) : w.tytulLang, adres: w.href,
     koniec: w.koniec || w.koniecIcs || w.poczatek,
   };
 };
@@ -121,7 +121,7 @@ const skr = await Promise.all((skroty.kafelki as any[]).slice(0, 5).map(async (k
     // „e-maile”: po łączniku U+2060 (łącznik słów, bez szerokości), żeby wyraz się nie łamał (zlecenie 26, punkt 4.2); łącznika niełamiącego
     // U+2011 Manrope nie ma, przeglądarka wzięłaby go z innego kroju
     : adres === '/pracownicy' ? T(`${osob} osób, pokoje, e-⁠maile`, `${osob} people, rooms, e-⁠mails`)
-    : adres === '/seminaria' ? T(`${seminaria.length} ${seminaria.length === 1 ? 'referat' : 'referatów'} w tym tygodniu`, `${seminaria.length} talks this week`)
+    : adres === '/seminaria' ? T(`${seminaria.length} ${seminaria.length === 1 ? 'referat' : 'referatów'} w tym tygodniu`, `${seminaria.length} ${seminaria.length === 1 ? 'talk' : 'talks'} this week`)
     : (wybierz(k, 'opis', lang) as string) || '';
   return { adres, kd: false, grafik: undefined, tytul: wybierz(k, 'etykieta', lang) as string, opis };
 }));
@@ -202,7 +202,7 @@ const LOSUJ = glownaJs(lang);
         <span class="gdzie">{T('Studia', 'Studies')}</span>
         <h2 id="z-h-studia"><Link class="h-link" href={st.rekrutacja}>{T('Studiuj matematykę we Wrocławiu', 'Study mathematics in Wrocław')}</Link></h2>
         <p>{wybierz(st, 'opis', lang)}</p>
-        <Link class="z-rekr-link" href={st.rekrutacja}>{T('Rekrutacja na studia', 'Admission')}{!isExternal(st.rekrutacja) && <span aria-hidden="true"> →</span>}</Link>
+        <Link class="z-rekr-link" href={st.rekrutacja}>{T('Rekrutacja na studia', 'Admissions (in Polish)')}{!isExternal(st.rekrutacja) && <span aria-hidden="true"> →</span>}</Link>
       </div>
       <nav class="z-kier" aria-label={T('Kierunki', 'Programmes')}>
         {kierunki.map((k) => (
@@ -212,7 +212,7 @@ const LOSUJ = glownaJs(lang);
     </section>
     {warto.length > 0 && (
       <section class="z-warto" data-dzial="instytut" aria-labelledby="z-h-warto">
-        <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Did you know')}</h2><a href={href(ADRES_WW)}>{T('Wszystkie →', 'All →')}</a></div>
+        <div class="z-h"><h2 id="z-h-warto">{T('Warto wiedzieć', 'Highlights')}</h2><a href={href(ADRES_WW)}>{T('Wszystkie →', 'All →')}</a></div>
         <div class="rzad" data-losuj={WARTO_ILE}>{warto.map((p) => (
           <Link href={href(p.adres)} {...p.dane} hidden={!p.widoczna}>
             {p.w.grupa === 'sylwetki' ? <span class="ww2-twarz" set:html={portretHtml(p.w)} /> : p.w.grupa === 'historie' && <span>{p.w.rok}</span>}

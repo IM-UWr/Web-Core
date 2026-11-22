@@ -34,6 +34,16 @@ Zlecenie 47 (poprawka): rektorat Marczewskiego trwał w latach **1953–1957** (
 | drugi ekran głównej — sala (`DrugiEkran.astro`) | s. HS | room HS | K10 |
 | drugi ekran — „więcej” (`DrugiEkran.astro`, `drugi-ekran.ts`) | i jeszcze 4 · Wszystkie aktualności → | 4 more · All news → | K11 |
 | kanał RSS (`src/pages/en/rss.xml.ts`) | Instytut Matematyczny UWr — aktualności | Mathematical Institute, University of Wrocław — news | L |
+| drugi ekran — nagłówek „Warto wiedzieć” (`DrugiEkran.astro`; przegląd 22.11.2026) | Warto wiedzieć | Highlights (było: Did you know) | — |
+| drugi ekran — Szybki dostęp, Seminaria (`DrugiEkran.astro`) | 1 referat w tym tygodniu | 1 talk this week (było: 1 talks) | — |
+| drugi ekran — link rekrutacji (`DrugiEkran.astro`) | Rekrutacja na studia | Admissions (in Polish) (było: Admission; D20) | — |
+| miejsca wydarzeń, obron, konferencji (`MIEJSCA_EN` w `src/lib/tresci.ts`) | sala 25, Instytut Informatyki Uniwersytetu Wrocławskiego · Instytut Informatyki sala 119 · Politechnika Wrocławska · budynek C-16 | room 25, Institute of Computer Science, University of Wrocław · Institute of Computer Science, room 119 · Wrocław University of Science and Technology · Building C-16 | — |
+| obrona — tytuł rozprawy po polsku (`Obrona.astro`; D5, D14) | *tytuł* | Original title: *tytuł* (lang="pl"; także lang="pl" na liście obron i w kalendarzu) | — |
+| obrona — dwóch promotorów (`Obrona.astro`) | Promotor | Supervisors (po polsku bez zmian) | — |
+| obrona — dopiski przy promotorze (`tytulyEn` w `src/lib/osoby.ts`) | (promotor pomocniczy) · (kopromotor) | (auxiliary supervisor) · (co-supervisor) | — |
+| zaproszenie na obronę bez `tresc_en` (`src/lib/widoki/obrona.ts`) | …, in online · in University of … | …, online · at University of … | — |
+| aktualność — „Dla:” (`Aktualnosc.astro`, `AktualnoscZamianaDni.astro`) | doktoranci | PhD students (było: phd students) | — |
+| Rok akademicki — legenda kolorów (`RokAkademicki.astro`) | dzień tygodnia występuje w semestrze po raz nieparzysty / parzysty | an odd-numbered / an even-numbered occurrence of that weekday in the semester | — |
 
 ### „Warto wiedzieć” (zlecenie 47; `src/views/ListaWartoWiedziec.astro`, `SylwetkaWW.astro`, `WartoWiedziecWpis.astro`, `src/components/ww/`, `src/lib/ww.mjs`, `src/lib/tekstyStron.ts`)
 
@@ -205,6 +215,9 @@ matematycznych, cz. XL”, „Wiadomości Matematyczne”, „Warszawa”).
 | Instytut Matematyczny, Uniwersytet Wrocławski · Uniwersytet Wrocławski | Mathematical Institute, University of Wrocław · University of Wrocław |
 | Materiały (z) sympozjum "…", poświęconego książce Andrzeja Kisielewicza "…", Wrocław, grudzień 2017. | Proceedings of the symposium "…" devoted to the book "…" by Andrzej Kisielewicz, Wrocław, December 2017. |
 | (tom, mimo daty 2007r., ukazał się dopiero w roku 2008, praca nie była sprawozdawana w 2007r.) | (the volume, although dated 2007, appeared only in 2008; the paper was not reported in 2007) |
+| (praca, mimo daty 2007, ukazała się dopiero w roku 2008; [praca] nie była sprawozdawana w roku 2007) — 5 wariantów zapisu | (the paper, although dated 2007, appeared only in 2008; it was not reported in 2007) |
+| Japoński przekład "…" · 320 stron. | Japanese translation of "…" · 320 pp. |
+| Recenzent : · Materiały V Konferencji "…", 9-10 grudnia 2016 | Reviewer: · Proceedings of the 5th Conference "…", 9–10 December 2016 |
 | Praca zbiorowa pod redakcją Witolda Więsława | collective work edited by Witold Więsław |
 
 ## 4. Treści CMS — łatki (`dok/en/latki/<Repozytorium>.patch`; sekcja C audytu)

@@ -39,6 +39,7 @@ export interface WW {
   zajawka_en?: string;
   obraz?: string;
   obraz_zrodlo?: string;
+  obraz_zrodlo_en?: string;
   obraz_opis?: string;
   obraz_opis_en?: string;
   link?: string;
@@ -129,7 +130,7 @@ function naWW(grupa: GrupaWW, kolekcja: KolekcjaWW, e: Wpis): WW {
     data: { opublikowany: d.opublikowany !== false },
     tytul: d.tytul, tytul_en: d.tytul_en,
     zajawka: d.zajawka, zajawka_en: d.zajawka_en,
-    obraz: d.obraz, obraz_zrodlo: d.obraz_zrodlo, obraz_opis: d.obraz_opis, obraz_opis_en: d.obraz_opis_en,
+    obraz: d.obraz, obraz_zrodlo: d.obraz_zrodlo, obraz_zrodlo_en: d.obraz_zrodlo_en, obraz_opis: d.obraz_opis, obraz_opis_en: d.obraz_opis_en,
     link: d.link, link_etykieta: d.link_etykieta, link_etykieta_en: d.link_etykieta_en,
     na_glownej: d.na_glownej !== false, ulubione: d.ulubione === true, zawsze: d.zawsze === true,
     dodano, lata: d.lata, podpis: d.podpis, podpis_en: d.podpis_en, liczby: Array.isArray(d.liczby) ? d.liczby : [], rocznica, rok,

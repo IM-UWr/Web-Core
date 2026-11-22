@@ -16,7 +16,7 @@ import SiatkaSylwetek from '../components/ww/SiatkaSylwetek.astro';
 import RamkiWW from '../components/ww/RamkiWW.astro';
 import LiczbyBanera from '../components/LiczbyBanera.astro';
 import { u } from '../lib/url';
-import { wJezyku } from '../lib/i18n';
+import { wJezyku, langTekstu } from '../lib/i18n';
 import { zrodlaLicz } from '../lib/ww.mjs';
 import { ADRES_WW, portretHtml, liczbyBaneraWW, type WW } from '../lib/wartoWiedziec';
 import { zrodlaJs } from '../lib/wwSkrypty';
@@ -30,7 +30,9 @@ const { T, tytul, tytulLang, zajawka, podpis, lata, tresc, bezTlumaczenia, wstec
 const { powiazane, inne, inneStart } = await sekcjeSylwetki(w, wszystkie);
 // zlecenie 55: „Fot.”, „Fot:”, „Foto:”, „Photo:” albo „Photo” wpisane na początku „Źródła zdjęcia” zdejmujemy, bo prefiks
 // T('Fot.', 'Photo:') dopisujemy sami — zawsze dokładnie jeden, bez „Fot. Fot.”
-const zrodloZdjecia = (w.obraz_zrodlo ?? '').replace(/^\s*(?:fot[.:]|foto:|photo(?![a-z]):?)\s*/i, '').trim();
+// Na /en pole obraz_zrodlo_en; puste = polskie, z lang="pl", gdy wygląda na polskie (decyzja D14)
+const zrodloZdjecia = (((lang === 'en' && w.obraz_zrodlo_en) || w.obraz_zrodlo) ?? '').replace(/^\s*(?:fot[.:]|foto:|photo(?![a-z]):?)\s*/i, '').trim();
+const zrodloLang = lang === 'en' && !w.obraz_zrodlo_en ? langTekstu(zrodloZdjecia, lang) : undefined;
 const liczby = liczbyBaneraWW(w);
 const sekcje = (tresc?.sekcje ?? []).map((s, i) => ({ ...s, id: s.id || `sekcja-${i + 1}` }));
 // „Zobacz też” (zlecenie 53; dawniej „W »Warto wiedzieć«” — dublowało dział): wiersze mają nazwę grupy, nagłówek jej nie powtarza
@@ -50,7 +52,7 @@ const spis = [
     <div class="ww2-prof-l">
       <Fragment set:html={portretHtml(w, 'ww2-duzy')} />
       {lata && <p class="ww2-prof-lata">{lata}</p>}
-      {w.obraz && zrodloZdjecia && <p class="ww2-prof-zrodlo">{T('Fot.', 'Photo:')} {zrodloZdjecia}</p>}
+      {w.obraz && zrodloZdjecia && <p class="ww2-prof-zrodlo">{T('Fot.', 'Photo:')} {zrodloLang ? <span lang={zrodloLang}>{zrodloZdjecia}</span> : zrodloZdjecia}</p>}
     </div>
     <RamkiWW lang={lang} bledy={tresc?.bledy} tba={w.tba} tlumaczenie={bezTlumaczenia ? `${ADRES_WW}/${w.slug}` : undefined} />
     {tresc?.wstep && <div class="ww2-wstep ww2-tresc"><div class="prose" set:html={tresc.wstep} /></div>}

@@ -223,12 +223,17 @@ export function sala(s: string | undefined, lang: Lang = 'pl'): string | undefin
 // typowe polskie fragmenty tłumaczymy tutaj („sala WS, Instytut Matematyczny UWr” → „room WS, Mathematical
 // Institute, University of Wrocław”, „Warszawa” → „Warsaw”). Nazwy spoza listy zostają bez zmian; po polsku — bez zmian.
 const MIEJSCA_EN: [RegExp, string][] = [
-  [/Wydział Matematyki i Informatyki UWr/g, 'Faculty of Mathematics and Computer Science, University of Wrocław'],
-  [/Instytut Matematyczny UWr/g, 'Mathematical Institute, University of Wrocław'],
-  [/Instytut Informatyki UWr/g, 'Institute of Computer Science, University of Wrocław'],
+  [/Wydział Matematyki i Informatyki (?:UWr|Uniwersytetu Wrocławskiego)/g, 'Faculty of Mathematics and Computer Science, University of Wrocław'],
+  [/Instytut Matematyczny (?:UWr|Uniwersytetu Wrocławskiego)/g, 'Mathematical Institute, University of Wrocław'],
+  [/Instytut Informatyki (?:UWr|Uniwersytetu Wrocławskiego)/g, 'Institute of Computer Science, University of Wrocław'],
+  [/Instytut Informatyki/g, 'Institute of Computer Science'],
+  [/Politechnika Wrocławska/g, 'Wrocław University of Science and Technology'],
   [/(^|, )sale ([\w.]+) i ([\w.]+)/g, '$1rooms $2 and $3'],
   [/(^|, )sale /g, '$1rooms '],
   [/(^|, )sala /g, '$1room '],
+  [/(^|, )budynek /g, '$1Building '],
+  // „Instytut Informatyki sala 119” → „Institute of Computer Science, room 119” (sala po nazwie miejsca)
+  [/ sala ([\w.]+)/g, ', room $1'],
   [/Warszawa/g, 'Warsaw'],
   [/Wiedeń/g, 'Vienna'],
 ];

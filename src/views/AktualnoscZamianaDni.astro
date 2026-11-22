@@ -14,7 +14,7 @@
 import Baza from '../layouts/Baza.astro';
 import NaglowekStrony from '../components/NaglowekStrony.astro';
 import { u } from '../lib/url';
-import { t, wJezyku, RODZAJE, ODBIORCY } from '../lib/i18n';
+import { t, wJezyku, RODZAJE, odbiorcyMalymi } from '../lib/i18n';
 import { short, longWithDay, type Lang } from '../lib/daty';
 import { nazwaSemestru, opisZamiany, NAZWA_KOLORU, SKROT_PLANU } from '../lib/kolory-dni';
 import { daneAktualnosciZamianyDni } from '../lib/widoki/aktualnoscZamianaDni';
@@ -33,7 +33,7 @@ const dzialBanera = dzialWpisu({ rodzaj: 'ogloszenie', dla });
   <div class="z-pd">
     <div class="z-pd-tresc tresc">
       <section class="zd">
-        <p class="etyk zd-meta"><span>{RODZAJE.ogloszenie[lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od, lang)}</time></span> · <span>{t(lang, 'dla')}: {dla.map((x) => ODBIORCY[x][lang].toLowerCase()).join(', ')}</span></p>
+        <p class="etyk zd-meta"><span>{RODZAJE.ogloszenie[lang]}</span> · <span>{t(lang, 'opublikowano')} <time datetime={a.od}>{short(a.od, lang)}</time></span> · <span>{t(lang, 'dla')}: {dla.map((x) => odbiorcyMalymi(x, lang)).join(', ')}</span></p>
 
         {minela && <div class="uwaga"><p>{T('Ta zamiana dni już się odbyła.', 'This day swap has already taken place.')}</p></div>}
 

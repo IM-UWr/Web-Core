@@ -58,7 +58,9 @@ function zaproszenieEn(obrona: Obrona, przyszla: boolean): string {
   const d = obrona.data;
   const kto = `the doctoral dissertation of ${esc(d.kandydat)}, MSc, entitled <em>${esc(d.tytul_rozprawy)}</em>`;
   const gdzie = miejsce(d.miejsce, 'en');
-  const kiedy = `on ${esc(longWithDay(d.termin, 'en'))}${gdzie ? `, in ${esc(gdzie)}` : ''}`;
+  // „in room WS, …”; „online” bez przyimka; uczelnia albo instytut — „at” („at University of Tunis El Manar, Tunis”)
+  const przyimek = !gdzie || /^online$/i.test(gdzie) ? '' : /^(university|institute|faculty|mathematical institute)\b/i.test(gdzie) ? 'at ' : 'in ';
+  const kiedy = `on ${esc(longWithDay(d.termin, 'en'))}${gdzie ? `, ${przyimek}${esc(gdzie)}` : ''}`;
   const akapity = [przyszla ? `You are cordially invited to the public defence of ${kto}, ${kiedy}.` : `The public defence of ${kto}, took place ${kiedy}.`];
   // bez promotorów pomocniczych (promotorzyNaStronie, decyzja 22.11)
   const prom = promotorzyNaStronie(obrona);

@@ -168,7 +168,8 @@ const aktualnosci = defineCollection({
     zdjecie: optStr,
     zdjecie_opis: optStr,
     zdjecie_opis_en: optStr,
-    galeria: lista(z.object({ plik: z.string(), podpis: optStr })),
+    // podpis_en — podpis zdjęcia po angielsku (puste = polski)
+    galeria: lista(z.object({ plik: z.string(), podpis: optStr, podpis_en: optStr })),
     album: optStr,
     zalaczniki: plikList,
     termin: lista(terminWydarzenia),
@@ -443,6 +444,8 @@ const konferencje = defineCollection({
     organizatorzy: optStr,
     zaklad: optId,
     zdjecie: optStr,
+    // opis po angielsku (Markdown, opcjonalnie); puste = na /en opis polski (z lang="pl", gdy wygląda na polski)
+    tresc_en: optStr,
     odwolana: z.preprocess((v) => (v == null || v === '' ? false : v), z.boolean()),
     opublikowany: published,
   }),
@@ -505,6 +508,8 @@ const ww_sylwetki = defineCollection({
     liczby: liczbyBanera,
     rocznica_urodzin: tekst,
     obraz_zrodlo: optStr,
+    // źródło zdjęcia po angielsku (puste = polskie, na /en z lang="pl", gdy wygląda na polskie)
+    obraz_zrodlo_en: optStr,
   }),
 });
 const obrazILink = {

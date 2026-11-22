@@ -3,6 +3,7 @@
 import { render } from 'astro:content';
 import { range, type Lang } from '../daty';
 import { langTekstu } from '../i18n';
+import { renderMarkdown } from '../markdown';
 import { zaklady, miejsce, trwaLubBedzie, type Konferencja } from '../tresci';
 
 export async function daneKonferencji(konferencja: Konferencja, lang: Lang) {
@@ -12,9 +13,10 @@ export async function daneKonferencji(konferencja: Konferencja, lang: Lang) {
   // tytuł w drugim języku (pod nagłówkiem), jeśli jest — jak na stronie projektu
   const tytulDrugi = lang === 'en' ? (d.tytul_en ? { tekst: d.tytul, lang: 'pl' } : undefined) : d.tytul_en ? { tekst: d.tytul_en, lang: 'en' } : undefined;
   const { Content } = await render(konferencja);
-  // Opis ma tylko wersję polską (formularz nie ma Treści EN): na /en dostaje lang="pl", gdy wygląda na polski
-  // (wiele opisów jest po angielsku; src/lib/jezykTekstu.ts).
-  const opisLang = langTekstu(konferencja.body, lang);
+  // Opis po angielsku: pole tresc_en (jak w aktualnościach); puste = opis polski, który na /en dostaje lang="pl", gdy wygląda
+  // na polski (wiele opisów jest po angielsku; src/lib/jezykTekstu.ts).
+  const htmlEn = lang === 'en' && d.tresc_en?.trim() ? await renderMarkdown(d.tresc_en, lang) : '';
+  const opisLang = htmlEn ? undefined : langTekstu(konferencja.body, lang);
   const termin = range(d.poczatek, d.koniec, lang);
   const gdzie = miejsce(d.miejsce, lang);
   const zaklad = d.zaklad ? (await zaklady()).find((z) => z.id === d.zaklad) : undefined;
@@ -23,5 +25,5 @@ export async function daneKonferencji(konferencja: Konferencja, lang: Lang) {
     ? { etykieta: T('odwołana', 'cancelled'), trwa: false }
     : trwaLubBedzie({ poczatek: d.poczatek, koniec: d.koniec }) ? { etykieta: T('nadchodząca', 'upcoming'), trwa: true } : undefined;
   const opis = [T('Konferencja', 'Conference'), termin, gdzie].filter(Boolean).join(', ');
-  return { tytul, tytulDrugi, Content, opisLang, termin, gdzie, zaklad, stan, opis };
+  return { tytul, tytulDrugi, Content, htmlEn, opisLang, termin, gdzie, zaklad, stan, opis };
 }
