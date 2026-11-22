@@ -99,7 +99,7 @@ To tekstowa informacja o terminie, widoczna razem z osią. Nie jest harmonograme
 
 ## Grafik dyżurów i pary (zlecenie 45)
 
-Strona `/studia/tutornia` (Web-Studia, „Strony studiów”) ma grafik dyżurów wpisywany w Treści, bez nowych pól formularza: sala i daty to linie w bloku. Pole „Liczby” zostaje puste — liczby banera (tutorzy, dyżury w tygodniu, sala) strona liczy z bloku; wpisane „Liczby” mają pierwszeństwo.
+Strona `/studia/tutornia` (od 22.11.2026 repozytorium Web-Tutornia, formularz „Tutornia”; wcześniej Web-Studia, „Strony studiów”) ma grafik dyżurów wpisywany w Treści, bez nowych pól formularza: sala i daty to linie w bloku. Pole „Liczby” zostaje puste — liczby banera (tutorzy, dyżury w tygodniu, sala) strona liczy z bloku; wpisane „Liczby” mają pierwszeństwo.
 
 ```markdown
 <!-- GRAFIK: Najpierw Sala:, Od: (np. 19.10.2026) i Do: (puste = do końca zajęć), potem jeden dyżur na linię: - pon. 12:15–14:00 **Imię Nazwisko** — przedmioty. -->

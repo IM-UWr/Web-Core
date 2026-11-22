@@ -13,7 +13,7 @@ Strony i strony działów (jawny Markdown):
 
 > Jawny Markdown: ## rozpoczyna sekcję i pozycję spisu; {#id} zachowuje adres sekcji. Zwykły tekst jest prozą domyślnie; nie wymaga otaczających znaczników. Specjalne układy wymagają znaczników, np. :::kafelki, :::etapy, :::zakladki. Komentarze <!-- … --> objaśniają bloki; na stronie ich nie widać. Zachowaj pasujące końcowe dwukropki. Plik PDF: wgraj w „Media” i w linku wpisz, gdzie leży w Media: [tekst](nazwa.pdf), w folderze: [tekst](folder/nazwa.pdf); z innego repozytorium: [tekst](Web-Nauka/nazwa.pdf). Po wgraniu sprawdź nazwę w Media: gdy taka już jest, CMS dopisze -1. Wygląd sprawdzaj po przebudowaniu strony (Podgląd).
 
-W „Stronach studiów” (Web-Studia) lista przykładowych bloków ma też `:::pary` i `:::grafik` (zlecenie 45; w Treści EN: „pusty blok wstawia grafik z wersji polskiej”). Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
+W „Stronach studiów” (Web-Studia) lista przykładowych bloków ma też `:::pary` (zlecenie 45). `:::grafik` opisuje formularz „Tutornia” w osobnym repozytorium Web-Tutornia (od 22.11.2026, zlecenie 64; w Treści EN pusty blok wstawia plan z wersji polskiej). Formularz dopisuje do tego, co dotyczy danej strony, np. na stronie działu Instytut: „Zdanie nad ostatnimi sukcesami: na końcu, pod „## Ostatnie sukcesy {#sukcesy}””; na stronie Pracownicy: „tekst stoi nad listą osób”. Kierunki i specjalności mają własny, dłuższy opis (Web-Studia).
 
 Wpisy (zwykły Markdown):
 
@@ -108,7 +108,7 @@ Pary etykieta–treść (etykieta w kolumnie obok treści; na telefonie nad tre�
 :::
 ```
 
-Grafik dyżurów (zlecenie 45, Tutornia; tylko zwykłe Strony, jeden blok na stronę). Strona rysuje z niego plan tygodnia, ramkę „Teraz” nad treścią, liczby banera i podpis kafelka „Tutornia” w Szybkim dostępie:
+Grafik dyżurów (zlecenie 45; Tutornia, od 22.11.2026 w repozytorium Web-Tutornia, formularz „Tutornia”; tylko zwykłe Strony, jeden blok na stronę). Strona rysuje z niego plan tygodnia, ramkę „Teraz” nad treścią, liczby banera i podpis kafelka „Tutornia” w Szybkim dostępie:
 
 ```markdown
 :::grafik
@@ -238,7 +238,7 @@ Pozostałe znaczniki (`:::zakladki`, `:::tabela`, `:::kreski`, `:::tematy`, `:::
 | Termin wydarzenia (Kalendarz, nadchodzące wydarzenia, .ics) | Web-Aktualnosci → Aktualności → Termin wydarzenia (pod „Rodzaj”; zwykła informacja: tylko „Data”) |
 | Deklaracja dostępności, Polityka prywatności, O stronie (linki w stopce) | Web-Ustawienia → formularze o tych nazwach (jawny Markdown; tylko administrator) |
 | Zdjęcia i kadry nagłówków działów, ikony Facebooka i YouTube w stopce | Web-Ustawienia → Strona główna i kontakt → Nagłówki działów; Facebook; YouTube (tylko administrator) |
-| Grafik dyżurów Tutorni (plan, ramka „Teraz”, liczby w banerze, podpis kafelka w Szybkim dostępie) | Web-Studia → Strony studiów → `studia/tutornia` → Treść, blok `:::grafik` (Treść EN: pusty blok) |
+| Grafik dyżurów Tutorni (plan, ramka „Teraz”, liczby w banerze, podpis kafelka w Szybkim dostępie) | Web-Tutornia → Tutornia → Treść, blok `:::grafik` (Treść EN: pusty blok) |
 | Link przy pozycji „W skrócie” (np. „Tutornia →”) | Web-Studia / Web-Instytut / Web-Nauka / Web-Popularyzacja → Strona działu … → „W skrócie” → „Link (opcjonalnie)” |
 | Kafelki „Szybki dostęp” na stronie głównej (pierwsze pięć) | Web-Ustawienia → Kafelki „Na skróty” (tylko właściciel); kafelek z adresem strony z grafikiem dyżurów ma podpis na żywo |
 

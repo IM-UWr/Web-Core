@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parsujGrafik, blokGrafiku, grafikZMarkdown, liczbyGrafiku, stanGrafiku, dzienGrafiku, minal, osGodzin, hm, POWODY } from '../lib/grafik.mjs';
 
-// wnętrze bloku z załącznika A zlecenia 45 (Web-Studia src/content/strony/studia/tutornia.md)
+// wnętrze bloku z załącznika A zlecenia 45 (dziś Web-Tutornia src/content/strony/studia/tutornia.md)
 const ZALACZNIK_A = `Sala: 202
 Od: 19.10.2026
 Do:

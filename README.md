@@ -24,6 +24,7 @@ Nowa strona Instytutu Matematycznego Uniwersytetu Wrocławskiego — kod strony 
 | Web-Instytut | zakłady, władze, kontakt, infrastruktura informatyczna, „Warto wiedzieć” |
 | Web-Nauka | konferencje, projekty i granty, publikacje, sukcesy |
 | Web-Studia | kierunki, strony studiów i szkoły doktorskiej, rok akademicki i kolory dni |
+| Web-Tutornia | Tutornia: tekst i plan dyżurów (publiczne; edytują studenci-tutorzy) |
 | Web-Popularyzacja | popularyzacja |
 | Web-Sem-… | po jednym seminarium (opis i referaty) |
 
