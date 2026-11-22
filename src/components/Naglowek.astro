@@ -5,6 +5,7 @@
 // Kolor według zasad paska komputera (zlecenie 21, punkt 2): klasy .przewiniety i .jasny ustawia src/scripts/zal/pasek.ts, style w zal-telefon.css.
 // Strona główna: na okładce zamiast nazwy Instytutu nazwa Wydziału (link na jego stronę), krojem z okładki komputera; po zjechaniu
 // z okładki znów Instytut (zlecenie 18, punkt 12). Dwa linki w jednym miejscu, widoczny jeden (zal-telefon.css); bez JS zostaje Wydział.
+// Druga linia nazwy (wydział) po angielsku przy 421–519 px jako skrót „Faculty of Math. & Comp. Science” (zlecenie 58, próg w zal-telefon.css).
 import Ikona from './Ikona.astro';
 import Flaga from './zal/Flaga.astro';
 import ustawienia from '../data/ustawienia.json';
@@ -15,6 +16,10 @@ import type { Lang } from '../lib/daty';
 interface Props { lang: Lang; sciezka: string; inny: string | null; idPanelu: string; naOkladce?: boolean }
 const { lang, inny, idPanelu, naOkladce = false } = Astro.props;
 const [wydz1, wydz2] = wydzialLinie(lang);
+// druga linia nazwy w pasku (zlecenie 58): gdy jest skrót (EN), dwa spany — pełna nazwa (.bs-pelna; przy 421–519 px tylko dla czytników)
+// i skrót (.bs-krotka, aria-hidden; widoczny tylko przy 421–519 px), próg w zal-telefon.css; bez skrótu (PL) — sam tekst, HTML jak dotąd
+const wydzial = t(lang, 'wydzial');
+const wydzialKrotko = t(lang, 'wydzialKrotko');
 const logo = (ustawienia as any).logo as string | undefined;
 // logo UWr prowadzi na stronę uczelni (w tej samej karcie), nazwa instytutu — na naszą stronę główną
 const uwrAdres = UWR_ADRES[lang];
@@ -37,7 +42,9 @@ const doJezyka = lang === 'pl' ? 'en' : 'pl';
       )}
       <a class="brand-txt" href={u(wJezyku('/', lang))}>
         <span class="brand-name">{t(lang, 'instytut')}</span>
-        <span class="brand-sub">{t(lang, 'wydzial')}</span>
+        <span class="brand-sub">{wydzialKrotko === wydzial
+          ? wydzial
+          : <><span class="bs-pelna">{wydzial}</span><span class="bs-krotka" aria-hidden="true">{wydzialKrotko}</span></>}</span>
       </a>
     </div>
 

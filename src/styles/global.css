@@ -181,6 +181,8 @@ body > main { flex: 1 0 auto; }
 .brand-txt { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .brand-name { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink); }
 .brand-sub { font-size: 13px; font-weight: 500; color: var(--muted); }
+/* skrót nazwy wydziału (EN) — widoczny tylko na wąskich telefonach, próg w zal-telefon.css (zlecenie 58) */
+.brand-sub .bs-krotka { display: none; }
 /* pozycja działu: napis = link do strony działu, strzałka = rozwinięcie; lista także po najechaniu myszką */
 .nav-item.open > .nav-pill { background: var(--surface); color: var(--ink); }
 .nav-item.open > .dropdown { visibility: visible; opacity: 1; pointer-events: auto; transition: opacity var(--t-krotki) var(--rytm), visibility 0s; }

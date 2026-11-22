@@ -7,6 +7,8 @@ const T = {
     uwr: 'Uniwersytet Wrocławski',
     uwrStronaGlowna: 'Uniwersytet Wrocławski — strona główna UWr',
     wydzial: 'Wydział Matematyki i Informatyki',
+    // nazwa wydziału w pasku telefonu przy 421–519 px (zlecenie 58): po polsku pełna, bo się mieści — skrótu nie ma
+    wydzialKrotko: 'Wydział Matematyki i Informatyki',
     szukaj: 'Szukaj',
     menu: 'Menu',
     otworzMenu: 'Otwórz menu',
@@ -117,6 +119,8 @@ const T = {
     uwr: 'University of Wrocław',
     uwrStronaGlowna: 'University of Wrocław — main website',
     wydzial: 'Faculty of Mathematics and Computer Science',
+    // skrót w pasku telefonu przy 421–519 px (zlecenie 58); pełna nazwa zostaje dla czytników ekranu
+    wydzialKrotko: 'Faculty of Math. & Comp. Science',
     szukaj: 'Search',
     menu: 'Menu',
     otworzMenu: 'Open menu',

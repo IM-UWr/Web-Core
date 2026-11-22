@@ -52,6 +52,14 @@
   .hdr .icon-btn.burger { background: var(--burger-tlo, rgb(255 255 255 / .14)) !important; color: #fff !important; }
   .hdr.jasny .brand-name { color: var(--ink) !important; }
   .hdr.jasny .brand-sub { color: var(--muted) !important; }
+  /* druga linia nazwy po angielsku (zlecenie 58; spany w Naglowek.astro): pełna „Faculty of Mathematics and Computer Science” (261 px przy 12 px)
+     mieści się obok przycisków z odstępem 16 px (gap paska) dopiero od ok. 515 px — próg 520 px daje mały zapas. Przy 421–519 px na ekranie skrót
+     „Faculty of Math. & Comp. Science” (186 px), a pełna nazwa zostaje dla czytników ekranu (jak .sr-only); do 420 px linii nie ma (global.css),
+     od 520 px pełna nazwa. Krój, stopień i kolor bez zmian. Po polsku skrótu nie ma (pełna nazwa się mieści). Jedyne miejsce tego progu. */
+  @media (min-width: 421px) and (max-width: 519px) {
+    .brand-sub .bs-pelna { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .brand-sub .bs-krotka { display: inline; }
+  }
   .hdr.jasny .brand-logo { background: var(--uwr) !important; }
   .hdr.jasny .icon-btn { color: color-mix(in srgb, var(--ink) 76%, transparent) !important; }
   .hdr.jasny .icon-btn.burger { background: var(--burger-tlo, var(--surface)) !important; color: var(--ink) !important; }
@@ -63,8 +71,7 @@
      więc angielska nazwa łamie się tu sama; przy 320 px „Computer Science” wymaga jeszcze węższych marginesów paska */
   @media (max-width: 389px) { .z-wydzial-nazwa:lang(en) br { display: none; } }
   @media (max-width: 330px) { .hdr-row:has(.brand-okladka) { padding-inline: 12px; } .brand-okladka { gap: 8px; } }
-  /* po zjechaniu: pełna nazwa wydziału po angielsku nie mieści się obok przycisków */
-  @media (max-width: 500px) { .brand-okladka .brand-sub:lang(en) { display: none; } }
+  /* po zjechaniu: druga linia nazwy jak na podstronach — po angielsku przy 421–519 px skrót (reguła niżej, zlecenie 58) */
   .brand-okladka > .brand-txt { grid-area: 1 / 2; transition: opacity var(--t-krotki) var(--rytm), visibility var(--t-krotki); }
   .brand-okladka > .brand-txt:not(.z-wydzial), .hdr.po-okladce .z-wydzial { opacity: 0; visibility: hidden; }
   .hdr.po-okladce .brand-okladka > .brand-txt:not(.z-wydzial) { opacity: 1; visibility: visible; }
