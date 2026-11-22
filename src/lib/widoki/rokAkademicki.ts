@@ -65,11 +65,8 @@ export async function daneRokuAkademickiego(lang: Lang) {
     { n: stBiezacego.pomaranczowe, pl: ['dzień pomarańczowy', 'dni pomarańczowe', 'dni pomarańczowych'] as [string, string, string], en: ['orange day', 'orange days'] as [string, string] },
   ] : [];
 
-  const ID = {
-    kolory: T('kolory-dni', 'day-colours'),
-    rok: T('rok-w-skrócie', 'the-year-at-a-glance'),
-    pobranie: T('do-pobrania', 'downloads'),
-  };
+  // id sekcji wspólne w PL i EN (przełącznik języka zabiera #kotwicę; decyzja właściciela z 22.11, po zleceniu 59)
+  const ID = { kolory: 'kolory-dni', rok: 'rok-w-skrócie', pobranie: 'do-pobrania' };
   const naglowki = [
     { depth: 2, slug: ID.kolory, text: T('Kolory dni', 'Day colours') },
     ...(saTerminy || tekstRoku || saWolne || saZamiany ? [{ depth: 2, slug: ID.rok, text: T('Rok w skrócie', 'The year at a glance') }] : []),
