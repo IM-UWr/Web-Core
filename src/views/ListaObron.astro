@@ -7,11 +7,13 @@
 // Baner bez zmian: hasło bez liczb (jak w Aktualnościach, zlecenie 27, punkt 2), okruszki „← Nauka”. Bez panelu „Pokaż”
 // (filtr lat i szukanie) i bez linku do archiwum starej strony (zlecenie 57). Stare adresy ?rok=RRRR (dawny filtr) — skrypt
 // na dole przenosi do #rok-RRRR (nieznany rok: góra strony), w adresie nie zostaje ?rok; bez JS cała strona jak zwykle.
-// Wiersze: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie), wygląd jak przed zleceniem 57 — dzień w kolorze Nauki,
+// Odbyte (zlecenie 65, decyzja 22.11): układ i styl minionych Konferencji — dwie kolumny na komputerze, wiersz bez wariantu
+// „zwarty”, przygaszone; rok bez kreski pod spodem.
+// Nadchodzące: WierszWydarzenia.astro (wariant zwarty, bez rodzaju w etykiecie), wygląd jak przed zleceniem 57 — dzień w kolorze Nauki,
 // obok dzień tygodnia, godzina i miejsce, kandydat Brygadą (cały wiersz prowadzi do strony obrony), tytuł rozprawy, promotor
 // (bez promotorów pomocniczych — promotorzyNaStronie w src/lib/tresci.ts, decyzja 22.11).
 // Nagłówek wiersza: h3 pod „Nadchodzące”, h4 pod rokiem. Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css,
-// klasa .tresc): sekcje h2 z kreską między nimi, lata h3. Własne style (na końcu pliku): rok z kreską pod spodem (prototyp 57), promotor.
+// klasa .tresc): sekcje h2 z kreską między nimi, lata h3. Własne style (na końcu pliku): liczba obron przy roku, promotor, odbyte w dwóch kolumnach.
 // Jedna wersja HTML: komputer (≥ 1024 px) i telefon (≤ 1023 px; spis zwinięty jak w Konferencjach).
 import Podstrona from '../components/zal/Podstrona.astro';
 import WierszWydarzenia from '../components/WierszWydarzenia.astro';
@@ -57,13 +59,15 @@ const spis = [
       {sek.grupy.filter((g) => g.lista.length > 0).map((g) => (
         <>
           {g.rok && <h3 id={`rok-${g.rok}`} class="ob-rok">{g.rok}<span class="sr-only">, </span> <small>{ileObron(g.lista.length)}</small></h3>}
-          {g.lista.map((o) => (
-            <WierszWydarzenia w={wiersz(o)} lang={lang} poziom={g.rok ? 'h4' : 'h3'} dzial="nauka" zwarty bezRodzaju>
-              {promotorzyNaStronie(o).length > 0 && (
-                <p class="ob-prom"><strong>{promotorzyNaStronie(o).length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {promotorzyNaStronie(o).map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
-              )}
-            </WierszWydarzenia>
-          ))}
+          <div class:list={['ob-wiersze', g.rok && 'ob-dwie']}>
+            {g.lista.map((o) => (
+              <WierszWydarzenia w={wiersz(o)} lang={lang} poziom={g.rok ? 'h4' : 'h3'} dzial="nauka" zwarty={!g.rok} bezRodzaju>
+                {promotorzyNaStronie(o).length > 0 && (
+                  <p class="ob-prom"><strong>{promotorzyNaStronie(o).length > 1 ? (en ? 'Supervisors:' : 'Promotorzy:') : t(lang, 'promotorzy') + ':'}</strong> {promotorzyNaStronie(o).map((p) => tytulyWJezyku(p, lang)).join(', ')}</p>
+                )}
+              </WierszWydarzenia>
+            ))}
+          </div>
         </>
       ))}
     </section>
@@ -101,10 +105,15 @@ const spis = [
 
 <style>
   /* Sekcje, lata (h3), akapity — wzorzec treści .tresc (src/styles/zal-tresc.css). Nagłówek sekcji tuż nad wierszami; rok jak
-     w Konferencjach (Brygada w kolorze działu, liczba obron małym krojem tekstu) z kreską pod spodem, od której zaczynają się wiersze. */
+     w Konferencjach (Brygada w kolorze działu, liczba obron małym krojem tekstu). */
   .ob-sek h2 { margin-bottom: 0; }
-  h3.ob-rok { margin-bottom: 0; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
   h3.ob-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
+  /* Odbyte (lata) jak minione Konferencje (ListaKonferencji.astro; decyzja 22.11): wiersz bez wariantu „zwarty” (dzień 34 px,
+     data minionej szara, tytuł 21 px), rok bez kreski pod spodem, na komputerze dwie kolumny; przygaszone jak „Ostatnio”
+     w Szybkim dostępie (zalozyciele-strony.css: .z-w.minelo): kandydat w --text, etykieta lekko przygaszona */
+  .ob-dwie :global(.ww-t) { color: var(--text); }
+  .ob-dwie :global(.ww-rodz) { opacity: .8; }
+  .ob-dwie .ob-prom strong { color: var(--text); }
   .pusto { margin: 10px 0 0; font-style: italic; color: var(--muted); }
   /* wiersz jak przed zleceniem 57: link kandydata bez przejścia koloru i odsunięcia podkreślenia linków .tresc (zal-tresc.css) */
   .ob-sek :global(.ww-t a) { transition: initial; text-underline-offset: initial; }
@@ -113,6 +122,11 @@ const spis = [
   .ob-prom strong { font-weight: 700; color: var(--ink); }
 
   /* Telefon i komputer: ta sama definicja co MQ_TELEFON i MQ_KOMPUTER w src/lib/media.ts (zlecenie 23, punkt 1) */
+  /* komputer: odbyte w dwóch kolumnach, jak minione Konferencje */
+  @media (min-width: 1024px) and (min-height: 501px), (min-width: 1024px) and (pointer: fine) {
+    .ob-dwie { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(300px, 45%), 1fr)); gap: 0 48px; }
+    .ob-dwie :global(.ww-t) { font-size: 19px; }
+  }
   @media (max-width: 1023px), (max-height: 500px) and (pointer: coarse) {
     .ob-sek :global(.ww-t a) { text-underline-offset: 3px; } /* jak main a w telefon.css */
     .ob-prom { font-size: 13.5px; }
