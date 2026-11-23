@@ -213,10 +213,14 @@ export const salaReferatu = (d: { sala?: string; sala_en?: string }, lang: Lang)
 export const afiliacjaReferatu = (d: { afiliacja?: string; afiliacja_en?: string }, lang: Lang): string | undefined =>
   (lang === 'en' && d.afiliacja_en) || d.afiliacja;
 
-// "605" → "sala 605"; dłuższe opisy miejsca zostają bez zmian.
+// Sala referatu (decyzja właściciela 23.11: miejsce u nas zawsze krótko „IM UWr”): "605" → "sala 605, IM UWr"
+// (EN "room 605, IM UWr"); krótkie słowa zdalne („online”, „zoom”, „Teams”, „webinar”) i dłuższe opisy miejsca
+// (np. sale na Politechnice) zostają bez zmian. Redaktor wpisuje w CMS sam numer albo symbol sali.
+const ZDALNIE = /^(online|zoom|teams|webinar|webinarium)$/i;
 export function sala(s: string | undefined, lang: Lang = 'pl'): string | undefined {
   if (!s) return undefined;
-  return /^[\w.\-]{1,6}$/.test(s) ? `${lang === 'en' ? 'room' : 'sala'} ${s}` : s;
+  if (!/^[\w.\-]{1,6}$/.test(s) || ZDALNIE.test(s)) return s;
+  return `${lang === 'en' ? 'room' : 'sala'} ${s}, IM UWr`;
 }
 
 // Miejsce wydarzenia, obrony albo konferencji. Pola miejsca nie mają wersji angielskiej, więc na stronach /en
