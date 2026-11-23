@@ -95,6 +95,15 @@ export function kierownikZakladu(z: Zaklad, wszyscy: Pracownik[]): { osoba?: Pra
 }
 
 // ---------- koordynatorzy seminarium (funkcja) ----------
+// Osoba spoza spisu jest wpisana z tytułem („dr Marek Kryspin (PWr)”). Na liście seminariów, tak jak osoby ze spisu,
+// pokazujemy ją bez tytułu (decyzja 23.11): zdejmujemy tytuły z początku („prof.”, „dr”, „hab.”, „inż.”, „mgr”, „doc.”) i końcówkę „, prof. UWr”.
+const TYTUL_NA_POCZATKU = /^(?:prof|dr|hab|inż|mgr|doc|lic)\.?(?:\s+|$)/i;
+export function bezTytulow(t: string): string {
+  let s = t.trim();
+  for (let i = 0; i < 6 && TYTUL_NA_POCZATKU.test(s); i++) s = s.replace(TYTUL_NA_POCZATKU, '');
+  s = s.replace(/,\s*prof\.?\s+\p{L}+\.?$/u, ''); // „…, prof. UWr”
+  return s || t.trim();
+}
 type Seminarium = CollectionEntry<'seminaria'>;
 export interface Koordynator { /** z tytułem */ nazwa: string; /** bez tytułu (lista seminariów) */ imie: string; strona?: string; osoba?: Pracownik }
 /** Koordynatorzy seminarium: najpierw ze spisu (pracujący), potem spoza spisu; stare pole „prowadzacy” jak dotąd (dokładne imię
@@ -109,7 +118,7 @@ export function koordynatorzySeminarium(s: Seminarium, wszyscy: Pracownik[], lan
       ...ze.map((id) => osobaPoId(id, wszyscy, `Seminarium ${s.id}: Koordynator ze spisu`))
         .filter((o): o is Pracownik => !!o && aktywny(o))
         .map((o) => ({ nazwa: zTytulem(o.data.stopien, o.data.imie_nazwisko, lang), imie: o.data.imie_nazwisko, strona: o.data.strona, osoba: o })),
-      ...spoza.map((t) => ({ nazwa: tytulyWJezyku(t, lang), imie: t })),
+      ...spoza.map((t) => ({ nazwa: tytulyWJezyku(t, lang), imie: bezTytulow(t) })),
     ];
   } else {
     const aktywni = wszyscy.filter(aktywny);
