@@ -8,8 +8,9 @@
 // w src/lib/daty.ts), podsekcja h3#rok-RRRR-RR („2025/26” i liczba referatów), lata od najnowszego, w roku od najnowszego
 // referatu; każdy rok ma własną siatkę .ref-dwie (układ zlecenia 65), a details name="streszczenie-minione" jest wspólne
 // dla całej strony (rozwinięte jedno streszczenie, także między latami). Tytuł minionego referatu pod rokiem w h4 (wygląd wiersza
-// bez zmian). Dwa najnowsze lata rozwinięte, starsze zwinięte (details.sem-rok-zw, rok i liczba w summary; klik rozwija;
-// decyzja właściciela 23.11). Spis tylko „Nadchodzące” i „Minione” — bez lat, żeby zapis na powiadomienia pod spisem
+// bez zmian). Każdy rok to details.sem-rok-zw (rok i liczba w summary; klik rozwija) ze wspólnym name="rok-minione":
+// rozwinięty jest jeden rok naraz — rozwinięcie innego zwija poprzedni; na starcie rozwinięty tylko najnowszy rok
+// (decyzja właściciela 23.11, wcześniej dwa najnowsze rozwinięte i nie do zwinięcia). Spis tylko „Nadchodzące” i „Minione” — bez lat, żeby zapis na powiadomienia pod spisem
 // nie zjeżdżał (decyzja 23.11). Minione tylko z jednego roku akademickiego: bez podziału (tytuł w h3, jak przed zleceniem 68).
 // Kotwica referatu albo roku w zwiniętym roku (#<slug> z Kalendarza, #rok-RRRR-RR) rozwija ten rok. Link do archiwum na końcu.
 // Baner (zlecenie 17, punkt 4): link wstecz, sygnet i nazwa, bez hasła, liczb i podpisu. Koordynatorzy, e-mail i zakład
@@ -54,8 +55,8 @@ const typPliku = (a: string) => {
 const zLatami = lataMinionych.length > 1;
 const grupyMinionych = zLatami ? lataMinionych : minione.length > 0 ? [{ rok: '', id: '', lista: minione }] : [];
 const ileRef = (n: number) => `${n} ${odmiana(n, ['referat', 'referaty', 'referatów'], ['talk', 'talks'], lang)}`;
-// rozwinięte: dwa najnowsze lata z minionymi referatami; starsze zwinięte (decyzja właściciela 23.11)
-const ROZWINIETE_LATA = 2;
+// na starcie rozwinięty tylko najnowszy rok z minionymi referatami; pozostałe zwinięte (decyzja właściciela 23.11)
+const ROZWINIETE_LATA = 1;
 // spis „Na tej stronie”: bez lat (decyzja 23.11 — długi spis spychał zapis na powiadomienia)
 const spis = [
   { id: 'z-nadchodzace', etykieta: t(lang, 'nadchodzace') },
@@ -142,8 +143,8 @@ const spis = [
       {minione.length > 0 && <h2 id="h-min">{t(lang, 'minione')}</h2>}
       {grupyMinionych.map((g, k) => {
         const H = g.rok ? 'h4' : 'h3';
-        const zwiniety = k >= ROZWINIETE_LATA;
-        const naglowek = g.rok && <h3 class="sem-rok" id={zwiniety ? undefined : g.id}>{g.rok}<span class="sr-only">, </span> <small>{ileRef(g.lista.length)}</small>{zwiniety && <svg class="sem-rok-ikona" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>}</h3>;
+        const otwarty = k < ROZWINIETE_LATA;
+        const naglowek = g.rok && <h3 class="sem-rok">{g.rok}<span class="sr-only">, </span> <small>{ileRef(g.lista.length)}</small>{<svg class="sem-rok-ikona" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>}</h3>;
         const siatka = (
           <div class="ref-dwie">
           {g.lista.map(({ r, C, en }) => (
@@ -167,9 +168,9 @@ const spis = [
           ))}
           </div>
         );
-        return zwiniety
-          ? <details class="sem-rok-zw" id={g.id}><summary>{naglowek}</summary>{siatka}</details>
-          : <>{naglowek}{siatka}</>;
+        return g.rok
+          ? <details class="sem-rok-zw" id={g.id} name="rok-minione" open={otwarty}><summary>{naglowek}</summary>{siatka}</details>
+          : siatka;
       })}
       {d.archiwum && <p class="archiwum"><Link href={d.archiwum}>{t(lang, 'archiwumSem')}</Link></p>}
     </section>
@@ -206,12 +207,18 @@ const spis = [
         if (w) kotwica = { el: w, y: w.getBoundingClientRect().top };
       });
     });
+    // rok akademicki (details name="rok-minione"): rozwinięcie roku zwija poprzednio rozwinięty (wyżej) — kliknięty wiersz roku
+    // zostaje w tym samym miejscu ekranu (decyzja 23.11)
+    document.getElementById('z-minione')?.addEventListener('click', (e) => {
+      const rok = (e.target as Element).closest('summary')?.parentElement;
+      if (rok?.matches('details.sem-rok-zw')) kotwica = { el: rok as HTMLElement, y: rok.getBoundingClientRect().top };
+    });
     // toggle nie wypływa w górę — nasłuch w fazie przechwytywania; na całej sekcji, bo rozwinięcie zwiniętego roku
     // (details.sem-rok-zw) też wymaga przeliczenia (siatka w zwiniętym roku nie ma kolumn)
     document.getElementById('z-minione')?.addEventListener('toggle', uloz, true);
   }
 
-  // Starsze lata zwinięte (decyzja 23.11): kotwica w zwiniętym roku — referat z Kalendarza (#<slug>) albo rok (#rok-RRRR-RR) —
+  // Lata zwinięte (decyzja 23.11): kotwica w zwiniętym roku — referat z Kalendarza (#<slug>) albo rok (#rok-RRRR-RR) —
   // rozwija ten rok i przewija do celu (przeglądarka nie zawsze przewija do treści zwiniętego details).
   const odkryj = () => {
     let cel: HTMLElement | null = null;
@@ -287,11 +294,12 @@ const spis = [
   /* rok akademicki (podsekcja h3 minionych, zlecenie 68): wygląd lat w Konferencjach i Obronach — rok wzorcem .tresc h3,
      liczba referatów małym krojem tekstu */
   h3.sem-rok small { margin-left: 8px; font-family: var(--f-text); font-size: 13px; font-weight: 600; color: var(--muted); }
-  /* starsze lata zwinięte (decyzja 23.11): wiersz roku jak nagłówek roku, ze strzałką z prawej; zwinięte lata jeden pod drugim,
+  /* lata jako details (decyzja 23.11, jeden rozwinięty naraz): wiersz roku jak nagłówek roku, ze strzałką z prawej; zwinięte lata jeden pod drugim,
      rozdzielone cienką kreską; po rozwinięciu siatka referatów pod spodem */
   .sem-rok-zw { margin-top: 30px; border-bottom: 1px solid var(--line); }
   .sem-rok-zw + .sem-rok-zw { margin-top: 0; }
   .sem-rok-zw[open] { border-bottom: 0; }
+  .sem-rok-zw[open] + .sem-rok-zw { margin-top: 30px; }
   .sem-rok-zw > summary { display: block; list-style: none; cursor: pointer; }
   .sem-rok-zw > summary::-webkit-details-marker { display: none; }
   .sem-rok-zw > summary h3.sem-rok { display: flex; align-items: baseline; margin: 0; padding: 12px 0; }
