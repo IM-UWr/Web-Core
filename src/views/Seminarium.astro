@@ -301,9 +301,12 @@ const spis = [
   .sem-rok-zw[open] + .sem-rok-zw { margin-top: 30px; }
   .sem-rok-zw > summary { display: block; list-style: none; cursor: pointer; }
   .sem-rok-zw > summary::-webkit-details-marker { display: none; }
-  .sem-rok-zw > summary h3.sem-rok { display: flex; align-items: baseline; margin: 0; padding: 12px 0; }
+  /* rok w kolorze tekstu; w kolorze działu tylko rozwinięty (decyzja 23.11) */
+  .sem-rok-zw > summary h3.sem-rok { display: flex; align-items: baseline; margin: 0; padding: 12px 0; color: var(--ink); }
+  .sem-rok-zw[open] > summary h3.sem-rok { color: var(--d-a); }
   .sem-rok-zw[open] > summary h3.sem-rok { padding-bottom: 8px; }
-  .sem-rok-ikona { align-self: center; flex: none; margin-left: auto; color: var(--d-a); transition: transform var(--t-krotki) var(--rytm); }
+  .sem-rok-ikona { align-self: center; flex: none; margin-left: auto; color: var(--muted); transition: transform var(--t-krotki) var(--rytm); }
+  .sem-rok-zw[open] .sem-rok-ikona, .sem-rok-zw > summary:hover .sem-rok-ikona { color: var(--d-a); }
   .sem-rok-zw[open] .sem-rok-ikona { transform: rotate(180deg); }
   .sem-rok-zw > summary:hover h3.sem-rok small { color: var(--d-a); }
   .sem-rok-zw > summary:focus-visible { outline: 2px solid var(--d-a); outline-offset: 2px; }

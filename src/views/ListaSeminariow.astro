@@ -6,6 +6,9 @@
 // z najbliższym referatem (siatka boksów ul.boksy, zlecenie 17, punkt 6), pozostałe (nieaktywne) seminaria. Każdy zakład ma swoje seminarium (pole „zaklad”); seminarium
 // bez zakładu (pole puste albo zakład, którego nie ma na stronie) to seminarium niezależne.
 // Wiersze z jednym wzorem daty (jak zal/dzial/Wiersz.astro): dzień dużą Brygadą w kolorze działu, pod nim „mie rrrr”.
+// Wyjątek: „Najbliższe seminaria” (decyzja 23.11) wyglądają jak seminaria w Szybkim dostępie na stronie głównej
+// (zal/DrugiEkran.astro): dzień Brygadą w kolorze tekstu, pod nim „mie · dzień tygodnia”; nad tytułem nazwa seminarium
+// pogrubiona w kolorze działu, po niej szarym godzina i sala; tytuł krojem tekstu, prelegent zaraz po tytule kursywą Brygady.
 // Wzorzec treści (zlecenie 11, zalecenie 14; src/styles/zal-tresc.css, klasa .tresc): sekcje h2 z kreską między nimi,
 // etykieta .etyk, pierwszy akapit .wst, lista linków ul.linki. Własne style (na końcu pliku) tylko dla wierszy z datą.
 import Podstrona from '../components/zal/Podstrona.astro';
@@ -53,11 +56,10 @@ const osoby = (l: string[]) => l.length <= 2
       <ul class="wiersze">
         {wTygodniu.map((w) => (
           <li class:list={['wiersz klik', koniecReferatu(w.termin) < now() && 'minelo']} data-koniec={koniecReferatu(w.termin)}>
-            <time class="dz" datetime={w.termin.slice(0, 10)}>{dayNum(w.termin)}<small> {monthShort(w.termin, lang)} {parse(w.termin).y}</small></time>
+            <time class="dz" datetime={w.termin.slice(0, 10)}>{dayNum(w.termin)}<small> {monthShort(w.termin, lang)} · {dayShort(w.termin, lang)}</small></time>
             <div>
-              <p class="etyk">{[dayShort(w.termin, lang), kiedyGdzie(w.termin, w.sala)].filter(Boolean).join(' · ')}</p>
-              <h3><a href={u(wJezyku(w.href, lang))}><TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /></a></h3>
-              <p class="kto">{w.prelegent}<span class="sem"> · {w.seminarium}</span></p>
+              <p class="etyk"><span class="sem-n">{w.seminarium}</span>{kiedyGdzie(w.termin, w.sala) && <span class="gdz">{'\u00a0· '}{kiedyGdzie(w.termin, w.sala)}</span>}</p>
+              <h3><a href={u(wJezyku(w.href, lang))}><TytulReferatu tekst={w.tytul} jezyk={w.jezyk} lang={lang} /></a>{w.prelegent && <> <span class="kto">– {w.prelegent}</span></>}</h3>
             </div>
           </li>
         ))}
@@ -125,10 +127,14 @@ const osoby = (l: string[]) => l.length <= 2
   .wiersz p { margin: 0; max-width: none; }
   .wiersz h3 { margin: 2px 0 4px; font-family: var(--f-display); font-weight: 500; font-size: 21px; line-height: 1.3; color: var(--ink); }
   .wiersz h3 a { color: inherit; text-decoration: none; }
-  .wiersz .kto { font-size: 15.5px; line-height: 1.55; color: var(--text); }
-  .wiersz .sem { color: var(--muted); }
+  /* „Najbliższe seminaria” jak seminaria w Szybkim dostępie (zalozyciele-strony.css: .z-w): dzień w kolorze tekstu, nazwa
+     seminarium w kolorze działu, godzina i sala szare, tytuł krojem tekstu, prelegent kursywą Brygady bez łamania (decyzja 23.11) */
+  #z-tydzien .wiersz .dz { color: var(--ink); }
+  #z-tydzien .wiersz .gdz { font-weight: 500; color: var(--muted); }
+  #z-tydzien .wiersz h3 { margin: 2px 0 0; font-family: var(--f-text); font-weight: 600; font-size: 17px; line-height: 1.45; }
+  #z-tydzien .wiersz .kto { font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: 1.04em; color: var(--muted); white-space: nowrap; }
   /* miniony referat tygodnia przygaszony jak „Ostatnio” w Szybkim dostępie (zalozyciele-strony.css: .z-w.minelo, .z-przeszle) */
-  .wiersz.minelo .dz { color: var(--muted); }
+  .wiersz.minelo .dz, #z-tydzien .wiersz.minelo .dz { color: var(--muted); }
   .wiersz.minelo h3 { color: var(--text); }
   .wiersz.minelo .etyk { opacity: .8; }
   .pusto { font-style: italic; color: var(--muted); }
@@ -155,7 +161,7 @@ const osoby = (l: string[]) => l.length <= 2
     .wiersz .dz { font-size: 28px; }
     .wiersz .dz small { font-size: 12.5px; white-space: nowrap; }
     .wiersz h3 { font-size: 18.5px; }
-    .wiersz .kto { font-size: 15px; }
+    #z-tydzien .wiersz h3 { font-size: 16px; }
   }
 </style>
 
